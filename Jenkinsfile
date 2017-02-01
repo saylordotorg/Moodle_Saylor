@@ -5,29 +5,29 @@ def projectProperties = [
     [$class: 'BuildDiscarderProperty',strategy: [$class: 'LogRotator', numToKeepStr: '5']],
 ]
 
-if (!env.CHANGE_ID) {
-    if (env.BRANCH_NAME == null) {
-        projectProperties.add(pipelineTriggers([cron('H/30 * * * *')]))
-    }
-}
-
 properties(projectProperties)
 
 
 try {
     stage ('Stash Repos') {
-        node {
-            git url: 'https://github.com/saylordotorg/moodle-theme_saylor.git', branch: env.BRANCH_NAME
-            stash name: 'theme_saylor'
-        }
-        node {
-            git url: 'https://github.com/moodle/moodle.git'
-            stash name: 'moodle'
+        parallel {
+            "moodle" : {
+                node {
+                    git url: 'https://github.com/moodle/moodle.git'
+                    stash name: 'moodle'
+                }
+            },
+            "theme" : {
+                node {
+                    git url: 'https://github.com/saylordotorg/moodle-theme_saylor.git', branch: env.BRANCH_NAME
+                    stash name: 'theme_saylor'
+                }
+            }
         }
     }
     node {
         stage('Build') {
-
+            deleteDir()
             checkout scm
 
             unstash name: 'moodle'
