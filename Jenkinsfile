@@ -10,7 +10,7 @@ properties(projectProperties)
 
 try {
     stage ('Stash Repos') {
-        parallel {
+        parallel (
             "moodle" : {
                 node {
                     git url: 'https://github.com/moodle/moodle.git'
@@ -23,7 +23,7 @@ try {
                     stash name: 'theme_saylor'
                 }
             }
-        }
+        )
     }
     node {
         stage('Build') {
