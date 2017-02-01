@@ -17,6 +17,9 @@ properties(projectProperties)
 try {
     node {
         stage('Test') {
+
+            checkout scm
+
             sh 'ls -halt'
             echo env.BRANCH_NAME
         }
