@@ -24,7 +24,6 @@ try {
                 git url: 'https://github.com/moodle/moodle.git'
                 stash name: 'moodle'
             }
-            echo "Stashed"
         }
         stage('Build') {
 
