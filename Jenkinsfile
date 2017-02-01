@@ -16,9 +16,14 @@ properties(projectProperties)
 
 try {
     node {
+        stage ('Stash Repos') {
+            echo "Stashing"
+        }
         stage('Test') {
 
             checkout scm
+
+            git url: 'https://github.com/saylordotorg/moodle_theme-saylor.git' blah
 
             sh 'ls -halt'
             echo env.BRANCH_NAME
