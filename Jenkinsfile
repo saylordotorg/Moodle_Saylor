@@ -15,22 +15,33 @@ properties(projectProperties)
 
 
 try {
-    node {
         stage ('Stash Repos') {
-            echo "Stashing"
+            node {
+                git url: 'https://github.com/saylordotorg/moodle-theme_saylor.git', branch: env.BRANCH_NAME
+                stash name: theme_saylor
+            }
+            node {
+                git url: 'https://github.com/moodle/moodle.git'
+                stash name: 'moodle'
+            }
+            echo "Stashed"
         }
-        stage('Test') {
+        stage('Build') {
 
             checkout scm
 
-            git url: 'https://github.com/saylordotorg/moodle-theme_saylor.git', branch: env.BRANCH_NAME
+            unstash name: 'moodle'
+
+            sh 'mkdir -p theme/saylor'
+            dir("theme/saylor") {
+                unstash name: 'theme_saylor'
+            }
 
             sh 'ls -halt'
             echo env.BRANCH_NAME
         }
 
     }
-}
 catch (exc) {
     echo "Caught: ${exc}"
 }
