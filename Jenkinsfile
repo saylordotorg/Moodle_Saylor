@@ -15,16 +15,17 @@ properties(projectProperties)
 
 
 try {
-        stage ('Stash Repos') {
-            node {
-                git url: 'https://github.com/saylordotorg/moodle-theme_saylor.git', branch: env.BRANCH_NAME
-                stash name: theme_saylor
-            }
-            node {
-                git url: 'https://github.com/moodle/moodle.git'
-                stash name: 'moodle'
-            }
+    stage ('Stash Repos') {
+        node {
+            git url: 'https://github.com/saylordotorg/moodle-theme_saylor.git', branch: env.BRANCH_NAME
+            stash name: 'theme_saylor'
         }
+        node {
+            git url: 'https://github.com/moodle/moodle.git'
+            stash name: 'moodle'
+        }
+    }
+    node {
         stage('Build') {
 
             checkout scm
@@ -41,6 +42,8 @@ try {
         }
 
     }
+}
+
 catch (exc) {
     echo "Caught: ${exc}"
 }
