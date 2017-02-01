@@ -22,8 +22,6 @@ try {
         }
 
     }
-
-    }
 }
 catch (exc) {
     echo "Caught: ${exc}"
