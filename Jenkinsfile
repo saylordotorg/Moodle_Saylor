@@ -23,7 +23,7 @@ try {
 
             checkout scm
 
-            git url: 'https://github.com/saylordotorg/moodle_theme-saylor.git' branch: env.BRANCH_NAME blah
+            git url: 'https://github.com/saylordotorg/moodle_theme-saylor.git', branch: env.BRANCH_NAME
 
             sh 'ls -halt'
             echo env.BRANCH_NAME
