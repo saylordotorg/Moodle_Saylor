@@ -81,26 +81,28 @@ try {
     stage('Test - Create Test DB') {
         node {
             /* Load up necessary credentials */
-            withCredentials([usernamePassword(credentialsId: 'mysql__user_npc-build', passwordVariable: 'mysql_password', usernameVariable: 'mysql_user')]) {
-                sh "export MYSQL_PWD=${mysql_password}"
-                def mysqlUser = mysql_user
-            }
             if(env.BRANCH_NAME == 'master') {
                 withCredentials([string(credentialsId: 'mysql-prod-01_host', variable: 'mysql_host')]) {
                     // If we're on the master branch, this is probably for production so test against the current prod db
                     echo("Setting mysql_host to production database: ${env.mysql_host}")
-                    def mysqlHost = mysql_host
+                    sh "export MYSQL_HOST=${mysql_host}"
                 }
             }
             else {
                 withCredentials([string(credentialsId: 'mysql-dev-01_host', variable: 'mysql_host')]) {
                     // Grab the development database to test if this isn't for the master branch (production environment)
                     echo("Setting mysql_host to development database: ${env.mysql_host}")
-                    def mysqlHost = mysql_host
+                    sh "export MYSQL_HOST=${mysql_host}"
                 }
             }
-            echo("Dumping moodle database from ${mysqlHost}")
-            sh "mysqldump --host ${mysqlHost} -u ${mysqlUser} moodle > /tmp/moodle_dump.sql"
+            withCredentials([usernamePassword(credentialsId: 'mysql__user_npc-build', passwordVariable: 'mysql_password', usernameVariable: 'mysql_user')]) {
+                sh "export MYSQL_PWD=${mysql_password}"
+
+                echo("Dumping moodle database from ${mysql_host}")
+                sh "mysqldump --host ${mysql_host} -u ${mysql_user} moodle > /tmp/moodle_dump.sql"
+            }
+
+
         }
 
     }
