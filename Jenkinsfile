@@ -83,7 +83,7 @@ try {
             /* Load up necessary credentials */
 
             withCredentials([usernamePassword(credentialsId: 'mysql__user_npc-build', passwordVariable: 'mysql_password', usernameVariable: 'mysql_user')]) {
-                sh "export MYSQL_PWD=${mysql_password}"
+                // TODO: Comment on this block
 
                 if(env.BRANCH_NAME == 'master') {
                     withCredentials([string(credentialsId: 'mysql-prod-01_host', variable: 'mysql_host')]) {
@@ -100,7 +100,7 @@ try {
                         echo("Setting mysql_host to development database: ${env.mysql_host}")
 
                     echo("Dumping moodle database from ${env.mysql_host}")
-                    sh "mysqldump --host ${env.mysql_host} -u ${mysql_user} moodle > /tmp/moodle_dump.sql"
+                    sh "mysqldump --host ${env.mysql_host} -u ${mysql_user} --password=${mysql_password} moodle > /tmp/moodle_dump.sql"
                     }
                 }
 
