@@ -75,7 +75,7 @@ try {
 
             sh 'mkdir -p mod/journal'
             dir("mod/journal") {
-                unstash name: 'mod/journal'
+                unstash name: 'mod_journal'
             }
 
             sh 'ls -halt'
