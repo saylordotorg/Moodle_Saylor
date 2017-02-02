@@ -45,7 +45,7 @@ def StashPlugins(plugins) {
 }
 
 def BuildPluginsJobs(plugins) {
-    def pluginsJobs = ""
+    def pluginJobs = ""
     for (int i = 0; i < plugins.size(); i++) {
         def integer = i
         pluginJobs = pluginJobs + """\"${plugins[integer].get("name")}\" : (
@@ -60,9 +60,9 @@ def BuildPluginsJobs(plugins) {
 
     }
 
-    pluginsJobs = pluginsJobs.substring(0, pluginsJobs.length() - 1)
+    pluginJobs = pluginJobs.substring(0, pluginJobs.length() - 1)
 
-    return pluginsJobs
+    return pluginJobs
 }
 
 try {
