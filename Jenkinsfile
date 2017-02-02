@@ -91,7 +91,7 @@ try {
                         echo("Setting mysql_host to production database: ${env.mysql_host}")
 
                     echo("Dumping moodle database from ${env.mysql_host}")
-                    sh "mysqldump --host ${env.mysql_host} -u ${mysql_user} --password=${mysql_password} moodle > /tmp/moodle_dump.sql"
+                    sh "mysqldump --single-transaction --host ${env.mysql_host} -u ${mysql_user} --password=${mysql_password} moodle > /tmp/moodle_dump.sql"
                     }
                 }
                 else {
@@ -100,7 +100,7 @@ try {
                         echo("Setting mysql_host to development database: ${env.mysql_host}")
 
                     echo("Dumping moodle database from ${env.mysql_host}")
-                    sh "mysqldump --host ${env.mysql_host} -u ${mysql_user} --password=${mysql_password} moodle > /tmp/moodle_dump.sql"
+                    sh "mysqldump --single-transaction --host ${env.mysql_host} -u ${mysql_user} --password=${mysql_password} moodle > /tmp/moodle_dump.sql"
                     }
                 }
 
