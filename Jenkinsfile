@@ -3,8 +3,6 @@
 /* Comments */
 
 
-//TODO: then build parallel array thingy, then unstash
-// println(plugins[0].get("dest")) plugins.size()
 def plugins = [
     [
         "name" : 'theme_saylor',
@@ -31,18 +29,46 @@ def StashMoodle() {
 
 def StashPlugins(plugins) {
     for (int i = 0; i < plugins.size(); i++) {
-        def integer = i
+        def x = i
         node {
             deleteDir()
-            git([url: (plugins[integer].get("url")), branch: (plugins[integer].get("branch"))])
-            echo("Stashing: ${plugins[integer].get("name")}")
-            stash([name: (plugins[integer].get("name"))])
+            git([url: (plugins[x].get("url")), branch: (plugins[x].get("branch"))])
+            echo("Stashing: ${plugins[x].get("name")}")
+            stash([name: (plugins[x].get("name"))])
+        }
+    }
+}
+
+def UnstashPlugins(plugins) {
+    for (int i = 0; i < plugins.size(); i++) {
+        def x = i
+        node {
+            echo("Unstashing: ${plugins[x].get("name")}")
+            sh 'mkdir -p ${plugins[x].get("dest")}'
+            dir("${plugins[x].get("dest")}") {
+                unstash([name: (plugins[x].get("name"))])
+            }
         }
     }
 }
 
 
+/* Load up necessary credentials */
+withCredentials([usernamePassword(credentialsId: 'mysql__user_npc-build', passwordVariable: 'mysql_password', usernameVariable: 'mysql_user')]) {
+    // some block
+}
+if(env.BRANCH_NAME == 'master') {
+    withCredentials([string(credentialsId: 'mysql-prod-01_host', variable: 'mysql_host')]) {
+    // some block
+    }
+}
+else {
+    withCredentials([string(credentialsId: 'mysql-dev-01_host', variable: 'mysql_host')]) {
+    // some block
+    }
+}
 
+/* Start build process */
 try {
     stage('Stash Repos') {
         echo("Beginning stashing operations")
@@ -58,25 +84,19 @@ try {
             echo("Checking out SCM")
             checkout scm
 
-            echo("Beginning unstash operations")
+            echo("Beginning unstashing operations")
+
             unstash name: 'moodle'
+            UnstashPlugins(plugins)
 
-            sh 'mkdir -p theme/saylor'
-            dir("theme/saylor") {
-                unstash name: 'theme_saylor'
-            }
-
-            sh 'mkdir -p mod/journal'
-            dir("mod/journal") {
-                unstash name: 'mod_journal'
-            }
+            echo("Finished unstashing operations")
 
         }
 
     } 
     stage('Test - Create Test DB') {
         node {
-            sh 'ls -halt'
+            
         }
 
     }
