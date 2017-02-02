@@ -21,11 +21,24 @@ def plugins = [
 
 ]
 
-def buildParallelPlugins(plugins) {
-    def ParallelPlugins = []
+def BuildMoodleJob() {
+    moodleJob = [
+        "moodle" : (
+            node {
+                git url: 'https://github.com/moodle/moodle.git' branch: 'MOODLE_31_STABLE'
+                stash name: 'moodle'
+            }
+            )
+    ]
+
+    return moodleJob
+}
+
+def BuildPluginsJobs(plugins) {
+    def pluginsJobs = []
     for (int i = 0; i < plugins.size(); i++) {
         def integer = i
-        ParallelPlugins[integer] = [
+        pluginsJobs[integer] = [
             (plugins[integer].get("name")) : (
                 node {
                     git([url: (plugins[integer].get("url")), branch: (plugins[integer].get("branch"))])
@@ -35,29 +48,18 @@ def buildParallelPlugins(plugins) {
         ]
     }
 
-    return ParallelPlugins
+    return pluginsJobs
 }
 
 try {
     stage('Stash Repos') {
 
-        def pluginJobs = buildParallelPlugins(plugins)
+        def Jobs = BuildPluginsJobs(plugins)
 
-        parallel pluginJobs
-        // parallel (
-        //     "moodle" : {
-        //         node {
-        //             git url: 'https://github.com/moodle/moodle.git'
-        //             stash name: 'moodle'
-        //         }
-        //     },
-        //     "theme" : {
-        //         node {
-        //             git url: 'https://github.com/saylordotorg/moodle-theme_saylor.git', branch: env.BRANCH_NAME
-        //             stash name: 'theme_saylor'
-        //         }
-        //     }
-        // )
+        Jobs << BuildMoodleJob()
+
+        parallel Jobs
+
     }
     node {
         stage('Build') {
@@ -69,6 +71,11 @@ try {
             sh 'mkdir -p theme/saylor'
             dir("theme/saylor") {
                 unstash name: 'theme_saylor'
+            }
+
+            sh 'mkdir -p mod/journal'
+            dir("mod/journal") {
+                unstash name: 'mod/journal'
             }
 
             sh 'ls -halt'
