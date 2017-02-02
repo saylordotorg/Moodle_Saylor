@@ -54,19 +54,20 @@ def BuildPluginsJobs(plugins) {
 
 try {
     stage('Stash Repos') {
-
+        echo("Beginning stashing operations")
         def Jobs = BuildPluginsJobs(plugins)
 
         Jobs << BuildMoodleJob()
 
         parallel Jobs
-
+        echo("Finished stashing operations")
     }
     stage('Build') {
         node {
-            
+            echo("Checking out SCM")
             checkout scm
 
+            echo("Beginning unstash operations")
             unstash name: 'moodle'
 
             sh 'mkdir -p theme/saylor'
@@ -79,8 +80,6 @@ try {
                 unstash name: 'mod_journal'
             }
 
-            sh 'ls -halt'
-            echo env.BRANCH_NAME
         }
 
     }  
