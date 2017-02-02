@@ -89,19 +89,21 @@ try {
                     withCredentials([string(credentialsId: 'mysql-prod-01_host', variable: 'mysql_host')]) {
                         // If we're on the master branch, this is probably for production so test against the current prod db
                         echo("Setting mysql_host to production database: ${env.mysql_host}")
-                        sh "export MYSQL_HOST=${mysql_host}"
+
+                    echo("Dumping moodle database from ${env.mysql_host}")
+                    sh "mysqldump --host ${env.mysql_host} -u ${mysql_user} moodle > /tmp/moodle_dump.sql"
                     }
                 }
                 else {
                     withCredentials([string(credentialsId: 'mysql-dev-01_host', variable: 'mysql_host')]) {
                         // Grab the development database to test if this isn't for the master branch (production environment)
                         echo("Setting mysql_host to development database: ${env.mysql_host}")
-                        sh "export MYSQL_HOST=${mysql_host}"
+
+                    echo("Dumping moodle database from ${env.mysql_host}")
+                    sh "mysqldump --host ${env.mysql_host} -u ${mysql_user} moodle > /tmp/moodle_dump.sql"
                     }
                 }
 
-                echo("Dumping moodle database from ${env.MYSQL_HOST}")
-                sh "mysqldump --host ${env.MYSQL_HOST} -u ${mysql_user} moodle > /tmp/moodle_dump.sql"
             }
 
 
