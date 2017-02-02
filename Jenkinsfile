@@ -25,8 +25,8 @@ def BuildMoodleJob() {
     moodleJob = [
         "moodle" : (
             node {
-                git url: 'https://github.com/moodle/moodle.git' branch: 'MOODLE_31_STABLE'
-                stash name: 'moodle'
+                git([url: 'https://github.com/moodle/moodle.git', branch: 'MOODLE_31_STABLE'])
+                stash([name: 'moodle'])
             }
             )
     ]
