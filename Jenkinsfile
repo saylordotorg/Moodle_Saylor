@@ -109,4 +109,5 @@ try {
 
 catch (exc) {
     echo "Caught: ${exc}"
+    throw exc
 }
