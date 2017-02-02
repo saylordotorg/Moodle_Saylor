@@ -87,8 +87,8 @@ try {
         echo("Beginning stashing operations")
 
         parallel (
-            "moodle" : StashMoodle(),
-            "plugins" : StashPlugins()
+            "moodle" : StashMoodle(plugins),
+            "plugins" : StashPlugins(plugins)
         )
 
 
