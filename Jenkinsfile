@@ -44,53 +44,12 @@ def StashPlugins(plugins) {
     }
 }
 
-def BuildPluginsJobsString(plugins) {
-    def pluginJobs = ""
-    for (int i = 0; i < plugins.size(); i++) {
-        def integer = i
-        pluginJobs = pluginJobs + """
-    \"${plugins[integer].get("name")}\" : {
-            node {
-                git([url: ${plugins[integer].get("url")}, branch: ${plugins[integer].get("branch")}])
-                echo(\"Stashing:${plugins[integer].get("name")}\")
-                stash([name: ${plugins[integer].get("name")}])
-                echo(\"Integer: ${integer}\")
-            }
-        },"""
-
-    }
-
-    pluginJobs = pluginJobs.substring(0, pluginJobs.length() - 1)
-
-    return pluginJobs
-}
-
-def BuildPluginsJobsMap(plugins) {
-    def pluginJobs = [:]
-    for (int i = 0; i < plugins.size(); i++) {
-        def integer = i
-        pluginJobs.add("${plugins[integer].get("name")}",[
-                    node {
-                            git([url: plugins[integer].get("url"), branch: plugins[integer].get("branch")])
-                            stash([name: plugins[integer].get("name")])
-                    }
-                ]
-            )
-
-    }
-
-    return pluginJobs
-}
-
 try {
     stage('Stash Repos') {
         echo("Beginning stashing operations")
 
-        parallel (
-            "moodle" : StashMoodle(plugins),
-            "plugins" : StashPlugins(plugins)
-        )
-
+        StashMoodle(plugins)
+        StashPlugins(plugins)
 
         echo("Finished stashing operations")
     }
