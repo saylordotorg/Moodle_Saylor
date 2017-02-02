@@ -72,7 +72,10 @@ try {
         StashMoodle()
         //StashPlugins(plugins)
 
-        parallel (BuildPluginsJobs(plugins))
+        pluginJobs = BuildPluginsJobs(plugins)
+        echo("${pluginJobs}")
+
+        parallel ("${pluginJobs}")
 
         echo("Finished stashing operations")
     }
