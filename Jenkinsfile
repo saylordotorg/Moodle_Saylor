@@ -42,6 +42,7 @@ def BuildPluginsJobs(plugins) {
             (plugins[integer].get("name")) : (
                 node {
                     git([url: (plugins[integer].get("url")), branch: (plugins[integer].get("branch"))])
+                    echo("Stashing:${plugins[integer].get("name)}")
                     stash([name: (plugins[integer].get("name"))])
                 }
             )
