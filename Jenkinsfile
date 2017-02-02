@@ -22,27 +22,26 @@ def plugins = [
 ]
 
 def StashMoodle() {
-    moodleJob = [
-        "moodle" : (
-            node {
-                git([url: 'https://github.com/moodle/moodle.git', branch: 'MOODLE_31_STABLE'])
-                stash([name: 'moodle'])
-            }
-            )
-    ]
-
+    node {
+        deleteDir()
+        git([url: 'https://github.com/moodle/moodle.git', branch: 'MOODLE_31_STABLE'])
+        stash([name: 'moodle'])
+    }
 }
 
 def StashPlugins(plugins) {
     for (int i = 0; i < plugins.size(); i++) {
         def integer = i
         node {
+            deleteDir()
             git([url: (plugins[integer].get("url")), branch: (plugins[integer].get("branch"))])
             echo("Stashing: ${plugins[integer].get("name")}")
             stash([name: (plugins[integer].get("name"))])
         }
     }
 }
+
+
 
 try {
     stage('Stash Repos') {
