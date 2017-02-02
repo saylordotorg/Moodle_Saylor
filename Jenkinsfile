@@ -71,7 +71,8 @@ try {
 
         StashMoodle()
         //StashPlugins(plugins)
-        parallel (BuildPluginsJobs())
+
+        parallel (BuildPluginsJobs(plugins))
 
         echo("Finished stashing operations")
     }
