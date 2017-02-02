@@ -49,7 +49,7 @@ try {
         echo("Beginning stashing operations")
 
         StashMoodle()
-        StashPlugins()
+        StashPlugins(plugins)
 
         echo("Finished stashing operations")
     }
