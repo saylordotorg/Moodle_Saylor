@@ -48,7 +48,7 @@ try {
     stage('Stash Repos') {
         echo("Beginning stashing operations")
 
-        StashMoodle(plugins)
+        StashMoodle()
         StashPlugins(plugins)
 
         echo("Finished stashing operations")
