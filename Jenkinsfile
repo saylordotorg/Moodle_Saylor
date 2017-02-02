@@ -61,8 +61,9 @@ try {
         parallel Jobs
 
     }
-    node {
-        stage('Build') {
+    stage('Build') {
+        node {
+            
             deleteDir()
             checkout scm
 
@@ -82,7 +83,7 @@ try {
             echo env.BRANCH_NAME
         }
 
-    }
+    }  
 }
 
 catch (exc) {
