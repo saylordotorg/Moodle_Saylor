@@ -99,6 +99,20 @@ try {
     } 
     stage('Test - Create Test DB') {
         node {
+            withCredentials([usernamePassword(credentialsId: 'mysql__user_npc-build', passwordVariable: 'mysql_password', usernameVariable: 'mysql_user')]) {
+            }
+            if(env.BRANCH_NAME == 'master') {
+                withCredentials([string(credentialsId: 'mysql-prod-01_host', variable: 'mysql_host')]) {
+                // If we're on the master branch, this is probably for production so test against the current prod db
+                echo("Setting mysql_host to production database")
+                }
+            }
+            else {
+                withCredentials([string(credentialsId: 'mysql-dev-01_host', variable: 'mysql_host')]) {
+                // Grab the development database to test if this isn't for the master branch (production environment)
+                echo("Setting mysql_host to development database")
+                }
+            }
             echo("Dumping moodle database from ${env.mysql_host}")
             sh "mysqldump --host ${env.mysql_host} -u ${env.mysql_user} --password=${env.mysql_password} moodle > /tmp/moodle_dump.sql"
         }
