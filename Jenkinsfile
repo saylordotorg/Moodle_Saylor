@@ -86,13 +86,11 @@ try {
     stage('Stash Repos') {
         echo("Beginning stashing operations")
 
-        StashMoodle()
-        //StashPlugins(plugins)
+        parallel (
+            "moodle" : StashMoodle(),
+            "plugins" : StashPlugins()
+        )
 
-        pluginJobs = BuildPluginsJobsMap(plugins)
-        echo(pluginJobs.dump())
-
-        parallel (pluginJobs)
 
         echo("Finished stashing operations")
     }
