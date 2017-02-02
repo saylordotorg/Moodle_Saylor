@@ -104,6 +104,13 @@ try {
                     }
                 }
 
+                // Now drop previous test db and upload dumped data
+                withCredentials([string(credentialsId: 'mysql-dev-01_host', variable: 'mysql_host')]) {
+                    echo("Dropping test database and uploading dumped data")
+                    sh "mysql -h ${mysql_host} -u ${mysql_user} --password=${mysql_password} --execute=\"drop moodle\""
+                    sh "mysql -h ${mysql_host} -u ${mysql_user} --password=${mysql_password} moodle< /tmp/moodle_dump.sql"
+                }
+
             }
 
 
