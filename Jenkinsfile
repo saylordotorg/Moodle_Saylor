@@ -21,7 +21,7 @@ def plugins = [
 
 ]
 
-def BuildMoodleJob() {
+def StashMoodle() {
     moodleJob = [
         "moodle" : (
             node {
@@ -31,50 +31,26 @@ def BuildMoodleJob() {
             )
     ]
 
-    return moodleJob
 }
 
-def BuildPluginsJobs(plugins) {
-    def pluginsJobs = []
+def StashPlugins(plugins) {
     for (int i = 0; i < plugins.size(); i++) {
         def integer = i
-        pluginsJobs[integer] = [
-            (plugins[integer].get("name")) : (
-                node {
-                    git([url: (plugins[integer].get("url")), branch: (plugins[integer].get("branch"))])
-                    echo("Stashing:${plugins[integer].get("name")}")
-                    stash([name: (plugins[integer].get("name"))])
-                    echo("Integer: ${integer}")
-                }
-            )
-        ]
+        node {
+            git([url: (plugins[integer].get("url")), branch: (plugins[integer].get("branch"))])
+            echo("Stashing: ${plugins[integer].get("name")}")
+            stash([name: (plugins[integer].get("name"))])
+        }
     }
-
-    return pluginsJobs
 }
 
 try {
     stage('Stash Repos') {
         echo("Beginning stashing operations")
-        //def Jobs = BuildPluginsJobs(plugins)
 
-        //Jobs << BuildMoodleJob()
-        echo("Performing stash jobs")
-        //parallel Jobs
-parallel (
-        for (int i = 0; i < plugins.size(); i++) {
-        def integer = i
-        pluginsJobs[integer] = [
-            (plugins[integer].get("name")) : (
-                node {
-                    git([url: (plugins[integer].get("url")), branch: (plugins[integer].get("branch"))])
-                    echo("Stashing:${plugins[integer].get("name")}")
-                    stash([name: (plugins[integer].get("name"))])
-                    echo("Integer: ${integer}")
-                }
-            )
-        ]
-    })
+        StashMoodle()
+        StashPlugins()
+
         echo("Finished stashing operations")
     }
     stage('Build') {
