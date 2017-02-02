@@ -44,7 +44,7 @@ def UnstashPlugins(plugins) {
         def x = i
         node {
             echo("Unstashing: ${plugins[x].get("name")}")
-            sh 'mkdir -p ${plugins[x].get("dest")}'
+            sh "mkdir -p ${plugins[x].get("dest")}"
             dir("${plugins[x].get("dest")}") {
                 unstash([name: (plugins[x].get("name"))])
             }
