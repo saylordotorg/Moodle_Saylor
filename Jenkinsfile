@@ -55,6 +55,7 @@ try {
     }
     stage('Build') {
         node {
+            deleteDir()
             echo("Checking out SCM")
             checkout scm
 
@@ -73,7 +74,16 @@ try {
 
         }
 
-    }  
+    } 
+    stage('Test - Create Test DB') {
+        node {
+            sh 'ls -halt'
+        }
+
+    }
+    stage('Test - Run Upgrade') {
+
+    }
 }
 
 catch (exc) {
