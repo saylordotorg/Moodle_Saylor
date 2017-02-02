@@ -26,10 +26,10 @@ def buildParallelPlugins(plugins) {
     for (int i = 0; i < plugins.size(); i++) {
         def integer = i
         ParallelPlugins[integer] = [
-            plugins[integer].get("name") : (
+            (plugins[integer].get("name")) : (
                 node {
-                    git([url: plugins[integer].get("url"), branch: plugins[integer].get("branch")])
-                    stash([name: plugins[integer].get("name")])
+                    git([url: (plugins[integer].get("url")), branch: (plugins[integer].get("branch"))])
+                    stash([name: (plugins[integer].get("name"))])
                 }
             )
         ]
