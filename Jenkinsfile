@@ -56,16 +56,15 @@ def UnstashPlugins(plugins) {
 /* Load up necessary credentials */
 node {
     withCredentials([usernamePassword(credentialsId: 'mysql__user_npc-build', passwordVariable: 'mysql_password', usernameVariable: 'mysql_user')]) {
-        // some block
     }
     if(env.BRANCH_NAME == 'master') {
         withCredentials([string(credentialsId: 'mysql-prod-01_host', variable: 'mysql_host')]) {
-        // some block
+        // If we're on the master branch, this is probably for production so test against the current prod db
         }
     }
     else {
         withCredentials([string(credentialsId: 'mysql-dev-01_host', variable: 'mysql_host')]) {
-        // some block
+        // Grab the development database to test if this isn't for the master branch (production environment)
         }
     }
 }
@@ -98,7 +97,8 @@ try {
     } 
     stage('Test - Create Test DB') {
         node {
-            
+            echo("Dumping moodle database from ${env.mysql_host}")
+            sh "mysqldump --host ${env.mysql_host} -u ${env.mysql_user} --password=${env.mysql_password} moodle > /tmp/moodle_dump.sql"
         }
 
     }
