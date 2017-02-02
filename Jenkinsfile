@@ -65,7 +65,6 @@ try {
     stage('Build') {
         node {
             
-            deleteDir()
             checkout scm
 
             unstash name: 'moodle'
