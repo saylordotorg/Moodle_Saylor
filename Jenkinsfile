@@ -44,7 +44,7 @@ def StashPlugins(plugins) {
     }
 }
 
-def BuildPluginsJobs(plugins) {
+def BuildPluginsJobsString(plugins) {
     def pluginJobs = ""
     for (int i = 0; i < plugins.size(); i++) {
         def integer = i
@@ -65,6 +65,23 @@ def BuildPluginsJobs(plugins) {
     return pluginJobs
 }
 
+def BuildPluginsJobsMap(plugins) {
+    def pluginJobs = [:]
+    for (int i = 0; i < plugins.size(); i++) {
+        def integer = i
+        pluginJobs.add("${plugins[integer].get("name")}",[
+                    node {
+                            git([url: plugins[integer].get("url"), branch: plugins[integer].get("branch")])
+                            stash([name: plugins[integer].get("name")])
+                    }
+                ]
+            )
+
+    }
+
+    return pluginJobs
+}
+
 try {
     stage('Stash Repos') {
         echo("Beginning stashing operations")
@@ -72,10 +89,10 @@ try {
         StashMoodle()
         //StashPlugins(plugins)
 
-        pluginJobs = BuildPluginsJobs(plugins)
-        echo("${pluginJobs}")
+        pluginJobs = BuildPluginsJobsMap(plugins)
+        echo(pluginJobs.dump())
 
-        parallel ("${pluginJobs}")
+        parallel (pluginJobs)
 
         echo("Finished stashing operations")
     }
