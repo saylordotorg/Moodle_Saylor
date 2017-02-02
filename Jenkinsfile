@@ -54,17 +54,19 @@ def UnstashPlugins(plugins) {
 
 
 /* Load up necessary credentials */
-withCredentials([usernamePassword(credentialsId: 'mysql__user_npc-build', passwordVariable: 'mysql_password', usernameVariable: 'mysql_user')]) {
-    // some block
-}
-if(env.BRANCH_NAME == 'master') {
-    withCredentials([string(credentialsId: 'mysql-prod-01_host', variable: 'mysql_host')]) {
-    // some block
+node {
+    withCredentials([usernamePassword(credentialsId: 'mysql__user_npc-build', passwordVariable: 'mysql_password', usernameVariable: 'mysql_user')]) {
+        // some block
     }
-}
-else {
-    withCredentials([string(credentialsId: 'mysql-dev-01_host', variable: 'mysql_host')]) {
-    // some block
+    if(env.BRANCH_NAME == 'master') {
+        withCredentials([string(credentialsId: 'mysql-prod-01_host', variable: 'mysql_host')]) {
+        // some block
+        }
+    }
+    else {
+        withCredentials([string(credentialsId: 'mysql-dev-01_host', variable: 'mysql_host')]) {
+        // some block
+        }
     }
 }
 
