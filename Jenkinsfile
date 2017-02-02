@@ -59,7 +59,7 @@ try {
         def Jobs = BuildPluginsJobs(plugins)
 
         Jobs << BuildMoodleJob()
-
+        echo("Performing stash jobs")
         parallel Jobs
         echo("Finished stashing operations")
     }
