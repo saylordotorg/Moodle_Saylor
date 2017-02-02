@@ -98,8 +98,8 @@ try {
             withCredentials([usernamePassword(credentialsId: 'mysql__user_npc-build', passwordVariable: 'mysql_password', usernameVariable: 'mysql_user')]) {
                 sh "export MYSQL_PWD=${mysql_password}"
 
-                echo("Dumping moodle database from ${mysql_host}")
-                sh "mysqldump --host ${mysql_host} -u ${mysql_user} moodle > /tmp/moodle_dump.sql"
+                echo("Dumping moodle database from ${env.mysql_host}")
+                sh "mysqldump --host ${env.mysql_host} -u ${mysql_user} moodle > /tmp/moodle_dump.sql"
             }
 
 
