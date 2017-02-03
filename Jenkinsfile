@@ -52,7 +52,15 @@ def UnstashPlugins(plugins) {
     }
 }
 
+def Cleanup() {
+    // Need to clean up the test config file and test db dump.
+    // Will leave the moodle folder + plugins as an artifact.
 
+    sh 'rm config.php'
+
+    sh 'rm /tmp/moodle_dump.sql'
+
+}
 
 /* Start build process */
 try {
@@ -64,7 +72,7 @@ try {
 
         echo("Finished stashing operations")
 
-        node {
+        node('master') {
             deleteDir()
             echo("Checking out SCM")
             checkout scm
@@ -79,8 +87,8 @@ try {
         }
 
     } 
-    stage('Test - Create Test DB') {
-        node {
+    stage('Test - Set Up Environment') {
+        node('master') {
             /* Load up necessary credentials */
 
             withCredentials([usernamePassword(credentialsId: 'mysql__user_npc-build', passwordVariable: 'mysql_password', usernameVariable: 'mysql_user')]) {
@@ -115,7 +123,6 @@ try {
 
             }
 
-
         }
 
     }
@@ -126,5 +133,6 @@ try {
 
 catch (exc) {
     echo "Caught: ${exc}"
+    Cleanup()
     throw exc
 }
