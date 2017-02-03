@@ -58,7 +58,7 @@ def Cleanup() {
     // Need to clean up the test config file.
     // Will leave the moodle folder + plugins as an artifact.
     node {
-        //sh 'rm config.php'
+        sh 'rm -rf moodledata'
     }
 
 }
@@ -129,6 +129,8 @@ try {
     }
     stage('Test - Run Upgrade') {
         node('master') {
+
+            sh 'mkdir moodledata'
 
             withCredentials([usernamePassword(credentialsId: 'mysql__user_npc-build', passwordVariable: 'mysql_password', usernameVariable: 'mysql_user')]) {
                 withCredentials([string(credentialsId: 'mysql-dev-01_host', variable: 'mysql_host')]) {
