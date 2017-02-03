@@ -127,6 +127,21 @@ try {
 
     }
     stage('Test - Run Upgrade') {
+        node('master') {
+
+            withCredentials([usernamePassword(credentialsId: 'mysql__user_npc-build', passwordVariable: 'mysql_password', usernameVariable: 'mysql_user')]) {
+                withCredentials([string(credentialsId: 'mysql-dev-01_host', variable: 'mysql_host')]) {
+                    configFileProvider([configFile(fileId: 'moodle-test-config', replaceTokens: true, targetLocation: 'config.php')]) {
+                        
+                        echo("Beginning upgrade")
+                        
+                        sh 'php admin/cli/upgrade.php --non-interactive'
+
+                        echo("Finished upgrade")
+                    }
+                }
+            }
+        }
 
     }
 }
