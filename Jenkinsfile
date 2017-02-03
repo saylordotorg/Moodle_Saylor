@@ -52,17 +52,18 @@ def UnstashPlugins(plugins) {
     }
 }
 
+
+
 /* Start build process */
 try {
-    stage('Stash Repos') {
+    stage('Build') {
         echo("Beginning stashing operations")
 
         StashMoodle()
         StashPlugins(plugins)
 
         echo("Finished stashing operations")
-    }
-    stage('Build') {
+
         node {
             deleteDir()
             echo("Checking out SCM")
