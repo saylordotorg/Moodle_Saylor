@@ -133,9 +133,9 @@ try {
             sh 'mkdir moodledata'
 
             withCredentials([usernamePassword(credentialsId: 'mysql__user_npc-build', passwordVariable: 'mysql_password', usernameVariable: 'mysql_user')]) {
-                withCredentials([string(credentialsId: 'mysql-dev-01_host', variable: 'mysql_host')]) {
+                withCredentials([string(credentialsId: 'mysql-dev-01_host', variable: 'mysql_test_host')]) {
                     configFileProvider([configFile(fileId: 'moodle-test-config', replaceTokens: true, targetLocation: 'config.php')]) {
-                        sh "sed -e \'s/{{mysql_dest_host}}/${mysql_dest_host}/\' -e \'s/{{mysql_dest_dbname}}/${mysql_dest_dbname}/\' -e \'s/{{mysql_user}}/${mysql_user}/\' -e \'s/{{mysql_password}}/${mysql_password}/\' <config.php >config.php"
+                        sh "sed -e \'s/{{mysql_dest_host}}/${mysql_test_host}/\' -e \'s/{{mysql_dest_dbname}}/${mysql_dest_dbname}/\' -e \'s/{{mysql_user}}/${mysql_user}/\' -e \'s/{{mysql_password}}/${mysql_password}/\' <config.php >config.php"
 
                         sh 'cat config.php'
                         echo("Beginning upgrade")
