@@ -55,18 +55,18 @@ def UnstashPlugins(plugins) {
 }
 
 def Cleanup() {
-    // Need to clean up the test config file and test db dump.
+    // Need to clean up the test config file.
     // Will leave the moodle folder + plugins as an artifact.
-
-    sh 'rm config.php'
-
-    sh 'rm /tmp/moodle_dump.sql'
+    node {
+        sh 'rm config.php'
+    }
 
 }
 
-def CopyDatabase(mysql_user, mysql_password, mysql_source_host, mysql_dest_host, mysql_source_dbname, mysql_dest_dbname) {
+def CopyDatabase(mysql_user, mysql_password, mysql_source_host, mysql_source_dbname, mysql_dest_dbname) {
     // Drop previous test db and transfer source db
-    withCredentials([string(credentialsId: 'mysql-dev-01_host', variable: 'mysql_host')]) {
+    // Test db host is mysql-dev-01
+    withCredentials([string(credentialsId: 'mysql-dev-01_host', variable: 'mysql_dest_host')]) {
         echo("Dropping test database and transferring source data")
         sh "mysql -h ${mysql_host} -u ${mysql_user} --password=${mysql_password} --execute=\"drop database ${mysql_dest_dbname}\""
         sh "mysql -h ${mysql_host} -u ${mysql_user} --password=${mysql_password} --execute=\"create database ${mysql_dest_dbname}\""
@@ -112,14 +112,14 @@ try {
                     withCredentials([string(credentialsId: 'mysql-prod-01_host', variable: 'mysql_source_host')]) {
                         // If we're on the master branch, this is probably for production so test against the current prod db
                         echo("Setting mysql_source_host to production database.")
-                        CopyDatabase(mysql_user, mysql_password, mysql_source_host, mysql_dest_host, mysql_source_dbname, mysql_dest_dbname)
+                        CopyDatabase(mysql_user, mysql_password, mysql_source_host, mysql_source_dbname, mysql_dest_dbname)
                     }
                 }
                 else {
                     withCredentials([string(credentialsId: 'mysql-dev-01_host', variable: 'mysql_source_host')]) {
                         // Grab the development database to test if this isn't for the master branch (production environment)
                         echo("Setting mysql_source_host to development database.")
-                        CopyDatabase(mysql_user, mysql_password, mysql_source_host, mysql_dest_host, mysql_source_dbname, mysql_dest_dbname)
+                        CopyDatabase(mysql_user, mysql_password, mysql_source_host, mysql_source_dbname, mysql_dest_dbname)
                     }
                 }
 
