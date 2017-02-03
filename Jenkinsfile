@@ -2,6 +2,8 @@
 
 /* Comments */
 
+def mysql_source_dbname = 'moodle'
+def mysql_dest_dbname = 'moodle_test'
 
 def plugins = [
     [
@@ -62,6 +64,18 @@ def Cleanup() {
 
 }
 
+def CopyDatabase(mysql_user, mysql_password, mysql_source_host, mysql_dest_host, mysql_source_dbname, mysql_dest_dbname) {
+    // Drop previous test db and transfer source db
+    withCredentials([string(credentialsId: 'mysql-dev-01_host', variable: 'mysql_host')]) {
+        echo("Dropping test database and transferring source data")
+        sh "mysql -h ${mysql_host} -u ${mysql_user} --password=${mysql_password} --execute=\"drop database ${mysql_dest_dbname}\""
+        sh "mysql -h ${mysql_host} -u ${mysql_user} --password=${mysql_password} --execute=\"create database ${mysql_dest_dbname}\""
+        // Piping output of dump directly to mysql to increase speed of transfer. Also using mysqlpump instead of mysqldump.
+        sh "mysqlpump --single-transaction --host ${mysql_source_host} -u ${mysql_user} --password=${mysql_password} ${mysql_source_dbname} | mysql -h ${mysql_dest_host} -u ${mysql_user} --password=${mysql_password} ${mysql_dest_dbname}"
+    }
+
+}
+
 /* Start build process */
 try {
     stage('Build') {
@@ -95,34 +109,21 @@ try {
                 // TODO: Comment on this block
 
                 if(env.BRANCH_NAME == 'master') {
-                    withCredentials([string(credentialsId: 'mysql-prod-01_host', variable: 'mysql_host')]) {
+                    withCredentials([string(credentialsId: 'mysql-prod-01_host', variable: 'mysql_source_host')]) {
                         // If we're on the master branch, this is probably for production so test against the current prod db
-                        echo("Setting mysql_host to production database: ${env.mysql_host}")
-
-                    echo("Dumping moodle database from ${env.mysql_host}")
-                    sh "mysqldump --single-transaction --host ${env.mysql_host} -u ${mysql_user} --password=${mysql_password} moodle > /tmp/moodle_dump.sql"
+                        echo("Setting mysql_source_host to production database.")
+                        CopyDatabase(mysql_user, mysql_password, mysql_source_host, mysql_dest_host, mysql_source_dbname, mysql_dest_dbname)
                     }
                 }
                 else {
-                    withCredentials([string(credentialsId: 'mysql-dev-01_host', variable: 'mysql_host')]) {
+                    withCredentials([string(credentialsId: 'mysql-dev-01_host', variable: 'mysql_source_host')]) {
                         // Grab the development database to test if this isn't for the master branch (production environment)
-                        echo("Setting mysql_host to development database: ${env.mysql_host}")
-
-                    echo("Dumping moodle database from ${env.mysql_host}")
-                    sh "mysqldump --single-transaction --host ${env.mysql_host} -u ${mysql_user} --password=${mysql_password} moodle > /tmp/moodle_dump.sql"
+                        echo("Setting mysql_source_host to development database.")
+                        CopyDatabase(mysql_user, mysql_password, mysql_source_host, mysql_dest_host, mysql_source_dbname, mysql_dest_dbname)
                     }
                 }
 
-                // Now drop previous test db and upload dumped data
-                withCredentials([string(credentialsId: 'mysql-dev-01_host', variable: 'mysql_host')]) {
-                    echo("Dropping test database and uploading dumped data")
-                    sh "mysql -h ${mysql_host} -u ${mysql_user} --password=${mysql_password} --execute=\"drop database moodle_test\""
-                    sh "mysql -h ${mysql_host} -u ${mysql_user} --password=${mysql_password} --execute=\"create database moodle_test\""
-                    sh "mysql -h ${mysql_host} -u ${mysql_user} --password=${mysql_password} moodle_test< /tmp/moodle_dump.sql"
-                }
-
             }
-
         }
 
     }
@@ -135,7 +136,7 @@ try {
                         sh 'cat config.php'
                         echo("Beginning upgrade")
 
-                        sh 'php admin/cli/upgrade.php --non-interactive'
+                        sh '/usr/bin/php admin/cli/upgrade.php --non-interactive'
 
                         echo("Finished upgrade")
                     }
