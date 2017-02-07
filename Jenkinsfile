@@ -179,41 +179,42 @@ try {
         // git add .
         // git commit -m "MESSAGE"
         def commitMessage = "Build #${env.BUILD_NUMBER} - Automated Commit Message"
+        node('master') {
+            Cleanup()
 
-        Cleanup()
+            try {
+                echo("Adding changed files")
+                sh("git add .")
 
-        try {
-            echo("Adding changed files")
-            sh("git add .")
-
-            echo("Commiting changes")
-            sh("git commit -m \"${commitMessage}\"")
-        }
-        catch(err) {
-            echo("Failed to commit changes: ${err}")
-
-            // Note: this might fail if no changes have been made since last build
-            NotifyOnFail("Failed to commit changes: ${err}")
-
-            throw err
-        }
-        try {
-            echo("Pushing to GitHub")
-            sshagent(['6728e4b0-6b97-4d5b-96d0-c47cf4510ece']) {
-                // some block
-                sh("git push origin HEAD:${env.BRANCH_NAME}")
+                echo("Commiting changes")
+                sh("git commit -m \"${commitMessage}\"")
             }
+            catch(err) {
+                echo("Failed to commit changes: ${err}")
+
+                // Note: this might fail if no changes have been made since last build
+                NotifyOnFail("Failed to commit changes: ${err}")
+
+                throw err
+            }
+            try {
+                echo("Pushing to GitHub")
+                sshagent(['6728e4b0-6b97-4d5b-96d0-c47cf4510ece']) {
+                    // some block
+                    sh("git push origin HEAD:${env.BRANCH_NAME}")
+                }
+            }
+            catch(err) {
+                echo("Failed to push to GitHub: ${err}")
+
+                // Note: this might fail if no changes have been made since last build
+                NotifyOnFail("Failed to push to GitHub: ${err}")
+
+                throw err            
+            }
+
+            NotifyOnComplete()
         }
-        catch(err) {
-            echo("Failed to push to GitHub: ${err}")
-
-            // Note: this might fail if no changes have been made since last build
-            NotifyOnFail("Failed to push to GitHub: ${err}")
-
-            throw err            
-        }
-
-        NotifyOnComplete()
     }
 }
 
