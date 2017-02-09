@@ -271,7 +271,7 @@ def CopyDatabase(mysql_user, mysql_password, mysql_source_host, mysql_source_dbn
 
 def NotifyOnComplete() {
     // What to do when build is successful.
-    def message = "Build completed successfully: ${env.JOB_NAME} ${env.BUILD_NUMBER} on ${env.BRANCH_NAME}"
+    def message = "Build completed successfully: ${env.JOB_NAME} #${env.BUILD_NUMBER} on ${env.BRANCH_NAME}"
 
     // For now, we post in slack.
     slackSend color: 'good', message: "${message}"
