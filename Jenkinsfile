@@ -17,8 +17,193 @@ def plugins = [
         "url" : 'https://github.com/dmonllao/moodle-mod_journal.git',
         "branch" : 'MOODLE_31_STABLE',
         "dest" : 'mod/journal'
+    ],
+    [
+        "name" : 'format_flexsections',
+        "url" : 'https://github.com/marinaglancy/moodle-format_flexsections.git',
+        "branch" : 'master',
+        "dest" : 'course/format/flexsections'
+    ],
+    [
+        "name" : 'format_grid',
+        "url" : 'https://github.com/gjb2048/moodle-format_grid.git',
+        "branch" : 'MOODLE_31_STABLE',
+        "dest" : 'course/format/grid'
+    ],
+    [
+        "name" : 'format_topcoll',
+        "url" : 'https://github.com/gjb2048/moodle-format_topcoll.git',
+        "branch" : 'MOODLE_31',
+        "dest" : 'course/format/topcoll'
+    ],
+    [
+        "name" : 'mod_hotpot',
+        "url" : 'https://github.com/gbateson/moodle-mod_hotpot.git',
+        "branch" : 'master',
+        "dest" : 'mod/hotpot'
+    ],
+    [
+        "name" : 'block_progress',
+        "url" : 'https://github.com/deraadt/moodle-block_progress.git',
+        "branch" : 'master',
+        "dest" : 'blocks/progress'
+    ],
+    [
+        "name" : 'mod_checklist',
+        "url" : 'https://github.com/davosmith/moodle-checklist.git',
+        "branch" : 'master',
+        "dest" : 'mod/checklist'
+    ],
+    [
+        "name" : 'block_checklist',
+        "url" : 'https://github.com/davosmith/moodle-block_checklist.git',
+        "branch" : 'master',
+        "dest" : 'blocks/checklist'
+    ],
+    [
+        "name" : 'grade_checklist',
+        "url" : 'https://github.com/davosmith/moodle-grade_checklist.git',
+        "branch" : 'master',
+        "dest" : 'grade/export/checklist'
+    ],
+    [
+        "name" : 'block_accessibility',
+        "url" : 'https://github.com/marxjohnson/moodle-block_accessibility.git',
+        "branch" : 'master',
+        "dest" : 'blocks/accessibility'
+    ],
+    [
+        "name" : 'editor_supsub',
+        "url" : 'https://github.com/moodleou/moodle-editor_supsub.git',
+        "branch" : 'master',
+        "dest" : 'lib/editor/supsub'
+    ],
+    [
+        "name" : 'block_workflow',
+        "url" : 'https://github.com/moodleou/moodle-block_workflow.git',
+        "branch" : 'master',
+        "dest" : 'blocks/workflow'
+    ],
+    [
+        "name" : 'mod_accredible',
+        "url" : 'https://github.com/accredible/moodle-mod_accredible.git',
+        "branch" : 'master',
+        "dest" : 'mod/accredible'
+    ],
+    [
+        "name" : 'block_configurablereports',
+        "url" : 'https://github.com/jleyva/moodle-block_configurablereports.git',
+        "branch" : 'MOODLE_30_STABLE',
+        "dest" : 'blocks/configurable_reports'
+    ],
+    [
+        "name" : 'local_ltiprovider',
+        "url" : 'https://github.com/jleyva/moodle-local_ltiprovider.git',
+        "branch" : 'MOODLE_29_STABLE',
+        "dest" : 'local/ltiprovider'
+    ],
+    [
+        "name" : 'report_myfeedback',
+        "url" : 'https://github.com/jgramp/moodle-report_myfeedback.git',
+        "branch" : 'master',
+        "dest" : 'report/myfeedback'
+    ],
+    [
+        "name" : 'qtype_jme',
+        "url" : 'https://github.com/jmvedrine/moodle-qtype_jme.git',
+        "branch" : 'master',
+        "dest" : 'question/type/jme'
+    ],
+    [
+        "name" : 'qtype_jme_JSME',
+        "url" : 'https://github.com/saylordotorg/JSME-deploy.git',
+        "branch" : 'master',
+        "dest" : 'question/type/jme/jsme'
+    ],
+    [
+        "name" : 'quiz_honestycheck',
+        "url" : 'https://github.com/moodleou/moodle-quizaccess_honestycheck.git',
+        "branch" : 'master',
+        "dest" : 'mod/quiz/accessrule/honestycheck'
+    ],
+    [
+        "name" : 'qtype_algebra',
+        "url" : 'https://github.com/jmvedrine/moodle-qtype_algebra.git',
+        "branch" : 'master',
+        "dest" : 'question/type/algebra'
+    ],
+    [
+        "name" : 'qtype_pmatch',
+        "url" : 'https://github.com/moodleou/moodle-qtype_pmatch.git',
+        "branch" : 'master',
+        "dest" : 'question/type/pmatch'
+    ],
+    [
+        "name" : 'local_intelliboard',
+        "url" : 'https://github.com/intelliboard/intelliboard.git',
+        "branch" : 'master',
+        "dest" : 'local/intelliboard'
+    ],
+    [
+        "name" : 'qbehaviour_adaptivehints',
+        "url" : 'https://github.com/saylordotorg/moodle-qbehaviour_adaptivehints.git',
+        "branch" : 'master',
+        "dest" : 'question/behaviour/adaptivehints'
+    ],
+    [
+        "name" : 'qbehaviour_adaptivehintsnopenalties',
+        "url" : 'https://github.com/saylordotorg/moodle-qbehaviour_adaptivehintsnopenalties.git',
+        "branch" : 'master',
+        "dest" : 'question/behaviour/adaptivehintsnopenalties'
+    ],
+    [
+        "name" : 'qbehaviour_interactivehints',
+        "url" : 'https://github.com/saylordotorg/moodle-qbehaviour_interactivehints.git',
+        "branch" : 'master',
+        "dest" : 'question/behaviour/interactivehints'
+    ],
+    [
+        "name" : 'qtype_poasquestion',
+        "url" : 'https://github.com/saylordotorg/moodle-qtype_poasquestion.git',
+        "branch" : 'master',
+        "dest" : 'question/type/poasquestion'
+    ],
+    [
+        "name" : 'local_wsfunc',
+        "url" : 'https://github.com/saylordotorg/moodle-local_wsfunc.git',
+        "branch" : 'master',
+        "dest" : 'local/wsfunc'
+    ],
+    [
+        "name" : 'qtype_ordering',
+        "url" : 'https://github.com/gbateson/moodle-qtype_ordering.git',
+        "branch" : 'master',
+        "dest" : 'question/type/ordering'
+    ],
+    [
+        "name" : 'block_heatmap',
+        "url" : 'https://github.com/deraadt/moodle-block_heatmap.git',
+        "branch" : 'master',
+        "dest" : 'blocks/heatmap'
+    ],
+    [
+        "name" : 'local_unusedquestions',
+        "url" : 'https://github.com/morrisr2/moodle_local_unusedquestions.git',
+        "branch" : 'master',
+        "dest" : 'local/unusedquestions'
+    ],
+    [
+        "name" : 'auth_mcae',
+        "url" : 'https://github.com/kamat/moodle-auth_mcae.git',
+        "branch" : 'master',
+        "dest" : 'auth/mcae'
+    ],
+    [
+        "name" : 'mod_reengagement',
+        "url" : 'https://github.com/catalyst/moodle-mod_reengagement.git',
+        "branch" : 'MOODLE_31_STABLE',
+        "dest" : 'mod/reengagement'
     ]
-
 ]
 
 def StashMoodle() {
