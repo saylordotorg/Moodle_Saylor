@@ -209,7 +209,12 @@ def plugins = [
 def StashMoodle() {
     node {
         deleteDir()
-        git([url: 'https://github.com/moodle/moodle.git', branch: 'MOODLE_31_STABLE'])
+            try {
+                git([url: 'https://github.com/moodle/moodle.git', branch: 'MOODLE_31_STABLE'])
+            }
+            catch(err) {
+                NotifyOnFail("Unable to retrieve Moodle: ${err}")"
+            }
         stash([name: 'moodle'])
     }
 }
@@ -219,7 +224,12 @@ def StashPlugins(plugins) {
         def x = i
         node {
             deleteDir()
-            git([url: (plugins[x].get("url")), branch: (plugins[x].get("branch"))])
+            try {
+                git([url: (plugins[x].get("url")), branch: (plugins[x].get("branch"))])
+            }
+            catch(err) {
+                NotifyOnFail("Unable to retrieve plugin ${plugins[x].get("name")}: ${err}")"
+            }
             echo("Stashing: ${plugins[x].get("name")}")
             stash([name: (plugins[x].get("name"))])
         }
