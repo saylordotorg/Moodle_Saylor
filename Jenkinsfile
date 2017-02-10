@@ -212,7 +212,7 @@ def StashMoodle() {
     node {
         deleteDir()
             try {
-                git([url: 'https://github.com/moodle/moodle.git', branch: moodle_version])
+                git([url: 'https://github.com/moodle/moodle.git', branch: "${moodle_version}"])
             }
             catch(err) {
                 NotifyOnFail("Unable to retrieve Moodle: ${err}")
