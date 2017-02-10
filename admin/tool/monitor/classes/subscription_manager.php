@@ -464,7 +464,7 @@ class subscription_manager {
     /**
      * Activates a group of subscriptions based on an input array of ids.
      *
-     * @since 3.1.1
+     * @since 3.2.0
      * @param array $ids of subscription ids.
      * @return bool true if the operation was successful, false otherwise.
      */
@@ -481,7 +481,7 @@ class subscription_manager {
     /**
      * Deactivates a group of subscriptions based on an input array of ids.
      *
-     * @since 3.1.1
+     * @since 3.2.0
      * @param array $ids of subscription ids.
      * @return bool true if the operation was successful, false otherwise.
      */
@@ -500,7 +500,7 @@ class subscription_manager {
     /**
      * Deletes subscriptions which have been inactive for a period of time.
      *
-     * @since 3.1.1
+     * @since 3.2.0
      * @param int $userid if provided, only this user's stale subscriptions will be deleted.
      * @return bool true if the operation was successful, false otherwise.
      */
@@ -527,7 +527,7 @@ class subscription_manager {
     /**
      * Check whether a subscription is active.
      *
-     * @since 3.1.1
+     * @since 3.2.0
      * @param \tool_monitor\subscription $subscription instance.
      * @return bool true if the subscription is active, false otherwise.
      */

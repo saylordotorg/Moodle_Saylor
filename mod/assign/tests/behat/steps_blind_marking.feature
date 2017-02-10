@@ -44,7 +44,7 @@ Feature: Assignments correctly add feedback to the grade report when workflow an
     And I log in as "teacher1"
     And I follow "Course 1"
     And I follow "Test assignment name"
-    And I follow "View all submissions"
+    And I navigate to "View all submissions" in current page administration
     And I should see "Not marked" in the "I'm the student's first submission" "table_row"
     And I click on "Grade" "link" in the "I'm the student's first submission" "table_row"
     And I set the field "Grade out of 100" to "50"
@@ -55,7 +55,7 @@ Feature: Assignments correctly add feedback to the grade report when workflow an
     And I press "Ok"
     And I click on "Edit settings" "link"
     And I follow "Test assignment name"
-    And I follow "View all submissions"
+    And I navigate to "View all submissions" in current page administration
     And I should see "In review" in the "I'm the student's first submission" "table_row"
 
   @javascript
@@ -67,7 +67,7 @@ Feature: Assignments correctly add feedback to the grade report when workflow an
     And I press "Ok"
     And I click on "Edit settings" "link"
     And I follow "Test assignment name"
-    And I follow "View all submissions"
+    And I navigate to "View all submissions" in current page administration
     And I should see "Ready for release" in the "I'm the student's first submission" "table_row"
     And I click on "Grade" "link" in the "I'm the student's first submission" "table_row"
     And I set the field "Marking workflow state" to "Released"
@@ -75,15 +75,14 @@ Feature: Assignments correctly add feedback to the grade report when workflow an
     And I press "Ok"
     And I click on "Edit settings" "link"
     And I follow "Test assignment name"
-    And I follow "View all submissions"
+    And I navigate to "View all submissions" in current page administration
     And I should see "Released" in the "I'm the student's first submission" "table_row"
     And I set the field "Grading action" to "Reveal student identities"
     And I press "Continue"
     And I log out
     And I log in as "student1"
     And I follow "Course 1"
-    And I navigate to "Grades" node in "Course administration"
-    And I set the field "Grade report" to "User report"
+    And I navigate to "User report" in the course gradebook
     Then I should see "50"
     And I should see "Great job! Lol, not really."
 
@@ -96,7 +95,7 @@ Feature: Assignments correctly add feedback to the grade report when workflow an
     And I press "Ok"
     And I click on "Edit settings" "link"
     And I follow "Test assignment name"
-    And I follow "View all submissions"
+    And I navigate to "View all submissions" in current page administration
     And I should see "Ready for release" in the "I'm the student's first submission" "table_row"
     And I set the field "Grading action" to "Reveal student identities"
     And I press "Continue"
@@ -106,12 +105,11 @@ Feature: Assignments correctly add feedback to the grade report when workflow an
     And I press "Ok"
     And I click on "Edit settings" "link"
     And I follow "Test assignment name"
-    And I follow "View all submissions"
+    And I navigate to "View all submissions" in current page administration
     And I should see "Released" in the "Student 1" "table_row"
     And I log out
     And I log in as "student1"
     And I follow "Course 1"
-    And I navigate to "Grades" node in "Course administration"
-    And I set the field "Grade report" to "User report"
+    And I navigate to "User report" in the course gradebook
     Then I should see "50"
     And I should see "Great job! Lol, not really."

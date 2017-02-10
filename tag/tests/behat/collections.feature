@@ -86,7 +86,7 @@ Feature: Managers can create and manage tag collections
 
   Scenario: Moving tags when changing tag collections
     And I follow "Preferences" in the user menu
-    And I follow "Edit profile"
+    And I click on "Edit profile" "link" in the "region-main" "region"
     And I expand all fieldsets
     And I set the field "List of interests" to "Swimming, Tag0, Tag3"
     And I press "Update profile"
@@ -117,6 +117,9 @@ Feature: Managers can create and manage tag collections
       | Searchable | 0 |
     And I press "Create"
     And "Yes" "text" should not exist in the "//table[contains(@class,'tag-collections-table')]//tr[contains(.,'Hiddencoll')]" "xpath_element"
+    And I press "Blocks editing on"
+    # TODO MDL-57120 "Tags" link not accessible without navigation block.
+    And I add the "Navigation" block if not present
     And I navigate to "Tags" node in "Site pages"
     Then the "Select tag collection" select box should contain "Default collection"
     And the "Select tag collection" select box should contain "Hobbies"

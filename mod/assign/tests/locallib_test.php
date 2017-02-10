@@ -85,7 +85,7 @@ class mod_assign_locallib_testcase extends mod_assign_base_testcase {
         $nopermission = false;
         $this->students[0]->ignoresesskey = true;
         $this->setUser($this->students[0]);
-        $this->setExpectedException('required_capability_exception');
+        $this->expectException('required_capability_exception');
         $assign->reveal_identities();
         $this->students[0]->ignoresesskey = false;
 
@@ -93,13 +93,13 @@ class mod_assign_locallib_testcase extends mod_assign_base_testcase {
         $nopermission = false;
         $this->teachers[0]->ignoresesskey = true;
         $this->setUser($this->teachers[0]);
-        $this->setExpectedException('required_capability_exception');
+        $this->expectException('required_capability_exception');
         $assign->reveal_identities();
         $this->teachers[0]->ignoresesskey = false;
 
         // Test sesskey is required.
         $this->setUser($this->editingteachers[0]);
-        $this->setExpectedException('moodle_exception');
+        $this->expectException('moodle_exception');
         $assign->reveal_identities();
 
         // Test editingteacher can reveal identities if sesskey is ignored.
@@ -315,7 +315,7 @@ class mod_assign_locallib_testcase extends mod_assign_base_testcase {
         $this->assertContains(get_string('overdue', 'assign', format_time(4 * 24 * 60 * 60 + $difftime)), $output);
 
         $document = new DOMDocument();
-        $document->loadHTML($output);
+        @$document->loadHTML($output);
         $xpath = new DOMXPath($document);
         $this->assertEquals('', $xpath->evaluate('string(//td[@id="mod_assign_grading_r0_c8"])'));
     }
@@ -359,7 +359,7 @@ class mod_assign_locallib_testcase extends mod_assign_base_testcase {
         $gradingtable = new assign_grading_table($assign, 4, '', 0, true);
         $output = $assign->get_renderer()->render($gradingtable);
         $document = new DOMDocument();
-        $document->loadHTML($output);
+        @$document->loadHTML($output);
         $xpath = new DOMXPath($document);
 
         // Check status.
@@ -513,6 +513,8 @@ class mod_assign_locallib_testcase extends mod_assign_base_testcase {
         $data = new stdClass();
         $data->reset_assign_submissions = 1;
         $data->reset_gradebook_grades = 1;
+        $data->reset_assign_user_overrides = 1;
+        $data->reset_assign_group_overrides = 1;
         $data->courseid = $this->course->id;
         $data->timeshift = 24*60*60;
         $this->setUser($this->editingteachers[0]);
@@ -685,6 +687,63 @@ class mod_assign_locallib_testcase extends mod_assign_base_testcase {
         // Test you can see the submit button for an online text assignment with a submission.
         $output = $assign->view_student_summary($this->students[0], true);
         $this->assertContains(get_string('submitassignment', 'assign'), $output, 'Can submit non empty onlinetext assignment');
+    }
+
+    /**
+     * Test new_submission_empty
+     *
+     * We only test combinations of plugins here. Individual plugins are tested
+     * in their respective test files.
+     *
+     * @dataProvider test_new_submission_empty_testcases
+     * @param string $data The file submission data
+     * @param bool $expected The expected return value
+     */
+    public function test_new_submission_empty($data, $expected) {
+        $this->resetAfterTest();
+        $assign = $this->create_instance(['assignsubmission_file_enabled' => 1,
+                                          'assignsubmission_file_maxfiles' => 12,
+                                          'assignsubmission_file_maxsizebytes' => 10,
+                                          'assignsubmission_onlinetext_enabled' => 1]);
+        $this->setUser($this->students[0]);
+        $submission = new stdClass();
+
+        if ($data['file'] && isset($data['file']['filename'])) {
+            $itemid = file_get_unused_draft_itemid();
+            $submission->files_filemanager = $itemid;
+            $data['file'] += ['contextid' => context_user::instance($this->students[0]->id)->id, 'itemid' => $itemid];
+            $fs = get_file_storage();
+            $fs->create_file_from_string((object)$data['file'], 'Content of ' . $data['file']['filename']);
+        }
+
+        if ($data['onlinetext']) {
+            $submission->onlinetext_editor = ['text' => $data['onlinetext']];
+        }
+
+        $result = $assign->new_submission_empty($submission);
+        $this->assertTrue($result === $expected);
+    }
+
+    /**
+     * Dataprovider for the test_new_submission_empty testcase
+     *
+     * @return array of testcases
+     */
+    public function test_new_submission_empty_testcases() {
+        return [
+            'With file and onlinetext' => [
+                [
+                    'file' => [
+                        'component' => 'user',
+                        'filearea' => 'draft',
+                        'filepath' => '/',
+                        'filename' => 'not_a_virus.exe'
+                    ],
+                    'onlinetext' => 'Balin Fundinul Uzbadkhazaddumu'
+                ],
+                false
+            ]
+        ];
     }
 
     public function test_list_participants() {
@@ -872,7 +931,7 @@ class mod_assign_locallib_testcase extends mod_assign_base_testcase {
         $this->assertEmpty($notices, 'No errors on save submission');
 
         // Set active groups to all groups.
-        $this->setUser($this->teachers[0]);
+        $this->setUser($this->editingteachers[0]);
         $SESSION->activegroup[$this->course->id]['aag'][0] = 0;
         $this->assertEquals(1, $assign->count_submissions_with_status(ASSIGN_SUBMISSION_STATUS_SUBMITTED));
 
@@ -998,7 +1057,7 @@ class mod_assign_locallib_testcase extends mod_assign_base_testcase {
         $this->assertEquals(1, $assign2->count_submissions_with_status(ASSIGN_SUBMISSION_STATUS_SUBMITTED));
 
         // Set active groups to all groups.
-        $this->setUser($this->teachers[0]);
+        $this->setUser($this->editingteachers[0]);
         $SESSION->activegroup[$this->course->id]['aag'][0] = 0;
         $this->assertEquals(1, $assign2->count_submissions_with_status(ASSIGN_SUBMISSION_STATUS_SUBMITTED));
 
@@ -1187,6 +1246,40 @@ class mod_assign_locallib_testcase extends mod_assign_base_testcase {
         $this->assertEquals(1, count($messages));
         $this->assertEquals($messages[0]->useridto, $this->students[1]->id);
         $this->assertEquals($assign->get_instance()->name, $messages[0]->contexturlname);
+    }
+
+    public function test_cron_message_includes_courseid() {
+        // First run cron so there are no messages waiting to be sent (from other tests).
+        cron_setup_user();
+        assign::cron();
+
+        // Now create an assignment.
+        $this->setUser($this->editingteachers[0]);
+        $assign = $this->create_instance(array('sendstudentnotifications' => 1));
+
+        // Simulate adding a grade.
+        $this->setUser($this->teachers[0]);
+        $data = new stdClass();
+        $data->grade = '50.0';
+        $assign->testable_apply_grade_to_user($data, $this->students[0]->id, 0);
+
+        $this->preventResetByRollback();
+        $sink = $this->redirectEvents();
+        $this->expectOutputRegex('/Done processing 1 assignment submissions/');
+
+        assign::cron();
+
+        $events = $sink->get_events();
+        // Two messages are sent, one to student and one to teacher. This generates
+        // four events:
+        // core\event\message_sent
+        // core\event\message_viewed
+        // core\event\message_sent
+        // core\event\message_viewed.
+        $event = reset($events);
+        $this->assertInstanceOf('\core\event\message_sent', $event);
+        $this->assertEquals($assign->get_course()->id, $event->other['courseid']);
+        $sink->close();
     }
 
     public function test_is_graded() {
@@ -2092,8 +2185,9 @@ class mod_assign_locallib_testcase extends mod_assign_base_testcase {
         $this->assertNotEquals(true, strpos($output, $this->students[0]->lastname));
     }
 
-
-
+    /**
+     * @expectedException moodle_exception
+     */
     public function test_teacher_submit_for_student() {
         global $PAGE;
 
@@ -2172,7 +2266,6 @@ class mod_assign_locallib_testcase extends mod_assign_base_testcase {
                                          'format'=>FORMAT_MOODLE);
 
         $notices = array();
-        $this->setExpectedException('moodle_exception');
         $assign->save_submission($data, $notices);
 
         $sink->close();
@@ -2425,26 +2518,31 @@ Anchor link 2:<a title=\"bananas\" href=\"../logo-240x60.gif\">Link text</a>
      * Test if the view blind details capability works
      */
     public function test_can_view_blind_details() {
-        global $PAGE, $DB;
-        $teacherrole = $DB->get_record('role', array('shortname' => 'teacher'));
-        $managerrole = $DB->get_record('role', array('shortname' => 'manager'));
+        global $DB;
+        // Note: The shared setUp leads to terrible tests. Please don't use it.
+        $roles = $DB->get_records('role', null, '', 'shortname, id');
+        $course = $this->getDataGenerator()->create_course([]);
 
         $student = $this->students[0];// Get a student user.
+        $this->getDataGenerator()->enrol_user($student->id,
+                                              $course->id,
+                                              $roles['student']->id);
+
         // Create a teacher. Shouldn't be able to view blind marking ID.
         $teacher = $this->getDataGenerator()->create_user();
 
         $this->getDataGenerator()->enrol_user($teacher->id,
-                                              $this->course->id,
-                                              $teacherrole->id);
+                                              $course->id,
+                                              $roles['teacher']->id);
 
         // Create a manager.. Should be able to view blind marking ID.
         $manager = $this->getDataGenerator()->create_user();
         $this->getDataGenerator()->enrol_user($manager->id,
-                $this->course->id,
-                $managerrole->id);
+                                              $course->id,
+                                              $roles['manager']->id);
 
         // Generate blind marking assignment.
-        $assign = $this->create_instance(array('blindmarking' => 1));
+        $assign = $this->create_instance(array('course' => $course->id, 'blindmarking' => 1));
         $this->assertEquals(true, $assign->is_blind_marking());
 
         // Test student names are hidden to teacher.

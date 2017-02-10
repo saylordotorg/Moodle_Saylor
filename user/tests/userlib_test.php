@@ -473,6 +473,7 @@ class core_userliblib_testcase extends advanced_testcase {
 
         $testsize = 100;
 
+        $PAGE->set_url('/');
         $user = $this->getDataGenerator()->create_user();
         $opts = user_get_user_navigation_info($user, $PAGE, array('avatarsize' => $testsize));
         $avatarhtml = $opts->metadata['useravatar'];
@@ -620,7 +621,7 @@ class core_userliblib_testcase extends advanced_testcase {
         $this->assertEquals($studentfullname, $result['fullname']);
 
         // Get exception for invalid required fields.
-        $this->setExpectedException('moodle_exception');
+        $this->expectException('moodle_exception');
         $result = user_get_user_details($student, $course1, array('wrongrequiredfield'));
     }
 }
