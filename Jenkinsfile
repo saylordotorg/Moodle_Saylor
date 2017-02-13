@@ -240,12 +240,11 @@ def StashPlugins(plugins) {
 def UnstashPlugins(plugins) {
     for (int i = 0; i < plugins.size(); i++) {
         def x = i
-        node {
-            echo("Unstashing: ${plugins[x].get("name")}")
-            sh "mkdir -p ${plugins[x].get("dest")}"
-            dir("${plugins[x].get("dest")}") {
-                unstash([name: (plugins[x].get("name"))])
-            }
+
+        echo("Unstashing: ${plugins[x].get("name")}")
+        sh "mkdir -p ${plugins[x].get("dest")}"
+        dir("${plugins[x].get("dest")}") {
+            unstash([name: (plugins[x].get("name"))])
         }
     }
 }
