@@ -228,7 +228,7 @@ def StashPlugins(plugins) {
                 git([url: (plugins[x].get("url")), branch: (plugins[x].get("branch"))])
             }
             catch(err) {
-                def failmessage = "Unable to retrieve plugin ${plugins[x].get('name')}\: ${err}"
+                def failmessage = "Unable to retrieve plugin ${plugins[x].get('name')}: ${err}"
                 NotifyOnFail(failmessage)
             }
             echo("Stashing: ${plugins[x].get("name")}")
