@@ -1,0 +1,91 @@
+body
+{
+    background: #fff;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+#resizeTree,
+#resizeGraph
+{
+    position: absolute;
+    left: -10px;
+    top: - 10px;
+    cursor: move;
+    background-repeat: no-repeat;
+    border:1px solid;
+    visibility: hidden;
+}
+
+#resizeSE,
+#resizeE,
+#resizeNE,
+#resizeN,
+#resizeNW,
+#resizeW,
+#resizeSW,
+#resizeS
+{
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background-color: #ddd;
+    border: 1px solid #333;
+    overflow: hidden;
+}
+#resizeSE{
+    bottom: -4px;
+    right: -4px;
+    cursor: se-resize;
+}
+#resizeE
+{
+    top: 50%;
+    right: -4px;
+    margin-top: -5px;
+    cursor: e-resize;
+}
+#resizeNE
+{
+    top: -4px;
+    right: -4px;
+    cursor: ne-resize;
+}
+#resizeN
+{
+    top: -4px;
+    left: 50%;
+    margin-left: -5px;
+    cursor: n-resize;
+}
+#resizeNW{
+    top: -4px;
+    left: -4px;
+    cursor: nw-resize;
+}
+#resizeW
+{
+    top: 50%;
+    left: -4px;
+    margin-top: -5px;
+    cursor: w-resize;
+}
+#resizeSW
+{
+    left: -4px;
+    bottom: -4px;
+    cursor: sw-resize;
+}
+#resizeS
+{
+    bottom: -4px;
+    left: 50%;
+    margin-left: -5px;
+    cursor: s-resize;
+}
+#container
+{
+    position: absolute;
+    top: 50px;
+    left: 50px;
+}

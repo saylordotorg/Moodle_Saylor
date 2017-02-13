@@ -1,0 +1,14 @@
+This editor plugin is used by qtype_pmatch and qtype_varnumeric. This testcase
+uses qtype_pmatch to test the editor.
+
+1. Go to the question bank in any course, and start creating a pmatch question.
+
+2. Choose the option Allow use of subscript: Yes, Allow use of superscript: No,
+and complete the rest of the form however you like.
+
+3. Preview the question in Firefox, IE and Chrome, ensure you can enter
+superscripts, and there are no JavaScript errors at any time.
+
+4. Repeat 2. & 3. using the Allow use of subscript: Yes, Allow use of superscript: Yes.
+
+5. Repeat 2. & 3. using the Allow use of subscript: No, Allow use of superscript: Yes.

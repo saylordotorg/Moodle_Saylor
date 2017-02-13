@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="question/type/pmatch/db" VERSION="20160126" COMMENT="XMLDB file for Moodle question/type/pmatch"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="qtype_pmatch" COMMENT="Options for pmatch questions">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="questionid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Foreign key references question.id."/>
+        <FIELD NAME="allowsubscript" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Allow sub script in student input"/>
+        <FIELD NAME="allowsuperscript" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Allow super script in student input"/>
+        <FIELD NAME="forcelength" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Remind the user that length should be less than 20 chars."/>
+        <FIELD NAME="usecase" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Whether answers are matched case-sensitively."/>
+        <FIELD NAME="converttospace" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Student answer characters that are converted to a space."/>
+        <FIELD NAME="applydictionarycheck" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Whether to check student answers for spelling mistakes."/>
+        <FIELD NAME="extenddictionary" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Extra words for dictionary."/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="questionid" TYPE="foreign" FIELDS="questionid" REFTABLE="question" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="qtype_pmatch_synonyms" COMMENT="synonyms used in pmatch questions.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="questionid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="points to the question that these are used in"/>
+        <FIELD NAME="word" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="synonyms" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="qtype_pmatch_test_responses" COMMENT="marked test responses for pmatch questions.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="questionid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="points to the question that these relate to"/>
+        <FIELD NAME="response" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="expectedfraction" TYPE="number" LENGTH="12" NOTNULL="false" DEFAULT="0" SEQUENCE="false" DECIMALS="7"/>
+        <FIELD NAME="gradedfraction" TYPE="number" LENGTH="12" NOTNULL="false" SEQUENCE="false" DECIMALS="7"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="questionid" TYPE="foreign" FIELDS="questionid" REFTABLE="question" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="qtype_pmatch_rule_matches" COMMENT="Store id of each answer/rule that matches a test response">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="answerid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="ponits to id of the question_answers table"/>
+        <FIELD NAME="testresponseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="ponits to id of the qtype_pmatch_test_responses table"/>
+        <FIELD NAME="questionid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="ID of the linked question"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="testresponseid" TYPE="foreign" FIELDS="testresponseid" REFTABLE="qtype_pmatch_test_responses" REFFIELDS="id"/>
+        <KEY NAME="answerid" TYPE="foreign" FIELDS="answerid" REFTABLE="question_answers" REFFIELDS="id"/>
+        <KEY NAME="questionid" TYPE="foreign" FIELDS="questionid" REFTABLE="question" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+  </TABLES>
+</XMLDB>

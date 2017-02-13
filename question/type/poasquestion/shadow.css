@@ -1,0 +1,155 @@
+#SLlogo,#SL_shadow_button {
+	background: url('chrome://imtranslator/skin/imtranslator-s.png') top left no-repeat;
+	height: 24px;
+	width: 24px;
+	position:absolute;
+}
+#SLlogo{
+	position:relative;
+}
+
+#SL_tts,.SL_copy,.SL_copy_auto {
+	background: url('chrome://imtranslator/skin/tts-voice.png') top left no-repeat;
+	height: 16px;
+	width: 16px;
+	cursor:pointer;
+}
+
+#SLDONATE{
+	background: url('chrome://imtranslator/skin/donate2.png') top left no-repeat;
+	position:absolute;
+	height: 14px;
+	width: 64px;
+	cursor:pointer;
+	margin-top:-12px;
+	margin-left:245px;
+}
+#SL_sel_source{margin-left:25px;width:300px;}
+
+.SL_copy{
+	background: url('chrome://imtranslator/skin/copy.png') top left no-repeat;
+}
+.SL_copy_auto{
+	background: url('chrome://imtranslator/skin/copy_auto.png') top left no-repeat;
+}
+
+.SL_pin_off,.SL_pin_on {
+	background: url('chrome://imtranslator/skin/pin-off.png') top left no-repeat;
+	height: 16px;
+	width: 16px;
+	cursor:pointer;
+	margin-left:20px;
+}
+.SL_pin_on {
+	background: url('chrome://imtranslator/skin/pin-on.png') top left no-repeat;
+	margin-top:-3px;
+}
+
+.SL_font_off,.SL_font_on {
+	background: url('chrome://imtranslator/skin/font-on.png') top left no-repeat;
+	height: 16px;
+	width: 16px;
+	cursor:pointer;
+}
+.SL_font_off {
+	background: url('chrome://imtranslator/skin/font-off.png') top left no-repeat;
+}
+
+
+.SL_small_options_switch_on,.SL_small_options_switch_off{
+	background: url('chrome://imtranslator/skin/options-off.png') top left no-repeat;
+	height: 16px;
+	width: 94px;
+	margin-left:256px;
+	cursor:pointer;
+}
+.SL_small_options_switch_on{
+	background: url('chrome://imtranslator/skin/options-on.png') top left no-repeat;
+}
+.SL_small_tooltips_switch_on,.SL_small_tooltips_switch_off{
+	background: url('chrome://imtranslator/skin/tooltips-off.png') top left no-repeat;
+	height: 16px;
+	width: 94px;
+	margin-top:-16px;
+	cursor:pointer;
+	position:absolute;
+}
+
+.SL_small_tooltips_switch_on{
+	background: url('chrome://imtranslator/skin/tooltips-on.png') top left no-repeat;
+}
+
+#SLtopbar {padding:1px;margin:1px;width:340px;height:25px;}
+#SLonoffTEXT{color:green;font-size:10px;}
+#SLonoff{ width:0;height:0;}
+#SL_shadow_balloon{
+ font-family:Verdana,Sans-serif;
+ width:350px;
+ top:-1000px;
+ left:-1000px;
+ font-size:12px;
+ background:#FFF;
+ border:1px solid #BAB9B5;
+ border-radius: 5px 5px 5px 5px;
+ position:absolute;
+ z-index:999999999999999;
+ box-shadow: 5px 5px 15px #BAB9B5;
+}
+#SL_shadow_button{cursor:pointer;top:100px;left:100px;opacity:0.5;z-index:9999;}
+#SLplanshet{
+ width:350px;
+ cursor:move;
+ height:28px;
+ margin-left:-1px;
+ margin-top:-1px;
+ font-size:12px;
+ background:ThreeDFace;
+ border:1px solid #BAB9B5;
+ border-radius: 5px 5px 0px 0px;
+ z-index:999999999;
+ position:relative;
+}
+#SLarrowTOP,#SLarrowBOT{
+ display:block;
+ position:absolute;
+ left:165px;
+ width:0;
+ height:0;
+ border-color: transparent transparent ThreeDFace transparent;
+ border-style: solid;
+ border-width: 10px;
+ border-radius:10;
+}
+#SLtriggerKey{
+ background: url('chrome://imtranslator/skin/triggerkey.png') top left no-repeat;
+ width:13px;
+ height:10px;
+ margin-left:28px;
+ margin-top:5px;
+ margin-bottom:5px;
+}
+
+#SLarrowTOP{top:-20px;}
+#SLarrowBOT{border-color: #fff transparent transparent transparent;}
+#SLto,#SLfrom,#SLcontrols,#SL_tip{width:90px;margin:0;padding:0;font-family:Verdana,Sans-serif;color:#000;font-size:13px;font-weight:400;}
+#SLto{height:20px;background:#fff;border:1px solid #bababa;}
+#SLfrom{margin-left:5px;}
+#SL_result{position:relative;text-align:left;font-family:Verdana,Sans-serif;color:#000;font-size:12px;line-height: 16px;margin:8px;z-index:999999999;width: 96%; max-height: 200px; overflow-y: auto;-moz-hyphens: auto; word-break: normal;}
+#SLcontrols{width:98%;text-align:left;margin-left:8px;margin-top:8px; font-size:11px;}
+#SL_tip,#SL_small_tooltips{color:red; margin:8px;font-size:10px;width:98%;text-align:left;}
+#SLoptionsKey,#SLfrom_options{width:60px;height:20px;margin:0px;padding:0px;}
+#SLfrom_options{width:140px;}
+#SL_select_patch,#SL_select2_patch{
+ background: url('chrome://imtranslator/skin/patch.png') top left repeat;width:65px;height:18px;margin-left:-1px;margin-top:-1px;position:absolute;z-index:9999;
+}
+#SL_select2_patch{
+ margin-left:155px;
+ width:150px;
+ margin-top:-17px;
+}
+.SLtable,.SLtd{font-size:11px;font-family:Verdana,Sans-serif;color:#000;margin:0px;padding:0px;border:0px;height:16px;vertical-align:middle;text-align:left;}
+.SLaligner,.SLaligner2{height:18px;margin:3px;font-family:Verdana,Sans-serif;color:#000;font-size:11px;text-align:left;}
+.SLaligner2{margin-top:8px;width:70px;}
+.SLselectbox,#SLoptionsKey,#SLfrom_options{font-size:10px; height:16px;font-family:Verdana,Sans-serif;color:#000;border:1px solid #bababa;font-weight:400;background:#fff;}
+#SLspacer{height:20px;margin-bottom:5px;margin-top:-3px;text-align:left;}
+.SL_sesultLTRRTL{direction:ltr;text-align: left;unicode-bidi: bidi-override;}

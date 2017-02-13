@@ -1,0 +1,46 @@
+Version 3.1
+- Add CLI scripts
+- Add Travis CI
+- Fix missing requre_once
+
+Version 3.0
+- Minor fixes
+
+Version 2.9.4
+- Minor fixes
+
+Version 2.9.3
+- Migrate to Mustache templates
+
+Version 1.1
+- Add %split function
+- Rename some variables
+- Copy readme.md to readme.txt for moodle plugin database
+
+Version 1.0
+- Use sql_fullname function in view.php
+- move menu links from root to user->accounts section
+- add $SESSION global in auth.php (pull request from sbourget. thanks!)
+- add missing require_once in auth.php
+
+Verion 0.5
+- small fixes in view.php and convert.php
+
+Version 0.4
+- Add 'raw' custom profile fields
+- Add session variable mcautoenrolled for use in other plugins or themes
+- Add theme patch which forces autoenrol
+- Rebuild README file /now it's readme.md/
+- update 'Available templates' section in settings.php
+
+Version 0.31
+- Fix errors in view.php and russian translation
+
+Version 0.3
+- "Ignore user" feature added
+- "Unenrol" feature added
+- Add "%email_username" and "%email_domain" variables
+
+Version 0.2
+- Fix error with arrays in profile field
+- Add "Delimiter" value (CR+LF, CR, LF)
