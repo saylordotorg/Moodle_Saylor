@@ -1,0 +1,22 @@
+{
+    "name": "accredible/acms-api-php",
+    "description": "PHP wrappers for Accredible ACMS API",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Alan Heppenstall",
+            "email": "alan@accredible.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-4": {
+            "ACMS\\": "src",
+            "ACMS\\Tests\\": "tests"
+        }
+    },
+    "require": {
+        "php": ">=5.3",
+        "guzzlehttp/guzzle": "~4.0"
+    }
+}

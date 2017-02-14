@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="question/type/jme/db" VERSION="20130701" COMMENT="XMLDB file for Moodle question/type/jme"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="qtype_jme_options" COMMENT="Options for java molecule editor questions">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="questionid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Foreign key references question.id."/>
+        <FIELD NAME="jmeoptions" TYPE="text" LENGTH="small" NOTNULL="true" SEQUENCE="false" COMMENT="Options for the JME Applet."/>
+        <FIELD NAME="width" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="360" SEQUENCE="false" COMMENT="Width of JME Applet in pixels."/>
+        <FIELD NAME="height" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="315" SEQUENCE="false" COMMENT="Height the JME Applet in pixels."/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="questionid" TYPE="foreign-unique" FIELDS="questionid" REFTABLE="question" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+  </TABLES>
+</XMLDB>

@@ -1,0 +1,2 @@
+function WP(a){this.a=a}r(624,1,{},WP);_.Cc=function(){Ns(this.a.e.ob,!0);this.a.e.ob.focus();var a=this.a.e,b;b=Om(a.ob,Ag).length;if(0<b&&a.jb){if(0>b)throw new VC("Length must be a positive integer. Length: "+b);if(b>Om(a.ob,Ag).length)throw new VC("From Index: 0  To Index: "+b+"  Text Length: "+Om(a.ob,Ag).length);try{a.ob.setSelectionRange(0,0+b)}catch(c){}}};_.a=null;r(636,1,Uh);
+_.Pc=function(){var a;a=new eM;var b=this.a,c;Av(a.e,b);b=(c=$C(b,"\r\n|\r|\n|\n\r"),c.length);Fs(a.e,20*(10>b?b:10)+vf);xm((um(),vm),new WP(a));gL(a);uL(a)};Y(624);y($F)(7);

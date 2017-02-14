@@ -1,0 +1,51 @@
+PHP "String" Stream Wrapper
+========================
+
+The PHP "String" Stream Wrapper is a simple stream wrapper for PHP that is 
+designed to handle simple strings within PHP. There are two classes included:
+one to "control" the virtual streams and another to translate the string into
+the stream interface for use with functions that accept file pointers (e.g.
+fgetcsv, fread, etc).
+
+-------------------------------------------------------------------------------
+Usage
+
+require('stringstream.php');
+$mystring = "This,is,a,CSV,string";
+StringStreamController::createRef('reference',$mystring);
+$file = fopen('string://reference');
+...
+$file is now a file handle, you can use this for any function that requests a
+file handle, such as fgetcsv:
+$row = fgetcsv($file);
+
+Please note that it is necessary to to create a reference first and that 
+reference will always point to the same string, which includes any 
+modifications you make to the string. 
+
+-------------------------------------------------------------------------------
+Why
+
+I was mentoring for Summer of Code and my student asked me if I had any decent 
+code for parsing a CSV string. I didn't, but noticed that there was a PHP 
+function that would, fgetcsv. The problem being in this case that the CSV
+file was already in a PHP string. I looked at the built-in "data" stream
+which provides similar functionality (but not the same!) however an fopen
+with it causes a duplication of data for the string, which really isn't
+good. Additionally, the "data" stream requires the information to be in a 
+certain format which may or may not be acceptable in certain circumstances. So 
+I searched on how to make a stream, found the page noted at the bottom which 
+is an Amazon S3 Stream Wrapper and made my own stream.   
+
+Whilst a bit 'clunky' compared to most streams, it solves the problem, with
+approximately 1k of memory usage (which if you have a large CSV file, is a
+really smaller number). The alternative was to use a PHP written CSV parser or
+to put it into a file. I feel that this solution is nicer.
+
+-------------------------------------------------------------------------------
+References
+
+PHP Streams: http://www.php.net/stream
+PHP fopen: http://www.php.net/manual/en/function.fopen.php
+I borrowed some template code from here: http://cesarodas.com/2007/09/php-amazon-s3-stream-wrapper.html 
+  

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="question/type/algebra/db" VERSION="20080516" COMMENT="XMLDB file for Moodle question/type/algebra question type"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="qtype_algebra_options" COMMENT="Options for algebra questions" NEXT="qtype_algebra_variables">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="questionid"/>
+        <FIELD NAME="questionid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="compareby"/>
+        <FIELD NAME="compareby" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="evaluated" SEQUENCE="false" PREVIOUS="questionid" NEXT="nchecks"/>
+        <FIELD NAME="nchecks" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="10" SEQUENCE="false" PREVIOUS="compareby" NEXT="tolerance"/>
+        <FIELD NAME="tolerance" TYPE="float" NOTNULL="true" SEQUENCE="false" PREVIOUS="nchecks" NEXT="disallow"/>
+        <FIELD NAME="disallow" TYPE="text" NOTNULL="true" SEQUENCE="false" PREVIOUS="tolerance" NEXT="allowedfuncs"/>
+        <FIELD NAME="allowedfuncs" TYPE="text" NOTNULL="true" SEQUENCE="false" PREVIOUS="disallow" NEXT="answerprefix"/>
+        <FIELD NAME="answerprefix" TYPE="text" NOTNULL="true" SEQUENCE="false" PREVIOUS="allowedfuncs"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="questionid"/>
+        <KEY NAME="questionid" TYPE="foreign" FIELDS="questionid" REFTABLE="question" REFFIELDS="id" PREVIOUS="primary"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="qtype_algebra_variables" COMMENT="Variables for algebra questions" PREVIOUS="qtype_algebra_options">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="question"/>
+        <FIELD NAME="question" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="name"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="30" NOTNULL="true" SEQUENCE="false" PREVIOUS="question" NEXT="min"/>
+        <FIELD NAME="min" TYPE="char" LENGTH="30" NOTNULL="true" DEFAULT="-" SEQUENCE="false" PREVIOUS="name" NEXT="max"/>
+        <FIELD NAME="max" TYPE="char" LENGTH="30" NOTNULL="true" DEFAULT="-" SEQUENCE="false" PREVIOUS="min"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="question"/>
+        <KEY NAME="question" TYPE="foreign" FIELDS="question" REFTABLE="question" REFFIELDS="id" PREVIOUS="primary"/>
+      </KEYS>
+    </TABLE>
+  </TABLES>
+</XMLDB>

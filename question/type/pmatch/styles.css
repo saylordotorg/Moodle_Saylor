@@ -1,0 +1,132 @@
+.que.pmatch .answer {
+    padding: 0.3em;
+    width: auto;
+    display: inline;
+}
+.que.pmatch .qtext textarea,
+.que.pmatch .ablock textarea {
+    max-width: 100%;
+}
+
+/* Editing form. Style repeated elements*/
+#page-question-type-pmatch .mform .textareamonospace {
+    white-space: pre;
+    font-family: Andale Mono, Monaco, Courier New, DejaVu Sans Mono, monospace;
+}
+
+/* Top */
+body#page-question-type-pmatch #id_answerhdr div.fitem.femptylabel,
+body#page-question-type-pmatch #fitem_id_addanswers + .fitem {
+    background: #EEE;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-bottom: 5px;
+    padding-top: 5px;
+    border: 1px solid #BBB;
+    border-bottom: 0;
+}
+
+body#page-question-type-pmatch div[id^=fitem_id_][id*=_answer_] .fitemtitle,
+body#page-question-type-pmatch div.fitem.fitem_accuracy .fitemtitle,
+body#page-question-type-pmatch #fitem_id_addanswers + .fitem .fitemtitle {
+    font-weight: bold;
+}
+body#page-question-type-pmatch #region-main div.fitem.femptylabel {
+    padding: 0;
+}
+body#page-question-type-pmatch #region-main div.fitem.femptylabel .fitemtitle {
+    padding: 0;
+    margin: 0;
+}
+body#page-question-type-pmatch #region-main div.fitem.femptylabel .fstatic {
+    margin: 0;
+}
+body#page-question-type-pmatch #region-main #fgroup_id_updatebuttonar {
+    background: none;
+    border: none;
+}
+
+/* Middle */
+body#page-question-type-pmatch div[id^=fitem_id_][id*=answer_],
+body#page-question-type-pmatch div[id^=fitem_id_][id*=fraction_],
+body#page-question-type-pmatch div.fitem.fitem_matchedresponses,
+body#page-question-type-pmatch div.fitem.fitem_accuracy,
+body#page-question-type-pmatch div.fitem.rcw,
+body#page-question-type-pmatch div.fitem.try-rule,
+body#page-question-type-pmatch #fitem_id_addanswers + .fitem + .fitem {
+    background: #EEE;
+    margin-bottom: 0;
+    margin-top: 0;
+    padding-bottom: 5px;
+    padding-top: 5px;
+    border: 1px solid #BBB;
+    border-top: 0;
+    border-bottom: 0;
+}
+
+/* Bottom */
+body#page-question-type-pmatch div[id^=fitem_id_][id*=feedback_],
+body#page-question-type-pmatch div[id^=fitem_id_][id*=otherfeedback] {
+    background: #EEE;
+    margin-bottom: 2em;
+    margin-top: 0;
+    padding-bottom: 5px;
+    padding-top: 5px;
+    border: 1px solid #BBB;
+    border-top: 0;
+}
+body#page-question-type-pmatch #fitem_id_addanswers {
+    margin-bottom: 2em;
+}
+
+/* Styles for the question-testing interface. */
+.qtype_pmatch-selftest-missed-negative {
+    font-weight: bold;
+    color: #f00;
+}
+
+.qtype_pmatch-selftest-null {
+    font-weight: bold;
+    color: #B38686;
+}
+
+.qtype_pmatch-selftest-missed-positive {
+    font-weight: bold;
+    color: #00f;
+}
+
+.que.pmatch .formulation .questiontestslink {
+    float: right;
+    font-size: 0.7em;
+}
+
+.que.pmatch .formulation .questiontestslink {
+    float: right;
+    font-size: 0.7em;
+}
+#page-question-type-pmatch .rcw input[type=submit] {
+    margin: 0 0 10px 5px;
+}
+#page-question-type-pmatch .rc-hidden {
+    display: none;
+}
+/* The missing style for the successful progress bar colour.
+  This is due to theme/base/style/core.css not having this rule (though it has
+  .progress-stripped etc.) Note theme/bootstrapbase/ has the full css, but our
+  themes (ou, osep) are not based on it. */
+body#page-question-type-pmatch-testquestion .progress-success .bar,
+body#page-question-type-pmatch-testquestion .progress .bar-success {
+    background-color: #5eb95e;
+    background-image: -moz-linear-gradient(top, #62c462, #57a957);
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#62c462), to(#57a957));
+    background-image: -webkit-linear-gradient(top, #62c462, #57a957);
+    background-image: -o-linear-gradient(top, #62c462, #57a957);
+    background-image: linear-gradient(to bottom, #62c462, #57a957);
+    background-repeat: repeat-x;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff62c462', endColorstr='#ff57a957', GradientType=0);
+}
+
+/* Align reset table preferences button */
+body#page-question-type-pmatch-testquestion .resettable {
+    text-align: left;
+}
