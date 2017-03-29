@@ -483,6 +483,57 @@ function accredible_quiz_submission_handler($event) {
 	}
 }
 
+
+/*
+ * Course completion handler
+ *
+ * @param core/event $event
+ */
+function accredible_course_completed_handler($event) {
+
+    global $DB, $CFG;
+
+	$user = $DB->get_record('user', array('id' => $event->relateduserid));
+
+	// Check we have a course record
+	if($accredible_certificate_records = $DB->get_records('accredible', array('course' => $event->courseid))) {
+		foreach ($accredible_certificate_records as $record) {
+			// check for the existence of an activity instance and an auto-issue rule
+			if( $record and ($record->completionactivities && $record->completionactivities != 0) ) {
+
+				// Check if we have a group mapping - if not use the old logic
+				if($record->groupid){
+					// check for an existing certificate
+					$existing_certificate = accredible_check_for_existing_credential($record->groupid, $user->email);
+					
+					// create that credential if it doesn't exist
+					if(!$existing_certificate) {
+						create_credential($user, $record->groupid);
+					}
+
+				} else {
+					$existing_certificate = accredible_check_for_existing_certificate ($record->achievementid, $user);
+
+					// check for an existing certificate
+					if(!$existing_certificate) {
+						// issue a ceritificate
+						$api_response = accredible_issue_default_certificate( $user->id, $record->id, fullname($user), $user->email, null, null);
+						$certificate_event = \mod_accredible\event\certificate_created::create(array(
+						  'objectid' => $api_response->credential->id,
+						  'context' => context_module::instance($event->contextinstanceid),
+						  'relateduserid' => $event->relateduserid
+						));
+						$certificate_event->trigger();
+					} 
+
+				}
+
+			}
+		}
+	}
+}
+
+
 function accredible_update_certificate_grade($certificate_id, $evidence_item_id, $grade) {
   global $CFG;
 
