@@ -1,30 +1,29 @@
 <?php
-// IntelliBoard.net
+// This file is part of Moodle - http://moodle.org/
 //
-// IntelliBoard.net is built to work with any LMS designed in Moodle
-// with the goal to deliver educational data analytics to single dashboard instantly.
-// With power to turn this analytical data into simple and easy to read reports,
-// IntelliBoard.net will become your primary reporting tool.
-//
-// Moodle
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-// IntelliBoard.net is built as a local plugin for Moodle.
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * IntelliBoard.net
+ * This plugin provides access to Moodle data in form of analytics and reports in real time.
  *
  *
- * @package    	intelliboard
- * @copyright  	2015 IntelliBoard, Inc
- * @license    	http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @created by	IntelliBoard, Inc
- * @website		www.intelliboard.net
+ * @package    local_intelliboard
+ * @copyright  2017 IntelliBoard, Inc
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @website    https://intelliboard.net/
  */
+
 require('../../config.php');
 require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->dirroot .'/local/intelliboard/externallib.php');
@@ -47,7 +46,7 @@ if($id){
 		case 3: $timestart = strtotime('-7 days'); $timefinish = time(); break;
 		case 4: $timestart = strtotime('-30 days'); $timefinish = time(); break;
 		case 5: $timestart = strtotime('-90 days'); $timefinish = time(); break;
-		case 6: $timestart = 0; $timefinish = time(); break;
+		default: $timestart = 0; $timefinish = time();
 	}
 
 	$params = (object) array(
@@ -86,10 +85,6 @@ if($id){
 }
 
 $params = array(
-	'url'=>$CFG->wwwroot,
-	'email'=>$USER->email,
-	'firstname'=>$USER->firstname,
-	'lastname'=>$USER->lastname,
 	'reports'=>get_config('local_intelliboard', 'reports'),
 	'filter'=>s($filter),
 	'daterange'=>$daterange,

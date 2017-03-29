@@ -73,7 +73,7 @@ class core_message_api_testcase extends core_message_messagelib_testcase {
         $this->send_fake_message($sender2, $recipient);
 
         \core_message\api::mark_all_read_for_user($recipient->id, $sender1->id);
-        $this->assertEquals(message_count_unread_messages($recipient), 6);
+        $this->assertEquals(message_count_unread_messages($recipient), 3);
     }
 
     public function test_mark_all_read_for_user_touser_with_type() {
@@ -333,6 +333,9 @@ class core_message_api_testcase extends core_message_messagelib_testcase {
         // The person doing the search.
         $this->setUser($user1);
 
+        // No conversations yet.
+        $this->assertEquals([], \core_message\api::get_conversations($user1->id));
+
         // Send some messages back and forth, have some different conversations with different users.
         $time = 1;
         $this->send_fake_message($user1, $user2, 'Yo!', 0, $time + 1);
@@ -460,6 +463,41 @@ class core_message_api_testcase extends core_message_messagelib_testcase {
 
         // We should not get any conversations back.
         $this->assertCount(0, $conversations);
+    }
+
+    /**
+     * Tests retrieving conversations when a conversation contains a deleted user.
+     */
+    public function test_get_conversations_with_deleted_user() {
+        // Create some users.
+        $user1 = self::getDataGenerator()->create_user();
+        $user2 = self::getDataGenerator()->create_user();
+        $user3 = self::getDataGenerator()->create_user();
+
+        // Send some messages back and forth, have some different conversations with different users.
+        $time = 1;
+        $this->send_fake_message($user1, $user2, 'Yo!', 0, $time + 1);
+        $this->send_fake_message($user2, $user1, 'Sup mang?', 0, $time + 2);
+        $this->send_fake_message($user1, $user2, 'Writing PHPUnit tests!', 0, $time + 3);
+        $this->send_fake_message($user2, $user1, 'Word.', 0, $time + 4);
+
+        $this->send_fake_message($user1, $user3, 'Booyah', 0, $time + 5);
+        $this->send_fake_message($user3, $user1, 'Whaaat?', 0, $time + 6);
+        $this->send_fake_message($user1, $user3, 'Nothing.', 0, $time + 7);
+        $this->send_fake_message($user3, $user1, 'Cool.', 0, $time + 8);
+
+        // Delete the second user.
+        delete_user($user2);
+
+        // Retrieve the conversations.
+        $conversations = \core_message\api::get_conversations($user1->id);
+
+        // We should only have one conversation because the other user was deleted.
+        $this->assertCount(1, $conversations);
+
+        // Confirm the conversation is from the non-deleted user.
+        $conversation = reset($conversations);
+        $this->assertEquals($user3->id, $conversation->userid);
     }
 
    /**

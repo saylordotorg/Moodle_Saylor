@@ -314,6 +314,7 @@ class api {
 
         // This user has no conversations so we can return early here.
         if (empty($conversationrecords)) {
+            $transaction->allow_commit();
             return [];
         }
 
@@ -417,7 +418,8 @@ class api {
         $userfields = \user_picture::fields('', array('lastaccess'));
         $userssql = "SELECT $userfields
                      FROM {user}
-                     WHERE id $useridsql";
+                     WHERE id $useridsql
+                       AND deleted = 0";
         $otherusers = $DB->get_records_sql($userssql, $usersparams);
 
         // Similar to the above use case, we need to pull the contact information and again this has
@@ -439,7 +441,7 @@ class api {
         $unreadcounts = $DB->get_records_sql($unreadcountssql, [$userid]);
 
         // We can close off the transaction now.
-        $DB->commit_delegated_transaction($transaction);
+        $transaction->allow_commit();
 
         // Now we need to order the messages back into the same order of the conversations.
         $orderedconvosigs = array_keys($conversationrecords);
@@ -476,6 +478,11 @@ class api {
             // Add the other user's information to the conversation, if we have one.
             foreach ($userproperties as $prop) {
                 $conversation->$prop = ($otheruser) ? $otheruser->$prop : null;
+            }
+
+            // Do not process a conversation with a deleted user.
+            if (empty($conversation->id)) {
+                continue;
             }
 
             // Add the contact's information, if we have one.

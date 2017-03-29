@@ -401,8 +401,9 @@ class format_grid_renderer extends format_section_renderer_base {
             echo html_writer::end_tag('div');
             echo html_writer::end_tag('div');
             echo html_writer::tag('div', '&nbsp;', array('class' => 'clearer'));
-            echo html_writer::end_tag('div');
         }
+
+        echo html_writer::end_tag('div');
 
         $sectionredirect = null;
         if ($course->coursedisplay == COURSE_DISPLAY_MULTIPAGE) {

@@ -95,16 +95,9 @@ function accredible_add_instance($post) {
         }
     }
 
-    $completion_activities = array();
-    foreach ($post->activities as $activity_id => $track_activity) {
-        if($track_activity) {
-            $completion_activities[$activity_id] = false;
-        }
-    }
-
     // Save record
     $db_record = new stdClass();
-    $db_record->completionactivities = serialize_completion_array($completion_activities);
+    $db_record->completionactivities = $post->completionactivities;
     $db_record->name = $post->name;
     $db_record->course = $post->course;
     $db_record->finalquiz = $post->finalquiz;
@@ -216,13 +209,6 @@ function accredible_update_instance($post) {
         }
     }
 
-    $completion_activities = array();
-    foreach ($post->activities as $activity_id => $track_activity) {
-        if($track_activity) {
-            $completion_activities[$activity_id] = false;
-        }
-    }
-
     // If the group was changed we should save that
     if(!$accredible_certificate->achievementid && $post->groupid){
         $groupid = $post->groupid;
@@ -230,12 +216,17 @@ function accredible_update_instance($post) {
         $groupid = $accredible_certificate->groupid;
     }
 
+    // Set completion activitied to 0 if unchecked
+    if(!property_exists($post, 'completionactivities')){
+        $post->completionactivities = 0;
+    }
+
     // Save record
     if($accredible_certificate->achievementid){
         $db_record = new stdClass();
         $db_record->id = $post->instance;
         $db_record->achievementid = $post->achievementid;
-        $db_record->completionactivities = serialize_completion_array($completion_activities);
+        $db_record->completionactivities = $post->completionactivities;
         $db_record->name = $post->name;
         $db_record->certificatename = $post->certificatename;
         $db_record->description = $post->description;
@@ -244,7 +235,7 @@ function accredible_update_instance($post) {
     } else {
         $db_record = new stdClass();
         $db_record->id = $post->instance;
-        $db_record->completionactivities = serialize_completion_array($completion_activities);
+        $db_record->completionactivities = $post->completionactivities;
         $db_record->name = $post->name;
         $db_record->course = $post->course;
         $db_record->finalquiz = $post->finalquiz;

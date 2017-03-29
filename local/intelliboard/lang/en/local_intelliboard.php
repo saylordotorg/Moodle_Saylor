@@ -1,29 +1,27 @@
 <?php
-// IntelliBoard.net
+// This file is part of Moodle - http://moodle.org/
 //
-// IntelliBoard.net is built to work with any LMS designed in Moodle
-// with the goal to deliver educational data analytics to single dashboard instantly.
-// With power to turn this analytical data into simple and easy to read reports,
-// IntelliBoard.net will become your primary reporting tool.
-//
-// Moodle
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-// IntelliBoard.net is built as a local plugin for Moodle.
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * IntelliBoard.net
+ * This plugin provides access to Moodle data in form of analytics and reports in real time.
  *
  *
- * @package    	intelliboard
- * @copyright  	2015 IntelliBoard, Inc
- * @license    	http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @created by	IntelliBoard, Inc
- * @website		www.intelliboard.net
+ * @package    local_intelliboard
+ * @copyright  2017 IntelliBoard, Inc
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @website    http://intelliboard.net/
  */
 
 $string['pluginname'] = 'IntelliBoard.net Plugin';
@@ -47,6 +45,7 @@ $string['enabled_desc'] = 'Enable Tracking';
 $string['trackadmin'] = 'Tracking Admins';
 $string['logs'] = 'Migration Tool';
 $string['trackadmin_desc'] = 'Enable tracking for admin users (not recommended)';
+$string['intelliboard:instructors'] = 'IntelliBoard [instructor]';
 $string['intelliboard:students'] = 'IntelliBoard [student]';
 $string['intelliboard:view'] = 'IntelliBoard [view]';
 $string['intelliboard:manage'] = 'IntelliBoard [manage]';
@@ -54,8 +53,10 @@ $string['tls12'] = 'TLS v1.2';
 $string['tls12_desc'] = 'Advanced settings: TLS v1.2';
 $string['sizemode'] = 'Large size mode';
 $string['sizemode_desc'] = 'Large ( > 5.000 users)';
-
-
+$string['server'] = 'IntelliBoard Server';
+$string['server_usa'] = 'IntelliBoard USA';
+$string['server_au'] = 'IntelliBoard Australia';
+$string['server_eu'] = 'IntelliBoard Europe';
 $string['filters'] = 'Dashboard filters';
 $string['filter1'] = 'Deleted users';
 $string['filter2'] = 'Suspended users';
@@ -73,20 +74,29 @@ $string['filter5_desc'] = 'Show not active enrollment methods';
 $string['filter6_desc'] = 'Show users with not active enrollment status';
 $string['filter7_desc'] = 'Show not visible Activities/Resourses';
 $string['filter8_desc'] = 'Show only enrolled users (not recommended)';
-
-
-$string['intelliboardstudent'] = 'IntelliBoard';
 $string['intelliboardaccess'] = 'You do not have permission to view Learner Dashboard. Please contact your Administrator for assistance.';
 $string['tex1'] = 'IntelliBoard Learner Dashboard is not enabled.';
-$string['te1'] = 'Subscription email';
-$string['te1_desc'] = 'Enter email used with IntelliBoard.net subscription. If you do not have an active subscription, please register at <a target="_blank" href="https://intelliboard.net">IntelliBoard.net</a>. The Learner Dashboard is available with a subscription of Level 3 and higher.';
-
+$string['account'] = 'Subscription Information';
+$string['te12'] = 'First Name';
+$string['te13'] = 'Last Name';
+$string['te1'] = 'Email';
+$string['te1_desc'] = 'Enter First Name, Last Name, Email used with IntelliBoard.net subscription. If you do not have an active subscription, please register at <a target="_blank" href="https://intelliboard.net">IntelliBoard.net</a>. The Learner and Instructor Dashboard are available with a subscription of Level 3 and higher.';
+$string['n1'] = 'Overview [Learner Progress]';
+$string['n2'] = 'Overview [Grade Progress]';
+$string['n3'] = 'Overview [Activity Progress]';
+$string['n4'] = 'Overview [Totals]';
+$string['n5'] = 'Current Progress';
+$string['n6'] = 'Widget: Correlations';
+$string['n7'] = 'Widget: Event Utilization';
+$string['n8'] = 'Courses Page';
+$string['n9'] = 'Reports Page';
+$string['n10'] = 'Instructor Dashboard';
+$string['n11'] = 'Alternative text for navigation menu';
 $string['ts1'] = 'Learner Dashboard';
 $string['ts2'] = 'Learner Dashboard Page';
 $string['ts3'] = 'Learner Dashboard Courses';
 $string['ts4'] = 'Learner Dashboard Grades';
 $string['ts5'] = 'Learner Dashboard Reports';
-
 $string['t01'] = 'Time filter: Last Month';
 $string['t02'] = 'Time filter: Last Quarter';
 $string['t03'] = 'Time filter: Last Semester';
@@ -94,7 +104,6 @@ $string['t04'] = 'Enable [header] Completed courses';
 $string['t05'] = 'Enable [header] Courses in progress';
 $string['t06'] = 'Enable [header] Courses avg. grade';
 $string['t07'] = 'Enable [header] Messages';
-
 $string['t1'] = 'Enable Learner Dashboard';
 $string['t2'] = 'Enable Dashboard';
 $string['t3'] = 'Enable Courses';
@@ -126,7 +135,6 @@ $string['t27'] = 'Enable [Completed Activities] column';
 $string['t28'] = 'Enable [Score] column';
 $string['t29'] = 'Enable [Course Completion Status] column';
 $string['t30'] = 'Enable [Activity Grades] column';
-
 $string['t31'] = 'Enable [Assignments][Grade] widget column';
 $string['t32'] = 'Enable [Assignments][Due Date] widget column';
 $string['t33'] = 'Enable [Quizzes][Grade] widget column';
@@ -147,7 +155,6 @@ $string['t47'] = 'Courses [grid] background color';
 $string['t49'] = 'Report filter columns';
 $string['t50'] = 'Teacher roles';
 $string['t51'] = 'Student roles';
-
 $string['current_grade'] = 'current grade';
 $string['average_grade'] = 'average grade';
 $string['type_here'] = 'Type here...';
@@ -266,5 +273,50 @@ $string['showing_1_to_10'] = 'Showing 1 to 10';
 $string['course_grade'] = 'Course Grade';
 $string['completed_activities_resourses'] = 'Completed Activities/Resourses';
 $string['save'] = 'Save';
-
-
+$string['help'] = 'Need Help?';
+$string['in1'] = 'Overview';
+$string['in2'] = 'Current Progress';
+$string['in3'] = 'Total Courses';
+$string['in4'] = 'Total Learners';
+$string['in5'] = 'Total Course Grades';
+$string['in6'] = 'Learners Completed';
+$string['in7'] = 'Learners Incomplete';
+$string['in8'] = 'Learner Avg. Grade';
+$string['in9'] = 'Correlations';
+$string['in10'] = 'Event Utilization';
+$string['in11'] = 'Learner Progress';
+$string['in12'] = 'Grade Progress';
+$string['in13'] = 'Time Spent (%)';
+$string['in14'] = '% Progress';
+$string['in15'] = 'Learner Completions';
+$string['in16'] = 'Last Access';
+$string['in17'] = 'Total Time Spent';
+$string['in18'] = 'Total Visits';
+$string['in19'] = 'Avg. Grade';
+$string['in20'] = 'Return to Learners';
+$string['in201'] = 'Return to Activities';
+$string['in21'] = 'Course Avg. grade';
+$string['in22'] = 'Enabled';
+$string['in23'] = 'You have no learners to display.';
+$string['in24'] = 'Module';
+$string['in25'] = 'Passing Grade';
+$string['status'] = 'Status';
+$string['course_category'] = 'Course Category';
+$string['course_started'] = 'Course Started';
+$string['total_time_spent_enrolled_learners'] = 'Total Time Spent by Enrolled Learners on Course';
+$string['total_visits_enrolled_learners'] = 'Total Visits by Enrolled Learners on Course';
+$string['learners_enrolled'] = 'Learners Enrolled';
+$string['learning_progress'] = 'Learning Progress';
+$string['sections'] = 'Sections';
+$string['section'] = 'Section';
+$string['total_activities_resources'] = 'Total Activities/Resources';
+$string['completions'] = 'Completions';
+$string['return_to_courses'] = 'Return to Courses';
+$string['click_link_below_support_pages'] = 'Click the link below to access the IntelliBoard support pages:';
+$string['support'] = 'Support';
+$string['course_name'] = 'Course Name';
+$string['enrolled_completed_learners'] = 'Enrolled/Completed Learners';
+$string['activities_resources'] = 'Activities/Resources';
+$string['actions'] = 'Actions';
+$string['learner_name'] = 'Learner Name';
+$string['completed_activities_resources'] = 'Completed Activities/Resources';

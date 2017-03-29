@@ -169,21 +169,22 @@ class mod_accredible_mod_form extends moodleform_mod {
 
 
         $mform->addElement('header', 'completionissue', get_string('completionissueheader', 'accredible'));
-        $this->add_checkbox_controller(2, 'Select All/None');
         if($updatingcert) {
-            $completion_activity_ids = unserialize_completion_array($accredible_certificate->completionactivities);
-            foreach ($quizes as $quiz) {
-                $mform->addElement('advcheckbox', 'activities['.$quiz->id.']', 'Quiz', $quiz->name, array('group' => 2));
-                if(isset( $completion_activity_ids[$quiz->id] )) {
-                    $mform->setDefault('activities['.$quiz->id.']', 1);
-                }
+
+            $mform->addElement('checkbox', 'completionactivities', get_string('completionissuecheckbox', 'accredible'));
+            if(isset( $accredible_certificate->completionactivities )) {
+                $mform->setDefault('completionactivities', 1);
             }
         } else {
-            if($quizes) {
-                foreach ($quizes as $quiz) {
-                    $mform->addElement('advcheckbox', 'activities['.$quiz->id.']', 'Quiz', $quiz->name, array('group' => 2));
-                }
-            }   
+            $mform->addElement('checkbox', 'completionactivities', get_string('completionissuecheckbox', 'accredible'));
+            // $mform->addElement('advcheckbox', 'activities['.$quiz->id.']', 'Quiz', $quiz->name, array('group' => 2));
+            // $mform->addElement('advcheckbox', 'users['.$user->id.']', $user->firstname . ' ' . $user->lastname, null, array('group' => 1));
+
+            // if($quizes) {
+            //     foreach ($quizes as $quiz) {
+            //         $mform->addElement('advcheckbox', 'activities['.$quiz->id.']', 'Quiz', $quiz->name, array('group' => 2));
+            //     }
+            // }   
         }
 
 

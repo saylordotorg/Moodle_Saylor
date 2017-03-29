@@ -774,13 +774,16 @@ class assign {
 
         require_once($CFG->dirroot . '/calendar/lib.php');
 
-        $cm = get_coursemodule_from_instance('assign', $this->get_context()->id, $this->get_context()->course);
+        $cm = $this->get_course_module();
+        if (empty($cm)) {
+            $instance = $this->get_instance();
+            $cm = get_coursemodule_from_instance('assign', $instance->id, $instance->course);
+        }
 
         $override = $DB->get_record('assign_overrides', array('id' => $overrideid), '*', MUST_EXIST);
 
         // Delete the events.
-        $conds = array('modulename' => 'assign',
-            'instance' => $this->get_context()->id);
+        $conds = array('modulename' => 'assign', 'instance' => $this->get_instance()->id);
         if (isset($override->userid)) {
             $conds['userid'] = $override->userid;
         } else {
@@ -824,7 +827,7 @@ class assign {
     public function delete_all_overrides() {
         global $DB;
 
-        $overrides = $DB->get_records('assign_overrides', array('assignid' => $this->get_context()->id), 'id');
+        $overrides = $DB->get_records('assign_overrides', array('assignid' => $this->get_instance()->id), 'id');
         foreach ($overrides as $override) {
             $this->delete_override($override->id);
         }
@@ -1783,7 +1786,7 @@ class assign {
      * @return array List of user records
      */
     public function list_participants($currentgroup, $idsonly) {
-        global $DB;
+        global $DB, $USER;
 
         if (empty($currentgroup)) {
             $currentgroup = 0;
@@ -1797,6 +1800,7 @@ class assign {
             $fields = 'u.*';
             $orderby = 'u.lastname, u.firstname, u.id';
             $additionaljoins = '';
+            $additionalfilters = '';
             $instance = $this->get_instance();
             if (!empty($instance->blindmarking)) {
                 $additionaljoins .= " LEFT JOIN {assign_user_mapping} um
@@ -1818,11 +1822,27 @@ class assign {
                 $orderby = "COALESCE(s.timecreated, " . time() . ") ASC, COALESCE(s.id, " . PHP_INT_MAX . ") ASC, um.id ASC";
             }
 
+            if ($instance->markingworkflow &&
+                    $instance->markingallocation &&
+                    !has_capability('mod/assign:manageallocations', $this->get_context()) &&
+                    has_capability('mod/assign:grade', $this->get_context())) {
+
+                $additionaljoins .= ' LEFT JOIN {assign_user_flags} uf
+                                     ON u.id = uf.userid
+                                     AND uf.assignment = :assignmentid3';
+
+                $params['assignmentid3'] = (int) $instance->id;
+
+                $additionalfilters .= ' AND uf.allocatedmarker = :markerid';
+                $params['markerid'] = $USER->id;
+            }
+
             $sql = "SELECT $fields
                       FROM {user} u
                       JOIN ($esql) je ON je.id = u.id
                            $additionaljoins
                      WHERE u.deleted = 0
+                           $additionalfilters
                   ORDER BY $orderby";
 
             $users = $DB->get_records_sql($sql, $params);
@@ -3035,7 +3055,7 @@ class assign {
      * Throw an error if the permissions to view this users submission are missing.
      *
      * @throws required_capability_exception
-     * @return none
+     * @return void
      */
     public function require_view_submission($userid) {
         if (!$this->can_view_submission($userid)) {
@@ -3047,7 +3067,7 @@ class assign {
      * Throw an error if the permissions to view grades in this assignment are missing.
      *
      * @throws required_capability_exception
-     * @return none
+     * @return void
      */
     public function require_view_grades() {
         if (!$this->can_view_grades()) {
@@ -3065,7 +3085,12 @@ class assign {
         if (!has_any_capability(array('mod/assign:viewgrades', 'mod/assign:grade'), $this->context)) {
             return false;
         }
-
+        // Checks for the edge case when user belongs to no groups and groupmode is sep.
+        if ($this->get_course_module()->effectivegroupmode == SEPARATEGROUPS) {
+            $groupflag = has_capability('moodle/site:accessallgroups', $this->get_context());
+            $groupflag = $groupflag || !empty(groups_get_activity_allowed_groups($this->get_course_module()));
+            return (bool)$groupflag;
+        }
         return true;
     }
 

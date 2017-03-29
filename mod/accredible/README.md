@@ -68,11 +68,13 @@ Issuing a certificate or badge is easy - choose from 3 issuing options:
 
 - Pick student names and manually issue credentials. Only students that don't already have a credential will show a checkbox.
 - Choose the Quiz Activity that represents the **final exam**, and set a minimum grade requirement. Certificates/Badges will get issued as soon as the student receives a grade above the threshold.
-- Choose multiple Activities that need to be **completed** (attempted) for a student to receive their certificate/badge.
+- Choose for a student to receive their certificate/badge when they complete the course if you've setup completion tracking.
 
-![settings-image](https://s3.amazonaws.com/accredible-moodle-instructions/activity_settings.png "Choose how to issue certificates")
+![settings-image](https://s3.amazonaws.com/accredible-moodle-instructions/activity_settings2.png "Choose how to issue certificates")
 
 *Note: if you set both types of auto-issue criteria, completing either will issue a certificate/badge.*
+
+*Note: Make sure you don't allow students to set their completion of the Accredible activity or they'll be able to issue their own certificates/badges.*
 
 Once you've added the activity to your course we'll auto-create a Group on your Accredible account where these credentials will belong. You'll see this on your dashboard.
 

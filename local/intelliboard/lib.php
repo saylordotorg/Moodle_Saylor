@@ -1,50 +1,98 @@
 <?php
-// IntelliBoard.net
+// This file is part of Moodle - http://moodle.org/
 //
-// IntelliBoard.net is built to work with any LMS designed in Moodle
-// with the goal to deliver educational data analytics to single dashboard instantly.
-// With power to turn this analytical data into simple and easy to read reports,
-// IntelliBoard.net will become your primary reporting tool.
-//
-// Moodle
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-// IntelliBoard.net is built as a local plugin for Moodle.
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * IntelliBoard.net
+ * This plugin provides access to Moodle data in form of analytics and reports in real time.
  *
  *
- * @package    	intelliboard
- * @copyright  	2015 IntelliBoard, Inc
- * @license    	http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @created by	IntelliBoard, Inc
- * @website		www.intelliboard.net
+ * @package    local_intelliboard
+ * @copyright  2017 IntelliBoard, Inc
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @website    https://intelliboard.net/
  */
-
 
 // In versions before Moodle 2.9, the supported callbacks have _extends_ (not imperative mood) in their names. This was a consistency bug fixed in MDL-49643.
 function local_intelliboard_extends_navigation(global_navigation $nav){
-	global $CFG;
+	global $CFG, $USER;
 
 	local_intelliboard_insert_tracking(false);
 	$context = context_system::instance();
-	if(isloggedin() and get_config('local_intelliboard', 't1') and has_capability('local/intelliboard:students', $context)){
-		$nav->add(get_string('intelliboardstudent', 'local_intelliboard'), new moodle_url($CFG->wwwroot.'/local/intelliboard/student/index.php'));
+	if (isloggedin() and get_config('local_intelliboard', 't1') and has_capability('local/intelliboard:students', $context)) {
+		$alt_name = get_config('local_intelliboard', 't0');
+		$def_name = get_string('ts1', 'local_intelliboard');
+		$name = ($alt_name) ? $alt_name : $def_name;
+		$nav->add($name, new moodle_url($CFG->wwwroot.'/local/intelliboard/student/index.php'));
+	}
+
+	if (isloggedin() and get_config('local_intelliboard', 'n10')){
+	    //Check if user is enrolled to any courses with "instructor" role(s)
+		$instructor_roles = get_config('local_intelliboard', 'filter10');
+	    if (!empty($instructor_roles)) {
+	    	$access = false;
+		    $roles = explode(',', $instructor_roles);
+		    if (!empty($roles)) {
+			    foreach ($roles as $role) {
+			    	if ($role and user_has_role_assignment($USER->id, $role)){
+			    		$access = true;
+			    		break;
+			    	}
+			    }
+				if ($access) {
+					$alt_name = get_config('local_intelliboard', 'n11');
+					$def_name = get_string('n10', 'local_intelliboard');
+					$name = ($alt_name) ? $alt_name : $def_name;
+					$nav->add($name, new moodle_url($CFG->wwwroot.'/local/intelliboard/instructor/index.php'));
+				}
+			}
+		}
 	}
 }
 //call-back method to extend the navigation
 function local_intelliboard_extend_navigation(global_navigation $nav){
-	global $CFG;
+	global $CFG, $DB, $USER;
 
 	local_intelliboard_insert_tracking(false);
 	$context = context_system::instance();
-	if(isloggedin() and get_config('local_intelliboard', 't1') and has_capability('local/intelliboard:students', $context)){
-		$nav->add(get_string('intelliboardstudent', 'local_intelliboard'), new moodle_url($CFG->wwwroot.'/local/intelliboard/student/index.php'));
+	if (isloggedin() and get_config('local_intelliboard', 't1') and has_capability('local/intelliboard:students', $context)) {
+		$alt_name = get_config('local_intelliboard', 't0');
+		$def_name = get_string('ts1', 'local_intelliboard');
+		$name = ($alt_name) ? $alt_name : $def_name;
+		$nav->add($name, new moodle_url($CFG->wwwroot.'/local/intelliboard/student/index.php'));
+	}
+	if (isloggedin() and get_config('local_intelliboard', 'n10')){
+	    //Check if user is enrolled to any courses with "instructor" role(s)
+		$instructor_roles = get_config('local_intelliboard', 'filter10');
+	    if (!empty($instructor_roles)) {
+	    	$access = false;
+		    $roles = explode(',', $instructor_roles);
+		    if (!empty($roles)) {
+			    foreach ($roles as $role) {
+			    	if ($role and user_has_role_assignment($USER->id, $role)){
+			    		$access = true;
+			    		break;
+			    	}
+			    }
+				if ($access) {
+					$alt_name = get_config('local_intelliboard', 'n11');
+					$def_name = get_string('n10', 'local_intelliboard');
+					$name = ($alt_name) ? $alt_name : $def_name;
+					$nav->add($name, new moodle_url($CFG->wwwroot.'/local/intelliboard/instructor/index.php'));
+				}
+			}
+		}
 	}
 }
 
@@ -143,12 +191,12 @@ function local_intelliboard_insert_tracking($ajaxRequest = false){
 	$path = isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : '';
 
 	if(strpos($path,'cron.php') !== false){
-		return;
+		return false;
 	}
 
 	if ($enabled and isloggedin() and !isguestuser()){
 		if(is_siteadmin() and !$trackadmin){
-			return;
+			return false;
 		}
 		$intelliboardPage = (isset($_COOKIE['intelliboardPage'])) ? clean_param($_COOKIE['intelliboardPage'], PARAM_ALPHANUMEXT) : '';
 		$intelliboardParam = (isset($_COOKIE['intelliboardParam'])) ? clean_param($_COOKIE['intelliboardParam'], 0, PARAM_INT) : 0;
@@ -274,9 +322,11 @@ function local_intelliboard_insert_tracking($ajaxRequest = false){
 			$intelliboardPage = 'site';
 			$intelliboardParam = 0;
 		}
-		SetCookie('intelliboardPage', $intelliboardPage, time()+3600, "/");
-		SetCookie('intelliboardParam', $intelliboardParam, time()+3600, "/");
-		SetCookie('intelliboardTime', 0, time()+3600, "/");
+		if(!headers_sent()){
+			SetCookie('intelliboardPage', $intelliboardPage, time()+3600, "/");
+			SetCookie('intelliboardParam', $intelliboardParam, time()+3600, "/");
+			SetCookie('intelliboardTime', 0, time()+3600, "/");
+		}
 
 		$params = new stdClass();
 		$params->intelliboardAjax = $ajax;
@@ -286,5 +336,7 @@ function local_intelliboard_insert_tracking($ajaxRequest = false){
 
 		$PAGE->requires->js('/local/intelliboard/module.js', false);
 		$PAGE->requires->js_function_call('intelliboardInit', array($params), false);
+
+		return true;
 	}
 }

@@ -55,22 +55,24 @@ if ($ADMIN->fulltree) {
     $fldlist = mcae_prepare_profile_data($usrhelper);
 
     // Additional values for email.
-    list($emailusername, $emaildomain) = explode("@", $fldlist['email']);
+    if (!empty($fldlist['email'])) {
+        list($emailusername, $emaildomain) = explode("@", $fldlist['email']);
 
-    // Email root domain.
-    $emaildomainarray = explode('.', $emaildomain);
-    if (count($emaildomainarray) > 2) {
-        $emailrootdomain = $emaildomainarray[count($emaildomainarray) - 2].'.'.
-                           $emaildomainarray[count($emaildomainarray) - 1];
-    } else {
-        $emailrootdomain = $emaildomain;
+        // Email root domain.
+        $emaildomainarray = explode('.', $emaildomain);
+        if (count($emaildomainarray) > 2) {
+            $emailrootdomain = $emaildomainarray[count($emaildomainarray) - 2].'.'.
+                $emaildomainarray[count($emaildomainarray) - 1];
+        } else {
+            $emailrootdomain = $emaildomain;
+        }
+        $fldlist['email'] = array(
+            'full' => $fldlist['email'],
+            'username' => $emailusername,
+            'domain' => $emaildomain,
+            'rootdomain' => $emailrootdomain
+        );
     }
-    $fldlist['email'] = array(
-        'full' => $fldlist['email'],
-        'username' => $emailusername,
-        'domain' => $emaildomain,
-        'rootdomain' => $emailrootdomain
-    );
 
     $helparray = array();
     mcae_print_profile_data($fldlist, '', $helparray);

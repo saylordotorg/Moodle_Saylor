@@ -1,29 +1,27 @@
 <?php
-// IntelliBoard.net
+// This file is part of Moodle - http://moodle.org/
 //
-// IntelliBoard.net is built to work with any LMS designed in Moodle
-// with the goal to deliver educational data analytics to single dashboard instantly.
-// With power to turn this analytical data into simple and easy to read reports,
-// IntelliBoard.net will become your primary reporting tool.
-//
-// Moodle
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-// IntelliBoard.net is built as a local plugin for Moodle.
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * IntelliBoard.net
+ * This plugin provides access to Moodle data in form of analytics and reports in real time.
  *
  *
- * @package    	intelliboard
- * @copyright  	2015 IntelliBoard, Inc
- * @license    	http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @created by	IntelliBoard, Inc
- * @website		www.intelliboard.net
+ * @package    local_intelliboard
+ * @copyright  2017 IntelliBoard, Inc
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @website    http://intelliboard.net/
  */
 
 require('../../../config.php');
@@ -42,10 +40,6 @@ if(!get_config('local_intelliboard', 't1') or !get_config('local_intelliboard', 
 }
 $email = get_config('local_intelliboard', 'te1');
 $params = array(
-	'url'=>$CFG->wwwroot,
-	'email'=>s($email),
-	'firstname'=>s($USER->firstname),
-	'lastname'=>s($USER->lastname),
 	'do'=>'learner',
 	'mode'=> 1
 );
@@ -112,8 +106,8 @@ echo $OUTPUT->header();
 
 		<div class="intelliboard-search clearfix">
 			<form action="<?php echo $PAGE->url; ?>" method="GET">
-				<input name="search" type="text" value="<?php echo format_string($search); ?>" placeholder="<?php echo get_string('type_here', 'local_intelliboard');?>" />
-				<button><?php echo get_string('search');?></button>
+				<span class="pull-left"><input class="form-control" name="search" type="text" value="<?php echo format_string($search); ?>" placeholder="<?php echo get_string('type_here', 'local_intelliboard');?>" /></span>
+				<button class="btn btn-default"><?php echo get_string('search');?></button>
 				<span>
 					<a class="active" value="grid" href=""><i class="ion-android-apps"></i></a>
 					<a href="" value="list"><i class="ion-android-menu"></i></a>
@@ -135,12 +129,13 @@ echo $OUTPUT->header();
 						<div class="title">
 							<strong><?php echo format_string($item->fullname); ?></strong>
 							<?php if($t16): ?>
-								<?php $teachers = get_users_by_capability(context_course::instance($item->id), 'moodle/course:update', '', '', '', '', '', null, false);
-									$teachers = sort_by_roleassignment_authority($teachers, context_course::instance($item->id));
-								?>
-								<?php foreach($teachers as $teacher): ?>
-									<p title="<?php echo get_string('teacher','local_intelliboard');?>"><?php echo $OUTPUT->user_picture($teacher, array('size'=>20)); ?> <?php echo fullname($teacher); ?></p>
-								<?php break; endforeach; ?>
+								<?php if($teachers = get_users_by_capability(context_course::instance($item->id), 'moodle/course:update', '', '', '', '', '', null, false)): ?>
+
+									<?php $teachers = sort_by_roleassignment_authority($teachers, context_course::instance($item->id)); ?>
+									<?php foreach($teachers as $teacher): ?>
+										<p title="<?php echo get_string('teacher','local_intelliboard');?>"><?php echo $OUTPUT->user_picture($teacher, array('size'=>20)); ?> <?php echo fullname($teacher); ?></p>
+									<?php break; endforeach; ?>
+								<?php endif; ?>
 							<?php endif; ?>
 							<?php if($t17): ?>
 								<span title="<?php echo get_string('category','local_intelliboard');?>"><i class="ion-ios-folder-outline"></i> <?php echo format_string($item->category); ?></span>
