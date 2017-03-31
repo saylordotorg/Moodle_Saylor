@@ -86,8 +86,8 @@ def plugins = [
     ],
     [
         "name" : 'mod_accredible',
-        "url" : 'https://github.com/accredible/moodle-mod_accredible.git',
-        "branch" : 'master',
+        "url" : 'https://github.com/saylordotorg/moodle-mod_accredible.git',
+        "branch" : 'hotfix/pagination',
         "dest" : 'mod/accredible'
     ],
     [
