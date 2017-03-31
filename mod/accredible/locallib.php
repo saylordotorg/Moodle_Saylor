@@ -78,26 +78,32 @@ function sync_course_with_accredible($course, $instance_id = null) {
 }
 
 /**
- * List all of the ceritificates with a specific achievement id
+ * List all of the certificates with a specific achievement id
  *
- * @param string $group_id
+ * @param string $group_id Limit the returned Credentials to a specific group ID.
+ * @param string|null $email Limit the returned Credentials to a specific recipient's email address.
  * @return array[stdClass] $credentials
  */
-function accredible_get_credentials($group_id) {
+function accredible_get_credentials($group_id, $email= null) {
 	global $CFG;
 
 	$api = new Api($CFG->accredible_api_key);
 
 	try {
-		$credentials = $api->get_credentials($group_id);
+		$credentials = $api->get_credentials($group_id, $email);
 
+		// TODO: handle paginated responses
 		return $credentials->credentials;
 	} catch (ClientException $e) {
 	    // throw API exception
 	  	// include the achievement id that triggered the error
 	  	// direct the user to accredible's support
 	  	// dump the achievement id to debug_info
-	  	throw new moodle_exception('groupsyncerror', 'accredible', 'https://accredible.com/contact/support', $group_id, $group_id);
+        $exceptionparam = new stdClass();
+        $exceptionparam->group_id = $group_id;
+        $exceptionparam->email = $email;
+        $exceptionparam->response = $credentials;
+	  	throw new moodle_exception('getcredentialserror', 'accredible', 'https://accredible.com/contact/support', $exceptionparam);
 	}
 }	
 
@@ -611,7 +617,7 @@ function accredible_post_evidence($credential_id, $evidence_item, $allow_excepti
 function accredible_check_for_existing_certificate($achievement_id, $user) {
 	global $DB;
 	$existing_certificate = false;
-	$certificates = accredible_get_issued($achievement_id);
+	$certificates = accredible_get_credentials($achievement_id, $user->email);
 
 	foreach ($certificates as $certificate) {
 		if($certificate->recipient->email == $user->email) {
