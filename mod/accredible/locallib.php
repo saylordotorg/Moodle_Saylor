@@ -85,15 +85,38 @@ function sync_course_with_accredible($course, $instance_id = null) {
  * @return array[stdClass] $credentials
  */
 function accredible_get_credentials($group_id, $email= null) {
-	global $CFG;
+    global $CFG;
 
-	$api = new Api($CFG->accredible_api_key);
+    $page_size = 50;
+    $page = 1;
+    // Maximum number of pages to request to avoid possible infinite loop.
+    $loop_limit = 100;
 
-	try {
-		$credentials = $api->get_credentials($group_id, $email);
+    $api = new Api($CFG->accredible_api_key);
 
-		// TODO: handle paginated responses
-		return $credentials->credentials;
+    try {
+
+        $loop = true;
+        $count = 0;
+        $credentials = array();
+        // Query the Accredible API and loop until it returns that there is no next page.
+        while ($loop === true) {
+            $credentials_page = $api->get_credentials($group_id, $email, $page_size, $page);
+
+            foreach ($credentials_page->credentials as $credential) {
+                $credentials[] = $credential;
+            }
+
+            $page++;
+            $count++;
+
+            if ($credentials_page->meta->next_page === null || $count >= $loop_limit) {
+                // If the Accredible API returns that there
+                // is no next page, end the loop.
+                $loop = false;
+            }
+         }
+        return $credentials;
 	} catch (ClientException $e) {
 	    // throw API exception
 	  	// include the achievement id that triggered the error
@@ -102,7 +125,7 @@ function accredible_get_credentials($group_id, $email= null) {
         $exceptionparam = new stdClass();
         $exceptionparam->group_id = $group_id;
         $exceptionparam->email = $email;
-        $exceptionparam->response = $credentials;
+        $exceptionparam->last_response = $credentials_page;
 	  	throw new moodle_exception('getcredentialserror', 'accredible', 'https://accredible.com/contact/support', $exceptionparam);
 	}
 }	

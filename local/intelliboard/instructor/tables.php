@@ -101,7 +101,7 @@ class intelliboard_courses_grades_table extends table_sql {
                 '' as 'Actions'";
         $from = "{course} c
                 LEFT JOIN {course_categories} ca ON ca.id = c.category";
-        $where = "c.id IN (SELECT ctx.instanceid FROM {role_assignments} ra, {context} ctx WHERE ctx.id = ra.contextid AND ctx.contextlevel = 50 AND ra.roleid $sql2 AND ra.userid = :userid GROUP BY ctx.instanceid) $sql";
+        $where = "c.visible = 1 AND c.id IN (SELECT ctx.instanceid FROM {role_assignments} ra, {context} ctx WHERE ctx.id = ra.contextid AND ctx.contextlevel = 50 AND ra.roleid $sql2 AND ra.userid = :userid GROUP BY ctx.instanceid) $sql";
         $this->set_sql($fields, $from, $where, $params);
         $this->define_baseurl($PAGE->url);
     }
@@ -216,7 +216,7 @@ class intelliboard_activities_grades_table extends table_sql {
 
         $from = "{course_modules} cm
                 LEFT JOIN {modules} m ON m.id = cm.module
-                LEFT JOIN (SELECT gi.iteminstance, gi.itemmodule, AVG((g.finalgrade/g.rawgrademax)*100) AS grade FROM {grade_items} gi, {grade_grades} g WHERE gi.itemtype = 'mod' AND g.itemid = gi.id AND g.finalgrade IS NOT NULL AND gi.courseid = :c1 GROUP BY gi.iteminstance) as g ON g.iteminstance = cm.instance AND g.itemmodule = m.name
+                LEFT JOIN (SELECT gi.iteminstance, gi.itemmodule, AVG((g.finalgrade/g.rawgrademax)*100) AS grade FROM {grade_items} gi, {grade_grades} g WHERE gi.itemtype = 'mod' AND g.itemid = gi.id AND g.finalgrade IS NOT NULL AND gi.courseid = :c1 GROUP BY gi.iteminstance, gi.itemmodule) as g ON g.iteminstance = cm.instance AND g.itemmodule = m.name
                 LEFT JOIN (SELECT coursemoduleid, COUNT(id) AS completed FROM {course_modules_completion} WHERE completionstate=1 GROUP BY coursemoduleid) cmc ON cmc.coursemoduleid = cm.id
                 LEFT JOIN (SELECT param, SUM(visits) AS visits, SUM(timespend) AS timespend FROM {local_intelliboard_tracking} WHERE page='module' AND courseid = :c2 AND userid IN (SELECT DISTINCT ra.userid FROM {role_assignments} ra, {context} ctx WHERE ctx.id = ra.contextid AND ctx.instanceid = :c4 AND ctx.contextlevel = 50 AND ra.roleid $sql1) GROUP BY param) l ON l.param=cm.id";
         $where = "cm.visible = 1 AND cm.course = :c3 $sql";
@@ -498,7 +498,7 @@ class intelliboard_learner_grades_table extends table_sql {
         );
         $sql = "";
         if($search){
-            $sql .= " AND " . $DB->sql_like('activity', ":activity", false, false);
+            $sql .= " AND " . $DB->sql_like('m.name', ":activity", false, false);
             $params['activity'] = "%$search%";
         }
 

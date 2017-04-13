@@ -47,21 +47,36 @@ $PAGE->set_heading(format_string($course->fullname));
 
 // Get array of certificates
 if($accredible_certificate->achievementid){ // legacy achievment ID
-	$certificates = accredible_get_issued($accredible_certificate->achievementid);
+	$certificates = accredible_get_credentials($accredible_certificate->achievementid);
 } else { // group id
 	$certificates = accredible_get_credentials($accredible_certificate->groupid);
 }
 
 if(has_capability('mod/accredible:manage', $context)) {
+	// User has admin privileges, show table of certificates.
+
+	// Get array of certificates
+	if($accredible_certificate->achievementid){ // legacy achievment ID
+		$certificates = accredible_get_credentials($accredible_certificate->achievementid);
+	} else { // group id
+		$certificates = accredible_get_credentials($accredible_certificate->groupid);
+	}
+
 	$table = new html_table();
 	$table->head  = array (get_string('id', 'accredible'), get_string('recipient', 'accredible'), get_string('certificateurl', 'accredible'), get_string('datecreated', 'accredible'));
 
 	foreach ($certificates as $certificate) {
 		$issue_date = date_format( date_create($certificate->issued_on), "M d, Y" ) ;
+	    if(isset($certificate->url)) {
+	        $certificate_link = $certificate->url;
+	    }
+	    else {
+	        $certificate_link = 'https://www.credential.net/'.$certificate->id;
+	    }
 	  	$table->data[] = array ( 
 	  		$certificate->id, 
 	  		$certificate->recipient->name, 
-	  		"<a href='$certificate->url' target='_blank'>$certificate->url</a>", 
+	  		"<a href='$certificate_link' target='_blank'>$certificate_link</a>", 
 	  		$issue_date
 	  	);
 	}
@@ -81,15 +96,24 @@ if(has_capability('mod/accredible:manage', $context)) {
 	echo $OUTPUT->footer($course);
 } 
 else {
-	// Check for this user's certificate
+	// Regular user, Check for this user's certificate
 	$users_certificate_link = null;
+
+	// Get certificate
+	if($accredible_certificate->achievementid){ // legacy achievment ID
+		$certificates = accredible_get_credentials($accredible_certificate->achievementid, $USER->email);
+	} else { // group id
+		$certificates = accredible_get_credentials($accredible_certificate->groupid, $USER->email);
+	}
+
 	foreach ($certificates as $certificate) {
     if($certificate->recipient->email == $USER->email) {
-      if($certificate->private) {
-      	$users_certificate_link = $certificate->id . '?key=' . $certificate->private_key;
-      } else {
-      	$users_certificate_link = $certificate->id;
-      }
+	    if(isset($certificate->url)) {
+	        $users_certificate_link = $certificate->url;
+	    }
+	    else {
+	        $users_certificate_link = 'https://www.credential.net/'.$certificate->id;
+	    }
     }
 	}
 	// Echo the page
@@ -104,8 +128,8 @@ else {
 		} else {
 			$img = html_writer::img($src, get_string('viewimgcomplete', 'accredible'), array('width' => '90%') );
 		}
-		// TODO : Remove this hard coded link
-		echo html_writer::link( 'https://www.credential.net/'.$users_certificate_link, $img, array('target' => '_blank') );
+
+		echo html_writer::link( $users_certificate_link, $img, array('target' => '_blank') );
 		echo html_writer::end_div('text-center');
 	} 
 	else {

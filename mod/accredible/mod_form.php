@@ -128,24 +128,24 @@ class mod_accredible_mod_form extends moodleform_mod {
 
         if($updatingcert) {
             // Grab existing certificates and cross-reference emails
-            $certificates = accredible_get_issued($accredible_certificate->achievementid);
+            $certificates = accredible_get_credentials($accredible_certificate->achievementid);
             foreach ($users as $user) {
                 $cert_id = null;
                 // check cert emails for this user
                 foreach ($certificates as $certificate) {
                     if($certificate->recipient->email == $user->email) {
                         $cert_id = $certificate->id;
-                        if($certificate->private) {
-                            $cert_link = $certificate->id . '?key=' . $certificate->private_key;
+                        if(isset($certificate->url)) {
+                            $cert_link = $certificate->url;
                         }
                         else {
-                            $cert_link = $cert_id;
+                            $cert_link = 'https://www.credential.net/'.$cert_id;
                         }
                     }
                 }
                 // show the certificate if they have a certificate
                 if( $cert_id ) {
-                    $mform->addElement('static', 'certlink'.$user->id, $user->firstname . ' ' . $user->lastname, "Certificate $cert_id - <a href='https://accredible.com/$cert_link' target='_blank'>link</a>");
+                    $mform->addElement('static', 'certlink'.$user->id, $user->firstname . ' ' . $user->lastname, "Certificate $cert_id - <a href='$cert_link' target='_blank'>link</a>");
                 } // show a checkbox if they don't
                 else {
                     $mform->addElement('advcheckbox', 'users['.$user->id.']', $user->firstname . ' ' . $user->lastname, null, array('group' => 1));
