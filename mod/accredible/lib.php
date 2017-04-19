@@ -145,10 +145,10 @@ function accredible_update_instance($post) {
             if($issue_certificate) {
                 $user = $DB->get_record('user', array('id'=>$user_id), '*', MUST_EXIST);
                 // Create the credential
-                $result = create_credential($user,$groupid);
+                $result = create_credential($user, $groupid);
 
                 // evidence item posts
-                $credential_id = $result->credential->id;
+                $credential_id = $result->id;
                 if($post->finalquiz) {
                     $quiz = $DB->get_record('quiz', array('id'=>$post->finalquiz), '*', MUST_EXIST);
                     $users_grade = min( ( quiz_get_best_grade($quiz, $user->id) / $quiz->grade ) * 100, 100);

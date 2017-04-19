@@ -160,15 +160,15 @@ class mod_accredible_mod_form extends moodleform_mod {
                 }
 
                 if (!$existing_certificate) {
-                    if (!$unissuedheader) {
+                    if (!$unissued_header) {
                         // The header has not been added to the form yet and is needed
                         $mform->addElement('header', 'chooseunissuedusers', get_string('unissuedheader', 'accredible'));
                         $mform->addElement('static', 'unissueddescription', '', get_string('unissueddescription', 'accredible'));
                         $this->add_checkbox_controller(2, 'Select All/None');
-                        $unissuedheader = true;
+                        $unissued_header = true;
                     }
                     // No existing certificate, add this user to the unissued users list
-                    $mform->addElement('advcheckbox', 'unissuedusers['.$user->id.']', $user->firstname . ' ' . $user->lastname, null, array('group' => 2));
+                    $mform->addElement('advcheckbox', 'unissuedusers['.$user->id.']', $user->firstname . ' ' . $user->lastname . '    ' . $user->email, null, array('group' => 2));
                 }
 
             }
@@ -198,17 +198,17 @@ class mod_accredible_mod_form extends moodleform_mod {
                 }
                 // show the certificate if they have a certificate
                 if( $cert_id ) {
-                    $mform->addElement('static', 'certlink'.$user->id, $user->firstname . ' ' . $user->lastname, "Certificate $cert_id - <a href='$cert_link' target='_blank'>link</a>");
+                    $mform->addElement('static', 'certlink'.$user->id, $user->firstname . ' ' . $user->lastname . '    ' . $user->email, "Certificate $cert_id - <a href='$cert_link' target='_blank'>link</a>");
                 } // show a checkbox if they don't
                 else {
-                    $mform->addElement('advcheckbox', 'users['.$user->id.']', $user->firstname . ' ' . $user->lastname, null, array('group' => 1));
+                    $mform->addElement('advcheckbox', 'users['.$user->id.']', $user->firstname . ' ' . $user->lastname . '    ' . $user->email, null, array('group' => 1));
                 }
             }
         }
         // For new modules, just list all the users
         else {
             foreach( $users as $user ) { 
-                $mform->addElement('advcheckbox', 'users['.$user->id.']', $user->firstname . ' ' . $user->lastname, null, array('group' => 1));
+                $mform->addElement('advcheckbox', 'users['.$user->id.']', $user->firstname . ' ' . $user->lastname . '    ' . $user->email, null, array('group' => 1));
             }
         }
 
