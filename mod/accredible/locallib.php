@@ -160,6 +160,77 @@ function accredible_check_for_existing_credential($group_id, $email) {
 }
 
 /**
+ * Checks if a user has earned a specific credential according to the activity settings
+ * @param stdObject $record An Accredible activity record
+ * @param stdObject $course
+ * @param stdObject user
+ * @return bool
+ */
+function accredible_check_if_cert_earned($record, $course, $user) {
+	global $DB;
+
+    $earned = false;
+
+    // check for the existence of an activity instance and an auto-issue rule
+    if( $record and ($record->finalquiz or $record->completionactivities) ) {
+
+        // Check if we have a groupid or achievementid. Logic is same for both
+        if($record->groupid) {
+            $groupid = $record->groupid;
+        }
+        elseif($record->achievementid) {
+            $groupid = $record->achievementid;
+        }
+
+        if($record->finalquiz) {
+            $quiz = $DB->get_record('quiz', array('id'=> $record->finalquiz), '*', MUST_EXIST);
+            
+            // create that credential if it doesn't exist
+            $users_grade = min( ( quiz_get_best_grade($quiz, $user->id) / $quiz->grade ) * 100, 100);
+            $grade_is_high_enough = ($users_grade >= $record->passinggrade);
+
+            // check for pass
+            if($grade_is_high_enough) {
+                // Student earned certificate through final quiz
+                $earned = true;
+            }
+        }
+
+        $completion_activities = unserialize_completion_array($record->completionactivities);
+        // if this quiz is in the completion activities
+        if( isset($completion_activities[$quiz->id]) ) {
+            $completion_activities[$quiz->id] = true;
+            $quiz_attempts = $DB->get_records('quiz_attempts', array('userid' => $user->id, 'state' => 'finished'));
+            foreach($quiz_attempts as $quiz_attempt) {
+                // if this quiz was already attempted, then we shouldn't be issuing a certificate
+                if( $quiz_attempt->quiz == $quiz->id && $quiz_attempt->attempt > 1 ) {
+                    return null;
+                }
+                // otherwise, set this quiz as completed
+                if( isset($completion_activities[$quiz_attempt->quiz]) ) {
+                    $completion_activities[$quiz_attempt->quiz] = true;
+                }
+            }
+
+            // but was this the last required activity that was completed?
+            $course_complete = true;
+            foreach($completion_activities as $is_complete) {
+                if(!$is_complete) {
+                    $course_complete = false;
+                }
+            }
+            // if it was the final activity
+            if($course_complete) {
+                // Student earned certificate by completing completion activities
+                $earned = true;
+            }
+        }
+        
+    }
+    return $earned;
+}
+
+/**
  * Create a credential given a user and an existing group
  * @param stdObject $user 
  * @param int $group_id 

@@ -123,12 +123,65 @@ class mod_accredible_mod_form extends moodleform_mod {
             }
         }
 
+        // Get certificates if updating
+        if ($updatingcert) {
+            // Grab existing certificates and cross-reference emails
+            if ($accredible_certificate->achievementid) {
+                $certificates = accredible_get_credentials($accredible_certificate->achievementid);
+            }
+            elseif ($accredible_certificate->groupid) {
+                $certificates = accredible_get_credentials($accredible_certificate->groupid);
+            }
+        }
+
+        // Generate list of users who have earned a certificate, if updating
+        if ($updatingcert) {
+            foreach ($users as $user) {
+                // If this user has completed the criteria to earn a certificate, add to $users_earned_certificate
+                if(accredible_check_if_cert_earned($accredible_certificate, $course, $user)) {
+                    $users_earned_certificate[$user->id] = $user;
+                }
+            }
+        }
+
+        // Unissued certificates header
+        if (count($users_earned_certificate) > 0) {
+            $unissued_header = false;
+            foreach ($users_earned_certificate as $user) {
+                $existing_certificate = false;
+
+                foreach ($certificates as $certificate) {
+                    // Search through the certificates to see if this user has one existing
+                    if ($certificate->recipient->email == $user->email) {
+                        // This user has an existing certificate, no need to continue searching
+                        $existing_certificate = true;
+                        break;
+                    }
+                }
+
+                if (!$existing_certificate) {
+                    if (!$unissuedheader) {
+                        // The header has not been added to the form yet and is needed
+                        $mform->addElement('header', 'chooseunissuedusers', get_string('unissuedheader', 'accredible'));
+                        $mform->addElement('static', 'unissueddescription', '', get_string('unissueddescription', 'accredible'));
+                        $this->add_checkbox_controller(2, 'Select All/None');
+                        $unissuedheader = true;
+                    }
+                    // No existing certificate, add this user to the unissued users list
+                    $mform->addElement('advcheckbox', 'unissuedusers['.$user->id.']', $user->firstname . ' ' . $user->lastname, null, array('group' => 2));
+                }
+
+            }
+        }
+
+
+        // Manually issue certificates header
         $mform->addElement('header', 'chooseusers', get_string('manualheader', 'accredible'));
         $this->add_checkbox_controller(1, 'Select All/None');
 
         if($updatingcert) {
-            // Grab existing certificates and cross-reference emails
-            $certificates = accredible_get_credentials($accredible_certificate->achievementid);
+
+            // Cross-reference emails from existing certificates
             foreach ($users as $user) {
                 $cert_id = null;
                 // check cert emails for this user
