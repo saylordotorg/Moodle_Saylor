@@ -118,10 +118,16 @@ function assign_refresh_events($courseid = 0) {
         }
     }
     foreach ($assigns as $assign) {
-        // Get course and course module for the assignment.
-        list($course, $cm) = get_course_and_cm_from_instance($assign->id, 'assign', $assign->course);
-
-        // Refresh the assignment's calendar events.
+        // Use assignment's course column if courseid parameter is not given.
+        if (!$courseid) {
+            $courseid = $assign->course;
+            if (!$course = $DB->get_record('course', array('id' => $courseid), '*')) {
+                continue;
+            }
+        }
+        if (!$cm = get_coursemodule_from_instance('assign', $assign->id, $courseid, false)) {
+            continue;
+        }
         $context = context_module::instance($cm->id);
         $assignment = new assign($context, $cm, $course);
         $assignment->update_calendar($cm->id);
