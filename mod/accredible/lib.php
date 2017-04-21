@@ -140,34 +140,45 @@ function accredible_update_instance($post) {
         elseif($accredible_certificate->groupid) {
             $groupid = $accredible_certificate->groupid;
         }
-
         foreach ($post->unissuedusers as $user_id => $issue_certificate) {
             if($issue_certificate) {
                 $user = $DB->get_record('user', array('id'=>$user_id), '*', MUST_EXIST);
-                // Create the credential
-                $result = create_credential($user, $groupid);
-
-                // evidence item posts
-                $credential_id = $result->id;
-                if($post->finalquiz) {
-                    $quiz = $DB->get_record('quiz', array('id'=>$post->finalquiz), '*', MUST_EXIST);
-                    $users_grade = min( ( quiz_get_best_grade($quiz, $user->id) / $quiz->grade ) * 100, 100);
-                    $grade_evidence =  array('string_object' => (string) $users_grade, 'description' => $quiz->name, 'custom'=> true, 'category' => 'grade');
-                    if($users_grade < 50) {
-                        $grade_evidence['hidden'] = true;
+                if($accredible_certificate->groupid){
+                        // Create the credential
+                        $result = create_credential($user, $groupid);
+                        $credential_id = $result->id;
+                        // evidence item posts
+                        if($post->finalquiz) {
+                            $quiz = $DB->get_record('quiz', array('id'=>$post->finalquiz), '*', MUST_EXIST);
+                            $users_grade = min( ( quiz_get_best_grade($quiz, $user->id) / $quiz->grade ) * 100, 100);
+                            $grade_evidence =  array('string_object' => (string) $users_grade, 'description' => $quiz->name, 'custom'=> true, 'category' => 'grade');
+                            if($users_grade < 50) {
+                                $grade_evidence['hidden'] = true;
+                            }
+                            accredible_post_evidence($credential_id, $grade_evidence, true);
+                        }
+                        if($transcript = accredible_get_transcript($post->course, $user_id, $post->finalquiz)) {
+                            accredible_post_evidence($credential_id, $transcript, true);
+                        }
+                        accredible_post_essay_answers($user_id, $post->course, $credential_id);
+                        accredible_course_duration_evidence($user_id, $post->course, $credential_id);
+                }
+                elseif($accredible_certificate->achievementid){
+                    if($post->finalquiz) {
+                        $quiz = $DB->get_record('quiz', array('id'=>$post->finalquiz), '*', MUST_EXIST);
+                        $grade = min( ( quiz_get_best_grade($quiz, $user->id) / $quiz->grade ) * 100, 100);
                     }
-                    accredible_post_evidence($credential_id, $grade_evidence, true);
+                    else {
+                        // This is an older activity that now uses the course completion to issue cert.
+                        // Can't use accredible_issue_default_certificate, but create_credential only works with groupid.
+                    }
+                    $result = accredible_issue_default_certificate($user->id, $accredible_certificate->id, fullname($user), $user->email, $grade, $quiz->name);
+                    $credential_id = $result->credential->id;
                 }
-                if($transcript = accredible_get_transcript($post->course, $user_id, $post->finalquiz)) {
-                    accredible_post_evidence($credential_id, $transcript, true);
-                }
-                accredible_post_essay_answers($user_id, $post->course, $credential_id);
-                accredible_course_duration_evidence($user_id, $post->course, $credential_id);
-
                 // Log the creation
                 $event = accredible_log_creation( 
                     $credential_id,
-                    $user_id,
+                    $user->id,
                     null,
                     $post->coursemodule
                 );
