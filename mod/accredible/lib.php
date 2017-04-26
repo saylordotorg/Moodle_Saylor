@@ -143,9 +143,11 @@ function accredible_update_instance($post) {
         foreach ($post->unissuedusers as $user_id => $issue_certificate) {
             if($issue_certificate) {
                 $user = $DB->get_record('user', array('id'=>$user_id), '*', MUST_EXIST);
+                $completed_timestamp = accredible_manual_issue_completion_timestamp($accredible_certificate, $user);
+                $completed_date = date('Y-m-d', (int) $completed_timestamp);
                 if($accredible_certificate->groupid){
                         // Create the credential
-                        $result = create_credential($user, $groupid);
+                        $result = create_credential($user, $groupid, null, $completed_date);
                         $credential_id = $result->id;
                         // evidence item posts
                         if($post->finalquiz) {
@@ -161,7 +163,7 @@ function accredible_update_instance($post) {
                             accredible_post_evidence($credential_id, $transcript, true);
                         }
                         accredible_post_essay_answers($user_id, $post->course, $credential_id);
-                        accredible_course_duration_evidence($user_id, $post->course, $credential_id);
+                        accredible_course_duration_evidence($user_id, $post->course, $credential_id, $completed_timestamp);
                 }
                 elseif($accredible_certificate->achievementid){
                     if($post->finalquiz) {
@@ -172,7 +174,7 @@ function accredible_update_instance($post) {
                         // This is an older activity that now uses the course completion to issue cert.
                         // Can't use accredible_issue_default_certificate, but create_credential only works with groupid.
                     }
-                    $result = accredible_issue_default_certificate($user->id, $accredible_certificate->id, fullname($user), $user->email, $grade, $quiz->name);
+                    $result = accredible_issue_default_certificate($user->id, $accredible_certificate->id, fullname($user), $user->email, $grade, $quiz->name, $completed_timestamp);
                     $credential_id = $result->credential->id;
                 }
                 // Log the creation
@@ -194,7 +196,8 @@ function accredible_update_instance($post) {
         foreach ($post->users as $user_id => $issue_certificate) {
             if($issue_certificate) {
                 $user = $DB->get_record('user', array('id'=>$user_id), '*', MUST_EXIST);
-
+                $completed_timestamp = accredible_manual_issue_completion_timestamp($accredible_certificate, $user);
+                $completed_date = date('Y-m-d', (int) $completed_timestamp);
                 if($accredible_certificate->achievementid){
                     $certificate = array();
                     $course_url = new moodle_url('/course/view.php', array('id' => $post->course));
@@ -203,6 +206,7 @@ function accredible_update_instance($post) {
                     $certificate['description'] = $post->description;
                     $certificate['course_link'] = $course_url->__toString();
                     $certificate['recipient'] = array('name' => fullname($user), 'email'=> $user->email);
+                    $certificate['issued_on'] = $completed_date;
 
                     $curl = curl_init('https://api.accredible.com/v1/credentials');
                     curl_setopt($curl, CURLOPT_POST, 1);
@@ -221,6 +225,7 @@ function accredible_update_instance($post) {
                     $certificate = array();
                     $certificate['group_id'] = $accredible_certificate->groupid;
                     $certificate['recipient'] = array('name' => fullname($user), 'email'=> $user->email);
+                    $certificate['issued_on'] = $completed_date;
 
                     $curl = curl_init('https://api.accredible.com/v1/credentials');
                     curl_setopt($curl, CURLOPT_POST, 1);
@@ -252,7 +257,7 @@ function accredible_update_instance($post) {
                     accredible_post_evidence($credential_id, $transcript, true);
                 }
                 accredible_post_essay_answers($user_id, $post->course, $credential_id);
-                accredible_course_duration_evidence($user_id, $post->course, $credential_id);
+                accredible_course_duration_evidence($user_id, $post->course, $credential_id, $completed_timestamp);
 
                 // Log the creation
                 $event = accredible_log_creation( 
