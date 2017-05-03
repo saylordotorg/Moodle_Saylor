@@ -14,16 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * MathJax filter version information
- *
- * @package    filter_mathjaxloader
- * @copyright  2014 Damyon Wiese (damyon@moodle.com)
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
-defined('MOODLE_INTERNAL') || die();
-
-$plugin->version  = 2016052302;
-$plugin->requires = 2016051900;  // Requires this Moodle version.
-$plugin->component= 'filter_mathjaxloader';
+$string['pluginname'] = 'מאגר שאלות - שאלות שלא נעשה בהן שימוש באף בוחן';
+$string['onlyused'] = 'רק שאלות שנעשה בהן שימוש בבוחן כלשהו';
+$string['onlyunused'] = 'רק שאלות שלא נעשה בהן שימוש באף בוחן';
+$string['usedandunused'] = 'כל השאלות';
