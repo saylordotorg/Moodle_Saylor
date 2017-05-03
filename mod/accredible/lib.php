@@ -130,6 +130,65 @@ function accredible_update_instance($post) {
         sync_course_with_accredible($course, $post->instance);
     }
 
+    // Issue certs for unissued users
+    if(isset($post->unissuedusers)) {
+        // Checklist array from the form comes in the format:
+        // int user_id => boolean issue_certificate
+        if($accredible_certificate->achievementid) {
+            $groupid = $accredible_certificate->achievementid;
+        }
+        elseif($accredible_certificate->groupid) {
+            $groupid = $accredible_certificate->groupid;
+        }
+        foreach ($post->unissuedusers as $user_id => $issue_certificate) {
+            if($issue_certificate) {
+                $user = $DB->get_record('user', array('id'=>$user_id), '*', MUST_EXIST);
+                $completed_timestamp = accredible_manual_issue_completion_timestamp($accredible_certificate, $user);
+                $completed_date = date('Y-m-d', (int) $completed_timestamp);
+                if($accredible_certificate->groupid){
+                        // Create the credential
+                        $result = create_credential($user, $groupid, null, $completed_date);
+                        $credential_id = $result->id;
+                        // evidence item posts
+                        if($post->finalquiz) {
+                            $quiz = $DB->get_record('quiz', array('id'=>$post->finalquiz), '*', MUST_EXIST);
+                            $users_grade = min( ( quiz_get_best_grade($quiz, $user->id) / $quiz->grade ) * 100, 100);
+                            $grade_evidence =  array('string_object' => (string) $users_grade, 'description' => $quiz->name, 'custom'=> true, 'category' => 'grade');
+                            if($users_grade < 50) {
+                                $grade_evidence['hidden'] = true;
+                            }
+                            accredible_post_evidence($credential_id, $grade_evidence, true);
+                        }
+                        if($transcript = accredible_get_transcript($post->course, $user_id, $post->finalquiz)) {
+                            accredible_post_evidence($credential_id, $transcript, true);
+                        }
+                        accredible_post_essay_answers($user_id, $post->course, $credential_id);
+                        accredible_course_duration_evidence($user_id, $post->course, $credential_id, $completed_timestamp);
+                }
+                elseif($accredible_certificate->achievementid){
+                    if($post->finalquiz) {
+                        $quiz = $DB->get_record('quiz', array('id'=>$post->finalquiz), '*', MUST_EXIST);
+                        $grade = min( ( quiz_get_best_grade($quiz, $user->id) / $quiz->grade ) * 100, 100);
+                    }
+                    else {
+                        // This is an older activity that now uses the course completion to issue cert.
+                        // Can't use accredible_issue_default_certificate, but create_credential only works with groupid.
+                    }
+                    $result = accredible_issue_default_certificate($user->id, $accredible_certificate->id, fullname($user), $user->email, $grade, $quiz->name, $completed_timestamp);
+                    $credential_id = $result->credential->id;
+                }
+                // Log the creation
+                $event = accredible_log_creation( 
+                    $credential_id,
+                    $user->id,
+                    null,
+                    $post->coursemodule
+                );
+                $event->trigger();
+            }
+        }       
+    }
+
     // Issue certs
     if( isset($post->users) ) {
         // Checklist array from the form comes in the format:
@@ -137,7 +196,8 @@ function accredible_update_instance($post) {
         foreach ($post->users as $user_id => $issue_certificate) {
             if($issue_certificate) {
                 $user = $DB->get_record('user', array('id'=>$user_id), '*', MUST_EXIST);
-
+                $completed_timestamp = accredible_manual_issue_completion_timestamp($accredible_certificate, $user);
+                $completed_date = date('Y-m-d', (int) $completed_timestamp);
                 if($accredible_certificate->achievementid){
                     $certificate = array();
                     $course_url = new moodle_url('/course/view.php', array('id' => $post->course));
@@ -146,6 +206,7 @@ function accredible_update_instance($post) {
                     $certificate['description'] = $post->description;
                     $certificate['course_link'] = $course_url->__toString();
                     $certificate['recipient'] = array('name' => fullname($user), 'email'=> $user->email);
+                    $certificate['issued_on'] = $completed_date;
 
                     $curl = curl_init('https://api.accredible.com/v1/credentials');
                     curl_setopt($curl, CURLOPT_POST, 1);
@@ -164,6 +225,7 @@ function accredible_update_instance($post) {
                     $certificate = array();
                     $certificate['group_id'] = $accredible_certificate->groupid;
                     $certificate['recipient'] = array('name' => fullname($user), 'email'=> $user->email);
+                    $certificate['issued_on'] = $completed_date;
 
                     $curl = curl_init('https://api.accredible.com/v1/credentials');
                     curl_setopt($curl, CURLOPT_POST, 1);
@@ -195,7 +257,7 @@ function accredible_update_instance($post) {
                     accredible_post_evidence($credential_id, $transcript, true);
                 }
                 accredible_post_essay_answers($user_id, $post->course, $credential_id);
-                accredible_course_duration_evidence($user_id, $post->course, $credential_id);
+                accredible_course_duration_evidence($user_id, $post->course, $credential_id, $completed_timestamp);
 
                 // Log the creation
                 $event = accredible_log_creation( 

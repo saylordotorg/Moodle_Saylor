@@ -99,7 +99,7 @@ h2.main,
 #page {
     max-width: 3040px;
     padding: 0 0;
-    background-color: #FDFDFD;
+    background-color: #F7F7F7;
 }
 
 #page-content {
@@ -679,6 +679,24 @@ input[type="color"],
     .container {
         width: 95%;
     }
+
+    /* change background color of foreground content in blocks on left (nav & admin) 
+    and padding */
+    .block {
+        padding: 1em 0 0 1em;
+        background-color: #FFF;
+    }
+
+    /* change background color of foreground content of central block */
+    .course_category_tree .category>.info {
+        background-color: #FFF;
+    }
+    
+    /* change background color of each single course */
+    .course_category_tree .category>.content {
+        background-color: #E3E3E3;
+    }
+    
     .block .header {
         margin: 0 10px !important;
     }
@@ -827,6 +845,7 @@ div.guestsub {
     display: none;
     width: 12px;
 }
+
 
 
 /* change background color of dropdown nav bar*/

@@ -27,6 +27,9 @@
 $string['getissuederror'] = 'An error occured while fetching the certificates with achievement id = {$a}.
 
 Please contact Accredible\'s support';
+$string['getcredentialserror'] = 'An error occured while fetching credentials.
+
+Please contact Accredible\'s support';
 $string['gettemplateserror'] = 'An error occured while fetching certificate templates.
 
 Please contact Accredible\'s support';
