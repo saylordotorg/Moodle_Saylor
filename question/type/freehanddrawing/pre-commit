@@ -1,0 +1,5 @@
+#!/bin/sh
+
+~/bin/bump_version  $PWD"/version.php"
+echo "updated version"
+git add $PWD"/version.php"

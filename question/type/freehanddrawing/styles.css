@@ -1,0 +1,55 @@
+/*
+ * @package    qtype
+ * @subpackage freehanddrawing
+ * @copyright  ETHZ LET <jacob.shapiro@let.ethz.ch>
+ * @license  http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+*/
+#fitem_id_qtype_freehanddrawing_textarea {
+    display: block;
+}
+.qtype_freehanddrawing_textarea {
+	display: none;
+}
+.fitem_id_qtype_freehanddrawing_textarea_id_0 {
+	display: block;
+}
+
+#fitem_id_qtype_freehanddrawing_textarea_id_0 {
+		display: block;
+}
+#page-question-type-freehanddrawing input[type="submit"]:disabled {
+	display: none;
+}
+.qtype_freehanddrawing_canvas {
+	align: center;
+    margin-left: auto; 
+    margin-right: auto; 
+    margin-top:5px; 
+    border: 1px solid black; 
+    display: block;
+      -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.qtype_freehanddrawing_eraser {
+	text-align: left;
+	width: 32px;
+	height: 32px;
+	display: block;
+    float: left;
+}
+.qtype_freehanddrawing_eraser_tool {
+	text-align: left;
+	width: 67px;
+	height: 32px;
+	display: block;
+}
+.qtype_freehanddrawing_container_div {
+margin: 10px;
+    padding: 10px;
+    background-position:right top;
+    text-align: center;
+    display: inline-block;
+        border: 1px dashed black; 
+}
