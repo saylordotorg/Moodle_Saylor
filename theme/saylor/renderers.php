@@ -696,7 +696,7 @@ class theme_saylor_core_course_renderer extends core_course_renderer
         global $CFG;
 
         // New array with filtered courses.
-        $coursestorender[] = array();
+        $coursestorender = array();
 
         // First, create whitelist of courses in cat 2.
         $options['recursive'] = true;
@@ -714,7 +714,6 @@ class theme_saylor_core_course_renderer extends core_course_renderer
         // Get list of courses and check if each course is in category 2.
         foreach ($courses as $course) {
             $courseisincat2 = false; // False = 0
-            $coursecount ++;
             // Checking if course is in whitelist.
             foreach ($cat2courses as $cat2course) {
                 if ($cat2course == $course->id) {
@@ -796,6 +795,7 @@ class theme_saylor_core_course_renderer extends core_course_renderer
                 $classes .= ' last';
             }
             $content .= $this->coursecat_coursebox($chelper, $course, $classes);
+            $coursecount += 1;
         }
 
         if (!empty($pagingbar)) {
