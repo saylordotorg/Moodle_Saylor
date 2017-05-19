@@ -19,15 +19,13 @@ Feature: Checklists export without warnings or errors
       | C2     | student1 | student        |
       | C2     | teacher1 | editingteacher |
     And I log in as "teacher1"
-    And I am on site homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I turn editing mode on
     And I add a "Checklist" to section "1" and I fill the form with:
       | Checklist | Test checklist 1 |
     And I add a "Checklist" to section "1" and I fill the form with:
       | Checklist | Test checklist 2 |
-    And I am on site homepage
-    And I follow "Course 2"
+    And I am on "Course 2" course homepage
     And I add a "Checklist" to section "1" and I fill the form with:
       | Checklist | Test checklist 3 |
     And the following items exist in checklist "Test checklist 1":
@@ -61,12 +59,10 @@ Feature: Checklists export without warnings or errors
       | itemtext | studentmark |
       | Item 7   | yes         |
       | Item 8   | yes         |
-    And I am on site homepage
 
   Scenario: The teacher exports the checklist
-    When I follow "Course 1"
-    And I navigate to "Gradebook setup" node in "Course administration"
-    And I navigate to "Checklist" node in "Grade administration > Export"
+    When I am on "Course 1" course homepage
+    And I navigate to "Export > Checklist" in the course gradebook
     And I set the following fields to these values:
       | Checklist to export     | Test checklist 1 |
       | Percentage column       | 1                |
