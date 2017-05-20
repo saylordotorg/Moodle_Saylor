@@ -203,6 +203,12 @@ def plugins = [
         "url" : 'https://github.com/catalyst/moodle-mod_reengagement.git',
         "branch" : 'MOODLE_31_STABLE',
         "dest" : 'mod/reengagement'
+    ],
+    [
+        "name" : 'local_discoursesso',
+        "url" : 'https://github.com/saylordotorg/moodle-local_discoursesso.git',
+        "branch" : 'master',
+        "dest" : 'local/discoursesso'
     ]
 ]
 
