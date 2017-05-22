@@ -32,7 +32,7 @@ class mod_forum_external extends external_api {
     /**
      * Describes the parameters for get_forum.
      *
-     * @return external_external_function_parameters
+     * @return external_function_parameters
      * @since Moodle 2.5
      */
     public static function get_forums_by_courses_parameters() {
@@ -97,6 +97,10 @@ class mod_forum_external extends external_api {
                 $forum->numdiscussions = forum_count_discussions($forum, $cm, $course);
                 $forum->cmid = $forum->coursemodule;
                 $forum->cancreatediscussions = forum_user_can_post_discussion($forum, null, -1, $cm, $context);
+                $forum->istracked = forum_tp_is_tracked($forum);
+                if ($forum->istracked) {
+                    $forum->unreadpostscount = forum_tp_count_forum_unread_posts($cm, $course);
+                }
 
                 // Add the forum to the array to return.
                 $arrforums[$forum->id] = $forum;
@@ -144,6 +148,9 @@ class mod_forum_external extends external_api {
                     'numdiscussions' => new external_value(PARAM_INT, 'Number of discussions in the forum', VALUE_OPTIONAL),
                     'cancreatediscussions' => new external_value(PARAM_BOOL, 'If the user can create discussions', VALUE_OPTIONAL),
                     'lockdiscussionafter' => new external_value(PARAM_INT, 'After what period a discussion is locked', VALUE_OPTIONAL),
+                    'istracked' => new external_value(PARAM_BOOL, 'If the user is tracking the forum', VALUE_OPTIONAL),
+                    'unreadpostscount' => new external_value(PARAM_INT, 'The number of unread posts for tracked forums',
+                        VALUE_OPTIONAL),
                 ), 'forum'
             )
         );
@@ -152,7 +159,7 @@ class mod_forum_external extends external_api {
     /**
      * Describes the parameters for get_forum_discussion_posts.
      *
-     * @return external_external_function_parameters
+     * @return external_function_parameters
      * @since Moodle 2.7
      */
     public static function get_forum_discussion_posts_parameters() {
@@ -350,7 +357,7 @@ class mod_forum_external extends external_api {
     /**
      * Describes the parameters for get_forum_discussions_paginated.
      *
-     * @return external_external_function_parameters
+     * @return external_function_parameters
      * @since Moodle 2.8
      */
     public static function get_forum_discussions_paginated_parameters() {
@@ -773,36 +780,13 @@ class mod_forum_external extends external_api {
         require_once($CFG->dirroot . "/mod/forum/lib.php");
 
         $params = self::validate_parameters(self::add_discussion_post_parameters(),
-                                            array(
-                                                'postid' => $postid,
-                                                'subject' => $subject,
-                                                'message' => $message,
-                                                'options' => $options
-                                            ));
-        // Validate options.
-        $options = array(
-            'discussionsubscribe' => true,
-            'inlineattachmentsid' => 0,
-            'attachmentsid' => null
+            array(
+                'postid' => $postid,
+                'subject' => $subject,
+                'message' => $message,
+                'options' => $options
+            )
         );
-        foreach ($params['options'] as $option) {
-            $name = trim($option['name']);
-            switch ($name) {
-                case 'discussionsubscribe':
-                    $value = clean_param($option['value'], PARAM_BOOL);
-                    break;
-                case 'inlineattachmentsid':
-                    $value = clean_param($option['value'], PARAM_INT);
-                    break;
-                case 'attachmentsid':
-                    $value = clean_param($option['value'], PARAM_INT);
-                    break;
-                default:
-                    throw new moodle_exception('errorinvalidparam', 'webservice', '', $name);
-            }
-            $options[$name] = $value;
-        }
-
         $warnings = array();
 
         if (!$parent = forum_get_post_full($params['postid'])) {
@@ -820,15 +804,36 @@ class mod_forum_external extends external_api {
         $context = context_module::instance($cm->id);
         self::validate_context($context);
 
-        if (!forum_user_can_post($forum, $discussion, $USER, $cm, $course, $context)) {
-            throw new moodle_exception('nopostforum', 'forum');
+        // Validate options.
+        $options = array(
+            'discussionsubscribe' => true,
+            'inlineattachmentsid' => 0,
+            'attachmentsid' => null
+        );
+        foreach ($params['options'] as $option) {
+            $name = trim($option['name']);
+            switch ($name) {
+                case 'discussionsubscribe':
+                    $value = clean_param($option['value'], PARAM_BOOL);
+                    break;
+                case 'inlineattachmentsid':
+                    $value = clean_param($option['value'], PARAM_INT);
+                    break;
+                case 'attachmentsid':
+                    $value = clean_param($option['value'], PARAM_INT);
+                    // Ensure that the user has permissions to create attachments.
+                    if (!has_capability('mod/forum:createattachment', $context)) {
+                        $value = 0;
+                    }
+                    break;
+                default:
+                    throw new moodle_exception('errorinvalidparam', 'webservice', '', $name);
+            }
+            $options[$name] = $value;
         }
 
-        if (!empty($options['attachmentsid'])) {
-            // Ensure that the user has permissions to create attachments.
-            if (!has_capability('mod/forum:createattachment', $context)) {
-                $options['attachmentsid'] = 0;
-            }
+        if (!forum_user_can_post($forum, $discussion, $USER, $cm, $course, $context)) {
+            throw new moodle_exception('nopostforum', 'forum');
         }
 
         $thresholdwarning = forum_check_throttling($forum, $cm);
@@ -955,6 +960,16 @@ class mod_forum_external extends external_api {
                                                 'groupid' => $groupid,
                                                 'options' => $options
                                             ));
+
+        $warnings = array();
+
+        // Request and permission validation.
+        $forum = $DB->get_record('forum', array('id' => $params['forumid']), '*', MUST_EXIST);
+        list($course, $cm) = get_course_and_cm_from_instance($forum, 'forum');
+
+        $context = context_module::instance($cm->id);
+        self::validate_context($context);
+
         // Validate options.
         $options = array(
             'discussionsubscribe' => true,
@@ -976,21 +991,16 @@ class mod_forum_external extends external_api {
                     break;
                 case 'attachmentsid':
                     $value = clean_param($option['value'], PARAM_INT);
+                    // Ensure that the user has permissions to create attachments.
+                    if (!has_capability('mod/forum:createattachment', $context)) {
+                        $value = 0;
+                    }
                     break;
                 default:
                     throw new moodle_exception('errorinvalidparam', 'webservice', '', $name);
             }
             $options[$name] = $value;
         }
-
-        $warnings = array();
-
-        // Request and permission validation.
-        $forum = $DB->get_record('forum', array('id' => $params['forumid']), '*', MUST_EXIST);
-        list($course, $cm) = get_course_and_cm_from_instance($forum, 'forum');
-
-        $context = context_module::instance($cm->id);
-        self::validate_context($context);
 
         // Normalize group.
         if (!groups_get_activity_groupmode($cm)) {
@@ -1009,13 +1019,6 @@ class mod_forum_external extends external_api {
 
         if (!forum_user_can_post_discussion($forum, $groupid, -1, $cm, $context)) {
             throw new moodle_exception('cannotcreatediscussion', 'forum');
-        }
-
-        if (!empty($options['attachmentsid'])) {
-            // Ensure that the user has permissions to create attachments.
-            if (!has_capability('mod/forum:createattachment', $context)) {
-                $options['attachmentsid'] = 0;
-            }
         }
 
         $thresholdwarning = forum_check_throttling($forum, $cm);
@@ -1141,6 +1144,8 @@ class mod_forum_external extends external_api {
 
         $result = array();
         $result['status'] = $status;
+        $result['canpindiscussions'] = has_capability('mod/forum:pindiscussions', $context);
+        $result['cancreateattachment'] = forum_can_create_attachment($forum, $context);
         $result['warnings'] = $warnings;
         return $result;
     }
@@ -1155,6 +1160,10 @@ class mod_forum_external extends external_api {
         return new external_single_structure(
             array(
                 'status' => new external_value(PARAM_BOOL, 'True if the user can add discussions, false otherwise.'),
+                'canpindiscussions' => new external_value(PARAM_BOOL, 'True if the user can pin discussions, false otherwise.',
+                    VALUE_OPTIONAL),
+                'cancreateattachment' => new external_value(PARAM_BOOL, 'True if the user can add attachments, false otherwise.',
+                    VALUE_OPTIONAL),
                 'warnings' => new external_warnings()
             )
         );

@@ -59,3 +59,14 @@ strftimedaydatetime,core_message
 timenosee,core_message
 timesent,core_message
 userssearchresults,core_message
+loginpasswordautocomplete,core_admin
+loginpasswordautocomplete_help,core_admin
+deletecomment,core
+personaconnection,core_badges
+personaconnection_help,core_badges
+error:noassertion,core_badges
+error:personaneedsjs,core_badges
+error:badjson,core_badges
+error:backpackloginfailed,core_badges
+signinwithyouremail,core_badges
+sectionusedefaultname,core

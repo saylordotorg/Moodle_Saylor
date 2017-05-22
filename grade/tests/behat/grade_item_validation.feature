@@ -1,5 +1,5 @@
 @core_grades
-Feature: Editing a grade item
+Feature: Grade item validation
   In order to ensure validation is provided to the teacher
   As a teacher
   I need to know why I can not add/edit values on the grade item form
@@ -28,8 +28,7 @@ Feature: Editing a grade item
       | Name  | Letter scale |
       | Scale | Disappointing, Good, Very good, Excellent |
     And I press "Save changes"
-    And I am on site homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "Setup > Gradebook setup" in the course gradebook
     And I press "Add grade item"
     And I set the following fields to these values:

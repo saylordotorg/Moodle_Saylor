@@ -2903,7 +2903,8 @@ function require_login($courseorid = null, $autologinguest = true, $cm = null, $
         } else {
             $url = new moodle_url('/');
         }
-        redirect($url, get_string('activityiscurrentlyhidden'));
+        redirect($url, get_string('activityiscurrentlyhidden'), null,
+                \core\output\notification::NOTIFY_ERROR);
     }
 
     // Set the global $COURSE.
@@ -4985,6 +4986,9 @@ function remove_course_contents($courseid, $showfeedback = true, array $options 
 
     // We have tried to delete everything the nice way - now let's force-delete any remaining module data.
 
+    // Delete completion defaults.
+    $DB->delete_records("course_completion_defaults", array("course" => $courseid));
+
     // Remove all data from availability and completion tables that is associated
     // with course-modules belonging to this course. Note this is done even if the
     // features are not enabled now, in case they were enabled previously.
@@ -5820,23 +5824,13 @@ function email_to_user($user, $from, $subject, $messagetext, $messagehtml = '', 
         $replyto = $noreplyaddress;
     }
 
-    $alloweddomains = null;
-    if (!empty($CFG->allowedemaildomains)) {
-        $alloweddomains = array_map('trim', explode("\n", $CFG->allowedemaildomains));
-    }
-
-    // Email will be sent using no reply address.
-    if (empty($alloweddomains)) {
-        $usetrueaddress = false;
-    }
-
     if (is_string($from)) { // So we can pass whatever we want if there is need.
         $mail->From     = $noreplyaddress;
         $mail->FromName = $from;
     // Check if using the true address is true, and the email is in the list of allowed domains for sending email,
     // and that the senders email setting is either displayed to everyone, or display to only other users that are enrolled
     // in a course with the sender.
-    } else if ($usetrueaddress && can_send_from_real_email_address($from, $user, $alloweddomains)) {
+    } else if ($usetrueaddress && can_send_from_real_email_address($from, $user)) {
         if (!validate_email($from->email)) {
             debugging('email_to_user: Invalid from-email '.s($from->email).' - not sending');
             // Better not to use $noreplyaddress in this case.
@@ -6073,10 +6067,15 @@ function email_to_user($user, $from, $subject, $messagetext, $messagehtml = '', 
  *
  * @param  object $from The user object for the user we are sending the email from.
  * @param  object $user The user object that we are sending the email to.
- * @param  array $alloweddomains An array of allowed domains that we can send email from.
+ * @param  array $unused No longer used.
  * @return bool Returns true if we can use the from user's email adress in the "From" field.
  */
-function can_send_from_real_email_address($from, $user, $alloweddomains) {
+function can_send_from_real_email_address($from, $user, $unused = null) {
+    global $CFG;
+    if (!isset($CFG->allowedemaildomains) || empty(trim($CFG->allowedemaildomains))) {
+        return false;
+    }
+    $alloweddomains = array_map('trim', explode("\n", $CFG->allowedemaildomains));
     // Email is in the list of allowed domains for sending email,
     // and the senders email setting is either displayed to everyone, or display to only other users that are enrolled
     // in a course with the sender.
@@ -6380,10 +6379,15 @@ function email_is_not_allowed($email) {
  *
  * @return file_storage
  */
-function get_file_storage() {
+function get_file_storage($reset = false) {
     global $CFG;
 
     static $fs = null;
+
+    if ($reset) {
+        $fs = null;
+        return;
+    }
 
     if ($fs) {
         return $fs;
@@ -6391,19 +6395,7 @@ function get_file_storage() {
 
     require_once("$CFG->libdir/filelib.php");
 
-    if (isset($CFG->filedir)) {
-        $filedir = $CFG->filedir;
-    } else {
-        $filedir = $CFG->dataroot.'/filedir';
-    }
-
-    if (isset($CFG->trashdir)) {
-        $trashdirdir = $CFG->trashdir;
-    } else {
-        $trashdirdir = $CFG->dataroot.'/trashdir';
-    }
-
-    $fs = new file_storage($filedir, $trashdirdir, "$CFG->tempdir/filestorage", $CFG->directorypermissions, $CFG->filepermissions);
+    $fs = new file_storage();
 
     return $fs;
 }
@@ -6600,7 +6592,9 @@ function get_max_upload_sizes($sitebytes = 0, $coursebytes = 0, $modulebytes = 0
 
     $filesize = array();
     $sizelist = array(10240, 51200, 102400, 512000, 1048576, 2097152,
-                      5242880, 10485760, 20971520, 52428800, 104857600);
+                      5242880, 10485760, 20971520, 52428800, 104857600,
+                      262144000, 524288000, 786432000, 1073741824,
+                      2147483648, 4294967296, 8589934592);
 
     // If custombytes is given and is valid then add it to the list.
     if (is_number($custombytes) and $custombytes > 0) {
@@ -7494,13 +7488,19 @@ function get_plugin_list_with_function($plugintype, $function, $file = 'lib.php'
 function get_plugins_with_function($function, $file = 'lib.php', $include = true) {
     global $CFG;
 
+    if (during_initial_install() || isset($CFG->upgraderunning)) {
+        // API functions _must not_ be called during an installation or upgrade.
+        return [];
+    }
+
     $cache = \cache::make('core', 'plugin_functions');
 
     // Including both although I doubt that we will find two functions definitions with the same name.
     // Clearning the filename as cache_helper::hash_key only allows a-zA-Z0-9_.
     $key = $function . '_' . clean_param($file, PARAM_ALPHA);
+    $pluginfunctions = $cache->get($key);
 
-    if ($pluginfunctions = $cache->get($key)) {
+    if ($pluginfunctions !== false) {
 
         // Checking that the files are still available.
         foreach ($pluginfunctions as $plugintype => $plugins) {
@@ -8750,8 +8750,13 @@ function address_in_subnet($addr, $subnetstr) {
  *                      This ensures any messages have time to display before redirect
  */
 function mtrace($string, $eol="\n", $sleep=0) {
+    global $CFG;
 
-    if (defined('STDOUT') && !PHPUNIT_TEST && !defined('BEHAT_TEST')) {
+    if (isset($CFG->mtrace_wrapper) && function_exists($CFG->mtrace_wrapper)) {
+        $fn = $CFG->mtrace_wrapper;
+        $fn($string, $eol);
+        return;
+    } else if (defined('STDOUT') && !PHPUNIT_TEST && !defined('BEHAT_TEST')) {
         fwrite(STDOUT, $string.$eol);
     } else {
         echo $string . $eol;

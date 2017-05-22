@@ -233,5 +233,65 @@ function xmldb_assign_upgrade($oldversion) {
     // Automatically generated Moodle v3.2.0 release upgrade line.
     // Put any upgrade step following this.
 
+    if ($oldversion < 2017021500) {
+        // Fix event types of assign events.
+        $params = [
+            'modulename' => 'assign',
+            'eventtype' => 'close'
+        ];
+        $select = "modulename = :modulename AND eventtype = :eventtype";
+        $DB->set_field_select('event', 'eventtype', 'due', $select, $params);
+
+        // Delete 'open' events.
+        $params = [
+            'modulename' => 'assign',
+            'eventtype' => 'open'
+        ];
+        $DB->delete_records('event', $params);
+
+        // Assign savepoint reached.
+        upgrade_mod_savepoint(true, 2017021500, 'assign');
+    }
+
+    if ($oldversion < 2017031300) {
+        // Add a 'gradingduedate' field to the 'assign' table.
+        $table = new xmldb_table('assign');
+        $field = new xmldb_field('gradingduedate', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, 0, 'cutoffdate');
+
+        // Conditionally launch add field.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Assign savepoint reached.
+        upgrade_mod_savepoint(true, 2017031300, 'assign');
+    }
+
+    if ($oldversion < 2017042800) {
+        // Update query to set the grading due date one week after the due date.
+        // Only assign instances with grading due date not set and with a due date of not older than 3 weeks will be updated.
+        $sql = "UPDATE {assign}
+                   SET gradingduedate = duedate + :weeksecs
+                 WHERE gradingduedate = 0
+                       AND duedate > :timelimit";
+
+        // Calculate the time limit, which is 3 weeks before the current date.
+        $interval = new DateInterval('P3W');
+        $timelimit = new DateTime();
+        $timelimit->sub($interval);
+
+        // Update query params.
+        $params = [
+            'weeksecs' => WEEKSECS,
+            'timelimit' => $timelimit->getTimestamp()
+        ];
+
+        // Execute DB update for assign instances.
+        $DB->execute($sql, $params);
+
+        // Assign savepoint reached.
+        upgrade_mod_savepoint(true, 2017042800, 'assign');
+    }
+
     return true;
 }

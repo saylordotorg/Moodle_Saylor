@@ -1991,7 +1991,7 @@ class global_navigation extends navigation_node {
                     $activity->display = false;
                 } else {
                     $activity->url = $url->out();
-                    $activity->display = $cm->uservisible ? true : false;
+                    $activity->display = $cm->is_visible_on_course_page() ? true : false;
                     if (self::module_extends_navigation($cm->modname)) {
                         $activity->nodetype = navigation_node::NODETYPE_BRANCH;
                     }
@@ -2139,7 +2139,7 @@ class global_navigation extends navigation_node {
         $activitynode = $coursenode->add(format_string($cm->name), $url, navigation_node::TYPE_ACTIVITY, null, $cm->id, $icon);
         $activitynode->title(get_string('modulename', $cm->modname));
         $activitynode->hidden = (!$cm->visible);
-        if (!$cm->uservisible) {
+        if (!$cm->is_visible_on_course_page()) {
             // Do not show any error here, let the page handle exception that activity is not visible for the current user.
             // Also there may be no exception at all in case when teacher is logged in as student.
             $activitynode->display = false;
@@ -4207,14 +4207,14 @@ class settings_navigation extends navigation_node {
             $coursenode->add($editstring, $editurl, self::TYPE_SETTING, null, 'turneditingonoff', new pix_icon('i/edit', ''));
         }
 
-        if ($adminoptions->update) {
-
+        if ($adminoptions->editcompletion) {
             // Add the course completion settings link
-            if ($CFG->enablecompletion && $course->enablecompletion) {
-                $url = new moodle_url('/course/completion.php', array('id'=>$course->id));
-                $coursenode->add(get_string('coursecompletion', 'completion'), $url, self::TYPE_SETTING, null, null, new pix_icon('i/settings', ''));
-            }
-        } else if ($adminoptions->tags) {
+            $url = new moodle_url('/course/completion.php', array('id' => $course->id));
+            $coursenode->add(get_string('coursecompletion', 'completion'), $url, self::TYPE_SETTING, null, null,
+                             new pix_icon('i/settings', ''));
+        }
+
+        if (!$adminoptions->update && $adminoptions->tags) {
             $url = new moodle_url('/course/tags.php', array('id' => $course->id));
             $coursenode->add(get_string('coursetags', 'tag'), $url, self::TYPE_SETTING, null, 'coursetags', new pix_icon('i/settings', ''));
         }

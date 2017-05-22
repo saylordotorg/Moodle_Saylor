@@ -2230,6 +2230,7 @@ class mod_assign_external_testcase extends externallib_advanced_testcase {
         $this->assertFalse(fullname($student) == $result['fullname']);
         $this->assertFalse($result['submitted']);
         $this->assertFalse($result['requiregrading']);
+        $this->assertFalse($result['grantedextension']);
         $this->assertTrue($result['blindmarking']);
         // Make sure we don't get any additional info.
         $this->assertArrayNotHasKey('user', $result);
@@ -2283,6 +2284,7 @@ class mod_assign_external_testcase extends externallib_advanced_testcase {
         $this->assertEquals(fullname($student), $result['fullname']);
         $this->assertTrue($result['submitted']);
         $this->assertTrue($result['requiregrading']);
+        $this->assertFalse($result['grantedextension']);
         $this->assertFalse($result['blindmarking']);
         // Make sure we don't get any additional info.
         $this->assertArrayNotHasKey('user', $result);

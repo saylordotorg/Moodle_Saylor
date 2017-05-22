@@ -64,8 +64,6 @@ class login implements renderable, templatable {
     public $instructions;
     /** @var moodle_url The form action login URL. */
     public $loginurl;
-    /** @var bool Whether the password can be auto completed. */
-    public $passwordautocomplete;
     /** @var bool Whether the username should be remembered. */
     public $rememberusername;
     /** @var moodle_url The sign-up URL. */
@@ -90,7 +88,6 @@ class login implements renderable, templatable {
         $this->cookieshelpicon = new help_icon('cookiesenabled', 'core');
 
         $this->autofocusform = !empty($CFG->loginpageautofocus);
-        $this->passwordautocomplete = !empty($CFG->loginpasswordautocomplete);
         $this->rememberusername = isset($CFG->rememberusername) and $CFG->rememberusername == 2;
 
         $this->forgotpasswordurl = new moodle_url($CFG->httpswwwroot . '/login/forgot_password.php');
@@ -106,12 +103,7 @@ class login implements renderable, templatable {
         }
 
         // Identity providers.
-        $identityproviders = [];
-        foreach ($authsequence as $authname) {
-            $authplugin = get_auth_plugin($authname);
-            $identityproviders = array_merge($identityproviders, $authplugin->loginpage_idp_list($SESSION->wantsurl));
-        }
-        $this->identityproviders = $identityproviders;
+        $this->identityproviders = \auth_plugin_base::get_identity_providers($authsequence);
     }
 
     /**
@@ -124,15 +116,8 @@ class login implements renderable, templatable {
     }
 
     public function export_for_template(renderer_base $output) {
-        global $CFG;
 
-        $identityproviders = array_map(function($idp) use ($output) {
-            $idp['icon'] = $idp['icon']->export_for_template($output);
-            if ($idp['url'] instanceof moodle_url) {
-                $idp['url'] = $idp['url']->out(false);
-            }
-            return $idp;
-        }, $this->identityproviders);
+        $identityproviders = \auth_plugin_base::prepare_identity_providers_for_output($this->identityproviders, $output);
 
         $data = new stdClass();
         $data->autofocusform = $this->autofocusform;
@@ -143,13 +128,12 @@ class login implements renderable, templatable {
         $data->error = $this->error;
         $data->forgotpasswordurl = $this->forgotpasswordurl->out(false);
         $data->hasidentityproviders = !empty($this->identityproviders);
-        $data->hasinstructions = !empty($this->instructions);
+        $data->hasinstructions = !empty($this->instructions) || $this->cansignup;
         $data->identityproviders = $identityproviders;
         list($data->instructions, $data->instructionsformat) = external_format_text($this->instructions, FORMAT_MOODLE,
             context_system::instance()->id);
         $data->loginurl = $this->loginurl->out(false);
         $data->rememberusername = $this->rememberusername;
-        $data->passwordautocomplete = $this->passwordautocomplete;
         $data->signupurl = $this->signupurl->out(false);
         $data->username = $this->username;
 

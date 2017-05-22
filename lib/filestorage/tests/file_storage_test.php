@@ -59,12 +59,15 @@ class core_files_file_storage_testcase extends advanced_testcase {
         $file = $fs->create_file_from_string($filerecord, $content);
 
         $this->assertInstanceOf('stored_file', $file);
-        $this->assertSame(sha1($content), $file->get_contenthash());
+        $this->assertTrue($file->compare_to_string($content));
         $this->assertSame($pathhash, $file->get_pathnamehash());
 
         $this->assertTrue($DB->record_exists('files', array('pathnamehash'=>$pathhash)));
 
-        $location = test_stored_file_inspection::get_pretected_pathname($file);
+        $method = new ReflectionMethod('file_system', 'get_local_path_from_storedfile');
+        $method->setAccessible(true);
+        $filesystem = $fs->get_file_system();
+        $location = $method->invokeArgs($filesystem, array($file, true));
 
         $this->assertFileExists($location);
 
@@ -129,11 +132,14 @@ class core_files_file_storage_testcase extends advanced_testcase {
         $file = $fs->create_file_from_pathname($filerecord, $filepath);
 
         $this->assertInstanceOf('stored_file', $file);
-        $this->assertSame(sha1_file($filepath), $file->get_contenthash());
+        $this->assertTrue($file->compare_to_path($filepath));
 
         $this->assertTrue($DB->record_exists('files', array('pathnamehash'=>$pathhash)));
 
-        $location = test_stored_file_inspection::get_pretected_pathname($file);
+        $method = new ReflectionMethod('file_system', 'get_local_path_from_storedfile');
+        $method->setAccessible(true);
+        $filesystem = $fs->get_file_system();
+        $location = $method->invokeArgs($filesystem, array($file, true));
 
         $this->assertFileExists($location);
 
@@ -465,6 +471,17 @@ class core_files_file_storage_testcase extends advanced_testcase {
             $this->assertInstanceOf('stored_file', $file);
             $this->assertEquals($key, $file->get_pathnamehash());
         }
+
+        // Test the limit feature to retrieve each individual file.
+        $limited = $fs->get_area_files($user->ctxid, 'user', 'private', false, 'filename', false,
+                0, 0, 1);
+        $mapfunc = function($f) {
+            return $f->get_filename();
+        };
+        $this->assertEquals(array('1.txt'), array_values(array_map($mapfunc, $limited)));
+        $limited = $fs->get_area_files($user->ctxid, 'user', 'private', false, 'filename', false,
+                0, 1, 50);
+        $this->assertEquals(array('2.txt', '3.txt'), array_values(array_map($mapfunc, $limited)));
 
         // Test with an itemid with no files.
         $areafiles = $fs->get_area_files($user->ctxid, 'user', 'private', 666, 'sortorder', false);
@@ -1831,6 +1848,53 @@ class core_files_file_storage_testcase extends advanced_testcase {
         $this->expectException('coding_exception');
         $fs->get_unused_filename($contextid, $component, $filearea, $itemid, $filepath, '');
     }
+
+    /**
+     * Test that mimetype_from_file returns appropriate output when the
+     * file could not be found.
+     */
+    public function test_mimetype_not_found() {
+        $mimetype = file_storage::mimetype('/path/to/nonexistent/file');
+        $this->assertEquals('document/unknown', $mimetype);
+    }
+
+    /**
+     * Test that mimetype_from_file returns appropriate output for a known
+     * file.
+     *
+     * Note: this is not intended to check that functions outside of this
+     * file works. It is intended to validate the codepath contains no
+     * errors and behaves as expected.
+     */
+    public function test_mimetype_known() {
+        $filepath = __DIR__ . '/fixtures/testimage.jpg';
+        $mimetype = file_storage::mimetype_from_file($filepath);
+        $this->assertEquals('image/jpeg', $mimetype);
+    }
+
+    /**
+     * Test that mimetype_from_file returns appropriate output when the
+     * file could not be found.
+     */
+    public function test_mimetype_from_file_not_found() {
+        $mimetype = file_storage::mimetype_from_file('/path/to/nonexistent/file');
+        $this->assertEquals('document/unknown', $mimetype);
+    }
+
+    /**
+     * Test that mimetype_from_file returns appropriate output for a known
+     * file.
+     *
+     * Note: this is not intended to check that functions outside of this
+     * file works. It is intended to validate the codepath contains no
+     * errors and behaves as expected.
+     */
+    public function test_mimetype_from_file_known() {
+        $filepath = __DIR__ . '/fixtures/testimage.jpg';
+        $mimetype = file_storage::mimetype_from_file($filepath);
+        $this->assertEquals('image/jpeg', $mimetype);
+    }
+
 }
 
 class test_stored_file_inspection extends stored_file {

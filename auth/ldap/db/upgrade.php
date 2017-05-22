@@ -25,6 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
+ * Function to upgrade auth_ldap.
  * @param int $oldversion the version we are upgrading from
  * @return bool result
  */
@@ -57,6 +58,13 @@ function xmldb_auth_ldap_upgrade($oldversion) {
 
     // Automatically generated Moodle v3.2.0 release upgrade line.
     // Put any upgrade step following this.
+
+    if ($oldversion < 2017020700) {
+        // Convert info in config plugins from auth/ldap to auth_ldap.
+        upgrade_fix_config_auth_plugin_names('ldap');
+        upgrade_fix_config_auth_plugin_defaults('ldap');
+        upgrade_plugin_savepoint(true, 2017020700, 'auth', 'ldap');
+    }
 
     return true;
 }

@@ -28,6 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 
 require_once($CFG->dirroot . '/webservice/tests/helpers.php');
+require_once($CFG->dirroot . '/mod/forum/lib.php');
 
 class mod_forum_external_testcase extends externallib_advanced_testcase {
 
@@ -59,7 +60,7 @@ class mod_forum_external_testcase extends externallib_advanced_testcase {
         $this->resetAfterTest(true);
 
         // Create a user.
-        $user = self::getDataGenerator()->create_user();
+        $user = self::getDataGenerator()->create_user(array('trackforums' => 1));
 
         // Set to the user.
         self::setUser($user);
@@ -72,12 +73,14 @@ class mod_forum_external_testcase extends externallib_advanced_testcase {
         $record = new stdClass();
         $record->introformat = FORMAT_HTML;
         $record->course = $course1->id;
+        $record->trackingtype = FORUM_TRACKING_FORCED;
         $forum1 = self::getDataGenerator()->create_module('forum', $record);
 
         // Second forum.
         $record = new stdClass();
         $record->introformat = FORMAT_HTML;
         $record->course = $course2->id;
+        $record->trackingtype = FORUM_TRACKING_OFF;
         $forum2 = self::getDataGenerator()->create_module('forum', $record);
         $forum2->introfiles = [];
 
@@ -90,6 +93,8 @@ class mod_forum_external_testcase extends externallib_advanced_testcase {
         // Expect one discussion.
         $forum1->numdiscussions = 1;
         $forum1->cancreatediscussions = true;
+        $forum1->istracked = true;
+        $forum1->unreadpostscount = 0;
         $forum1->introfiles = [];
 
         $record = new stdClass();
@@ -102,6 +107,7 @@ class mod_forum_external_testcase extends externallib_advanced_testcase {
         $forum2->numdiscussions = 2;
         // Default limited role, no create discussion capability enabled.
         $forum2->cancreatediscussions = false;
+        $forum2->istracked = false;
 
         // Check the forum was correctly created.
         $this->assertEquals(2, $DB->count_records_select('forum', 'id = :forum1 OR id = :forum2',
@@ -210,6 +216,7 @@ class mod_forum_external_testcase extends externallib_advanced_testcase {
         $record = new stdClass();
         $record->course = $course1->id;
         $forum2 = self::getDataGenerator()->create_module('forum', $record);
+        $forum2cm = get_coursemodule_from_id('forum', $forum2->cmid);
         $forum2context = context_module::instance($forum2->cmid);
 
         // Add discussions to the forums.
@@ -318,6 +325,7 @@ class mod_forum_external_testcase extends externallib_advanced_testcase {
                                     $discussion1reply1->id, '/', $filename),
                     'timemodified' => $timepost,
                     'mimetype' => 'image/jpeg',
+                    'isexternalfile' => false,
                 )
             ),
             'totalscore' => $discussion1reply1->totalscore,
@@ -346,6 +354,16 @@ class mod_forum_external_testcase extends externallib_advanced_testcase {
         // Unset the initial discussion post.
         array_pop($posts['posts']);
         $this->assertEquals($expectedposts, $posts);
+
+        // Check we receive the unread count correctly on tracked forum.
+        forum_tp_count_forum_unread_posts($forum2cm, $course1, true);    // Reset static cache.
+        $result = mod_forum_external::get_forums_by_courses(array($course1->id));
+        $result = external_api::clean_returnvalue(mod_forum_external::get_forums_by_courses_returns(), $result);
+        foreach ($result as $f) {
+            if ($f['id'] == $forum2->id) {
+                $this->assertEquals(1, $f['unreadpostscount']);
+            }
+        }
 
         // Test discussion without additional posts. There should be only one post (the one created by the discussion).
         $posts = mod_forum_external::get_forum_discussion_posts($discussion2->id, 'modified', 'DESC');
@@ -376,6 +394,16 @@ class mod_forum_external_testcase extends externallib_advanced_testcase {
         $posts = external_api::clean_returnvalue(mod_forum_external::get_forum_discussion_posts_returns(), $posts);
         foreach ($posts['posts'] as $post) {
             $this->assertTrue($post['postread']);
+        }
+
+        // Check we receive 0 unread posts.
+        forum_tp_count_forum_unread_posts($forum2cm, $course1, true);    // Reset static cache.
+        $result = mod_forum_external::get_forums_by_courses(array($course1->id));
+        $result = external_api::clean_returnvalue(mod_forum_external::get_forums_by_courses_returns(), $result);
+        foreach ($result as $f) {
+            if ($f['id'] == $forum2->id) {
+                $this->assertEquals(0, $f['unreadpostscount']);
+            }
         }
     }
 
@@ -996,7 +1024,7 @@ class mod_forum_external_testcase extends externallib_advanced_testcase {
      * Test can_add_discussion. A basic test since all the API functions are already covered by unit tests.
      */
     public function test_can_add_discussion() {
-
+        global $DB;
         $this->resetAfterTest(true);
 
         // Create courses to add the modules.
@@ -1017,11 +1045,24 @@ class mod_forum_external_testcase extends externallib_advanced_testcase {
         $result = mod_forum_external::can_add_discussion($forum->id);
         $result = external_api::clean_returnvalue(mod_forum_external::can_add_discussion_returns(), $result);
         $this->assertFalse($result['status']);
+        $this->assertFalse($result['canpindiscussions']);
+        $this->assertTrue($result['cancreateattachment']);
+
+        // Disable attachments.
+        $DB->set_field('forum', 'maxattachments', 0, array('id' => $forum->id));
+        $result = mod_forum_external::can_add_discussion($forum->id);
+        $result = external_api::clean_returnvalue(mod_forum_external::can_add_discussion_returns(), $result);
+        $this->assertFalse($result['status']);
+        $this->assertFalse($result['canpindiscussions']);
+        $this->assertFalse($result['cancreateattachment']);
+        $DB->set_field('forum', 'maxattachments', 1, array('id' => $forum->id));    // Enable attachments again.
 
         self::setAdminUser();
         $result = mod_forum_external::can_add_discussion($forum->id);
         $result = external_api::clean_returnvalue(mod_forum_external::can_add_discussion_returns(), $result);
         $this->assertTrue($result['status']);
+        $this->assertTrue($result['canpindiscussions']);
+        $this->assertTrue($result['cancreateattachment']);
 
     }
 

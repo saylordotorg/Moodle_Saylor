@@ -690,6 +690,8 @@ class course_modinfo {
  * @property-read int $added Time that this course-module was added (unix time) - from course_modules table
  * @property-read int $visible Visible setting (0 or 1; if this is 0, students cannot see/access the activity) - from
  *    course_modules table
+ * @property-read int $visibleoncoursepage Visible on course page setting - from course_modules table, adjusted to
+ *    whether course format allows this module to have the "stealth" mode
  * @property-read int $visibleold Old visible setting (if the entire section is hidden, the previous value for
  *    visible is stored in this field) - from course_modules table
  * @property-read int $groupmode Group mode (one of the constants NOGROUPS, SEPARATEGROUPS, or VISIBLEGROUPS) - from
@@ -832,6 +834,12 @@ class cm_info implements IteratorAggregate {
      * @var int
      */
     private $visible;
+
+    /**
+     * Visible on course page setting - from course_modules table
+     * @var int
+     */
+    private $visibleoncoursepage;
 
     /**
      * Old visible setting (if the entire section is hidden, the previous value for
@@ -999,6 +1007,12 @@ class cm_info implements IteratorAggregate {
     private $uservisible;
 
     /**
+     * True if this course-module is visible to the CURRENT user on the course page
+     * @var bool
+     */
+    private $uservisibleoncoursepage;
+
+    /**
      * @var moodle_url
      */
     private $url;
@@ -1093,6 +1107,7 @@ class cm_info implements IteratorAggregate {
         'showdescription' => false,
         'uservisible' => 'get_user_visible',
         'visible' => false,
+        'visibleoncoursepage' => false,
         'visibleold' => false,
         'deletioninprogress' => false
     );
@@ -1366,18 +1381,18 @@ class cm_info implements IteratorAggregate {
         } else if (!empty($this->icon)) {
             if (substr($this->icon, 0, 4) === 'mod/') {
                 list($modname, $iconname) = explode('/', substr($this->icon, 4), 2);
-                $icon = $output->pix_url($iconname, $modname);
+                $icon = $output->image_url($iconname, $modname);
             } else {
                 if (!empty($this->iconcomponent)) {
                     // Icon  has specified component
-                    $icon = $output->pix_url($this->icon, $this->iconcomponent);
+                    $icon = $output->image_url($this->icon, $this->iconcomponent);
                 } else {
                     // Icon does not have specified component, use default
-                    $icon = $output->pix_url($this->icon);
+                    $icon = $output->image_url($this->icon);
                 }
             }
         } else {
-            $icon = $output->pix_url('icon', $this->modname);
+            $icon = $output->image_url('icon', $this->modname);
         }
         return $icon;
     }
@@ -1388,7 +1403,8 @@ class cm_info implements IteratorAggregate {
      */
     public function get_grouping_label($textclasses = '') {
         $groupinglabel = '';
-        if (!empty($this->groupingid) && has_capability('moodle/course:managegroups', context_course::instance($this->course))) {
+        if ($this->effectivegroupmode != NOGROUPS && !empty($this->groupingid) &&
+                has_capability('moodle/course:managegroups', context_course::instance($this->course))) {
             $groupings = groups_get_all_groupings($this->course);
             $groupinglabel = html_writer::tag('span', '('.format_string($groupings[$this->groupingid]->name).')',
                 array('class' => 'groupinglabel '.$textclasses));
@@ -1425,6 +1441,15 @@ class cm_info implements IteratorAggregate {
      */
     public function get_modinfo() {
         return $this->modinfo;
+    }
+
+    /**
+     * Returns the section this module belongs to
+     *
+     * @return section_info
+     */
+    public function get_section_info() {
+        return $this->modinfo->get_section_info($this->sectionnum);
     }
 
     /**
@@ -1509,7 +1534,7 @@ class cm_info implements IteratorAggregate {
 
         // Standard fields from table course_modules.
         static $cmfields = array('id', 'course', 'module', 'instance', 'section', 'idnumber', 'added',
-            'score', 'indent', 'visible', 'visibleold', 'groupmode', 'groupingid',
+            'score', 'indent', 'visible', 'visibleoncoursepage', 'visibleold', 'groupmode', 'groupingid',
             'completion', 'completiongradeitemnumber', 'completionview', 'completionexpected',
             'showdescription', 'availability', 'deletioninprogress');
         foreach ($cmfields as $key) {
@@ -1685,6 +1710,7 @@ class cm_info implements IteratorAggregate {
         $this->idnumber         = isset($mod->idnumber) ? $mod->idnumber : '';
         $this->name             = $mod->name;
         $this->visible          = $mod->visible;
+        $this->visibleoncoursepage = $mod->visibleoncoursepage;
         $this->sectionnum       = $mod->section; // Note weirdness with name here
         $this->groupmode        = isset($mod->groupmode) ? $mod->groupmode : 0;
         $this->groupingid       = isset($mod->groupingid) ? $mod->groupingid : 0;
@@ -1824,6 +1850,34 @@ class cm_info implements IteratorAggregate {
     }
 
     /**
+     * Returns whether this module is visible to the current user on course page
+     *
+     * Activity may be visible on the course page but not available, for example
+     * when it is hidden conditionally but the condition information is displayed.
+     *
+     * @return bool
+     */
+    public function is_visible_on_course_page() {
+        $this->obtain_dynamic_data();
+        return $this->uservisibleoncoursepage;
+    }
+
+    /**
+     * Whether this module is available but hidden from course page
+     *
+     * "Stealth" modules are the ones that are not shown on course page but available by following url.
+     * They are normally also displayed in grade reports and other reports.
+     * Module will be stealth either if visibleoncoursepage=0 or it is a visible module inside the hidden
+     * section.
+     *
+     * @return bool
+     */
+    public function is_stealth() {
+        return !$this->visibleoncoursepage ||
+            ($this->visible && ($section = $this->get_section_info()) && !$section->visible);
+    }
+
+    /**
      * Getter method for property $available, ensures that dynamic data is retrieved
      * @return bool
      */
@@ -1876,8 +1930,9 @@ class cm_info implements IteratorAggregate {
 
         // If the user cannot access the activity set the uservisible flag to false.
         // Additional checks are required to determine whether the activity is entirely hidden or just greyed out.
-        if ((!$this->visible or !$this->get_available()) and
-                !has_capability('moodle/course:viewhiddenactivities', $this->get_context(), $userid)) {
+        if ((!$this->visible && !has_capability('moodle/course:viewhiddenactivities', $this->get_context(), $userid)) ||
+                (!$this->get_available() &&
+                !has_capability('moodle/course:ignoreavailabilityrestrictions', $this->get_context(), $userid))) {
 
             $this->uservisible = false;
         }
@@ -1888,6 +1943,16 @@ class cm_info implements IteratorAggregate {
              $this->uservisible = false;
             // Ensure activity is completely hidden from the user.
             $this->availableinfo = '';
+        }
+
+        $this->uservisibleoncoursepage = $this->uservisible &&
+            ($this->visibleoncoursepage ||
+                has_capability('moodle/course:manageactivities', $this->get_context(), $userid) ||
+                has_capability('moodle/course:activityvisibility', $this->get_context(), $userid));
+        // Activity that is not available, not hidden from course page and has availability
+        // info is actually visible on the course page (with availability info and without a link).
+        if (!$this->uservisible && $this->visibleoncoursepage && $this->availableinfo) {
+            $this->uservisibleoncoursepage = true;
         }
     }
 
@@ -2292,19 +2357,19 @@ class cached_cm_info {
 
     /**
      * Name of icon for this activity. Normally, this should be used together with $iconcomponent
-     * to define the icon, as per pix_url function.
+     * to define the icon, as per image_url function.
      * For backward compatibility, if this value is of the form 'mod/forum/icon' then an icon
      * within that module will be used.
      * @see cm_info::get_icon_url()
-     * @see renderer_base::pix_url()
+     * @see renderer_base::image_url()
      * @var string
      */
     public $icon;
 
     /**
-     * Component for icon for this activity, as per pix_url; leave blank to use default 'moodle'
+     * Component for icon for this activity, as per image_url; leave blank to use default 'moodle'
      * component
-     * @see renderer_base::pix_url()
+     * @see renderer_base::image_url()
      * @var string
      */
     public $iconcomponent;
@@ -2696,7 +2761,10 @@ class section_info implements IteratorAggregate {
         $this->_uservisible = true;
         if (!$this->_visible || !$this->get_available()) {
             $coursecontext = context_course::instance($this->get_course());
-            if (!has_capability('moodle/course:viewhiddensections', $coursecontext, $userid)) {
+            if (!$this->_visible && !has_capability('moodle/course:viewhiddensections', $coursecontext, $userid) ||
+                    (!$this->get_available() &&
+                    !has_capability('moodle/course:ignoreavailabilityrestrictions', $coursecontext, $userid))) {
+
                 $this->_uservisible = false;
             }
         }

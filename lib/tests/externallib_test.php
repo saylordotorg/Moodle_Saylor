@@ -540,6 +540,7 @@ class core_externallib_testcase extends advanced_testcase {
             'timemodified' => $timemodified,
             'filesize' => $filesize,
             'mimetype' => 'text/plain',
+            'isexternalfile' => false,
         );
         // Get all the files for the area.
         $files = external_util::get_area_files($context, $component, $filearea, false);
@@ -559,7 +560,8 @@ class core_externallib_testcase extends advanced_testcase {
         $description = new external_files();
 
         // First check that the expected default values and keys are returned.
-        $expectedkeys = array_flip(array('filename', 'filepath', 'filesize', 'fileurl', 'timemodified', 'mimetype'));
+        $expectedkeys = array_flip(array('filename', 'filepath', 'filesize', 'fileurl', 'timemodified', 'mimetype',
+            'isexternalfile', 'repositorytype'));
         $returnedkeys = array_flip(array_keys($description->content->keys));
         $this->assertEquals($expectedkeys, $returnedkeys);
         $this->assertEquals('List of files.', $description->desc);

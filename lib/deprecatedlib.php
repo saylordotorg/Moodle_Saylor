@@ -1077,7 +1077,7 @@ function print_arrow($direction='up', $strsort=null, $return=false) {
         $strsort  = get_string('sort' . $sortdir, 'grades');
     }
 
-    $return = ' <img src="'.$OUTPUT->pix_url('t/' . $direction) . '" alt="'.$strsort.'" /> ';
+    $return = ' ' . $OUTPUT->pix_icon('t/' . $direction, $strsort) . ' ';
 
     if ($return) {
         return $return;
@@ -5043,7 +5043,7 @@ function message_contact_link($userid, $linktype='add', $return=false, $script=n
                 $iconpath = 't/addcontact';
         }
 
-        $img = '<img src="'.$OUTPUT->pix_url($iconpath).'" class="iconsmall" alt="'.$safealttext.'" />';
+        $img = $OUTPUT->pix_icon($iconpath, $safealttext);
     }
 
     $output = '<span class="'.$linktype.'contact">'.
@@ -5116,9 +5116,9 @@ function message_history_link($userid1, $userid2, $return=false, $keywords='', $
     }
 
     if ($linktext == 'icon') {  // Icon only
-        $fulllink = '<img src="'.$OUTPUT->pix_url('t/messages') . '" class="iconsmall" alt="'.$strmessagehistory.'" />';
+        $fulllink = $OUTPUT->pix_icon('t/messages', $strmessagehistory);
     } else if ($linktext == 'both') {  // Icon and standard name
-        $fulllink = '<img src="'.$OUTPUT->pix_url('t/messages') . '" class="iconsmall" alt="" />';
+        $fulllink = $OUTPUT->pix_icon('t/messages', '');
         $fulllink .= '&nbsp;'.$strmessagehistory;
     } else if ($linktext) {    // Custom name
         $fulllink = $linktext;
@@ -6384,4 +6384,255 @@ function get_logs($select, array $params=null, $order='l.time DESC', $limitfrom=
 function prevent_form_autofill_password() {
     debugging('prevent_form_autofill_password has been deprecated and is no longer in use.', DEBUG_DEVELOPER);
     return '';
+}
+
+/**
+ * Get the users recent conversations meaning all the people they've recently
+ * sent or received a message from plus the most recent message sent to or received from each other user
+ *
+ * @deprecated since Moodle 3.3 MDL-57370
+ * @param object|int $userorid the current user or user id
+ * @param int $limitfrom can be used for paging
+ * @param int $limitto can be used for paging
+ * @return array
+ */
+function message_get_recent_conversations($userorid, $limitfrom = 0, $limitto = 100) {
+    global $DB;
+
+    debugging('message_get_recent_conversations() is deprecated. Please use \core_message\api::get_conversations() instead.', DEBUG_DEVELOPER);
+
+    if (is_object($userorid)) {
+        $user = $userorid;
+    } else {
+        $userid = $userorid;
+        $user = new stdClass();
+        $user->id = $userid;
+    }
+
+    $userfields = user_picture::fields('otheruser', array('lastaccess'));
+
+    // This query retrieves the most recent message received from or sent to
+    // seach other user.
+    //
+    // If two messages have the same timecreated, we take the one with the
+    // larger id.
+    //
+    // There is a separate query for read and unread messages as they are stored
+    // in different tables. They were originally retrieved in one query but it
+    // was so large that it was difficult to be confident in its correctness.
+    $uniquefield = $DB->sql_concat('message.useridfrom', "'-'", 'message.useridto');
+    $sql = "SELECT $uniquefield, $userfields,
+                   message.id as mid, message.notification, message.useridfrom, message.useridto,
+                   message.smallmessage, message.fullmessage, message.fullmessagehtml,
+                   message.fullmessageformat, message.timecreated,
+                   contact.id as contactlistid, contact.blocked
+              FROM {message_read} message
+              JOIN (
+                        SELECT MAX(id) AS messageid,
+                               matchedmessage.useridto,
+                               matchedmessage.useridfrom
+                         FROM {message_read} matchedmessage
+                   INNER JOIN (
+                               SELECT MAX(recentmessages.timecreated) timecreated,
+                                      recentmessages.useridfrom,
+                                      recentmessages.useridto
+                                 FROM {message_read} recentmessages
+                                WHERE (
+                                      (recentmessages.useridfrom = :userid1 AND recentmessages.timeuserfromdeleted = 0) OR
+                                      (recentmessages.useridto = :userid2   AND recentmessages.timeusertodeleted = 0)
+                                      )
+                             GROUP BY recentmessages.useridfrom, recentmessages.useridto
+                              ) recent ON matchedmessage.useridto     = recent.useridto
+                           AND matchedmessage.useridfrom   = recent.useridfrom
+                           AND matchedmessage.timecreated  = recent.timecreated
+                           WHERE (
+                                 (matchedmessage.useridfrom = :userid6 AND matchedmessage.timeuserfromdeleted = 0) OR
+                                 (matchedmessage.useridto = :userid7   AND matchedmessage.timeusertodeleted = 0)
+                                 )
+                      GROUP BY matchedmessage.useridto, matchedmessage.useridfrom
+                   ) messagesubset ON messagesubset.messageid = message.id
+              JOIN {user} otheruser ON (message.useridfrom = :userid4 AND message.useridto = otheruser.id)
+                OR (message.useridto   = :userid5 AND message.useridfrom   = otheruser.id)
+         LEFT JOIN {message_contacts} contact ON contact.userid  = :userid3 AND contact.contactid = otheruser.id
+             WHERE otheruser.deleted = 0 AND message.notification = 0
+          ORDER BY message.timecreated DESC";
+    $params = array(
+        'userid1' => $user->id,
+        'userid2' => $user->id,
+        'userid3' => $user->id,
+        'userid4' => $user->id,
+        'userid5' => $user->id,
+        'userid6' => $user->id,
+        'userid7' => $user->id
+    );
+    $read = $DB->get_records_sql($sql, $params, $limitfrom, $limitto);
+
+    // We want to get the messages that have not been read. These are stored in the 'message' table. It is the
+    // exact same query as the one above, except for the table we are querying. So, simply replace references to
+    // the 'message_read' table with the 'message' table.
+    $sql = str_replace('{message_read}', '{message}', $sql);
+    $unread = $DB->get_records_sql($sql, $params, $limitfrom, $limitto);
+
+    $unreadcountssql = 'SELECT useridfrom, count(*) as count
+                          FROM {message}
+                         WHERE useridto = :userid
+                           AND timeusertodeleted = 0
+                           AND notification = 0
+                      GROUP BY useridfrom';
+    $unreadcounts = $DB->get_records_sql($unreadcountssql, array('userid' => $user->id));
+
+    // Union the 2 result sets together looking for the message with the most
+    // recent timecreated for each other user.
+    // $conversation->id (the array key) is the other user's ID.
+    $conversations = array();
+    $conversation_arrays = array($unread, $read);
+    foreach ($conversation_arrays as $conversation_array) {
+        foreach ($conversation_array as $conversation) {
+            // Only consider it unread if $user has unread messages.
+            if (isset($unreadcounts[$conversation->useridfrom])) {
+                $conversation->isread = 0;
+                $conversation->unreadcount = $unreadcounts[$conversation->useridfrom]->count;
+            } else {
+                $conversation->isread = 1;
+            }
+
+            if (!isset($conversations[$conversation->id])) {
+                $conversations[$conversation->id] = $conversation;
+            } else {
+                $current = $conversations[$conversation->id];
+                // We need to maintain the isread and unreadcount values from existing
+                // parts of the conversation if we're replacing it.
+                $conversation->isread = ($conversation->isread && $current->isread);
+                if (isset($current->unreadcount) && !isset($conversation->unreadcount)) {
+                    $conversation->unreadcount = $current->unreadcount;
+                }
+
+                if ($current->timecreated < $conversation->timecreated) {
+                    $conversations[$conversation->id] = $conversation;
+                } else if ($current->timecreated == $conversation->timecreated) {
+                    if ($current->mid < $conversation->mid) {
+                        $conversations[$conversation->id] = $conversation;
+                    }
+                }
+            }
+        }
+    }
+
+    // Sort the conversations by $conversation->timecreated, newest to oldest
+    // There may be multiple conversations with the same timecreated
+    // The conversations array contains both read and unread messages (different tables) so sorting by ID won't work
+    $result = core_collator::asort_objects_by_property($conversations, 'timecreated', core_collator::SORT_NUMERIC);
+    $conversations = array_reverse($conversations);
+
+    return $conversations;
+}
+
+/**
+ * Display calendar preference button.
+ *
+ * @param stdClass $course course object
+ * @deprecated since Moodle 3.2
+ * @return string return preference button in html
+ */
+function calendar_preferences_button(stdClass $course) {
+    debugging('This should no longer be used, the calendar preferences are now linked to the user preferences page.');
+
+    global $OUTPUT;
+
+    // Guests have no preferences.
+    if (!isloggedin() || isguestuser()) {
+        return '';
+    }
+
+    return $OUTPUT->single_button(new moodle_url('/user/calendar.php'), get_string("preferences", "calendar"));
+}
+
+/**
+ * Return the name of the weekday
+ *
+ * @deprecated since 3.3
+ * @todo The final deprecation of this function will take place in Moodle 3.7 - see MDL-57617.
+ * @param string $englishname
+ * @return string of the weekeday
+ */
+function calendar_wday_name($englishname) {
+    debugging(__FUNCTION__ . '() is deprecated and no longer used in core.', DEBUG_DEVELOPER);
+    return get_string(strtolower($englishname), 'calendar');
+}
+
+/**
+ * Get the upcoming event block.
+ *
+ * @deprecated since 3.3
+ * @todo The final deprecation of this function will take place in Moodle 3.7 - see MDL-57617.
+ * @param array $events list of events
+ * @param moodle_url|string $linkhref link to event referer
+ * @param boolean $showcourselink whether links to courses should be shown
+ * @return string|null $content html block content
+ */
+function calendar_get_block_upcoming($events, $linkhref = null, $showcourselink = false) {
+    global $CFG;
+
+    debugging(__FUNCTION__ . '() is deprecated, please use block_calendar_upcoming::get_upcoming_content() instead.',
+        DEBUG_DEVELOPER);
+
+    require_once($CFG->dirroot . '/blocks/moodleblock.class.php');
+    require_once($CFG->dirroot . '/blocks/calendar_upcoming/block_calendar_upcoming.php');
+    return block_calendar_upcoming::get_upcoming_content($events, $linkhref, $showcourselink);
+}
+
+/**
+ * Display month selector options.
+ *
+ * @deprecated since 3.3
+ * @todo The final deprecation of this function will take place in Moodle 3.7 - see MDL-57617.
+ * @param string $name for the select element
+ * @param string|array $selected options for select elements
+ */
+function calendar_print_month_selector($name, $selected) {
+    debugging(__FUNCTION__ . '() is deprecated and no longer used in core.', DEBUG_DEVELOPER);
+    $months = array();
+    for ($i = 1; $i <= 12; $i++) {
+        $months[$i] = userdate(gmmktime(12, 0, 0, $i, 15, 2000), '%B');
+    }
+    echo html_writer::label(get_string('months'), 'menu'. $name, false, array('class' => 'accesshide'));
+    echo html_writer::select($months, $name, $selected, false);
+}
+
+/**
+ * Update calendar subscriptions.
+ *
+ * @deprecated since 3.3
+ * @todo The final deprecation of this function will take place in Moodle 3.7 - see MDL-57617.
+ * @return bool
+ */
+function calendar_cron() {
+    debugging(__FUNCTION__ . '() is deprecated and should not be used. Please use the core\task\calendar_cron_task instead.',
+        DEBUG_DEVELOPER);
+
+    global $CFG, $DB;
+
+    require_once($CFG->dirroot . '/calendar/lib.php');
+    // In order to execute this we need bennu.
+    require_once($CFG->libdir.'/bennu/bennu.inc.php');
+
+    mtrace('Updating calendar subscriptions:');
+    cron_trace_time_and_memory();
+
+    $time = time();
+    $subscriptions = $DB->get_records_sql('SELECT * FROM {event_subscriptions} WHERE pollinterval > 0
+      AND lastupdated + pollinterval < ?', array($time));
+    foreach ($subscriptions as $sub) {
+        mtrace("Updating calendar subscription {$sub->name} in course {$sub->courseid}");
+        try {
+            $log = calendar_update_subscription_events($sub->id);
+            mtrace(trim(strip_tags($log)));
+        } catch (moodle_exception $ex) {
+            mtrace('Error updating calendar subscription: ' . $ex->getMessage());
+        }
+    }
+
+    mtrace('Finished updating calendar subscriptions.');
+
+    return true;
 }
