@@ -46,8 +46,8 @@ $PAGE->set_heading($strmodulename);
 
 // Check if user is logged and not guest. If not, redirect to login page.
 $context = context_course::instance(1);
+$SESSION->wantsurl = $PAGE->url . '?sso=' . $payload . '&sig=' . $signature;
 if (isguestuser()) {
-	$SESSION->wantsurl = $PAGE->url . '?sso=' . $payload . '&sig=' . $signature;
 	redirect(get_login_url());
 }
 require_login(null, false);
@@ -62,6 +62,9 @@ if (!($ssohelper->validatePayload($payload, $signature))) {
     // invaild, deny
     header("HTTP/1.1 403 Forbidden");
     echo("Bad SSO request");
+    $exceptionparam->payload = $payload;
+    $exceptionparam->signature = $signature;
+    throw new moodle_exception('badssoerror', 'discoursesso', $CFG->discoursesso_discourse_url, $exceptionparam);
     die();
 }
 
@@ -96,4 +99,3 @@ $extraParameters = array(
 $query = $ssohelper->getSignInString($nonce, $userId, $userEmail, $extraParameters);
 $url = $CFG->discoursesso_discourse_url . '/session/sso_login?' . $query;
 redirect($url);
-//header('Location: http://discourse.example.com/session/sso_login?' . $query);
