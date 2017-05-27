@@ -37,8 +37,7 @@ $wantsurl = optional_param('wantsurl', NULL, PARAM_RAW);
 $strmodulename = get_string('modulename', 'local_discoursesso');
 $PAGE->set_context(context_system::instance());
 $PAGE->set_pagelayout('standard');
-$PAGE->set_url('/local/discoursesso/index.php', array('sso'=>$payload, 'sig'=>$signature));
-//$PAGE->navbar->add($strcertificates);
+$PAGE->set_url('/local/discoursesso/sso.php', array('sso'=>$payload, 'sig'=>$signature));
 $PAGE->set_title($strmodulename);
 $PAGE->set_heading($strmodulename);
 
@@ -98,11 +97,6 @@ $userEmail = $USER->email;
 // Optional - if you don't set these, Discourse will generate suggestions
 // based on the email address
 
-// Generate user avatar url
-$userpicture = new user_picture($USER);
-$userpicture->size = 1; // Size f1.
-$userAvatar = $userpicture->get_url($PAGE)->out(false);
-
 // Get the user's description
 $user = $DB->get_record('user', array('id' => $USER->id));
 $userDescription = format_text($user->description, $user->descriptionformat);
@@ -110,9 +104,20 @@ $userDescription = format_text($user->description, $user->descriptionformat);
 $extraParameters = array(
     'username' => $USER->username,
     'name'     => fullname($USER, true),
-    'avatar_url' => $userAvatar,
     'bio'      => $userDescription
 );
+
+// Generate user avatar url
+$userpicture = new user_picture($USER);
+$userpicture->size = 1; // Size f1.
+// Did the user upload an avatar or is gravatar enabled?
+if (($userpicture->user->picture > 0) || !empty($CFG->enablegravatar)) {
+    $userAvatar = $userpicture->get_url($PAGE)->out(false);
+}
+// Add the avatar if set
+if (isset($userAvatar)) {
+    $extraParameters['avatar_url'] = $userAvatar;
+}
 
 // build query string and redirect back to the Discourse site
 $query = $ssohelper->getSignInString($nonce, $userId, $userEmail, $extraParameters);

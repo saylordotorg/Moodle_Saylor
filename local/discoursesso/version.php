@@ -25,10 +25,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2017052400;
+$plugin->version  = 2017052700;
 $plugin->requires = 2016052306;  // Requires this Moodle version - at least 3.1
 $plugin->cron     = 0;
 $plugin->component = 'local_discoursesso';
 
-$plugin->release = '0.1.02';
+$plugin->release = '0.2.0';
 $plugin->maturity = MATURITY_BETA;
