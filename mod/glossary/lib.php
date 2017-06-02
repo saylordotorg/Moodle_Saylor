@@ -88,6 +88,10 @@ function glossary_add_instance($glossary) {
     $glossary->id = $returnid;
     glossary_grade_item_update($glossary);
 
+    $completiontimeexpected = !empty($glossary->completionexpected) ? $glossary->completionexpected : null;
+    \core_completion\api::update_completion_date_event($glossary->coursemodule,
+        'glossary', $glossary->id, $completiontimeexpected);
+
     return $returnid;
 }
 
@@ -132,6 +136,10 @@ function glossary_update_instance($glossary) {
         $DB->execute("UPDATE {glossary_entries} SET approved = 1 where approved <> 1 and glossaryid = ?", array($glossary->id));
     }
     glossary_grade_item_update($glossary);
+
+    $completiontimeexpected = !empty($glossary->completionexpected) ? $glossary->completionexpected : null;
+    \core_completion\api::update_completion_date_event($glossary->coursemodule,
+        'glossary', $glossary->id, $completiontimeexpected);
 
     return true;
 }
@@ -211,6 +219,8 @@ function glossary_delete_instance($id) {
     $fs->delete_area_files($context->id);
 
     glossary_grade_item_delete($glossary);
+
+    \core_completion\api::update_completion_date_event($cm->id, 'glossary', $glossary->id, null);
 
     $DB->delete_records('glossary', array('id'=>$id));
 
@@ -1181,7 +1191,7 @@ function  glossary_print_entry_aliases($course, $cm, $glossary, $entry,$mode='',
         foreach ($aliases as $alias) {
             if (trim($alias->alias)) {
                 if ($return == '') {
-                    $return = '<select id="keyword" style="font-size:8pt">';
+                    $return = '<select id="keyword" class="custom-select">';
                 }
                 $return .= "<option>$alias->alias</option>";
             }
@@ -1223,7 +1233,7 @@ function glossary_print_entry_icons($course, $cm, $glossary, $entry, $mode='',$h
 
     $return = '<span class="commands">';
     // Differentiate links for each entry.
-    $altsuffix = ': '.strip_tags(format_text($entry->concept));
+    $altsuffix = strip_tags(format_text($entry->concept));
 
     if (!$entry->approved) {
         $output = true;
@@ -1233,11 +1243,10 @@ function glossary_print_entry_icons($course, $cm, $glossary, $entry, $mode='',$h
 
     if (has_capability('mod/glossary:approve', $context) && !$glossary->defaultapproval && $entry->approved) {
         $output = true;
-        $return .= '<a class="action-icon" title="' . get_string('disapprove', 'glossary').
+        $return .= '<a class="icon" title="' . get_string('disapprove', 'glossary').
                    '" href="approve.php?newstate=0&amp;eid='.$entry->id.'&amp;mode='.$mode.
                    '&amp;hook='.urlencode($hook).'&amp;sesskey='.sesskey().
-                   '"><img src="'.$OUTPUT->pix_url('t/block').'" class="smallicon" alt="'.
-                   get_string('disapprove','glossary').$altsuffix.'" /></a>';
+                   '">' . $OUTPUT->pix_icon('t/block', get_string('disapprove', 'glossary')) . '</a>';
     }
 
     $iscurrentuser = ($entry->userid == $USER->id);
@@ -1248,14 +1257,17 @@ function glossary_print_entry_icons($course, $cm, $glossary, $entry, $mode='',$h
             $mainglossary = $DB->get_record('glossary', array('mainglossary'=>1,'course'=>$course->id));
             if ( $mainglossary ) {  // if there is a main glossary defined, allow to export the current entry
                 $output = true;
-                $return .= '<a class="action-icon" title="'.get_string('exporttomainglossary','glossary') . '" href="exportentry.php?id='.$entry->id.'&amp;prevmode='.$mode.'&amp;hook='.urlencode($hook).'"><img src="'.$OUTPUT->pix_url('export', 'glossary').'" class="smallicon" alt="'.get_string('exporttomainglossary','glossary').$altsuffix.'" /></a>';
+                $return .= '<a class="icon" title="'.get_string('exporttomainglossary','glossary') . '" ' .
+                    'href="exportentry.php?id='.$entry->id.'&amp;prevmode='.$mode.'&amp;hook='.urlencode($hook).'">' .
+                    $OUTPUT->pix_icon('export', get_string('exporttomainglossary', 'glossary'), 'glossary') . '</a>';
             }
         }
 
+        $icon = 't/delete';
+        $iconcomponent = 'moodle';
         if ( $entry->sourceglossaryid ) {
-            $icon = $OUTPUT->pix_url('minus', 'glossary');   // graphical metaphor (minus) for deleting an imported entry
-        } else {
-            $icon = $OUTPUT->pix_url('t/delete');
+            $icon = 'minus';   // graphical metaphor (minus) for deleting an imported entry
+            $iconcomponent = 'glossary';
         }
 
         //Decide if an entry is editable:
@@ -1264,11 +1276,13 @@ function glossary_print_entry_icons($course, $cm, $glossary, $entry, $mode='',$h
         $ineditperiod = ((time() - $entry->timecreated <  $CFG->maxeditingtime) || $glossary->editalways);
         if ( !$importedentry and (has_capability('mod/glossary:manageentries', $context) or ($entry->userid == $USER->id and ($ineditperiod and has_capability('mod/glossary:write', $context))))) {
             $output = true;
-            $return .= "<a class='action-icon' title=\"" . get_string("delete") . "\" href=\"deleteentry.php?id=$cm->id&amp;mode=delete&amp;entry=$entry->id&amp;prevmode=$mode&amp;hook=".urlencode($hook)."\"><img src=\"";
-            $return .= $icon;
-            $return .= "\" class=\"smallicon\" alt=\"" . get_string("delete") .$altsuffix."\" /></a>";
+            $url = "deleteentry.php?id=$cm->id&amp;mode=delete&amp;entry=$entry->id&amp;prevmode=$mode&amp;hook=".urlencode($hook);
+            $return .= "<a class='icon' title=\"" . get_string("delete") . "\" " .
+                       "href=\"$url\">" . $OUTPUT->pix_icon($icon, get_string('deleteentrya', 'mod_glossary', $altsuffix), $iconcomponent) . '</a>';
 
-            $return .= "<a class='action-icon' title=\"" . get_string("edit") . "\" href=\"edit.php?cmid=$cm->id&amp;id=$entry->id&amp;mode=$mode&amp;hook=".urlencode($hook)."\"><img src=\"" . $OUTPUT->pix_url('t/edit') . "\" class=\"smallicon\" alt=\"" . get_string("edit") .$altsuffix. "\" /></a>";
+            $url = "edit.php?cmid=$cm->id&amp;id=$entry->id&amp;mode=$mode&amp;hook=".urlencode($hook);
+            $return .= "<a class='icon' title=\"" . get_string("edit") . "\" href=\"$url\">" .
+                       $OUTPUT->pix_icon('t/edit', get_string('editentrya', 'mod_glossary', $altsuffix)) . '</a>';
         } elseif ( $importedentry ) {
             $return .= "<font size=\"-1\">" . get_string("exportedentry","glossary") . "</font>";
         }
@@ -1311,6 +1325,7 @@ function glossary_print_entry_icons($course, $cm, $glossary, $entry, $mode='',$h
         $return .= '<div>'.$comment->output(true).'</div>';
         $output = true;
     }
+    $return .= '<hr>';
 
     //If we haven't calculated any REAL thing, delete result ($return)
     if (!$output) {
@@ -2041,7 +2056,7 @@ function glossary_print_sorting_links($cm, $mode, $sortkey = '',$sortorder = '')
              $neworder = '&amp;sortorder=asc';
              $newordertitle = get_string('changeto', 'glossary', $asc);
          }
-         $icon = " <img src=\"".$OUTPUT->pix_url($sortorder, 'glossary')."\" class=\"icon\" alt=\"$newordertitle\" />";
+         $icon = " " . $OUTPUT->pix_icon($sortorder, $newordertitle, 'glossary');
      } else {
          if ( $sortkey != 'CREATION' and $sortkey != 'UPDATE' and
                $sortkey != 'FIRSTNAME' and $sortkey != 'LASTNAME' ) {
@@ -2050,7 +2065,7 @@ function glossary_print_sorting_links($cm, $mode, $sortkey = '',$sortorder = '')
          } else {
              $newordertitle = $desc;
              $neworder = '&amp;sortorder=desc';
-             $icon = ' <img src="'.$OUTPUT->pix_url('asc', 'glossary').'" class="icon" alt="'.$newordertitle.'" />';
+             $icon = " " . $OUTPUT->pix_icon('asc', $newordertitle, 'glossary');
          }
      }
      $ficon     = '';
@@ -2158,7 +2173,7 @@ function  glossary_print_entry_ratings($course, $entry) {
  * @param int $displayformat
  */
 function glossary_print_dynaentry($courseid, $entries, $displayformat = -1) {
-    global $USER,$CFG, $DB;
+    global $USER, $CFG, $DB;
 
     echo '<div class="boxaligncenter">';
     echo '<table class="glossarypopup" cellspacing="0"><tr>';
@@ -3032,6 +3047,7 @@ function glossary_supports($feature) {
         case FEATURE_RATE:                    return true;
         case FEATURE_BACKUP_MOODLE2:          return true;
         case FEATURE_SHOW_DESCRIPTION:        return true;
+        case FEATURE_COMMENT:                 return true;
 
         default: return null;
     }
@@ -3942,4 +3958,312 @@ function glossary_can_view_entry($entry, $cminfo) {
     }
 
     return true;
+}
+
+/**
+ * Check if a concept exists in a glossary.
+ *
+ * @param  stdClass $glossary glossary object
+ * @param  string $concept the concept to check
+ * @return bool true if exists
+ * @since  Moodle 3.2
+ */
+function glossary_concept_exists($glossary, $concept) {
+    global $DB;
+
+    return $DB->record_exists_select('glossary_entries', 'glossaryid = :glossaryid AND LOWER(concept) = :concept',
+        array(
+            'glossaryid' => $glossary->id,
+            'concept'    => core_text::strtolower($concept)
+        )
+    );
+}
+
+/**
+ * Return the editor and attachment options when editing a glossary entry
+ *
+ * @param  stdClass $course  course object
+ * @param  stdClass $context context object
+ * @param  stdClass $entry   entry object
+ * @return array array containing the editor and attachment options
+ * @since  Moodle 3.2
+ */
+function glossary_get_editor_and_attachment_options($course, $context, $entry) {
+    $maxfiles = 99;                // TODO: add some setting.
+    $maxbytes = $course->maxbytes; // TODO: add some setting.
+
+    $definitionoptions = array('trusttext' => true, 'maxfiles' => $maxfiles, 'maxbytes' => $maxbytes, 'context' => $context,
+        'subdirs' => file_area_contains_subdirs($context, 'mod_glossary', 'entry', $entry->id));
+    $attachmentoptions = array('subdirs' => false, 'maxfiles' => $maxfiles, 'maxbytes' => $maxbytes);
+    return array($definitionoptions, $attachmentoptions);
+}
+
+/**
+ * Creates or updates a glossary entry
+ *
+ * @param  stdClass $entry entry data
+ * @param  stdClass $course course object
+ * @param  stdClass $cm course module object
+ * @param  stdClass $glossary glossary object
+ * @param  stdClass $context context object
+ * @return stdClass the complete new or updated entry
+ * @since  Moodle 3.2
+ */
+function glossary_edit_entry($entry, $course, $cm, $glossary, $context) {
+    global $DB, $USER;
+
+    list($definitionoptions, $attachmentoptions) = glossary_get_editor_and_attachment_options($course, $context, $entry);
+
+    $timenow = time();
+
+    $categories = empty($entry->categories) ? array() : $entry->categories;
+    unset($entry->categories);
+    $aliases = trim($entry->aliases);
+    unset($entry->aliases);
+
+    if (empty($entry->id)) {
+        $entry->glossaryid       = $glossary->id;
+        $entry->timecreated      = $timenow;
+        $entry->userid           = $USER->id;
+        $entry->timecreated      = $timenow;
+        $entry->sourceglossaryid = 0;
+        $entry->teacherentry     = has_capability('mod/glossary:manageentries', $context);
+        $isnewentry              = true;
+    } else {
+        $isnewentry              = false;
+    }
+
+    $entry->concept          = trim($entry->concept);
+    $entry->definition       = '';          // Updated later.
+    $entry->definitionformat = FORMAT_HTML; // Updated later.
+    $entry->definitiontrust  = 0;           // Updated later.
+    $entry->timemodified     = $timenow;
+    $entry->approved         = 0;
+    $entry->usedynalink      = isset($entry->usedynalink) ? $entry->usedynalink : 0;
+    $entry->casesensitive    = isset($entry->casesensitive) ? $entry->casesensitive : 0;
+    $entry->fullmatch        = isset($entry->fullmatch) ? $entry->fullmatch : 0;
+
+    if ($glossary->defaultapproval or has_capability('mod/glossary:approve', $context)) {
+        $entry->approved = 1;
+    }
+
+    if ($isnewentry) {
+        // Add new entry.
+        $entry->id = $DB->insert_record('glossary_entries', $entry);
+    } else {
+        // Update existing entry.
+        $DB->update_record('glossary_entries', $entry);
+    }
+
+    // Save and relink embedded images and save attachments.
+    if (!empty($entry->definition_editor)) {
+        $entry = file_postupdate_standard_editor($entry, 'definition', $definitionoptions, $context, 'mod_glossary', 'entry',
+            $entry->id);
+    }
+    if (!empty($entry->attachment_filemanager)) {
+        $entry = file_postupdate_standard_filemanager($entry, 'attachment', $attachmentoptions, $context, 'mod_glossary',
+            'attachment', $entry->id);
+    }
+
+    // Store the updated value values.
+    $DB->update_record('glossary_entries', $entry);
+
+    // Refetch complete entry.
+    $entry = $DB->get_record('glossary_entries', array('id' => $entry->id));
+
+    // Update entry categories.
+    $DB->delete_records('glossary_entries_categories', array('entryid' => $entry->id));
+    // TODO: this deletes cats from both both main and secondary glossary :-(.
+    if (!empty($categories) and array_search(0, $categories) === false) {
+        foreach ($categories as $catid) {
+            $newcategory = new stdClass();
+            $newcategory->entryid    = $entry->id;
+            $newcategory->categoryid = $catid;
+            $DB->insert_record('glossary_entries_categories', $newcategory, false);
+        }
+    }
+
+    // Update aliases.
+    $DB->delete_records('glossary_alias', array('entryid' => $entry->id));
+    if ($aliases !== '') {
+        $aliases = explode("\n", $aliases);
+        foreach ($aliases as $alias) {
+            $alias = trim($alias);
+            if ($alias !== '') {
+                $newalias = new stdClass();
+                $newalias->entryid = $entry->id;
+                $newalias->alias   = $alias;
+                $DB->insert_record('glossary_alias', $newalias, false);
+            }
+        }
+    }
+
+    // Trigger event and update completion (if entry was created).
+    $eventparams = array(
+        'context' => $context,
+        'objectid' => $entry->id,
+        'other' => array('concept' => $entry->concept)
+    );
+    if ($isnewentry) {
+        $event = \mod_glossary\event\entry_created::create($eventparams);
+    } else {
+        $event = \mod_glossary\event\entry_updated::create($eventparams);
+    }
+    $event->add_record_snapshot('glossary_entries', $entry);
+    $event->trigger();
+    if ($isnewentry) {
+        // Update completion state.
+        $completion = new completion_info($course);
+        if ($completion->is_enabled($cm) == COMPLETION_TRACKING_AUTOMATIC && $glossary->completionentries && $entry->approved) {
+            $completion->update_state($cm, COMPLETION_COMPLETE);
+        }
+    }
+
+    // Reset caches.
+    if ($isnewentry) {
+        if ($entry->usedynalink and $entry->approved) {
+            \mod_glossary\local\concept_cache::reset_glossary($glossary);
+        }
+    } else {
+        // So many things may affect the linking, let's just purge the cache always on edit.
+        \mod_glossary\local\concept_cache::reset_glossary($glossary);
+    }
+    return $entry;
+}
+
+/**
+ * Check if the module has any update that affects the current user since a given time.
+ *
+ * @param  cm_info $cm course module data
+ * @param  int $from the time to check updates from
+ * @param  array $filter  if we need to check only specific updates
+ * @return stdClass an object with the different type of areas indicating if they were updated or not
+ * @since Moodle 3.2
+ */
+function glossary_check_updates_since(cm_info $cm, $from, $filter = array()) {
+    global $DB;
+
+    $updates = course_check_module_updates_since($cm, $from, array('attachment', 'entry'), $filter);
+
+    $updates->entries = (object) array('updated' => false);
+    $select = 'glossaryid = :id AND (timecreated > :since1 OR timemodified > :since2)';
+    $params = array('id' => $cm->instance, 'since1' => $from, 'since2' => $from);
+    if (!has_capability('mod/glossary:approve', $cm->context)) {
+        $select .= ' AND approved = 1';
+    }
+
+    $entries = $DB->get_records_select('glossary_entries', $select, $params, '', 'id');
+    if (!empty($entries)) {
+        $updates->entries->updated = true;
+        $updates->entries->itemids = array_keys($entries);
+    }
+
+    return $updates;
+}
+
+/**
+ * Get icon mapping for font-awesome.
+ *
+ * @return array
+ */
+function mod_glossary_get_fontawesome_icon_map() {
+    return [
+        'mod_glossary:export' => 'fa-download',
+        'mod_glossary:minus' => 'fa-minus'
+    ];
+}
+
+/**
+ * This function receives a calendar event and returns the action associated with it, or null if there is none.
+ *
+ * This is used by block_myoverview in order to display the event appropriately. If null is returned then the event
+ * is not displayed on the block.
+ *
+ * @param calendar_event $event
+ * @param \core_calendar\action_factory $factory
+ * @return \core_calendar\local\event\entities\action_interface|null
+ */
+function mod_glossary_core_calendar_provide_event_action(calendar_event $event,
+                                                      \core_calendar\action_factory $factory) {
+    $cm = get_fast_modinfo($event->courseid)->instances['glossary'][$event->instance];
+
+    $completion = new \completion_info($cm->get_course());
+
+    $completiondata = $completion->get_data($cm, false);
+
+    if ($completiondata->completionstate != COMPLETION_INCOMPLETE) {
+        return null;
+    }
+
+    return $factory->create_instance(
+        get_string('view'),
+        new \moodle_url('/mod/glossary/view.php', ['id' => $cm->id]),
+        1,
+        true
+    );
+}
+
+/**
+ * Add a get_coursemodule_info function in case any glossary type wants to add 'extra' information
+ * for the course (see resource).
+ *
+ * Given a course_module object, this function returns any "extra" information that may be needed
+ * when printing this activity in a course listing.  See get_array_of_activities() in course/lib.php.
+ *
+ * @param stdClass $coursemodule The coursemodule object (record).
+ * @return cached_cm_info An object on information that the courses
+ *                        will know about (most noticeably, an icon).
+ */
+function glossary_get_coursemodule_info($coursemodule) {
+    global $DB;
+
+    $dbparams = ['id' => $coursemodule->instance];
+    $fields = 'id, name, intro, introformat, completionentries';
+    if (!$glossary = $DB->get_record('glossary', $dbparams, $fields)) {
+        return false;
+    }
+
+    $result = new cached_cm_info();
+    $result->name = $glossary->name;
+
+    if ($coursemodule->showdescription) {
+        // Convert intro to html. Do not filter cached version, filters run at display time.
+        $result->content = format_module_intro('glossary', $glossary, $coursemodule->id, false);
+    }
+
+    // Populate the custom completion rules as key => value pairs, but only if the completion mode is 'automatic'.
+    if ($coursemodule->completion == COMPLETION_TRACKING_AUTOMATIC) {
+        $result->customdata['customcompletionrules']['completionentries'] = $glossary->completionentries;
+    }
+
+    return $result;
+}
+
+/**
+ * Callback which returns human-readable strings describing the active completion custom rules for the module instance.
+ *
+ * @param cm_info|stdClass $cm object with fields ->completion and ->customdata['customcompletionrules']
+ * @return array $descriptions the array of descriptions for the custom rules.
+ */
+function mod_glossary_get_completion_active_rule_descriptions($cm) {
+    // Values will be present in cm_info, and we assume these are up to date.
+    if (empty($cm->customdata['customcompletionrules'])
+        || $cm->completion != COMPLETION_TRACKING_AUTOMATIC) {
+        return [];
+    }
+
+    $descriptions = [];
+    foreach ($cm->customdata['customcompletionrules'] as $key => $val) {
+        switch ($key) {
+            case 'completionentries':
+                if (empty($val)) {
+                    continue;
+                }
+                $descriptions[] = get_string('completionentriesdesc', 'glossary', $val);
+                break;
+            default:
+                break;
+        }
+    }
+    return $descriptions;
 }

@@ -146,7 +146,10 @@ function xmldb_feedback_upgrade($oldversion) {
     // Moodle v3.1.0 release upgrade line.
     // Put any upgrade step following this.
 
-    if ($oldversion < 2016052301) {
+    // Automatically generated Moodle v3.2.0 release upgrade line.
+    // Put any upgrade step following this.
+
+    if ($oldversion < 2017032800) {
 
         // Delete duplicated records in feedback_completed. We just keep the last record of completion.
         // Related values in feedback_value won't be deleted (they won't be used and can be kept there as a backup).
@@ -168,8 +171,11 @@ function xmldb_feedback_upgrade($oldversion) {
         $duplicatedrows->close();
 
         // Feedback savepoint reached.
-        upgrade_mod_savepoint(true, 2016052301, 'feedback');
+        upgrade_mod_savepoint(true, 2017032800, 'feedback');
     }
+
+    // Automatically generated Moodle v3.3.0 release upgrade line.
+    // Put any upgrade step following this.
 
     return true;
 }

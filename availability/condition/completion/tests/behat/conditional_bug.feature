@@ -19,7 +19,7 @@ Feature: Confirm that conditions on completion no longer cause a bug
   Scenario: Multiple completion conditions on glossary
     # Set up course.
     Given I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "Edit settings" node in "Course administration"
     And I expand all fieldsets
     And I set the field "Enable completion tracking" to "Yes"
@@ -46,7 +46,7 @@ Feature: Confirm that conditions on completion no longer cause a bug
     And I set the field "Activity or resource" to "Page1"
     And I press "Add restriction..."
     And I click on "Activity completion" "button" in the "Add restriction..." "dialogue"
-    And I set the field with xpath "//div[@class='availability-item'][preceding-sibling::div]//select[@name='cm']" to "Page2"
+    And I set the field with xpath "//div[contains(concat(' ', normalize-space(@class), ' '), ' availability-item ')][preceding-sibling::div]//select[@name='cm']" to "Page2"
     And I press "Save and return to course"
     And I should see "Not available unless:" in the ".activity.glossary" "css_element"
     And I should see "The activity Page1 is marked complete" in the ".activity.glossary" "css_element"

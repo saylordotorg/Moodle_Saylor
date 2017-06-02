@@ -232,6 +232,9 @@ class moodle_page {
      */
     protected $_requires = null;
 
+    /** @var page_requirements_manager Saves the requirement manager object used before switching to to fragments one. */
+    protected $savedrequires = null;
+
     /**
      * @var string The capability required by the user in order to edit blocks
      * and block settings on this page.
@@ -287,6 +290,11 @@ class moodle_page {
     protected $_settingsnav = null;
 
     /**
+     * @var flat_navigation Contains a list of nav nodes, most closely related to the current page.
+     */
+    protected $_flatnav = null;
+
+    /**
      * @var navbar Contains the navbar structure.
      */
     protected $_navbar = null;
@@ -338,6 +346,33 @@ class moodle_page {
      * such as upgrading or completing a quiz.
      */
     protected $_popup_notification_allowed = true;
+
+    /**
+     * @var bool Is the settings menu being forced to display on this page (activities / resources only).
+     * This is only used by themes that use the settings menu.
+     */
+    protected $_forcesettingsmenu = false;
+
+    /**
+     * Force the settings menu to be displayed on this page. This will only force the
+     * settings menu on an activity / resource page that is being displayed on a theme that
+     * uses a settings menu.
+     *
+     * @param bool $forced default of true, can be sent false to turn off the force.
+     */
+    public function force_settings_menu($forced = true) {
+        $this->_forcesettingsmenu = $forced;
+    }
+
+    /**
+     * Check to see if the settings menu is forced to display on this activity / resource page.
+     * This only applies to themes that use the settings menu.
+     *
+     * @return bool True if the settings menu is forced to display.
+     */
+    public function is_settings_menu_forced() {
+        return $this->_forcesettingsmenu;
+    }
 
     // Magic getter methods =============================================================
     // Due to the __get magic below, you normally do not call these as $PAGE->magic_get_x
@@ -727,6 +762,18 @@ class moodle_page {
     }
 
     /**
+     * Returns the flat navigation object
+     * @return flat_navigation
+     */
+    protected function magic_get_flatnav() {
+        if ($this->_flatnav === null) {
+            $this->_flatnav = new flat_navigation($this);
+            $this->_flatnav->initialise();
+        }
+        return $this->_flatnav;
+    }
+
+    /**
      * Returns request IP address.
      *
      * @return string IP address or null if unknown
@@ -846,10 +893,22 @@ class moodle_page {
         // JavaScript for the fragment to be collected. _wherethemewasinitialised is set when header() is called.
         if (!empty($this->_wherethemewasinitialised)) {
             // Change the current requirements manager over to the fragment manager to capture JS.
+            $this->savedrequires = $this->_requires;
             $this->_requires = new fragment_requirements_manager();
         } else {
             throw new coding_exception('$OUTPUT->header() needs to be called before collecting JavaScript requirements.');
         }
+    }
+
+    /**
+     * Switches back from collecting fragment JS requirement to the original requirement manager
+     */
+    public function end_collecting_javascript_requirements() {
+        if ($this->savedrequires === null) {
+            throw new coding_exception('JavaScript collection has not been started.');
+        }
+        $this->_requires = $this->savedrequires;
+        $this->savedrequires = null;
     }
 
     /**
@@ -1501,9 +1560,6 @@ class moodle_page {
                 $title .= ' - ';
             }
             $this->set_title($title . get_string('maintenancemode', 'admin'));
-        } else {
-            // Show the messaging popup if there are messages.
-            message_popup_window();
         }
 
         $this->initialise_standard_body_classes();
@@ -1556,6 +1612,11 @@ class moodle_page {
                 $target = RENDERER_TARGET_MAINTENANCE;
             }
             $OUTPUT = $this->get_renderer('core', null, $target);
+        }
+
+        if (!during_initial_install()) {
+            $filtermanager = filter_manager::instance();
+            $filtermanager->setup_page_for_globally_available_filters($this);
         }
 
         $this->_wherethemewasinitialised = debug_backtrace();

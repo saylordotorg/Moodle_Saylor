@@ -38,6 +38,8 @@ $string['pluginname'] = 'Book';
 $string['pluginadministration'] = 'Book administration';
 
 $string['toc'] = 'Table of contents';
+$string['chapterandsubchaptersdeleted'] = 'Chapter "{$a->title}" and its {$a->subchapters} subchapters were deleted';
+$string['chapterdeleted'] = 'Chapter "{$a->title}" was deleted';
 $string['customtitles'] = 'Custom titles';
 $string['customtitles_help'] = 'Normally the chapter title is displayed in the table of contents (TOC) AND as a heading above the content.
 
@@ -84,7 +86,9 @@ $string['confchapterdelete'] = 'Do you really want to delete this chapter?';
 $string['confchapterdeleteall'] = 'Do you really want to delete this chapter and all its subchapters?';
 $string['top'] = 'top';
 $string['navprev'] = 'Previous';
+$string['navprevtitle'] = 'Previous: {$a}';
 $string['navnext'] = 'Next';
+$string['navnexttitle'] = 'Next: {$a}';
 $string['navexit'] = 'Exit book';
 $string['book:addinstance'] = 'Add a new book';
 $string['book:read'] = 'View book';
@@ -96,3 +100,8 @@ $string['page-mod-book-x'] = 'Any book module page';
 $string['subchapternotice'] = '(Only available once the first chapter has been created)';
 $string['subplugintype_booktool'] = 'Book tool';
 $string['subplugintype_booktool_plural'] = 'Book tools';
+
+$string['removeallbooktags'] = 'Remove all book tags';
+$string['tagarea_book_chapters'] = 'Book chapters';
+$string['tagsdeleted'] = 'Book tags have been deleted';
+$string['tagtitle'] = 'See the "{$a}" tag';

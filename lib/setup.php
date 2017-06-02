@@ -57,7 +57,7 @@ if (!isset($CFG)) {
 
 // We can detect real dirroot path reliably since PHP 4.0.2,
 // it can not be anything else, there is no point in having this in config.php
-$CFG->dirroot = dirname(dirname(__FILE__));
+$CFG->dirroot = dirname(__DIR__);
 
 // File permissions on created directories in the $CFG->dataroot
 if (!isset($CFG->directorypermissions)) {
@@ -84,7 +84,8 @@ if (defined('BEHAT_SITE_RUNNING')) {
     // Update config variables for parallel behat runs.
     behat_update_vars_for_process();
 
-    if (behat_is_test_site()) {
+    // If behat is being installed for parallel run, then we modify params for parallel run only.
+    if (behat_is_test_site() && !(defined('BEHAT_PARALLEL_UTIL') && empty($CFG->behatrunprocess))) {
         clearstatcache();
 
         // Checking the integrity of the provided $CFG->behat_* vars and the
@@ -116,7 +117,8 @@ if (defined('BEHAT_SITE_RUNNING')) {
 
         if (!defined('BEHAT_UTIL') and !defined('BEHAT_TEST')) {
             // Somebody tries to access test site directly, tell them if not enabled.
-            if (!file_exists($CFG->behat_dataroot . '/behat/test_environment_enabled.txt')) {
+            $behatdir = preg_replace("#[/|\\\]" . BEHAT_PARALLEL_SITE_NAME . "\d{0,}$#", '', $CFG->behat_dataroot);
+            if (!file_exists($behatdir . '/test_environment_enabled.txt')) {
                 behat_error(BEHAT_EXITCODE_CONFIG, 'Behat is configured but not enabled on this test site.');
             }
         }
@@ -313,6 +315,9 @@ if (!defined('WS_SERVER')) {
 // Detect CLI maintenance mode - this is useful when you need to mess with database, such as during upgrades
 if (file_exists("$CFG->dataroot/climaintenance.html")) {
     if (!CLI_SCRIPT) {
+        header($_SERVER['SERVER_PROTOCOL'] . ' 503 Moodle under maintenance');
+        header('Status: 503 Moodle under maintenance');
+        header('Retry-After: 300');
         header('Content-type: text/html; charset=utf-8');
         header('X-UA-Compatible: IE=edge');
         /// Headers to make it not cacheable and json
@@ -335,15 +340,13 @@ if (file_exists("$CFG->dataroot/climaintenance.html")) {
     }
 }
 
-if (CLI_SCRIPT) {
-    // sometimes people use different PHP binary for web and CLI, make 100% sure they have the supported PHP version
-    if (version_compare(phpversion(), '5.4.4') < 0) {
-        $phpversion = phpversion();
-        // do NOT localise - lang strings would not work here and we CAN NOT move it to later place
-        echo "Moodle 2.7 or later requires at least PHP 5.4.4 (currently using version $phpversion).\n";
-        echo "Some servers may have multiple PHP versions installed, are you using the correct executable?\n";
-        exit(1);
-    }
+// Sometimes people use different PHP binary for web and CLI, make 100% sure they have the supported PHP version.
+if (version_compare(PHP_VERSION, '5.6.5') < 0) {
+    $phpversion = PHP_VERSION;
+    // Do NOT localise - lang strings would not work here and we CAN NOT move it to later place.
+    echo "Moodle 3.2 or later requires at least PHP 5.6.5 (currently using version $phpversion).\n";
+    echo "Some servers may have multiple PHP versions installed, are you using the correct executable?\n";
+    exit(1);
 }
 
 // Detect ajax scripts - they are similar to CLI because we can not redirect, output html, etc.
@@ -836,7 +839,7 @@ unset($urlthemename);
 
 // Ensure a valid theme is set.
 if (!isset($CFG->theme)) {
-    $CFG->theme = 'clean';
+    $CFG->theme = 'boost';
 }
 
 // Set language/locale of printed times.  If user has chosen a language that
@@ -912,36 +915,54 @@ if (!empty($CFG->debugvalidators) and !empty($CFG->guestloginbutton)) {
 
 // Apache log integration. In apache conf file one can use ${MOODULEUSER}n in
 // LogFormat to get the current logged in username in moodle.
-if ($USER && function_exists('apache_note')
-    && !empty($CFG->apacheloguser) && isset($USER->username)) {
-    $apachelog_userid = $USER->id;
-    $apachelog_username = clean_filename($USER->username);
-    $apachelog_name = '';
-    if (isset($USER->firstname)) {
-        // We can assume both will be set
-        // - even if to empty.
-        $apachelog_name = clean_filename($USER->firstname . " " .
-                                         $USER->lastname);
+// Alternatvely for other web servers a header X-MOODLEUSER can be set which
+// can be using in the logfile and stripped out if needed.
+if ($USER && isset($USER->username)) {
+    $logmethod = '';
+    $logvalue = 0;
+    if (!empty($CFG->apacheloguser) && function_exists('apache_note')) {
+        $logmethod = 'apache';
+        $logvalue = $CFG->apacheloguser;
     }
-    if (\core\session\manager::is_loggedinas()) {
-        $realuser = \core\session\manager::get_realuser();
-        $apachelog_username = clean_filename($realuser->username." as ".$apachelog_username);
-        $apachelog_name = clean_filename($realuser->firstname." ".$realuser->lastname ." as ".$apachelog_name);
-        $apachelog_userid = clean_filename($realuser->id." as ".$apachelog_userid);
+    if (!empty($CFG->headerloguser)) {
+        $logmethod = 'header';
+        $logvalue = $CFG->headerloguser;
     }
-    switch ($CFG->apacheloguser) {
-        case 3:
-            $logname = $apachelog_username;
-            break;
-        case 2:
-            $logname = $apachelog_name;
-            break;
-        case 1:
-        default:
-            $logname = $apachelog_userid;
-            break;
+    if (!empty($logmethod)) {
+        $loguserid = $USER->id;
+        $logusername = clean_filename($USER->username);
+        $logname = '';
+        if (isset($USER->firstname)) {
+            // We can assume both will be set
+            // - even if to empty.
+            $logname = clean_filename($USER->firstname . " " . $USER->lastname);
+        }
+        if (\core\session\manager::is_loggedinas()) {
+            $realuser = \core\session\manager::get_realuser();
+            $logusername = clean_filename($realuser->username." as ".$logusername);
+            $logname = clean_filename($realuser->firstname." ".$realuser->lastname ." as ".$logname);
+            $loguserid = clean_filename($realuser->id." as ".$loguserid);
+        }
+        switch ($logvalue) {
+            case 3:
+                $logname = $logusername;
+                break;
+            case 2:
+                $logname = $logname;
+                break;
+            case 1:
+            default:
+                $logname = $loguserid;
+                break;
+        }
+        if ($logmethod == 'apache') {
+            apache_note('MOODLEUSER', $logname);
+        }
+
+        if ($logmethod == 'header') {
+            header("X-MOODLEUSER: $logname");
+        }
     }
-    apache_note('MOODLEUSER', $logname);
 }
 
 // Ensure the urlrewriteclass is setup correctly (to avoid crippling site).

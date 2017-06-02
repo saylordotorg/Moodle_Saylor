@@ -229,7 +229,8 @@ class cache_helper {
     /**
      * Invalidates a given set of keys by means of an event.
      *
-     * @todo add support for identifiers to be supplied and utilised.
+     * Events cannot determine what identifiers might need to be cleared. Event based purge and invalidation
+     * are only supported on caches without identifiers.
      *
      * @param string $event
      * @param array $keys
@@ -292,8 +293,9 @@ class cache_helper {
         if ($cache instanceof cache_store) {
             $factory = cache_factory::instance();
             $definition = $factory->create_definition($component, $area, null);
-            $definition->set_identifiers($identifiers);
-            $cache->initialise($definition);
+            $cacheddefinition = clone $definition;
+            $cacheddefinition->set_identifiers($identifiers);
+            $cache->initialise($cacheddefinition);
         }
         // Purge baby, purge.
         $cache->purge();
@@ -302,6 +304,9 @@ class cache_helper {
 
     /**
      * Purges a cache of all information on a given event.
+     *
+     * Events cannot determine what identifiers might need to be cleared. Event based purge and invalidation
+     * are only supported on caches without identifiers.
      *
      * @param string $event
      */
@@ -502,15 +507,18 @@ class cache_helper {
         $store = $stores[$storename];
         $class = $store['class'];
 
+
+        // We check are_requirements_met although we expect is_ready is going to check as well.
+        if (!$class::are_requirements_met()) {
+            return false;
+        }
         // Found the store: is it ready?
         /* @var cache_store $instance */
         $instance = new $class($store['name'], $store['configuration']);
-        // We check are_requirements_met although we expect is_ready is going to check as well.
-        if (!$instance::are_requirements_met() || !$instance->is_ready()) {
+        if (!$instance->is_ready()) {
             unset($instance);
             return false;
         }
-
         foreach ($config->get_definitions_by_store($storename) as $id => $definition) {
             $definition = cache_definition::load($id, $definition);
             $definitioninstance = clone($instance);

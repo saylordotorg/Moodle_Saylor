@@ -22,7 +22,7 @@ Feature: Preview a Multiple choice question
       | Test questions   | multichoice | Multi-choice-001 | two_of_four |
       | Test questions   | multichoice | Multi-choice-002 | one_of_four |
     Given I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "Question bank" node in "Course administration"
 
   @javascript @_switch_window
@@ -54,7 +54,7 @@ Feature: Preview a Multiple choice question
     And I should see "Mark 1.00 out of 1.00"
     And I should see "Well done!"
     And I should see "The odd numbers are One and Three."
-    And I should see "The correct answer is: One, Three"
+    And I should see "The correct answers are: One, Three"
     And I switch to the main window
 
   @javascript @_switch_window

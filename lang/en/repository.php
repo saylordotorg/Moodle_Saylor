@@ -160,6 +160,7 @@ $string['lostsource'] = 'Error. Source is missing. {$a}';
 $string['makefileinternal'] = 'Make a copy of the file';
 $string['makefilelink'] = 'Link to the file directly';
 $string['makefilereference'] = 'Create an alias/shortcut to the file';
+$string['makefilecontrolledlink'] = 'Create an access controlled link to the file';
 $string['manage'] = 'Manage repositories';
 $string['manageinstances'] = 'Manage instances';
 $string['manageurl'] = 'Manage';
@@ -232,6 +233,7 @@ $string['unknownoriginal'] = 'Unknown';
 $string['upload'] = 'Upload this file';
 $string['uploading'] = 'Uploading...';
 $string['uploadsucc'] = 'The file has been uploaded successfully';
+$string['unknownsource'] = 'Unknown source';
 $string['undisclosedsource'] = '(Undisclosed)';
 $string['undisclosedreference'] = '(Undisclosed)';
 $string['uselatestfile'] = 'Use latest file';
@@ -242,6 +244,3 @@ $string['unzipped'] = 'Unzipped successfully';
 $string['wrongcontext'] = 'You cannot access to this context';
 $string['xhtmlerror'] = 'You are probably using an XHTML strict header. Certain YUI components don\'t work in this mode; please turn it off.';
 $string['ziped'] = 'Compress folder successfully';
-
-// Deprecated since Moodle 2.9.
-$string['personalrepositories'] = 'Available repository instances';

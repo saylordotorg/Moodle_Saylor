@@ -114,7 +114,6 @@ $PAGE->navbar->add($pagetitle);
 $PAGE->set_title($course->shortname.': '.get_string('calendar', 'calendar').': '.$pagetitle);
 $PAGE->set_heading($course->fullname);
 $PAGE->set_pagelayout('standard');
-$PAGE->set_button(calendar_preferences_button($course));
 
 $renderer = $PAGE->get_renderer('core_calendar');
 $calendar->add_sidecalendar_blocks($renderer);
@@ -170,4 +169,5 @@ if ($action != 'advanced') {
 echo $calendarurl;
 
 echo $renderer->complete_layout();
+
 echo $OUTPUT->footer();

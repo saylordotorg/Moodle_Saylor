@@ -200,5 +200,101 @@ function xmldb_assign_upgrade($oldversion) {
     // Moodle v3.1.0 release upgrade line.
     // Put any upgrade step following this.
 
+    if ($oldversion < 2016100301) {
+
+        // Define table assign_overrides to be created.
+        $table = new xmldb_table('assign_overrides');
+
+        // Adding fields to table assign_overrides.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('assignid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('groupid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('sortorder', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('allowsubmissionsfromdate', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('duedate', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('cutoffdate', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+
+        // Adding keys to table assign_overrides.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('assignid', XMLDB_KEY_FOREIGN, array('assignid'), 'assign', array('id'));
+        $table->add_key('groupid', XMLDB_KEY_FOREIGN, array('groupid'), 'groups', array('id'));
+        $table->add_key('userid', XMLDB_KEY_FOREIGN, array('userid'), 'user', array('id'));
+
+        // Conditionally launch create table for assign_overrides.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Assign savepoint reached.
+        upgrade_mod_savepoint(true, 2016100301, 'assign');
+    }
+
+    // Automatically generated Moodle v3.2.0 release upgrade line.
+    // Put any upgrade step following this.
+
+    if ($oldversion < 2017021500) {
+        // Fix event types of assign events.
+        $params = [
+            'modulename' => 'assign',
+            'eventtype' => 'close'
+        ];
+        $select = "modulename = :modulename AND eventtype = :eventtype";
+        $DB->set_field_select('event', 'eventtype', 'due', $select, $params);
+
+        // Delete 'open' events.
+        $params = [
+            'modulename' => 'assign',
+            'eventtype' => 'open'
+        ];
+        $DB->delete_records('event', $params);
+
+        // Assign savepoint reached.
+        upgrade_mod_savepoint(true, 2017021500, 'assign');
+    }
+
+    if ($oldversion < 2017031300) {
+        // Add a 'gradingduedate' field to the 'assign' table.
+        $table = new xmldb_table('assign');
+        $field = new xmldb_field('gradingduedate', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, 0, 'cutoffdate');
+
+        // Conditionally launch add field.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Assign savepoint reached.
+        upgrade_mod_savepoint(true, 2017031300, 'assign');
+    }
+
+    if ($oldversion < 2017042800) {
+        // Update query to set the grading due date one week after the due date.
+        // Only assign instances with grading due date not set and with a due date of not older than 3 weeks will be updated.
+        $sql = "UPDATE {assign}
+                   SET gradingduedate = duedate + :weeksecs
+                 WHERE gradingduedate = 0
+                       AND duedate > :timelimit";
+
+        // Calculate the time limit, which is 3 weeks before the current date.
+        $interval = new DateInterval('P3W');
+        $timelimit = new DateTime();
+        $timelimit->sub($interval);
+
+        // Update query params.
+        $params = [
+            'weeksecs' => WEEKSECS,
+            'timelimit' => $timelimit->getTimestamp()
+        ];
+
+        // Execute DB update for assign instances.
+        $DB->execute($sql, $params);
+
+        // Assign savepoint reached.
+        upgrade_mod_savepoint(true, 2017042800, 'assign');
+    }
+
+    // Automatically generated Moodle v3.3.0 release upgrade line.
+    // Put any upgrade step following this.
+
     return true;
 }

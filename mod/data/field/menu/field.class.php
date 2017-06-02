@@ -25,6 +25,12 @@
 class data_field_menu extends data_field_base {
 
     var $type = 'menu';
+    /**
+     * priority for globalsearch indexing
+     *
+     * @var int
+     */
+    protected static $priority = self::HIGH_PRIORITY;
 
     function display_add_field($recordid = 0, $formdata = null) {
         global $DB, $OUTPUT;
@@ -52,13 +58,12 @@ class data_field_menu extends data_field_base {
         $str .= '<label for="' . 'field_' . $this->field->id . '">';
         $str .= html_writer::span($this->field->name, 'accesshide');
         if ($this->field->required) {
-            $image = html_writer::img($OUTPUT->pix_url('req'), get_string('requiredelement', 'form'),
-                                     array('class' => 'req', 'title' => get_string('requiredelement', 'form')));
+            $image = $OUTPUT->pix_icon('req', get_string('requiredelement', 'form'));
             $str .= html_writer::div($image, 'inline-req');
         }
         $str .= '</label>';
         $str .= html_writer::select($options, 'field_'.$this->field->id, $content, array('' => get_string('menuchoose', 'data')),
-                                    array('id' => 'field_'.$this->field->id, 'class' => 'mod-data-input'));
+                                    array('id' => 'field_'.$this->field->id, 'class' => 'mod-data-input custom-select'));
 
         $str .= '</div>';
 
@@ -97,15 +102,20 @@ class data_field_menu extends data_field_base {
             return '';
         }
 
-        $return = html_writer::label(get_string('namemenu', 'data'), 'menuf_'. $this->field->id, false, array('class' => 'accesshide'));
+        $return = html_writer::label(get_string('fieldtypelabel', "datafield_" . $this->type),
+            'menuf_' . $this->field->id, false, array('class' => 'accesshide'));
         $return .= html_writer::select($options, 'f_'.$this->field->id, $content, array('' => get_string('menuchoose', 'data')),
                 array('class' => 'custom-select'));
         return $return;
     }
 
-     function parse_search_field() {
-            return optional_param('f_'.$this->field->id, '', PARAM_NOTAGS);
-     }
+    public function parse_search_field($defaults = null) {
+        $param = 'f_'.$this->field->id;
+        if (empty($defaults[$param])) {
+            $defaults = array($param => '');
+        }
+        return optional_param($param, $defaults[$param], PARAM_NOTAGS);
+    }
 
     function generate_sql($tablealias, $value) {
         global $DB;
@@ -129,4 +139,18 @@ class data_field_menu extends data_field_base {
         return strval($value) !== '';
     }
 
+    /**
+     * Return the plugin configs for external functions.
+     *
+     * @return array the list of config parameters
+     * @since Moodle 3.3
+     */
+    public function get_config_for_external() {
+        // Return all the config parameters.
+        $configs = [];
+        for ($i = 1; $i <= 10; $i++) {
+            $configs["param$i"] = $this->field->{"param$i"};
+        }
+        return $configs;
+    }
 }

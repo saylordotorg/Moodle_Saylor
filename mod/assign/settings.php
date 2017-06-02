@@ -65,10 +65,12 @@ if ($ADMIN->fulltree) {
     $name = new lang_string('submissionstatement', 'mod_assign');
     $description = new lang_string('submissionstatement_help', 'mod_assign');
     $default = get_string('submissionstatementdefault', 'mod_assign');
-    $settings->add(new admin_setting_configtextarea('assign/submissionstatement',
+    $setting = new admin_setting_configtextarea('assign/submissionstatement',
                                                     $name,
                                                     $description,
-                                                    $default));
+                                                    $default);
+    $setting->set_force_ltr(false);
+    $settings->add($setting);
 
     $name = new lang_string('maxperpage', 'mod_assign');
     $options = array(
@@ -126,6 +128,16 @@ if ($ADMIN->fulltree) {
                                                     $description,
                                                     1209600);
     $setting->set_enabled_flag_options(admin_setting_flag::ENABLED, false);
+    $setting->set_advanced_flag_options(admin_setting_flag::ENABLED, false);
+    $settings->add($setting);
+
+    $name = new lang_string('gradingduedate', 'mod_assign');
+    $description = new lang_string('gradingduedate_help', 'mod_assign');
+    $setting = new admin_setting_configduration('assign/gradingduedate',
+                                                    $name,
+                                                    $description,
+                                                    1209600);
+    $setting->set_enabled_flag_options(admin_setting_flag::ENABLED, true);
     $setting->set_advanced_flag_options(admin_setting_flag::ENABLED, false);
     $settings->add($setting);
 

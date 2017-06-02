@@ -25,8 +25,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'qformat_multianswer';
-$plugin->version   = 2016052300;
+$plugin->version   = 2017051500;
 
-$plugin->requires  = 2016051900;
+$plugin->requires  = 2017050500;
 
 $plugin->maturity  = MATURITY_STABLE;

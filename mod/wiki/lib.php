@@ -53,7 +53,13 @@ function wiki_add_instance($wiki) {
     if (empty($wiki->forceformat)) {
         $wiki->forceformat = 0;
     }
-    return $DB->insert_record('wiki', $wiki);
+
+    $id = $DB->insert_record('wiki', $wiki);
+
+    $completiontimeexpected = !empty($wiki->completionexpected) ? $wiki->completionexpected : null;
+    \core_completion\api::update_completion_date_event($wiki->coursemodule, 'wiki', $id, $completiontimeexpected);
+
+    return $id;
 }
 
 /**
@@ -72,6 +78,9 @@ function wiki_update_instance($wiki) {
     if (empty($wiki->forceformat)) {
         $wiki->forceformat = 0;
     }
+
+    $completiontimeexpected = !empty($wiki->completionexpected) ? $wiki->completionexpected : null;
+    \core_completion\api::update_completion_date_event($wiki->coursemodule, 'wiki', $wiki->id, $completiontimeexpected);
 
     # May have to add extra stuff in here #
 
@@ -134,6 +143,9 @@ function wiki_delete_instance($id) {
             $result = false;
         }
     }
+
+    $cm = get_coursemodule_from_instance('wiki', $id);
+    \core_completion\api::update_completion_date_event($cm->id, 'wiki', $wiki->id, null);
 
     # Delete any dependent records here #
     if (!$DB->delete_records('wiki', array('id' => $wiki->id))) {
@@ -261,6 +273,8 @@ function wiki_supports($feature) {
     case FEATURE_BACKUP_MOODLE2:
         return true;
     case FEATURE_SHOW_DESCRIPTION:
+        return true;
+    case FEATURE_COMMENT:
         return true;
 
     default:
@@ -736,4 +750,83 @@ function wiki_page_view($wiki, $page, $course, $cm, $context, $uid = null, $othe
     // Completion.
     $completion = new completion_info($course);
     $completion->set_module_viewed($cm);
+}
+
+/**
+ * Check if the module has any update that affects the current user since a given time.
+ *
+ * @param  cm_info $cm course module data
+ * @param  int $from the time to check updates from
+ * @param  array $filter  if we need to check only specific updates
+ * @return stdClass an object with the different type of areas indicating if they were updated or not
+ * @since Moodle 3.2
+ */
+function wiki_check_updates_since(cm_info $cm, $from, $filter = array()) {
+    global $DB, $CFG;
+    require_once($CFG->dirroot . '/mod/wiki/locallib.php');
+
+    $updates = new stdClass();
+    if (!has_capability('mod/wiki:viewpage', $cm->context)) {
+        return $updates;
+    }
+    $updates = course_check_module_updates_since($cm, $from, array('attachments'), $filter);
+
+    // Check only pages updated in subwikis the user can access.
+    $updates->pages = (object) array('updated' => false);
+    $wiki = $DB->get_record($cm->modname, array('id' => $cm->instance), '*', MUST_EXIST);
+    if ($subwikis = wiki_get_visible_subwikis($wiki, $cm, $cm->context)) {
+        $subwikisids = array();
+        foreach ($subwikis as $subwiki) {
+            $subwikisids[] = $subwiki->id;
+        }
+        list($subwikissql, $params) = $DB->get_in_or_equal($subwikisids, SQL_PARAMS_NAMED);
+        $select = 'subwikiid ' . $subwikissql . ' AND (timemodified > :since1 OR timecreated > :since2)';
+        $params['since1'] = $from;
+        $params['since2'] = $from;
+        $pages = $DB->get_records_select('wiki_pages', $select, $params, '', 'id');
+        if (!empty($pages)) {
+            $updates->pages->updated = true;
+            $updates->pages->itemids = array_keys($pages);
+        }
+    }
+    return $updates;
+}
+
+/**
+ * Get icon mapping for font-awesome.
+ */
+function mod_wiki_get_fontawesome_icon_map() {
+    return [
+        'mod_wiki:attachment' => 'fa-paperclip',
+    ];
+}
+
+/**
+ * This function receives a calendar event and returns the action associated with it, or null if there is none.
+ *
+ * This is used by block_myoverview in order to display the event appropriately. If null is returned then the event
+ * is not displayed on the block.
+ *
+ * @param calendar_event $event
+ * @param \core_calendar\action_factory $factory
+ * @return \core_calendar\local\event\entities\action_interface|null
+ */
+function mod_wiki_core_calendar_provide_event_action(calendar_event $event,
+                                                    \core_calendar\action_factory $factory) {
+    $cm = get_fast_modinfo($event->courseid)->instances['wiki'][$event->instance];
+
+    $completion = new \completion_info($cm->get_course());
+
+    $completiondata = $completion->get_data($cm, false);
+
+    if ($completiondata->completionstate != COMPLETION_INCOMPLETE) {
+        return null;
+    }
+
+    return $factory->create_instance(
+        get_string('view'),
+        new \moodle_url('/mod/wiki/view.php', ['id' => $cm->id]),
+        1,
+        true
+    );
 }

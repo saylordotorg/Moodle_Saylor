@@ -26,8 +26,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
-require_once(dirname(__FILE__).'/locallib.php');
+require(__DIR__.'/../../config.php');
+require_once(__DIR__.'/locallib.php');
 require_once($CFG->libdir.'/completionlib.php');
 
 $id         = optional_param('id', 0, PARAM_INT); // course_module ID, or
@@ -114,7 +114,7 @@ $output = $PAGE->get_renderer('mod_workshop');
 
 echo $output->header();
 echo $output->heading_with_help(format_string($workshop->name), 'userplan', 'workshop');
-echo $output->heading(format_string($currentphasetitle), 3);
+echo $output->heading(format_string($currentphasetitle), 3, null, 'mod_workshop-userplanheading');
 echo $output->render($userplan);
 
 switch ($workshop->phase) {
@@ -500,10 +500,8 @@ case workshop::PHASE_EVALUATION:
         echo $output->container_start('toolboxaction');
         echo $output->render($btn);
         echo $output->help_icon('clearassessments', 'workshop');
-        echo html_writer::empty_tag('img', array('src' => $output->pix_url('i/risk_dataloss'),
-                                                 'title' => get_string('riskdatalossshort', 'admin'),
-                                                 'alt' => get_string('riskdatalossshort', 'admin'),
-                                                 'class' => 'workshop-risk-dataloss'));
+
+        echo $OUTPUT->pix_icon('i/risk_dataloss', get_string('riskdatalossshort', 'admin'));
         echo $output->container_end();
 
         echo $output->box_end();
@@ -665,5 +663,5 @@ case workshop::PHASE_CLOSED:
     break;
 default:
 }
-
+$PAGE->requires->js_call_amd('mod_workshop/workshopview', 'init');
 echo $output->footer();

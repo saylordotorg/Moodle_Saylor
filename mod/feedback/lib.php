@@ -40,6 +40,10 @@ define('FEEDBACK_RESETFORM_DROP', 'feedback_drop_feedback_');
 define('FEEDBACK_MAX_PIX_LENGTH', '400'); //max. Breite des grafischen Balkens in der Auswertung
 define('FEEDBACK_DEFAULT_PAGE_COUNT', 20);
 
+// Event types.
+define('FEEDBACK_EVENT_TYPE_OPEN', 'open');
+define('FEEDBACK_EVENT_TYPE_CLOSE', 'close');
+
 /**
  * Returns all other caps used in module.
  *
@@ -313,35 +317,43 @@ function feedback_delete_instance($id) {
 }
 
 /**
- * this is called after deleting all instances if the course will be deleted.
- * only templates have to be deleted
- *
- * @global object
- * @param object $course
- * @return boolean
- */
-function feedback_delete_course($course) {
-    global $DB;
-
-    //delete all templates of given course
-    return $DB->delete_records('feedback_template', array('course'=>$course->id));
-}
-
-/**
  * Return a small object with summary information about what a
  * user has done with a given particular instance of this module
  * Used for user activity reports.
  * $return->time = the time they did it
  * $return->info = a short text description
  *
- * @param object $course
- * @param object $user
- * @param object $mod
- * @param object $feedback
- * @return object
+ * @param stdClass $course
+ * @param stdClass $user
+ * @param cm_info|stdClass $mod
+ * @param stdClass $feedback
+ * @return stdClass
  */
 function feedback_user_outline($course, $user, $mod, $feedback) {
-    return null;
+    global $DB;
+    $outline = (object)['info' => '', 'time' => 0];
+    if ($feedback->anonymous != FEEDBACK_ANONYMOUS_NO) {
+        // Do not disclose any user info if feedback is anonymous.
+        return $outline;
+    }
+    $params = array('userid' => $user->id, 'feedback' => $feedback->id,
+        'anonymous_response' => FEEDBACK_ANONYMOUS_NO);
+    $status = null;
+    $context = context_module::instance($mod->id);
+    if ($completed = $DB->get_record('feedback_completed', $params)) {
+        // User has completed feedback.
+        $outline->info = get_string('completed', 'feedback');
+        $outline->time = $completed->timemodified;
+    } else if ($completedtmp = $DB->get_record('feedback_completedtmp', $params)) {
+        // User has started but not completed feedback.
+        $outline->info = get_string('started', 'feedback');
+        $outline->time = $completedtmp->timemodified;
+    } else if (has_capability('mod/feedback:complete', $context, $user)) {
+        // User has not started feedback but has capability to do so.
+        $outline->info = get_string('not_started', 'feedback');
+    }
+
+    return $outline;
 }
 
 /**
@@ -484,8 +496,7 @@ function feedback_print_recent_mod_activity($activity, $courseid, $detail, $modn
     if ($detail) {
         $modname = $modnames[$activity->type];
         echo '<div class="title">';
-        echo "<img src=\"" . $OUTPUT->pix_url('icon', $activity->type) . "\" ".
-             "class=\"icon\" alt=\"$modname\" />";
+        echo $OUTPUT->image_icon('icon', $modname, $activity->type);
         echo "<a href=\"$CFG->wwwroot/mod/feedback/view.php?id={$activity->cmid}\">{$activity->name}</a>";
         echo '</div>';
     }
@@ -529,19 +540,46 @@ function feedback_get_completion_state($course, $cm, $userid, $type) {
     }
 }
 
-
 /**
  * Print a detailed representation of what a  user has done with
  * a given particular instance of this module, for user activity reports.
  *
- * @param object $course
- * @param object $user
- * @param object $mod
- * @param object $feedback
- * @return bool
+ * @param stdClass $course
+ * @param stdClass $user
+ * @param cm_info|stdClass $mod
+ * @param stdClass $feedback
  */
 function feedback_user_complete($course, $user, $mod, $feedback) {
-    return true;
+    global $DB;
+    if ($feedback->anonymous != FEEDBACK_ANONYMOUS_NO) {
+        // Do not disclose any user info if feedback is anonymous.
+        return;
+    }
+    $params = array('userid' => $user->id, 'feedback' => $feedback->id,
+        'anonymous_response' => FEEDBACK_ANONYMOUS_NO);
+    $url = $status = null;
+    $context = context_module::instance($mod->id);
+    if ($completed = $DB->get_record('feedback_completed', $params)) {
+        // User has completed feedback.
+        if (has_capability('mod/feedback:viewreports', $context)) {
+            $url = new moodle_url('/mod/feedback/show_entries.php',
+                ['id' => $mod->id, 'userid' => $user->id,
+                    'showcompleted' => $completed->id]);
+        }
+        $status = get_string('completedon', 'feedback', userdate($completed->timemodified));
+    } else if ($completedtmp = $DB->get_record('feedback_completedtmp', $params)) {
+        // User has started but not completed feedback.
+        $status = get_string('startedon', 'feedback', userdate($completedtmp->timemodified));
+    } else if (has_capability('mod/feedback:complete', $context, $user)) {
+        // User has not started feedback but has capability to do so.
+        $status = get_string('not_started', 'feedback');
+    }
+
+    if ($url && $status) {
+        echo html_writer::link($url, $status);
+    } else if ($status) {
+        echo html_writer::div($status);
+    }
 }
 
 /**
@@ -765,13 +803,16 @@ function feedback_set_events($feedback) {
 
     // Feedback start calendar events.
     $eventid = $DB->get_field('event', 'id',
-            array('modulename' => 'feedback', 'instance' => $feedback->id, 'eventtype' => 'open'));
+            array('modulename' => 'feedback', 'instance' => $feedback->id, 'eventtype' => FEEDBACK_EVENT_TYPE_OPEN));
 
     if (isset($feedback->timeopen) && $feedback->timeopen > 0) {
         $event = new stdClass();
+        $event->eventtype    = FEEDBACK_EVENT_TYPE_OPEN;
+        $event->type         = empty($feedback->timeclose) ? CALENDAR_EVENT_TYPE_ACTION : CALENDAR_EVENT_TYPE_STANDARD;
         $event->name         = get_string('calendarstart', 'feedback', $feedback->name);
         $event->description  = format_module_intro('feedback', $feedback, $feedback->coursemodule);
         $event->timestart    = $feedback->timeopen;
+        $event->timesort     = $feedback->timeopen;
         $event->visible      = instance_is_visible('feedback', $feedback);
         $event->timeduration = 0;
         if ($eventid) {
@@ -786,7 +827,7 @@ function feedback_set_events($feedback) {
             $event->userid       = 0;
             $event->modulename   = 'feedback';
             $event->instance     = $feedback->id;
-            $event->eventtype    = 'open';
+            $event->eventtype    = FEEDBACK_EVENT_TYPE_OPEN;
             calendar_event::create($event);
         }
     } else if ($eventid) {
@@ -797,13 +838,16 @@ function feedback_set_events($feedback) {
 
     // Feedback close calendar events.
     $eventid = $DB->get_field('event', 'id',
-            array('modulename' => 'feedback', 'instance' => $feedback->id, 'eventtype' => 'close'));
+            array('modulename' => 'feedback', 'instance' => $feedback->id, 'eventtype' => FEEDBACK_EVENT_TYPE_CLOSE));
 
     if (isset($feedback->timeclose) && $feedback->timeclose > 0) {
         $event = new stdClass();
+        $event->type         = CALENDAR_EVENT_TYPE_ACTION;
+        $event->eventtype    = FEEDBACK_EVENT_TYPE_CLOSE;
         $event->name         = get_string('calendarend', 'feedback', $feedback->name);
         $event->description  = format_module_intro('feedback', $feedback, $feedback->coursemodule);
         $event->timestart    = $feedback->timeclose;
+        $event->timesort     = $feedback->timeclose;
         $event->visible      = instance_is_visible('feedback', $feedback);
         $event->timeduration = 0;
         if ($eventid) {
@@ -818,7 +862,6 @@ function feedback_set_events($feedback) {
             $event->userid       = 0;
             $event->modulename   = 'feedback';
             $event->instance     = $feedback->id;
-            $event->eventtype    = 'close';
             calendar_event::create($event);
         }
     } else if ($eventid) {
@@ -928,13 +971,15 @@ function feedback_check_is_switchrole() {
  * @param string $sort
  * @param int $startpage
  * @param int $pagecount
- * @return object the userrecords
+ * @param bool $includestatus to return if the user started or not the feedback among the complete user record
+ * @return array array of user ids or user objects when $includestatus set to true
  */
 function feedback_get_incomplete_users(cm_info $cm,
                                        $group = false,
                                        $sort = '',
                                        $startpage = false,
-                                       $pagecount = false) {
+                                       $pagecount = false,
+                                       $includestatus = false) {
 
     global $DB;
 
@@ -942,7 +987,8 @@ function feedback_get_incomplete_users(cm_info $cm,
 
     //first get all user who can complete this feedback
     $cap = 'mod/feedback:complete';
-    $fields = 'u.id, u.username';
+    $allnames = get_all_user_name_fields(true, 'u');
+    $fields = 'u.id, ' . $allnames . ', u.picture, u.email, u.imagealt';
     if (!$allusers = get_users_by_capability($context,
                                             $cap,
                                             $fields,
@@ -956,25 +1002,35 @@ function feedback_get_incomplete_users(cm_info $cm,
     }
     // Filter users that are not in the correct group/grouping.
     $info = new \core_availability\info_module($cm);
-    $allusers = $info->filter_user_list($allusers);
+    $allusersrecords = $info->filter_user_list($allusers);
 
-    $allusers = array_keys($allusers);
+    $allusers = array_keys($allusersrecords);
 
     //now get all completeds
     $params = array('feedback'=>$cm->instance);
-    if (!$completedusers = $DB->get_records_menu('feedback_completed', $params, '', 'id, userid')) {
-        return $allusers;
+    if ($completedusers = $DB->get_records_menu('feedback_completed', $params, '', 'id, userid')) {
+        // Now strike all completedusers from allusers.
+        $allusers = array_diff($allusers, $completedusers);
     }
-
-    //now strike all completedusers from allusers
-    $allusers = array_diff($allusers, $completedusers);
 
     //for paging I use array_slice()
     if ($startpage !== false AND $pagecount !== false) {
         $allusers = array_slice($allusers, $startpage, $pagecount);
     }
 
-    return $allusers;
+    // Check if we should return the full users objects.
+    if ($includestatus) {
+        $userrecords = [];
+        $startedusers = $DB->get_records_menu('feedback_completedtmp', ['feedback' => $cm->instance], '', 'id, userid');
+        $startedusers = array_flip($startedusers);
+        foreach ($allusers as $userid) {
+            $allusersrecords[$userid]->feedbackstarted = isset($startedusers[$userid]);
+            $userrecords[] = $allusersrecords[$userid];
+        }
+        return $userrecords;
+    } else {    // Return just user ids.
+        return $allusers;
+    }
 }
 
 /**
@@ -2997,7 +3053,8 @@ function feedback_send_email($cm, $feedback, $course, $user, $completed = null) 
             }
 
             if ($feedback->anonymous == FEEDBACK_ANONYMOUS_NO) {
-                $eventdata = new stdClass();
+                $eventdata = new \core\message\message();
+                $eventdata->courseid         = $course->id;
                 $eventdata->name             = 'submission';
                 $eventdata->component        = 'mod_feedback';
                 $eventdata->userfrom         = $user;
@@ -3007,9 +3064,13 @@ function feedback_send_email($cm, $feedback, $course, $user, $completed = null) 
                 $eventdata->fullmessageformat = FORMAT_PLAIN;
                 $eventdata->fullmessagehtml  = $posthtml;
                 $eventdata->smallmessage     = '';
+                $eventdata->courseid         = $course->id;
+                $eventdata->contexturl       = $info->url;
+                $eventdata->contexturlname   = $info->feedback;
                 message_send($eventdata);
             } else {
-                $eventdata = new stdClass();
+                $eventdata = new \core\message\message();
+                $eventdata->courseid         = $course->id;
                 $eventdata->name             = 'submission';
                 $eventdata->component        = 'mod_feedback';
                 $eventdata->userfrom         = $teacher;
@@ -3019,6 +3080,9 @@ function feedback_send_email($cm, $feedback, $course, $user, $completed = null) 
                 $eventdata->fullmessageformat = FORMAT_PLAIN;
                 $eventdata->fullmessagehtml  = $posthtml;
                 $eventdata->smallmessage     = '';
+                $eventdata->courseid         = $course->id;
+                $eventdata->contexturl       = $info->url;
+                $eventdata->contexturlname   = $info->feedback;
                 message_send($eventdata);
             }
         }
@@ -3067,7 +3131,8 @@ function feedback_send_email_anonym($cm, $feedback, $course) {
                 $posthtml = '';
             }
 
-            $eventdata = new stdClass();
+            $eventdata = new \core\message\message();
+            $eventdata->courseid         = $course->id;
             $eventdata->name             = 'submission';
             $eventdata->component        = 'mod_feedback';
             $eventdata->userfrom         = $teacher;
@@ -3077,6 +3142,9 @@ function feedback_send_email_anonym($cm, $feedback, $course) {
             $eventdata->fullmessageformat = FORMAT_PLAIN;
             $eventdata->fullmessagehtml  = $posthtml;
             $eventdata->smallmessage     = '';
+            $eventdata->courseid         = $course->id;
+            $eventdata->contexturl       = $info->url;
+            $eventdata->contexturlname   = $info->feedback;
             message_send($eventdata);
         }
     }
@@ -3274,4 +3342,206 @@ function feedback_can_view_analysis($feedback, $context, $courseid = false) {
     }
 
     return feedback_is_already_submitted($feedback->id, $courseid);
+}
+
+/**
+ * Get icon mapping for font-awesome.
+ */
+function mod_feedback_get_fontawesome_icon_map() {
+    return [
+        'mod_feedback:required' => 'fa-exclamation-circle',
+        'mod_feedback:notrequired' => 'fa-question-circle-o',
+    ];
+}
+
+/**
+ * Check if the module has any update that affects the current user since a given time.
+ *
+ * @param  cm_info $cm course module data
+ * @param  int $from the time to check updates from
+ * @param  array $filter if we need to check only specific updates
+ * @return stdClass an object with the different type of areas indicating if they were updated or not
+ * @since Moodle 3.3
+ */
+function feedback_check_updates_since(cm_info $cm, $from, $filter = array()) {
+    global $DB, $USER, $CFG;
+
+    $updates = course_check_module_updates_since($cm, $from, array(), $filter);
+
+    // Check for new attempts.
+    $updates->attemptsfinished = (object) array('updated' => false);
+    $updates->attemptsunfinished = (object) array('updated' => false);
+    $select = 'feedback = ? AND userid = ? AND timemodified > ?';
+    $params = array($cm->instance, $USER->id, $from);
+
+    $attemptsfinished = $DB->get_records_select('feedback_completed', $select, $params, '', 'id');
+    if (!empty($attemptsfinished)) {
+        $updates->attemptsfinished->updated = true;
+        $updates->attemptsfinished->itemids = array_keys($attemptsfinished);
+    }
+    $attemptsunfinished = $DB->get_records_select('feedback_completedtmp', $select, $params, '', 'id');
+    if (!empty($attemptsunfinished)) {
+        $updates->attemptsunfinished->updated = true;
+        $updates->attemptsunfinished->itemids = array_keys($attemptsunfinished);
+    }
+
+    // Now, teachers should see other students updates.
+    if (has_capability('mod/feedback:viewreports', $cm->context)) {
+        $select = 'feedback = ? AND timemodified > ?';
+        $params = array($cm->instance, $from);
+
+        if (groups_get_activity_groupmode($cm) == SEPARATEGROUPS) {
+            $groupusers = array_keys(groups_get_activity_shared_group_members($cm));
+            if (empty($groupusers)) {
+                return $updates;
+            }
+            list($insql, $inparams) = $DB->get_in_or_equal($groupusers);
+            $select .= ' AND userid ' . $insql;
+            $params = array_merge($params, $inparams);
+        }
+
+        $updates->userattemptsfinished = (object) array('updated' => false);
+        $attemptsfinished = $DB->get_records_select('feedback_completed', $select, $params, '', 'id');
+        if (!empty($attemptsfinished)) {
+            $updates->userattemptsfinished->updated = true;
+            $updates->userattemptsfinished->itemids = array_keys($attemptsfinished);
+        }
+
+        $updates->userattemptsunfinished = (object) array('updated' => false);
+        $attemptsunfinished = $DB->get_records_select('feedback_completedtmp', $select, $params, '', 'id');
+        if (!empty($attemptsunfinished)) {
+            $updates->userattemptsunfinished->updated = true;
+            $updates->userattemptsunfinished->itemids = array_keys($attemptsunfinished);
+        }
+    }
+
+    return $updates;
+}
+
+/**
+ * The event is only visible anywhere if the user can submit feedback.
+ *
+ * @param calendar_event $event
+ * @return bool Returns true if the event is visible to the current user, false otherwise.
+ */
+function mod_feedback_core_calendar_is_event_visible(calendar_event $event) {
+    global $DB;
+
+    $cm = get_fast_modinfo($event->courseid)->instances['feedback'][$event->instance];
+    $feedbackcompletion = new mod_feedback_completion(null, $cm, 0);
+
+    // The event is only visible if the user can submit it.
+    return $feedbackcompletion->can_complete();
+}
+
+/**
+ * This function receives a calendar event and returns the action associated with it, or null if there is none.
+ *
+ * This is used by block_myoverview in order to display the event appropriately. If null is returned then the event
+ * is not displayed on the block.
+ *
+ * @param calendar_event $event
+ * @param \core_calendar\action_factory $factory
+ * @return \core_calendar\local\event\entities\action_interface|null
+ */
+function mod_feedback_core_calendar_provide_event_action(calendar_event $event,
+                                                         \core_calendar\action_factory $factory) {
+
+    $cm = get_fast_modinfo($event->courseid)->instances['feedback'][$event->instance];
+    $feedbackcompletion = new mod_feedback_completion(null, $cm, 0);
+
+    if (!empty($cm->customdata['timeclose']) && $cm->customdata['timeclose'] < time()) {
+        // Feedback is already closed, do not display it even if it was never submitted.
+        return null;
+    }
+
+    // The feedback is actionable if it does not have timeopen or timeopen is in the past.
+    $actionable = $feedbackcompletion->is_open();
+
+    if ($actionable && $feedbackcompletion->is_already_submitted()) {
+        // There is no need to display anything if the user has already submitted the feedback.
+        return null;
+    }
+
+    return $factory->create_instance(
+        get_string('answerquestions', 'feedback'),
+        new \moodle_url('/mod/feedback/view.php', ['id' => $cm->id]),
+        1,
+        $actionable
+    );
+}
+
+/**
+ * Add a get_coursemodule_info function in case any feedback type wants to add 'extra' information
+ * for the course (see resource).
+ *
+ * Given a course_module object, this function returns any "extra" information that may be needed
+ * when printing this activity in a course listing.  See get_array_of_activities() in course/lib.php.
+ *
+ * @param stdClass $coursemodule The coursemodule object (record).
+ * @return cached_cm_info An object on information that the courses
+ *                        will know about (most noticeably, an icon).
+ */
+function feedback_get_coursemodule_info($coursemodule) {
+    global $DB;
+
+    $dbparams = ['id' => $coursemodule->instance];
+    $fields = 'id, name, intro, introformat, completionsubmit, timeopen, timeclose, anonymous';
+    if (!$feedback = $DB->get_record('feedback', $dbparams, $fields)) {
+        return false;
+    }
+
+    $result = new cached_cm_info();
+    $result->name = $feedback->name;
+
+    if ($coursemodule->showdescription) {
+        // Convert intro to html. Do not filter cached version, filters run at display time.
+        $result->content = format_module_intro('feedback', $feedback, $coursemodule->id, false);
+    }
+
+    // Populate the custom completion rules as key => value pairs, but only if the completion mode is 'automatic'.
+    if ($coursemodule->completion == COMPLETION_TRACKING_AUTOMATIC) {
+        $result->customdata['customcompletionrules']['completionsubmit'] = $feedback->completionsubmit;
+    }
+    // Populate some other values that can be used in calendar or on dashboard.
+    if ($feedback->timeopen) {
+        $result->customdata['timeopen'] = $feedback->timeopen;
+    }
+    if ($feedback->timeclose) {
+        $result->customdata['timeclose'] = $feedback->timeclose;
+    }
+    if ($feedback->anonymous) {
+        $result->customdata['anonymous'] = $feedback->anonymous;
+    }
+
+    return $result;
+}
+
+/**
+ * Callback which returns human-readable strings describing the active completion custom rules for the module instance.
+ *
+ * @param cm_info|stdClass $cm object with fields ->completion and ->customdata['customcompletionrules']
+ * @return array $descriptions the array of descriptions for the custom rules.
+ */
+function mod_feedback_get_completion_active_rule_descriptions($cm) {
+    // Values will be present in cm_info, and we assume these are up to date.
+    if (empty($cm->customdata['customcompletionrules'])
+        || $cm->completion != COMPLETION_TRACKING_AUTOMATIC) {
+        return [];
+    }
+
+    $descriptions = [];
+    foreach ($cm->customdata['customcompletionrules'] as $key => $val) {
+        switch ($key) {
+            case 'completionsubmit':
+                if (empty($val)) {
+                    continue;
+                }
+                $descriptions[] = get_string('completionsubmit', 'feedback');
+                break;
+            default:
+                break;
+        }
+    }
+    return $descriptions;
 }

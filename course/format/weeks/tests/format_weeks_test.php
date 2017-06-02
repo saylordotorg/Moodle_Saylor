@@ -36,32 +36,6 @@ require_once($CFG->dirroot . '/course/lib.php');
  */
 class format_weeks_testcase extends advanced_testcase {
 
-    public function test_update_course_numsections() {
-        global $DB;
-        $this->resetAfterTest(true);
-
-        $generator = $this->getDataGenerator();
-
-        $course = $generator->create_course(array('numsections' => 10, 'format' => 'weeks'),
-            array('createsections' => true));
-        $generator->create_module('assign', array('course' => $course, 'section' => 7));
-
-        $this->setAdminUser();
-
-        $this->assertEquals(11, $DB->count_records('course_sections', array('course' => $course->id)));
-
-        // Change the numsections to 8, last two sections did not have any activities, they should be deleted.
-        update_course((object)array('id' => $course->id, 'numsections' => 8));
-        $this->assertEquals(9, $DB->count_records('course_sections', array('course' => $course->id)));
-        $this->assertEquals(9, count(get_fast_modinfo($course)->get_section_info_all()));
-
-        // Change the numsections to 5, section 8 should be deleted but section 7 should remain as it has activities.
-        update_course((object)array('id' => $course->id, 'numsections' => 6));
-        $this->assertEquals(8, $DB->count_records('course_sections', array('course' => $course->id)));
-        $this->assertEquals(8, count(get_fast_modinfo($course)->get_section_info_all()));
-        $this->assertEquals(6, course_get_format($course)->get_course()->numsections);
-    }
-
     /**
      * Tests for format_weeks::get_section_name method with default section names.
      */
@@ -217,4 +191,45 @@ class format_weeks_testcase extends advanced_testcase {
             $this->assertEquals(1, preg_match('/^Can not find data record in database/', $e->getMessage()));
         }
     }
+
+    /**
+     * Test get_default_course_enddate.
+     *
+     * @return void
+     */
+    public function test_default_course_enddate() {
+        global $CFG, $DB, $PAGE;
+
+        $this->resetAfterTest(true);
+
+        require_once($CFG->dirroot . '/course/tests/fixtures/testable_course_edit_form.php');
+
+        $this->setTimezone('UTC');
+
+        $params = array('format' => 'weeks', 'numsections' => 5, 'startdate' => 1445644800);
+        $course = $this->getDataGenerator()->create_course($params);
+        $category = $DB->get_record('course_categories', array('id' => $course->category));
+
+        $args = [
+            'course' => $course,
+            'category' => $category,
+            'editoroptions' => [
+                'context' => context_course::instance($course->id),
+                'subdirs' => 0
+            ],
+            'returnto' => new moodle_url('/'),
+            'returnurl' => new moodle_url('/'),
+        ];
+
+        $PAGE->set_course($course);
+        $courseform = new testable_course_edit_form(null, $args);
+        $courseform->definition_after_data();
+
+        // format_weeks::get_section_dates is adding 2h to avoid DST problems, we need to replicate it here.
+        $enddate = $params['startdate'] + (WEEKSECS * $params['numsections']) + 7200;
+
+        $weeksformat = course_get_format($course->id);
+        $this->assertEquals($enddate, $weeksformat->get_default_course_enddate($courseform->get_quick_form()));
+    }
+
 }

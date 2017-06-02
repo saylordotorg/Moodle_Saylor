@@ -160,6 +160,8 @@ class lesson_page_type_branchtable extends lesson_page {
     public function check_answer() {
         global $USER, $DB, $PAGE, $CFG;
 
+        $result = parent::check_answer();
+
         require_sesskey();
         $newpageid = optional_param('jumpto', null, PARAM_INT);
         // going to insert into lesson_branch
@@ -214,7 +216,10 @@ class lesson_page_type_branchtable extends lesson_page {
         $branch->nextpageid = $newpageid;
         $DB->update_record("lesson_branch", $branch);
 
-        redirect(new moodle_url('/mod/lesson/view.php', array('id' => $PAGE->cm->id, 'pageid' => $newpageid)));
+        // This will force to redirect to the newpageid.
+        $result->inmediatejump = true;
+        $result->newpageid = $newpageid;
+        return $result;
     }
 
     public function display_answers(html_table $table) {
@@ -255,7 +260,9 @@ class lesson_page_type_branchtable extends lesson_page {
         $formattextdefoptions->context = $answerpage->context;
 
         foreach ($answers as $answer) {
-            $data = "<input type=\"button\" name=\"$answer->id\" value=\"".s(strip_tags(format_text($answer->answer, FORMAT_MOODLE,$formattextdefoptions)))."\" disabled=\"disabled\"> ";
+            $data = "<input type=\"button\" class=\"btn btn-secondary\" name=\"$answer->id\" " .
+                    "value=\"".s(strip_tags(format_text($answer->answer, FORMAT_MOODLE, $formattextdefoptions)))."\" " .
+                    "disabled=\"disabled\"> ";
             $data .= get_string('jumpsto', 'lesson', $this->get_jump_name($answer->jumpto));
             $answerdata->answers[] = array($data, "");
             $answerpage->answerdata = $answerdata;

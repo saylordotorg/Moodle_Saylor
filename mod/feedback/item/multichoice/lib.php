@@ -71,9 +71,10 @@ class feedback_item_multichoice extends feedback_item_base {
     public function save_item() {
         global $DB;
 
-        if (!$item = $this->item_form->get_data()) {
+        if (!$this->get_data()) {
             return false;
         }
+        $item = $this->item;
 
         if (isset($item->clone_item) AND $item->clone_item) {
             $item->id = ''; //to clone this item
@@ -207,6 +208,7 @@ class feedback_item_multichoice extends feedback_item_base {
         $analysed_item = $this->get_analysed($item, $groupid, $courseid);
         if ($analysed_item) {
             $itemname = $analysed_item[1];
+            echo "<table class=\"analysis itemtype_{$item->typ}\">";
             echo '<tr><th colspan="2" align="left">';
             echo $itemnr . ' ';
             if (strval($item->label) !== '') {
@@ -214,32 +216,32 @@ class feedback_item_multichoice extends feedback_item_base {
             }
             echo format_string($itemname);
             echo '</th></tr>';
-
+            echo "</table>";
             $analysed_vals = $analysed_item[2];
-            $pixnr = 0;
+            $count = 0;
+            $data = [];
             foreach ($analysed_vals as $val) {
-                $intvalue = $pixnr % 10;
-                $pix = $OUTPUT->pix_url('multichoice/' . $intvalue, 'feedback');
-                $pixspacer = $OUTPUT->pix_url('spacer');
-                $pixnr++;
-                $pixwidth = max(2, intval($val->quotient * FEEDBACK_MAX_PIX_LENGTH));
-                $pixwidthspacer = FEEDBACK_MAX_PIX_LENGTH + 1 - $pixwidth;
                 $quotient = format_float($val->quotient * 100, 2);
-                $str_quotient = '';
+                $strquotient = '';
                 if ($val->quotient > 0) {
-                    $str_quotient = ' ('. $quotient . ' %)';
+                    $strquotient = ' ('. $quotient . ' %)';
                 }
-                echo '<tr>';
-                echo '<td class="optionname">' .
-                            format_text(trim($val->answertext), FORMAT_HTML, array('noclean' => true, 'para' => false)).':
-                      </td>
-                      <td class="optioncount" style="width:'.FEEDBACK_MAX_PIX_LENGTH.';">
-                        <img class="feedback_bar_image" alt="'.$intvalue.'" src="'.$pix.'" width="'.$pixwidth.'" />'.
-                        '<img class="feedback_bar_image" alt="" src="'.$pixspacer.'" width="'.$pixwidthspacer.'" />
-                        '.$val->answercount.$str_quotient.'
-                      </td>';
-                echo '</tr>';
+                $answertext = format_text(trim($val->answertext), FORMAT_HTML,
+                        array('noclean' => true, 'para' => false));
+
+                $data['labels'][$count] = $answertext;
+                $data['series'][$count] = $val->answercount;
+                $data['series_labels'][$count] = $val->answercount . $strquotient;
+                $count++;
             }
+            $chart = new \core\chart_bar();
+            $chart->set_horizontal(true);
+            $series = new \core\chart_series(format_string(get_string("responses", "feedback")), $data['series']);
+            $series->set_labels($data['series_labels']);
+            $chart->add_series($series);
+            $chart->set_labels($data['labels']);
+
+            echo $OUTPUT->render($chart);
         }
     }
 
@@ -341,6 +343,8 @@ class feedback_item_multichoice extends feedback_item_base {
                     $objs[] = ['advcheckbox', $inputname.'['.$idx.']', '', $label, null, array(0, $idx)];
                     $form->set_element_type($inputname.'['.$idx.']', PARAM_INT);
                 }
+                // Span to hold the element id. The id is used for drag and drop reordering.
+                $objs[] = ['static', '', '', html_writer::span('', '', ['id' => 'feedback_item_' . $item->id])];
                 $element = $form->add_form_group_element($item, 'group_'.$inputname, $name, $objs, $separator, $class);
                 if ($tmpvalue) {
                     foreach (explode(FEEDBACK_MULTICHOICE_LINE_SEP, $tmpvalue) as $v) {
@@ -356,6 +360,8 @@ class feedback_item_multichoice extends feedback_item_base {
                 foreach ($options as $idx => $label) {
                     $objs[] = ['radio', $inputname.'[0]', '', $label, $idx];
                 }
+                // Span to hold the element id. The id is used for drag and drop reordering.
+                $objs[] = ['static', '', '', html_writer::span('', '', ['id' => 'feedback_item_' . $item->id])];
                 $element = $form->add_form_group_element($item, 'group_'.$inputname, $name, $objs, $separator, $class);
                 $form->set_element_default($inputname.'[0]', $tmpvalue);
                 $form->set_element_type($inputname.'[0]', PARAM_INT);
@@ -466,5 +472,27 @@ class feedback_item_multichoice extends feedback_item_base {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Return the analysis data ready for external functions.
+     *
+     * @param stdClass $item     the item (question) information
+     * @param int      $groupid  the group id to filter data (optional)
+     * @param int      $courseid the course id (optional)
+     * @return array an array of data with non scalar types json encoded
+     * @since  Moodle 3.3
+     */
+    public function get_analysed_for_external($item, $groupid = false, $courseid = false) {
+
+        $externaldata = array();
+        $data = $this->get_analysed($item, $groupid, $courseid);
+
+        if (!empty($data[2]) && is_array($data[2])) {
+            foreach ($data[2] as $d) {
+                $externaldata[] = json_encode($d);
+            }
+        }
+        return $externaldata;
     }
 }

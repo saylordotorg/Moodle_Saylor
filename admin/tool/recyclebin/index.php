@@ -22,7 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(__FILE__) . '/../../../config.php');
+require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->libdir . '/tablelib.php');
 
 $contextid = required_param('contextid', PARAM_INT);
@@ -187,7 +187,7 @@ foreach ($items as $item) {
         if (isset($modules[$item->module])) {
             $mod = $modules[$item->module];
             $modname = get_string('modulename', $mod->name);
-            $name = '<img src="' . $OUTPUT->pix_url('icon', $mod->name) . '" class="icon" alt="' . $modname . '" /> ' . $name;
+            $name = $OUTPUT->image_icon('icon', $modname, $mod->name) . $name;
         }
     }
 

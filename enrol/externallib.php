@@ -300,7 +300,7 @@ class core_enrol_external extends external_api {
         $params = self::validate_parameters(self::get_users_courses_parameters(), array('userid'=>$userid));
 
         $courses = enrol_get_users_courses($params['userid'], true, 'id, shortname, fullname, idnumber, visible,
-                   summary, summaryformat, format, showgrades, lang, enablecompletion');
+                   summary, summaryformat, format, showgrades, lang, enablecompletion, category, startdate, enddate');
         $result = array();
 
         foreach ($courses as $course) {
@@ -326,11 +326,29 @@ class core_enrol_external extends external_api {
             $course->fullname = external_format_string($course->fullname, $context->id);
             $course->shortname = external_format_string($course->shortname, $context->id);
 
-            $result[] = array('id' => $course->id, 'shortname' => $course->shortname, 'fullname' => $course->fullname,
-                'idnumber' => $course->idnumber, 'visible' => $course->visible, 'enrolledusercount' => $enrolledusercount,
-                'summary' => $course->summary, 'summaryformat' => $course->summaryformat, 'format' => $course->format,
-                'showgrades' => $course->showgrades, 'lang' => $course->lang, 'enablecompletion' => $course->enablecompletion
-                );
+            $progress = null;
+            if ($course->enablecompletion) {
+                $progress = \core_completion\progress::get_course_progress_percentage($course);
+            }
+
+            $result[] = array(
+                'id' => $course->id,
+                'shortname' => $course->shortname,
+                'fullname' => $course->fullname,
+                'idnumber' => $course->idnumber,
+                'visible' => $course->visible,
+                'enrolledusercount' => $enrolledusercount,
+                'summary' => $course->summary,
+                'summaryformat' => $course->summaryformat,
+                'format' => $course->format,
+                'showgrades' => $course->showgrades,
+                'lang' => $course->lang,
+                'enablecompletion' => $course->enablecompletion,
+                'category' => $course->category,
+                'progress' => $progress,
+                'startdate' => $course->startdate,
+                'enddate' => $course->enddate,
+            );
         }
 
         return $result;
@@ -357,7 +375,11 @@ class core_enrol_external extends external_api {
                     'showgrades' => new external_value(PARAM_BOOL, 'true if grades are shown, otherwise false', VALUE_OPTIONAL),
                     'lang'      => new external_value(PARAM_LANG, 'forced course language', VALUE_OPTIONAL),
                     'enablecompletion' => new external_value(PARAM_BOOL, 'true if completion is enabled, otherwise false',
-                                                                VALUE_OPTIONAL)
+                                                                VALUE_OPTIONAL),
+                    'category' => new external_value(PARAM_INT, 'course category id', VALUE_OPTIONAL),
+                    'progress' => new external_value(PARAM_FLOAT, 'Progress percentage', VALUE_OPTIONAL),
+                    'startdate' => new external_value(PARAM_INT, 'Timestamp when the course start', VALUE_OPTIONAL),
+                    'enddate' => new external_value(PARAM_INT, 'Timestamp when the course end', VALUE_OPTIONAL),
                 )
             )
         );

@@ -32,9 +32,8 @@ Feature: Editing a grade item
       | grade_aggregations_visible | Mean of grades,Weighted mean of grades,Simple weighted mean of grades,Mean of grades (with extra credits),Median of grades,Lowest grade,Highest grade,Mode of grades,Natural |
     And I log out
     And I log in as "teacher1"
-    And I am on site homepage
-    And I follow "Course 1"
-    And I navigate to "Gradebook setup" node in "Course administration"
+    And I am on "Course 1" course homepage
+    And I navigate to "Setup > Gradebook setup" in the course gradebook
     And I press "Add category"
     And I set the following fields to these values:
       | Category name | Cat 1 |
@@ -69,15 +68,15 @@ Feature: Editing a grade item
     And I should not see "You cannot change the scale, as grades already exist for this item"
 
   Scenario: Attempting to change a category item's grade type when overridden grades already exist
-    Given I navigate to "Grader report" node in "Grade administration"
+    Given I navigate to "View > Grader report" in the course gradebook
     And I turn editing mode on
     And I give the grade "20.00" to the user "Student 1" for the grade item "Cat 1 total"
     And I press "Save changes"
-    And I navigate to "Gradebook setup" node in "Grade administration > Setup"
+    And I navigate to "Setup > Gradebook setup" in the course gradebook
     And I click on "Edit" "link" in the "Cat 1" "table_row"
     When I click on "Edit settings" "link" in the "Cat 1" "table_row"
     Then I should see "This category has associated grade items which have been overridden. Therefore some grades have already been awarded, so the grade type cannot be changed. If you wish to change the maximum grade, you must first choose whether or not to rescale existing grades."
-    And "//div[contains(concat(' ', normalize-space(@class), ' '), 'fstatic') and contains(text(), 'Value')]" "xpath_element" should exist
+    And "//div[contains(concat(' ', normalize-space(@class), ' '), 'felement') and contains(text(), 'Value')]" "xpath_element" should exist
 
   Scenario: Attempting to change a category item's scale when overridden grades already exist
     Given I click on "Edit" "link" in the "Cat 1" "table_row"
@@ -85,22 +84,22 @@ Feature: Editing a grade item
     And I set the field "Grade type" to "Scale"
     And I set the field "Scale" to "ABCDEF"
     And I press "Save changes"
-    And I navigate to "Grader report" node in "Grade administration"
+    And I navigate to "View > Grader report" in the course gradebook
     And I turn editing mode on
     And I give the grade "C" to the user "Student 1" for the grade item "Cat 1 total"
     And I press "Save changes"
-    And I navigate to "Gradebook setup" node in "Grade administration > Setup"
+    And I navigate to "Setup > Gradebook setup" in the course gradebook
     And I click on "Edit" "link" in the "Cat 1" "table_row"
     When I click on "Edit settings" "link" in the "Cat 1" "table_row"
     Then I should see "This category has associated grade items which have been overridden. Therefore some grades have already been awarded, so the grade type and scale cannot be changed."
-    And "//div[contains(concat(' ', normalize-space(@class), ' '), 'fstatic') and contains(text(), 'ABCDEF')]" "xpath_element" should exist
+    And "//div[contains(concat(' ', normalize-space(@class), ' '), 'felement') and contains(text(), 'ABCDEF')]" "xpath_element" should exist
 
   Scenario: Attempting to change a category item's maximum grade when no rescaling option has been chosen
-    Given I navigate to "Grader report" node in "Grade administration"
+    Given I navigate to "View > Grader report" in the course gradebook
     And I turn editing mode on
     And I give the grade "20.00" to the user "Student 1" for the grade item "Cat 1 total"
     And I press "Save changes"
-    And I navigate to "Gradebook setup" node in "Grade administration > Setup"
+    And I navigate to "Setup > Gradebook setup" in the course gradebook
     And I click on "Edit" "link" in the "Cat 1" "table_row"
     And I click on "Edit settings" "link" in the "Cat 1" "table_row"
     And I set the field "Maximum grade" to "50"

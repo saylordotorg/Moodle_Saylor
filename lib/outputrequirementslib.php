@@ -180,7 +180,7 @@ class page_requirements_manager {
         $this->yui3loader = new stdClass();
         $this->YUI_config = new YUI_config();
 
-        if (is_https()) {
+        if (is_https() && !empty($CFG->useexternalyui)) {
             // On HTTPS sites all JS must be loaded from https sites,
             // YUI CDN does not support https yet, sorry.
             $CFG->useexternalyui = 0;
@@ -313,16 +313,26 @@ class page_requirements_manager {
             // Otherwise, in some situations, users will get warnings about insecure content
             // on secure pages from their web browser.
 
+            $iconsystem = \core\output\icon_system::instance();
+
+            // It is possible that the $page->context is null, so we can't use $page->context->id.
+            $contextid = null;
+            if (!is_null($page->context)) {
+                $contextid = $page->context->id;
+            }
+
             $this->M_cfg = array(
                 'wwwroot'             => $CFG->httpswwwroot, // Yes, really. See above.
                 'sesskey'             => sesskey(),
-                'loadingicon'         => $renderer->pix_url('i/loading_small', 'moodle')->out(false),
                 'themerev'            => theme_get_revision(),
                 'slasharguments'      => (int)(!empty($CFG->slasharguments)),
                 'theme'               => $page->theme->name,
+                'iconsystemmodule'    => $iconsystem->get_amd_name(),
                 'jsrev'               => $this->get_jsrev(),
                 'admin'               => $CFG->admin,
-                'svgicons'            => $page->theme->use_svg_icons()
+                'svgicons'            => $page->theme->use_svg_icons(),
+                'usertimezone'        => usertimezone(),
+                'contextid'           => $contextid,
             );
             if ($CFG->debugdeveloper) {
                 $this->M_cfg['developerdebug'] = true;
@@ -430,10 +440,6 @@ class page_requirements_manager {
      *
      * NOTE: this should not be used in official Moodle distribution!
      *
-     * We are going to bundle jQuery 1.9.x until we drop support
-     * all support for IE 6-8. Use $PAGE->requires->jquery_plugin('migrate')
-     * for code written for earlier jQuery versions.
-     *
      * {@see http://docs.moodle.org/dev/jQuery}
      */
     public function jquery() {
@@ -450,7 +456,6 @@ class page_requirements_manager {
      *
      * Included core plugins:
      *   - jQuery UI
-     *   - jQuery Migrate (useful for code written for previous UI version)
      *
      * Add-ons may include extra jQuery plugins in jquery/ directory,
      * plugins.php file defines the mapping between plugin names and
@@ -497,7 +502,7 @@ class page_requirements_manager {
             return false;
         }
 
-        if ($component !== 'core' and in_array($plugin, array('jquery', 'ui', 'ui-css', 'migrate'))) {
+        if ($component !== 'core' and in_array($plugin, array('jquery', 'ui', 'ui-css'))) {
             debugging("jQuery plugin '$plugin' is included in Moodle core, other components can not use the same name.", DEBUG_DEVELOPER);
             $component = 'core';
         } else if ($component !== 'core' and strpos($component, '_') === false) {
@@ -735,7 +740,11 @@ class page_requirements_manager {
                 case 'core_filepicker':
                     $module = array('name'     => 'core_filepicker',
                                     'fullpath' => '/repository/filepicker.js',
-                                    'requires' => array('base', 'node', 'node-event-simulate', 'json', 'async-queue', 'io-base', 'io-upload-iframe', 'io-form', 'yui2-treeview', 'panel', 'cookie', 'datatable', 'datatable-sort', 'resize-plugin', 'dd-plugin', 'escape', 'moodle-core_filepicker'),
+                                    'requires' => array(
+                                        'base', 'node', 'node-event-simulate', 'json', 'async-queue', 'io-base', 'io-upload-iframe', 'io-form',
+                                        'yui2-treeview', 'panel', 'cookie', 'datatable', 'datatable-sort', 'resize-plugin', 'dd-plugin',
+                                        'escape', 'moodle-core_filepicker', 'moodle-core-notification-dialogue'
+                                    ),
                                     'strings'  => array(array('lastmodified', 'moodle'), array('name', 'moodle'), array('type', 'repository'), array('size', 'repository'),
                                                         array('invalidjson', 'repository'), array('error', 'moodle'), array('info', 'moodle'),
                                                         array('nofilesattached', 'repository'), array('filepicker', 'repository'), array('logout', 'repository'),
@@ -1408,7 +1417,6 @@ class page_requirements_manager {
 
         $baserollups = array(
             'rollup/' . $rollupversion . "/yui-moodlesimple{$yuiformat}.js",
-            'rollup/' . $jsrev . "/mcore{$format}.js",
         );
 
         if ($this->yui3loader->combine) {
@@ -1536,17 +1544,12 @@ class page_requirements_manager {
      * Normally, this method is called automatically by the code that prints the
      * <head> tag. You should not normally need to call it in your own code.
      *
+     * @param renderer_base $renderer
      * @return string the HTML code to go at the start of the <body> tag.
      */
-    public function get_top_of_body_code() {
+    public function get_top_of_body_code(renderer_base $renderer) {
         // First the skip links.
-        $links = '';
-        $attributes = array('class' => 'skip');
-        foreach ($this->skiplinks as $url => $text) {
-            $links .= html_writer::link('#'.$url, $text, $attributes);
-        }
-        $output = html_writer::tag('div', $links, array('class'=>'skiplinks')) . "\n";
-        $this->js_init_call('M.util.init_skiplink');
+        $output = $renderer->render_skip_links($this->skiplinks);
 
         // YUI3 JS needs to be loaded early in the body. It should be cached well by the browser.
         $output .= $this->get_yui3lib_headcode();
@@ -1614,7 +1617,6 @@ class page_requirements_manager {
             'areyousure',
             'closebuttontitle',
             'unknownerror',
-            'changesmadereallygoaway',
         ), 'moodle');
         if (!empty($this->stringsforjs)) {
             $strings = array();

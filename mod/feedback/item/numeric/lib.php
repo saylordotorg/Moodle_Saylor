@@ -76,9 +76,10 @@ class feedback_item_numeric extends feedback_item_base {
     public function save_item() {
         global $DB;
 
-        if (!$item = $this->item_form->get_data()) {
+        if (!$this->get_data()) {
             return false;
         }
+        $item = $this->item;
 
         if (isset($item->clone_item) AND $item->clone_item) {
             $item->id = ''; //to clone this item
@@ -142,6 +143,7 @@ class feedback_item_numeric extends feedback_item_base {
         $values = $this->get_analysed($item, $groupid, $courseid);
 
         if (isset($values->data) AND is_array($values->data)) {
+            echo "<table class=\"analysis itemtype_{$item->typ}\">";
             echo '<tr><th colspan="2" align="left">';
             echo $itemnr . ' ';
             if (strval($item->label) !== '') {
@@ -164,6 +166,7 @@ class feedback_item_numeric extends feedback_item_base {
             echo '<tr><td colspan="2"><b>';
             echo get_string('average', 'feedback').': '.$avg;
             echo '</b></td></tr>';
+            echo '</table>';
         }
     }
 
@@ -302,5 +305,25 @@ class feedback_item_numeric extends feedback_item_base {
             $data = '';
         }
         return $data;
+    }
+
+    /**
+     * Return the analysis data ready for external functions.
+     *
+     * @param stdClass $item     the item (question) information
+     * @param int      $groupid  the group id to filter data (optional)
+     * @param int      $courseid the course id (optional)
+     * @return array an array of data with non scalar types json encoded
+     * @since  Moodle 3.3
+     */
+    public function get_analysed_for_external($item, $groupid = false, $courseid = false) {
+
+        $externaldata = array();
+        $data = $this->get_analysed($item, $groupid, $courseid);
+
+        if (is_array($data->data)) {
+            return $data->data; // No need to json, scalar type.
+        }
+        return $externaldata;
     }
 }

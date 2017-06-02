@@ -25,13 +25,25 @@
 class data_field_text extends data_field_base {
 
     var $type = 'text';
+    /**
+     * priority for globalsearch indexing
+     *
+     * @var int
+     */
+    protected static $priority = self::MAX_PRIORITY;
 
     function display_search_field($value = '') {
-        return '<label class="accesshide" for="f_' . $this->field->id . '">'. $this->field->name.'</label>' . '<input type="text" size="16" id="f_'.$this->field->id.'" name="f_'.$this->field->id.'" value="'.s($value).'" />';
+        return '<label class="accesshide" for="f_' . $this->field->id . '">' . $this->field->name.'</label>' .
+               '<input type="text" class="form-control" size="16" id="f_' . $this->field->id . '" ' .
+               'name="f_' . $this->field->id . '" value="' . s($value) . '" />';
     }
 
-    function parse_search_field() {
-        return optional_param('f_'.$this->field->id, '', PARAM_NOTAGS);
+    public function parse_search_field($defaults = null) {
+        $param = 'f_'.$this->field->id;
+        if (empty($defaults[$param])) {
+            $defaults = array($param => '');
+        }
+        return optional_param($param, $defaults[$param], PARAM_NOTAGS);
     }
 
     function generate_sql($tablealias, $value) {
@@ -52,6 +64,21 @@ class data_field_text extends data_field_base {
      */
     function notemptyfield($value, $name) {
         return strval($value) !== '';
+    }
+
+    /**
+     * Return the plugin configs for external functions.
+     *
+     * @return array the list of config parameters
+     * @since Moodle 3.3
+     */
+    public function get_config_for_external() {
+        // Return all the config parameters.
+        $configs = [];
+        for ($i = 1; $i <= 10; $i++) {
+            $configs["param$i"] = $this->field->{"param$i"};
+        }
+        return $configs;
     }
 }
 

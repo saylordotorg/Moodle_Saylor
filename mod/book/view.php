@@ -22,9 +22,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require(dirname(__FILE__).'/../../config.php');
-require_once(dirname(__FILE__).'/lib.php');
-require_once(dirname(__FILE__).'/locallib.php');
+require(__DIR__.'/../../config.php');
+require_once(__DIR__.'/lib.php');
+require_once(__DIR__.'/locallib.php');
 require_once($CFG->libdir.'/completionlib.php');
 
 $id        = optional_param('id', 0, PARAM_INT);        // Course Module ID
@@ -126,8 +126,10 @@ book_add_fake_block($chapters, $chapter, $book, $cm, $edit);
 // prepare chapter navigation icons
 $previd = null;
 $prevtitle = null;
+$navprevtitle = null;
 $nextid = null;
 $nexttitle = null;
+$navnexttitle = null;
 $last = null;
 foreach ($chapters as $ch) {
     if (!$edit and $ch->hidden) {
@@ -136,11 +138,13 @@ foreach ($chapters as $ch) {
     if ($last == $chapter->id) {
         $nextid = $ch->id;
         $nexttitle = book_get_chapter_title($ch->id, $chapters, $book, $context);
+        $navnexttitle = get_string('navnexttitle', 'mod_book', $nexttitle);
         break;
     }
     if ($ch->id != $chapter->id) {
         $previd = $ch->id;
         $prevtitle = book_get_chapter_title($ch->id, $chapters, $book, $context);
+        $navprevtitle = get_string('navprevtitle', 'mod_book', $prevtitle);
     }
     $last = $ch->id;
 }
@@ -155,9 +159,9 @@ if ($book->navstyle) {
     if ($previd) {
         $navprev = get_string('navprev', 'book');
         if ($book->navstyle == 1) {
-            $chnavigation .= '<a title="' . $navprev . '" class="bookprev" href="view.php?id=' .
+            $chnavigation .= '<a title="' . $navprevtitle . '" class="bookprev" href="view.php?id=' .
                 $cm->id . '&amp;chapterid=' . $previd .  '">' .
-                '<img src="' . $OUTPUT->pix_url($navprevicon, 'mod_book') . '" class="icon" alt="' . $navprev . '"/></a>';
+                $OUTPUT->pix_icon($navprevicon, $navprevtitle, 'mod_book') . '</a>';
         } else {
             $chnavigation .= '<a title="' . $navprev . '" class="bookprev" href="view.php?id=' .
                 $cm->id . '&amp;chapterid=' . $previd . '">' .
@@ -166,15 +170,15 @@ if ($book->navstyle) {
         }
     } else {
         if ($book->navstyle == 1) {
-            $chnavigation .= '<img src="' . $OUTPUT->pix_url($navprevdisicon, 'mod_book') . '" class="icon" alt="" />';
+            $chnavigation .= $OUTPUT->pix_icon($navprevdisicon, '', 'mod_book');
         }
     }
     if ($nextid) {
         $navnext = get_string('navnext', 'book');
         if ($book->navstyle == 1) {
-            $chnavigation .= '<a title="' . $navnext . '" class="booknext" href="view.php?id=' .
+            $chnavigation .= '<a title="' . $navnexttitle . '" class="booknext" href="view.php?id=' .
                 $cm->id . '&amp;chapterid='.$nextid.'">' .
-                '<img src="' . $OUTPUT->pix_url($navnexticon, 'mod_book').'" class="icon" alt="' . $navnext . '" /></a>';
+                $OUTPUT->pix_icon($navnexticon, $navnexttitle, 'mod_book') . '</a>';
         } else {
             $chnavigation .= ' <a title="' . $navnext . '" class="booknext" href="view.php?id=' .
                 $cm->id . '&amp;chapterid='.$nextid.'">' .
@@ -187,7 +191,7 @@ if ($book->navstyle) {
         $returnurl = course_get_url($course, $sec);
         if ($book->navstyle == 1) {
             $chnavigation .= '<a title="' . $navexit . '" class="bookexit"  href="'.$returnurl.'">' .
-                '<img src="' . $OUTPUT->pix_url('nav_exit', 'mod_book') . '" class="icon" alt="' . $navexit . '" /></a>';
+                $OUTPUT->pix_icon('nav_exit', $navexit, 'mod_book') . '</a>';
         } else {
             $chnavigation .= ' <a title="' . $navexit . '" class="bookexit"  href="'.$returnurl.'">' .
                 '<span class="chaptername">' . $navexit . '&nbsp;' . $OUTPUT->uarrow() . '</span></a>';
@@ -232,6 +236,10 @@ $chaptertext = file_rewrite_pluginfile_urls($chapter->content, 'pluginfile.php',
 echo format_text($chaptertext, $chapter->contentformat, array('noclean'=>true, 'overflowdiv'=>true, 'context'=>$context));
 
 echo $OUTPUT->box_end();
+
+if (core_tag_tag::is_enabled('mod_book', 'book_chapters')) {
+    echo $OUTPUT->tag_list(core_tag_tag::get_item_tags('mod_book', 'book_chapters', $chapter->id), null, 'book-tags');
+}
 
 if ($book->navstyle) {
     // Lower navigation.

@@ -168,8 +168,10 @@ $string['commentorgrade'] = 'Make comment or override grade';
 $string['comments'] = 'Comments';
 $string['completedon'] = 'Completed on';
 $string['completionpass'] = 'Require passing grade';
+$string['completionpassdesc'] = 'Student must achieve a passing grade to complete this activity';
 $string['completionpass_help'] = 'If enabled, this activity is considered complete when the student receives a passing grade, with the pass grade set in the gradebook.';
 $string['completionattemptsexhausted'] = 'Or all available attempts completed';
+$string['completionattemptsexhausteddesc'] = 'Complete if all available attempts are exhausted';
 $string['completionattemptsexhausted_help'] = 'Mark quiz complete when the student has exhausted the maximum number of attempts.';
 $string['configadaptive'] = 'If you choose Yes for this option then the student will be allowed multiple responses to a question even within the same attempt at the quiz.';
 $string['configattemptsallowed'] = 'Restriction on the number of attempts students are allowed at the quiz.';
@@ -704,7 +706,7 @@ $string['readytosend'] = 'You are about to send your whole quiz to be graded.  A
 $string['reattemptquiz'] = 'Re-attempt quiz';
 $string['recentlyaddedquestion'] = 'Recently added question!';
 $string['recurse'] = 'Include questions from subcategories too';
-$string['redoquestion'] = 'Redo question';
+$string['redoquestion'] = 'Try another question like this one';
 $string['redoesofthisquestion'] = 'Other questions attempted here: {$a}';
 $string['regrade'] = 'Regrade all attempts';
 $string['regradecomplete'] = 'All attempts have been regraded';
@@ -816,6 +818,8 @@ $string['select'] = 'Select';
 $string['selectall'] = 'Select all';
 $string['selectcategory'] = 'Select category';
 $string['selectedattempts'] = 'Selected attempts...';
+$string['selectmultipleitems'] = 'Select multiple items';
+$string['selectmultipletoolbar'] = 'Select multiple toolbar';
 $string['selectnone'] = 'Deselect all';
 $string['selectquestiontype'] = '-- Select question type --';
 $string['serveradded'] = 'Server added';
@@ -938,8 +942,3 @@ $string['wronguse'] = 'You can not use this page like that';
 $string['xhtml'] = 'XHTML';
 $string['youneedtoenrol'] = 'You need to enrol in this course before you can attempt this quiz';
 $string['yourfinalgradeis'] = 'Your final grade for this quiz is {$a}.';
-
-// Deprecated since Moodle 2.9.
-
-$string['timelimitmin'] = 'Time limit (minutes)';
-$string['timelimitsec'] = 'Time limit (seconds)';

@@ -1,5 +1,25 @@
 ﻿Version Information
 ===================
+Version 3.3.0.2
+  1. Make the 'readme' course setting only display and not store in the database, thus regenerate and not broken in the
+     course backup.
+  2. Fix not being able to tab to colour settings.
+
+Version 3.3.0.1
+  1. Apply MDL-58637.
+  2. pix_url to pix_icon.
+  3. Fix section move name not changing.
+  4. Apply MDL-57769.
+
+Version 3.2.1.0
+  1. Remove old 'format_topcoll_delete_course' function and replace with '\core\event\course_content_deleted' event.
+  2. Add Boost theme specific style sheet - not the best of solutions but only one at the moment I can think of.
+
+Version 3.2.0.1
+  1. Detect 'Boost' theme as different grid system and no way core would put in code for a contributed plugin.
+  2. Update Travis CI.
+  3. Update tests for M3.2 and 'boost' as the new default theme.  Note: Need to write 'Boost' specific tests.
+
 Version 3.1.1.3
   1. Improve and fix responsive column layouts.
   2. Cursor style in M3.1 when not editing - #25.

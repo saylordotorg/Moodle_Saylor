@@ -153,6 +153,17 @@ function tool_recyclebin_pre_course_module_delete($cm) {
 }
 
 /**
+ * Hook called to check whether async course module deletion should be performed or not.
+ *
+ * @return true if background deletion is required (is the recyclebin is enabled), false otherwise.
+ */
+function tool_recyclebin_course_module_background_deletion_recommended() {
+    if (\tool_recyclebin\course_bin::is_enabled()) {
+        return true;
+    }
+}
+
+/**
  * Hook called before we delete a course.
  *
  * @param \stdClass $course The course record.
@@ -185,4 +196,13 @@ function tool_recyclebin_pre_course_category_delete($category) {
     // It may have been enabled, then disabled later on, so may still have content.
     $categorybin = new \tool_recyclebin\category_bin($category->id);
     $categorybin->delete_all_items();
+}
+
+/**
+ * Map icons for font-awesome themes.
+ */
+function tool_recyclebin_get_fontawesome_icon_map() {
+    return [
+        'tool_recyclebin:trash' => 'fa-trash'
+    ];
 }

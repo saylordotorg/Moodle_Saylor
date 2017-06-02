@@ -31,7 +31,7 @@ defined('MOODLE_INTERNAL') || die;
 function book_get_numbering_types() {
     global $CFG; // required for the include
 
-    require_once(dirname(__FILE__).'/locallib.php');
+    require_once(__DIR__.'/locallib.php');
 
     return array (
         BOOK_NUM_NONE       => get_string('numbering0', 'mod_book'),
@@ -46,7 +46,7 @@ function book_get_numbering_types() {
  * @return array
  */
 function book_get_nav_types() {
-    require_once(dirname(__FILE__).'/locallib.php');
+    require_once(__DIR__.'/locallib.php');
 
     return array (
         BOOK_LINK_TOCONLY   => get_string('navtoc', 'mod_book'),
@@ -88,7 +88,12 @@ function book_add_instance($data, $mform) {
         $data->customtitles = 0;
     }
 
-    return $DB->insert_record('book', $data);
+    $id = $DB->insert_record('book', $data);
+
+    $completiontimeexpected = !empty($data->completionexpected) ? $data->completionexpected : null;
+    \core_completion\api::update_completion_date_event($data->coursemodule, 'book', $id, $completiontimeexpected);
+
+    return $id;
 }
 
 /**
@@ -112,6 +117,9 @@ function book_update_instance($data, $mform) {
     $book = $DB->get_record('book', array('id'=>$data->id));
     $DB->set_field('book', 'revision', $book->revision+1, array('id'=>$book->id));
 
+    $completiontimeexpected = !empty($data->completionexpected) ? $data->completionexpected : null;
+    \core_completion\api::update_completion_date_event($data->coursemodule, 'book', $book->id, $completiontimeexpected);
+
     return true;
 }
 
@@ -127,6 +135,9 @@ function book_delete_instance($id) {
     if (!$book = $DB->get_record('book', array('id'=>$id))) {
         return false;
     }
+
+    $cm = get_coursemodule_from_instance('book', $id);
+    \core_completion\api::update_completion_date_event($cm->id, 'book', $id, null);
 
     $DB->delete_records('book_chapters', array('bookid'=>$book->id));
     $DB->delete_records('book', array('id'=>$book->id));
@@ -293,15 +304,10 @@ function book_supports($feature) {
 function book_extend_settings_navigation(settings_navigation $settingsnav, navigation_node $booknode) {
     global $USER, $PAGE, $OUTPUT;
 
-    $plugins = core_component::get_plugin_list('booktool');
-    foreach ($plugins as $plugin => $dir) {
-        if (file_exists("$dir/lib.php")) {
-            require_once("$dir/lib.php");
-        }
-        $function = 'booktool_'.$plugin.'_extend_settings_navigation';
-        if (function_exists($function)) {
-            $function($settingsnav, $booknode);
-        }
+    if ($booknode->children->count() > 0) {
+        $firstkey = $booknode->children->get_key_list()[0];
+    } else {
+        $firstkey = null;
     }
 
     $params = $PAGE->url->params();
@@ -316,8 +322,20 @@ function book_extend_settings_navigation(settings_navigation $settingsnav, navig
             $edit = '1';
         }
         $url = new moodle_url('/mod/book/view.php', array('id'=>$params['id'], 'chapterid'=>$params['chapterid'], 'edit'=>$edit, 'sesskey'=>sesskey()));
-        $booknode->add($string, $url, navigation_node::TYPE_SETTING);
+        $editnode = navigation_node::create($string, $url, navigation_node::TYPE_SETTING);
+        $booknode->add_node($editnode, $firstkey);
         $PAGE->set_button($OUTPUT->single_button($url, $string));
+    }
+
+    $plugins = core_component::get_plugin_list('booktool');
+    foreach ($plugins as $plugin => $dir) {
+        if (file_exists("$dir/lib.php")) {
+            require_once("$dir/lib.php");
+        }
+        $function = 'booktool_'.$plugin.'_extend_settings_navigation';
+        if (function_exists($function)) {
+            $function($settingsnav, $booknode);
+        }
     }
 }
 
@@ -361,7 +379,7 @@ function book_get_file_info($browser, $areas, $course, $cm, $context, $filearea,
         return null;
     }
 
-    require_once(dirname(__FILE__).'/locallib.php');
+    require_once(__DIR__.'/locallib.php');
 
     if (is_null($itemid)) {
         return new book_file_info($browser, $course, $cm, $context, $areas, $filearea);
@@ -450,7 +468,7 @@ function book_pluginfile($course, $cm, $context, $filearea, $args, $forcedownloa
         $titles = "";
         // Format the chapter titles.
         if (!$book->customtitles) {
-            require_once(dirname(__FILE__).'/locallib.php');
+            require_once(__DIR__.'/locallib.php');
             $chapters = book_preload_chapters($book);
 
             if (!$chapter->subchapter) {
@@ -584,6 +602,11 @@ function book_export_contents($cm, $baseurl) {
             $file['userid']       = $fileinfo->get_userid();
             $file['author']       = $fileinfo->get_author();
             $file['license']      = $fileinfo->get_license();
+            $file['mimetype']     = $fileinfo->get_mimetype();
+            $file['isexternalfile'] = $fileinfo->is_external_file();
+            if ($file['isexternalfile']) {
+                $file['repositorytype'] = $fileinfo->get_repository_type();
+            }
             $contents[] = $file;
         }
     }
@@ -635,4 +658,89 @@ function book_view($book, $chapter, $islastchapter, $course, $cm, $context) {
             $completion->set_module_viewed($cm);
         }
     }
+}
+
+/**
+ * Check if the module has any update that affects the current user since a given time.
+ *
+ * @param  cm_info $cm course module data
+ * @param  int $from the time to check updates from
+ * @param  array $filter  if we need to check only specific updates
+ * @return stdClass an object with the different type of areas indicating if they were updated or not
+ * @since Moodle 3.2
+ */
+function book_check_updates_since(cm_info $cm, $from, $filter = array()) {
+    global $DB;
+
+    $context = $cm->context;
+    $updates = new stdClass();
+    if (!has_capability('mod/book:read', $context)) {
+        return $updates;
+    }
+    $updates = course_check_module_updates_since($cm, $from, array('content'), $filter);
+
+    $select = 'bookid = :id AND (timecreated > :since1 OR timemodified > :since2)';
+    $params = array('id' => $cm->instance, 'since1' => $from, 'since2' => $from);
+    if (!has_capability('mod/book:viewhiddenchapters', $context)) {
+        $select .= ' AND hidden = 0';
+    }
+    $updates->entries = (object) array('updated' => false);
+    $entries = $DB->get_records_select('book_chapters', $select, $params, '', 'id');
+    if (!empty($entries)) {
+        $updates->entries->updated = true;
+        $updates->entries->itemids = array_keys($entries);
+    }
+
+    return $updates;
+}
+
+/**
+ * Get icon mapping for font-awesome.
+ */
+function mod_book_get_fontawesome_icon_map() {
+    return [
+        'mod_book:chapter' => 'fa-bookmark-o',
+        'mod_book:nav_prev' => 'fa-arrow-left',
+        'mod_book:nav_prev_dis' => 'fa-angle-left',
+        'mod_book:nav_sep' => 'fa-minus',
+        'mod_book:add' => 'fa-plus',
+        'mod_book:nav_next' => 'fa-arrow-right',
+        'mod_book:nav_next_dis' => 'fa-angle-right',
+        'mod_book:nav_exit' => 'fa-arrow-up',
+    ];
+}
+
+/**
+ * This function receives a calendar event and returns the action associated with it, or null if there is none.
+ *
+ * This is used by block_myoverview in order to display the event appropriately. If null is returned then the event
+ * is not displayed on the block.
+ *
+ * @param calendar_event $event
+ * @param \core_calendar\action_factory $factory
+ * @return \core_calendar\local\event\entities\action_interface|null
+ */
+function mod_book_core_calendar_provide_event_action(calendar_event $event,
+                                                     \core_calendar\action_factory $factory) {
+    $cm = get_fast_modinfo($event->courseid)->instances['book'][$event->instance];
+    $context = context_module::instance($cm->id);
+
+    if (!has_capability('mod/book:read', $context)) {
+        return null;
+    }
+
+    $completion = new \completion_info($cm->get_course());
+
+    $completiondata = $completion->get_data($cm, false);
+
+    if ($completiondata->completionstate != COMPLETION_INCOMPLETE) {
+        return null;
+    }
+
+    return $factory->create_instance(
+        get_string('view'),
+        new \moodle_url('/mod/book/view.php', ['id' => $cm->id]),
+        1,
+        true
+    );
 }

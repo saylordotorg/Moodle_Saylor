@@ -4,7 +4,8 @@ Feature: Test creating different types of feedback questions for anonymous feedb
   As a teacher
   I need to be able to add different question types
 
-  Background:
+  @javascript
+  Scenario: Create different types of questions in anonymous feedback with javascript enabled
     Given the following "users" exist:
       | username | firstname | lastname |
       | teacher1 | Teacher   | 1        |
@@ -22,9 +23,9 @@ Feature: Test creating different types of feedback questions for anonymous feedb
       | activity   | name                | course | idnumber    |
       | feedback   | Learning experience | C1     | feedback0   |
     When I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Learning experience"
-    And I follow "Edit questions"
+    And I click on "Edit questions" "link" in the "[role=main]" "css_element"
     And I add a "Information" question to the feedback with:
       | Question         | this is an information question |
       | Label            | info                            |
@@ -66,7 +67,7 @@ Feature: Test creating different types of feedback questions for anonymous feedb
       | Maximum characters accepted | 200                    |
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Learning experience"
     And I follow "Answer the questions..."
     And I set the following fields to these values:
@@ -81,7 +82,7 @@ Feature: Test creating different types of feedback questions for anonymous feedb
     And I press "Submit your answers"
     And I log out
     And I log in as "student2"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Learning experience"
     And I follow "Answer the questions..."
     And I set the following fields to these values:
@@ -96,42 +97,40 @@ Feature: Test creating different types of feedback questions for anonymous feedb
     And I press "Submit your answers"
     And I log out
     When I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Learning experience"
-    And I follow "Analysis"
+    And I navigate to "Analysis" in current page administration
     And I should see "Submitted answers: 2"
     And I should see "Questions: 8"
     And I log out
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Learning experience"
-    And I follow "Analysis"
+    And I navigate to "Analysis" in current page administration
     And I should see "C1" in the "(info)" "table"
     And I should see "my long answer" in the "(longertext)" "table"
     And I should see "lots of feedbacks" in the "(longertext)" "table"
-    And I should see "2 (100.00 %)" in the "option d:" "table_row"
-    And I should see "1 (50.00 %)" in the "option e:" "table_row"
-    And I should see "1 (50.00 %)" in the "option f:" "table_row"
-    And I should see "0" in the "option g:" "table_row"
-    And I should not see "%" in the "option g:" "table_row"
-    And I should see "1 (50.00 %)" in the "option h:" "table_row"
-    And I should see "1 (50.00 %)" in the "option i:" "table_row"
-    And I should see "0" in the "(0) option k" "table_row"
+    And I show chart data for the "multichoice2" feedback
+    And I should see "2 (100.00 %)" in the "option d" "table_row"
+    And I should see "1 (50.00 %)" in the "option e" "table_row"
+    And I should see "1 (50.00 %)" in the "option f" "table_row"
+    And I show chart data for the "multichoice3" feedback
+    And I should see "0" in the "option g" "table_row"
+    And I should not see "%" in the "option g" "table_row"
+    And I should see "1 (50.00 %)" in the "option h" "table_row"
+    And I should see "1 (50.00 %)" in the "option i" "table_row"
+    And I show chart data for the "multichoice4" feedback
+    And I should see "0" in the "option k" "table_row"
     And I should not see "%" in the "(0) option k" "table_row"
     And I should see "1 (50.00 %)" in the "(1) option l" "table_row"
-    And I should see "1 (50.00 %)" in the "(5) option m:" "table_row"
-    And I should see "Average: 3.00" in the "(multichoice4)" "table"
+    And I should see "1 (50.00 %)" in the "(5) option m" "table_row"
+    And I should see "Average: 3.00"
     And I should see "35" in the "(numeric)" "table"
     And I should see "71" in the "(numeric)" "table"
     And I should see "Average: 53.00" in the "(numeric)" "table"
     And I should see "no way" in the "(shorttext)" "table"
     And I should see "hello" in the "(shorttext)" "table"
-
-  Scenario: Create different types of questions in anonymous feedback with javascript disabled
-    And I log out
-
-  @javascript
-  Scenario: Create different types of questions in anonymous feedback with javascript enabled
-    And I should see "1 (50.00 %)" in the "option a:" "table_row"
-    And I should see "1 (50.00 %)" in the "option b:" "table_row"
+    And I show chart data for the "multichoice1" feedback
+    And I should see "1 (50.00 %)" in the "option a" "table_row"
+    And I should see "1 (50.00 %)" in the "option b" "table_row"
     And I log out

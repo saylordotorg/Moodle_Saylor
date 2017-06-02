@@ -56,7 +56,9 @@ class core_enrol_renderer extends plugin_renderer_base {
         if (!empty($buttonhtml)) {
             $content .= $buttonhtml;
         }
+        $content .= html_writer::start_tag('div', array('class' => 'form-inline'));
         $content .= $mform->render();
+        $content .= html_writer::end_tag('div');
 
         $content .= $this->output->render($table->get_paging_bar());
 
@@ -104,7 +106,8 @@ class core_enrol_renderer extends plugin_renderer_base {
         $attributes = array('type'     => 'submit',
                             'value'    => $button->label,
                             'disabled' => $button->disabled ? 'disabled' : null,
-                            'title'    => $button->tooltip);
+                            'title'    => $button->tooltip,
+                            'class'    => 'btn btn-secondary m-y-1');
 
         if ($button->actions) {
             $id = html_writer::random_id('single_button');
@@ -184,16 +187,13 @@ class core_enrol_renderer extends plugin_renderer_base {
      * @return string
      */
     public function user_roles_and_actions($userid, $roles, $assignableroles, $canassign, $pageurl) {
-        $iconenrolremove = $this->output->pix_url('t/delete');
-
-
 
         // Get list of roles.
         $rolesoutput = '';
         foreach ($roles as $roleid=>$role) {
             if ($canassign and (is_siteadmin() or isset($assignableroles[$roleid])) and !$role['unchangeable']) {
                 $strunassign = get_string('unassignarole', 'role', $role['text']);
-                $icon = html_writer::empty_tag('img', array('alt'=>$strunassign, 'src'=>$iconenrolremove));
+                $icon = $this->output->pix_icon('t/delete', $strunassign);
                 $url = new moodle_url($pageurl, array('action'=>'unassign', 'roleid'=>$roleid, 'user'=>$userid));
                 $rolesoutput .= html_writer::tag('div', $role['text'] . html_writer::link($url, $icon, array('class'=>'unassignrolelink', 'rel'=>$roleid, 'title'=>$strunassign)), array('class'=>'role role_'.$roleid));
             } else {
@@ -232,14 +232,12 @@ class core_enrol_renderer extends plugin_renderer_base {
      * @return string
      */
     public function user_groups_and_actions($userid, $groups, $allgroups, $canmanagegroups, $pageurl) {
-        $iconenrolremove = $this->output->pix_url('t/delete');
-
         $groupicon = $this->output->pix_icon('i/group', get_string('addgroup', 'group'));
 
         $groupoutput = '';
         foreach($groups as $groupid=>$name) {
             if ($canmanagegroups and groups_remove_member_allowed($groupid, $userid)) {
-                $icon = html_writer::empty_tag('img', array('alt'=>get_string('removefromgroup', 'group', $name), 'src'=>$iconenrolremove));
+                $icon = $this->output->pix_icon('t/delete', get_string('removefromgroup', 'group', $name));
                 $url = new moodle_url($pageurl, array('action'=>'removemember', 'group'=>$groupid, 'user'=>$userid));
                 $groupoutput .= html_writer::tag('div', $name . html_writer::link($url, $icon), array('class'=>'group', 'rel'=>$groupid));
             } else {
@@ -638,11 +636,9 @@ class course_enrolment_table extends html_table implements renderable {
             $direction = $this->sortdirection;
         }
         if ($direction === 'ASC') {
-            return html_writer::empty_tag('img', array('alt' => '', 'class' => 'iconsort',
-                'src' => $output->pix_url('t/sort_asc')));
+            return $output->pix_icon('t/sort_asc', get_string('sort'));
         } else {
-            return html_writer::empty_tag('img', array('alt' => '', 'class' => 'iconsort',
-                'src' => $output->pix_url('t/sort_desc')));
+            return $output->pix_icon('t/sort_desc', get_string('sort'));
         }
     }
 

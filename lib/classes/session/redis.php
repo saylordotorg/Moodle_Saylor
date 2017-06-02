@@ -44,12 +44,16 @@ class redis extends handler {
     protected $host = '';
     /** @var int $port The port to connect to */
     protected $port = 6379;
+    /** @var string $auth redis password  */
+    protected $auth = '';
     /** @var int $database the Redis database to store sesions in */
     protected $database = 0;
     /** @var array $servers list of servers parsed from save_path */
     protected $prefix = '';
     /** @var int $acquiretimeout how long to wait for session lock in seconds */
     protected $acquiretimeout = 120;
+    /** @var int $serializer The serializer to use */
+    protected $serializer = \Redis::SERIALIZER_PHP;
     /**
      * @var int $lockexpire how long to wait in seconds before expiring the lock automatically
      * so that other requests may continue execution, ignored if PECL redis is below version 2.2.0.
@@ -79,6 +83,10 @@ class redis extends handler {
             $this->port = (int)$CFG->session_redis_port;
         }
 
+        if (isset($CFG->session_redis_auth)) {
+            $this->auth = $CFG->session_redis_auth;
+        }
+
         if (isset($CFG->session_redis_database)) {
             $this->database = (int)$CFG->session_redis_database;
         }
@@ -89,6 +97,10 @@ class redis extends handler {
 
         if (isset($CFG->session_redis_acquire_lock_timeout)) {
             $this->acquiretimeout = (int)$CFG->session_redis_acquire_lock_timeout;
+        }
+
+        if (!empty($CFG->session_redis_serializer_use_igbinary) && defined('\Redis::SERIALIZER_IGBINARY')) {
+            $this->serializer = \Redis::SERIALIZER_IGBINARY; // Set igbinary serializer if phpredis supports it.
         }
 
         // The following configures the session lifetime in redis to allow some
@@ -150,7 +162,14 @@ class redis extends handler {
             if (!$this->connection->connect($this->host, $this->port, 1)) {
                 throw new RedisException('Unable to connect to host.');
             }
-            if (!$this->connection->setOption(\Redis::OPT_SERIALIZER, \Redis::SERIALIZER_PHP)) {
+
+            if ($this->auth !== '') {
+                if (!$this->connection->auth($this->auth)) {
+                    throw new RedisException('Unable to authenticate.');
+                }
+            }
+
+            if (!$this->connection->setOption(\Redis::OPT_SERIALIZER, $this->serializer)) {
                 throw new RedisException('Unable to set Redis PHP Serializer option.');
             }
 

@@ -76,8 +76,7 @@ class data_field_picture extends data_field_base {
 
         if ($this->field->required) {
             $str .= '&nbsp;' . get_string('requiredelement', 'form') . '</span></legend>';
-            $image = html_writer::img($OUTPUT->pix_url('req'), get_string('requiredelement', 'form'),
-                                      array('class' => 'req', 'title' => get_string('requiredelement', 'form')));
+            $image = $OUTPUT->pix_icon('req', get_string('requiredelement', 'form'));
             $str .= html_writer::div($image, 'inline-req');
         } else {
             $str .= '</span></legend>';
@@ -109,9 +108,11 @@ class data_field_picture extends data_field_base {
         $str .= $output->render($fm);
 
         $str .= '<div class="mdl-left">';
-        $str .= '<input type="hidden" name="field_'.$this->field->id.'_file" value="'.s($itemid).'" />';
-        $str .= '<label for="field_'.$this->field->id.'_alttext">'.get_string('alttext','data') .'</label>&nbsp;<input type="text" name="field_'
-                .$this->field->id.'_alttext" id="field_'.$this->field->id.'_alttext" value="'.s($alttext).'" />';
+        $str .= '<input type="hidden" name="field_' . $this->field->id . '_file" value="' . s($itemid) . '" />';
+        $str .= '<label for="field_' . $this->field->id . '_alttext">' .
+                get_string('alttext', 'data') .
+                '</label>&nbsp;<input type="text" class="form-control" name="field_' .
+                $this->field->id . '_alttext" id="field_' . $this->field->id . '_alttext" value="' . s($alttext) . '" />';
         $str .= '</div>';
         $str .= '</div>';
 
@@ -139,12 +140,17 @@ class data_field_picture extends data_field_base {
     }
 
     function display_search_field($value = '') {
-        return '<label class="accesshide" for="f_'.$this->field->id.'">' . get_string('fieldname', 'data') . '</label>' .
-               '<input type="text" size="16" id="f_'.$this->field->id.'" name="f_'.$this->field->id.'" value="'.s($value).'" />';
+        return '<label class="accesshide" for="f_' . $this->field->id . '">' . get_string('fieldname', 'data') . '</label>' .
+               '<input type="text" size="16" id="f_' . $this->field->id . '" name="f_' . $this->field->id . '" ' .
+               'value="' . s($value) . '" class="form-control"/>';
     }
 
-    function parse_search_field() {
-        return optional_param('f_'.$this->field->id, '', PARAM_NOTAGS);
+    public function parse_search_field($defaults = null) {
+        $param = 'f_'.$this->field->id;
+        if (empty($defaults[$param])) {
+            $defaults = array($param => '');
+        }
+        return optional_param($param, $defaults[$param], PARAM_NOTAGS);
     }
 
     function generate_sql($tablealias, $value) {
@@ -321,5 +327,20 @@ class data_field_picture extends data_field_base {
             return count($files) >= 2;
         }
         return false;
+    }
+
+    /**
+     * Return the plugin configs for external functions.
+     *
+     * @return array the list of config parameters
+     * @since Moodle 3.3
+     */
+    public function get_config_for_external() {
+        // Return all the config parameters.
+        $configs = [];
+        for ($i = 1; $i <= 10; $i++) {
+            $configs["param$i"] = $this->field->{"param$i"};
+        }
+        return $configs;
     }
 }

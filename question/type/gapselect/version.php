@@ -24,8 +24,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2016052300;
-$plugin->requires  = 2016051900;
+$plugin->version   = 2017051500;
+$plugin->requires  = 2017050500;
 
 $plugin->component = 'qtype_gapselect';
 $plugin->maturity  = MATURITY_STABLE;

@@ -53,12 +53,14 @@ if ($CFG->forcelogin) {
     user_accesstime_log();
 }
 
-$hassiteconfig = has_capability('moodle/site:config', context_system::instance());
+$hasmaintenanceaccess = has_capability('moodle/site:maintenanceaccess', context_system::instance());
 
 // If the site is currently under maintenance, then print a message.
-if (!empty($CFG->maintenance_enabled) and !$hassiteconfig) {
+if (!empty($CFG->maintenance_enabled) and !$hasmaintenanceaccess) {
     print_maintenance_message();
 }
+
+$hassiteconfig = has_capability('moodle/site:config', context_system::instance());
 
 if ($hassiteconfig && moodle_needs_upgrading()) {
     redirect($CFG->wwwroot .'/'. $CFG->admin .'/index.php');
@@ -167,9 +169,9 @@ if (!empty($CFG->customfrontpageinclude)) {
 
         if ($editing && has_capability('moodle/course:update', $context)) {
             $streditsummary = get_string('editsummary');
-            echo "<a title=\"$streditsummary\" ".
-                 " href=\"course/editsection.php?id=$section->id\"><img src=\"" . $OUTPUT->pix_url('t/edit') . "\" ".
-                 " class=\"iconsmall\" alt=\"$streditsummary\" /></a><br /><br />";
+            echo "<a title=\"$streditsummary\" " .
+                 " href=\"course/editsection.php?id=$section->id\">" . $OUTPUT->pix_icon('t/edit', $streditsummary) .
+                 "</a><br /><br />";
         }
 
         $courserenderer = $PAGE->get_renderer('core', 'course');

@@ -30,7 +30,7 @@
     * autostart
     * canpost
     * cid
-    * collapsediconurl
+    * collapsediconkey
     * commentarea
     * component
     * contextid
@@ -45,6 +45,7 @@
     * template
     * uniqid
 
+    // This template has no example context because it would trigger real updates to the DB.
     Example context (json):
     {
     }
@@ -54,7 +55,7 @@
 <div class="mdl-left">
     {{^notoggle}}
         <a href="#" class="comment-link" id="comment-link-{{cid}}">
-            <img src="{{{collapsediconurl}}}" id="comment-img-{{cid}}" alt="{{linktext}}" title="{{linktext}}"><span id="comment-link-text-{{cid}}">{{linktext}}
+            {{#pix}}{{collapsediconkey}}, core, {{linktext}}{{/pix}}<span id="comment-link-text-{{cid}}">{{linktext}}
                 {{#displaytotalcount}}
                     ({{count}})
                 {{/displaytotalcount}}</span>

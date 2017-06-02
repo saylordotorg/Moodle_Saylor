@@ -86,6 +86,32 @@ class core_weblib_testcase extends advanced_testcase {
         $this->assertSame('An entity: &#1073;.', s('An entity: &#1073;.'));
         $this->assertSame('An entity: &amp;amp;.', s('An entity: &amp;.'));
         $this->assertSame('Not an entity: &amp;amp;#x09ff;.', s('Not an entity: &amp;#x09ff;.'));
+
+        // Test all ASCII characters (0-127).
+        for ($i = 0; $i <= 127; $i++) {
+            $character = chr($i);
+            $result = s($character);
+            switch ($character) {
+                case '"' :
+                    $this->assertSame('&quot;', $result);
+                    break;
+                case '&' :
+                    $this->assertSame('&amp;', $result);
+                    break;
+                case "'" :
+                    $this->assertSame('&#039;', $result);
+                    break;
+                case '<' :
+                    $this->assertSame('&lt;', $result);
+                    break;
+                case '>' :
+                    $this->assertSame('&gt;', $result);
+                    break;
+                default:
+                    $this->assertSame($character, $result);
+                    break;
+            }
+        }
     }
 
     public function test_format_text_email() {
@@ -258,10 +284,11 @@ class core_weblib_testcase extends advanced_testcase {
 
     /**
      * Test set bad scheme on Moodle URL objects.
+     *
+     * @expectedException coding_exception
      */
     public function test_moodle_url_set_bad_scheme() {
         $url = new moodle_url('http://moodle.org/foo/bar');
-        $this->setExpectedException('coding_exception');
         $url->set_scheme('not a valid $ scheme');
     }
 
@@ -643,15 +670,15 @@ EXPECTED;
      */
     public function test_validate_email() {
 
-        $this->assertEquals(1, validate_email('moodle@example.com'));
-        $this->assertEquals(1, validate_email('moodle@localhost.local'));
-        $this->assertEquals(1, validate_email('verp_email+is=mighty@moodle.org'));
-        $this->assertEquals(1, validate_email("but_potentially'dangerous'too@example.org"));
-        $this->assertEquals(1, validate_email('posts+AAAAAAAAAAIAAAAAAAAGQQAAAAABFSXz1eM/P/lR2bYyljM+@posts.moodle.org'));
+        $this->assertTrue(validate_email('moodle@example.com'));
+        $this->assertTrue(validate_email('moodle@localhost.local'));
+        $this->assertTrue(validate_email('verp_email+is=mighty@moodle.org'));
+        $this->assertTrue(validate_email("but_potentially'dangerous'too@example.org"));
+        $this->assertTrue(validate_email('posts+AAAAAAAAAAIAAAAAAAAGQQAAAAABFSXz1eM/P/lR2bYyljM+@posts.moodle.org'));
 
-        $this->assertEquals(0, validate_email('moodle@localhost'));
-        $this->assertEquals(0, validate_email('"attacker\\" -oQ/tmp/ -X/var/www/vhost/moodle/backdoor.php  some"@email.com'));
-        $this->assertEquals(0, validate_email("moodle@example.com>\r\nRCPT TO:<victim@example.com"));
+        $this->assertFalse(validate_email('moodle@localhost'));
+        $this->assertFalse(validate_email('"attacker\\" -oQ/tmp/ -X/var/www/vhost/moodle/backdoor.php  some"@email.com'));
+        $this->assertFalse(validate_email("moodle@example.com>\r\nRCPT TO:<victim@example.com"));
     }
 
     /**

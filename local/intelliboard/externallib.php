@@ -171,7 +171,11 @@ class local_intelliboard_external extends external_api {
 	}
 	private function get_filter_enrolled_users_sql($params, $column)
 	{
-		return ($params->filter_enrolled_users) ? " AND {$column} IN (SELECT DISTINCT userid FROM {user_enrolments})" : "";
+		$sql = $this->get_filter_course_sql($params, 'c.');
+		$sql .= $this->get_filter_enrol_sql($params, 'e.');
+		$sql .= $this->get_filter_enrol_sql($params, 'ue.');
+
+		return ($params->filter_enrolled_users) ? " AND {$column} IN (SELECT DISTINCT userid FROM {user_enrolments} ue, {enrol} e, {course} c WHERE ue.enrolid = e.id AND c.id = e.courseid $sql)" : "";
 	}
 	private function get_filter_module_sql($params, $prefix)
 	{
@@ -599,10 +603,9 @@ class local_intelliboard_external extends external_api {
 		$sql_order = $this->get_order_sql($params, $columns);
 		$sql_columns = $this->get_columns($params, "u.id");
 
-
 		$sql_join = "";
 		if($params->cohortid){
-			$sql_join = "LEFT JOIN {cohort_members} ch ON ch.userid = u.id";
+			$sql_join = " LEFT JOIN {cohort_members} ch ON ch.userid = u.id";
 			$sql_filter .= $this->get_filter_in_sql($params->cohortid, "ch.cohortid");
 		}
 
@@ -610,7 +613,7 @@ class local_intelliboard_external extends external_api {
 			$sql_columns .= ", '0' as timespend, '0' as visits";
 		}else{
 			$sql_columns .= ", MAX(lit.timespend) AS timespend, MAX(lit.visits) AS visits";
-			$sql_join .= "LEFT JOIN (SELECT userid, courseid, SUM(timespend) as timespend, SUM(visits) as visits
+			$sql_join .= " LEFT JOIN (SELECT userid, courseid, SUM(timespend) as timespend, SUM(visits) as visits
 						FROM {local_intelliboard_tracking} GROUP BY courseid, userid) lit ON lit.courseid = c.id AND lit.userid = u.id";
 		}
 
@@ -1051,12 +1054,6 @@ class local_intelliboard_external extends external_api {
 
 	public function report17($params)
     {
-        global $DB;
-
-        $date = new DateTime('2000-01-01', new DateTimeZone(core_date::get_server_timezone()));
-        $date_params = array('timezone'=>$date->format('P'));
-        $DB->execute('SET @@session.time_zone = :timezone', $date_params);
-
         $columns = array_merge(array("c.fullname", "f.name", "avg_month", "avg_week", "avg_day", "popular_hour.hour", "popular_week.week", "popular_day.day"), $this->get_filter_columns($params));
 
 
@@ -2321,7 +2318,8 @@ class local_intelliboard_external extends external_api {
 				LEFT JOIN {user} u ON u.id = ue.userid
 				LEFT JOIN {assign_submission} s ON s.assignment = a.id AND s.userid = u.id
 				LEFT JOIN {course} c ON c.id = a.course
-				LEFT JOIN {course_modules} cm ON cm.instance = a.id
+				LEFT JOIN {modules} m ON m.name = 'assign'
+				LEFT JOIN {course_modules} cm ON cm.instance = a.id AND cm.module = m.id
 			WHERE (s.timemodified > a.duedate or s.timemodified IS NULL) $sql_filter $sql_having $sql_order", $params);
     }
 
@@ -4367,6 +4365,7 @@ class local_intelliboard_external extends external_api {
         $sql_order = $this->get_order_sql($params, $columns);
         $sql_filter = $this->get_filter_in_sql($params->custom,'ctx.instanceid');
         $sql_columns = $this->get_columns($params, "u.id");
+        $sql = $this->get_filter_in_sql($params->learner_roles, "ra.roleid");
 
         $data = $this->get_report_data("
             SELECT
@@ -4377,7 +4376,7 @@ class local_intelliboard_external extends external_api {
               $sql_columns
 
             FROM {context} ctx
-              LEFT JOIN {role_assignments} ra ON ctx.id = ra.contextid AND ra.roleid=5
+              LEFT JOIN {role_assignments} ra ON ctx.id = ra.contextid $sql
               LEFT JOIN {user} u ON u.id=ra.userid
             WHERE ctx.contextlevel = 50 AND u.id IS NOT NULL $sql_filter $sql_having $sql_order", $params,false);
 

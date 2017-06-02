@@ -19,47 +19,45 @@ Feature: Teachers can embed images into instructions and conclusion fields
     And I follow "Manage private files"
     And I upload "mod/workshop/tests/fixtures/moodlelogo.png" file to "Files" filemanager
     And I click on "Save changes" "button"
-    And I am on homepage
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     # Create and edit the workshop.
     When I add a "Workshop" to section "1" and I fill the form with:
       | Workshop name | Workshop with embedded images  |
     And I follow "Workshop with embedded images"
     # Embed the image into Instructions for submission.
-    And I navigate to "Edit settings" node in "Workshop administration"
+    And I navigate to "Edit settings" in current page administration
     And I expand all fieldsets
     And I set the field "Instructions for submission" to "<p>Image test</p>"
     And I select the text in the "Instructions for submission" Atto editor
-    And I click on "Image" "button" in the "#fitem_id_instructauthorseditor" "css_element"
+    And I click on "Image" "button" in the "//*[@data-fieldtype='editor']/*[descendant::*[@id='id_instructauthorseditor']]" "xpath_element"
     And I click on "Browse repositories..." "button"
-    And I click on "Private files" "link"
+    And I click on "Private files" "link" in the ".fp-repo-area" "css_element"
     And I click on "moodlelogo.png" "link"
     And I click on "Select this file" "button"
     And I set the field "Describe this image for someone who cannot see it" to "How to submit"
     And I click on "Save image" "button"
     And I press "Save and display"
     # Embed the image into Instructions for assessment.
-    And I navigate to "Edit settings" node in "Workshop administration"
+    And I navigate to "Edit settings" in current page administration
     And I expand all fieldsets
     And I set the field "Instructions for assessment" to "<p>Image test</p>"
     And I select the text in the "Instructions for assessment" Atto editor
-    And I click on "Image" "button" in the "#fitem_id_instructreviewerseditor" "css_element"
+    And I click on "Image" "button" in the "//*[@data-fieldtype='editor']/*[descendant::*[@id='id_instructreviewerseditor']]" "xpath_element"
     And I click on "Browse repositories..." "button"
-    And I click on "Private files" "link"
+    And I click on "Private files" "link" in the ".fp-repo-area" "css_element"
     And I click on "moodlelogo.png" "link"
     And I click on "Select this file" "button"
     And I set the field "Describe this image for someone who cannot see it" to "How to assess"
     And I click on "Save image" "button"
     And I press "Save and display"
     # Embed the image into Conclusion.
-    And I navigate to "Edit settings" node in "Workshop administration"
+    And I navigate to "Edit settings" in current page administration
     And I expand all fieldsets
     And I set the field "Conclusion" to "<p>Image test</p>"
     And I select the text in the "Conclusion" Atto editor
-    And I click on "Image" "button" in the "#fitem_id_conclusioneditor" "css_element"
+    And I click on "Image" "button" in the "//*[@data-fieldtype='editor']/*[descendant::*[@id='id_conclusioneditor']]" "xpath_element"
     And I click on "Browse repositories..." "button"
-    And I click on "Private files" "link"
+    And I click on "Private files" "link" in the ".fp-repo-area" "css_element"
     And I click on "moodlelogo.png" "link"
     And I click on "Select this file" "button"
     And I set the field "Describe this image for someone who cannot see it" to "Well done"

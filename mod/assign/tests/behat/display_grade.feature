@@ -21,14 +21,13 @@ Feature: Check that the assignment grade can be updated correctly
       | name | course | idnumber |
       | Group 1 | C1 | G1 |
     And I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Assignment" to section "1" and I fill the form with:
       | Assignment name | Test assignment name |
       | Description | Test assignment description |
       | Use marking workflow | Yes |
     When I follow "Test assignment name"
-    Then I follow "View all submissions"
+    Then I navigate to "View all submissions" in current page administration
     And I click on "Grade" "link" in the "Student 1" "table_row"
     And I set the field "Grade out of 100" to "50"
     And I set the field "Notify students" to "0"
@@ -36,7 +35,7 @@ Feature: Check that the assignment grade can be updated correctly
     And I press "Ok"
     And I click on "Edit settings" "link"
     And I follow "Test assignment name"
-    And I follow "View all submissions"
+    And I navigate to "View all submissions" in current page administration
     And "Student 1" row "Grade" column of "generaltable" table should contain "50.00"
 
   @javascript
@@ -56,8 +55,7 @@ Feature: Check that the assignment grade can be updated correctly
       | name | course | idnumber |
       | Group 1 | C1 | G1 |
     And I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Assignment" to section "1" and I fill the form with:
       | Assignment name | Test assignment name |
       | Description | Test assignment description |
@@ -65,7 +63,7 @@ Feature: Check that the assignment grade can be updated correctly
       | Students submit in groups | Yes |
       | Group mode | No groups |
     When I follow "Test assignment name"
-    Then I follow "View all submissions"
+    Then I navigate to "View all submissions" in current page administration
     And I click on "Grade" "link" in the "Student 1" "table_row"
     And I set the field "Grade out of 100" to "50"
     And I set the field "Notify students" to "0"
@@ -73,5 +71,5 @@ Feature: Check that the assignment grade can be updated correctly
     And I press "Ok"
     And I click on "Edit settings" "link"
     And I follow "Test assignment name"
-    And I follow "View all submissions"
+    And I navigate to "View all submissions" in current page administration
     And "Student 1" row "Grade" column of "generaltable" table should contain "50.00"

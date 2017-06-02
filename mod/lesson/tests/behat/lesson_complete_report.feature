@@ -16,8 +16,7 @@ Feature: Teachers can review student progress on all lessons in a course by view
       | teacher1 | C1 | editingteacher |
       | student1 | C1 | student |
     And I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Lesson" to section "1"
     And I set the following fields to these values:
       | Name | Test lesson name |
@@ -47,8 +46,8 @@ Feature: Teachers can review student progress on all lessons in a course by view
       | id_response_editor_1 | Wrong |
       | id_jumpto_1 | This page |
     And I press "Save page"
-    When I follow "Course 1"
-    And I follow "Participants"
+    When I am on "Course 1" course homepage
+    And I navigate to course participants
     And I follow "Student 1"
     And I follow "Complete report"
     Then I should see "No attempts have been made on this lesson"
@@ -85,14 +84,14 @@ Feature: Teachers can review student progress on all lessons in a course by view
     And I press "Save page"
     And I log out
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test lesson name"
     And I should see "First page contents"
     And I press "Next page"
     And I log out
     Then I log in as "teacher1"
-    And I follow "Course 1"
-    And I follow "Participants"
+    And I am on "Course 1" course homepage
+    And I navigate to course participants
     And I follow "Student 1"
     And I follow "Complete report"
     And I should see "Lesson has been started, but not yet completed"
@@ -144,7 +143,7 @@ Feature: Teachers can review student progress on all lessons in a course by view
     And I press "Save page"
     And I log out
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test lesson name"
     And I should see "First page contents"
     And I press "Next page"
@@ -163,8 +162,8 @@ Feature: Teachers can review student progress on all lessons in a course by view
     And I should see "Congratulations - end of lesson reached"
     And I log out
     Then I log in as "teacher1"
-    And I follow "Course 1"
-    And I follow "Participants"
+    And I am on "Course 1" course homepage
+    And I navigate to course participants
     And I follow "Student 1"
     And I follow "Complete report"
     And I should see "Grade: 50.00 / 100.00"
@@ -191,7 +190,7 @@ Feature: Teachers can review student progress on all lessons in a course by view
     And I press "Save page"
     And I log out
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test lesson name"
     And I should see "First page contents"
     And I press "Next page"
@@ -199,8 +198,8 @@ Feature: Teachers can review student progress on all lessons in a course by view
     And I press "End of lesson"
     And I log out
     Then I log in as "teacher1"
-    And I follow "Course 1"
-    And I follow "Participants"
+    And I am on "Course 1" course homepage
+    And I navigate to course participants
     And I follow "Student 1"
     And I follow "Complete report"
     And I should see "Completed"

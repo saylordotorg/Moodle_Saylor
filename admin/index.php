@@ -30,10 +30,10 @@ if (!file_exists('../config.php')) {
 }
 
 // Check that PHP is of a sufficient version as soon as possible
-if (version_compare(phpversion(), '5.4.4') < 0) {
+if (version_compare(phpversion(), '5.6.5') < 0) {
     $phpversion = phpversion();
     // do NOT localise - lang strings would not work here and we CAN NOT move it to later place
-    echo "Moodle 2.7 or later requires at least PHP 5.4.4 (currently using version $phpversion).<br />";
+    echo "Moodle 3.2 or later requires at least PHP 5.6.5 (currently using version $phpversion).<br />";
     echo "Please upgrade your server software or install older Moodle version.";
     die();
 }
@@ -100,6 +100,12 @@ if (function_exists('opcache_invalidate')) {
 // Make sure the component cache gets rebuilt if necessary, any method that
 // indirectly calls the protected init() method is good here.
 core_component::get_core_subsystems();
+
+if (is_major_upgrade_required() && isloggedin()) {
+    // A major upgrade is required.
+    // Terminate the session and redirect back here before anything DB-related happens.
+    redirect_if_major_upgrade_required();
+}
 
 require_once($CFG->libdir.'/adminlib.php');    // various admin-only functions
 require_once($CFG->libdir.'/upgradelib.php');  // general upgrade/install related functions
@@ -315,6 +321,11 @@ if (!$cache and $version > $CFG->version) {  // upgrade
         $testsite = 'behat';
     }
 
+    if (isset($CFG->themerev)) {
+        // Store the themerev to restore after purging caches.
+        $themerev = $CFG->themerev;
+    }
+
     // We purge all of MUC's caches here.
     // Caches are disabled for upgrade by CACHE_DISABLE_ALL so we must set the first arg to true.
     // This ensures a real config object is loaded and the stores will be purged.
@@ -323,6 +334,11 @@ if (!$cache and $version > $CFG->version) {  // upgrade
     cache_helper::purge_all(true);
     // We then purge the regular caches.
     purge_all_caches();
+
+    if (isset($themerev)) {
+        // Restore the themerev
+        set_config('themerev', $themerev);
+    }
 
     $output = $PAGE->get_renderer('core', 'admin');
 
@@ -851,6 +867,7 @@ $registered = $DB->count_records('registration_hubs', array('huburl' => HUB_MOOD
 $cachewarnings = cache_helper::warnings();
 // Check if there are events 1 API handlers.
 $eventshandlers = $DB->get_records_sql('SELECT DISTINCT component FROM {events_handlers}');
+$themedesignermode = !empty($CFG->themedesignermode);
 
 admin_externalpage_setup('adminnotifications');
 
@@ -858,4 +875,4 @@ $output = $PAGE->get_renderer('core', 'admin');
 
 echo $output->admin_notifications_page($maturity, $insecuredataroot, $errorsdisplayed, $cronoverdue, $dbproblems,
                                        $maintenancemode, $availableupdates, $availableupdatesfetch, $buggyiconvnomb,
-                                       $registered, $cachewarnings, $eventshandlers);
+                                       $registered, $cachewarnings, $eventshandlers, $themedesignermode);

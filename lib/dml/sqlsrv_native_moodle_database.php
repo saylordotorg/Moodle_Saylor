@@ -69,11 +69,7 @@ class sqlsrv_native_moodle_database extends moodle_database {
         // the name used by 'extension_loaded()' is case specific! The extension
         // therefore *could be* mixed case and hence not found.
         if (!function_exists('sqlsrv_num_rows')) {
-            if (stripos(PHP_OS, 'win') === 0) {
-                return get_string('nativesqlsrvnodriver', 'install');
-            } else {
-                return get_string('nativesqlsrvnonwindows', 'install');
-            }
+            return get_string('nativesqlsrvnodriver', 'install');
         }
         return true;
     }
@@ -1292,6 +1288,24 @@ class sqlsrv_native_moodle_database extends moodle_database {
         }
 
         return $this->collation;
+    }
+
+    public function sql_equal($fieldname, $param, $casesensitive = true, $accentsensitive = true, $notequal = false) {
+        $equalop = $notequal ? '<>' : '=';
+        $collation = $this->get_collation();
+
+        if ($casesensitive) {
+            $collation = str_replace('_CI', '_CS', $collation);
+        } else {
+            $collation = str_replace('_CS', '_CI', $collation);
+        }
+        if ($accentsensitive) {
+            $collation = str_replace('_AI', '_AS', $collation);
+        } else {
+            $collation = str_replace('_AS', '_AI', $collation);
+        }
+
+        return "$fieldname COLLATE $collation $equalop $param";
     }
 
     /**

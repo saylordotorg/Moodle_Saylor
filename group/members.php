@@ -22,8 +22,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @package   core_group
  */
-require_once(dirname(__FILE__) . '/../config.php');
-require_once(dirname(__FILE__) . '/lib.php');
+require_once(__DIR__ . '/../config.php');
+require_once(__DIR__ . '/lib.php');
 require_once($CFG->dirroot . '/user/selector/lib.php');
 require_once($CFG->dirroot . '/course/lib.php');
 require_once($CFG->libdir . '/filelib.php');
@@ -152,8 +152,12 @@ if (!empty($groupinforow)) {
           </td>
       <td id='buttonscell'>
         <p class="arrow_button">
-            <input name="add" id="add" type="submit" value="<?php echo $OUTPUT->larrow().'&nbsp;'.get_string('add'); ?>" title="<?php print_string('add'); ?>" /><br />
-            <input name="remove" id="remove" type="submit" value="<?php echo get_string('remove').'&nbsp;'.$OUTPUT->rarrow(); ?>" title="<?php print_string('remove'); ?>" />
+            <input class="btn btn-secondary" name="add" id="add"
+                   type="submit" value="<?php echo $OUTPUT->larrow().'&nbsp;'.get_string('add'); ?>"
+                   title="<?php print_string('add'); ?>" /><br />
+            <input class="btn btn-secondary" name="remove" id="remove"
+                   type="submit" value="<?php echo get_string('remove').'&nbsp;'.$OUTPUT->rarrow(); ?>"
+                   title="<?php print_string('remove'); ?>" />
         </p>
       </td>
       <td id='potentialcell'>
@@ -168,7 +172,8 @@ if (!empty($groupinforow)) {
       </td>
     </tr>
     <tr><td colspan="3" id='backcell'>
-        <input type="submit" name="cancel" value="<?php print_string('backtogroups', 'group'); ?>" />
+        <input class="btn btn-secondary" type="submit" name="cancel"
+               value="<?php print_string('backtogroups', 'group'); ?>" />
     </td></tr>
     </table>
     </div>

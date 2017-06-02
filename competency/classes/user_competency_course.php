@@ -74,7 +74,7 @@ class user_competency_course extends persistent {
      * @return competency Competency Object
      */
     public function get_competency() {
-        return new competency($this->get_competencyid());
+        return new competency($this->get('competencyid'));
     }
 
     /**
@@ -83,7 +83,7 @@ class user_competency_course extends persistent {
      * @return context The context.
      */
     public function get_context() {
-        return context_user::instance($this->get_userid());
+        return context_user::instance($this->get('userid'));
     }
 
     /**
@@ -218,7 +218,7 @@ class user_competency_course extends persistent {
             } else {
                 $ids = array();
                 foreach ($competenciesorids as $comp) {
-                    $ids[] = $comp->get_id();
+                    $ids[] = $comp->get('id');
                 }
             }
 
@@ -243,6 +243,8 @@ class user_competency_course extends persistent {
 
         $sql = 'SELECT COUNT(comp.id)
                   FROM {' . self::TABLE . '} usercoursecomp
+                  JOIN {' . course_competency::TABLE . '} cc
+                    ON usercoursecomp.competencyid = cc.competencyid AND cc.courseid = usercoursecomp.courseid
                   JOIN {' . competency::TABLE . '} comp
                     ON usercoursecomp.competencyid = comp.id
                  WHERE usercoursecomp.courseid = ? AND usercoursecomp.userid = ? AND usercoursecomp.proficiency = ?';

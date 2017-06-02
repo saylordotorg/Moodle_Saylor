@@ -211,6 +211,9 @@ abstract class moodleform {
         $this->_form->setDefault('_qf__'.$this->_formname, 1);
         $this->_form->_setDefaultRuleMessages();
 
+        // Hook to inject logic after the definition was provided.
+        $this->after_definition();
+
         // we have to know all input types before processing submission ;-)
         $this->_process_submission($method);
     }
@@ -969,6 +972,23 @@ abstract class moodleform {
     protected abstract function definition();
 
     /**
+     * After definition hook.
+     *
+     * This is useful for intermediate classes to inject logic after the definition was
+     * provided without requiring developers to call the parent {{@link self::definition()}}
+     * as it's not obvious by design. The 'intermediate' class is 'MyClass extends
+     * IntermediateClass extends moodleform'.
+     *
+     * Classes overriding this method should always call the parent. We may not add
+     * anything specifically in this instance of the method, but intermediate classes
+     * are likely to do so, and so it is a good practice to always call the parent.
+     *
+     * @return void
+     */
+    protected function after_definition() {
+    }
+
+    /**
      * Dummy stub method - override if you need to setup the form depending on current
      * values. This method is called after definition(), data submission and set_data().
      * All form setup that is dependent on form values should go in here.
@@ -1240,31 +1260,15 @@ abstract class moodleform {
      *                      $enhancement = 'smartselect';
      *                      $options = array('selectablecategories' => true|false)
      *
-     * @since Moodle 2.0
      * @param string|element $element form element for which Javascript needs to be initalized
      * @param string $enhancement which init function should be called
      * @param array $options options passed to javascript
      * @param array $strings strings for javascript
+     * @deprecated since Moodle 3.3 MDL-57471
      */
     function init_javascript_enhancement($element, $enhancement, array $options=array(), array $strings=null) {
-        global $PAGE;
-        if (is_string($element)) {
-            $element = $this->_form->getElement($element);
-        }
-        if (is_object($element)) {
-            $element->_generateId();
-            $elementid = $element->getAttribute('id');
-            $PAGE->requires->js_init_call('M.form.init_'.$enhancement, array($elementid, $options));
-            if (is_array($strings)) {
-                foreach ($strings as $string) {
-                    if (is_array($string)) {
-                        call_user_func_array(array($PAGE->requires, 'string_for_js'), $string);
-                    } else {
-                        $PAGE->requires->string_for_js($string, 'moodle');
-                    }
-                }
-            }
-        }
+        debugging('$mform->init_javascript_enhancement() is deprecated and no longer does anything. '.
+            'smartselect uses should be converted to the searchableselector form element.', DEBUG_DEVELOPER);
     }
 
     /**
@@ -1482,9 +1486,9 @@ class MoodleQuickForm extends HTML_QuickForm_DHTMLRulesTableless {
         }else {
             $this->updateAttributes(array('class'=>'mform'));
         }
-        $this->_reqHTML = '<img class="req" title="'.get_string('requiredelement', 'form').'" alt="'.get_string('requiredelement', 'form').'" src="'.$OUTPUT->pix_url('req') .'" />';
-        $this->_advancedHTML = '<img class="adv" title="'.get_string('advancedelement', 'form').'" alt="'.get_string('advancedelement', 'form').'" src="'.$OUTPUT->pix_url('adv') .'" />';
-        $this->setRequiredNote(get_string('somefieldsrequired', 'form', '<img alt="'.get_string('requiredelement', 'form').'" src="'.$OUTPUT->pix_url('req') .'" />'));
+        $this->_reqHTML = '<span class="req">' . $OUTPUT->pix_icon('req', get_string('requiredelement', 'form')) . '</span>';
+        $this->_advancedHTML = '<span class="adv">' . $OUTPUT->pix_icon('adv', get_string('advancedelement', 'form')) . '</span>';
+        $this->setRequiredNote(get_string('somefieldsrequired', 'form', $OUTPUT->pix_icon('req', get_string('requiredelement', 'form'))));
     }
 
     /**
@@ -1749,6 +1753,21 @@ class MoodleQuickForm extends HTML_QuickForm_DHTMLRulesTableless {
     }
 
     /**
+     * Set an element to be forced to flow LTR.
+     *
+     * The element must exist and support this functionality. Also note that
+     * when setting the type of a field (@link self::setType} we try to guess the
+     * whether the field should be force to LTR or not. Make sure you're always
+     * calling this method last.
+     *
+     * @param string $elementname The element name.
+     * @param bool $value When false, disables force LTR, else enables it.
+     */
+    public function setForceLtr($elementname, $value = true) {
+        $this->getElement($elementname)->set_force_ltr($value);
+    }
+
+    /**
      * Should be used for all elements of a form except for select, radio and checkboxes which
      * clean their own data.
      *
@@ -1758,6 +1777,16 @@ class MoodleQuickForm extends HTML_QuickForm_DHTMLRulesTableless {
      */
     function setType($elementname, $paramtype) {
         $this->_types[$elementname] = $paramtype;
+
+        // This will not always get it right, but it should be accurate in most cases.
+        // When inaccurate use setForceLtr().
+        if (!is_rtl_compatible($paramtype)
+                && $this->elementExists($elementname)
+                && ($element =& $this->getElement($elementname))
+                && method_exists($element, 'set_force_ltr')) {
+
+            $element->set_force_ltr(true);
+        }
     }
 
     /**
@@ -1767,7 +1796,9 @@ class MoodleQuickForm extends HTML_QuickForm_DHTMLRulesTableless {
      * @see MoodleQuickForm::setType
      */
     function setTypes($paramtypes) {
-        $this->_types = $paramtypes + $this->_types;
+        foreach ($paramtypes as $elementname => $paramtype) {
+            $this->setType($elementname, $paramtype);
+        }
     }
 
     /**
@@ -2094,6 +2125,8 @@ class MoodleQuickForm extends HTML_QuickForm_DHTMLRulesTableless {
      */
     function getValidationScript()
     {
+        global $PAGE;
+
         if (empty($this->_rules) || $this->clientvalidation === false) {
             return '';
         }
@@ -2175,67 +2208,71 @@ class MoodleQuickForm extends HTML_QuickForm_DHTMLRulesTableless {
         unset($element);
 
         $js = '
-<script type="text/javascript">
-//<![CDATA[
 
-var skipClientValidation = false;
-
-(function() {
+require(["core/event", "jquery"], function(Event, $) {
 
     function qf_errorHandler(element, _qfMsg, escapedName) {
-      div = element.parentNode;
+        var event = $.Event(Event.Events.FORM_FIELD_VALIDATION);
+        $(element).trigger(event, _qfMsg);
+        if (event.isDefaultPrevented()) {
+            return _qfMsg == \'\';
+        } else {
+            // Legacy mforms.
+            var div = element.parentNode;
 
-      if ((div == undefined) || (element.name == undefined)) {
-        //no checking can be done for undefined elements so let server handle it.
-        return true;
-      }
+            if ((div == undefined) || (element.name == undefined)) {
+                // No checking can be done for undefined elements so let server handle it.
+                return true;
+            }
 
-      if (_qfMsg != \'\') {
-        var errorSpan = document.getElementById(\'id_error_\' + escapedName);
-        if (!errorSpan) {
-          errorSpan = document.createElement("span");
-          errorSpan.id = \'id_error_\' + escapedName;
-          errorSpan.className = "error";
-          element.parentNode.insertBefore(errorSpan, element.parentNode.firstChild);
-          document.getElementById(errorSpan.id).setAttribute(\'TabIndex\', \'0\');
-          document.getElementById(errorSpan.id).focus();
-        }
+            if (_qfMsg != \'\') {
+                var errorSpan = document.getElementById(\'id_error_\' + escapedName);
+                if (!errorSpan) {
+                    errorSpan = document.createElement("span");
+                    errorSpan.id = \'id_error_\' + escapedName;
+                    errorSpan.className = "error";
+                    element.parentNode.insertBefore(errorSpan, element.parentNode.firstChild);
+                    document.getElementById(errorSpan.id).setAttribute(\'TabIndex\', \'0\');
+                    document.getElementById(errorSpan.id).focus();
+                }
 
-        while (errorSpan.firstChild) {
-          errorSpan.removeChild(errorSpan.firstChild);
-        }
+                while (errorSpan.firstChild) {
+                    errorSpan.removeChild(errorSpan.firstChild);
+                }
 
-        errorSpan.appendChild(document.createTextNode(_qfMsg.substring(3)));
+                errorSpan.appendChild(document.createTextNode(_qfMsg.substring(3)));
 
-        if (div.className.substr(div.className.length - 6, 6) != " error"
-          && div.className != "error") {
-            div.className += " error";
-            linebreak = document.createElement("br");
-            linebreak.className = "error";
-            linebreak.id = \'id_error_break_\' + escapedName;
-            errorSpan.parentNode.insertBefore(linebreak, errorSpan.nextSibling);
-        }
+                if (div.className.substr(div.className.length - 6, 6) != " error"
+                        && div.className != "error") {
+                    div.className += " error";
+                    linebreak = document.createElement("br");
+                    linebreak.className = "error";
+                    linebreak.id = \'id_error_break_\' + escapedName;
+                    errorSpan.parentNode.insertBefore(linebreak, errorSpan.nextSibling);
+                }
 
-        return false;
-      } else {
-        var errorSpan = document.getElementById(\'id_error_\' + escapedName);
-        if (errorSpan) {
-          errorSpan.parentNode.removeChild(errorSpan);
-        }
-        var linebreak = document.getElementById(\'id_error_break_\' + escapedName);
-        if (linebreak) {
-          linebreak.parentNode.removeChild(linebreak);
-        }
+                return false;
+            } else {
+                var errorSpan = document.getElementById(\'id_error_\' + escapedName);
+                if (errorSpan) {
+                    errorSpan.parentNode.removeChild(errorSpan);
+                }
+                var linebreak = document.getElementById(\'id_error_break_\' + escapedName);
+                if (linebreak) {
+                    linebreak.parentNode.removeChild(linebreak);
+                }
 
-        if (div.className.substr(div.className.length - 6, 6) == " error") {
-          div.className = div.className.substr(0, div.className.length - 6);
-        } else if (div.className == "error") {
-          div.className = "";
-        }
+                if (div.className.substr(div.className.length - 6, 6) == " error") {
+                    div.className = div.className.substr(0, div.className.length - 6);
+                } else if (div.className == "error") {
+                    div.className = "";
+                }
 
-        return true;
-      }
-    }';
+                return true;
+            } // End if.
+        } // End if.
+    } // End function.
+    ';
         $validateJS = '';
         foreach ($test as $elementName => $jsandelement) {
             // Fix for bug displaying errors for elements in a group
@@ -2335,10 +2372,14 @@ var skipClientValidation = false;
             ev.preventDefault();
         }
     });
-})();
-//]]>
-</script>';
-        return $js;
+
+});
+';
+
+        $PAGE->requires->js_amd_inline($js);
+
+        // Global variable used to skip the client validation.
+        return html_writer::tag('script', 'var skipClientValidation = false;');
     } // end func getValidationScript
 
     /**
@@ -2411,8 +2452,14 @@ var skipClientValidation = false;
             $elNames = array();
             foreach ($elsInGroup as $elInGroup){
                 if (is_a($elInGroup, 'HTML_QuickForm_group')) {
-                    // not sure if this would work - groups nested in groups
+                    // Groups nested in groups: append the group name to the element and then change it back.
+                    // We will be appending group name again in MoodleQuickForm_group::export_for_template().
+                    $oldname = $elInGroup->getName();
+                    if ($element->_appendName) {
+                        $elInGroup->setName($element->getName() . '[' . $oldname . ']');
+                    }
                     $elNames = array_merge($elNames, $this->_getElNamesRecursive($elInGroup));
+                    $elInGroup->setName($oldname);
                 } else {
                     $elNames[] = $element->getElementName($elInGroup->getName());
                 }
@@ -2667,19 +2714,19 @@ class MoodleQuickForm_Renderer extends HTML_QuickForm_Renderer_Tableless{
      */
     public function __construct() {
         // switch next two lines for ol li containers for form items.
-        //        $this->_elementTemplates=array('default'=>"\n\t\t".'<li class="fitem"><label>{label}{help}<!-- BEGIN required -->{req}<!-- END required --></label><div class="qfelement<!-- BEGIN error --> error<!-- END error --> {type}"><!-- BEGIN error --><span class="error">{error}</span><br /><!-- END error -->{element}</div></li>');
+        //        $this->_elementTemplates=array('default'=>"\n\t\t".'<li class="fitem"><label>{label}{help}<!-- BEGIN required -->{req}<!-- END required --></label><div class="qfelement<!-- BEGIN error --> error<!-- END error --> {typeclass}"><!-- BEGIN error --><span class="error">{error}</span><br /><!-- END error -->{element}</div></li>');
         $this->_elementTemplates = array(
-        'default'=>"\n\t\t".'<div id="{id}" class="fitem {advanced}<!-- BEGIN required --> required<!-- END required --> fitem_{type} {emptylabel} {class}" {aria-live}><div class="fitemtitle"><label>{label}<!-- BEGIN required -->{req}<!-- END required -->{advancedimg} </label>{help}</div><div class="felement {type}<!-- BEGIN error --> error<!-- END error -->"><!-- BEGIN error --><span class="error" tabindex="0">{error}</span><br /><!-- END error -->{element}</div></div>',
+        'default' => "\n\t\t".'<div id="{id}" class="fitem {advanced}<!-- BEGIN required --> required<!-- END required --> fitem_{typeclass} {emptylabel} {class}" {aria-live}><div class="fitemtitle"><label>{label}<!-- BEGIN required -->{req}<!-- END required -->{advancedimg} </label>{help}</div><div class="felement {typeclass}<!-- BEGIN error --> error<!-- END error -->" data-fieldtype="{type}"><!-- BEGIN error --><span class="error" tabindex="0">{error}</span><br /><!-- END error -->{element}</div></div>',
 
-        'actionbuttons'=>"\n\t\t".'<div id="{id}" class="fitem fitem_actionbuttons fitem_{type} {class}"><div class="felement {type}">{element}</div></div>',
+        'actionbuttons' => "\n\t\t".'<div id="{id}" class="fitem fitem_actionbuttons fitem_{typeclass} {class}"><div class="felement {typeclass}" data-fieldtype="{type}">{element}</div></div>',
 
-        'fieldset'=>"\n\t\t".'<div id="{id}" class="fitem {advanced} {class}<!-- BEGIN required --> required<!-- END required --> fitem_{type} {emptylabel}"><div class="fitemtitle"><div class="fgrouplabel"><label>{label}<!-- BEGIN required -->{req}<!-- END required -->{advancedimg} </label>{help}</div></div><fieldset class="felement {type}<!-- BEGIN error --> error<!-- END error -->"><!-- BEGIN error --><span class="error" tabindex="0">{error}</span><br /><!-- END error -->{element}</fieldset></div>',
+        'fieldset' => "\n\t\t".'<div id="{id}" class="fitem {advanced} {class}<!-- BEGIN required --> required<!-- END required --> fitem_{typeclass} {emptylabel}"><div class="fitemtitle"><div class="fgrouplabel"><label>{label}<!-- BEGIN required -->{req}<!-- END required -->{advancedimg} </label>{help}</div></div><fieldset class="felement {typeclass}<!-- BEGIN error --> error<!-- END error -->" data-fieldtype="{type}"><!-- BEGIN error --><span class="error" tabindex="0">{error}</span><br /><!-- END error -->{element}</fieldset></div>',
 
-        'static'=>"\n\t\t".'<div id="{id}" class="fitem {advanced} {emptylabel} {class}"><div class="fitemtitle"><div class="fstaticlabel">{label}<!-- BEGIN required -->{req}<!-- END required -->{advancedimg} {help}</div></div><div class="felement fstatic <!-- BEGIN error --> error<!-- END error -->"><!-- BEGIN error --><span class="error" tabindex="0">{error}</span><br /><!-- END error -->{element}</div></div>',
+        'static' => "\n\t\t".'<div id="{id}" class="fitem {advanced} {emptylabel} {class}"><div class="fitemtitle"><div class="fstaticlabel">{label}<!-- BEGIN required -->{req}<!-- END required -->{advancedimg} {help}</div></div><div class="felement fstatic <!-- BEGIN error --> error<!-- END error -->" data-fieldtype="static"><!-- BEGIN error --><span class="error" tabindex="0">{error}</span><br /><!-- END error -->{element}</div></div>',
 
-        'warning'=>"\n\t\t".'<div id="{id}" class="fitem {advanced} {emptylabel} {class}">{element}</div>',
+        'warning' => "\n\t\t".'<div id="{id}" class="fitem {advanced} {emptylabel} {class}">{element}</div>',
 
-        'nodisplay'=>'');
+        'nodisplay' => '');
 
         parent::__construct();
     }
@@ -2725,8 +2772,6 @@ class MoodleQuickForm_Renderer extends HTML_QuickForm_Renderer_Tableless{
         $this->_collapseButtons = '';
         $formid = $form->getAttribute('id');
         parent::startForm($form);
-        // HACK to prevent browsers from automatically inserting the user's password into the wrong fields.
-        $this->_hiddenHtml .= prevent_form_autofill_password();
         if ($form->isFrozen()){
             $this->_formTemplate = "\n<div class=\"mform frozen\">\n{content}\n</div>";
         } else {
@@ -2765,6 +2810,8 @@ class MoodleQuickForm_Renderer extends HTML_QuickForm_Renderer_Tableless{
      * @param string $error error message to display
      */
     function startGroup(&$group, $required, $error){
+        global $OUTPUT;
+
         // Make sure the element has an id.
         $group->_generateId();
 
@@ -2773,47 +2820,53 @@ class MoodleQuickForm_Renderer extends HTML_QuickForm_Renderer_Tableless{
 
         // Update the ID.
         $group->updateAttributes(array('id' => $groupid));
+        $advanced = isset($this->_advancedElements[$group->getName()]);
 
-        if (method_exists($group, 'getElementTemplateType')){
-            $html = $this->_elementTemplates[$group->getElementTemplateType()];
-        }else{
-            $html = $this->_elementTemplates['default'];
+        $html = $OUTPUT->mform_element($group, $required, $advanced, $error, false);
+        $fromtemplate = !empty($html);
+        if (!$fromtemplate) {
+            if (method_exists($group, 'getElementTemplateType')) {
+                $html = $this->_elementTemplates[$group->getElementTemplateType()];
+            } else {
+                $html = $this->_elementTemplates['default'];
+            }
 
+            if (isset($this->_advancedElements[$group->getName()])) {
+                $html = str_replace(' {advanced}', ' advanced', $html);
+                $html = str_replace('{advancedimg}', $this->_advancedHTML, $html);
+            } else {
+                $html = str_replace(' {advanced}', '', $html);
+                $html = str_replace('{advancedimg}', '', $html);
+            }
+            if (method_exists($group, 'getHelpButton')) {
+                $html = str_replace('{help}', $group->getHelpButton(), $html);
+            } else {
+                $html = str_replace('{help}', '', $html);
+            }
+            $html = str_replace('{id}', $group->getAttribute('id'), $html);
+            $html = str_replace('{name}', $group->getName(), $html);
+            $html = str_replace('{typeclass}', 'fgroup', $html);
+            $html = str_replace('{type}', 'group', $html);
+            $html = str_replace('{class}', $group->getAttribute('class'), $html);
+            $emptylabel = '';
+            if ($group->getLabel() == '') {
+                $emptylabel = 'femptylabel';
+            }
+            $html = str_replace('{emptylabel}', $emptylabel, $html);
         }
-
-        if (isset($this->_advancedElements[$group->getName()])){
-            $html =str_replace(' {advanced}', ' advanced', $html);
-            $html =str_replace('{advancedimg}', $this->_advancedHTML, $html);
-        } else {
-            $html =str_replace(' {advanced}', '', $html);
-            $html =str_replace('{advancedimg}', '', $html);
-        }
-        if (method_exists($group, 'getHelpButton')){
-            $html =str_replace('{help}', $group->getHelpButton(), $html);
-        }else{
-            $html =str_replace('{help}', '', $html);
-        }
-        $html = str_replace('{id}', $group->getAttribute('id'), $html);
-        $html =str_replace('{name}', $group->getName(), $html);
-        $html =str_replace('{type}', 'fgroup', $html);
-        $html =str_replace('{class}', $group->getAttribute('class'), $html);
-        $emptylabel = '';
-        if ($group->getLabel() == '') {
-            $emptylabel = 'femptylabel';
-        }
-        $html = str_replace('{emptylabel}', $emptylabel, $html);
-
-        $this->_templates[$group->getName()]=$html;
+        $this->_templates[$group->getName()] = $html;
         // Fix for bug in tableless quickforms that didn't allow you to stop a
         // fieldset before a group of elements.
         // if the element name indicates the end of a fieldset, close the fieldset
-        if (   in_array($group->getName(), $this->_stopFieldsetElements)
-            && $this->_fieldsetsOpen > 0
-           ) {
+        if (in_array($group->getName(), $this->_stopFieldsetElements) && $this->_fieldsetsOpen > 0) {
             $this->_html .= $this->_closeFieldsetTemplate;
             $this->_fieldsetsOpen--;
         }
-        parent::startGroup($group, $required, $error);
+        if (!$fromtemplate) {
+            parent::startGroup($group, $required, $error);
+        } else {
+            $this->_html .= $html;
+        }
     }
 
     /**
@@ -2824,55 +2877,72 @@ class MoodleQuickForm_Renderer extends HTML_QuickForm_Renderer_Tableless{
      * @param string $error error message to display
      */
     function renderElement(&$element, $required, $error){
+        global $OUTPUT;
+
         // Make sure the element has an id.
         $element->_generateId();
+        $advanced = isset($this->_advancedElements[$element->getName()]);
 
-        //adding stuff to place holders in template
-        //check if this is a group element first
-        if (($this->_inGroup) and !empty($this->_groupElementTemplate)) {
-            // so it gets substitutions for *each* element
-            $html = $this->_groupElementTemplate;
-        }
-        elseif (method_exists($element, 'getElementTemplateType')){
-            $html = $this->_elementTemplates[$element->getElementTemplateType()];
-        }else{
-            $html = $this->_elementTemplates['default'];
-        }
-        if (isset($this->_advancedElements[$element->getName()])){
-            $html = str_replace(' {advanced}', ' advanced', $html);
-            $html = str_replace(' {aria-live}', ' aria-live="polite"', $html);
+        $html = $OUTPUT->mform_element($element, $required, $advanced, $error, false);
+        $fromtemplate = !empty($html);
+        if (!$fromtemplate) {
+            // Adding stuff to place holders in template
+            // check if this is a group element first.
+            if (($this->_inGroup) and !empty($this->_groupElementTemplate)) {
+                // So it gets substitutions for *each* element.
+                $html = $this->_groupElementTemplate;
+            } else if (method_exists($element, 'getElementTemplateType')) {
+                $html = $this->_elementTemplates[$element->getElementTemplateType()];
+            } else {
+                $html = $this->_elementTemplates['default'];
+            }
+            if (isset($this->_advancedElements[$element->getName()])) {
+                $html = str_replace(' {advanced}', ' advanced', $html);
+                $html = str_replace(' {aria-live}', ' aria-live="polite"', $html);
+            } else {
+                $html = str_replace(' {advanced}', '', $html);
+                $html = str_replace(' {aria-live}', '', $html);
+            }
+            if (isset($this->_advancedElements[$element->getName()]) || $element->getName() == 'mform_showadvanced') {
+                $html = str_replace('{advancedimg}', $this->_advancedHTML, $html);
+            } else {
+                $html = str_replace('{advancedimg}', '', $html);
+            }
+            $html = str_replace('{id}', 'fitem_' . $element->getAttribute('id'), $html);
+            $html = str_replace('{typeclass}', 'f' . $element->getType(), $html);
+            $html = str_replace('{type}', $element->getType(), $html);
+            $html = str_replace('{name}', $element->getName(), $html);
+            $html = str_replace('{class}', $element->getAttribute('class'), $html);
+            $emptylabel = '';
+            if ($element->getLabel() == '') {
+                $emptylabel = 'femptylabel';
+            }
+            $html = str_replace('{emptylabel}', $emptylabel, $html);
+            if (method_exists($element, 'getHelpButton')) {
+                $html = str_replace('{help}', $element->getHelpButton(), $html);
+            } else {
+                $html = str_replace('{help}', '', $html);
+            }
         } else {
-            $html = str_replace(' {advanced}', '', $html);
-            $html = str_replace(' {aria-live}', '', $html);
-        }
-        if (isset($this->_advancedElements[$element->getName()])||$element->getName() == 'mform_showadvanced'){
-            $html =str_replace('{advancedimg}', $this->_advancedHTML, $html);
-        } else {
-            $html =str_replace('{advancedimg}', '', $html);
-        }
-        $html =str_replace('{id}', 'fitem_' . $element->getAttribute('id'), $html);
-        $html =str_replace('{type}', 'f'.$element->getType(), $html);
-        $html =str_replace('{name}', $element->getName(), $html);
-        $html =str_replace('{class}', $element->getAttribute('class'), $html);
-        $emptylabel = '';
-        if ($element->getLabel() == '') {
-            $emptylabel = 'femptylabel';
-        }
-        $html = str_replace('{emptylabel}', $emptylabel, $html);
-        if (method_exists($element, 'getHelpButton')){
-            $html = str_replace('{help}', $element->getHelpButton(), $html);
-        }else{
-            $html = str_replace('{help}', '', $html);
-
+            if ($this->_inGroup) {
+                $this->_groupElementTemplate = $html;
+            }
         }
         if (($this->_inGroup) and !empty($this->_groupElementTemplate)) {
             $this->_groupElementTemplate = $html;
-        }
-        elseif (!isset($this->_templates[$element->getName()])) {
+        } else if (!isset($this->_templates[$element->getName()])) {
             $this->_templates[$element->getName()] = $html;
         }
 
-        parent::renderElement($element, $required, $error);
+        if (!$fromtemplate) {
+            parent::renderElement($element, $required, $error);
+        } else {
+            if (in_array($element->getName(), $this->_stopFieldsetElements) && $this->_fieldsetsOpen > 0) {
+                $this->_html .= $this->_closeFieldsetTemplate;
+                $this->_fieldsetsOpen--;
+            }
+            $this->_html .= $html;
+        }
     }
 
     /**
@@ -3041,6 +3111,7 @@ MoodleQuickForm::registerElementType('header', "$CFG->libdir/form/header.php", '
 MoodleQuickForm::registerElementType('hidden', "$CFG->libdir/form/hidden.php", 'MoodleQuickForm_hidden');
 MoodleQuickForm::registerElementType('htmleditor', "$CFG->libdir/form/htmleditor.php", 'MoodleQuickForm_htmleditor');
 MoodleQuickForm::registerElementType('listing', "$CFG->libdir/form/listing.php", 'MoodleQuickForm_listing');
+MoodleQuickForm::registerElementType('defaultcustom', "$CFG->libdir/form/defaultcustom.php", 'MoodleQuickForm_defaultcustom');
 MoodleQuickForm::registerElementType('modgrade', "$CFG->libdir/form/modgrade.php", 'MoodleQuickForm_modgrade');
 MoodleQuickForm::registerElementType('modvisible', "$CFG->libdir/form/modvisible.php", 'MoodleQuickForm_modvisible');
 MoodleQuickForm::registerElementType('password', "$CFG->libdir/form/password.php", 'MoodleQuickForm_password');

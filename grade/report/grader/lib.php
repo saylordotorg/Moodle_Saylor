@@ -448,22 +448,22 @@ class grade_report_grader extends grade_report {
                     $this->groupwheresql_params, $enrolledparams, $relatedctxparams);
 
             $sortjoin = "LEFT JOIN {grade_grades} g ON g.userid = u.id AND g.itemid = $this->sortitemid";
-            $sort = "g.finalgrade $this->sortorder";
+            $sort = "g.finalgrade $this->sortorder, u.idnumber, u.lastname, u.firstname, u.email";
         } else {
             $sortjoin = '';
             switch($this->sortitemid) {
                 case 'lastname':
-                    $sort = "u.lastname $this->sortorder, u.firstname $this->sortorder";
+                    $sort = "u.lastname $this->sortorder, u.firstname $this->sortorder, u.idnumber, u.email";
                     break;
                 case 'firstname':
-                    $sort = "u.firstname $this->sortorder, u.lastname $this->sortorder";
+                    $sort = "u.firstname $this->sortorder, u.lastname $this->sortorder, u.idnumber, u.email";
                     break;
                 case 'email':
-                    $sort = "u.email $this->sortorder";
+                    $sort = "u.email $this->sortorder, u.firstname, u.lastname, u.idnumber";
                     break;
                 case 'idnumber':
                 default:
-                    $sort = "u.idnumber $this->sortorder";
+                    $sort = "u.idnumber $this->sortorder, u.firstname, u.lastname, u.email";
                     break;
             }
 
@@ -736,8 +736,8 @@ class grade_report_grader extends grade_report {
                 if (empty($suspendedstring)) {
                     $suspendedstring = get_string('userenrolmentsuspended', 'grades');
                 }
-                $usercell->text .= html_writer::empty_tag('img', array('src'=>$OUTPUT->pix_url('i/enrolmentsuspended'), 'title'=>$suspendedstring,
-                        'alt'=>$suspendedstring, 'class'=>'usersuspendedicon'));
+                $icon = $OUTPUT->pix_icon('i/enrolmentsuspended', $suspendedstring);
+                $usercell->text .= html_writer::tag('span', $icon, array('class'=>'usersuspendedicon'));
             }
 
             $userrow->cells[] = $usercell;
@@ -921,7 +921,7 @@ class grade_report_grader extends grade_report {
                     }
 
                     $itemcell->colspan = $colspan;
-                    $itemcell->text = shorten_text($headerlink) . $arrow . $singleview;
+                    $itemcell->text = $headerlink . $arrow . $singleview;
                     $itemcell->header = true;
                     $itemcell->scope = 'col';
 
@@ -1646,9 +1646,10 @@ class grade_report_grader extends grade_report {
             }
         }
 
-        $name = shorten_text($element['object']->get_name());
+        $name = $element['object']->get_name();
         $courseheaderid = 'courseheader_' . clean_param($name, PARAM_ALPHANUMEXT);
-        $courseheader = html_writer::tag('span', $name, array('id' => $courseheaderid));
+        $courseheader = html_writer::tag('span', $name, array('id' => $courseheaderid,
+                'title' => $name, 'class' => 'gradeitemheader'));
         $courseheader .= html_writer::label($showing, $courseheaderid, false, array('class' => 'accesshide'));
         $courseheader .= $icon;
 

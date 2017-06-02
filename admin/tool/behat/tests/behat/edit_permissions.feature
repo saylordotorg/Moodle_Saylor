@@ -31,9 +31,8 @@ Feature: Edit capabilities
 
   Scenario: Course capabilities overrides
     Given I log in as "teacher1"
-    And I follow "Course 1"
-    And I expand "Users" node
-    And I follow "Permissions"
+    And I am on "Course 1" course homepage
+    And I navigate to "Users > Permissions" in current page administration
     And I override the system permissions of "Student" role with:
       | mod/forum:deleteanypost | Prohibit |
       | mod/forum:editanypost | Prevent |
@@ -46,19 +45,18 @@ Feature: Edit capabilities
 
   Scenario: Module capabilities overrides
     Given I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Forum" to section "1" and I fill the form with:
       | Forum name | I'm the name |
       | Description | I'm the introduction |
     And I follow "I'm the name"
-    And I follow "Permissions"
+    And I navigate to "Permissions" in current page administration
     And I override the system permissions of "Student" role with:
       | mod/forum:deleteanypost | Prohibit |
       | mod/forum:editanypost | Prevent |
       | mod/forum:addquestion | Allow |
     When I set the field "Advanced role override" to "Student (3)"
-    And I press "Go"
+    And I click on "Go" "button" in the "region-main" "region"
     Then "mod/forum:deleteanypost" capability has "Prohibit" permission
     And "mod/forum:editanypost" capability has "Prevent" permission
     And "mod/forum:addquestion" capability has "Allow" permission

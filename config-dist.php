@@ -59,6 +59,10 @@ $CFG->dboptions = array(
     'dbport'    => '',          // the TCP port number to use when connecting
                                 //  to the server. keep empty string for the
                                 //  default port
+    'dbhandlesoptions' => false,// On PostgreSQL poolers like pgbouncer don't
+                                // support advanced options on connection.
+                                // If you set those in the database then
+                                // the advanced settings will not be sent.
     'dbcollation' => 'utf8mb4_unicode_ci', // MySQL has partial and full UTF-8
                                 // support. If you wish to use partial UTF-8
                                 // (three bytes) then set this option to
@@ -261,9 +265,13 @@ $CFG->admin = 'admin';
 //      $CFG->session_redis_host = '127.0.0.1';
 //      $CFG->session_redis_port = 6379;  // Optional.
 //      $CFG->session_redis_database = 0;  // Optional, default is db 0.
+//      $CFG->session_redis_auth = ''; // Optional, default is don't set one.
 //      $CFG->session_redis_prefix = ''; // Optional, default is don't set one.
 //      $CFG->session_redis_acquire_lock_timeout = 120;
 //      $CFG->session_redis_lock_expire = 7200;
+//      Use the igbinary serializer instead of the php default one. Note that phpredis must be compiled with
+//      igbinary support to make the setting to work. Also, if you change the serializer you have to flush the database!
+//      $CFG->session_redis_serializer_use_igbinary = false; // Optional, default is PHP builtin serializer.
 //
 //   Memcache session handler (requires memcached server and memcache extension):
 //      $CFG->session_handler_class = '\core\session\memcache';
@@ -378,7 +386,15 @@ $CFG->admin = 'admin';
 //     LogFormat "%h %l %{MOODLEUSER}n %t \"%r\" %s %b \"%{Referer}i\" \"%{User-Agent}i\"" moodleformat
 // And in the part specific to your Moodle install / virtualhost:
 //     CustomLog "/your/path/to/log" moodleformat
-// CAUTION: Use of this option will expose usernames in the Apache log,
+//
+// Alternatively for other webservers such as nginx, you can instead have the username sent via a http header
+// 'X-MOODLEUSER' which can be saved in the logfile and then stripped out before being sent to the browser:
+//     $CFG->headerloguser = 0; // Turn this feature off. Default value.
+//     $CFG->headerloguser = 1; // Log user id.
+//     $CFG->headerloguser = 2; // Log full name in cleaned format. ie, Darth Vader will be displayed as darth_vader.
+//     $CFG->headerloguser = 3; // Log username.
+//
+// CAUTION: Use of this option will expose usernames in the Apache / nginx log,
 // If you are going to publish your log, or the output of your web stats analyzer
 // this will weaken the security of your website.
 //
@@ -436,32 +452,6 @@ $CFG->admin = 'admin';
 // webserver.
 //
 //     $CFG->altcacheconfigpath = '/var/www/shared/moodle.cache.config.php
-//
-// The CSS files the Moodle produces can be extremely large and complex, especially
-// if you are using a custom theme that builds upon several other themes.
-// In Moodle 2.3 a CSS optimiser was added as an experimental feature for advanced
-// users. The CSS optimiser organises the CSS in order to reduce the overall number
-// of rules and styles being sent to the client. It does this by collating the
-// CSS before it is cached removing excess styles and rules and stripping out any
-// extraneous content such as comments and empty rules.
-// The following settings are used to enable and control the optimisation.
-//
-// Enable the CSS optimiser. This will only optimise the CSS if themedesignermode
-// is not enabled. This can be set through the UI however it is noted here as well
-// because the other CSS optimiser settings can not be set through the UI.
-//
-//      $CFG->enablecssoptimiser = true;
-//
-// If set the CSS optimiser will add stats about the optimisation to the top of
-// the optimised CSS file. You can then inspect the CSS to see the affect the CSS
-// optimiser is having.
-//
-//      $CFG->cssoptimiserstats = true;
-//
-// If set the CSS that is optimised will still retain a minimalistic formatting
-// so that anyone wanting to can still clearly read it.
-//
-//      $CFG->cssoptimiserpretty = true;
 //
 // Use the following flag to completely disable the Available update notifications
 // feature and hide it from the server administration UI.
@@ -655,6 +645,7 @@ $CFG->admin = 'admin';
 // $CFG->phpunit_prefix = 'phpu_';
 // $CFG->phpunit_dataroot = '/home/example/phpu_moodledata';
 // $CFG->phpunit_directorypermissions = 02777; // optional
+// $CFG->phpunit_profilingenabled = true; // optional to profile PHPUnit runs.
 //
 //
 //=========================================================================
@@ -862,12 +853,24 @@ $CFG->admin = 'admin';
 // Unoconv is used convert between file formats supported by LibreOffice.
 // Use a recent version of unoconv ( >= 0.7 ), older versions have trouble running from a webserver.
 //      $CFG->pathtounoconv = '';
-
+//
+//=========================================================================
+// 14. ALTERNATIVE FILE SYSTEM SETTINGS
+//=========================================================================
+//
+// Alternative file system.
+// Since 3.3 it is possible to override file_storage and file_system API and use alternative storage systems (e.g. S3,
+// Rackspace Cloud Files, Google Cloud Storage, Azure Storage, etc.).
+// To set the alternative file storage system in config.php you can use the following setting, providing the
+// alternative system class name that will be auto-loaded by file_storage API.
+//
+//      $CFG->alternative_file_system_class = '\\local_myfilestorage\\file_system';
+//
 //=========================================================================
 // ALL DONE!  To continue installation, visit your main page with a browser
 //=========================================================================
 
-require_once(dirname(__FILE__) . '/lib/setup.php'); // Do not edit
+require_once(__DIR__ . '/lib/setup.php'); // Do not edit
 
 // There is no php closing tag in this file,
 // it is intentional because it prevents trailing whitespace problems!

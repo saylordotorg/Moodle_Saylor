@@ -15,9 +15,9 @@ Feature: Enable Block Badges in a course
       | user | course | role |
       | teacher1 | C1 | editingteacher |
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     # Issue badge 1 of 2
-    And I navigate to "Add a new badge" node in "Badges"
+    And I navigate to "Add a new badge" node in "Course administration > Badges"
     And I set the following fields to these values:
       | id_name | Badge 1 |
       | id_description | Badge 1 |
@@ -34,7 +34,7 @@ Feature: Enable Block Badges in a course
     And I set the field "potentialrecipients[]" to "Teacher 1 (teacher1@example.com)"
     And I press "Award badge"
     # Issue Badge 2 of 2
-    And I navigate to "Add a new badge" node in "Badges"
+    And I navigate to "Add a new badge" node in "Course administration > Badges"
     And I set the following fields to these values:
       | id_name | Badge 2 |
       | id_description | Badge 2 |
@@ -54,16 +54,14 @@ Feature: Enable Block Badges in a course
 
   Scenario: Add the recent badges block to a course.
     Given I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     When I add the "Latest badges" block
     Then I should see "Badge 1" in the "Latest badges" "block"
     And I should see "Badge 2" in the "Latest badges" "block"
 
   Scenario: Add the recent badges block to a course and limit it to only display 1 badge.
     Given I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     When I add the "Latest badges" block
     And I configure the "Latest badges" block
     And I set the following fields to these values:

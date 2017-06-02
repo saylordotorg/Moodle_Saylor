@@ -882,4 +882,98 @@ class core_upgradelib_testcase extends advanced_testcase {
             $this->assertNull(check_libcurl_version($result));
         }
     }
+
+    /**
+     * Create two pages with blocks, delete one page and make sure upgrade script deletes orphaned blocks
+     */
+    public function test_delete_block_positions() {
+        global $DB, $CFG;
+        require_once($CFG->dirroot . '/my/lib.php');
+        $this->resetAfterTest();
+
+        // Make sure each block on system dashboard page has a position.
+        $systempage = $DB->get_record('my_pages', array('userid' => null, 'private' => MY_PAGE_PRIVATE));
+        $systemcontext = context_system::instance();
+        $blockinstances = $DB->get_records('block_instances', array('parentcontextid' => $systemcontext->id,
+            'pagetypepattern' => 'my-index', 'subpagepattern' => $systempage->id));
+        $this->assertNotEmpty($blockinstances);
+        foreach ($blockinstances as $bi) {
+            $DB->insert_record('block_positions', ['subpage' => $systempage->id, 'pagetype' => 'my-index', 'contextid' => $systemcontext->id,
+                'blockinstanceid' => $bi->id, 'visible' => 1, 'weight' => $bi->defaultweight]);
+        }
+
+        // Create two users and make two copies of the system dashboard.
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+        $page1 = my_copy_page($user1->id, MY_PAGE_PRIVATE, 'my-index');
+        $page2 = my_copy_page($user2->id, MY_PAGE_PRIVATE, 'my-index');
+
+        $context1 = context_user::instance($user1->id);
+        $context2 = context_user::instance($user2->id);
+
+        // Delete second page without deleting block positions.
+        $DB->delete_records('my_pages', ['id' => $page2->id]);
+
+        // Blocks are still here.
+        $this->assertEquals(count($blockinstances), $DB->count_records('block_positions', ['subpage' => $page1->id, 'pagetype' => 'my-index', 'contextid' => $context1->id]));
+        $this->assertEquals(count($blockinstances), $DB->count_records('block_positions', ['subpage' => $page2->id, 'pagetype' => 'my-index', 'contextid' => $context2->id]));
+
+        // Run upgrade script that should delete orphaned block_positions.
+        upgrade_block_positions();
+
+        // First user still has all his block_positions, second user does not.
+        $this->assertEquals(count($blockinstances), $DB->count_records('block_positions', ['subpage' => $page1->id, 'pagetype' => 'my-index', 'contextid' => $context1->id]));
+        $this->assertEquals(0, $DB->count_records('block_positions', ['subpage' => $page2->id, 'pagetype' => 'my-index']));
+    }
+
+    /**
+     * Test the conversion of auth plugin settings names.
+     */
+    public function test_upgrade_fix_config_auth_plugin_names() {
+        $this->resetAfterTest();
+
+        // Let the plugin auth_foo use legacy format only.
+        set_config('name1', 'val1', 'auth/foo');
+        set_config('name2', 'val2', 'auth/foo');
+
+        // Let the plugin auth_bar use new format only.
+        set_config('name1', 'val1', 'auth_bar');
+        set_config('name2', 'val2', 'auth_bar');
+
+        // Let the plugin auth_baz use a mix of legacy and new format, with no conflicts.
+        set_config('name1', 'val1', 'auth_baz');
+        set_config('name1', 'val1', 'auth/baz');
+        set_config('name2', 'val2', 'auth/baz');
+        set_config('name3', 'val3', 'auth_baz');
+
+        // Let the plugin auth_qux use a mix of legacy and new format, with conflicts.
+        set_config('name1', 'val1', 'auth_qux');
+        set_config('name1', 'val2', 'auth/qux');
+
+        // Execute the migration.
+        upgrade_fix_config_auth_plugin_names('foo');
+        upgrade_fix_config_auth_plugin_names('bar');
+        upgrade_fix_config_auth_plugin_names('baz');
+        upgrade_fix_config_auth_plugin_names('qux');
+
+        // Assert that legacy settings are gone and no new were introduced.
+        $this->assertEmpty((array) get_config('auth/foo'));
+        $this->assertEmpty((array) get_config('auth/bar'));
+        $this->assertEmpty((array) get_config('auth/baz'));
+        $this->assertEmpty((array) get_config('auth/qux'));
+
+        // Assert values were simply kept where there was no conflict.
+        $this->assertSame('val1', get_config('auth_foo', 'name1'));
+        $this->assertSame('val2', get_config('auth_foo', 'name2'));
+
+        $this->assertSame('val1', get_config('auth_bar', 'name1'));
+        $this->assertSame('val2', get_config('auth_bar', 'name2'));
+
+        $this->assertSame('val1', get_config('auth_baz', 'name1'));
+        $this->assertSame('val2', get_config('auth_baz', 'name2'));
+        $this->assertSame('val3', get_config('auth_baz', 'name3'));
+
+        // Assert the new format took precedence in case of conflict.
+        $this->assertSame('val1', get_config('auth_qux', 'name1'));
+    }
 }

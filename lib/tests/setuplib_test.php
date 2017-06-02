@@ -181,9 +181,8 @@ class core_setuplib_testcase extends advanced_testcase {
         $this->assertFalse(make_unique_writable_directory($base, false));
 
         // Now check for exception.
-        $this->setExpectedException('invalid_dataroot_permissions',
-                $base . ' is not writable. Unable to create a unique directory within it.'
-            );
+        $this->expectException('invalid_dataroot_permissions');
+        $this->expectExceptionMessage($base . ' is not writable. Unable to create a unique directory within it.');
         make_unique_writable_directory($base);
 
         unlink($base);
@@ -360,7 +359,6 @@ class core_setuplib_testcase extends advanced_testcase {
 
         $initialloginhttps = $CFG->loginhttps;
         $httpswwwroot = str_replace('http:', 'https:', $CFG->wwwroot);
-        $CFG->loginhttps = false;
 
         // Simple local URL.
         $url = $CFG->wwwroot . '/something/here?really=yes';
@@ -374,14 +372,31 @@ class core_setuplib_testcase extends advanced_testcase {
         $infos = $this->get_exception_info($exception);
         $this->assertSame($CFG->wwwroot . '/', $infos->link);
 
-        // HTTPS URL when login HTTPS is not enabled.
+        // HTTPS URL when login HTTPS is not enabled and site is HTTP.
+        $CFG->loginhttps = false;
+        $CFG->wwwroot = str_replace('https:', 'http:', $CFG->wwwroot);
         $url = $httpswwwroot . '/something/here?really=yes';
         $exception = new moodle_exception('none', 'error', $url);
         $infos = $this->get_exception_info($exception);
         $this->assertSame($CFG->wwwroot . '/', $infos->link);
 
-        // HTTPS URL with login HTTPS.
+        // HTTPS URL when login HTTPS is not enabled and site is HTTPS.
+        $CFG->wwwroot = str_replace('http:', 'https:', $CFG->wwwroot);
+        $url = $httpswwwroot . '/something/here?really=yes';
+        $exception = new moodle_exception('none', 'error', $url);
+        $infos = $this->get_exception_info($exception);
+        $this->assertSame($url, $infos->link);
+
+        // HTTPS URL when login HTTPS enabled and site is HTTP.
         $CFG->loginhttps = true;
+        $CFG->wwwroot = str_replace('https:', 'http:', $CFG->wwwroot);
+        $url = $httpswwwroot . '/something/here?really=yes';
+        $exception = new moodle_exception('none', 'error', $url);
+        $infos = $this->get_exception_info($exception);
+        $this->assertSame($url, $infos->link);
+
+        // HTTPS URL when login HTTPS enabled and site is HTTPS.
+        $CFG->wwwroot = str_replace('http:', 'https:', $CFG->wwwroot);
         $url = $httpswwwroot . '/something/here?really=yes';
         $exception = new moodle_exception('none', 'error', $url);
         $infos = $this->get_exception_info($exception);
@@ -416,13 +431,6 @@ class core_setuplib_testcase extends advanced_testcase {
         $exception = new moodle_exception('none');
         $infos = $this->get_exception_info($exception);
         $this->assertSame($url, $infos->link);
-
-        // Internal HTTPS link from fromurl without login HTTPS.
-        $CFG->loginhttps = false;
-        $SESSION->fromurl = $httpswwwroot . '/something/here?really=yes';
-        $exception = new moodle_exception('none');
-        $infos = $this->get_exception_info($exception);
-        $this->assertSame($CFG->wwwroot . '/', $infos->link);
 
         // External link from fromurl.
         $SESSION->fromurl = 'http://moodle.org/something/here?really=yes';

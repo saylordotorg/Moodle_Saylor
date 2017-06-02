@@ -77,7 +77,10 @@ function xmldb_tool_monitor_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2016052305, 'tool', 'monitor');
     }
 
-    if ($oldversion < 2016052306) {
+    // Automatically generated Moodle v3.2.0 release upgrade line.
+    // Put any upgrade step following this.
+
+    if ($oldversion < 2017021300) {
 
         // Delete "orphaned" subscriptions.
         $sql = "SELECT DISTINCT s.courseid
@@ -91,8 +94,11 @@ function xmldb_tool_monitor_upgrade($oldversion) {
         }
 
         // Monitor savepoint reached.
-        upgrade_plugin_savepoint(true, 2016052306, 'tool', 'monitor');
+        upgrade_plugin_savepoint(true, 2017021300, 'tool', 'monitor');
     }
+
+    // Automatically generated Moodle v3.3.0 release upgrade line.
+    // Put any upgrade step following this.
 
     return true;
 }

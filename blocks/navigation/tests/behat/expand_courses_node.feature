@@ -38,7 +38,14 @@ Feature: Expand the courses nodes within the navigation block
       | navshowallcourses | 1 |
     And I log in as "admin"
     And I am on site homepage
-    And I follow "Course 2"
+    And I turn editing mode on
+    And I add the "Navigation" block if not present
+    And I configure the "Navigation" block
+    And I set the following fields to these values:
+      | Page contexts | Display throughout the entire site |
+    And I press "Save changes"
+    And I turn editing mode off
+    And I am on "Course 2" course homepage
     And I navigate to "Enrolment methods" node in "Course administration > Users"
     And I click on "Edit" "link" in the "Guest access" "table_row"
     And I set the following fields to these values:

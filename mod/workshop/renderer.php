@@ -281,53 +281,61 @@ class mod_workshop_renderer extends plugin_renderer_base {
      * @return string html code to be displayed
      */
     protected function render_workshop_user_plan(workshop_user_plan $plan) {
-        $table = new html_table();
-        $table->attributes['class'] = 'userplan';
-        $table->attributes['role'] = 'section';
+        $o  = '';    // Output HTML code.
         $numberofphases = count($plan->phases);
-        $table->attributes['aria-label'] = get_string('userplanaccessibilitytitle', 'workshop', $numberofphases);
-        $table->head = array();
-        $table->colclasses = array();
-        $row = new html_table_row();
-        $row->attributes['class'] = 'phasetasks';
+        $o .= html_writer::start_tag('div', array(
+            'class' => 'userplan',
+            'aria-labelledby' => 'mod_workshop-userplanheading',
+            'aria-describedby' => 'mod_workshop-userplanaccessibilitytitle',
+        ));
+        $o .= html_writer::span(get_string('userplanaccessibilitytitle', 'workshop', $numberofphases),
+            'accesshide', array('id' => 'mod_workshop-userplanaccessibilitytitle'));
+        $o .= html_writer::link('#mod_workshop-userplancurrenttasks', get_string('userplanaccessibilityskip', 'workshop'),
+            array('class' => 'accesshide'));
         foreach ($plan->phases as $phasecode => $phase) {
-            $title = html_writer::tag('span', $phase->title);
-            if ($phase->active) {
-                $title .= ' ' . html_writer::tag('span', get_string('userplancurrentphase', 'workshop'),
-                    array('class' => 'accesshide'));
-            }
+            $o .= html_writer::start_tag('dl', array('class' => 'phase'));
             $actions = '';
-            foreach ($phase->actions as $action) {
-                switch ($action->type) {
-                case 'switchphase':
-                    $icon = 'i/marker';
-                    if ($phasecode == workshop::PHASE_ASSESSMENT
-                            and $plan->workshop->phase == workshop::PHASE_SUBMISSION
-                            and $plan->workshop->phaseswitchassessment) {
-                        $icon = 'i/scheduled';
+
+            if ($phase->active) {
+                // Mark the section as the current one.
+                $icon = $this->output->pix_icon('i/marked', '', 'moodle', ['role' => 'presentation']);
+                $actions .= get_string('userplancurrentphase', 'workshop').' '.$icon;
+
+            } else {
+                // Display a control widget to switch to the given phase or mark the phase as the current one.
+                foreach ($phase->actions as $action) {
+                    if ($action->type === 'switchphase') {
+                        if ($phasecode == workshop::PHASE_ASSESSMENT && $plan->workshop->phase == workshop::PHASE_SUBMISSION
+                                && $plan->workshop->phaseswitchassessment) {
+                            $icon = new pix_icon('i/scheduled', get_string('switchphaseauto', 'mod_workshop'));
+                        } else {
+                            $icon = new pix_icon('i/marker', get_string('switchphase'.$phasecode, 'mod_workshop'));
+                        }
+                        $actions .= $this->output->action_icon($action->url, $icon, null, null, true);
                     }
-                    $actions .= $this->output->action_icon($action->url, new pix_icon($icon, get_string('switchphase', 'workshop')));
-                    break;
                 }
             }
+
             if (!empty($actions)) {
                 $actions = $this->output->container($actions, 'actions');
             }
-            $table->head[] = $this->output->container($title . $actions);
             $classes = 'phase' . $phasecode;
             if ($phase->active) {
+                $title = html_writer::span($phase->title, 'phasetitle', ['id' => 'mod_workshop-userplancurrenttasks']);
                 $classes .= ' active';
             } else {
+                $title = html_writer::span($phase->title, 'phasetitle');
                 $classes .= ' nonactive';
             }
-            $table->colclasses[] = $classes;
-            $cell = new html_table_cell();
-            $cell->text = $this->helper_user_plan_tasks($phase->tasks);
-            $row->cells[] = $cell;
+            $o .= html_writer::start_tag('dt', array('class' => $classes));
+            $o .= $this->output->container($title . $actions);
+            $o .= html_writer::start_tag('dd', array('class' => $classes. ' phasetasks'));
+            $o .= $this->helper_user_plan_tasks($phase->tasks);
+            $o .= html_writer::end_tag('dd');
+            $o .= html_writer::end_tag('dl');
         }
-        $table->data = array($row);
-
-        return html_writer::table($table);
+        $o .= html_writer::end_tag('div');
+        return $o;
     }
 
     /**
@@ -936,18 +944,26 @@ class mod_workshop_renderer extends plugin_renderer_base {
         $out = '';
         foreach ($tasks as $taskcode => $task) {
             $classes = '';
+            $accessibilitytext = '';
             $icon = null;
             if ($task->completed === true) {
                 $classes .= ' completed';
-            } elseif ($task->completed === false) {
+                $accessibilitytext .= get_string('taskdone', 'workshop') . ' ';
+            } else if ($task->completed === false) {
                 $classes .= ' fail';
-            } elseif ($task->completed === 'info') {
+                $accessibilitytext .= get_string('taskfail', 'workshop') . ' ';
+            } else if ($task->completed === 'info') {
                 $classes .= ' info';
+                $accessibilitytext .= get_string('taskinfo', 'workshop') . ' ';
+            } else {
+                $accessibilitytext .= get_string('tasktodo', 'workshop') . ' ';
             }
             if (is_null($task->link)) {
-                $title = $task->title;
+                $title = html_writer::tag('span', $accessibilitytext, array('class' => 'accesshide'));
+                $title .= $task->title;
             } else {
-                $title = html_writer::link($task->link, $task->title);
+                $title = html_writer::tag('span', $accessibilitytext, array('class' => 'accesshide'));
+                $title .= html_writer::link($task->link, $task->title);
             }
             $title = $this->output->container($title, 'title');
             $details = $this->output->container($task->details, 'details');

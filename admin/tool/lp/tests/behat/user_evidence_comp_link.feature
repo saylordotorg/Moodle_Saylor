@@ -41,6 +41,7 @@ Feature: Manage competencies linked to evidence of prior learning
 
   Scenario: Link competency to evidence of prior learning from list
     Given I follow "Evidence of prior learning"
+    And I change window size to "large"
     And I should see "List of evidence"
     And I should see "Test-Evidence"
     And I click on "Link" of edit menu in the "Test-Evidence" row
@@ -66,5 +67,6 @@ Feature: Manage competencies linked to evidence of prior learning
     And I should see "Test-Comp1"
     And I should see "Test-Comp2"
     When I click on "Delete" "link" in the "Test-Comp1" "table_row"
+    And I wait until the page is ready
     Then I should not see "Test-Comp1"
     And I should see "Test-Comp2"

@@ -125,6 +125,19 @@ function assign_refresh_events($courseid = 0) {
         $context = context_module::instance($cm->id);
         $assignment = new assign($context, $cm, $course);
         $assignment->update_calendar($cm->id);
+
+        // Refresh the calendar events also for the assignment overrides.
+        $overrides = $DB->get_records('assign_overrides', ['assignid' => $assign->id], '',
+                                      'id, groupid, userid, duedate, sortorder');
+        foreach ($overrides as $override) {
+            if (empty($override->userid)) {
+                unset($override->userid);
+            }
+            if (empty($override->groupid)) {
+                unset($override->groupid);
+            }
+            assign_update_events($assignment, $override);
+        }
     }
 
     return true;
@@ -160,6 +173,10 @@ function assign_reset_course_form_definition(&$mform) {
     $mform->addElement('header', 'assignheader', get_string('modulenameplural', 'assign'));
     $name = get_string('deleteallsubmissions', 'assign');
     $mform->addElement('advcheckbox', 'reset_assign_submissions', $name);
+    $mform->addElement('advcheckbox', 'reset_assign_user_overrides',
+        get_string('removealluseroverrides', 'assign'));
+    $mform->addElement('advcheckbox', 'reset_assign_group_overrides',
+        get_string('removeallgroupoverrides', 'assign'));
 }
 
 /**
@@ -168,7 +185,9 @@ function assign_reset_course_form_definition(&$mform) {
  * @return array
  */
 function assign_reset_course_form_defaults($course) {
-    return array('reset_assign_submissions'=>1);
+    return array('reset_assign_submissions' => 1,
+            'reset_assign_group_overrides' => 1,
+            'reset_assign_user_overrides' => 1);
 }
 
 /**
@@ -185,6 +204,122 @@ function assign_update_instance(stdClass $data, $form) {
     $context = context_module::instance($data->coursemodule);
     $assignment = new assign($context, null, null);
     return $assignment->update_instance($data);
+}
+
+/**
+ * This function updates the events associated to the assign.
+ * If $override is non-zero, then it updates only the events
+ * associated with the specified override.
+ *
+ * @param assign $assign the assign object.
+ * @param object $override (optional) limit to a specific override
+ */
+function assign_update_events($assign, $override = null) {
+    global $CFG, $DB;
+
+    require_once($CFG->dirroot . '/calendar/lib.php');
+
+    $assigninstance = $assign->get_instance();
+
+    // Load the old events relating to this assign.
+    $conds = array('modulename' => 'assign', 'instance' => $assigninstance->id);
+    if (!empty($override)) {
+        // Only load events for this override.
+        if (isset($override->userid)) {
+            $conds['userid'] = $override->userid;
+        } else {
+            $conds['groupid'] = $override->groupid;
+        }
+    }
+    $oldevents = $DB->get_records('event', $conds, 'id ASC');
+
+    // Now make a to-do list of all that needs to be updated.
+    if (empty($override)) {
+        // We are updating the primary settings for the assignment, so we need to add all the overrides.
+        $overrides = $DB->get_records('assign_overrides', array('assignid' => $assigninstance->id), 'id ASC');
+        // It is necessary to add an empty stdClass to the beginning of the array as the $oldevents
+        // list contains the original (non-override) event for the module. If this is not included
+        // the logic below will end up updating the wrong row when we try to reconcile this $overrides
+        // list against the $oldevents list.
+        array_unshift($overrides, new stdClass());
+    } else {
+        // Just do the one override.
+        $overrides = array($override);
+    }
+
+    if (!empty($assign->get_course_module())) {
+        $cmid = $assign->get_course_module()->id;
+    } else {
+        $cmid = get_coursemodule_from_instance('assign', $assigninstance->id, $assigninstance->course)->id;
+    }
+
+    foreach ($overrides as $current) {
+        $groupid   = isset($current->groupid) ? $current->groupid : 0;
+        $userid    = isset($current->userid) ? $current->userid : 0;
+        $duedate = isset($current->duedate) ? $current->duedate : $assigninstance->duedate;
+
+        // Only add 'due' events for an override if they differ from the assign default.
+        $addclose = empty($current->id) || !empty($current->duedate);
+
+        $event = new stdClass();
+        $event->type = CALENDAR_EVENT_TYPE_ACTION;
+        $event->description = format_module_intro('assign', $assigninstance, $cmid);
+        // Events module won't show user events when the courseid is nonzero.
+        $event->courseid    = ($userid) ? 0 : $assigninstance->course;
+        $event->groupid     = $groupid;
+        $event->userid      = $userid;
+        $event->modulename  = 'assign';
+        $event->instance    = $assigninstance->id;
+        $event->timestart   = $duedate;
+        $event->timeduration = 0;
+        $event->timesort    = $event->timestart + $event->timeduration;
+        $event->visible     = instance_is_visible('assign', $assigninstance);
+        $event->eventtype   = ASSIGN_EVENT_TYPE_DUE;
+        $event->priority    = null;
+
+        // Determine the event name and priority.
+        if ($groupid) {
+            // Group override event.
+            $params = new stdClass();
+            $params->assign = $assigninstance->name;
+            $params->group = groups_get_group_name($groupid);
+            if ($params->group === false) {
+                // Group doesn't exist, just skip it.
+                continue;
+            }
+            $eventname = get_string('overridegroupeventname', 'assign', $params);
+            // Set group override priority.
+            if (isset($current->sortorder)) {
+                $event->priority = $current->sortorder;
+            }
+        } else if ($userid) {
+            // User override event.
+            $params = new stdClass();
+            $params->assign = $assigninstance->name;
+            $eventname = get_string('overrideusereventname', 'assign', $params);
+            // Set user override priority.
+            $event->priority = CALENDAR_EVENT_USER_OVERRIDE_PRIORITY;
+        } else {
+            // The parent event.
+            $eventname = $assigninstance->name;
+        }
+
+        if ($duedate && $addclose) {
+            if ($oldevent = array_shift($oldevents)) {
+                $event->id = $oldevent->id;
+            } else {
+                unset($event->id);
+            }
+            $event->name      = $eventname.' ('.get_string('duedate', 'assign').')';
+            calendar_event::create($event);
+        }
+    }
+
+    // Delete any leftover events.
+    foreach ($oldevents as $badevent) {
+        $badevent = calendar_event::load($badevent);
+        $badevent->delete();
+    }
 }
 
 /**
@@ -217,6 +352,8 @@ function assign_supports($feature) {
             return true;
         case FEATURE_PLAGIARISM:
             return true;
+        case FEATURE_COMMENT:
+            return true;
 
         default:
             return null;
@@ -243,6 +380,17 @@ function assign_grading_areas_list() {
 function assign_extend_settings_navigation(settings_navigation $settings, navigation_node $navref) {
     global $PAGE, $DB;
 
+    // We want to add these new nodes after the Edit settings node, and before the
+    // Locally assigned roles node. Of course, both of those are controlled by capabilities.
+    $keys = $navref->get_children_key_list();
+    $beforekey = null;
+    $i = array_search('modedit', $keys);
+    if ($i === false and array_key_exists(0, $keys)) {
+        $beforekey = $keys[0];
+    } else if (array_key_exists($i + 1, $keys)) {
+        $beforekey = $keys[$i + 1];
+    }
+
     $cm = $PAGE->cm;
     if (!$cm) {
         return;
@@ -253,6 +401,19 @@ function assign_extend_settings_navigation(settings_navigation $settings, naviga
 
     if (!$course) {
         return;
+    }
+
+    if (has_capability('mod/assign:manageoverrides', $PAGE->cm->context)) {
+        $url = new moodle_url('/mod/assign/overrides.php', array('cmid' => $PAGE->cm->id));
+        $node = navigation_node::create(get_string('groupoverrides', 'assign'),
+            new moodle_url($url, array('mode' => 'group')),
+            navigation_node::TYPE_SETTING, null, 'mod_assign_groupoverrides');
+        $navref->add_node($node, $beforekey);
+
+        $node = navigation_node::create(get_string('useroverrides', 'assign'),
+            new moodle_url($url, array('mode' => 'user')),
+            navigation_node::TYPE_SETTING, null, 'mod_assign_useroverrides');
+        $navref->add_node($node, $beforekey);
     }
 
     // Link to gradebook.
@@ -300,7 +461,7 @@ function assign_get_coursemodule_info($coursemodule) {
     global $CFG, $DB;
 
     $dbparams = array('id'=>$coursemodule->instance);
-    $fields = 'id, name, alwaysshowdescription, allowsubmissionsfromdate, intro, introformat';
+    $fields = 'id, name, alwaysshowdescription, allowsubmissionsfromdate, intro, introformat, completionsubmit';
     if (! $assignment = $DB->get_record('assign', $dbparams, $fields)) {
         return false;
     }
@@ -313,7 +474,42 @@ function assign_get_coursemodule_info($coursemodule) {
             $result->content = format_module_intro('assign', $assignment, $coursemodule->id, false);
         }
     }
+
+    // Populate the custom completion rules as key => value pairs, but only if the completion mode is 'automatic'.
+    if ($coursemodule->completion == COMPLETION_TRACKING_AUTOMATIC) {
+        $result->customdata['customcompletionrules']['completionsubmit'] = $assignment->completionsubmit;
+    }
+
     return $result;
+}
+
+/**
+ * Callback which returns human-readable strings describing the active completion custom rules for the module instance.
+ *
+ * @param cm_info|stdClass $cm object with fields ->completion and ->customdata['customcompletionrules']
+ * @return array $descriptions the array of descriptions for the custom rules.
+ */
+function mod_assign_get_completion_active_rule_descriptions($cm) {
+    // Values will be present in cm_info, and we assume these are up to date.
+    if (empty($cm->customdata['customcompletionrules'])
+        || $cm->completion != COMPLETION_TRACKING_AUTOMATIC) {
+        return [];
+    }
+
+    $descriptions = [];
+    foreach ($cm->customdata['customcompletionrules'] as $key => $val) {
+        switch ($key) {
+            case 'completionsubmit':
+                if (empty($val)) {
+                    continue;
+                }
+                $descriptions[] = get_string('completionsubmit', 'assign');
+                break;
+            default:
+                break;
+        }
+    }
+    return $descriptions;
 }
 
 /**
@@ -334,13 +530,16 @@ function assign_page_type_list($pagetype, $parentcontext, $currentcontext) {
  * Print an overview of all assignments
  * for the courses.
  *
+ * @deprecated since 3.3
+ * @todo The final deprecation of this function will take place in Moodle 3.7 - see MDL-57487.
  * @param mixed $courses The list of courses to print the overview for
  * @param array $htmlarray The array of html to return
- *
  * @return true
  */
 function assign_print_overview($courses, &$htmlarray) {
     global $CFG, $DB;
+
+    debugging('The function assign_print_overview() is now deprecated.', DEBUG_DEVELOPER);
 
     if (empty($courses) || !is_array($courses) || count($courses) == 0) {
         return true;
@@ -474,6 +673,8 @@ function assign_print_overview($courses, &$htmlarray) {
  * This api generates html to be displayed to students in print overview section, related to their submission status of the given
  * assignment.
  *
+ * @deprecated since 3.3
+ * @todo The final deprecation of this function will take place in Moodle 3.7 - see MDL-57487.
  * @param array $mysubmissions list of submissions of current user indexed by assignment id.
  * @param string $sqlassignmentids sql clause used to filter open assignments.
  * @param array $assignmentidparams sql params used to filter open assignments.
@@ -485,6 +686,8 @@ function assign_print_overview($courses, &$htmlarray) {
 function assign_get_mysubmission_details_for_print_overview(&$mysubmissions, $sqlassignmentids, $assignmentidparams,
                                                             $assignment) {
     global $USER, $DB;
+
+    debugging('The function assign_get_mysubmission_details_for_print_overview() is now deprecated.', DEBUG_DEVELOPER);
 
     if ($assignment->nosubmissions) {
         // Offline assignment. No need to display alerts for offline assignments.
@@ -560,6 +763,8 @@ function assign_get_mysubmission_details_for_print_overview(&$mysubmissions, $sq
  * This api generates html to be displayed to teachers in print overview section, related to the grading status of the given
  * assignment's submissions.
  *
+ * @deprecated since 3.3
+ * @todo The final deprecation of this function will take place in Moodle 3.7 - see MDL-57487.
  * @param array $unmarkedsubmissions list of submissions of that are currently unmarked indexed by assignment id.
  * @param string $sqlassignmentids sql clause used to filter open assignments.
  * @param array $assignmentidparams sql params used to filter open assignments.
@@ -572,6 +777,9 @@ function assign_get_mysubmission_details_for_print_overview(&$mysubmissions, $sq
 function assign_get_grade_details_for_print_overview(&$unmarkedsubmissions, $sqlassignmentids, $assignmentidparams,
                                                      $assignment, $context) {
     global $DB;
+
+    debugging('The function assign_get_grade_details_for_print_overview() is now deprecated.', DEBUG_DEVELOPER);
+
     if (!isset($unmarkedsubmissions)) {
         // Build up and array of unmarked submissions indexed by assignment id/ userid
         // for use where the user has grading rights on assignment.
@@ -928,8 +1136,7 @@ function assign_print_recent_mod_activity($activity, $courseid, $detail, $modnam
     if ($detail) {
         $modname = $modnames[$activity->type];
         echo '<div class="title">';
-        echo '<img src="' . $OUTPUT->pix_url('icon', 'assign') . '" '.
-             'class="icon" alt="' . $modname . '">';
+        echo $OUTPUT->image_icon('icon', $modname, 'assign');
         echo '<a href="' . $CFG->wwwroot . '/mod/assign/view.php?id=' . $activity->cmid . '">';
         echo $activity->name;
         echo '</a>';
@@ -1512,4 +1719,173 @@ function mod_assign_output_fragment_gradingpanel($args) {
     );
 
     return $assign->view('gradingpanel', $viewargs);
+}
+
+/**
+ * Check if the module has any update that affects the current user since a given time.
+ *
+ * @param  cm_info $cm course module data
+ * @param  int $from the time to check updates from
+ * @param  array $filter  if we need to check only specific updates
+ * @return stdClass an object with the different type of areas indicating if they were updated or not
+ * @since Moodle 3.2
+ */
+function assign_check_updates_since(cm_info $cm, $from, $filter = array()) {
+    global $DB, $USER, $CFG;
+    require_once($CFG->dirroot . '/mod/assign/locallib.php');
+
+    $updates = new stdClass();
+    $updates = course_check_module_updates_since($cm, $from, array(ASSIGN_INTROATTACHMENT_FILEAREA), $filter);
+
+    // Check if there is a new submission by the user or new grades.
+    $select = 'assignment = :id AND userid = :userid AND (timecreated > :since1 OR timemodified > :since2)';
+    $params = array('id' => $cm->instance, 'userid' => $USER->id, 'since1' => $from, 'since2' => $from);
+    $updates->submissions = (object) array('updated' => false);
+    $submissions = $DB->get_records_select('assign_submission', $select, $params, '', 'id');
+    if (!empty($submissions)) {
+        $updates->submissions->updated = true;
+        $updates->submissions->itemids = array_keys($submissions);
+    }
+
+    $updates->grades = (object) array('updated' => false);
+    $grades = $DB->get_records_select('assign_grades', $select, $params, '', 'id');
+    if (!empty($grades)) {
+        $updates->grades->updated = true;
+        $updates->grades->itemids = array_keys($grades);
+    }
+
+    // Now, teachers should see other students updates.
+    if (has_capability('mod/assign:viewgrades', $cm->context)) {
+        $params = array('id' => $cm->instance, 'since1' => $from, 'since2' => $from);
+        $select = 'assignment = :id AND (timecreated > :since1 OR timemodified > :since2)';
+
+        if (groups_get_activity_groupmode($cm) == SEPARATEGROUPS) {
+            $groupusers = array_keys(groups_get_activity_shared_group_members($cm));
+            if (empty($groupusers)) {
+                return $updates;
+            }
+            list($insql, $inparams) = $DB->get_in_or_equal($groupusers, SQL_PARAMS_NAMED);
+            $select .= ' AND userid ' . $insql;
+            $params = array_merge($params, $inparams);
+        }
+
+        $updates->usersubmissions = (object) array('updated' => false);
+        $submissions = $DB->get_records_select('assign_submission', $select, $params, '', 'id');
+        if (!empty($submissions)) {
+            $updates->usersubmissions->updated = true;
+            $updates->usersubmissions->itemids = array_keys($submissions);
+        }
+
+        $updates->usergrades = (object) array('updated' => false);
+        $grades = $DB->get_records_select('assign_grades', $select, $params, '', 'id');
+        if (!empty($grades)) {
+            $updates->usergrades->updated = true;
+            $updates->usergrades->itemids = array_keys($grades);
+        }
+    }
+
+    return $updates;
+}
+
+/**
+ * Is the event visible?
+ *
+ * This is used to determine global visibility of an event in all places throughout Moodle. For example,
+ * the ASSIGN_EVENT_TYPE_GRADINGDUE event will not be shown to students on their calendar, and
+ * ASSIGN_EVENT_TYPE_DUE events will not be shown to teachers.
+ *
+ * @param calendar_event $event
+ * @return bool Returns true if the event is visible to the current user, false otherwise.
+ */
+function mod_assign_core_calendar_is_event_visible(calendar_event $event) {
+    global $CFG, $USER;
+
+    require_once($CFG->dirroot . '/mod/assign/locallib.php');
+
+    $cm = get_fast_modinfo($event->courseid)->instances['assign'][$event->instance];
+    $context = context_module::instance($cm->id);
+
+    $assign = new assign($context, $cm, null);
+
+    if ($event->eventtype == ASSIGN_EVENT_TYPE_GRADINGDUE) {
+        return $assign->can_grade();
+    } else {
+        return !$assign->can_grade() && $assign->can_view_submission($USER->id);
+    }
+}
+
+/**
+ * This function receives a calendar event and returns the action associated with it, or null if there is none.
+ *
+ * This is used by block_myoverview in order to display the event appropriately. If null is returned then the event
+ * is not displayed on the block.
+ *
+ * @param calendar_event $event
+ * @param \core_calendar\action_factory $factory
+ * @return \core_calendar\local\event\entities\action_interface|null
+ */
+function mod_assign_core_calendar_provide_event_action(calendar_event $event,
+                                                       \core_calendar\action_factory $factory) {
+
+    global $CFG, $USER;
+
+    require_once($CFG->dirroot . '/mod/assign/locallib.php');
+
+    $cm = get_fast_modinfo($event->courseid)->instances['assign'][$event->instance];
+    $context = context_module::instance($cm->id);
+
+    $assign = new assign($context, $cm, null);
+
+    // Apply overrides.
+    $assign->update_effective_access($USER->id);
+
+    if ($event->eventtype == ASSIGN_EVENT_TYPE_GRADINGDUE) {
+        $name = get_string('grade');
+        $url = new \moodle_url('/mod/assign/view.php', [
+            'id' => $cm->id,
+            'action' => 'grader'
+        ]);
+        $itemcount = $assign->count_submissions_need_grading();
+        $actionable = $assign->can_grade() && (time() >= $assign->get_instance()->allowsubmissionsfromdate);
+    } else {
+        $usersubmission = $assign->get_user_submission($USER->id, false);
+        if ($usersubmission && $usersubmission->status === ASSIGN_SUBMISSION_STATUS_SUBMITTED) {
+            // The user has already submitted.
+            // We do not want to change the text to edit the submission, we want to remove the event from the Dashboard entirely.
+            return null;
+        }
+
+        // The user has not yet submitted anything. Show the addsubmission link.
+        $name = get_string('addsubmission', 'assign');
+        $url = new \moodle_url('/mod/assign/view.php', [
+            'id' => $cm->id,
+            'action' => 'editsubmission'
+        ]);
+        $itemcount = 1;
+        $actionable = $assign->is_any_submission_plugin_enabled() && $assign->can_edit_submission($USER->id);
+    }
+
+    return $factory->create_instance(
+        $name,
+        $url,
+        $itemcount,
+        $actionable
+    );
+}
+
+/**
+ * Callback function that determines whether an action event should be showing its item count
+ * based on the event type and the item count.
+ *
+ * @param calendar_event $event The calendar event.
+ * @param int $itemcount The item count associated with the action event.
+ * @return bool
+ */
+function mod_assign_core_calendar_event_action_shows_item_count(calendar_event $event, $itemcount = 0) {
+    // List of event types where the action event's item count should be shown.
+    $eventtypesshowingitemcount = [
+        ASSIGN_EVENT_TYPE_GRADINGDUE
+    ];
+    // For mod_assign, item count should be shown if the event type is 'gradingdue' and there is one or more item count.
+    return in_array($event->eventtype, $eventtypesshowingitemcount) && $itemcount > 0;
 }

@@ -147,6 +147,22 @@ class mod_forum_mod_form extends moodleform_mod {
             }
         }
 
+        $mform->addElement('header', 'discussionlocking', get_string('discussionlockingheader', 'forum'));
+        $options = [
+            0               => get_string('discussionlockingdisabled', 'forum'),
+            1   * DAYSECS   => get_string('numday', 'core', 1),
+            1   * WEEKSECS  => get_string('numweek', 'core', 1),
+            2   * WEEKSECS  => get_string('numweeks', 'core', 2),
+            30  * DAYSECS   => get_string('nummonth', 'core', 1),
+            60  * DAYSECS   => get_string('nummonths', 'core', 2),
+            90  * DAYSECS   => get_string('nummonths', 'core', 3),
+            180 * DAYSECS   => get_string('nummonths', 'core', 6),
+            1   * YEARSECS  => get_string('numyear', 'core', 1),
+        ];
+        $mform->addElement('select', 'lockdiscussionafter', get_string('lockdiscussionafter', 'forum'), $options);
+        $mform->addHelpButton('lockdiscussionafter', 'lockdiscussionafter', 'forum');
+        $mform->disabledIf('lockdiscussionafter', 'type', 'eq', 'single');
+
 //-------------------------------------------------------------------------------
         $mform->addElement('header', 'blockafterheader', get_string('blockafter', 'forum'));
         $options = array();
@@ -227,14 +243,23 @@ class mod_forum_mod_form extends moodleform_mod {
         if (empty($default_values['completionreplies'])) {
             $default_values['completionreplies']=1;
         }
-        $default_values['completionpostsenabled']=
-            !empty($default_values['completionposts']) ? 1 : 0;
+        // Tick by default if Add mode or if completion posts settings is set to 1 or more.
+        if (empty($this->_instance) || !empty($default_values['completionposts'])) {
+            $default_values['completionpostsenabled'] = 1;
+        } else {
+            $default_values['completionpostsenabled'] = 0;
+        }
         if (empty($default_values['completionposts'])) {
             $default_values['completionposts']=1;
         }
     }
 
-      function add_completion_rules() {
+    /**
+     * Add custom completion rules.
+     *
+     * @return array Array of string IDs of added items, empty array if none
+     */
+    public function add_completion_rules() {
         $mform =& $this->_form;
 
         $group=array();
@@ -267,11 +292,16 @@ class mod_forum_mod_form extends moodleform_mod {
             (!empty($data['completionpostsenabled']) && $data['completionposts']!=0);
     }
 
-    function get_data() {
-        $data = parent::get_data();
-        if (!$data) {
-            return false;
-        }
+    /**
+     * Allows module to modify the data returned by form get_data().
+     * This method is also called in the bulk activity completion form.
+     *
+     * Only available on moodleform_mod.
+     *
+     * @param stdClass $data the form data to be modified.
+     */
+    public function data_postprocessing($data) {
+        parent::data_postprocessing($data);
         // Turn off completion settings if the checkboxes aren't ticked
         if (!empty($data->completionunlocked)) {
             $autocompletion = !empty($data->completion) && $data->completion==COMPLETION_TRACKING_AUTOMATIC;
@@ -285,7 +315,6 @@ class mod_forum_mod_form extends moodleform_mod {
                 $data->completionposts = 0;
             }
         }
-        return $data;
     }
 }
 

@@ -1,5 +1,5 @@
 @block @block_activity_results
-Feature: The activity results block displays student scores
+Feature: The activity results block doesn't display student scores for unsupported activity
   In order to be display student scores
   As a user
   I need to properly configure the activity results block
@@ -15,8 +15,7 @@ Feature: The activity results block displays student scores
       | user | course | role |
       | teacher1 | C1 | editingteacher |
     And I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
 
   Scenario: Try to configure the block to use an activity without grades
     Given I add a "Assignment" to section "1" and I fill the form with:
@@ -33,7 +32,7 @@ Feature: The activity results block displays student scores
       | id_config_nameformat | Display full names |
     And I press "Save changes"
     When I follow "Test assignment"
-    And I click on "Edit settings" "link" in the "Administration" "block"
+    And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | id_grade_modgrade_type | None |
     And I press "Save and return to course"
