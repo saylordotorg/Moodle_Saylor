@@ -297,7 +297,7 @@ try {
     stage('Build') {
         echo("Beginning stashing operations")
 
-        StashMoodle()
+        StashMoodle(moodle_version)
         StashPlugins(plugins)
 
         echo("Finished stashing operations")
