@@ -17,25 +17,25 @@ def plugins = [
     [
         "name" : 'mod_journal',
         "url" : 'https://github.com/dmonllao/moodle-mod_journal.git',
-        "branch" : 'MOODLE_31_STABLE',
+        "branch" : 'MOODLE_32_STABLE',
         "dest" : 'mod/journal'
     ],
     [
         "name" : 'format_flexsections',
         "url" : 'https://github.com/marinaglancy/moodle-format_flexsections.git',
-        "branch" : 'master',
+        "branch" : 'MOODLE_32_STABLE',
         "dest" : 'course/format/flexsections'
     ],
     [
         "name" : 'format_grid',
         "url" : 'https://github.com/gjb2048/moodle-format_grid.git',
-        "branch" : 'MOODLE_31',
+        "branch" : 'master',
         "dest" : 'course/format/grid'
     ],
     [
         "name" : 'format_topcoll',
         "url" : 'https://github.com/gjb2048/moodle-format_topcoll.git',
-        "branch" : 'MOODLE_31',
+        "branch" : 'master',
         "dest" : 'course/format/topcoll'
     ],
     [
@@ -197,7 +197,7 @@ def plugins = [
     [
         "name" : 'mod_reengagement',
         "url" : 'https://github.com/catalyst/moodle-mod_reengagement.git',
-        "branch" : 'MOODLE_31_STABLE',
+        "branch" : 'MOODLE_32_STABLE',
         "dest" : 'mod/reengagement'
     ],
     [
