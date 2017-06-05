@@ -105,12 +105,6 @@ def plugins = [
         "dest" : 'blocks/configurable_reports'
     ],
     [
-        "name" : 'local_ltiprovider',
-        "url" : 'https://github.com/jleyva/moodle-local_ltiprovider.git',
-        "branch" : 'MOODLE_29_STABLE',
-        "dest" : 'local/ltiprovider'
-    ],
-    [
         "name" : 'report_myfeedback',
         "url" : 'https://github.com/jgramp/moodle-report_myfeedback.git',
         "branch" : 'master',
