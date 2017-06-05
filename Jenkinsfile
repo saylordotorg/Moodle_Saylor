@@ -15,12 +15,6 @@ def plugins = [
         "dest" : 'theme/saylor'
     ],
     [
-        "name" : 'qtype_freehanddrawing',
-        "url" : 'https://github.com/ethz-let/moodle-qtype_freehanddrawing',
-        "branch" : 'master',
-        "dest" : 'question/type/freehanddrawing'
-    ],
-    [
         "name" : 'mod_journal',
         "url" : 'https://github.com/dmonllao/moodle-mod_journal.git',
         "branch" : 'MOODLE_31_STABLE',
