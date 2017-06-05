@@ -1,13 +1,53 @@
 History
 =============
-Version 3.1.1.2
-  1. Fix 'Embedded videos still load in one section per page mode' - #39.
-  2. Fix '"bordercolour" is set to 0 when creating courses using the "Upload courses" tool' - CONTRIB-6655.
-  3. Fix 'Managers assigned at Course Category levels cannot create a course with grid format selected' - #42.
+Version 3.2.1.3
+  1. Fix "Error when restoring course" - CONTRIB-6917.
+  2. Fix not being able to tab to colour settings.
 
-Version 3.1.1.1
+Version 3.2.1.2
+  1. Fix unable to use cursor keys to edit section title when editing.
+  2. Fix border colour spilling out of title.
+  3. Add ability to have a zero sized border.
+  4. Add tile alignment setting.
+  5. Add tile title height setting when 'inside' the tile.
+  6. Add tile title background opacity setting when 'inside' the tile.
+  7. Add tile title font size setting when 'inside' the tile.
+  8. Add section title text alignment setting.
+  9. Add section summary hover text length setting.
+ 10. Add section summary hover font colour setting.
+ 11. Add section summary hover background colour setting.
+ 12. Add section summary hover background opacity setting.
+ 13. Add ability to turn off custom cursors setting.
+ 14. Renderer API changes to support Adaptable theme changes.
+ 15. Fix 'Grey out unavailable broken' - #49.
+ 16. Fix 'Text not correctly escaped in grid popovers' - #52.
+ 17. Add nav drawer click functionality for Boost theme.
+ Changes 2-14 gratefully funded by Coventry University UK.
+
+Version 3.2.1.1
+  1. Fix '"bordercolour" is set to 0 when creating courses using the "Upload courses" tool' - CONTRIB-6655.
+  2. Fix 'Arrows and cursors in M3.2 with RTL' - #41.
+     Notes: Clean up CSS after MDL-57869 is fixed.
+            Rebuilt YUI JS with Shifter - https://docs.moodle.org/dev/YUI/Shifter.
+  3. Fix 'Managers assigned at Course Category levels cannot create a course with grid format selected' - #42.
+  4. Fix position of shadebox with Essential / Boost theme - #45.
+  5. Fix missing closing 'div'.
+  6. Fix position of section title when inside the grid box and section title tooltip width.
+  7. Incorrect word in 'defaultsectiontitleboxinsideposition' setting option - #46.
+  8. Changed overlay and shadebox z-index to 2 for the Essential theme.  If proven issues then will need to be somehow dynamic.
+
+Version 3.2.1.0
+  1. Fix 'Embedded videos still load in one section per page mode' - #39.
+  2. Remove old 'format_grid_delete_course' function and replace with '\core\event\course_content_deleted' event.
+  3. Cope with the Boost theme in relation to the shadebox.
+  4. Cope with the Boost theme in relation to the grid area.
+
+Version 3.2.0.2
   1. Improve deletion.
   2. Section title text format options.  Thanks to Murdoch University, Perth, WA for supporting this enhancement.
+
+Version 3.2.0.1
+  1. First beta for M3.2.
 
 Version 3.1.1.0
   1. Changes for MDL-54557.
