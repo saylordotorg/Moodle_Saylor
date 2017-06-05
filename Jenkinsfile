@@ -23,7 +23,7 @@ def plugins = [
     [
         "name" : 'format_flexsections',
         "url" : 'https://github.com/marinaglancy/moodle-format_flexsections.git',
-        "branch" : 'MOODLE_32_STABLE',
+        "branch" : 'master',
         "dest" : 'course/format/flexsections'
     ],
     [
