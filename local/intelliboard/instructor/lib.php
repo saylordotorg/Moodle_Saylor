@@ -336,7 +336,7 @@ function intelliboard_instructor_stats()
             GROUP BY c.id, u.id) x
         GROUP BY x.id", $params);
 }
-function intelliboard_instructor_courses($view, $page, $length)
+function intelliboard_instructor_courses($view, $page, $length, $courseid = 0)
 {
     global $DB, $USER;
 
@@ -386,6 +386,8 @@ function intelliboard_instructor_courses($view, $page, $length)
         foreach($courses as $course){
             $course->data1 = ($course->data2) ? ($course->data1 / ($course->learners * $course->data2)) * 100 : 0;
         }
+    }elseif($view == 'course_overview'){
+        return array();
     }else{
         $courses = $DB->get_records_sql("
             SELECT
@@ -404,4 +406,19 @@ function intelliboard_instructor_courses($view, $page, $length)
             GROUP BY c.id", $params, $page, $length);
     }
     return $courses;
+}
+
+function intelliboard_instructor_get_my_courses(){
+    global $DB,$USER;
+
+    $teacher_roles = get_config('local_intelliboard', 'filter10');
+    $params = array('userid'=>$USER->id);
+    list($sql, $params) = intelliboard_filter_in_sql($teacher_roles, "ra.roleid", $params);
+
+
+    return $DB->get_records_sql("
+                SELECT DISTINCT c.id,c.fullname
+                FROM {role_assignments} ra, {context} ctx, {course} c
+                WHERE ctx.id = ra.contextid AND ctx.contextlevel = 50 AND ra.userid = :userid AND c.id=ctx.instanceid $sql
+                ORDER BY c.fullname", $params);
 }
