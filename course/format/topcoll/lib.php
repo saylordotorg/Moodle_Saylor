@@ -225,10 +225,6 @@ class format_topcoll extends format_base {
             if ($sectionno != 0 && $usercoursedisplay == COURSE_DISPLAY_MULTIPAGE) {
                 $url->param('section', $sectionno);
             } else {
-                global $CFG;
-                if (empty($CFG->linkcoursesections) && !empty($options['navigation'])) {
-                    return null;
-                }
                 $url->set_anchor('section-' . $sectionno);
             }
         }
@@ -709,13 +705,12 @@ class format_topcoll extends format_base {
      * @return array array of references to the added form elements
      */
     public function create_edit_form_elements(&$mform, $forsection = false) {
-        global $CFG, $COURSE, $OUTPUT;
+        global $CFG, $COURSE, $OUTPUT, $USER;
         MoodleQuickForm::registerElementType('tccolourpopup', "$CFG->dirroot/course/format/topcoll/js/tc_colourpopup.php",
                                              'MoodleQuickForm_tccolourpopup');
 
         $elements = parent::create_edit_form_elements($mform, $forsection);
         if (!$forsection && (empty($COURSE->id) || $COURSE->id == SITEID)) {
-            global $USER;
             /* Add "numsections" element to the create course form - it will force new course to be prepopulated
                with empty sections.
                The "Number of sections" option is no longer available when editing course, instead teachers should
@@ -728,72 +723,72 @@ class format_topcoll extends format_base {
                 $mform->setDefault('numsections', $courseconfig->numsections);
             }
             array_unshift($elements, $element);
+        }
 
-            $context = $this->get_context();
+        $context = $this->get_context();
 
-            $changelayout = has_capability('format/topcoll:changelayout', $context);
-            $changecolour = has_capability('format/topcoll:changecolour', $context);
-            $changetogglealignment = has_capability('format/topcoll:changetogglealignment', $context);
-            $changetoggleiconset = has_capability('format/topcoll:changetoggleiconset', $context);
-            $resetall = is_siteadmin($USER); // Site admins only.
+        $changelayout = has_capability('format/topcoll:changelayout', $context);
+        $changecolour = has_capability('format/topcoll:changecolour', $context);
+        $changetogglealignment = has_capability('format/topcoll:changetogglealignment', $context);
+        $changetoggleiconset = has_capability('format/topcoll:changetoggleiconset', $context);
+        $resetall = is_siteadmin($USER); // Site admins only.
 
-            $elements[] = $mform->addElement('header', 'ctreset', get_string('ctreset', 'format_topcoll'));
-            $mform->addHelpButton('ctreset', 'ctreset', 'format_topcoll', '', true);
+        $elements[] = $mform->addElement('header', 'ctreset', get_string('ctreset', 'format_topcoll'));
+        $mform->addHelpButton('ctreset', 'ctreset', 'format_topcoll', '', true);
 
-            $resetelements = array();
-            $checkboxname = get_string('resetdisplayinstructions', 'format_topcoll').
-                $OUTPUT->help_icon('resetdisplayinstructions', 'format_topcoll');
-            $resetelements[] =& $mform->createElement('checkbox', 'resetdisplayinstructions', '', $checkboxname);
+        $resetelements = array();
+        $checkboxname = get_string('resetdisplayinstructions', 'format_topcoll').
+            $OUTPUT->help_icon('resetdisplayinstructions', 'format_topcoll');
+        $resetelements[] =& $mform->createElement('checkbox', 'resetdisplayinstructions', '', $checkboxname);
 
-            if ($changelayout) {
-                $checkboxname = get_string('resetlayout', 'format_topcoll').$OUTPUT->help_icon('resetlayout', 'format_topcoll');
-                $resetelements[] =& $mform->createElement('checkbox', 'resetlayout', '', $checkboxname);
-            }
+        if ($changelayout) {
+            $checkboxname = get_string('resetlayout', 'format_topcoll').$OUTPUT->help_icon('resetlayout', 'format_topcoll');
+            $resetelements[] =& $mform->createElement('checkbox', 'resetlayout', '', $checkboxname);
+        }
 
-            if ($changecolour) {
-                $checkboxname = get_string('resetcolour', 'format_topcoll').$OUTPUT->help_icon('resetcolour', 'format_topcoll');
-                $resetelements[] =& $mform->createElement('checkbox', 'resetcolour', '', $checkboxname);
-            }
+        if ($changecolour) {
+            $checkboxname = get_string('resetcolour', 'format_topcoll').$OUTPUT->help_icon('resetcolour', 'format_topcoll');
+            $resetelements[] =& $mform->createElement('checkbox', 'resetcolour', '', $checkboxname);
+        }
 
-            if ($changetogglealignment) {
-                $checkboxname = get_string('resettogglealignment', 'format_topcoll').
-                    $OUTPUT->help_icon('resettogglealignment', 'format_topcoll');
-                $resetelements[] =& $mform->createElement('checkbox', 'resettogglealignment', '', $checkboxname);
-            }
+        if ($changetogglealignment) {
+            $checkboxname = get_string('resettogglealignment', 'format_topcoll').
+                $OUTPUT->help_icon('resettogglealignment', 'format_topcoll');
+            $resetelements[] =& $mform->createElement('checkbox', 'resettogglealignment', '', $checkboxname);
+        }
 
-            if ($changetoggleiconset) {
-                $checkboxname = get_string('resettoggleiconset', 'format_topcoll').
-                    $OUTPUT->help_icon('resettoggleiconset', 'format_topcoll');
-                $resetelements[] =& $mform->createElement('checkbox', 'resettoggleiconset', '', $checkboxname);
-            }
-            $elements[] = $mform->addGroup($resetelements, 'resetgroup', get_string('resetgrp', 'format_topcoll'), null, false);
+        if ($changetoggleiconset) {
+            $checkboxname = get_string('resettoggleiconset', 'format_topcoll').
+                $OUTPUT->help_icon('resettoggleiconset', 'format_topcoll');
+            $resetelements[] =& $mform->createElement('checkbox', 'resettoggleiconset', '', $checkboxname);
+        }
+        $elements[] = $mform->addGroup($resetelements, 'resetgroup', get_string('resetgrp', 'format_topcoll'), null, false);
 
-            if ($resetall) {
-                $resetallelements = array();
+        if ($resetall) {
+            $resetallelements = array();
 
-                $checkboxname = get_string('resetalldisplayinstructions', 'format_topcoll').
-                    $OUTPUT->help_icon('resetalldisplayinstructions', 'format_topcoll');
-                $resetallelements[] =& $mform->createElement('checkbox', 'resetalldisplayinstructions', '', $checkboxname);
+            $checkboxname = get_string('resetalldisplayinstructions', 'format_topcoll').
+                $OUTPUT->help_icon('resetalldisplayinstructions', 'format_topcoll');
+            $resetallelements[] =& $mform->createElement('checkbox', 'resetalldisplayinstructions', '', $checkboxname);
 
-                $checkboxname = get_string('resetalllayout', 'format_topcoll').
-                    $OUTPUT->help_icon('resetalllayout', 'format_topcoll');
-                $resetallelements[] =& $mform->createElement('checkbox', 'resetalllayout', '', $checkboxname);
+            $checkboxname = get_string('resetalllayout', 'format_topcoll').
+                $OUTPUT->help_icon('resetalllayout', 'format_topcoll');
+            $resetallelements[] =& $mform->createElement('checkbox', 'resetalllayout', '', $checkboxname);
 
-                $checkboxname = get_string('resetallcolour', 'format_topcoll').
-                    $OUTPUT->help_icon('resetallcolour', 'format_topcoll');
-                $resetallelements[] =& $mform->createElement('checkbox', 'resetallcolour', '', $checkboxname);
+            $checkboxname = get_string('resetallcolour', 'format_topcoll').
+                $OUTPUT->help_icon('resetallcolour', 'format_topcoll');
+            $resetallelements[] =& $mform->createElement('checkbox', 'resetallcolour', '', $checkboxname);
 
-                $checkboxname = get_string('resetalltogglealignment', 'format_topcoll').
-                    $OUTPUT->help_icon('resetalltogglealignment', 'format_topcoll');
-                $resetallelements[] =& $mform->createElement('checkbox', 'resetalltogglealignment', '', $checkboxname);
+            $checkboxname = get_string('resetalltogglealignment', 'format_topcoll').
+                $OUTPUT->help_icon('resetalltogglealignment', 'format_topcoll');
+            $resetallelements[] =& $mform->createElement('checkbox', 'resetalltogglealignment', '', $checkboxname);
 
-                $checkboxname = get_string('resetalltoggleiconset', 'format_topcoll').
-                    $OUTPUT->help_icon('resetalltoggleiconset', 'format_topcoll');
-                $resetallelements[] =& $mform->createElement('checkbox', 'resetalltoggleiconset', '', $checkboxname);
+            $checkboxname = get_string('resetalltoggleiconset', 'format_topcoll').
+                $OUTPUT->help_icon('resetalltoggleiconset', 'format_topcoll');
+            $resetallelements[] =& $mform->createElement('checkbox', 'resetalltoggleiconset', '', $checkboxname);
 
-                $elements[] = $mform->addGroup($resetallelements, 'resetallgroup',
-                    get_string('resetallgrp', 'format_topcoll'), null, false);
-            }
+            $elements[] = $mform->addGroup($resetallelements, 'resetallgroup',
+                get_string('resetallgrp', 'format_topcoll'), null, false);
         }
 
         return $elements;
@@ -1242,11 +1237,15 @@ class format_topcoll extends format_base {
     public function section_action($section, $action, $sr) {
         global $PAGE;
 
-        if ($section->section && ($action === 'setmarker' || $action === 'removemarker')) {
-            // Format 'Topcoll' allows to set and remove markers in addition to common section actions.
-            require_capability('moodle/course:setcurrentsection', context_course::instance($this->courseid));
-            course_set_marker($this->courseid, ($action === 'setmarker') ? $section->section : 0);
-            return null;
+        // Topic based course.
+        $tcsettings = $this->get_settings();
+        if (($tcsettings['layoutstructure'] == 1) || ($tcsettings['layoutstructure'] == 4)) {
+            if ($section->section && ($action === 'setmarker' || $action === 'removemarker')) {
+                // Format 'Topcoll' allows to set and remove markers in addition to common section actions.
+                require_capability('moodle/course:setcurrentsection', context_course::instance($this->courseid));
+                course_set_marker($this->courseid, ($action === 'setmarker') ? $section->section : 0);
+                return null;
+            }
         }
 
         // For show/hide actions call the parent method and return the new content for .section_availability element.

@@ -1,0 +1,268 @@
+/**
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+/**
+ * @package    block_intelliboard
+ * @copyright  2017 IntelliBoard, Inc
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @website    http://intelliboard.net/
+ */
+
+.intelliboard-block{
+    min-height: 290px;
+}
+.intelliboard-block ul{
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.intelliboard-block ul li{
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    min-height: 270px;
+    display: none;
+}
+.intelliboard-block ul li.active{
+    display: block;
+}
+.intelliboard-block ul li .progress-title{
+    margin:auto;
+    padding: 0;
+    list-style: none;
+     min-height: 270px;
+}
+.intelliboard-block ul li p{
+    margin: 0;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    font-size: 13px;
+}
+.intelliboard-block ul li p:last-child{
+    border-bottom: 0;
+}
+.intelliboard-block ul li p strong{
+    float: right;
+}
+.intelliboard-block ul li h4 span{
+	float: right;
+}
+.intelliboard-block ul li h4{
+	border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+	font-size: 17px;
+	font-weight: 300;
+	padding-bottom: 5px;
+    margin: 0;
+    position: relative;
+}
+.intelliboard-block ul li h4 span{
+    position: absolute;
+    bottom: -1px;
+    left: 0px;
+    height: 1px;
+    width: 0%;
+    background: #3399ff;
+}
+.intelliboard-block .summary-chart-wrap{
+    position: relative;
+}
+.intelliboard-block .summary-chart-label{
+    position: absolute;
+    top: 0;
+    left: 0;
+    right:0;
+    bottom: 0;
+    margin: auto;
+    text-align: center;
+    width: 100%;
+    z-index: 9999;
+    height: 30px;
+    font-weight: 100;
+    line-height: 26px;
+    font-size: 42px;
+}
+.intelliboard-block .summary-chart-label i{
+    display: block;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 100;
+    padding-top: 5px;
+    font-style: normal;
+    text-transform: uppercase;
+}
+.flat-list h5{
+    font-size: 13px;
+    font-weight: 400;
+    margin: 15px 0 0;
+    cursor: pointer;
+}
+.flat-list .item-line {
+    height: 15px;
+    border-radius: 0 0px 0px 0;
+    margin-top: 5px;
+    margin-bottom: -15px;
+    transition: all 0.4s;
+}
+.flat-list .item-completed{
+    background-color:#16a085;
+}
+.flat-list .item-grade{
+    background-color: #3498db;
+}
+.flat-list .item-time{
+    background-color: #f1c40f;
+}
+.flat-list .item-sum{
+    border-bottom: 15px solid #ddd;
+}
+.flat-list .item-sum span{
+    display: none;
+    float: left;
+}
+.flat-list .item-sum strong{
+    display: none;
+    float: right;
+}
+.flat-list .flat-list-item.active .item-sum{
+    border-bottom: 2px solid #ddd;
+}
+.flat-list .flat-list-item.active .item-sum span{
+    display: block;
+}
+.flat-list .flat-list-item.active .item-sum strong{
+    display: block;
+}
+.flat-list .flat-list-item.active .item-line {
+    height: 2px;
+    margin-bottom: -2px;
+}
+.flat-list .flat-list-item.active h5{
+    font-weight: 600;
+}
+.flat-list .flat-list-item h5:hover{
+    font-weight: 600;
+}
+.intelliboard-block-nav{
+    position: absolute;
+    top:0;
+    right: 0;
+    z-index: 9;
+}
+.intelliboard-block{
+    position: relative;
+}
+.intelliboard-block-nav img{
+    cursor: pointer;
+    margin-left: 12px;
+    width: 12px;
+}
+.intelliboard-navcontent{
+    display: none;
+    padding: 0px 0;
+}
+.intelliboard-navcontent a{
+    padding: 10px;
+    display: block;
+    border-bottom: 1px solid #ddd;
+}
+.intelliboard-navcontent .external-links{
+    border-top: 3px solid #ddd;
+    margin-top: 0px;
+    padding-bottom: 0px;
+}
+.intelliboard-navcontent .external-links a{
+    color: #999;
+    line-height: 16px;
+    clear: both;
+}
+.intelliboard-navcontent .external-links img{
+    float: left;
+    margin-right: 10px;
+}
+.intelliboard-navcontent a:last-child{
+    border-bottom: 0;
+}
+.intelliboard-navcontent a.active,
+.intelliboard-navcontent a:hover{
+    background: #fff;
+}
+.intelliboard-navcontent h4{
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    font-size: 17px;
+    font-weight: 300;
+    padding-bottom: 5px;
+    margin: 0 0 20px;
+}
+.intelliboard-ajax-block{
+    padding-top: 10px;
+    overflow-y: auto;
+    max-height: 560px;
+}
+.intelliboard-block-activity{
+    margin: 0;
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd;
+    font-size: 13px;
+}
+.intelliboard-block-activity:last-child{
+    border-bottom: 0;
+}
+.intelliboard-block-activity span{
+    color: #777;
+    padding-right: 5px;
+    display: block;
+}
+.block_intelliboard.block{
+	transition: all 0.4s;
+}
+.block_intelliboard.block.fullsize .intelliboard-block-activity span{
+    display: inline;
+}
+.block_intelliboard.block.fullsize{
+	bottom: 0;
+    height: 100%;
+    left: 0;
+    margin: auto;
+    position: fixed;
+    right: 0;
+    top: 0;
+    width:100%;
+    background-color: rgba(0,0,0,0.2);
+    z-index: 9999;
+}
+.block_intelliboard.block.fullsize ul li h4{
+    margin-bottom: 0;
+}
+.block_intelliboard.block.fullsize .content{
+	overflow-y: auto;
+	bottom: 0;
+    height: 600px;
+    left: 0;
+    margin: auto;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 600px;
+    background-color: rgba(255, 255, 255, 1);
+    padding: 20px;
+}
+.block_intelliboard.block_with_controls .intelliboard-block-nav{
+    display: none;
+}
+.block_intelliboard.block_with_controls .block-controls{
+    position: relative;
+    z-index: 99999;
+}

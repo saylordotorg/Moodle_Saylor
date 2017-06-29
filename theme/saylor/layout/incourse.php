@@ -117,7 +117,7 @@ echo $OUTPUT->doctype() ?>
             </header>
         </div>    
         <div id="cname" class="container">
-            <h1>— <?php echo $this->page->course->fullname ?> —</h1>
+            <h1><?php echo $this->page->course->fullname ?></h1>
         </div>
         <div id="navwrap">
             <div id="page-navbar" class="container clearfix">

@@ -607,6 +607,10 @@ input[type="color"],
     width: 100%;
 }
 
+/*Remove 'Site Pages' from left nav bar*/
+.block_navigation .type_course.depth_2 { 
+    display: none; 
+}
 
 @media (max-width: 979px) {
     .navbar {

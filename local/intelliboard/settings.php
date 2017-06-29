@@ -244,6 +244,11 @@ if($ADMIN->fulltree){
         $setting = new admin_setting_configcheckbox($name, $title, '', true, true, false);
         $settings->add($setting);
 
+        $name = 'local_intelliboard/n12';
+        $title = new lang_string('n12', 'local_intelliboard');
+        $setting = new admin_setting_configcheckbox($name, $title, '', true, true, false);
+        $settings->add($setting);
+
         $name = 'local_intelliboard/n4';
         $title = new lang_string('n4', 'local_intelliboard');
         $setting = new admin_setting_configcheckbox($name, $title, '', true, true, false);
@@ -254,13 +259,33 @@ if($ADMIN->fulltree){
         $setting = new admin_setting_configcheckbox($name, $title, '', true, true, false);
         $settings->add($setting);
 
+        $name = 'local_intelliboard/n13';
+        $title = new lang_string('n13', 'local_intelliboard');
+        $setting = new admin_setting_configcheckbox($name, $title, '', true, true, false);
+        $settings->add($setting);
+
         $name = 'local_intelliboard/n6';
         $title = new lang_string('n6', 'local_intelliboard');
         $setting = new admin_setting_configcheckbox($name, $title, '', true, true, false);
         $settings->add($setting);
 
+        $name = 'local_intelliboard/n14';
+        $title = new lang_string('n14', 'local_intelliboard');
+        $setting = new admin_setting_configcheckbox($name, $title, '', true, true, false);
+        $settings->add($setting);
+
         $name = 'local_intelliboard/n7';
         $title = new lang_string('n7', 'local_intelliboard');
+        $setting = new admin_setting_configcheckbox($name, $title, '', true, true, false);
+        $settings->add($setting);
+
+        $name = 'local_intelliboard/n15';
+        $title = new lang_string('n15', 'local_intelliboard');
+        $setting = new admin_setting_configcheckbox($name, $title, '', true, true, false);
+        $settings->add($setting);
+
+        $name = 'local_intelliboard/n16';
+        $title = new lang_string('n16', 'local_intelliboard');
         $setting = new admin_setting_configcheckbox($name, $title, '', true, true, false);
         $settings->add($setting);
 
@@ -596,5 +621,36 @@ if($ADMIN->fulltree){
         $name = 'local_intelliboard/a31';
         $title = new lang_string('a31', 'local_intelliboard');
         $setting = new admin_setting_configcheckbox($name, $title, '', true, true, false);
+        $settings->add($setting);
+
+
+        $settings->add(new admin_setting_heading('local_intelliboard/scalesettings', new lang_string('scalesettings', 'local_intelliboard'), ''));
+
+        $name = 'local_intelliboard/scale_raw';
+        $title = new lang_string('scale_raw', 'local_intelliboard');
+        $setting = new admin_setting_configcheckbox($name, $title, '', false, true, false);
+        $settings->add($setting);
+
+        $name = 'local_intelliboard/scales';
+        $title = new lang_string('scales', 'local_intelliboard');
+        $setting = new admin_setting_configcheckbox($name, $title, '', false, true, false);
+        $settings->add($setting);
+
+        $name = 'local_intelliboard/scale_total';
+        $title = new lang_string('scale_total', 'local_intelliboard');
+        $default = 0;
+        $setting = new admin_setting_configtext($name, $title, '', $default);
+        $settings->add($setting);
+
+        $name = 'local_intelliboard/scale_value';
+        $title = new lang_string('scale_value', 'local_intelliboard');
+        $default = 0;
+        $setting = new admin_setting_configtext($name, $title, '', $default);
+        $settings->add($setting);
+
+        $name = 'local_intelliboard/scale_percentage';
+        $title = new lang_string('scale_percentage', 'local_intelliboard');
+        $default = 0;
+        $setting = new admin_setting_configtext($name, $title, '', $default);
         $settings->add($setting);
 }
