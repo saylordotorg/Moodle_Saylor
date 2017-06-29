@@ -210,7 +210,7 @@ def plugins = [
         "name" : 'block_intelliboard',
         "url" : 'https://github.com/intelliboard/intelliboard_block',
         "branch" : 'master',
-        "dest" : 'block/intelliboard'
+        "dest" : 'blocks/intelliboard'
     ]
 ]
 
