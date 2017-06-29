@@ -205,6 +205,12 @@ def plugins = [
         "url" : 'https://github.com/saylordotorg/moodle-local_discoursesso.git',
         "branch" : 'master',
         "dest" : 'local/discoursesso'
+    ],
+    [
+        "name" : 'block_intelliboard',
+        "url" : 'https://github.com/intelliboard/intelliboard_block',
+        "branch" : 'master',
+        "dest" : 'block/intelliboard'
     ]
 ]
 
