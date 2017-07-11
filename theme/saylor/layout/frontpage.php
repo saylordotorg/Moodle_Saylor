@@ -87,7 +87,7 @@ echo $OUTPUT->doctype() ?>
 <div id="page-header-wrapper" class="clearfix">
     <header id="page-header" class="clearfix <?php echo "$headerclass"; ?> lalign">
         <div class="logo-div">
-            <a class="logo-img" style="background-image: url('<?php echo $OUTPUT->pix_url('logo', 'theme')?>');" href="/"></a>
+            <a class="logo-img" style="background-image: url('<?php echo $OUTPUT->image_url('logo', 'theme')?>');" href="/"></a>
         </div>         
         <div class="navbar pull-left">
     <nav role="navigation" class="navbar-inner">
@@ -161,7 +161,7 @@ echo $OUTPUT->doctype() ?>
         
         <div class="span4">
         <div align="center" class="logo">
-            <a class="logo" style="background-image: url('<?php echo $OUTPUT->pix_url('logo2', 'theme')?>');" href="/"></a>
+            <a class="logo" style="background-image: url('<?php echo $OUTPUT->image_url('logo2', 'theme')?>');" href="/"></a>
         </div>
             <div class="footer-share">
                 <a title="Facebook | /SaylorFoundation" target="_blank" href="https://www.facebook.com/SaylorFoundation" class="fa fa-facebook fa-2x"></a>
@@ -174,7 +174,7 @@ echo $OUTPUT->doctype() ?>
         
         <div class="span4">
         
-        <div class="textwidget"><p><a href="http://creativecommons.org/licenses/by/3.0/" rel="license"><img src="<?php echo $OUTPUT->pix_url('ccby', 'theme')?>" style="border-width:0" alt="Creative Commons License"></a><br>&copy; Saylor Academy 2010-2017 except as otherwise noted. Excluding course final exams, content authored by Saylor Academy is available under a <a rel="license" href="http://creativecommons.org/licenses/by/3.0/" target="_blank">Creative Commons Attribution 3.0 Unported</a> license. Third-party materials are the copyright of their respective owners and shared under various licenses. See <a href="https://www.saylor.org/open/licensinginformation/" target="_blank">detailed licensing information</a>.</p>
+        <div class="textwidget"><p><a href="http://creativecommons.org/licenses/by/3.0/" rel="license"><img src="<?php echo $OUTPUT->image_url('ccby', 'theme')?>" style="border-width:0" alt="Creative Commons License"></a><br>&copy; Saylor Academy 2010-2017 except as otherwise noted. Excluding course final exams, content authored by Saylor Academy is available under a <a rel="license" href="http://creativecommons.org/licenses/by/3.0/" target="_blank">Creative Commons Attribution 3.0 Unported</a> license. Third-party materials are the copyright of their respective owners and shared under various licenses. See <a href="https://www.saylor.org/open/licensinginformation/" target="_blank">detailed licensing information</a>.</p>
 <p>Saylor Academy and Saylor.org&reg; are trade names of the Constitution Foundation, a 501(c)(3) organization through which our educational activities are conducted.</p>
 <p><a href="http://www.saylor.org/sitemap">Sitemap</a> | <a href="http://www.saylor.org/terms-of-use">Terms of Use</a> | <a href="http://www.saylor.org/privacy-policy">Privacy Policy</a></p>
 </div>   

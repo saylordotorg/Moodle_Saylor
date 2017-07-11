@@ -518,7 +518,7 @@ class theme_saylor_block_course_overview_renderer extends block_course_overview_
             // Create move icon, so it can be used.
             $movetofirsticon = html_writer::empty_tag(
                 'img',
-                array('src' => $this->output->pix_url('movehere'),
+                array('src' => $this->output->image_url('movehere'),
                         'alt' => get_string('movetofirst', 'block_course_overview', $courses[$movingcourseid]->fullname),
                 'title' => get_string('movehere'))
             );
@@ -602,7 +602,7 @@ class theme_saylor_block_course_overview_renderer extends block_course_overview_
         if ($userediting && !$ismovingcourse) {
             $moveicon = html_writer::empty_tag(
                 'img',
-                array('src' => $this->pix_url('t/move')->out(false),
+                array('src' => $this->image_url('t/move')->out(false),
                         'alt' => get_string('movecourse', 'block_course_overview', $course->fullname),
                 'title' => get_string('move'))
             );
@@ -677,7 +677,7 @@ class theme_saylor_block_course_overview_renderer extends block_course_overview_
             $a->currentcoursename = $course->fullname;
             $movehereicon = html_writer::empty_tag(
                 'img',
-                array('src' => $this->output->pix_url('movehere'),
+                array('src' => $this->output->image_url('movehere'),
                         'alt' => get_string('moveafterhere', 'block_course_overview', $a),
                 'title' => get_string('movehere'))
             );

@@ -1,6 +1,6 @@
 ﻿Version Information
 ===================
-Version 3.3.0.3
+Version 3.3.1.0
   1. Fix missing reset course settings.
   2. Add 'numsections' coping restore code from Topics format.
   3. Fix toggle all cursor.
@@ -8,6 +8,8 @@ Version 3.3.0.3
   5. One section only.
   6. Remove 'coursedisplay' setting favour of combining the two and adding a link on the right of the toggle.
   7. Add opactity option for all four toggle colour settings.
+  8. private or protected - #31.
+  9. Fix Boost theme :target CSS conflict.
 
 Version 3.3.0.2
   1. Make the 'readme' course setting only display and not store in the database, thus regenerate and not broken in the

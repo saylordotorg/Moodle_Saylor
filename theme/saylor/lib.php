@@ -229,7 +229,7 @@ function saylor_set_pone($css, $p1, $theme) {
     $tag = '[[setting:bannerpic]]';
     $replacement = $p1;
     if (is_null($replacement)) {
-        $replacement = $theme->pix_url('paint', 'theme');
+        $replacement = $theme->image_url('paint', 'theme');
     }
     $css = str_replace($tag, $replacement, $css);
     return $css;
