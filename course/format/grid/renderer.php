@@ -19,12 +19,16 @@
  *
  * @package    course/format
  * @subpackage grid
+ * @version    See the value of '$plugin->version' in version.php.
  * @copyright  &copy; 2012 G J Barnard in respect to modifications of standard topics format.
- * @author     G J Barnard - gjbarnard at gmail dot com and {@link http://moodle.org/user/profile.php?id=442195}
+ * @author     G J Barnard - {@link http://about.me/gjbarnard} and
+ *                           {@link http://moodle.org/user/profile.php?id=442195}
  * @author     Based on code originally written by Paul Krix and Julian Ridden.
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->dirroot . '/course/format/renderer.php');
 require_once($CFG->dirroot . '/course/format/grid/lib.php');
 
@@ -133,8 +137,9 @@ class format_grid_renderer extends format_section_renderer_base {
             $back--;
         }
 
+        $coursenumsections = $this->courseformat->get_last_section_number();
         $forward = $sectionno + 1;
-        while ($forward <= $course->numsections and empty($links['next'])) {
+        while ($forward <= $coursenumsections and empty($links['next'])) {
             if ($canviewhidden || $sections[$forward]->uservisible) {
                 $params = array();
                 if (!$sections[$forward]->visible) {
@@ -170,7 +175,8 @@ class format_grid_renderer extends format_section_renderer_base {
         } else {
             $section = 1;
         }
-        while ($section <= $course->numsections) {
+        $coursenumsections = $this->courseformat->get_last_section_number();
+        while ($section <= $coursenumsections) {
             $thissection = $modinfo->get_section_info($section);
             $showsection = $thissection->uservisible or !$course->hiddensections;
             if (($showsection) && ($section != $displaysection) && ($url = course_get_url($course, $section))) {
@@ -230,8 +236,7 @@ class format_grid_renderer extends format_section_renderer_base {
         $o .= $this->format_summary_text($section);
         $o .= html_writer::end_tag('div');
 
-        $context = context_course::instance($course->id);
-        $o .= $this->section_availability_message($section, has_capability('moodle/course:viewhiddensections', $context));
+        $o .= $this->section_availability($section);
 
         return $o;
     }
@@ -346,7 +351,7 @@ class format_grid_renderer extends format_section_renderer_base {
 
         if ($editing) {
             $streditsummary = get_string('editsummary');
-            $urlpicedit = $this->output->pix_url('t/edit');
+            $urlpicedit = $this->output->image_url('t/edit');
         } else {
             $urlpicedit = false;
             $streditsummary = '';
@@ -367,7 +372,6 @@ class format_grid_renderer extends format_section_renderer_base {
         }
         echo html_writer::start_tag('div', array('id' => 'gridiconcontainer', 'role' => 'navigation',
             'aria-label' => get_string('gridimagecontainer', 'format_grid')));
-        $sectiontitleclass = 'icon_content';
 
         $gridiconsclass = 'gridicons';
         if ($this->settings['sectiontitleboxposition'] == 1) {
@@ -385,6 +389,9 @@ class format_grid_renderer extends format_section_renderer_base {
         echo html_writer::end_tag('div');
 
         $rtl = right_to_left();
+
+        $coursenumsections = $this->courseformat->get_last_section_number();
+
         if (!(($course->coursedisplay == COURSE_DISPLAY_MULTIPAGE) && (!$editing))) {
             $gridshadeboxattributes = array('id' => 'gridshadebox');
             if ($defaultcustommousepointers == 2) { // Yes.
@@ -420,12 +427,12 @@ class format_grid_renderer extends format_section_renderer_base {
             }
             echo html_writer::tag('img', '', array('id' => 'gridshadebox_close', 'style' => 'display: none;',
                 'class' => $deviceextra,
-                'src' => $this->output->pix_url('close', 'format_grid'),
+                'src' => $this->output->image_url('close', 'format_grid'),
                 'role' => 'link',
                 'aria-label' => get_string('closeshadebox', 'format_grid')));
 
             // Only show the arrows if there is more than one box shown.
-            if (($course->numsections > 1) || (($course->numsections == 1) && (!$this->topic0attop))) {
+            if (($coursenumsections > 1) || (($coursenumsections == 1) && (!$this->topic0attop))) {
                 if ($rtl) {
                     $previcon = 'right';
                     $nexticon = 'left';
@@ -441,7 +448,7 @@ class format_grid_renderer extends format_section_renderer_base {
                     'role' => 'link',
                     'aria-label' => get_string('previoussection', 'format_grid')));
                 $prev .= html_writer::tag('img', '', array('class' => 'gridshadebox_arrow gridshadebox_previous'.$deviceextra,
-                    'src' => $this->output->pix_url('fa-arrow-circle-'.$previcon.'-w', 'format_grid')));
+                    'src' => $this->output->image_url('fa-arrow-circle-'.$previcon.'-w', 'format_grid')));
                 $prev .= html_writer::end_tag('div');
                 $next = html_writer::start_tag('div', array('id' => 'gridshadebox_next',
                     'class' => 'gridshadebox_area gridshadebox_next_area '.$areadir,
@@ -449,7 +456,7 @@ class format_grid_renderer extends format_section_renderer_base {
                     'role' => 'link',
                     'aria-label' => get_string('nextsection', 'format_grid')));
                 $next .= html_writer::tag('img', '', array('class' => 'gridshadebox_arrow gridshadebox_next'.$deviceextra,
-                    'src' => $this->output->pix_url('fa-arrow-circle-'.$nexticon.'-w', 'format_grid')));
+                    'src' => $this->output->image_url('fa-arrow-circle-'.$nexticon.'-w', 'format_grid')));
                 $next .= html_writer::end_tag('div');
 
                 if ($rtl) {
@@ -489,7 +496,7 @@ class format_grid_renderer extends format_section_renderer_base {
         $PAGE->requires->js_init_call('M.format_grid.init', array(
             $PAGE->user_is_editing(),
             $sectionredirect,
-            $course->numsections,
+            $coursenumsections,
             json_encode($this->shadeboxshownarray)));
         if (!$PAGE->user_is_editing()) {
             // Initialise the key control functionality...
@@ -521,9 +528,8 @@ class format_grid_renderer extends format_section_renderer_base {
         }
         $url->param('sesskey', sesskey());
 
-        $isstealth = $section->section > $course->numsections;
         $controls = array();
-        if (!$isstealth && $section->section && has_capability('moodle/course:setcurrentsection', $coursecontext)) {
+        if ($section->section && has_capability('moodle/course:setcurrentsection', $coursecontext)) {
             if ($course->marker == $section->section) {  // Show the "light globe" on/off.
                 $url->param('marker', 0);
                 $markedthissection = get_string('markedthissection', 'format_grid');
@@ -531,7 +537,8 @@ class format_grid_renderer extends format_section_renderer_base {
                 $controls['highlight'] = array('url' => $url, "icon" => 'i/marked',
                                                'name' => $highlightoff,
                                                'pixattr' => array('class' => '', 'alt' => $markedthissection),
-                                               'attr' => array('class' => 'editing_highlight', 'title' => $markedthissection));
+                                               'attr' => array('class' => 'editing_highlight', 'title' => $markedthissection,
+                                               'data-action' => 'removemarker'));
                 $url->param('marker', 0);
             } else {
                 $url->param('marker', $section->section);
@@ -540,7 +547,8 @@ class format_grid_renderer extends format_section_renderer_base {
                 $controls['highlight'] = array('url' => $url, "icon" => 'i/marker',
                                                'name' => $highlight,
                                                'pixattr' => array('class' => '', 'alt' => $markthissection),
-                                               'attr' => array('class' => 'editing_highlight', 'title' => $markthissection));
+                                               'attr' => array('class' => 'editing_highlight', 'title' => $markthissection,
+                                               'data-action' => 'setmarker'));
             }
         }
 
@@ -627,7 +635,7 @@ class format_grid_renderer extends format_section_renderer_base {
                             'sesskey' => sesskey(),
                             'course' => $course->id,
                             'showsummary' => 0)), html_writer::empty_tag('img', array(
-                            'src' => $this->output->pix_url('into_grid', 'format_grid'),
+                            'src' => $this->output->image_url('into_grid', 'format_grid'),
                             'alt' => $strhidesummaryalt)) . '&nbsp;' . $strhidesummary, array('title' => $strhidesummaryalt));
             }
         }
@@ -652,7 +660,7 @@ class format_grid_renderer extends format_section_renderer_base {
             if (!file_exists("$CFG->dirroot/course/format/grid/pix/new_activity_".$currentlanguage.".png")) {
                 $currentlanguage = 'en';
             }
-            $urlpicnewactivity = $this->output->pix_url('new_activity_'.$currentlanguage, 'format_grid');
+            $urlpicnewactivity = $this->output->image_url('new_activity_'.$currentlanguage, 'format_grid');
 
             // Get all the section information about which items should be marked with the NEW picture.
             $sectionupdated = $this->new_activity($course);
@@ -674,7 +682,8 @@ class format_grid_renderer extends format_section_renderer_base {
         }
 
         // Start at 1 to skip the summary block or include the summary block if it's in the grid display.
-        for ($section = $this->topic0attop ? 1 : 0; $section <= $course->numsections; $section++) {
+        $coursenumsections = $this->courseformat->get_last_section_number();
+        for ($section = $this->topic0attop ? 1 : 0; $section <= $coursenumsections; $section++) {
             $thissection = $modinfo->get_section_info($section);
 
             // Check if section is visible to user.
@@ -899,7 +908,7 @@ class format_grid_renderer extends format_section_renderer_base {
                 'role' => 'img',
                 'aria-label' => $sectionname));
         } else if ($section == 0) {
-            $imgurl = $this->output->pix_url('info', 'format_grid');
+            $imgurl = $this->output->image_url('info', 'format_grid');
             $content = html_writer::empty_tag('img', array(
                 'src' => $imgurl,
                 'alt' => $sectionname,
@@ -946,7 +955,7 @@ class format_grid_renderer extends format_section_renderer_base {
                 'aria-label' => $strdisplaysummaryalt)
             ),
             html_writer::empty_tag('img', array(
-                'src' => $this->output->pix_url('out_of_grid', 'format_grid'),
+                'src' => $this->output->image_url('out_of_grid', 'format_grid'),
                 'alt' => $strdisplaysummaryalt,
                 'role' => 'img',
                 'aria-label' => $strdisplaysummaryalt)) . '&nbsp;' . $strdisplaysummary,
@@ -981,7 +990,10 @@ class format_grid_renderer extends format_section_renderer_base {
             $urlpicedit, $onsectionpage) {
         $coursecontext = context_course::instance($course->id);
         unset($sections[0]);
-        for ($section = 1; $section <= $course->numsections; $section++) {
+
+        $coursenumsections = $this->courseformat->get_last_section_number();
+
+        for ($section = 1; $section <= $coursenumsections; $section++) {
             $thissection = $modinfo->get_section_info($section);
 
             if (!$hascapvishidsect && !$thissection->visible && $course->hiddensections) {
@@ -1059,7 +1071,7 @@ class format_grid_renderer extends format_section_renderer_base {
         if ($editing) {
             // Print stealth sections if present.
             foreach ($modinfo->get_section_info_all() as $section => $thissection) {
-                if ($section <= $course->numsections or empty($modinfo->sections[$section])) {
+                if ($section <= $coursenumsections or empty($modinfo->sections[$section])) {
                     // This is not stealth section or it is empty.
                     continue;
                 }
@@ -1070,27 +1082,7 @@ class format_grid_renderer extends format_section_renderer_base {
 
             echo $this->end_section_list();
 
-            echo html_writer::start_tag('div', array('id' => 'changenumsections', 'class' => 'mdl-right'));
-
-            // Increase number of sections.
-            $straddsection = get_string('increasesections', 'moodle');
-            $url = new moodle_url('/course/changenumsections.php', array('courseid' => $course->id,
-                'increase' => true,
-                'sesskey' => sesskey()));
-            $icon = $this->output->pix_icon('t/switch_plus', $straddsection);
-            echo html_writer::link($url, $icon . get_accesshide($straddsection), array('class' => 'increase-sections'));
-
-            if ($course->numsections > 0) {
-                // Reduce number of sections sections.
-                $strremovesection = get_string('reducesections', 'moodle');
-                $url = new moodle_url('/course/changenumsections.php', array('courseid' => $course->id,
-                    'increase' => false,
-                    'sesskey' => sesskey()));
-                $icon = $this->output->pix_icon('t/switch_minus', $strremovesection);
-                echo html_writer::link($url, $icon . get_accesshide($strremovesection), array('class' => 'reduce-sections'));
-            }
-
-            echo html_writer::end_tag('div');
+            echo $this->change_number_sections($course, 0);
         } else {
             echo $this->end_section_list();
         }

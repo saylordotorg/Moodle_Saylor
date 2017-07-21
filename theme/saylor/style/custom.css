@@ -144,10 +144,6 @@ h2.main,
     margin: 0 auto;
 }
 
-.logininfo {
-    margin-top: 5px;
-}
-
 #page-header .logo-img {
     background-position: center center;
     background-repeat: no-repeat;
@@ -612,6 +608,26 @@ input[type="color"],
     display: none; 
 }
 
+/*Fix padding issue on left nav bar*/
+.block .content{
+    padding: 0.5em 1em !important;
+}
+
+/*Fix header padding issue on left nav bar*/
+.block .header {
+    padding: 0.5em !important;
+}
+
+/*Add bottom padding to each sub-block in central block content*/
+.format-flexsections .course-content ul.flexsections li.section {
+    padding-bottom: 0.5em;
+}
+
+/*Increase font size of login status message on nav bar*/
+#page-header .socials {
+    font-size: 20px;
+}
+
 @media (max-width: 979px) {
     .navbar {
         float: none !important;
@@ -684,13 +700,6 @@ input[type="color"],
         width: 95%;
     }
 
-    /* change background color of foreground content in blocks on left (nav & admin) 
-    and padding */
-    .block {
-        padding: 1em 0 0 1em;
-        background-color: #FFF;
-    }
-
     /* change background color of foreground content of central block */
     .course_category_tree .category>.info {
         background-color: #FFF;
@@ -701,9 +710,10 @@ input[type="color"],
         background-color: #E3E3E3;
     }
     
-    .block .header {
+   /* .block .header {
         margin: 0 10px !important;
-    }
+    }*/
+    
     #page-footer {
         margin: 50px 0 0;
     }
@@ -851,11 +861,6 @@ div.guestsub {
 }
 
 
-
-/* change background color of dropdown nav bar*/
-/*.navbar-inner {
-    background-color: #25535E;
-}*/
 
 https://moodle-dev.sylr.org/
 

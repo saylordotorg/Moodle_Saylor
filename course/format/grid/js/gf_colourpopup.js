@@ -18,8 +18,10 @@
  *
  * @package    course/format
  * @subpackage grid
+ * @version    See the value of '$plugin->version' in version.php.
  * @copyright  &copy; 2013 onwards G J Barnard in respect to modifications of standard topics format.
- * @author     G J Barnard - gjbarnard at gmail dot com, about.me/gjbarnard and {@link http://moodle.org/user/profile.php?id=442195}
+ * @author     G J Barnard - {@link http://about.me/gjbarnard} and
+ *                           {@link http://moodle.org/user/profile.php?id=442195}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

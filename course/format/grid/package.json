@@ -7,6 +7,13 @@
     "name": "Gareth J Barnard",
     "url": "http://about.me/gjbarnard"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gjb2048/moodle-format_grid.git"
+  },
+  "bugs": {
+    "url": "https://github.com/gjb2048/moodle-format_grid/issues"
+  },
   "devDependencies": {
     "grunt": "~0.4.5",
     "grunt-exec": "~0.4.6",

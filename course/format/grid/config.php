@@ -21,10 +21,13 @@
  * @subpackage Grid
  * @version    See the value of '$plugin->version' in below.
  * @copyright  &copy; 2012 G J Barnard in respect to modifications of standard topics format.
- * @author     G J Barnard - gjbarnard at gmail dot com and {@link http://moodle.org/user/profile.php?id=442195}
+ * @author     G J Barnard - {@link http://about.me/gjbarnard} and
+ *                           {@link http://moodle.org/user/profile.php?id=442195}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU Public License
  *
  */
+
+defined('MOODLE_INTERNAL') || die();
 
 // Optional course format configuration file.
 // This file contains any specific configuration settings for the format.

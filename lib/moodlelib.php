@@ -2898,13 +2898,11 @@ function require_login($courseorid = null, $autologinguest = true, $cm = null, $
         if ($preventredirect) {
             throw new require_login_exception('Activity is hidden');
         }
-        if ($course->id != SITEID) {
-            $url = new moodle_url('/course/view.php', array('id' => $course->id));
-        } else {
-            $url = new moodle_url('/');
-        }
-        redirect($url, get_string('activityiscurrentlyhidden'), null,
-                \core\output\notification::NOTIFY_ERROR);
+        // Get the error message that activity is not available and why (if explanation can be shown to the user).
+        $PAGE->set_course($course);
+        $renderer = $PAGE->get_renderer('course');
+        $message = $renderer->course_section_cm_unavailable_error_message($cm);
+        redirect(course_get_url($course), $message, null, \core\output\notification::NOTIFY_ERROR);
     }
 
     // Set the global $COURSE.
@@ -5175,11 +5173,6 @@ function shift_course_mod_dates($modname, $fields, $timeshift, $courseid, $modid
         $return = $DB->execute($updatesql, $params) && $return;
     }
 
-    $refreshfunction = $modname.'_refresh_events';
-    if (function_exists($refreshfunction)) {
-        $refreshfunction($courseid);
-    }
-
     return $return;
 }
 
@@ -5435,6 +5428,8 @@ function reset_course_userdata($data) {
             } else {
                 debugging('Missing lib.php in '.$modname.' module!');
             }
+            // Update calendar events for all modules.
+            course_module_bulk_update_calendar_events($modname, $data->courseid);
         }
     }
 

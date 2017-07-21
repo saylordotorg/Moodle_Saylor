@@ -81,7 +81,7 @@ echo $OUTPUT->doctype() ?>
 <div id="page" class="container-fluid">
 
     <header id="page-header" class="clearfix">
-    <img src="<?php echo $OUTPUT->pix_url('nsl_logo', 'theme')?>" id="logo">
+    <img src="<?php echo $OUTPUT->image_url('nsl_logo', 'theme')?>" id="logo">
        
         <div id="course-header">
             <?php echo $OUTPUT->course_header(); ?>
