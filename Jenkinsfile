@@ -211,6 +211,12 @@ def plugins = [
         "url" : 'https://github.com/intelliboard/intelliboard_block',
         "branch" : 'master',
         "dest" : 'blocks/intelliboard'
+    ],
+    [
+        "name" : 'block_sayloroverview',
+        "url" : 'https://github.com/saylordotorg/moodle-block_sayloroverview.git',
+        "branch" : 'development',
+        "dest" : 'blocks/sayloroverview'
     ]
 ]
 
