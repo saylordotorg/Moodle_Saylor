@@ -96,6 +96,12 @@ $string['market3desc'] = 'Add html for marketing block 3 (see the readme file fo
 $string['market4'] = 'Marketing Block 4';
 $string['market4desc'] = 'Add html for marketing block 4 (see the readme file for additional info and hints).';
 
+$string['logintext'] = 'Log in';
+$string['loggedingreeting'] = 'Hi, {$a}!';
+$string['loggedinnotgreeting'] = '';
+
+$string['logouttext'] = 'Log out';
+
 $string['logo'] = 'Logo';
 $string['logodesc'] = 'Change the logo of this theme by entering the URL to a new one (i.e., http://www.somesite/animage.png). A transparent .png will work best.';
 

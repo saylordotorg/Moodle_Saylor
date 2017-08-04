@@ -18,8 +18,10 @@
  *
  * @package    course/format
  * @subpackage grid
+ * @version    See the value of '$plugin->version' in version.php.
  * @copyright  &copy; 2012 onwards G J Barnard in respect to modifications of standard topics format.
- * @author     G J Barnard - gjbarnard at gmail dot com and {@link http://moodle.org/user/profile.php?id=442195}
+ * @author     G J Barnard - {@link http://about.me/gjbarnard} and
+ *                           {@link http://moodle.org/user/profile.php?id=442195}
  * @author     Based on code originally written by Paul Krix and Julian Ridden.
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -83,17 +85,17 @@ div#gridmiddle-column > ul {
     float: right;
 }
 
-/* @group Topic Icons */
+/* @group Icons */
 #gridiconcontainer {
     height: auto;
     margin: 0 auto;
     padding: 0;
-    text-align: center;
     width: 100%;
 }
 #gridiconcontainer ul.gridicons {
     display: flex;
     flex-wrap: wrap;
+    justify-content: flex-start;
     margin: 0 auto;
     padding: 0;
     width: 100%;
@@ -113,6 +115,7 @@ div#gridmiddle-column > ul {
 
 .course-content ul.gridicons img.new_activity {
     position: absolute;
+    z-index: 1;
 }
 
 .course-content .gridcursor .gridicon_link {

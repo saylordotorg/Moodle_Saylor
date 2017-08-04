@@ -19,11 +19,14 @@
  *
  * @package    course/format
  * @subpackage grid
+ * @version    See the value of '$plugin->version' in version.php.
  * @copyright  &copy; 2012+ G J Barnard in respect to modifications of standard topics format.
- * @author     G J Barnard - gjbarnard at gmail dot com, about.me/gjbarnard and {@link http://moodle.org/user/profile.php?id=442195}
+ * @author     G J Barnard - {@link http://about.me/gjbarnard} and
+ *                           {@link http://moodle.org/user/profile.php?id=442195}
  * @author     Based on code originally written by Paul Krix and Julian Ridden.
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/course/format/lib.php'); // For format_base.
@@ -539,10 +542,6 @@ class format_grid extends format_base {
 
             $courseconfig = get_config('moodlecourse');
             $courseformatoptions = array(
-                'numsections' => array(
-                    'default' => $courseconfig->numsections,
-                    'type' => PARAM_INT
-                ),
                 'hiddensections' => array(
                     'default' => $courseconfig->hiddensections,
                     'type' => PARAM_INT
@@ -686,11 +685,6 @@ class format_grid extends format_base {
                 $sectionmenu[$i] = "$i";
             }
             $courseformatoptionsedit = array(
-                'numsections' => array(
-                    'label' => new lang_string('numbersections', 'format_grid'),
-                    'element_type' => 'select',
-                    'element_attributes' => array($sectionmenu),
-                ),
                 'hiddensections' => array(
                     'label' => new lang_string('hiddensections'),
                     'help' => 'hiddensections',
@@ -1134,125 +1128,119 @@ class format_grid extends format_base {
      * @return array array of references to the added form elements.
      */
     public function create_edit_form_elements(&$mform, $forsection = false) {
-        global $CFG, $OUTPUT;
+        global $CFG, $COURSE, $OUTPUT, $USER;
         MoodleQuickForm::registerElementType('gfcolourpopup', "$CFG->dirroot/course/format/grid/js/gf_colourpopup.php",
                 'MoodleQuickForm_gfcolourpopup');
 
         $elements = parent::create_edit_form_elements($mform, $forsection);
-        if ($forsection == false) {
-            global $USER;
-            /*
-              Increase the number of sections combo box values if the user has increased the number of sections
-              using the imagecontainer on the course page beyond course 'maxsections' or course 'maxsections' has been
-              reduced below the number of sections already set for the course on the site administration course
-              defaults page.  This is so that the number of sections is not reduced leaving unintended orphaned
-              activities / resources.
-             */
-            $maxsections = get_config('moodlecourse', 'maxsections');
-            $numsections = $mform->getElementValue('numsections');
-            $numsections = $numsections[0];
-            if ($numsections > $maxsections) {
-                $element = $mform->getElement('numsections');
-                for ($i = $maxsections + 1; $i <= $numsections; $i++) {
-                    $element->addOption("$i", $i);
-                }
+        if (!$forsection && (empty($COURSE->id) || $COURSE->id == SITEID)) {
+            /* Add "numsections" element to the create course form - it will force new course to be prepopulated
+               with empty sections.
+               The "Number of sections" option is no longer available when editing course, instead teachers should
+               delete and add sections when needed. */
+            $courseconfig = get_config('moodlecourse');
+            $max = (int)$courseconfig->maxsections;
+            $element = $mform->addElement('select', 'numsections', get_string('numberweeks'), range(0, $max ?: 52));
+            $mform->setType('numsections', PARAM_INT);
+            if (is_null($mform->getElementValue('numsections'))) {
+                $mform->setDefault('numsections', $courseconfig->numsections);
+            }
+            array_unshift($elements, $element);
+        }
+
+        $context = $this->get_context();
+
+        $changeimagecontaineralignment = has_capability('format/grid:changeimagecontaineralignment', $context);
+        $changeimagecontainersize = has_capability('format/grid:changeimagecontainersize', $context);
+        $changeimageresizemethod = has_capability('format/grid:changeimageresizemethod', $context);
+        $changeimagecontainerstyle = has_capability('format/grid:changeimagecontainerstyle', $context);
+        $changesectiontitleoptions = has_capability('format/grid:changesectiontitleoptions', $context);
+        $resetall = is_siteadmin($USER); // Site admins only.
+
+        $elements[] = $mform->addElement('header', 'gfreset', get_string('gfreset', 'format_grid'));
+        $mform->addHelpButton('gfreset', 'gfreset', 'format_grid', '', true);
+
+        $resetelements = array();
+
+        if (($changeimagecontaineralignment) ||
+           ($changeimagecontainersize) ||
+           ($changeimageresizemethod) ||
+           ($changeimagecontainerstyle) ||
+           ($changesectiontitleoptions)) {
+
+            if ($changeimagecontaineralignment) {
+                $checkboxname = get_string('resetimagecontaineralignment', 'format_grid') .
+                        $OUTPUT->help_icon('resetimagecontaineralignment', 'format_grid');
+                $resetelements[] = & $mform->createElement('checkbox', 'resetimagecontaineralignment', '', $checkboxname);
             }
 
-            $context = $this->get_context();
-
-            $changeimagecontaineralignment = has_capability('format/grid:changeimagecontaineralignment', $context);
-            $changeimagecontainersize = has_capability('format/grid:changeimagecontainersize', $context);
-            $changeimageresizemethod = has_capability('format/grid:changeimageresizemethod', $context);
-            $changeimagecontainerstyle = has_capability('format/grid:changeimagecontainerstyle', $context);
-            $changesectiontitleoptions = has_capability('format/grid:changesectiontitleoptions', $context);
-            $resetall = is_siteadmin($USER); // Site admins only.
-
-            $elements[] = $mform->addElement('header', 'gfreset', get_string('gfreset', 'format_grid'));
-            $mform->addHelpButton('gfreset', 'gfreset', 'format_grid', '', true);
-
-            $resetelements = array();
-
-            if (($changeimagecontaineralignment) ||
-               ($changeimagecontainersize) ||
-               ($changeimageresizemethod) ||
-               ($changeimagecontainerstyle) ||
-               ($changesectiontitleoptions)) {
-
-                if ($changeimagecontaineralignment) {
-                    $checkboxname = get_string('resetimagecontaineralignment', 'format_grid') .
-                            $OUTPUT->help_icon('resetimagecontaineralignment', 'format_grid');
-                    $resetelements[] = & $mform->createElement('checkbox', 'resetimagecontaineralignment', '', $checkboxname);
-                }
-
-                if ($changeimagecontainersize) {
-                    $checkboxname = get_string('resetimagecontainersize', 'format_grid') .
-                            $OUTPUT->help_icon('resetimagecontainersize', 'format_grid');
-                    $resetelements[] = & $mform->createElement('checkbox', 'resetimagecontainersize', '', $checkboxname);
-                }
-
-                if ($changeimageresizemethod) {
-                    $checkboxname = get_string('resetimageresizemethod', 'format_grid') .
-                            $OUTPUT->help_icon('resetimageresizemethod', 'format_grid');
-                    $resetelements[] = & $mform->createElement('checkbox', 'resetimageresizemethod', '', $checkboxname);
-                }
-
-                if ($changeimagecontainerstyle) {
-                    $checkboxname = get_string('resetimagecontainerstyle', 'format_grid') .
-                            $OUTPUT->help_icon('resetimagecontainerstyle', 'format_grid');
-                    $resetelements[] = & $mform->createElement('checkbox', 'resetimagecontainerstyle', '', $checkboxname);
-                }
-
-                if ($changesectiontitleoptions) {
-                    $checkboxname = get_string('resetsectiontitleoptions', 'format_grid') .
-                            $OUTPUT->help_icon('resetsectiontitleoptions', 'format_grid');
-                    $resetelements[] = & $mform->createElement('checkbox', 'resetsectiontitleoptions', '', $checkboxname);
-                }
+            if ($changeimagecontainersize) {
+                $checkboxname = get_string('resetimagecontainersize', 'format_grid') .
+                        $OUTPUT->help_icon('resetimagecontainersize', 'format_grid');
+                $resetelements[] = & $mform->createElement('checkbox', 'resetimagecontainersize', '', $checkboxname);
             }
 
-            $checkboxname = get_string('resetnewactivity', 'format_grid') .
-                    $OUTPUT->help_icon('resetnewactivity', 'format_grid');
-            $resetelements[] = & $mform->createElement('checkbox', 'resetnewactivity', '', $checkboxname);
-
-            $checkboxname = get_string('resetfitpopup', 'format_grid') .
-                    $OUTPUT->help_icon('resetfitpopup', 'format_grid');
-            $resetelements[] = & $mform->createElement('checkbox', 'resetfitpopup', '', $checkboxname);
-
-            $elements[] = $mform->addGroup($resetelements, 'resetgroup', get_string('resetgrp', 'format_grid'), null, false);
-
-            if ($resetall) {
-                $resetallelements = array();
-
-                $checkboxname = get_string('resetallimagecontaineralignment', 'format_grid') .
-                        $OUTPUT->help_icon('resetallimagecontaineralignment', 'format_grid');
-                $resetallelements[] = & $mform->createElement('checkbox', 'resetallimagecontaineralignment', '', $checkboxname);
-
-                $checkboxname = get_string('resetallimagecontainersize', 'format_grid') .
-                        $OUTPUT->help_icon('resetallimagecontainersize', 'format_grid');
-                $resetallelements[] = & $mform->createElement('checkbox', 'resetallimagecontainersize', '', $checkboxname);
-
-                $checkboxname = get_string('resetallimageresizemethod', 'format_grid') .
-                        $OUTPUT->help_icon('resetallimageresizemethod', 'format_grid');
-                $resetallelements[] = & $mform->createElement('checkbox', 'resetallimageresizemethod', '', $checkboxname);
-
-                $checkboxname = get_string('resetallimagecontainerstyle', 'format_grid') .
-                        $OUTPUT->help_icon('resetallimagecontainerstyle', 'format_grid');
-                $resetallelements[] = & $mform->createElement('checkbox', 'resetallimagecontainerstyle', '', $checkboxname);
-
-                $checkboxname = get_string('resetallsectiontitleoptions', 'format_grid') .
-                        $OUTPUT->help_icon('resetallsectiontitleoptions', 'format_grid');
-                $resetallelements[] = & $mform->createElement('checkbox', 'resetallsectiontitleoptions', '', $checkboxname);
-
-                $checkboxname = get_string('resetallnewactivity', 'format_grid') .
-                        $OUTPUT->help_icon('resetallnewactivity', 'format_grid');
-                $resetallelements[] = & $mform->createElement('checkbox', 'resetallnewactivity', '', $checkboxname);
-
-                $checkboxname = get_string('resetallfitpopup', 'format_grid') .
-                        $OUTPUT->help_icon('resetallfitpopup', 'format_grid');
-                $resetallelements[] = & $mform->createElement('checkbox', 'resetallfitpopup', '', $checkboxname);
-
-                $elements[] = $mform->addGroup($resetallelements, 'resetallgroup', get_string('resetallgrp', 'format_grid'), null,
-                        false);
+            if ($changeimageresizemethod) {
+                $checkboxname = get_string('resetimageresizemethod', 'format_grid') .
+                        $OUTPUT->help_icon('resetimageresizemethod', 'format_grid');
+                $resetelements[] = & $mform->createElement('checkbox', 'resetimageresizemethod', '', $checkboxname);
             }
+
+            if ($changeimagecontainerstyle) {
+                $checkboxname = get_string('resetimagecontainerstyle', 'format_grid') .
+                        $OUTPUT->help_icon('resetimagecontainerstyle', 'format_grid');
+                $resetelements[] = & $mform->createElement('checkbox', 'resetimagecontainerstyle', '', $checkboxname);
+            }
+
+            if ($changesectiontitleoptions) {
+                $checkboxname = get_string('resetsectiontitleoptions', 'format_grid') .
+                        $OUTPUT->help_icon('resetsectiontitleoptions', 'format_grid');
+                $resetelements[] = & $mform->createElement('checkbox', 'resetsectiontitleoptions', '', $checkboxname);
+            }
+        }
+
+        $checkboxname = get_string('resetnewactivity', 'format_grid').
+            $OUTPUT->help_icon('resetnewactivity', 'format_grid');
+        $resetelements[] = & $mform->createElement('checkbox', 'resetnewactivity', '', $checkboxname);
+
+        $checkboxname = get_string('resetfitpopup', 'format_grid').
+            $OUTPUT->help_icon('resetfitpopup', 'format_grid');
+        $resetelements[] = & $mform->createElement('checkbox', 'resepopup', '', $checkboxname);
+        $elements[] = $mform->addGroup($resetelements, 'resetgroup', get_string('resetgrp', 'format_grid'), null, false);
+
+        if ($resetall) {
+            $resetallelements = array();
+
+            $checkboxname = get_string('resetallimagecontaineralignment', 'format_grid').
+                $OUTPUT->help_icon('resetallimagecontaineralignment', 'format_grid');
+            $resetallelements[] = & $mform->createElement('checkbox', 'resetallimagecontaineralignment', '', $checkboxname);
+
+            $checkboxname = get_string('resetallimagecontainersize', 'format_grid').
+                $OUTPUT->help_icon('resetallimagecontainersize', 'format_grid');
+            $resetallelements[] = & $mform->createElement('checkbox', 'resetallimagecontainersize', '', $checkboxname);
+
+            $checkboxname = get_string('resetallimageresizemethod', 'format_grid').
+                $OUTPUT->help_icon('resetallimageresizemethod', 'format_grid');
+            $resetallelements[] = & $mform->createElement('checkbox', 'resetallimageresizemethod', '', $checkboxname);
+
+            $checkboxname = get_string('resetallimagecontainerstyle', 'format_grid').
+                $OUTPUT->help_icon('resetallimagecontainerstyle', 'format_grid');
+            $resetallelements[] = & $mform->createElement('checkbox', 'resetallimagecontainerstyle', '', $checkboxname);
+
+            $checkboxname = get_string('resetallsectiontitleoptions', 'format_grid').
+                $OUTPUT->help_icon('resetallsectiontitleoptions', 'format_grid');
+            $resetallelements[] = & $mform->createElement('checkbox', 'resetallsectiontitleoptions', '', $checkboxname);
+
+            $checkboxname = get_string('resetallnewactivity', 'format_grid').
+                $OUTPUT->help_icon('resetallnewactivity', 'format_grid');
+            $resetallelements[] = & $mform->createElement('checkbox', 'resetallnewactivity', '', $checkboxname);
+
+            $checkboxname = get_string('resetallfitpopup', 'format_grid').
+                $OUTPUT->help_icon('resetallfitpopup', 'format_grid');
+            $resetallelements[] = & $mform->createElement('checkbox', 'resetallfitpopup', '', $checkboxname);
+
+            $elements[] = $mform->addGroup($resetallelements, 'resetallgroup', get_string('resetallgrp', 'format_grid'), null,
+                false);
         }
 
         return $elements;
@@ -1369,9 +1357,8 @@ class format_grid extends format_base {
      * Updates format options for a course
      *
      * In case if course format was changed to 'Grid', we try to copy options
-     * 'coursedisplay', 'numsections' and 'hiddensections' from the previous format.
-     * If previous course format did not have 'numsections' option, we populate it with the
-     * current number of sections.  The layout and colour defaults will come from 'course_format_options'.
+     * 'coursedisplay' and 'hiddensections' from the previous format.
+     * The layout and colour defaults will come from 'course_format_options'.
      *
      * @param stdClass|array $data return value from {@link moodleform::get_data()} or array with data.
      * @param stdClass $oldcourse if this function is called from {@link update_course()}
@@ -1485,34 +1472,11 @@ class format_grid extends format_base {
                 if (!array_key_exists($key, $data)) {
                     if (array_key_exists($key, $oldcourse)) {
                         $data[$key] = $oldcourse[$key];
-                    } else if ($key === 'numsections') {
-                        /* If previous format does not have the field 'numsections'
-                          and $data['numsections'] is not set, we fill it with the
-                          maximum section number from the DB. */
-                        $maxsection = $DB->get_field_sql(
-                                'SELECT max(section) from {course_sections} WHERE course = ?', array($this->courseid)
-                        );
-                        if ($maxsection) {
-                            // If there are no sections, or just default 0-section, 'numsections' will be set to default.
-                            $data['numsections'] = $maxsection;
-                        }
                     }
                 }
             }
         }
         $changes = $this->update_format_options($data);
-
-        if ($changes && array_key_exists('numsections', $data)) {
-            // If the numsections was decreased, try to completely delete the orphaned sections (unless they are not empty).
-            $numsections = (int) $data['numsections'];
-            $maxsection = $DB->get_field_sql('SELECT max(section) from {course_sections}
-                        WHERE course = ?', array($this->courseid));
-            for ($sectionnum = $maxsection; $sectionnum > $numsections; $sectionnum--) {
-                if (!$this->delete_section($sectionnum, false)) {
-                    break;
-                }
-            }
-        }
 
         // Now we can change the displayed images if needed.
         if ($changedisplayedimages) {
@@ -2397,6 +2361,45 @@ class format_grid extends format_base {
             $editlabel = new lang_string('newsectionname', 'format_grid', $title);
         }
         return parent::inplace_editable_render_section_name($section, $linkifneeded, $editable, $edithint, $editlabel);
+    }
+
+    /**
+     * Indicates whether the course format supports the creation of a news forum.
+     *
+     * @return bool
+     */
+    public function supports_news() {
+        return true;
+    }
+
+    /**
+     * Returns whether this course format allows the activity to
+     * have "triple visibility state" - visible always, hidden on course page but available, hidden.
+     *
+     * @param stdClass|cm_info $cm course module (may be null if we are displaying a form for adding a module)
+     * @param stdClass|section_info $section section where this module is located or will be added to
+     * @return bool
+     */
+    public function allow_stealth_module_visibility($cm, $section) {
+        // Allow the third visibility state inside visible sections or in section 0.
+        return !$section->section || $section->visible;
+    }
+
+    public function section_action($section, $action, $sr) {
+        global $PAGE;
+
+        if ($section->section && ($action === 'setmarker' || $action === 'removemarker')) {
+            // Format 'grid' allows to set and remove markers in addition to common section actions.
+            require_capability('moodle/course:setcurrentsection', context_course::instance($this->courseid));
+            course_set_marker($this->courseid, ($action === 'setmarker') ? $section->section : 0);
+            return null;
+        }
+
+        // For show/hide actions call the parent method and return the new content for .section_availability element.
+        $rv = parent::section_action($section, $action, $sr);
+        $renderer = $PAGE->get_renderer('format_grid');
+        $rv['section_availability'] = $renderer->section_availability($this->get_section($section));
+        return $rv;
     }
 
     private function get_context() {
