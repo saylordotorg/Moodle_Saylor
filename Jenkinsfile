@@ -205,6 +205,12 @@ def plugins = [
         "url" : 'https://github.com/saylordotorg/moodle-local_discoursesso.git',
         "branch" : 'master',
         "dest" : 'local/discoursesso'
+    ],
+    [
+        "name" : 'block_sayloroverview',
+        "url" : 'https://github.com/saylordotorg/moodle-block_sayloroverview.git',
+        "branch" : 'master',
+        "dest" : 'blocks/sayloroverview'
     ]
 ]
 
