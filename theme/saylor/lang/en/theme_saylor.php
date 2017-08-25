@@ -96,7 +96,7 @@ $string['market3desc'] = 'Add html for marketing block 3 (see the readme file fo
 $string['market4'] = 'Marketing Block 4';
 $string['market4desc'] = 'Add html for marketing block 4 (see the readme file for additional info and hints).';
 
-$string['logintext'] = 'Log in';
+$string['logintext'] = 'Log in or Sign up';
 $string['loggedingreeting'] = 'Hi, {$a}!';
 $string['loggedinnotgreeting'] = '';
 

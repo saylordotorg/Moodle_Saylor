@@ -35,5 +35,5 @@ if ($ADMIN->fulltree) {
 
     $settings->add(new admin_setting_configselect('block_sayloroverview/defaulttab',
         get_string('defaulttab', 'block_sayloroverview'),
-        get_string('defaulttab_desc', 'block_sayloroverview'), 'timeline', $options));
+        get_string('defaulttab_desc', 'block_sayloroverview'), 'courses', $options));
 }
