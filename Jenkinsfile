@@ -217,6 +217,12 @@ def plugins = [
         "url" : 'https://github.com/saylordotorg/moodle-block_sayloroverview.git',
         "branch" : 'development',
         "dest" : 'blocks/sayloroverview'
+    ],
+    [
+        "name" : 'local_abtesting',
+        "url" : 'https://github.com/saylordotorg/moodle-local_abtesting.git',
+        "branch" : 'master',
+        "dest" : 'local/abtesting'
     ]
 ]
 
