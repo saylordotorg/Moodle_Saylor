@@ -223,6 +223,12 @@ def plugins = [
         "url" : 'https://github.com/saylordotorg/moodle-local_abtesting.git',
         "branch" : 'master',
         "dest" : 'local/abtesting'
+    ],
+    [
+        "name" : 'block_completion_progress',
+        "url" : 'https://github.com/deraadt/moodle-block_completion_progress',
+        "branch" : 'master',
+        "dest" : 'blocks/completion_progress'
     ]
 ]
 
