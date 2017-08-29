@@ -123,9 +123,9 @@ function abtesting_get_testinggroup($userid) {
 	$timecreated = $user->timecreated;
 
 	// If the userid is 1, it's the guest user (timecreated is 0).
-	// Set the testinggroup to 000
+	// Set the testinggroup to 1000 so we can differentiate.
 	if ($user->id == 1) {
-		$testinggroup = 000;
+		$testinggroup = 1000;
 	}
 	// If the userid is 2, this is the base admin (timecreated is 0).
 	// Set the testinggroup to 000

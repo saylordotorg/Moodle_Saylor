@@ -25,10 +25,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2017052702;
+$plugin->version  = 2017082902;
 $plugin->requires = 2016052306;  // Requires this Moodle version - at least 3.1
 $plugin->cron     = 0;
 $plugin->component = 'local_abtesting';
 
-$plugin->release = '0.0.1';
+$plugin->release = '0.0.2';
 $plugin->maturity = MATURITY_BETA;
