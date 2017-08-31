@@ -2887,7 +2887,12 @@ class assign {
             $item = $this->get_submission($submissionid);
 
             // Check permissions.
-            $this->require_view_submission($item->userid);
+            if (empty($item->userid)) {
+                // Group submission.
+                $this->require_view_group_submission($item->groupid);
+            } else {
+                $this->require_view_submission($item->userid);
+            }
             $o .= $this->get_renderer()->render(new assign_header($this->get_instance(),
                                                               $this->get_context(),
                                                               $this->show_intro(),
@@ -2942,11 +2947,17 @@ class assign {
      * @param assign_plugin $plugin - The assignment plugin
      */
     public function download_rewrite_pluginfile_urls($text, $user, $plugin) {
-        $groupmode = groups_get_activity_groupmode($this->get_course_module());
+        // The groupname prefix for the urls doesn't depend on the group mode of the assignment instance.
+        // Rather, it should be determined by checking the group submission settings of the instance,
+        // which is what download_submission() does when generating the file name prefixes.
         $groupname = '';
-        if ($groupmode) {
-            $groupid = groups_get_activity_group($this->get_course_module(), true);
-            $groupname = groups_get_group_name($groupid).'-';
+        if ($this->get_instance()->teamsubmission) {
+            $submissiongroup = $this->get_submission_group($user->id);
+            if ($submissiongroup) {
+                $groupname = $submissiongroup->name . '-';
+            } else {
+                $groupname = get_string('defaultteam', 'assign') . '-';
+            }
         }
 
         if ($this->is_blind_marking()) {
@@ -2959,10 +2970,14 @@ class assign {
             $prefix = clean_filename($prefix . '_' . $this->get_uniqueid_for_user($user->id) . '_');
         }
 
-        $subtype = $plugin->get_subtype();
-        $type = $plugin->get_type();
-        $prefix = $prefix . $subtype . '_' . $type . '_';
-
+        // Only prefix files if downloadasfolders user preference is NOT set.
+        if (!get_user_preferences('assign_downloadasfolders', 1)) {
+            $subtype = $plugin->get_subtype();
+            $type = $plugin->get_type();
+            $prefix = $prefix . $subtype . '_' . $type . '_';
+        } else {
+            $prefix = "";
+        }
         $result = str_replace('@@PLUGINFILE@@/', $prefix, $text);
 
         return $result;
@@ -3083,6 +3098,18 @@ class assign {
     }
 
     /**
+     * Throw an error if the permissions to view this users' group submission are missing.
+     *
+     * @param int $groupid Group id.
+     * @throws required_capability_exception
+     */
+    public function require_view_group_submission($groupid) {
+        if (!$this->can_view_group_submission($groupid)) {
+            throw new required_capability_exception($this->context, 'mod/assign:viewgrades', 'nopermission', '');
+        }
+    }
+
+    /**
      * Throw an error if the permissions to view this users submission are missing.
      *
      * @throws required_capability_exception
@@ -3170,7 +3197,9 @@ class assign {
         $groupname = '';
         if ($groupmode) {
             $groupid = groups_get_activity_group($this->get_course_module(), true);
-            $groupname = groups_get_group_name($groupid).'-';
+            if (!empty($groupid)) {
+                $groupname = groups_get_group_name($groupid) . '-';
+            }
         }
 
         // Construct the zip file name.
