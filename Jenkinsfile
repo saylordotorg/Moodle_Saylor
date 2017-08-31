@@ -211,6 +211,12 @@ def plugins = [
         "url" : 'https://github.com/saylordotorg/moodle-block_sayloroverview.git',
         "branch" : 'master',
         "dest" : 'blocks/sayloroverview'
+    ],
+    [
+        "name" : 'block_completion_progress',
+        "url" : 'https://github.com/deraadt/moodle-block_completion_progress',
+        "branch" : 'master',
+        "dest" : 'blocks/completion_progress'
     ]
 ]
 
