@@ -628,6 +628,12 @@ input[type="color"],
     font-size: 20px;
 }
 
+/*Add padding to enroll button on main course page*/
+div#enroll-button-container {
+    font-size: 1.1em;
+    text-align: center;
+}
+
 @media (max-width: 979px) {
     .navbar {
         float: none !important;

@@ -84,7 +84,7 @@ class theme_saylor_core_renderer extends core_renderer
             } else {
                 $username = $fullname;
             }
-            if (is_mnet_remote_user($USER) and $idprovider = $DB->get_record('mnet_host', array('id'=>$USER->mnethostid))) {
+            if (is_mnet_remote_user($USER) and $idprovider = $DB->get_record('mnet_host', array('id' => $USER->mnethostid))) {
                 if ($withlinks) {
                     $username .= " from <a href=\"{$idprovider->wwwroot}\">{$idprovider->name}</a>";
                 } else {
@@ -98,12 +98,12 @@ class theme_saylor_core_renderer extends core_renderer
                 }
             } else if (is_role_switched($course->id)) { // Has switched roles
                 $rolename = '';
-                if ($role = $DB->get_record('role', array('id'=>$USER->access['rsw'][$context->path]))) {
+                if ($role = $DB->get_record('role', array('id' => $USER->access['rsw'][$context->path]))) {
                     $rolename = ': '.role_get_name($role, $context);
                 }
                 $loggedinas = get_string('loggedinas', 'moodle', $username).$rolename;
                 if ($withlinks) {
-                    $url = new moodle_url('/course/switchrole.php', array('id'=>$course->id,'sesskey'=>sesskey(), 'switchrole'=>0, 'returnurl'=>$this->page->url->out_as_local_url(false)));
+                    $url = new moodle_url('/course/switchrole.php', array('id' => $course->id, 'sesskey' => sesskey(), 'switchrole' => 0, 'returnurl' => $this->page->url->out_as_local_url(false)));
                     $loggedinas .= ' '.html_writer::tag('a', get_string('switchrolereturn'), array('href' => $url)).'';
                 }
             } else {
@@ -574,6 +574,39 @@ class theme_saylor_core_renderer extends core_renderer
         );
         return html_writer::tag($tag, $this->blocks_for_region($region), $attributes);
     }
+
+    /*
+    * This code shows an enroll button in main course view to logged in user or Login/sign up link when suer is not logged in.
+    */
+    public function saylor_custom_enroll_button() {
+        global $COURSE, $PAGE;
+
+        // show nothing if user is already on enroll page.
+        if ($PAGE->pagetype == 'enrol-index') {
+                return "";
+        }
+
+        $output = html_writer::start_tag('div', array('id' => 'enroll-button-container', 'class' => 'enroll-container'));
+        $output .= html_writer::start_tag('div', array('id' => 'main-enroll-button', 'class' => 'center-block'));
+        $coursecontext = context_course::instance($COURSE->id);
+
+        if (isguestuser() || !isloggedin()) {
+            $link = new moodle_url('/login/index.php');
+            $output .= get_string('loginorsignupmessage', 'theme_saylor', $link->out());
+        } elseif (isloggedin($coursecontext) && !is_enrolled($coursecontext)) {
+            $link = new moodle_url('/enrol/index.php', array('id' => $COURSE->id));
+            $output .= $this->single_button($link->out(), get_string('enrolme', 'core_enrol'));
+        };
+
+        // Adding div that closes the main-enroll-button or the login/signup message.
+        $output .= html_writer::end_tag('div');
+
+        // Adding div that closes the enroll-button-container.
+        $output .= html_writer::end_tag('div');
+
+        return $output;
+    }
+
 }
 
 class theme_saylor_block_course_overview_renderer extends block_course_overview_renderer {
