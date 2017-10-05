@@ -29,3 +29,20 @@
 body:not(.editing) #gridmiddle-column {
     line-height: 1;
 }
+
+div#gridshadebox_overlay {
+    z-index: 1000;
+}
+
+#gridshadebox_content.absolute {
+    z-index: 1000;
+}
+
+#gridshadebox_content.fit_to_window {
+    z-index: 1000;
+}
+
+#gridshadebox_close {
+    z-index: 1000;
+}
+

@@ -1117,7 +1117,7 @@ class format_grid_renderer extends format_section_renderer_base {
             $title = trim(clean_param($title, PARAM_NOTAGS));
         }
 
-        if (strlen($title) > 40) {
+        if (core_text::strlen($title) > 40) {
             $title = $this->text_limit($title, 40);
         }
 
@@ -1138,13 +1138,13 @@ class format_grid_renderer extends format_section_renderer_base {
      * Cuts long texts up to certain length without breaking words.
      */
     private function text_limit($text, $length, $replacer = '...') {
-        if (strlen($text) > $length) {
+        if (core_text::strlen($text) > $length) {
             $text = wordwrap($text, $length, "\n", true);
             $pos = strpos($text, "\n");
             if ($pos === false) {
                 $pos = $length;
             }
-            $text = trim(substr($text, 0, $pos)) . $replacer;
+            $text = trim(core_text::substr($text, 0, $pos)) . $replacer;
         }
         return $text;
     }
