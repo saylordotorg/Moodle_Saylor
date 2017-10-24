@@ -223,6 +223,12 @@ def plugins = [
         "url" : 'https://github.com/saylordotorg/moodle-local_abtesting.git',
         "branch" : 'master',
         "dest" : 'local/abtesting'
+    ],
+    [
+        "name" : 'local_boostnavigation',
+        "url" : 'https://github.com/moodleuulm/moodle-local_boostnavigation',
+        "branch" : 'master',
+        "dest" : 'local/boostnavigation'
     ]
 ]
 
