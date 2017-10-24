@@ -229,6 +229,12 @@ def plugins = [
         "url" : 'https://github.com/deraadt/moodle-block_completion_progress',
         "branch" : 'master',
         "dest" : 'blocks/completion_progress'
+    ],
+    [
+        "name" : 'local_boostnavigation',
+        "url" : 'https://github.com/moodleuulm/moodle-local_boostnavigation',
+        "branch" : 'master',
+        "dest" : 'local/boostnavigation'
     ]
 ]
 
