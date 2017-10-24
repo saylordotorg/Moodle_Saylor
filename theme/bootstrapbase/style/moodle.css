@@ -5954,6 +5954,7 @@ img.iconsmall {
 .editing_hide + .editing_assign {
   margin-left: 20px;
 }
+.section_action_menu,
 .section .activity .commands {
   white-space: nowrap;
   display: inline;
@@ -17321,6 +17322,9 @@ div#dock {
 .path-mod-choice .media-left {
   float: left;
   padding-right: 1em;
+}
+.path-mod-choice .horizontal .choices .option {
+  display: inline-block;
 }
 .path-mod-lesson .firstpageoptions {
   margin: auto;
