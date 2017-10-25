@@ -43,6 +43,7 @@ $string['enabled_desc'] = 'Enable users deleting their accounts';
 $string['myaccount'] = 'My Account';
 $string['manageaccount'] = 'Delete my account';
 $string['loginerror'] = 'Invalid username or password';
+$string['loginsessionerror'] = 'There was an error authenticating your session.';
 $string['deleteaccount'] = 'Delete your account';
 $string['userpass'] = 'Enter your username and password';
 $string['noself'] = 'We are sorry, only self registration accounts are allowed to delete their account';

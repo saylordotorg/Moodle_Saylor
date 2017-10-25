@@ -39,23 +39,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-function local_sayonara_extend_navigation(global_navigation $navigation) {
-    global $USER;
-
-    if (!isloggedin() || isguestuser() && !is_siteadmin()) {
-        return '';
-    }
-    $enabled = get_config('local_sayonara', 'enabled');
-
-    if ($enabled && ($USER->auth == 'email' || $USER->auth == 'manual')) {
-
-        $container2 = $navigation->get('myprofile');
-        if (!empty($container2)) {
-            $container2->add(get_string('manageaccount', 'local_sayonara'), new moodle_url('/local/sayonara/index.php'));
-        }
-    }
-}
-
 /**
  * Add nodes to myprofile page.
  *
@@ -72,7 +55,7 @@ function local_sayonara_myprofile_navigation(core_user\output\myprofile\tree $tr
     $enabled = get_config('local_sayonara', 'enabled');
     $systemcontext = context_system::instance();
     $title = get_string('manageaccount', 'local_sayonara');
-    $url = new moodle_url('/local/sayonara/index.php');
+    $url = new moodle_url('/local/sayonara/index.php', array('sesskey'=>sesskey()));
 
     // Should be the same capability checks as editing your own profile in myprofile lib.
     if ((isloggedin() && !isguestuser($user) && !is_mnet_remote_user($user)) && $iscurrentuser && has_capability('moodle/user:editownprofile', $systemcontext)) {

@@ -46,6 +46,8 @@ class check_account_form extends moodleform {
         global $USER, $CFG, $COURSE;
 
         $mform = $this->_form;
+        $mform->disable_form_change_checker();
+
         $userid = $USER->id;
         $strrequired = get_string('required');
 
