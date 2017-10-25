@@ -72,3 +72,21 @@ function local_sayonara_myprofile_navigation(core_user\output\myprofile\tree $tr
 
     return false;
 }
+
+function local_sayonara_delete_user($user) {
+    $deleted = false;
+
+    if(delete_user($user)) {
+        $deleted = true;
+    }
+
+    $authsequence = get_enabled_auth_plugins(); // auths, in sequence
+    foreach($authsequence as $authname) {
+        $authplugin = get_auth_plugin($authname);
+        $authplugin->logoutpage_hook();
+    }
+
+    require_logout();
+
+    return $deleted;
+}

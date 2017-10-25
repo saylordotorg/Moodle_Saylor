@@ -45,6 +45,8 @@ $PAGE->set_url('/local/sayonara/index.php');
 $PAGE->set_title(format_string(get_string('deleteaccount', 'local_sayonara')));
 $PAGE->set_heading(format_string(get_string('userpass', 'local_sayonara')));
 
+$confirm      = optional_param('confirm', '', PARAM_ALPHANUM);   //md5 confirmation hash
+
 $systemcontext = context_system::instance();
 $enabled = get_config('local_sayonara', 'enabled');
 $error = '';
@@ -57,6 +59,19 @@ if ($enabled) {
         $url = new moodle_url('/local/sayonara/index.php', array('sesskey'=>$USER->sesskey));
         $checkaccount = new check_account_form($url);
 
+        if ($confirm == md5($USER->sesskey) && data_submitted()) {
+            $user = $DB->get_record('user', array('id'=>$USER->id), '*', MUST_EXIST);
+            if (is_siteadmin($user->id)) {
+                $error = $OUTPUT->notification(get_string('useradminnodelete', 'local_sayonara'));
+            } else if (local_sayonara_delete_user($user)) {
+                echo $OUTPUT->header(get_string('deleteaccount', 'local_sayonara'));
+                echo $OUTPUT->notification(get_string('useraccountdeleted', 'local_sayonara'), 'notifysuccess');
+                echo $OUTPUT->footer();
+                exit;
+            } else {
+                $error = $OUTPUT->notification(get_string('deleteaccounterror', 'local_sayonara'));
+            }
+        }
         if ($local_user = $checkaccount->get_data()) {
             if ($local_user->username != '' && $local_user->password != '') {
                 if ($user = $DB->get_record('user', array('username'=>$local_user->username))) {
@@ -65,21 +80,17 @@ if ($enabled) {
                         if ($user = authenticate_user_login($local_user->username, $local_user->password) ) {
                             complete_user_login($user);
                             if ($user->id == $USER->id && ($USER->auth == 'email' || $USER->auth == 'manual')) {
-                                delete_user($user);
+                                $optionsyes = array('confirm'=>md5($USER->sesskey), 'sesskey'=>$USER->sesskey);
+                                $deleteurl = new moodle_url($url, $optionsyes);
+                                $deletebutton = new single_button($deleteurl, get_string('delete'), 'post');
+                                $returnurl = new moodle_url('/user/profile.php', array('id'=>$USER->id));
 
-                                $authsequence = get_enabled_auth_plugins(); // auths, in sequence
-                                foreach($authsequence as $authname) {
-                                    $authplugin = get_auth_plugin($authname);
-                                    $authplugin->logoutpage_hook();
-                                }
-
-                                require_logout();
-                                echo $OUTPUT->header(get_string('deleteaccount', 'local_sayonara'));
-                                echo $OUTPUT->notification(get_string('useraccountdeleted', 'local_sayonara'), 'notifysuccess');
+                                echo $OUTPUT->header();
+                                echo $OUTPUT->confirm(get_config('local_sayonara', 'farewellconfirmation'), $deletebutton, $returnurl);
                                 echo $OUTPUT->footer();
-                                exit;
+                                die;
                             } else {
-                                $error = $OUTPUT->notificatin(get_string('noself', 'local_sayonara'));
+                                $error = $OUTPUT->notification(get_string('noself', 'local_sayonara'));
                             }
                         } else {
                             $error = $OUTPUT->notification(get_string('loginerror', 'local_sayonara'));

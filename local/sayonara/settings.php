@@ -59,5 +59,11 @@ if ($hassiteconfig) {
     $description = get_string('farewell_desc', 'local_sayonara');
     $setting = new admin_setting_confightmleditor($name, $title, $description, get_string('defaultfarewell', 'local_sayonara'));
     $settings->add($setting);
+
+    $name = 'local_sayonara/farewellconfirmation';
+    $title = get_string('farewellconfirmation', 'local_sayonara');
+    $description = get_string('farewellconfirmation_desc', 'local_sayonara');
+    $setting = new admin_setting_confightmleditor($name, $title, $description, get_string('defaultfarewellconfirmation', 'local_sayonara'));
+    $settings->add($setting);
 }
 
