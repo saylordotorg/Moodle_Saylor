@@ -235,6 +235,12 @@ def plugins = [
         "url" : 'https://github.com/moodleuulm/moodle-local_boostnavigation',
         "branch" : 'master',
         "dest" : 'local/boostnavigation'
+    ],
+    [
+        "name" : 'local_sayonara',
+        "url" : 'https://github.com/saylordotorg/moodle-local_sayonara',
+        "branch" : 'development',
+        "dest" : 'local/sayonara'
     ]
 ]
 
