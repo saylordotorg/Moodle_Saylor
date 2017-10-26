@@ -47,11 +47,11 @@ $PAGE->set_heading(format_string(get_string('userpass', 'local_sayonara')));
 
 $confirm      = optional_param('confirm', '', PARAM_ALPHANUM);   //md5 confirmation hash
 
+global $USER;
+
 $systemcontext = context_system::instance();
 $enabled = get_config('local_sayonara', 'enabled');
 $error = '';
-
-global $USER;
 
 if ($enabled) {
     if (isloggedin() && !isguestuser($USER) && !is_mnet_remote_user($USER) && confirm_sesskey()) {
@@ -74,26 +74,21 @@ if ($enabled) {
         }
         if ($local_user = $checkaccount->get_data()) {
             if ($local_user->username != '' && $local_user->password != '') {
-                if ($user = $DB->get_record('user', array('username'=>$local_user->username))) {
+                if ($user = authenticate_user_login($local_user->username, $local_user->password)) {
                     // User Exists, Check pass.
                     if ($user->id == $USER->id) { // User credentials authenticating with MUST match the credentials they are already logged in with.
-                        if ($user = authenticate_user_login($local_user->username, $local_user->password) ) {
-                            complete_user_login($user);
-                            if ($user->id == $USER->id && ($USER->auth == 'email' || $USER->auth == 'manual')) {
-                                $optionsyes = array('confirm'=>md5($USER->sesskey), 'sesskey'=>$USER->sesskey);
-                                $deleteurl = new moodle_url($url, $optionsyes);
-                                $deletebutton = new single_button($deleteurl, get_string('delete'), 'post');
-                                $returnurl = new moodle_url('/user/profile.php', array('id'=>$USER->id));
+                        if ($user->id == $USER->id && ($USER->auth == 'email' || $USER->auth == 'manual')) {
+                            $optionsyes = array('confirm'=>md5($USER->sesskey), 'sesskey'=>$USER->sesskey);
+                            $deleteurl = new moodle_url($url, $optionsyes);
+                            $deletebutton = new single_button($deleteurl, get_string('delete'), 'post');
+                            $returnurl = new moodle_url('/user/profile.php', array('id'=>$USER->id));
 
-                                echo $OUTPUT->header();
-                                echo $OUTPUT->confirm(get_config('local_sayonara', 'farewellconfirmation'), $deletebutton, $returnurl);
-                                echo $OUTPUT->footer();
-                                die;
-                            } else {
-                                $error = $OUTPUT->notification(get_string('noself', 'local_sayonara'));
-                            }
+                            echo $OUTPUT->header();
+                            echo $OUTPUT->confirm(get_config('local_sayonara', 'farewellconfirmation'), $deletebutton, $returnurl);
+                            echo $OUTPUT->footer();
+                            die;
                         } else {
-                            $error = $OUTPUT->notification(get_string('loginerror', 'local_sayonara'));
+                            $error = $OUTPUT->notification(get_string('noself', 'local_sayonara'));
                         }
                     } else {
                         $error = $OUTPUT->notification(get_string('loginerror', 'local_sayonara'));
