@@ -70,6 +70,9 @@ echo $OUTPUT->doctype() ?>
     /></noscript>
     <!-- DO NOT MODIFY -->
     <!-- End Facebook Pixel Code -->
+    <!-- Code Prettify -->
+    <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
+    <!-- End Code Prettify -->
     <link rel="shortcut icon" href="<?php echo $OUTPUT->favicon(); ?>" />
     <?php echo $OUTPUT->standard_head_html() ?>
 

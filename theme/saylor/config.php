@@ -39,7 +39,7 @@ $THEME->name = 'saylor';
 
 $THEME->doctype = 'html5';
 $THEME->parents = array('bootstrapbase');
-$THEME->sheets = array('custom', 'blocks', 'menu', 'course', 'slider');
+$THEME->sheets = array('custom', 'blocks', 'menu', 'course', 'slider', 'prettify-solarized');
 $THEME->supportscssoptimisation = false;
 $THEME->yuicssmodules = array();
 
