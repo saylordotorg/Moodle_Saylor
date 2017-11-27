@@ -218,6 +218,7 @@ def plugins = [
         "branch" : 'master',
         "dest" : 'local/boostnavigation'
     ]
+]
 
 def StashMoodle(moodle_version) {
     node {
