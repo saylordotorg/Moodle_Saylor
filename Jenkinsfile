@@ -75,12 +75,6 @@ def plugins = [
         "dest" : 'blocks/accessibility'
     ],
     [
-        "name" : 'editor_supsub',
-        "url" : 'https://github.com/moodleou/moodle-editor_supsub.git',
-        "branch" : 'master',
-        "dest" : 'lib/editor/supsub'
-    ],
-    [
         "name" : 'block_workflow',
         "url" : 'https://github.com/moodleou/moodle-block_workflow.git',
         "branch" : 'master',
