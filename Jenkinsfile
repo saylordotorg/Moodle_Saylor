@@ -93,12 +93,6 @@ def plugins = [
         "dest" : 'mod/accredible'
     ],
     [
-        "name" : 'block_configurablereports',
-        "url" : 'https://github.com/jleyva/moodle-block_configurablereports.git',
-        "branch" : 'MOODLE_30_STABLE',
-        "dest" : 'blocks/configurable_reports'
-    ],
-    [
         "name" : 'report_myfeedback',
         "url" : 'https://github.com/jgramp/moodle-report_myfeedback.git',
         "branch" : 'master',
