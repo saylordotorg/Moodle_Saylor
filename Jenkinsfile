@@ -197,7 +197,7 @@ def plugins = [
     [
         "name" : 'mod_reengagement',
         "url" : 'https://github.com/catalyst/moodle-mod_reengagement.git',
-        "branch" : 'MOODLE_32_STABLE',
+        "branch" : 'master',
         "dest" : 'mod/reengagement'
     ],
     [
