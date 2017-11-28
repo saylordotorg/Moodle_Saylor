@@ -29,13 +29,13 @@ def plugins = [
     [
         "name" : 'format_grid',
         "url" : 'https://github.com/gjb2048/moodle-format_grid.git',
-        "branch" : 'master',
+        "branch" : 'MOODLE_33',
         "dest" : 'course/format/grid'
     ],
     [
         "name" : 'format_topcoll',
         "url" : 'https://github.com/gjb2048/moodle-format_topcoll.git',
-        "branch" : 'master',
+        "branch" : 'MOODLE_33',
         "dest" : 'course/format/topcoll'
     ],
     [
