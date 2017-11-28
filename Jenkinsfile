@@ -17,7 +17,7 @@ def plugins = [
     [
         "name" : 'mod_journal',
         "url" : 'https://github.com/dmonllao/moodle-mod_journal.git',
-        "branch" : 'master',
+        "branch" : 'MOODLE_32_STABLE',
         "dest" : 'mod/journal'
     ],
     [
