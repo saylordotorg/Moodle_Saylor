@@ -7,14 +7,18 @@ namespace Composer\Autoload;
 class ComposerStaticInit8d947361c0083b855c1b429cc511cf33
 {
     public static $files = array (
-        'fad373d645dd668e85d44ccf3c38fbd6' => __DIR__ . '/..' . '/guzzlehttp/streams/src/functions.php',
-        '154e0d165f5fe76e8e9695179d0a7345' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions.php',
+        'ad155f8f1cf0d418fe49e248db8c661b' => __DIR__ . '/..' . '/react/promise/src/functions_include.php',
     );
 
     public static $prefixLengthsPsr4 = array (
+        'R' => 
+        array (
+            'React\\Promise\\' => 14,
+        ),
         'G' => 
         array (
             'GuzzleHttp\\Stream\\' => 18,
+            'GuzzleHttp\\Ring\\' => 16,
             'GuzzleHttp\\' => 11,
         ),
         'A' => 
@@ -25,9 +29,17 @@ class ComposerStaticInit8d947361c0083b855c1b429cc511cf33
     );
 
     public static $prefixDirsPsr4 = array (
+        'React\\Promise\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/react/promise/src',
+        ),
         'GuzzleHttp\\Stream\\' => 
         array (
             0 => __DIR__ . '/..' . '/guzzlehttp/streams/src',
+        ),
+        'GuzzleHttp\\Ring\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/guzzlehttp/ringphp/src',
         ),
         'GuzzleHttp\\' => 
         array (

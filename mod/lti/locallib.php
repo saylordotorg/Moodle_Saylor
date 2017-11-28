@@ -103,7 +103,12 @@ function lti_get_launch_data($instance) {
         if ($tool) {
             $typeid = $tool->id;
         } else {
-            $typeid = null;
+            $tool = lti_get_tool_by_url_match($instance->securetoolurl,  $instance->course);
+            if ($tool) {
+                $typeid = $tool->id;
+            } else {
+                $typeid = null;
+            }
         }
     } else {
         $typeid = $instance->typeid;
@@ -3014,6 +3019,15 @@ function lti_load_type_from_cartridge($url, $type) {
         $toolinfo['lti_secureicon'] = $toolinfo['lti_extension_secureicon'];
     }
     unset($toolinfo['lti_extension_secureicon']);
+
+    // Ensure Custom icons aren't overridden by cartridge params.
+    if (!empty($type->lti_icon)) {
+        unset($toolinfo['lti_icon']);
+    }
+
+    if (!empty($type->lti_secureicon)) {
+        unset($toolinfo['lti_secureicon']);
+    }
 
     foreach ($toolinfo as $property => $value) {
         $type->$property = $value;

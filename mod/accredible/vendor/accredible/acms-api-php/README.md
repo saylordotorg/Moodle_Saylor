@@ -67,3 +67,9 @@ https://github.com/accredible/acms-php-api/issues
 ### License
 
 This project is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT)
+
+### Todo
+* Make batch comsumption easier (example https://github.com/facebook/php-graph-sdk/blob/ad21129edb95196d04e4e69a464702215ad8c255/src/Facebook/FacebookBatchRequest.php) and document
+* Add evidence item endpoints
+* Add reference endpoints
+* Add additional test suite using mocks

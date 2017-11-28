@@ -33,7 +33,10 @@ require_once("HTML/QuickForm/text.php");
  * @author       Iain Checkland - modified from ColourPicker by Jamie Pratt [thanks]
  * @access       public
  */
-class MoodleQuickForm_gfcolourpopup extends HTML_QuickForm_text {
+class MoodleQuickForm_gfcolourpopup extends HTML_QuickForm_text implements templatable {
+    use templatable_form_element {
+        export_for_template as export_for_template_base;
+    }
 
     /*
      * html for help button, if empty then no help
@@ -45,7 +48,10 @@ class MoodleQuickForm_gfcolourpopup extends HTML_QuickForm_text {
 
     public function __construct($elementName = null, $elementLabel = null, $attributes = null, $options = null) {
         parent::__construct($elementName, $elementLabel, $attributes);
-        $this->setType('colourtext');
+        /* Pretend we are a 'static' MoodleForm element so that we get the core_form/element-static template where
+           we can render our own markup via core_renderer::mform_element() in lib/outputrenderers.php.
+           used in combination with 'use' statement above and export_for_template() method below. */
+        $this->setType('static');
     }
 
     /*
@@ -130,5 +136,12 @@ class MoodleQuickForm_gfcolourpopup extends HTML_QuickForm_text {
         } else {
             return 'default';
         }
+    }
+
+    public function export_for_template(renderer_base $output) {
+        $context = $this->export_for_template_base($output);
+        $context['html'] = $this->toHtml();
+        $context['staticlabel'] = false; // Not a static label!
+        return $context;
     }
 }

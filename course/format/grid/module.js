@@ -211,7 +211,7 @@ M.format_grid.grid_toggle = function() {
             window.scroll(0, document.getElementById("section-" + this.selected_section_no).offsetTop);
         } else if (this.section_redirect !== null) {
             // Keyboard control of 'toggle' in 'One section per page' layout.
-            location.replace(this.section_redirect + "&section=" + this.selected_section_no);
+            location.assign(this.section_redirect + "&section=" + this.selected_section_no);
         } else if (M.format_grid.shadebox.shadebox_open === true) {
             this.shadebox.toggle_shadebox();
         } else {

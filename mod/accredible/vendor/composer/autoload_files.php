@@ -6,6 +6,5 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'fad373d645dd668e85d44ccf3c38fbd6' => $vendorDir . '/guzzlehttp/streams/src/functions.php',
-    '154e0d165f5fe76e8e9695179d0a7345' => $vendorDir . '/guzzlehttp/guzzle/src/functions.php',
+    'ad155f8f1cf0d418fe49e248db8c661b' => $vendorDir . '/react/promise/src/functions_include.php',
 );

@@ -103,7 +103,7 @@ class core_user_external extends external_api {
                             'preferences' => new external_multiple_structure(
                                 new external_single_structure(
                                     array(
-                                        'type'  => new external_value(PARAM_ALPHANUMEXT, 'The name of the preference'),
+                                        'type'  => new external_value(PARAM_RAW, 'The name of the preference'),
                                         'value' => new external_value(PARAM_RAW, 'The value of the preference')
                                     )
                                 ), 'User preferences', VALUE_OPTIONAL),
@@ -133,6 +133,7 @@ class core_user_external extends external_api {
         global $CFG, $DB;
         require_once($CFG->dirroot."/lib/weblib.php");
         require_once($CFG->dirroot."/user/lib.php");
+        require_once($CFG->dirroot."/user/editlib.php");
         require_once($CFG->dirroot."/user/profile/lib.php"); // Required for customfields related function.
 
         // Ensure the current user is allowed to run this function.
@@ -341,7 +342,7 @@ class core_user_external extends external_api {
                 'preferences' => new external_multiple_structure(
                     new external_single_structure(
                         array(
-                            'type'  => new external_value(PARAM_ALPHANUMEXT, 'The name of the preference'),
+                            'type'  => new external_value(PARAM_RAW, 'The name of the preference'),
                             'value' => new external_value(PARAM_RAW, 'The value of the preference')
                         )
                     ), 'User preferences', VALUE_DEFAULT, array()
@@ -496,7 +497,7 @@ class core_user_external extends external_api {
                             'preferences' => new external_multiple_structure(
                                 new external_single_structure(
                                     array(
-                                        'type'  => new external_value(PARAM_ALPHANUMEXT, 'The name of the preference'),
+                                        'type'  => new external_value(PARAM_RAW, 'The name of the preference'),
                                         'value' => new external_value(PARAM_RAW, 'The value of the preference')
                                     )
                                 ), 'User preferences', VALUE_OPTIONAL),
@@ -547,6 +548,16 @@ class core_user_external extends external_api {
             if ($existinguser->deleted or is_mnet_remote_user($existinguser) or isguestuser($existinguser->id)) {
                 continue;
             }
+            // Check duplicated emails.
+            if (isset($user['email']) && $user['email'] !== $existinguser->email) {
+                if (!validate_email($user['email'])) {
+                    continue;
+                } else if (empty($CFG->allowaccountssameemail) &&
+                        $DB->record_exists('user', array('email' => $user['email'], 'mnethostid' => $CFG->mnet_localhost_id))) {
+                    continue;
+                }
+            }
+
             user_update_user($user, true, false);
 
             // Update user picture if it was specified for this user.
@@ -1059,8 +1070,8 @@ class core_user_external extends external_api {
             'preferences' => new external_multiple_structure(
                 new external_single_structure(
                     array(
-                        'name'  => new external_value(PARAM_ALPHANUMEXT, 'The name of the preferences'),
-                        'value' => new external_value(PARAM_RAW, 'The value of the custom field'),
+                        'name'  => new external_value(PARAM_RAW, 'The name of the preferences'),
+                        'value' => new external_value(PARAM_RAW, 'The value of the preference'),
                     )
             ), 'Users preferences', VALUE_OPTIONAL)
         );
