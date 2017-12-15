@@ -229,6 +229,12 @@ def plugins = [
         "url" : 'https://github.com/saylordotorg/moodle-local_sayonara',
         "branch" : 'development',
         "dest" : 'local/sayonara'
+    ],
+    [
+        "name" : 'gradereport_quizanalytics',
+        "url" : 'https://github.com/dualcube/moodle-gradereport_quizanalytics',
+        "branch" : 'master',
+        "dest" : 'gradereport/quizanalytics'
     ]
 ]
 
