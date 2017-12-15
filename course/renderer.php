@@ -456,7 +456,7 @@ class core_course_renderer extends plugin_renderer_base {
      * @return string
      */
     public function course_section_cm_completion($course, &$completioninfo, cm_info $mod, $displayoptions = array()) {
-        global $CFG;
+        global $CFG, $DB;
         $output = '';
         if (!empty($displayoptions['hidecompletion']) || !isloggedin() || isguestuser() || !$mod->uservisible) {
             return $output;
@@ -485,16 +485,20 @@ class core_course_renderer extends plugin_renderer_base {
         } else if ($completion == COMPLETION_TRACKING_MANUAL) {
             switch($completiondata->completionstate) {
                 case COMPLETION_INCOMPLETE:
-                    $completionicon = 'manual-n'; break;
+                    $completionicon = 'manual-n' . ($completiondata->overrideby ? '-override' : '');
+                    break;
                 case COMPLETION_COMPLETE:
-                    $completionicon = 'manual-y'; break;
+                    $completionicon = 'manual-y' . ($completiondata->overrideby ? '-override' : '');
+                    break;
             }
         } else { // Automatic
             switch($completiondata->completionstate) {
                 case COMPLETION_INCOMPLETE:
-                    $completionicon = 'auto-n'; break;
+                    $completionicon = 'auto-n' . ($completiondata->overrideby ? '-override' : '');
+                    break;
                 case COMPLETION_COMPLETE:
-                    $completionicon = 'auto-y'; break;
+                    $completionicon = 'auto-y' . ($completiondata->overrideby ? '-override' : '');
+                    break;
                 case COMPLETION_COMPLETE_PASS:
                     $completionicon = 'auto-pass'; break;
                 case COMPLETION_COMPLETE_FAIL:
@@ -503,7 +507,15 @@ class core_course_renderer extends plugin_renderer_base {
         }
         if ($completionicon) {
             $formattedname = $mod->get_formatted_name();
-            $imgalt = get_string('completion-alt-' . $completionicon, 'completion', $formattedname);
+            if ($completiondata->overrideby) {
+                $args = new stdClass();
+                $args->modname = $formattedname;
+                $overridebyuser = \core_user::get_user($completiondata->overrideby, '*', MUST_EXIST);
+                $args->overrideuser = fullname($overridebyuser);
+                $imgalt = get_string('completion-alt-' . $completionicon, 'completion', $args);
+            } else {
+                $imgalt = get_string('completion-alt-' . $completionicon, 'completion', $formattedname);
+            }
 
             if ($this->page->user_is_editing()) {
                 // When editing, the icon is just an image.
@@ -512,7 +524,6 @@ class core_course_renderer extends plugin_renderer_base {
                 $output .= html_writer::tag('span', $this->output->render($completionpixicon),
                         array('class' => 'autocompletion'));
             } else if ($completion == COMPLETION_TRACKING_MANUAL) {
-                $imgtitle = get_string('completion-title-' . $completionicon, 'completion', $formattedname);
                 $newstate =
                     $completiondata->completionstate == COMPLETION_COMPLETE
                     ? COMPLETION_INCOMPLETE
@@ -2118,6 +2129,19 @@ class core_course_renderer extends plugin_renderer_base {
                 ))->
                 set_attributes(array('class' => 'frontpage-category-names'));
         return $this->coursecat_tree($chelper, coursecat::get(0));
+    }
+
+    /**
+     * Renders the activity navigation.
+     *
+     * Defer to template.
+     *
+     * @param \core_course\output\activity_navigation $page
+     * @return string html for the page
+     */
+    public function render_activity_navigation(\core_course\output\activity_navigation $page) {
+        $data = $page->export_for_template($this->output);
+        return $this->output->render_from_template('core_course/activity_navigation', $data);
     }
 }
 

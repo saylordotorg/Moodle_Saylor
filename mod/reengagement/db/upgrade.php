@@ -126,7 +126,7 @@ function xmldb_reengagement_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2017040400, 'reengagement');
     }
 
-    if ($oldversion < 2017050801) {
+    if ($oldversion < 2017102001) {
         global $CFG;
         require_once($CFG->dirroot.'/mod/reengagement/lib.php');
         // A bug in previous versions prevented some e-mails from being sent.
@@ -175,7 +175,7 @@ function xmldb_reengagement_upgrade($oldversion=0) {
         }
         $missingprogress->close();
 
-        upgrade_mod_savepoint(true, 2017050801, 'reengagement');
+        upgrade_mod_savepoint(true, 2017102001, 'reengagement');
     }
 
     return true;

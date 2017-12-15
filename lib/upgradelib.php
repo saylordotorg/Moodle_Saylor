@@ -138,6 +138,57 @@ class plugin_misplaced_exception extends moodle_exception {
 }
 
 /**
+ * Static class monitors performance of upgrade steps.
+ */
+class core_upgrade_time {
+    /** @var float Time at start of current upgrade (plugin/system) */
+    protected static $before;
+    /** @var float Time at end of last savepoint */
+    protected static $lastsavepoint;
+    /** @var bool Flag to indicate whether we are recording timestamps or not. */
+    protected static $isrecording = false;
+
+    /**
+     * Records current time at the start of the current upgrade item, e.g. plugin.
+     */
+    public static function record_start() {
+        self::$before = microtime(true);
+        self::$lastsavepoint = self::$before;
+        self::$isrecording = true;
+    }
+
+    /**
+     * Records current time at the end of a given numbered step.
+     *
+     * @param float $version Version number (may have decimals, or not)
+     */
+    public static function record_savepoint($version) {
+        global $CFG, $OUTPUT;
+
+        // In developer debug mode we show a notification after each individual save point.
+        if ($CFG->debugdeveloper && self::$isrecording) {
+            $time = microtime(true);
+
+            $notification = new \core\output\notification($version . ': ' .
+                    get_string('successduration', '', format_float($time - self::$lastsavepoint, 2)),
+                    \core\output\notification::NOTIFY_SUCCESS);
+            $notification->set_show_closebutton(false);
+            echo $OUTPUT->render($notification);
+            self::$lastsavepoint = $time;
+        }
+    }
+
+    /**
+     * Gets the time since the record_start function was called, rounded to 2 digits.
+     *
+     * @return float Elapsed time
+     */
+    public static function get_elapsed() {
+        return microtime(true) - self::$before;
+    }
+}
+
+/**
  * Sets maximum expected time needed for upgrade task.
  * Please always make sure that upgrade will not run longer!
  *
@@ -224,6 +275,8 @@ function upgrade_main_savepoint($result, $version, $allowabort=true) {
     // reset upgrade timeout to default
     upgrade_set_timeout();
 
+    core_upgrade_time::record_savepoint($version);
+
     // this is a safe place to stop upgrades if user aborts page loading
     if ($allowabort and connection_aborted()) {
         die;
@@ -267,6 +320,8 @@ function upgrade_mod_savepoint($result, $version, $modname, $allowabort=true) {
 
     // reset upgrade timeout to default
     upgrade_set_timeout();
+
+    core_upgrade_time::record_savepoint($version);
 
     // this is a safe place to stop upgrades if user aborts page loading
     if ($allowabort and connection_aborted()) {
@@ -312,6 +367,8 @@ function upgrade_block_savepoint($result, $version, $blockname, $allowabort=true
     // reset upgrade timeout to default
     upgrade_set_timeout();
 
+    core_upgrade_time::record_savepoint($version);
+
     // this is a safe place to stop upgrades if user aborts page loading
     if ($allowabort and connection_aborted()) {
         die;
@@ -352,6 +409,8 @@ function upgrade_plugin_savepoint($result, $version, $type, $plugin, $allowabort
     // Reset upgrade timeout to default
     upgrade_set_timeout();
 
+    core_upgrade_time::record_savepoint($version);
+
     // This is a safe place to stop upgrades if user aborts page loading
     if ($allowabort and connection_aborted()) {
         die;
@@ -371,6 +430,11 @@ function upgrade_stale_php_files_present() {
     global $CFG;
 
     $someexamplesofremovedfiles = array(
+        // Removed in 3.4.
+        '/auth/README.txt',
+        '/calendar/set.php',
+        '/enrol/users.php',
+        '/enrol/yui/rolemanager/assets/skins/sam/rolemanager.css',
         // Removed in 3.3.
         '/badges/backpackconnect.php',
         '/calendar/yui/src/info/assets/skins/sam/moodle-calendar-info.css',
@@ -1508,6 +1572,7 @@ function print_upgrade_part_start($plugin, $installation, $verbose) {
             upgrade_log(UPGRADE_LOG_NORMAL, $plugin, 'Starting plugin installation');
         }
     } else {
+        core_upgrade_time::record_start();
         if (empty($plugin) or $plugin == 'moodle') {
             upgrade_log(UPGRADE_LOG_NORMAL, $plugin, 'Starting core upgrade');
         } else {
@@ -1538,7 +1603,13 @@ function print_upgrade_part_end($plugin, $installation, $verbose) {
         }
     }
     if ($verbose) {
-        $notification = new \core\output\notification(get_string('success'), \core\output\notification::NOTIFY_SUCCESS);
+        if ($installation) {
+            $message = get_string('success');
+        } else {
+            $duration = core_upgrade_time::get_elapsed();
+            $message = get_string('successduration', '', format_float($duration, 2));
+        }
+        $notification = new \core\output\notification($message, \core\output\notification::NOTIFY_SUCCESS);
         $notification->set_show_closebutton(false);
         echo $OUTPUT->render($notification);
         print_upgrade_separator();
@@ -1596,6 +1667,31 @@ function upgrade_language_pack($lang = null) {
     get_string_manager()->reset_caches();
 
     print_upgrade_separator();
+}
+
+/**
+ * Build the current theme so that the user doesn't have to wait for it
+ * to build on the first page load after the install / upgrade.
+ */
+function upgrade_themes() {
+    global $CFG;
+
+    require_once("{$CFG->libdir}/outputlib.php");
+
+    // Build the current theme so that the user can immediately
+    // browse the site without having to wait for the theme to build.
+    $themeconfig = theme_config::load($CFG->theme);
+    $direction = right_to_left() ? 'rtl' : 'ltr';
+    theme_build_css_for_themes([$themeconfig], [$direction]);
+
+    // Only queue the task if there isn't already one queued.
+    if (empty(\core\task\manager::get_adhoc_tasks('\\core\\task\\build_installed_themes_task'))) {
+        // Queue a task to build all of the site themes at some point
+        // later. These can happen offline because it doesn't block the
+        // user unless they quickly change theme.
+        $adhoctask = new \core\task\build_installed_themes_task();
+        \core\task\manager::queue_adhoc_task($adhoctask);
+    }
 }
 
 /**
@@ -2051,39 +2147,6 @@ function admin_mnet_method_get_help(ReflectionFunctionAbstract $function) {
 }
 
 /**
- * Detect draft file areas with missing root directory records and add them.
- */
-function upgrade_fix_missing_root_folders_draft() {
-    global $DB;
-
-    $transaction = $DB->start_delegated_transaction();
-
-    $sql = "SELECT contextid, itemid, MAX(timecreated) AS timecreated, MAX(timemodified) AS timemodified
-              FROM {files}
-             WHERE (component = 'user' AND filearea = 'draft')
-          GROUP BY contextid, itemid
-            HAVING MAX(CASE WHEN filename = '.' AND filepath = '/' THEN 1 ELSE 0 END) = 0";
-
-    $rs = $DB->get_recordset_sql($sql);
-    $defaults = array('component' => 'user',
-        'filearea' => 'draft',
-        'filepath' => '/',
-        'filename' => '.',
-        'userid' => 0, // Don't rely on any particular user for these system records.
-        'filesize' => 0,
-        // Note: This does not use the file_storage API's hash calculator
-        // because access to core APIs is not allowed during upgrade.
-        'contenthash' => sha1(''),
-    );
-    foreach ($rs as $r) {
-        $r->pathnamehash = sha1("/$r->contextid/user/draft/$r->itemid/.");
-        $DB->insert_record('files', (array)$r + $defaults);
-    }
-    $rs->close();
-    $transaction->allow_commit();
-}
-
-/**
  * This function verifies that the database is not using an unsupported storage engine.
  *
  * @param environment_results $result object to update, if relevant
@@ -2275,57 +2338,6 @@ function check_is_https(environment_results $result) {
     }
     return null;
 }
-
-/**
- * Upgrade the minmaxgrade setting.
- *
- * This step should only be run for sites running 2.8 or later. Sites using 2.7 will be fine
- * using the new default system setting $CFG->grade_minmaxtouse.
- *
- * @return void
- */
-function upgrade_minmaxgrade() {
-    global $CFG, $DB;
-
-    // 2 is a copy of GRADE_MIN_MAX_FROM_GRADE_GRADE.
-    $settingvalue = 2;
-
-    // Set the course setting when:
-    // - The system setting does not exist yet.
-    // - The system seeting is not set to what we'd set the course setting.
-    $setcoursesetting = !isset($CFG->grade_minmaxtouse) || $CFG->grade_minmaxtouse != $settingvalue;
-
-    // Identify the courses that have inconsistencies grade_item vs grade_grade.
-    $sql = "SELECT DISTINCT(gi.courseid)
-              FROM {grade_grades} gg
-              JOIN {grade_items} gi
-                ON gg.itemid = gi.id
-             WHERE gi.itemtype NOT IN (?, ?)
-               AND (gg.rawgrademax != gi.grademax OR gg.rawgrademin != gi.grademin)";
-
-    $rs = $DB->get_recordset_sql($sql, array('course', 'category'));
-    foreach ($rs as $record) {
-        // Flag the course to show a notice in the gradebook.
-        set_config('show_min_max_grades_changed_' . $record->courseid, 1);
-
-        // Set the appropriate course setting so that grades displayed are not changed.
-        $configname = 'minmaxtouse';
-        if ($setcoursesetting &&
-                !$DB->record_exists('grade_settings', array('courseid' => $record->courseid, 'name' => $configname))) {
-            // Do not set the setting when the course already defines it.
-            $data = new stdClass();
-            $data->courseid = $record->courseid;
-            $data->name     = $configname;
-            $data->value    = $settingvalue;
-            $DB->insert_record('grade_settings', $data);
-        }
-
-        // Mark the grades to be regraded.
-        $DB->set_field('grade_items', 'needsupdate', 1, array('courseid' => $record->courseid));
-    }
-    $rs->close();
-}
-
 
 /**
  * Assert the upgrade key is provided, if it is defined.

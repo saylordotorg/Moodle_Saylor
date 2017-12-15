@@ -138,6 +138,7 @@ class stored_file {
     protected function update($dataobject) {
         global $DB;
         $updatereferencesneeded = false;
+        $updatemimetype = false;
         $keys = array_keys((array)$this->file_record);
         $filepreupdate = clone($this->file_record);
         foreach ($dataobject as $field => $value) {
@@ -202,6 +203,10 @@ class stored_file {
                     $updatereferencesneeded = true;
                 }
 
+                if ($updatereferencesneeded || ($field === 'filename' && $this->file_record->filename != $value)) {
+                    $updatemimetype = true;
+                }
+
                 // adding the field
                 $this->file_record->$field = $value;
             } else {
@@ -209,8 +214,10 @@ class stored_file {
             }
         }
         // Validate mimetype field
-        $mimetype = $this->filesystem->mimetype_from_storedfile($this);
-        $this->file_record->mimetype = $mimetype;
+        if ($updatemimetype) {
+            $mimetype = $this->filesystem->mimetype_from_storedfile($this);
+            $this->file_record->mimetype = $mimetype;
+        }
 
         $DB->update_record('files', $this->file_record);
         if ($updatereferencesneeded) {
@@ -586,6 +593,24 @@ class stored_file {
         $filepath = ($filepath === '') ? '/' : "/$filepath/";
 
         return $this->fs->create_directory($this->file_record->contextid, $this->file_record->component, $this->file_record->filearea, $this->file_record->itemid, $filepath);
+    }
+
+    /**
+     * Set synchronised content from file.
+     *
+     * @param string $path Path to the file.
+     */
+    public function set_synchronised_content_from_file($path) {
+        $this->fs->synchronise_stored_file_from_file($this, $path, $this->file_record);
+    }
+
+    /**
+     * Set synchronised content from content.
+     *
+     * @param string $content File content.
+     */
+    public function set_synchronised_content_from_string($content) {
+        $this->fs->synchronise_stored_file_from_string($this, $content, $this->file_record);
     }
 
     /**

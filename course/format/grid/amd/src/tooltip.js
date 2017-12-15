@@ -266,9 +266,11 @@ define(['jquery', 'core/log'], function($, log) {
             var autoPlace = autoToken.test(placement)
             if (autoPlace) placement = placement.replace(autoToken, '') || 'top'
 
+            var css = { top: 0, left: 0, display: 'block' };
+
             $tip
                 .detach()
-                .css({ top: 0, left: 0, display: 'block' })
+                .css(css)
                 .addClass(placement)
                 .data('bs.' + this.type, this)
 

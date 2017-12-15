@@ -72,6 +72,10 @@ class issuer extends persistent {
                 'type' => PARAM_BOOL,
                 'default' => false
             ),
+            'basicauth' => array(
+                'type' => PARAM_BOOL,
+                'default' => false
+            ),
             'scopessupported' => array(
                 'type' => PARAM_RAW,
                 'null' => NULL_ALLOWED,
@@ -100,6 +104,10 @@ class issuer extends persistent {
             'sortorder' => array(
                 'type' => PARAM_INT,
                 'default' => 0,
+            ),
+            'requireconfirmation' => array(
+                'type' => PARAM_BOOL,
+                'default' => true
             )
         );
     }

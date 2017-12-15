@@ -597,12 +597,27 @@ class core_moodlelib_testcase extends advanced_testcase {
 
     public function test_clean_param_url() {
         // Test PARAM_URL and PARAM_LOCALURL a bit.
+        // Valid URLs.
         $this->assertSame('http://google.com/', clean_param('http://google.com/', PARAM_URL));
         $this->assertSame('http://some.very.long.and.silly.domain/with/a/path/', clean_param('http://some.very.long.and.silly.domain/with/a/path/', PARAM_URL));
         $this->assertSame('http://localhost/', clean_param('http://localhost/', PARAM_URL));
         $this->assertSame('http://0.255.1.1/numericip.php', clean_param('http://0.255.1.1/numericip.php', PARAM_URL));
+        $this->assertSame('https://google.com/', clean_param('https://google.com/', PARAM_URL));
+        $this->assertSame('https://some.very.long.and.silly.domain/with/a/path/', clean_param('https://some.very.long.and.silly.domain/with/a/path/', PARAM_URL));
+        $this->assertSame('https://localhost/', clean_param('https://localhost/', PARAM_URL));
+        $this->assertSame('https://0.255.1.1/numericip.php', clean_param('https://0.255.1.1/numericip.php', PARAM_URL));
+        $this->assertSame('ftp://ftp.debian.org/debian/', clean_param('ftp://ftp.debian.org/debian/', PARAM_URL));
         $this->assertSame('/just/a/path', clean_param('/just/a/path', PARAM_URL));
+        // Invalid URLs.
         $this->assertSame('', clean_param('funny:thing', PARAM_URL));
+        $this->assertSame('', clean_param('http://example.ee/sdsf"f', PARAM_URL));
+        $this->assertSame('', clean_param('javascript://comment%0Aalert(1)', PARAM_URL));
+        $this->assertSame('', clean_param('rtmp://example.com/livestream', PARAM_URL));
+        $this->assertSame('', clean_param('rtmp://example.com/live&foo', PARAM_URL));
+        $this->assertSame('', clean_param('rtmp://example.com/fms&mp4:path/to/file.mp4', PARAM_URL));
+        $this->assertSame('', clean_param('mailto:support@moodle.org', PARAM_URL));
+        $this->assertSame('', clean_param('mailto:support@moodle.org?subject=Hello%20Moodle', PARAM_URL));
+        $this->assertSame('', clean_param('mailto:support@moodle.org?subject=Hello%20Moodle&cc=feedback@moodle.org', PARAM_URL));
     }
 
     public function test_clean_param_localurl() {
@@ -628,31 +643,20 @@ class core_moodlelib_testcase extends advanced_testcase {
         // Local absolute HTTPS in a non HTTPS site.
         $CFG->wwwroot = str_replace('https:', 'http:', $CFG->wwwroot); // Need to simulate non-https site.
         $httpsroot = str_replace('http:', 'https:', $CFG->wwwroot);
-        $CFG->loginhttps = false; // Not allowed.
         $this->assertSame('', clean_param($httpsroot, PARAM_LOCALURL));
         $this->assertSame('', clean_param($httpsroot . '/with/something?else=true', PARAM_LOCALURL));
-        $CFG->loginhttps = true; // Allowed.
-        $this->assertSame($httpsroot, clean_param($httpsroot, PARAM_LOCALURL));
-        $this->assertSame($httpsroot . '/with/something?else=true',
-            clean_param($httpsroot . '/with/something?else=true', PARAM_LOCALURL));
 
         // Local absolute HTTPS in a HTTPS site.
-        $CFG->wwwroot = str_replace('https:', 'http:', $CFG->wwwroot);
+        $CFG->wwwroot = str_replace('http:', 'https:', $CFG->wwwroot);
         $httpsroot = $CFG->wwwroot;
-        $CFG->loginhttps = false; // Always allowed.
-        $this->assertSame($httpsroot, clean_param($httpsroot, PARAM_LOCALURL));
-        $this->assertSame($httpsroot . '/with/something?else=true',
-            clean_param($httpsroot . '/with/something?else=true', PARAM_LOCALURL));
-        $CFG->loginhttps = true; // Always allowed.
         $this->assertSame($httpsroot, clean_param($httpsroot, PARAM_LOCALURL));
         $this->assertSame($httpsroot . '/with/something?else=true',
             clean_param($httpsroot . '/with/something?else=true', PARAM_LOCALURL));
 
         // Test open redirects are not possible.
-        $CFG->loginhttps = false;
         $CFG->wwwroot = 'http://www.example.com';
         $this->assertSame('', clean_param('http://www.example.com.evil.net/hack.php', PARAM_LOCALURL));
-        $CFG->loginhttps = true;
+        $CFG->wwwroot = 'https://www.example.com';
         $this->assertSame('', clean_param('https://www.example.com.evil.net/hack.php', PARAM_LOCALURL));
     }
 
@@ -1820,7 +1824,7 @@ class core_moodlelib_testcase extends advanced_testcase {
     }
 
     /**
-     * @expectedException PHPUnit_Framework_Error_Warning
+     * @expectedException PHPUnit\Framework\Error\Warning
      */
     public function test_get_string_limitation() {
         // This is one of the limitations to the lang_string class. It can't be

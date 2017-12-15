@@ -42,15 +42,6 @@ function xmldb_feedback_upgrade($oldversion) {
 
     $dbman = $DB->get_manager(); // Loads ddl manager and xmldb classes.
 
-    // Moodle v2.8.0 release upgrade line.
-    // Put any upgrade step following this.
-
-    // Moodle v2.9.0 release upgrade line.
-    // Put any upgrade step following this.
-
-    // Moodle v3.0.0 release upgrade line.
-    // Put any upgrade step following this.
-
     if ($oldversion < 2016031600) {
         // Remove labels from all 'captcha' and 'label' items.
         $DB->execute('UPDATE {feedback_item} SET label = ? WHERE typ = ? OR typ = ?',
@@ -155,17 +146,20 @@ function xmldb_feedback_upgrade($oldversion) {
         // Related values in feedback_value won't be deleted (they won't be used and can be kept there as a backup).
         $sql = "SELECT MAX(id) as maxid, userid, feedback, courseid
                   FROM {feedback_completed}
-                 WHERE userid <> 0
+                 WHERE userid <> 0 AND anonymous_response = :notanonymous
               GROUP BY userid, feedback, courseid
                 HAVING COUNT(id) > 1";
+        $params = ['notanonymous' => 2]; // FEEDBACK_ANONYMOUS_NO.
 
-        $duplicatedrows = $DB->get_recordset_sql($sql);
+        $duplicatedrows = $DB->get_recordset_sql($sql, $params);
         foreach ($duplicatedrows as $row) {
-            $DB->delete_records_select('feedback_completed', 'userid = ? AND feedback = ? AND courseid = ? AND id <> ?', array(
-                $row->userid,
-                $row->feedback,
-                $row->courseid,
-                $row->maxid,
+            $DB->delete_records_select('feedback_completed', 'userid = ? AND feedback = ? AND courseid = ? AND id <> ?'.
+                                                           ' AND anonymous_response = ?', array(
+                                           $row->userid,
+                                           $row->feedback,
+                                           $row->courseid,
+                                           $row->maxid,
+                                           2, // FEEDBACK_ANONYMOUS_NO.
             ));
         }
         $duplicatedrows->close();
@@ -175,6 +169,9 @@ function xmldb_feedback_upgrade($oldversion) {
     }
 
     // Automatically generated Moodle v3.3.0 release upgrade line.
+    // Put any upgrade step following this.
+
+    // Automatically generated Moodle v3.4.0 release upgrade line.
     // Put any upgrade step following this.
 
     return true;

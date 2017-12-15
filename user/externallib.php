@@ -66,7 +66,7 @@ class core_user_external extends external_api {
                             'email' =>
                                 new external_value(core_user::get_property_type('email'), 'A valid and unique email address'),
                             'auth' =>
-                                new external_value(core_user::get_property_type('auth'), 'Auth plugins include manual, ldap, imap, etc', VALUE_DEFAULT,
+                                new external_value(core_user::get_property_type('auth'), 'Auth plugins include manual, ldap, etc', VALUE_DEFAULT,
                                     'manual', core_user::get_property_null('auth')),
                             'idnumber' =>
                                 new external_value(core_user::get_property_type('idnumber'), 'An arbitrary ID code number perhaps from the institution',
@@ -103,7 +103,7 @@ class core_user_external extends external_api {
                             'preferences' => new external_multiple_structure(
                                 new external_single_structure(
                                     array(
-                                        'type'  => new external_value(PARAM_ALPHANUMEXT, 'The name of the preference'),
+                                        'type'  => new external_value(PARAM_RAW, 'The name of the preference'),
                                         'value' => new external_value(PARAM_RAW, 'The value of the preference')
                                     )
                                 ), 'User preferences', VALUE_OPTIONAL),
@@ -133,6 +133,7 @@ class core_user_external extends external_api {
         global $CFG, $DB;
         require_once($CFG->dirroot."/lib/weblib.php");
         require_once($CFG->dirroot."/user/lib.php");
+        require_once($CFG->dirroot."/user/editlib.php");
         require_once($CFG->dirroot."/user/profile/lib.php"); // Required for customfields related function.
 
         // Ensure the current user is allowed to run this function.
@@ -341,7 +342,7 @@ class core_user_external extends external_api {
                 'preferences' => new external_multiple_structure(
                     new external_single_structure(
                         array(
-                            'type'  => new external_value(PARAM_ALPHANUMEXT, 'The name of the preference'),
+                            'type'  => new external_value(PARAM_RAW, 'The name of the preference'),
                             'value' => new external_value(PARAM_RAW, 'The value of the preference')
                         )
                     ), 'User preferences', VALUE_DEFAULT, array()
@@ -447,7 +448,7 @@ class core_user_external extends external_api {
                                 new external_value(core_user::get_property_type('email'), 'A valid and unique email address', VALUE_OPTIONAL, '',
                                     NULL_NOT_ALLOWED),
                             'auth' =>
-                                new external_value(core_user::get_property_type('auth'), 'Auth plugins include manual, ldap, imap, etc', VALUE_OPTIONAL, '',
+                                new external_value(core_user::get_property_type('auth'), 'Auth plugins include manual, ldap, etc', VALUE_OPTIONAL, '',
                                     NULL_NOT_ALLOWED),
                             'suspended' =>
                                 new external_value(core_user::get_property_type('suspended'), 'Suspend user account, either false to enable user login or true to disable it', VALUE_OPTIONAL),
@@ -496,7 +497,7 @@ class core_user_external extends external_api {
                             'preferences' => new external_multiple_structure(
                                 new external_single_structure(
                                     array(
-                                        'type'  => new external_value(PARAM_ALPHANUMEXT, 'The name of the preference'),
+                                        'type'  => new external_value(PARAM_RAW, 'The name of the preference'),
                                         'value' => new external_value(PARAM_RAW, 'The value of the preference')
                                     )
                                 ), 'User preferences', VALUE_OPTIONAL),
@@ -547,6 +548,16 @@ class core_user_external extends external_api {
             if ($existinguser->deleted or is_mnet_remote_user($existinguser) or isguestuser($existinguser->id)) {
                 continue;
             }
+            // Check duplicated emails.
+            if (isset($user['email']) && $user['email'] !== $existinguser->email) {
+                if (!validate_email($user['email'])) {
+                    continue;
+                } else if (empty($CFG->allowaccountssameemail) &&
+                        $DB->record_exists('user', array('email' => $user['email'], 'mnethostid' => $CFG->mnet_localhost_id))) {
+                    continue;
+                }
+            }
+
             user_update_user($user, true, false);
 
             // Update user picture if it was specified for this user.
@@ -1032,7 +1043,7 @@ class core_user_external extends external_api {
             'interests'   => new external_value(PARAM_TEXT, 'user interests (separated by commas)', VALUE_OPTIONAL),
             'firstaccess' => new external_value(core_user::get_property_type('firstaccess'), 'first access to the site (0 if never)', VALUE_OPTIONAL),
             'lastaccess'  => new external_value(core_user::get_property_type('lastaccess'), 'last access to the site (0 if never)', VALUE_OPTIONAL),
-            'auth'        => new external_value(core_user::get_property_type('auth'), 'Auth plugins include manual, ldap, imap, etc', VALUE_OPTIONAL),
+            'auth'        => new external_value(core_user::get_property_type('auth'), 'Auth plugins include manual, ldap, etc', VALUE_OPTIONAL),
             'suspended'   => new external_value(core_user::get_property_type('suspended'), 'Suspend user account, either false to enable user login or true to disable it', VALUE_OPTIONAL),
             'confirmed'   => new external_value(core_user::get_property_type('confirmed'), 'Active user: 1 if confirmed, 0 otherwise', VALUE_OPTIONAL),
             'lang'        => new external_value(core_user::get_property_type('lang'), 'Language code such as "en", must exist on server', VALUE_OPTIONAL),
@@ -1059,8 +1070,8 @@ class core_user_external extends external_api {
             'preferences' => new external_multiple_structure(
                 new external_single_structure(
                     array(
-                        'name'  => new external_value(PARAM_ALPHANUMEXT, 'The name of the preferences'),
-                        'value' => new external_value(PARAM_RAW, 'The value of the custom field'),
+                        'name'  => new external_value(PARAM_RAW, 'The name of the preferences'),
+                        'value' => new external_value(PARAM_RAW, 'The value of the preference'),
                     )
             ), 'Users preferences', VALUE_OPTIONAL)
         );
@@ -1332,6 +1343,7 @@ class core_user_external extends external_api {
     public static function view_user_list($courseid) {
         global $CFG;
         require_once($CFG->dirroot . "/user/lib.php");
+        require_once($CFG->dirroot . '/course/lib.php');
 
         $params = self::validate_parameters(self::view_user_list_parameters(),
                                             array(
@@ -1353,11 +1365,7 @@ class core_user_external extends external_api {
         }
         self::validate_context($context);
 
-        if ($course->id == SITEID) {
-            require_capability('moodle/site:viewparticipants', $context);
-        } else {
-            require_capability('moodle/course:viewparticipants', $context);
-        }
+        course_require_view_participants($context);
 
         user_list_view($course, $context);
 
@@ -1858,6 +1866,78 @@ class core_user_external extends external_api {
         return new external_single_structure(
             array(
                 'status' => new external_value(PARAM_BOOL, 'Status: true only if we set the policyagreed to 1 for the user'),
+                'warnings' => new external_warnings()
+            )
+        );
+    }
+
+    /**
+     * Returns description of method parameters.
+     *
+     * @return external_function_parameters
+     * @since Moodle 3.4
+     */
+    public static function get_private_files_info_parameters() {
+        return new external_function_parameters(
+            array(
+                'userid' => new external_value(PARAM_INT, 'Id of the user, default to current user.', VALUE_DEFAULT, 0)
+            )
+        );
+    }
+
+    /**
+     * Returns general information about files in the user private files area.
+     *
+     * @param int $userid Id of the user, default to current user.
+     * @return array of warnings and file area information
+     * @since Moodle 3.4
+     * @throws moodle_exception
+     */
+    public static function get_private_files_info($userid = 0) {
+        global $CFG, $USER;
+        require_once($CFG->libdir . '/filelib.php');
+
+        $params = self::validate_parameters(self::get_private_files_info_parameters(), array('userid' => $userid));
+        $warnings = array();
+
+        $context = context_system::instance();
+        self::validate_context($context);
+
+        if (empty($params['userid']) || $params['userid'] == $USER->id) {
+            $usercontext = context_user::instance($USER->id);
+            require_capability('moodle/user:manageownfiles', $usercontext);
+        } else {
+            $user = core_user::get_user($params['userid'], '*', MUST_EXIST);
+            core_user::require_active_user($user);
+            // Only admins can retrieve other users information.
+            require_capability('moodle/site:config', $context);
+            $usercontext = context_user::instance($user->id);
+        }
+
+        $fileareainfo = file_get_file_area_info($usercontext->id, 'user', 'private');
+
+        $result = array();
+        $result['filecount'] = $fileareainfo['filecount'];
+        $result['foldercount'] = $fileareainfo['foldercount'];
+        $result['filesize'] = $fileareainfo['filesize'];
+        $result['filesizewithoutreferences'] = $fileareainfo['filesize_without_references'];
+        $result['warnings'] = $warnings;
+        return $result;
+    }
+
+    /**
+     * Returns description of method result value.
+     *
+     * @return external_description
+     * @since Moodle 3.4
+     */
+    public static function get_private_files_info_returns() {
+        return new external_single_structure(
+            array(
+                'filecount' => new external_value(PARAM_INT, 'Number of files in the area.'),
+                'foldercount' => new external_value(PARAM_INT, 'Number of folders in the area.'),
+                'filesize' => new external_value(PARAM_INT, 'Total size of the files in the area.'),
+                'filesizewithoutreferences' => new external_value(PARAM_INT, 'Total size of the area excluding file references'),
                 'warnings' => new external_warnings()
             )
         );

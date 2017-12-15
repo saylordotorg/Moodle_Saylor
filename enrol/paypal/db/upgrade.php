@@ -45,15 +45,6 @@ defined('MOODLE_INTERNAL') || die();
 function xmldb_enrol_paypal_upgrade($oldversion) {
     global $CFG;
 
-    // Moodle v2.8.0 release upgrade line.
-    // Put any upgrade step following this.
-
-    // Moodle v2.9.0 release upgrade line.
-    // Put any upgrade step following this.
-
-    // Moodle v3.0.0 release upgrade line.
-    // Put any upgrade step following this.
-
     // Moodle v3.1.0 release upgrade line.
     // Put any upgrade step following this.
 
@@ -61,6 +52,9 @@ function xmldb_enrol_paypal_upgrade($oldversion) {
     // Put any upgrade step following this.
 
     // Automatically generated Moodle v3.3.0 release upgrade line.
+    // Put any upgrade step following this.
+
+    // Automatically generated Moodle v3.4.0 release upgrade line.
     // Put any upgrade step following this.
 
     return true;

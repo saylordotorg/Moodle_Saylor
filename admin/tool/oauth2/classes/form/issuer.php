@@ -78,6 +78,10 @@ class issuer extends persistent {
         $mform->addRule('clientsecret', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
         $mform->addHelpButton('clientsecret', 'issuerclientsecret', 'tool_oauth2');
 
+        // Use basic authentication.
+        $mform->addElement('checkbox', 'basicauth', get_string('usebasicauth', 'tool_oauth2'));
+        $mform->addHelpButton('basicauth', 'usebasicauth', 'tool_oauth2');
+
         // Login scopes.
         $mform->addElement('text', 'loginscopes', get_string('issuerloginscopes', 'tool_oauth2'));
         $mform->addRule('loginscopes', null, 'required', null, 'client');
@@ -118,6 +122,10 @@ class issuer extends persistent {
         // Show on login page.
         $mform->addElement('checkbox', 'showonloginpage', get_string('issuershowonloginpage', 'tool_oauth2'));
         $mform->addHelpButton('showonloginpage', 'issuershowonloginpage', 'tool_oauth2');
+
+        // Require confirmation email for new accounts.
+        $mform->addElement('advcheckbox', 'requireconfirmation', get_string('issuerrequireconfirmation', 'tool_oauth2'));
+        $mform->addHelpButton('requireconfirmation', 'issuerrequireconfirmation', 'tool_oauth2');
 
         $mform->addElement('hidden', 'sortorder');
         $mform->setType('sortorder', PARAM_INT);

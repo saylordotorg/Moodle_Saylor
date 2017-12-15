@@ -1,6 +1,6 @@
 This files describes API changes in the assign code.
 
-=== 3.3.3 ===
+=== 3.4 ===
 * assign::add_attempt requires that set_most_recent_team_submission() be called if attempting to use this function with a team
   submission.
 

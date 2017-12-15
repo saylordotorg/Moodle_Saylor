@@ -594,19 +594,29 @@ abstract class moodle_database {
             return;
         }
         if (CLI_SCRIPT) {
-            echo "--------------------------------\n";
-            echo $sql."\n";
+            $separator = "--------------------------------\n";
+            echo $separator;
+            echo "{$sql}\n";
             if (!is_null($params)) {
-                echo "[".var_export($params, true)."]\n";
+                echo "[" . var_export($params, true) . "]\n";
             }
-            echo "--------------------------------\n";
+            echo $separator;
+        } else if (AJAX_SCRIPT) {
+            $separator = "--------------------------------";
+            error_log($separator);
+            error_log($sql);
+            if (!is_null($params)) {
+                error_log("[" . var_export($params, true) . "]");
+            }
+            error_log($separator);
         } else {
-            echo "<hr />\n";
-            echo s($sql)."\n";
+            $separator = "<hr />\n";
+            echo $separator;
+            echo s($sql) . "\n";
             if (!is_null($params)) {
-                echo "[".s(var_export($params, true))."]\n";
+                echo "[" . s(var_export($params, true)) . "]\n";
             }
-            echo "<hr />\n";
+            echo $separator;
         }
     }
 
@@ -623,6 +633,9 @@ abstract class moodle_database {
         if (CLI_SCRIPT) {
             echo $message;
             echo "--------------------------------\n";
+        } else if (AJAX_SCRIPT) {
+            error_log($message);
+            error_log("--------------------------------");
         } else {
             echo s($message);
             echo "<hr />\n";
@@ -2328,10 +2341,12 @@ abstract class moodle_database {
     /**
      * Returns the driver specific syntax (SQL part) for matching regex positively or negatively (inverted matching).
      * Eg: 'REGEXP':'NOT REGEXP' or '~*' : '!~*'
+     *
      * @param bool $positivematch
+     * @param bool $casesensitive
      * @return string or empty if not supported
      */
-    public function sql_regex($positivematch=true) {
+    public function sql_regex($positivematch = true, $casesensitive = false) {
         return '';
     }
 
@@ -2387,21 +2402,25 @@ abstract class moodle_database {
 
         // Enclose the column name by the proper quotes if it's a reserved word.
         $columnname = $this->get_manager()->generator->getEncQuoted($column->name);
+
+        $searchsql = $this->sql_like($columnname, '?');
+        $searchparam = '%'.$this->sql_like_escape($search).'%';
+
         $sql = "UPDATE {".$table."}
                        SET $columnname = REPLACE($columnname, ?, ?)
-                     WHERE $columnname IS NOT NULL";
+                     WHERE $searchsql";
 
         if ($column->meta_type === 'X') {
-            $this->execute($sql, array($search, $replace));
+            $this->execute($sql, array($search, $replace, $searchparam));
 
         } else if ($column->meta_type === 'C') {
             if (core_text::strlen($search) < core_text::strlen($replace)) {
                 $colsize = $column->max_length;
                 $sql = "UPDATE {".$table."}
                        SET $columnname = " . $this->sql_substr("REPLACE(" . $columnname . ", ?, ?)", 1, $colsize) . "
-                     WHERE $columnname IS NOT NULL";
+                     WHERE $searchsql";
             }
-            $this->execute($sql, array($search, $replace));
+            $this->execute($sql, array($search, $replace, $searchparam));
         }
     }
 

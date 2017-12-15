@@ -464,9 +464,10 @@ class core_backup_moodle2_testcase extends advanced_testcase {
      *
      * @param stdClass $course Course object to backup
      * @param int $newdate If non-zero, specifies custom date for new course
+     * @param callable|null $inbetween If specified, function that is called before restore
      * @return int ID of newly restored course
      */
-    protected function backup_and_restore($course, $newdate = 0) {
+    protected function backup_and_restore($course, $newdate = 0, $inbetween = null) {
         global $USER, $CFG;
 
         // Turn off file logging, otherwise it can't delete the file (Windows).
@@ -480,6 +481,10 @@ class core_backup_moodle2_testcase extends advanced_testcase {
         $backupid = $bc->get_backupid();
         $bc->execute_plan();
         $bc->destroy();
+
+        if ($inbetween) {
+            $inbetween($backupid);
+        }
 
         // Do restore to new course with default settings.
         $newcourseid = restore_dbops::create_new_course(
@@ -801,5 +806,153 @@ class core_backup_moodle2_testcase extends advanced_testcase {
         $this->assertEquals(1, count($enrolments));
         $enrolment = reset($enrolments);
         $this->assertEquals('self', $enrolment->enrol);
+    }
+
+    /**
+     * Test the block instance time fields (timecreated, timemodified) through a backup and restore.
+     */
+    public function test_block_instance_times_backup() {
+        global $DB;
+        $this->resetAfterTest();
+
+        $this->setAdminUser();
+        $generator = $this->getDataGenerator();
+
+        // Create course and add HTML block.
+        $course = $generator->create_course();
+        $context = context_course::instance($course->id);
+        $page = new moodle_page();
+        $page->set_context($context);
+        $page->set_course($course);
+        $page->set_pagelayout('standard');
+        $page->set_pagetype('course-view');
+        $page->blocks->load_blocks();
+        $page->blocks->add_block_at_end_of_default_region('html');
+
+        // Update (hack in database) timemodified and timecreated to specific values for testing.
+        $blockdata = $DB->get_record('block_instances',
+                ['blockname' => 'html', 'parentcontextid' => $context->id]);
+        $originalblockid = $blockdata->id;
+        $blockdata->timecreated = 12345;
+        $blockdata->timemodified = 67890;
+        $DB->update_record('block_instances', $blockdata);
+
+        // Do backup and restore.
+        $newcourseid = $this->backup_and_restore($course);
+
+        // Confirm that values were transferred correctly into HTML block on new course.
+        $newcontext = context_course::instance($newcourseid);
+        $blockdata = $DB->get_record('block_instances',
+                ['blockname' => 'html', 'parentcontextid' => $newcontext->id]);
+        $this->assertEquals(12345, $blockdata->timecreated);
+        $this->assertEquals(67890, $blockdata->timemodified);
+
+        // Simulate what happens with an older backup that doesn't have those fields, by removing
+        // them from the backup before doing a restore.
+        $before = time();
+        $newcourseid = $this->backup_and_restore($course, 0, function($backupid) use($originalblockid) {
+            global $CFG;
+            $path = $CFG->dataroot . '/temp/backup/' . $backupid . '/course/blocks/html_' .
+                    $originalblockid . '/block.xml';
+            $xml = file_get_contents($path);
+            $xml = preg_replace('~<timecreated>.*?</timemodified>~s', '', $xml);
+            file_put_contents($path, $xml);
+        });
+        $after = time();
+
+        // The fields not specified should default to current time.
+        $newcontext = context_course::instance($newcourseid);
+        $blockdata = $DB->get_record('block_instances',
+                ['blockname' => 'html', 'parentcontextid' => $newcontext->id]);
+        $this->assertTrue($before <= $blockdata->timecreated && $after >= $blockdata->timecreated);
+        $this->assertTrue($before <= $blockdata->timemodified && $after >= $blockdata->timemodified);
+    }
+
+    /**
+     * When you restore a site with global search (or search indexing) turned on, then it should
+     * add entries to the search index requests table so that the data gets indexed.
+     */
+    public function test_restore_search_index_requests() {
+        global $DB, $CFG, $USER;
+
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+        $CFG->enableglobalsearch = true;
+
+        // Create a course.
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course();
+
+        // Add a forum.
+        $forum = $generator->create_module('forum', ['course' => $course->id]);
+
+        // Add a block.
+        $context = context_course::instance($course->id);
+        $page = new moodle_page();
+        $page->set_context($context);
+        $page->set_course($course);
+        $page->set_pagelayout('standard');
+        $page->set_pagetype('course-view');
+        $page->blocks->load_blocks();
+        $page->blocks->add_block_at_end_of_default_region('html');
+
+        // Initially there should be no search index requests.
+        $this->assertEquals(0, $DB->count_records('search_index_requests'));
+
+        // Do backup and restore.
+        $newcourseid = $this->backup_and_restore($course);
+
+        // Now the course should be requested for index (all search areas).
+        $newcontext = context_course::instance($newcourseid);
+        $requests = array_values($DB->get_records('search_index_requests'));
+        $this->assertCount(1, $requests);
+        $this->assertEquals($newcontext->id, $requests[0]->contextid);
+        $this->assertEquals('', $requests[0]->searcharea);
+
+        get_fast_modinfo($newcourseid);
+
+        // Backup the new course...
+        $CFG->backup_file_logger_level = backup::LOG_NONE;
+        $bc = new backup_controller(backup::TYPE_1COURSE, $newcourseid,
+                backup::FORMAT_MOODLE, backup::INTERACTIVE_NO, backup::MODE_IMPORT,
+                $USER->id);
+        $backupid = $bc->get_backupid();
+        $bc->execute_plan();
+        $bc->destroy();
+
+        // Restore it on top of old course (should duplicate the forum).
+        $rc = new restore_controller($backupid, $course->id,
+                backup::INTERACTIVE_NO, backup::MODE_GENERAL, $USER->id,
+                backup::TARGET_EXISTING_ADDING);
+        $this->assertTrue($rc->execute_precheck());
+        $rc->execute_plan();
+        $rc->destroy();
+
+        // Get the forums now on the old course.
+        $modinfo = get_fast_modinfo($course->id);
+        $forums = $modinfo->get_instances_of('forum');
+        $this->assertCount(2, $forums);
+
+        // The newer one will be the one with larger ID. (Safe to assume for unit test.)
+        $biggest = null;
+        foreach ($forums as $forum) {
+            if ($biggest === null || $biggest->id < $forum->id) {
+                $biggest = $forum;
+            }
+        }
+        $restoredforumcontext = \context_module::instance($biggest->id);
+
+        // Get the HTML blocks now on the old course.
+        $blockdata = array_values($DB->get_records('block_instances',
+                ['blockname' => 'html', 'parentcontextid' => $context->id], 'id DESC'));
+        $restoredblockcontext = \context_block::instance($blockdata[0]->id);
+
+        // Check that we have requested index update on both the module and the block.
+        $requests = array_values($DB->get_records('search_index_requests', null, 'id'));
+        $this->assertCount(3, $requests);
+        $this->assertEquals($restoredblockcontext->id, $requests[1]->contextid);
+        $this->assertEquals('', $requests[1]->searcharea);
+        $this->assertEquals($restoredforumcontext->id, $requests[2]->contextid);
+        $this->assertEquals('', $requests[2]->searcharea);
     }
 }

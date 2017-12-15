@@ -35,6 +35,207 @@ require_once($CFG->libdir.'/outputrenderers.php');
 require_once($CFG->libdir.'/outputrequirementslib.php');
 
 /**
+ * Returns current theme revision number.
+ *
+ * @return int
+ */
+function theme_get_revision() {
+    global $CFG;
+
+    if (empty($CFG->themedesignermode)) {
+        if (empty($CFG->themerev)) {
+            // This only happens during install. It doesn't matter what themerev we use as long as it's positive.
+            return 1;
+        } else {
+            return $CFG->themerev;
+        }
+
+    } else {
+        return -1;
+    }
+}
+
+/**
+ * Returns current theme sub revision number. This is the revision for
+ * this theme exclusively, not the global theme revision.
+ *
+ * @param string $themename The non-frankenstyle name of the theme
+ * @return int
+ */
+function theme_get_sub_revision_for_theme($themename) {
+    global $CFG;
+
+    if (empty($CFG->themedesignermode)) {
+        $pluginname = "theme_{$themename}";
+        $revision = during_initial_install() ? null : get_config($pluginname, 'themerev');
+
+        if (empty($revision)) {
+            // This only happens during install. It doesn't matter what themerev we use as long as it's positive.
+            return 1;
+        } else {
+            return $revision;
+        }
+    } else {
+        return -1;
+    }
+}
+
+/**
+ * Calculates and returns the next theme revision number.
+ *
+ * @return int
+ */
+function theme_get_next_revision() {
+    global $CFG;
+
+    $next = time();
+    if (isset($CFG->themerev) and $next <= $CFG->themerev and $CFG->themerev - $next < 60*60) {
+        // This resolves problems when reset is requested repeatedly within 1s,
+        // the < 1h condition prevents accidental switching to future dates
+        // because we might not recover from it.
+        $next = $CFG->themerev+1;
+    }
+
+    return $next;
+}
+
+/**
+ * Calculates and returns the next theme revision number.
+ *
+ * @param string $themename The non-frankenstyle name of the theme
+ * @return int
+ */
+function theme_get_next_sub_revision_for_theme($themename) {
+    global $CFG;
+
+    $next = time();
+    $current = theme_get_sub_revision_for_theme($themename);
+    if ($next <= $current and $current - $next < 60 * 60) {
+        // This resolves problems when reset is requested repeatedly within 1s,
+        // the < 1h condition prevents accidental switching to future dates
+        // because we might not recover from it.
+        $next = $current + 1;
+    }
+
+    return $next;
+}
+
+/**
+ * Sets the current theme revision number.
+ *
+ * @param int $revision The new theme revision number
+ */
+function theme_set_revision($revision) {
+    set_config('themerev', $revision);
+}
+
+/**
+ * Sets the current theme revision number for a specific theme.
+ * This does not affect the global themerev value.
+ *
+ * @param string $themename The non-frankenstyle name of the theme
+ * @param int    $revision  The new theme revision number
+ */
+function theme_set_sub_revision_for_theme($themename, $revision) {
+    set_config('themerev', $revision, "theme_{$themename}");
+}
+
+/**
+ * Get the path to a theme config.php file.
+ *
+ * @param string $themename The non-frankenstyle name of the theme to check
+ */
+function theme_get_config_file_path($themename) {
+    global $CFG;
+
+    if (file_exists("{$CFG->dirroot}/theme/{$themename}/config.php")) {
+        return "{$CFG->dirroot}/theme/{$themename}/config.php";
+    } else if (!empty($CFG->themedir) and file_exists("{$CFG->themedir}/{$themename}/config.php")) {
+        return "{$CFG->themedir}/{$themename}/config.php";
+    } else {
+        return null;
+    }
+}
+
+/**
+ * Get the path to the local cached CSS file.
+ *
+ * @param string $themename      The non-frankenstyle theme name.
+ * @param int    $globalrevision The global theme revision.
+ * @param int    $themerevision  The theme specific revision.
+ * @param string $direction      Either 'ltr' or 'rtl' (case sensitive).
+ */
+function theme_get_css_filename($themename, $globalrevision, $themerevision, $direction) {
+    global $CFG;
+
+    $path = "{$CFG->localcachedir}/theme/{$globalrevision}/{$themename}/css";
+    $filename = $direction == 'rtl' ? "all-rtl_{$themerevision}" : "all_{$themerevision}";
+    return "{$path}/{$filename}.css";
+}
+
+/**
+ * Generates and saves the CSS files for the given theme configs.
+ *
+ * @param theme_config[] $themeconfigs An array of theme_config instances.
+ * @param array          $directions   Must be a subset of ['rtl', 'ltr'].
+ * @param bool           $cache        Should the generated files be stored in local cache.
+ */
+function theme_build_css_for_themes($themeconfigs = [], $directions = ['rtl', 'ltr'], $cache = true) {
+    global $CFG;
+
+    if (empty($themeconfigs)) {
+        return;
+    }
+
+    require_once("{$CFG->libdir}/csslib.php");
+
+    $themescss = [];
+    $themerev = theme_get_revision();
+    // Make sure the local cache directory exists.
+    make_localcache_directory('theme');
+
+    foreach ($themeconfigs as $themeconfig) {
+        $themecss = [];
+        $oldrevision = theme_get_sub_revision_for_theme($themeconfig->name);
+        $newrevision = theme_get_next_sub_revision_for_theme($themeconfig->name);
+
+        // First generate all the new css.
+        foreach ($directions as $direction) {
+            // Lock it on. Technically we should build all themes for SVG and no SVG - but ie9 is out of support.
+            $themeconfig->force_svg_use(true);
+            $themeconfig->set_rtl_mode(($direction === 'rtl'));
+
+            $themecss[$direction] = $themeconfig->get_css_content();
+            if ($cache) {
+                $themeconfig->set_css_content_cache($themecss[$direction]);
+                $filename = theme_get_css_filename($themeconfig->name, $themerev, $newrevision, $direction);
+                css_store_css($themeconfig, $filename, $themecss[$direction]);
+            }
+        }
+        $themescss[] = $themecss;
+
+        if ($cache) {
+            // Only update the theme revision after we've successfully created the
+            // new CSS cache.
+            theme_set_sub_revision_for_theme($themeconfig->name, $newrevision);
+
+            // Now purge old files. We must purge all old files in the local cache
+            // because we've incremented the theme sub revision. This will leave any
+            // files with the old revision inaccessbile so we might as well removed
+            // them from disk.
+            foreach (['ltr', 'rtl'] as $direction) {
+                $oldcss = theme_get_css_filename($themeconfig->name, $themerev, $oldrevision, $direction);
+                if (file_exists($oldcss)) {
+                    unlink($oldcss);
+                }
+            }
+        }
+    }
+
+    return $themescss;
+}
+
+/**
  * Invalidate all server and client side caches.
  *
  * This method deletes the physical directory that is used to cache the theme
@@ -45,15 +246,8 @@ require_once($CFG->libdir.'/outputrequirementslib.php');
 function theme_reset_all_caches() {
     global $CFG, $PAGE;
 
-    $next = time();
-    if (isset($CFG->themerev) and $next <= $CFG->themerev and $CFG->themerev - $next < 60*60) {
-        // This resolves problems when reset is requested repeatedly within 1s,
-        // the < 1h condition prevents accidental switching to future dates
-        // because we might not recover from it.
-        $next = $CFG->themerev+1;
-    }
-
-    set_config('themerev', $next); // time is unique even when you reset/switch database
+    $next = theme_get_next_revision();
+    theme_set_revision($next);
 
     if (!empty($CFG->themedesignermode)) {
         $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'core', 'themedesigner');
@@ -77,27 +271,6 @@ function theme_set_designer_mod($state) {
     set_config('themedesignermode', (int)!empty($state));
     // Reset caches after switching mode so that any designer mode caches get purged too.
     theme_reset_all_caches();
-}
-
-/**
- * Returns current theme revision number.
- *
- * @return int
- */
-function theme_get_revision() {
-    global $CFG;
-
-    if (empty($CFG->themedesignermode)) {
-        if (empty($CFG->themerev)) {
-            // This only happens during install. It doesn't matter what themerev we use as long as it's positive.
-            return 1;
-        } else {
-            return $CFG->themerev;
-        }
-
-    } else {
-        return -1;
-    }
 }
 
 /**
@@ -192,6 +365,12 @@ class theme_config {
      * Sheets from parent themes are used automatically and can not be excluded.
      */
     public $editor_sheets = array();
+
+    /**
+     * @var bool Whether a fallback version of the stylesheet will be used
+     * whilst the final version is generated.
+     */
+    public $usefallback = false;
 
     /**
      * @var array The names of all the javascript files this theme that you would
@@ -375,7 +554,7 @@ class theme_config {
      * @var stdClass Theme settings stored in config_plugins table.
      * This can not be set in theme config.php
      */
-    public $setting = null;
+    public $settings = null;
 
     /**
      * @var bool If set to true and the theme enables the dock then  blocks will be able
@@ -554,7 +733,7 @@ class theme_config {
         }
 
         $configurable = array(
-            'parents', 'sheets', 'parents_exclude_sheets', 'plugins_exclude_sheets',
+            'parents', 'sheets', 'parents_exclude_sheets', 'plugins_exclude_sheets', 'usefallback',
             'javascripts', 'javascripts_footer', 'parents_exclude_javascripts',
             'layouts', 'enable_dock', 'enablecourseajax', 'requiredblocks',
             'rendererfactory', 'csspostprocess', 'editor_sheets', 'rarrow', 'larrow', 'uarrow', 'darrow',
@@ -718,7 +897,7 @@ class theme_config {
         global $CFG;
         $rev = theme_get_revision();
         if ($rev > -1) {
-            $url = new moodle_url("$CFG->httpswwwroot/theme/styles.php");
+            $url = new moodle_url("/theme/styles.php");
             if (!empty($CFG->slasharguments)) {
                 $url->set_slashargument('/'.$this->name.'/'.$rev.'/editor', 'noparam', true);
             } else {
@@ -726,7 +905,7 @@ class theme_config {
             }
         } else {
             $params = array('theme'=>$this->name, 'type'=>'editor');
-            $url = new moodle_url($CFG->httpswwwroot.'/theme/styles_debug.php', $params);
+            $url = new moodle_url('/theme/styles_debug.php', $params);
         }
         return $url;
     }
@@ -790,7 +969,15 @@ class theme_config {
 
         if ($rev > -1) {
             $filename = right_to_left() ? 'all-rtl' : 'all';
-            $url = new moodle_url("$CFG->httpswwwroot/theme/styles.php");
+            $url = new moodle_url("/theme/styles.php");
+            $themesubrevision = theme_get_sub_revision_for_theme($this->name);
+
+            // Provide the sub revision to allow us to invalidate cached theme CSS
+            // on a per theme basis, rather than globally.
+            if ($themesubrevision && $themesubrevision > 0) {
+                $rev .= "_{$themesubrevision}";
+            }
+
             if (!empty($CFG->slasharguments)) {
                 $slashargs = '';
                 if (!$svg) {
@@ -818,7 +1005,7 @@ class theme_config {
             $urls[] = $url;
 
         } else {
-            $baseurl = new moodle_url($CFG->httpswwwroot.'/theme/styles_debug.php');
+            $baseurl = new moodle_url('/theme/styles_debug.php');
 
             $css = $this->get_css_files(true);
             if (!$svg) {
@@ -922,6 +1109,19 @@ class theme_config {
         $key = $this->get_css_cache_key();
 
         return $cache->set($key, $csscontent);
+    }
+
+    /**
+     * Return whether the post processed CSS content has been cached.
+     *
+     * @return bool Whether the post-processed CSS is available in the cache.
+     */
+    public function has_css_cached_content() {
+
+        $key = $this->get_css_cache_key();
+        $cache = cache::make('core', 'postprocessedcss');
+
+        return $cache->has($key);
     }
 
     /**
@@ -1489,11 +1689,11 @@ class theme_config {
         }
 
         if (!empty($CFG->slasharguments) and $rev > 0) {
-            $url = new moodle_url("$CFG->httpswwwroot/theme/javascript.php");
+            $url = new moodle_url("/theme/javascript.php");
             $url->set_slashargument('/'.$this->name.'/'.$rev.'/'.$params['type'], 'noparam', true);
             return $url;
         } else {
-            return new moodle_url($CFG->httpswwwroot.'/theme/javascript.php', $params);
+            return new moodle_url('/theme/javascript.php', $params);
         }
     }
 
@@ -1725,7 +1925,7 @@ class theme_config {
 
         $params['image'] = $imagename;
 
-        $url = new moodle_url("$CFG->httpswwwroot/theme/image.php");
+        $url = new moodle_url("/theme/image.php");
         if (!empty($CFG->slasharguments) and $rev > 0) {
             $path = '/'.$params['theme'].'/'.$params['component'].'/'.$params['rev'].'/'.$params['image'];
             if (!$svg) {
@@ -1771,7 +1971,7 @@ class theme_config {
 
         $params['font'] = $font;
 
-        $url = new moodle_url("$CFG->httpswwwroot/theme/font.php");
+        $url = new moodle_url("/theme/font.php");
         if (!empty($CFG->slasharguments) and $rev > 0) {
             $path = '/'.$params['theme'].'/'.$params['component'].'/'.$params['rev'].'/'.$params['font'];
             $url->set_slashargument($path, 'noparam', true);
@@ -2038,6 +2238,15 @@ class theme_config {
      */
     public function set_rtl_mode($inrtl = true) {
         $this->rtlmode = $inrtl;
+    }
+
+    /**
+     * Whether the theme is being served in RTL mode.
+     *
+     * @return bool True when in RTL mode.
+     */
+    public function get_rtl_mode() {
+        return $this->rtlmode;
     }
 
     /**

@@ -18,6 +18,11 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
     $temp->add(new admin_setting_configcheckbox('forceloginforprofiles', new lang_string('forceloginforprofiles', 'admin'), new lang_string('configforceloginforprofiles', 'admin'), 1));
     $temp->add(new admin_setting_configcheckbox('forceloginforprofileimage', new lang_string('forceloginforprofileimage', 'admin'), new lang_string('forceloginforprofileimage_help', 'admin'), 0));
     $temp->add(new admin_setting_configcheckbox('opentogoogle', new lang_string('opentogoogle', 'admin'), new lang_string('configopentogoogle', 'admin'), 0));
+    $temp->add(new admin_setting_configselect('allowindexing', new lang_string('allowindexing', 'admin'), new lang_string('allowindexing_desc', 'admin'),
+        0,
+        array(0 => new lang_string('allowindexingexceptlogin', 'admin'),
+              1 => new lang_string('allowindexingeverywhere', 'admin'),
+              2 => new lang_string('allowindexingnowhere', 'admin'))));
     $temp->add(new admin_setting_pickroles('profileroles',
         new lang_string('profileroles','admin'),
         new lang_string('configprofileroles', 'admin'),
@@ -103,6 +108,10 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
         new lang_string('passwordchangetokendeletion', 'admin'),
         new lang_string('passwordchangetokendeletion_desc', 'admin'), 0));
 
+    $temp->add(new admin_setting_configduration('tokenduration',
+        new lang_string('tokenduration', 'admin'),
+        new lang_string('tokenduration_desc', 'admin'), 12 * WEEKSECS, WEEKSECS));
+
     $temp->add(new admin_setting_configcheckbox('groupenrolmentkeypolicy', new lang_string('groupenrolmentkeypolicy', 'admin'), new lang_string('groupenrolmentkeypolicy_desc', 'admin'), 1));
     $temp->add(new admin_setting_configcheckbox('disableuserimages', new lang_string('disableuserimages', 'admin'), new lang_string('configdisableuserimages', 'admin'), 0));
     $temp->add(new admin_setting_configcheckbox('emailchangeconfirmation', new lang_string('emailchangeconfirmation', 'admin'), new lang_string('configemailchangeconfirmation', 'admin'), 1));
@@ -115,7 +124,7 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
 
     // "httpsecurity" settingpage
     $temp = new admin_settingpage('httpsecurity', new lang_string('httpsecurity', 'admin'));
-    $temp->add(new admin_setting_configcheckbox('loginhttps', new lang_string('loginhttps', 'admin'), new lang_string('configloginhttps', 'admin'), 0));
+
     $temp->add(new admin_setting_configcheckbox('cookiesecure', new lang_string('cookiesecure', 'admin'), new lang_string('configcookiesecure', 'admin'), 1));
     $temp->add(new admin_setting_configcheckbox('cookiehttponly', new lang_string('cookiehttponly', 'admin'), new lang_string('configcookiehttponly', 'admin'), 0));
     $temp->add(new admin_setting_configcheckbox('allowframembedding', new lang_string('allowframembedding', 'admin'), new lang_string('allowframembedding_help', 'admin'), 0));

@@ -182,7 +182,7 @@ Feature: Initials bar
     And I should see "Bstudent Astudent"
     And I should see "Cstudent Cstudent"
 
-  Scenario Outline: Filter users on course participants page
+  Scenario: Filter users on course participants page
     Given the following "activities" exist:
       | activity | course | idnumber | name           | intro                       | assignsubmission_onlinetext_enabled | assignsubmission_file_enabled |
       | assign   | C1     | assign1  | TestAssignment | Test assignment description | 0                                   | 0                             |
@@ -195,7 +195,6 @@ Feature: Initials bar
     And I log in as "teacher"
     And I am on "Course 1" course homepage
     And I follow "Participants"
-    And I select "<viewmode>" from the "mode" singleselect
     And ".initialbarall.letter.active" "css_element" should exist in the ".initialbar.firstinitial" "css_element"
     And ".initialbarall.letter.active" "css_element" should exist in the ".initialbar.lastinitial" "css_element"
     And ".letter.active.B" "css_element" should not exist in the ".initialbar.firstinitial" "css_element"
@@ -221,7 +220,6 @@ Feature: Initials bar
     And I should not see "Cstudent Cstudent"
     And I am on "Course 1" course homepage
     And I follow "Participants"
-    And I select "<viewmode>" from the "mode" singleselect
     And ".initialbarall.letter.active" "css_element" should not exist in the ".initialbar.firstinitial" "css_element"
     And ".initialbarall.letter.active" "css_element" should not exist in the ".initialbar.lastinitial" "css_element"
     And ".letter.active.B" "css_element" should exist in the ".initialbar.firstinitial" "css_element"
@@ -245,11 +243,6 @@ Feature: Initials bar
     And I should see "Astudent Astudent"
     And I should see "Bstudent Astudent"
     And I should see "Cstudent Cstudent"
-
-    Examples:
-      | viewmode      |
-      | Brief         |
-      | User details  |
 
   @javascript
   Scenario: Filter users on activity completion page

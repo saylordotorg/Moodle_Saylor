@@ -90,7 +90,7 @@ class core_webservice_external extends external_api {
             'firstname' => $USER->firstname,
             'lastname' => $USER->lastname,
             'fullname' => fullname($USER),
-            'lang' => current_language(),
+            'lang' => clean_param(current_language(), PARAM_LANG),
             'userid' => $USER->id,
             'userpictureurl' => $profileimageurl->out(false),
             'siteid' => SITEID
@@ -188,14 +188,23 @@ class core_webservice_external extends external_api {
         // User quota. 0 means user can ignore the quota.
         $siteinfo['userquota'] = 0;
         if (!has_capability('moodle/user:ignoreuserquota', $context)) {
-            $siteinfo['userquota'] = $CFG->userquota;
+            $siteinfo['userquota'] = (int) $CFG->userquota; // Cast to int to ensure value is not higher than PHP_INT_MAX.
         }
 
         // User max upload file size. -1 means the user can ignore the upload file size.
-        $siteinfo['usermaxuploadfilesize'] = get_user_max_upload_file_size($context, $CFG->maxbytes);
+        // Cast to int to ensure value is not higher than PHP_INT_MAX.
+        $siteinfo['usermaxuploadfilesize'] = (int) get_user_max_upload_file_size($context, $CFG->maxbytes);
 
         // User home page.
         $siteinfo['userhomepage'] = get_home_page();
+
+        // Calendar.
+        $siteinfo['sitecalendartype'] = $CFG->calendartype;
+        if (empty($USER->calendartype)) {
+            $siteinfo['usercalendartype'] = $CFG->calendartype;
+        } else {
+            $siteinfo['usercalendartype'] = $USER->calendartype;
+        }
 
         return $siteinfo;
     }
@@ -214,7 +223,7 @@ class core_webservice_external extends external_api {
                 'firstname'      => new external_value(PARAM_TEXT, 'first name'),
                 'lastname'       => new external_value(PARAM_TEXT, 'last name'),
                 'fullname'       => new external_value(PARAM_TEXT, 'user full name'),
-                'lang'           => new external_value(PARAM_LANG, 'user language'),
+                'lang'           => new external_value(PARAM_LANG, 'Current language.'),
                 'userid'         => new external_value(PARAM_INT, 'user id'),
                 'siteurl'        => new external_value(PARAM_RAW, 'site url'),
                 'userpictureurl' => new external_value(PARAM_URL, 'the user profile picture.
@@ -259,7 +268,9 @@ class core_webservice_external extends external_api {
                 'userhomepage' => new external_value(PARAM_INT,
                                                         'the default home page for the user: 0 for the site home, 1 for dashboard',
                                                         VALUE_OPTIONAL),
-                'siteid'  => new external_value(PARAM_INT, 'Site course ID', VALUE_OPTIONAL)
+                'siteid'  => new external_value(PARAM_INT, 'Site course ID', VALUE_OPTIONAL),
+                'sitecalendartype'  => new external_value(PARAM_PLUGIN, 'Calendar type set in the site.', VALUE_OPTIONAL),
+                'usercalendartype'  => new external_value(PARAM_PLUGIN, 'Calendar typed used by the user.', VALUE_OPTIONAL),
             )
         );
     }

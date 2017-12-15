@@ -2965,7 +2965,7 @@ Anchor link 2:<a title=\"bananas\" href=\"../logo-240x60.gif\">Link text</a>
                 'count' => 1,
             ],
             'Negative one exactly is not errant' => [
-                'grade' => -1,
+                'grade' => ASSIGN_GRADE_NOT_SET,
                 'count' => 0,
             ],
             'Positive grade is not errant' => [
@@ -3027,7 +3027,7 @@ Anchor link 2:<a title=\"bananas\" href=\"../logo-240x60.gif\">Link text</a>
                 'gradebookvalue' => null,
             ],
             'Negative one exactly is not errant, but shouldn\'t be pushed to gradebook' => [
-                'grade' => -1,
+                'grade' => ASSIGN_GRADE_NOT_SET,
                 'gradebookvalue' => null,
             ],
             'Positive grade is not errant' => [

@@ -211,7 +211,7 @@ function lesson_update_events($lesson, $override = null) {
                 } else {
                     unset($event->id);
                 }
-                $event->name = $eventname.' ('.get_string('lessonopens', 'lesson').')';
+                $event->name = get_string('lessoneventopens', 'lesson', $eventname);
                 // The method calendar_event::create will reuse a db record if the id field is set.
                 calendar_event::create($event);
             }
@@ -222,7 +222,7 @@ function lesson_update_events($lesson, $override = null) {
                     unset($event->id);
                 }
                 $event->type      = CALENDAR_EVENT_TYPE_ACTION;
-                $event->name      = $eventname.' ('.get_string('lessoncloses', 'lesson').')';
+                $event->name      = get_string('lessoneventcloses', 'lesson', $eventname);
                 $event->timestart = $deadline;
                 $event->timesort  = $deadline;
                 $event->eventtype = LESSON_EVENT_TYPE_CLOSE;
@@ -1120,6 +1120,8 @@ function lesson_reset_userdata($data) {
                        WHERE lessonid IN (SELECT id FROM {lesson} WHERE course = ?)
                          AND deadline <> 0", array($data->timeshift, $data->courseid));
 
+        // Any changes to the list of dates that needs to be rolled should be same during course restore and course reset.
+        // See MDL-9367.
         shift_course_mod_dates('lesson', array('available', 'deadline'), $data->timeshift, $data->courseid);
         $status[] = array('component'=>$componentstr, 'item'=>get_string('datechanged'), 'error'=>false);
     }

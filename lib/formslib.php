@@ -572,6 +572,20 @@ abstract class moodleform {
                 $file_val = false;
             }
 
+            // Give the elements a chance to perform an implicit validation.
+            $element_val = true;
+            foreach ($mform->_elements as $element) {
+                if (method_exists($element, 'validateSubmitValue')) {
+                    $value = $mform->getSubmitValue($element->getName());
+                    $result = $element->validateSubmitValue($value);
+                    if (!empty($result) && is_string($result)) {
+                        $element_val = false;
+                        $mform->setElementError($element->getName(), $result);
+                    }
+                }
+            }
+
+            // Let the form instance validate the submitted values.
             $data = $mform->exportValues();
             $moodle_val = $this->validation($data, $files);
             if ((is_array($moodle_val) && count($moodle_val)!==0)) {
@@ -586,7 +600,7 @@ abstract class moodleform {
                 $moodle_val = true;
             }
 
-            $this->_validated = ($internal_val and $moodle_val and $file_val);
+            $this->_validated = ($internal_val and $element_val and $moodle_val and $file_val);
         }
         return $this->_validated;
     }
@@ -1376,6 +1390,37 @@ abstract class moodleform {
             $_POST = $simulatedsubmitteddata;
         }
     }
+
+    /**
+     * Used by tests to generate valid submit keys for moodle forms that are
+     * submitted with ajax data.
+     *
+     * @throws \moodle_exception If called outside unit test environment
+     * @param array  $data Existing form data you wish to add the keys to.
+     * @return array
+     */
+    public static function mock_generate_submit_keys($data = []) {
+        if (!defined('PHPUNIT_TEST') || !PHPUNIT_TEST) {
+            throw new \moodle_exception("This function can only be used for unit testing.");
+        }
+
+        $formidentifier = get_called_class();
+        $formidentifier = str_replace('\\', '_', $formidentifier); // See MDL-56233 for more information.
+        $data['sesskey'] = sesskey();
+        $data['_qf__' . $formidentifier] = 1;
+
+        return $data;
+    }
+
+    /**
+     * Set display mode for the form when labels take full width of the form and above the elements even on big screens
+     *
+     * Useful for forms displayed inside modals or in narrow containers
+     */
+    public function set_display_vertical() {
+        $oldclass = $this->_form->getAttribute('class');
+        $this->_form->updateAttributes(array('class' => $oldclass . ' full-width-labels'));
+    }
 }
 
 /**
@@ -1397,6 +1442,11 @@ class MoodleQuickForm extends HTML_QuickForm_DHTMLRulesTableless {
 
     /** @var array dependent state for the element/'s */
     var $_dependencies = array();
+
+    /**
+     * @var array elements that will become hidden based on another element
+     */
+    protected $_hideifs = array();
 
     /** @var array Array of buttons that if pressed do not result in the processing of the form. */
     var $_noSubmitButtons=array();
@@ -1445,6 +1495,16 @@ class MoodleQuickForm extends HTML_QuickForm_DHTMLRulesTableless {
      * @var bool
      */
     protected $clientvalidation = false;
+
+    /**
+     * Is this a 'disableIf' dependency ?
+     */
+    const DEP_DISABLE = 0;
+
+    /**
+     * Is this a 'hideIf' dependency?
+     */
+    const DEP_HIDE = 1;
 
     /**
      * Class constructor - same parameters as HTML_QuickForm_DHTMLRulesTableless
@@ -2281,7 +2341,9 @@ require(["core/event", "jquery"], function(Event, $) {
             //end of fix
             $escapedElementName = preg_replace_callback(
                 '/[_\[\]-]/',
-                create_function('$matches', 'return sprintf("_%2x",ord($matches[0]));'),
+                function($matches) {
+                    return sprintf("_%2x", ord($matches[0]));
+                },
                 $elementName);
             $valFunc = 'validate_' . $this->_formName . '_' . $escapedElementName . '(ev.target, \''.$escapedElementName.'\')';
 
@@ -2412,8 +2474,7 @@ require(["core/event", "jquery"], function(Event, $) {
             foreach ($conditions as $condition=>$values) {
                 $result[$dependentOn][$condition] = array();
                 foreach ($values as $value=>$dependents) {
-                    $result[$dependentOn][$condition][$value] = array();
-                    $i = 0;
+                    $result[$dependentOn][$condition][$value][self::DEP_DISABLE] = array();
                     foreach ($dependents as $dependent) {
                         $elements = $this->_getElNamesRecursive($dependent);
                         if (empty($elements)) {
@@ -2424,7 +2485,29 @@ require(["core/event", "jquery"], function(Event, $) {
                             if ($element == $dependentOn) {
                                 continue;
                             }
-                            $result[$dependentOn][$condition][$value][] = $element;
+                            $result[$dependentOn][$condition][$value][self::DEP_DISABLE][] = $element;
+                        }
+                    }
+                }
+            }
+        }
+        foreach ($this->_hideifs as $dependenton => $conditions) {
+            $result[$dependenton] = array();
+            foreach ($conditions as $condition => $values) {
+                $result[$dependenton][$condition] = array();
+                foreach ($values as $value => $dependents) {
+                    $result[$dependenton][$condition][$value][self::DEP_HIDE] = array();
+                    foreach ($dependents as $dependent) {
+                        $elements = $this->_getElNamesRecursive($dependent);
+                        if (!in_array($dependent, $elements)) {
+                            // Always want to hide the main element, even if it contains sub-elements as well.
+                            $elements[] = $dependent;
+                        }
+                        foreach ($elements as $element) {
+                            if ($element == $dependenton) {
+                                continue;
+                            }
+                            $result[$dependenton][$condition][$value][self::DEP_HIDE][] = $element;
                         }
                     }
                 }
@@ -2517,6 +2600,40 @@ require(["core/event", "jquery"], function(Event, $) {
             $this->_dependencies[$dependentOn][$condition][$value] = array();
         }
         $this->_dependencies[$dependentOn][$condition][$value][] = $elementName;
+    }
+
+    /**
+     * Adds a dependency for $elementName which will be hidden if $condition is met.
+     * If $condition = 'notchecked' (default) then the condition is that the $dependentOn element
+     * is not checked. If $condition = 'checked' then the condition is that the $dependentOn element
+     * is checked. If $condition is something else (like "eq" for equals) then it is checked to see if the value
+     * of the $dependentOn element is $condition (such as equal) to $value.
+     *
+     * When working with multiple selects, the dependentOn has to be the real name of the select, meaning that
+     * it will most likely end up with '[]'. Also, the value should be an array of required values, or a string
+     * containing the values separated by pipes: array('red', 'blue') or 'red|blue'.
+     *
+     * @param string $elementname the name of the element which will be hidden
+     * @param string $dependenton the name of the element whose state will be checked for condition
+     * @param string $condition the condition to check
+     * @param mixed $value used in conjunction with condition.
+     */
+    public function hideIf($elementname, $dependenton, $condition = 'notchecked', $value = '1') {
+        // Multiple selects allow for a multiple selection, we transform the array to string here as
+        // an array cannot be used as a key in an associative array.
+        if (is_array($value)) {
+            $value = implode('|', $value);
+        }
+        if (!array_key_exists($dependenton, $this->_hideifs)) {
+            $this->_hideifs[$dependenton] = array();
+        }
+        if (!array_key_exists($condition, $this->_hideifs[$dependenton])) {
+            $this->_hideifs[$dependenton][$condition] = array();
+        }
+        if (!array_key_exists($value, $this->_hideifs[$dependenton][$condition])) {
+            $this->_hideifs[$dependenton][$condition][$value] = array();
+        }
+        $this->_hideifs[$dependenton][$condition][$value][] = $elementname;
     }
 
     /**
@@ -3097,6 +3214,7 @@ MoodleQuickForm::registerElementType('autocomplete', "$CFG->libdir/form/autocomp
 MoodleQuickForm::registerElementType('button', "$CFG->libdir/form/button.php", 'MoodleQuickForm_button');
 MoodleQuickForm::registerElementType('cancel', "$CFG->libdir/form/cancel.php", 'MoodleQuickForm_cancel');
 MoodleQuickForm::registerElementType('course', "$CFG->libdir/form/course.php", 'MoodleQuickForm_course');
+MoodleQuickForm::registerElementType('cohort', "$CFG->libdir/form/cohort.php", 'MoodleQuickForm_cohort');
 MoodleQuickForm::registerElementType('searchableselector', "$CFG->libdir/form/searchableselector.php", 'MoodleQuickForm_searchableselector');
 MoodleQuickForm::registerElementType('checkbox', "$CFG->libdir/form/checkbox.php", 'MoodleQuickForm_checkbox');
 MoodleQuickForm::registerElementType('date_selector', "$CFG->libdir/form/dateselector.php", 'MoodleQuickForm_date_selector');
@@ -3105,6 +3223,7 @@ MoodleQuickForm::registerElementType('duration', "$CFG->libdir/form/duration.php
 MoodleQuickForm::registerElementType('editor', "$CFG->libdir/form/editor.php", 'MoodleQuickForm_editor');
 MoodleQuickForm::registerElementType('filemanager', "$CFG->libdir/form/filemanager.php", 'MoodleQuickForm_filemanager');
 MoodleQuickForm::registerElementType('filepicker', "$CFG->libdir/form/filepicker.php", 'MoodleQuickForm_filepicker');
+MoodleQuickForm::registerElementType('filetypes', "$CFG->libdir/form/filetypes.php", 'MoodleQuickForm_filetypes');
 MoodleQuickForm::registerElementType('grading', "$CFG->libdir/form/grading.php", 'MoodleQuickForm_grading');
 MoodleQuickForm::registerElementType('group', "$CFG->libdir/form/group.php", 'MoodleQuickForm_group');
 MoodleQuickForm::registerElementType('header', "$CFG->libdir/form/header.php", 'MoodleQuickForm_header');

@@ -307,6 +307,18 @@ class mysqli_native_moodle_database extends moodle_database {
                       FROM INFORMATION_SCHEMA.TABLES
                      WHERE table_schema = DATABASE() AND table_name = '{$this->prefix}$table'";
         } else {
+            if (($this->get_dbtype() == 'mysqli') &&
+                // Breaking change in MySQL 8.0.0+: antelope file format support has been removed.
+                version_compare($this->get_server_info()['version'], '8.0.0', '>=')) {
+                $dbengine = $this->get_dbengine();
+                $supporteddbengines = array('InnoDB', 'XtraDB');
+                if (in_array($dbengine, $supporteddbengines)) {
+                    $rowformat = 'Barracuda';
+                }
+
+                return $rowformat;
+            }
+
             $sql = "SHOW VARIABLES LIKE 'innodb_file_format'";
         }
         $this->query_start($sql, NULL, SQL_QUERY_AUX);
@@ -384,6 +396,12 @@ class mysqli_native_moodle_database extends moodle_database {
      * @return bool True if on otherwise false.
      */
     public function is_large_prefix_enabled() {
+        if (($this->get_dbtype() == 'mysqli') &&
+            // Breaking change since 8.0.0: there is only one file format and 'innodb_large_prefix' has been removed.
+            version_compare($this->get_server_info()['version'], '8.0.0', '>=')) {
+            return true;
+        }
+
         if ($largeprefix = $this->get_record_sql("SHOW VARIABLES LIKE 'innodb_large_prefix'")) {
             if ($largeprefix->value == 'ON') {
                 return true;
@@ -1746,10 +1764,25 @@ class mysqli_native_moodle_database extends moodle_database {
     /**
      * Return regex positive or negative match sql
      * @param bool $positivematch
+     * @param bool $casesensitive
      * @return string or empty if not supported
      */
-    public function sql_regex($positivematch=true) {
-        return $positivematch ? 'REGEXP' : 'NOT REGEXP';
+    public function sql_regex($positivematch = true, $casesensitive = false) {
+        $collation = '';
+        if ($casesensitive) {
+            if (substr($this->get_dbcollation(), -4) !== '_bin') {
+                $collationinfo = explode('_', $this->get_dbcollation());
+                $collation = 'COLLATE ' . $collationinfo[0] . '_bin ';
+            }
+        } else {
+            if ($this->get_dbcollation() == 'utf8_bin') {
+                $collation = 'COLLATE utf8_unicode_ci ';
+            } else if ($this->get_dbcollation() == 'utf8mb4_bin') {
+                $collation = 'COLLATE utf8mb4_unicode_ci ';
+            }
+        }
+
+        return $collation . ($positivematch ? 'REGEXP' : 'NOT REGEXP');
     }
 
     /**
@@ -1787,7 +1820,9 @@ class mysqli_native_moodle_database extends moodle_database {
             $rv .= " JOIN (".$selects[$i].") $alias ON ".
                 join(' AND ',
                     array_map(
-                        create_function('$a', 'return "'.$falias.'.$a = '.$alias.'.$a";'),
+                        function($a) use ($alias, $falias) {
+                            return $falias . '.' . $a .' = ' . $alias . '.' . $a;
+                        },
                         preg_split('/,/', $fields))
                 );
         }

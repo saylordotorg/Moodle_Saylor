@@ -58,7 +58,7 @@ class mod_reengagement_mod_form extends moodleform_mod {
         }
 
         $istotara = false;
-        if (file_exists($CFG->wwwroot.'/totara/hierarchy')) {
+        if (file_exists($CFG->dirroot.'/totara')) {
             $istotara = true;
         }
 
@@ -182,8 +182,16 @@ class mod_reengagement_mod_form extends moodleform_mod {
             $mform->setDefault('completion', COMPLETION_TRACKING_AUTOMATIC);
             $mform->freeze('completion');
         }
+        // Hide some elements not relevant to this activity (student visibility)
         if ($mform->elementExists('visible')) {
             $mform->removeElement('visible');
+            $mform->addElement('hidden', 'visible', 0);
+            $mform->setType('visible', PARAM_INT);
+            if ($mform->elementExists('visibleoncoursepage')) {
+                $mform->removeElement('visibleoncoursepage');
+            }
+            $mform->addElement('hidden', 'visibleoncoursepage', 1);
+            $mform->setType('visibleoncoursepage', PARAM_INT);
         }
 
         // Add standard buttons, common to all modules.
@@ -199,7 +207,7 @@ class mod_reengagement_mod_form extends moodleform_mod {
     public function set_data($toform) {
         global $CFG;
         $istotara = false;
-        if (file_exists($CFG->wwwroot.'/totara/hierarchy')) {
+        if (file_exists($CFG->dirroot.'/totara')) {
             $istotara = true;
         }
         // Form expects durations as a number of periods eg 5 minutes.
@@ -268,7 +276,7 @@ class mod_reengagement_mod_form extends moodleform_mod {
     public function get_data() {
         global $CFG;
         $istotara = false;
-        if (file_exists($CFG->wwwroot.'/totara/hierarchy')) {
+        if (file_exists($CFG->dirroot.'/totara')) {
             $istotara = true;
         }
         $fromform = parent::get_data();

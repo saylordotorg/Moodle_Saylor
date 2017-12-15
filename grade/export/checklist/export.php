@@ -89,25 +89,25 @@ if (!$percentcol) {
 // Useful for debugging
 if (defined('BEHAT_SITE_RUNNING')) {
     class FakeMoodleExcelWorkbook {
-        function FakeMoodleExcelWorkbook($ignore) {
+        public function __construct($ignore) {
         }
 
-        function send($ignore) {
+        public function send($ignore) {
         }
 
-        function write_string($row, $col, $data) {
+        public function write_string($row, $col, $data) {
             echo "($row, $col) = $data<br/>";
         }
 
-        function write_number($row, $col, $data) {
+        public function write_number($row, $col, $data) {
             echo "($row, $col) = $data<br/>";
         }
 
-        function add_worksheet($ignore) {
+        public function add_worksheet($ignore) {
             return new FakeMoodleExcelWorkbook($ignore);
         }
 
-        function close() {
+        public function close() {
         }
     }
 }

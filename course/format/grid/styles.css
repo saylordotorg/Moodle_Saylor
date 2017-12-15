@@ -233,7 +233,7 @@ div#gridshadebox_overlay {
     position: fixed;
     top: 0;
     width: 100%;
-    z-index: 2;
+    z-index: 3;
 }
 #gridshadebox_content {
     background: #fff;
@@ -248,7 +248,7 @@ body.jsenabled #gridshadebox_content.hide_content {
     left: 60px;
     position: absolute;
     right: 60px;
-    z-index: 2;
+    z-index: 3;
 }
 
 #gridshadebox_content.fit_to_window {
@@ -257,7 +257,7 @@ body.jsenabled #gridshadebox_content.hide_content {
     position: fixed;
     right: 10%;
     top: 10%;
-    z-index: 2;
+    z-index: 3;
 }
 
 #gridshadebox_content.fit_to_window ul.gtopics {

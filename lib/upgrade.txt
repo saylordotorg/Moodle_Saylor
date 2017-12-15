@@ -1,11 +1,68 @@
 This files describes API changes in core libraries and APIs,
 information provided here is intended especially for developers.
 
+=== 3.4 ===
+* oauth2_client::request method has an extra parameter to specify the accept header for the response (MDL-60733)
+* The following functions, previously used (exclusively) by upgrade steps are not available
+  anymore because of the upgrade cleanup performed for this version. See MDL-57432 for more info:
+    - upgrade_mimetypes()
+    - upgrade_fix_missing_root_folders_draft()
+    - upgrade_minmaxgrade()
+    - upgrade_course_tags()
+
+* Added new moodleform element 'filetypes' and new admin setting widget 'admin_setting_filetypes'. These new widgets
+  allow users to define a list of file types; either by typing them manually or selecting them from a list. The widgets
+  directly support the syntax used to feed the 'accepted_types' option of the filemanager and filepicker elements. File
+  types can be specified as extensions (.jpg or just jpg), mime types (text/plain) or groups (image).
+* Removed accesslib private functions: load_course_context(), load_role_access_by_context(), dedupe_user_access() (MDL-49398).
+* Internal "accessdata" structure format has changed to improve ability to perform role definition caching (MDL-49398).
+* Role definitions are no longer cached in user session (MDL-49398).
+* External function core_group_external::get_activity_allowed_groups now returns an additional field: canaccessallgroups.
+  It indicates whether the user will be able to access all the activity groups.
+* file_get_draft_area_info does not sum the root folder anymore when calculating the foldercount.
+* The moodleform element classes can now optionally provide a public function validateSubmitValue(). This method can be
+  used to perform implicit validation of submitted values - without the need to explicitly add the validation rules to
+  every form. The method should accept a single parameter with the submitted value. It should return a string with the
+  eventual validation error, or an empty value if the validation passes.
+* New user_picture attribute $includefullname to determine whether to include the user's full name with the user's picture.
+* Enrol plugins which provide enrolment actions can now declare the following "data-action" attributes in their implementation of
+  enrol_plugin::get_user_enrolment_actions() whenever applicable:
+  * "editenrolment" - For editing a user'e enrolment details. Defined by constant ENROL_ACTION_EDIT.
+  * "unenrol" - For unenrolling a student. Defined by constant ENROL_ACTION_UNENROL.
+  These attributes enable enrol actions to be rendered via modals. If not added, clicking on the enrolment action buttons will still
+  redirect the user to the appropriate enrolment action page. Though optional, it is recommended to add these attributes for a
+  better user experience when performing enrol actions.
+* The enrol_plugin::get_user_enrolment_actions() implementations for core enrol plugins have been removed and moved to
+  the parent method itself. New enrol plugins don't have to implement get_user_enrolment_actions(), but just need to
+  make sure that they override:
+  - enrol_plugin::allow_manage(), and/or
+  - enrol_plugin::allow_unenrol_user() or enrol_plugin::allow_unenrol()
+  Existing enrol plugins that override enrol_plugin::get_user_enrolment_actions() don't have to do anything, but can
+  also opt to remove their own implementation of the method if they basically have the same logic as the parent method.
+* New optional parameter $enrolid for the following functions:
+  - get_enrolled_join()
+  - get_enrolled_sql()
+  - get_enrolled_with_capabilities_join()
+  Setting this parameter to a non-zero value will add a condition to the query such that only users that were enrolled
+  with this enrolment method will be returned.
+* New optional parameter 'closeSuggestionsOnSelect' for the enhance() function for form-autocomplete. Setting this to true will
+  close the suggestions popup immediately after an option has been selected. If not specified, it defaults to true for single-select
+  elements and false for multiple-select elements.
+* user_can_view_profile() now also checks the moodle/user:viewalldetails capability.
+* The core/modal_confirm dialogue has been deprecated. Please use the core/modal_save_cancel dialogue instead. Please ensure you
+  update to use the ModalEvents.save and ModalEvents.cancel events instead of their yes/no counterparts.
+* Instead of checking the 'moodle/course:viewparticipants' and 'moodle/site:viewparticipants' capabilities use the
+  new functions course_can_view_participants() and course_require_view_participants().
+* $stored_file->add_to_curl_request() now adds the filename to the curl request.
+* The option for Login HTTPS (authentication-only SSL) has been removed
+* $CFG->loginhttps is now deprecated, do not use it.
+* $PAGE->https_required and $PAGE->verify_https_required() are now deprecated. They are no longer used and will throw a coding_exception.
+* $CFG->httpswwwroot is now deprecated and will always result in the same value as wwwroot.
+
 === 3.3.1 ===
 
 * ldap_get_entries_moodle() now always returns lower-cased attribute names in the returned entries.
   It was suppposed to do so before, but it actually didn't.
-* user_can_view_profile() now also checks the moodle/user:viewalldetails capability.
 
 === 3.3 ===
 

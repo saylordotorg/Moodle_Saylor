@@ -4,11 +4,19 @@ namespace ACMS\Tests;
 
 use ACMS\Api;
 
+// backward compatibility
+if (!class_exists('\PHPUnit\Framework\TestCase') &&
+    class_exists('\PHPUnit_Framework_TestCase')) {
+    class_alias('\PHPUnit_Framework_TestCase', 'PHPUnit\Framework\TestCase');
+}
+
+use PHPUnit\Framework\TestCase;
+
 //fwrite(STDERR, print_r($example_credential, TRUE));
 
 // TODO: Add mocked response tests for speed
 
-class ApiTest extends \PHPUnit_Framework_TestCase {
+class ApiTest extends TestCase {
 
     public $group;
 
@@ -58,7 +66,7 @@ class ApiTest extends \PHPUnit_Framework_TestCase {
     	// Check if we can get credentials given an email
 		$example_credentials = $this->api->get_credentials(null, "john@example.com", 1);
 		$example_credential = array_values($example_credentials->credentials)[0];
-		
+
 		$this->assertEquals("john@example.com", $example_credential->recipient->email);
 
 		//cleanup
@@ -149,13 +157,13 @@ class ApiTest extends \PHPUnit_Framework_TestCase {
     public function testSendBatchRequests(){
         $group_name = $this->RandomString(20);
 
-        $group_data = array(  
-            "group" => array( 
+        $group_data = array(
+            "group" => array(
                 "name" => $group_name,
                 "course_name" => "Example Course",
                 "course_description" => "Example Description",
                 "course_link" => "https://www.accredible.com"
-            ) 
+            )
         );
 
         $requests = [

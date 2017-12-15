@@ -6,6 +6,7 @@ http://moodle.org/plugins/view.php?plugin=mod_checklist
 
 ==Changes==
 
+* 2017-11-09 - Minor behat test fix to work with Moodle 3.4
 * 2017-05-12 - Update behat test to work with Moodle 3.3
 * 2016-11-21 - Minor M3.2 compatibility fix (only behat affected)
 * 2015-09-07 - Fix M2.7+ compatibility (gradeexport/checklist:publish + calculation of 'start date'); fix PostgreSQL compatibility (Thanks to Nick Phillips, Kathrin Osswald)
