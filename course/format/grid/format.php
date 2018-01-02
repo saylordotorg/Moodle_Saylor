@@ -232,7 +232,15 @@ echo '</style>';
 
 $sectionparam = optional_param('section', -1, PARAM_INT);
 if ($sectionparam != -1) {
-    $displaysection = $sectionparam;
+    if (($sectionparam == 0) && $courseformat->is_section0_attop() && ($gfsettings['setsection0ownpagenogridonesection'] == 1)) {
+        // Don't allow an old section 0 link to work.
+        $sectionparam = -1;
+    } else if ($gfsettings['coursedisplay'] == COURSE_DISPLAY_SINGLEPAGE) {
+        // Don't allow an old single page link to work.
+        $sectionparam = -1;
+    } else {
+        $displaysection = $sectionparam;
+    }
 }
 
 if ($sectionparam != -1) {

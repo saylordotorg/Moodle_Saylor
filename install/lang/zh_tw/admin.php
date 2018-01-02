@@ -35,7 +35,7 @@ $string['cliansweryes'] = 'y';
 $string['cliincorrectvalueerror'] = '錯誤，將“{$a->option}”的值設為“{$a->value}”是不正確的';
 $string['cliincorrectvalueretry'] = '不正確值，請重試';
 $string['clitypevalue'] = '輸入值';
-$string['clitypevaluedefault'] = '輸入值，按 Enter 可使用預設值（{$a}）';
+$string['clitypevaluedefault'] = '輸入值，按Enter 可使用預設值（{$a}）';
 $string['cliunknowoption'] = '無法辨識的選項：
 {$a}
 請使用 --help 選項。';

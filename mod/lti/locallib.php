@@ -1248,6 +1248,8 @@ function lti_parse_custom_parameter($toolproxy, $tool, $params, $value, $islti2)
                             $value = str_replace('<br>' , ' ', $value);
                             $value = format_string($value);
                         }
+                    } else {
+                        $value = lti_calculate_custom_parameter($value1);
                     }
                 } else if ($islti2) {
                     $val = $value;
@@ -1264,6 +1266,23 @@ function lti_parse_custom_parameter($toolproxy, $tool, $params, $value, $islti2)
         }
     }
     return $value;
+}
+
+/**
+ * Calculates the value of a custom parameter that has not been specified earlier
+ *
+ * @param string    $value          Custom parameter value
+ *
+ * @return string Calculated value of custom parameter
+ */
+function lti_calculate_custom_parameter($value) {
+    global $USER, $COURSE;
+
+    switch ($value) {
+        case 'Moodle.Person.userGroupIds':
+            return implode(",", groups_get_user_groups($COURSE->id, $USER->id)[0]);
+    }
+    return null;
 }
 
 /**
@@ -1305,9 +1324,9 @@ function lti_get_ims_role($user, $cmid, $courseid, $islti2) {
         // If no cmid is passed, check if the user is a teacher in the course
         // This allows other modules to programmatically "fake" a launch without
         // a real LTI instance.
-        $coursecontext = context_course::instance($courseid);
+        $context = context_course::instance($courseid);
 
-        if (has_capability('moodle/course:manageactivities', $coursecontext, $user)) {
+        if (has_capability('moodle/course:manageactivities', $context, $user)) {
             array_push($roles, 'Instructor');
         } else {
             array_push($roles, 'Learner');
@@ -1322,7 +1341,9 @@ function lti_get_ims_role($user, $cmid, $courseid, $islti2) {
         }
     }
 
-    if (is_siteadmin($user)) {
+    if (is_siteadmin($user) || has_capability('mod/lti:admin', $context)) {
+        // Make sure admins do not have the Learner role, then set admin role.
+        $roles = array_diff($roles, array('Learner'));
         if (!$islti2) {
             array_push($roles, 'urn:lti:sysrole:ims/lis/Administrator', 'urn:lti:instrole:ims/lis/Administrator');
         } else {
@@ -2362,7 +2383,7 @@ function lti_get_launch_container($lti, $toolconfig) {
 
 function lti_request_is_using_ssl() {
     global $CFG;
-    return (stripos($CFG->httpswwwroot, 'https://') === 0);
+    return (stripos($CFG->wwwroot, 'https://') === 0);
 }
 
 function lti_ensure_url_is_https($url) {
@@ -2555,7 +2576,8 @@ function lti_get_capabilities() {
        'Person.webaddress' => '$USER->url',
        'Membership.role' => 'roles',
        'Result.sourcedId' => 'lis_result_sourcedid',
-       'Result.autocreate' => 'lis_outcome_service_url');
+       'Result.autocreate' => 'lis_outcome_service_url',
+       'Moodle.Person.userGroupIds' => null);
 
     return $capabilities;
 

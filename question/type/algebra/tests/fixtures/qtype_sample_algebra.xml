@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 0  -->
+  <question type="category">
+    <category>
+        <text>$course$/Default for course1</text>
+
+    </category>
+  </question>
+
+<!-- question: 45  -->
+  <question type="algebra">
+    <name>
+      <text>Derive</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>What is the derivative of the function \(f(x) = x^2\) ?<br></p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<p>Generalfeedback: 2*x is the correct answer.<br></p>]]></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <compareby>eval</compareby>
+    <tolerance>0.001</tolerance>
+    <nchecks>10</nchecks>
+    <disallow>  <text></text>
+</disallow>
+    <allowedfuncs></allowedfuncs>
+    <answerprefix>  <text>f(x) = </text>
+</answerprefix>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>2*x</text>
+      <feedback format="html">
+        <text><![CDATA[<p>Correct.<br></p>]]></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>x</text>
+      <feedback format="html">
+        <text><![CDATA[<p>It seems that you forgot something.<br></p>]]></text>
+      </feedback>
+    </answer>
+<variable name="x">
+    <min>-5</min>
+    <max>5</max>
+</variable>
+  </question>
+
+</quiz>

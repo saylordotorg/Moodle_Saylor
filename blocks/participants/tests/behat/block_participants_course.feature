@@ -29,8 +29,7 @@ Feature: People Block used in a course
     When I log in as "student1"
     And I am on "Course 1" course homepage
     And I click on "Participants" "link" in the "People" "block"
-    Then I should see "All participants" in the "#page-content" "css_element"
-    And the "My courses" select box should contain "C101"
+    Then I should see "Participants" in the "#page-content" "css_element"
 
   Scenario: Student without permission can not view participants link
     Given the following "permission overrides" exist:

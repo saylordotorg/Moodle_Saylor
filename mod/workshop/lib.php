@@ -95,11 +95,15 @@ function workshop_add_instance(stdclass $workshop) {
     }
 
     if (isset($workshop->submissionfiletypes)) {
-        $workshop->submissionfiletypes = workshop::clean_file_extensions($workshop->submissionfiletypes);
+        $filetypesutil = new \core_form\filetypes_util();
+        $submissionfiletypes = $filetypesutil->normalize_file_types($workshop->submissionfiletypes);
+        $workshop->submissionfiletypes = implode(' ', $submissionfiletypes);
     }
 
     if (isset($workshop->overallfeedbackfiletypes)) {
-        $workshop->overallfeedbackfiletypes = workshop::clean_file_extensions($workshop->overallfeedbackfiletypes);
+        $filetypesutil = new \core_form\filetypes_util();
+        $overallfeedbackfiletypes = $filetypesutil->normalize_file_types($workshop->overallfeedbackfiletypes);
+        $workshop->overallfeedbackfiletypes = implode(' ', $overallfeedbackfiletypes);
     }
 
     // insert the new record so we get the id
@@ -174,11 +178,15 @@ function workshop_update_instance(stdclass $workshop) {
     }
 
     if (isset($workshop->submissionfiletypes)) {
-        $workshop->submissionfiletypes = workshop::clean_file_extensions($workshop->submissionfiletypes);
+        $filetypesutil = new \core_form\filetypes_util();
+        $submissionfiletypes = $filetypesutil->normalize_file_types($workshop->submissionfiletypes);
+        $workshop->submissionfiletypes = implode(' ', $submissionfiletypes);
     }
 
     if (isset($workshop->overallfeedbackfiletypes)) {
-        $workshop->overallfeedbackfiletypes = workshop::clean_file_extensions($workshop->overallfeedbackfiletypes);
+        $filetypesutil = new \core_form\filetypes_util();
+        $overallfeedbackfiletypes = $filetypesutil->normalize_file_types($workshop->overallfeedbackfiletypes);
+        $workshop->overallfeedbackfiletypes = implode(' ', $overallfeedbackfiletypes);
     }
 
     // todo - if the grading strategy is being changed, we may want to replace all aggregated peer grades with nulls
@@ -1882,24 +1890,31 @@ function workshop_reset_course_form_defaults(stdClass $course) {
 function workshop_reset_userdata(stdClass $data) {
     global $CFG, $DB;
 
+    // Any changes to the list of dates that needs to be rolled should be same during course restore and course reset.
+    // See MDL-9367.
+    shift_course_mod_dates('workshop', array('submissionstart', 'submissionend', 'assessmentstart', 'assessmentend'),
+        $data->timeshift, $data->courseid);
+    $status = array();
+    $status[] = array('component' => get_string('modulenameplural', 'workshop'), 'item' => get_string('datechanged'),
+        'error' => false);
+
     if (empty($data->reset_workshop_submissions)
             and empty($data->reset_workshop_assessments)
             and empty($data->reset_workshop_phase) ) {
         // Nothing to do here.
-        return array();
+        return $status;
     }
 
     $workshoprecords = $DB->get_records('workshop', array('course' => $data->courseid));
 
     if (empty($workshoprecords)) {
         // What a boring course - no workshops here!
-        return array();
+        return $status;
     }
 
     require_once($CFG->dirroot . '/mod/workshop/locallib.php');
 
     $course = $DB->get_record('course', array('id' => $data->courseid), '*', MUST_EXIST);
-    $status = array();
 
     foreach ($workshoprecords as $workshoprecord) {
         $cm = get_coursemodule_from_instance('workshop', $workshoprecord->id, $course->id, false, MUST_EXIST);
@@ -1920,4 +1935,116 @@ function mod_workshop_get_fontawesome_icon_map() {
         'mod_workshop:userplan/task-done' => 'fa-check text-success',
         'mod_workshop:userplan/task-fail' => 'fa-remove text-danger',
     ];
+}
+
+/**
+ * Check if the module has any update that affects the current user since a given time.
+ *
+ * @param  cm_info $cm course module data
+ * @param  int $from the time to check updates from
+ * @param  array $filter  if we need to check only specific updates
+ * @return stdClass an object with the different type of areas indicating if they were updated or not
+ * @since Moodle 3.4
+ */
+function workshop_check_updates_since(cm_info $cm, $from, $filter = array()) {
+    global $DB, $USER;
+
+    $updates = course_check_module_updates_since($cm, $from, array('instructauthors', 'instructreviewers', 'conclusion'), $filter);
+
+    // Check if there are new submissions, assessments or assessments grades in the workshop.
+    $updates->submissions = (object) array('updated' => false);
+    $updates->assessments = (object) array('updated' => false);
+    $updates->assessmentgrades = (object) array('updated' => false);
+
+    $select = 'workshopid = ? AND authorid = ? AND (timecreated > ? OR timegraded > ? OR timemodified > ?)';
+    $params = array($cm->instance, $USER->id, $from, $from, $from);
+    $submissions = $DB->get_records_select('workshop_submissions', $select, $params, '', 'id');
+    if (!empty($submissions)) {
+        $updates->submissions->updated = true;
+        $updates->submissions->itemids = array_keys($submissions);
+    }
+
+    // Get assessments updates (both submissions reviewed by me or reviews by others).
+    $select = "SELECT a.id
+                 FROM {workshop_assessments} a
+                 JOIN {workshop_submissions} s ON a.submissionid = s.id
+                 WHERE s.workshopid = ? AND (a.timecreated > ? OR a.timemodified > ?) AND (s.authorid = ? OR a.reviewerid = ?)";
+    $params = array($cm->instance, $from, $from, $USER->id, $USER->id);
+    $assessments = $DB->get_records_sql($select, $params);
+    if (!empty($assessments)) {
+        $updates->assessments->updated = true;
+        $updates->assessments->itemids = array_keys($assessments);
+    }
+    // Finally assessment aggregated grades.
+    $select = 'workshopid = ? AND userid = ? AND timegraded > ?';
+    $params = array($cm->instance, $USER->id, $from);
+    $assessmentgrades = $DB->get_records_select('workshop_aggregations', $select, $params, '', 'id');
+    if (!empty($assessmentgrades)) {
+        $updates->assessmentgrades->updated = true;
+        $updates->assessmentgrades->itemids = array_keys($assessmentgrades);
+    }
+
+    // Now, teachers should see other students updates.
+    $canviewallsubmissions = has_capability('mod/workshop:viewallsubmissions', $cm->context);
+    $canviewallassessments = has_capability('mod/workshop:viewallassessments', $cm->context);
+    if ($canviewallsubmissions || $canviewallassessments) {
+
+        $insql = '';
+        $inparams = array();
+        // To filter by users in my groups when separated groups are forced.
+        if (groups_get_activity_groupmode($cm) == SEPARATEGROUPS) {
+            $groupusers = array_keys(groups_get_activity_shared_group_members($cm));
+            if (empty($groupusers)) {
+                return $updates;
+            }
+            list($insql, $inparams) = $DB->get_in_or_equal($groupusers);
+        }
+
+        if ($canviewallsubmissions) {
+            $updates->usersubmissions = (object) array('updated' => false);
+            $select = 'workshopid = ? AND (timecreated > ? OR timegraded > ? OR timemodified > ?)';
+            $params = array($cm->instance, $from, $from, $from);
+            if (!empty($insql)) {
+                $select .= " AND authorid $insql";
+                $params = array_merge($params, $inparams);
+            }
+            $usersubmissions = $DB->get_records_select('workshop_submissions', $select, $params, '', 'id');
+            if (!empty($usersubmissions)) {
+                $updates->usersubmissions->updated = true;
+                $updates->usersubmissions->itemids = array_keys($usersubmissions);
+            }
+        }
+
+        if ($canviewallassessments) {
+            $updates->userassessments = (object) array('updated' => false);
+            $select = "SELECT a.id
+                         FROM {workshop_assessments} a
+                         JOIN {workshop_submissions} s ON a.submissionid = s.id
+                        WHERE s.workshopid = ? AND (a.timecreated > ? OR a.timemodified > ?)";
+            $params = array($cm->instance, $from, $from);
+            if (!empty($insql)) {
+                $select .= " AND s.reviewerid $insql";
+                $params = array_merge($params, $inparams);
+            }
+            $userassessments = $DB->get_records_sql($select, $params);
+            if (!empty($userassessments)) {
+                $updates->userassessments->updated = true;
+                $updates->userassessments->itemids = array_keys($userassessments);
+            }
+
+            $updates->userassessmentgrades = (object) array('updated' => false);
+            $select = 'workshopid = ? AND timegraded > ?';
+            $params = array($cm->instance, $USER->id);
+            if (!empty($insql)) {
+                $select .= " AND userid $insql";
+                $params = array_merge($params, $inparams);
+            }
+            $userassessmentgrades = $DB->get_records_select('workshop_aggregations', $select, $params, '', 'id');
+            if (!empty($userassessmentgrades)) {
+                $updates->userassessmentgrades->updated = true;
+                $updates->userassessmentgrades->itemids = array_keys($userassessmentgrades);
+            }
+        }
+    }
+    return $updates;
 }

@@ -1,12 +1,16 @@
 History
 =============
+Version 3.4.0.1
+  1. First beta version for M3.4.
+  2. Fix 'No visual feedback of hidden sections' - #58.
+  3. Another attempt at addressing #63 for tooltip accessibility - #60.
+  4. Grid with essential fixed nav - nav bar overlaps the grid section when opened - #64.
+  5. Add the ability to have section 0 on its own page when out of the grid and the 'Course layout' is 'One section per page'.  Gratefully funded by Coventry University UK.
+
 Version 3.3.0.2
   1. Ensure overlay of navigation drawer in Boost.
   2. Fix "WCAG Changes and work to allow tooltip appearance on hover" - #63 - thanks to Pat for this.
   3. Fix colour popup form element not rendering correctly in Boost theme.
-  4. Fix 'No visual feedback of hidden sections' - #58.
-  5. Another attempt at addressing #63 for tooltip accessibility - #60.
-  6. Grid with essential fixed nav - nav bar overlaps the grid section when opened - #64.
 
 Version 3.3.0.1
   1. First version for Moodle 3.3.

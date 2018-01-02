@@ -202,6 +202,11 @@ class user_picture implements renderable {
     public $visibletoscreenreaders = true;
 
     /**
+     * @var bool Whether to include the fullname in the user picture link.
+     */
+    public $includefullname = false;
+
+    /**
      * User picture constructor.
      *
      * @param stdClass $user user record with at least id, picture, imagealt, firstname and lastname set.
@@ -427,7 +432,6 @@ class user_picture implements renderable {
             // If the currently requested page is https then we'll return an
             // https gravatar page.
             if (is_https()) {
-                $gravatardefault = str_replace($CFG->wwwroot, $CFG->httpswwwroot, $gravatardefault); // Replace by secure url.
                 return new moodle_url("https://secure.gravatar.com/avatar/{$md5}", array('s' => $size, 'd' => $gravatardefault));
             } else {
                 return new moodle_url("http://www.gravatar.com/avatar/{$md5}", array('s' => $size, 'd' => $gravatardefault));
@@ -515,7 +519,7 @@ class help_icon implements renderable, templatable {
         $data->icon = (new pix_icon('help', $alt, 'core', ['class' => 'iconhelp']))->export_for_template($output);
         $data->linktext = $this->linktext;
         $data->title = get_string('helpprefix2', '', trim($title, ". \t"));
-        $data->url = (new moodle_url($CFG->httpswwwroot . '/help.php', [
+        $data->url = (new moodle_url('/help.php', [
             'component' => $this->component,
             'identifier' => $this->identifier,
             'lang' => current_language()
@@ -2649,7 +2653,7 @@ class html_table {
      * $row2->cells = array($cell2, $cell3);
      * $t->data = array($row1, $row2);
      */
-    public $data;
+    public $data = [];
 
     /**
      * @deprecated since Moodle 2.0. Styling should be in the CSS.
@@ -4460,7 +4464,9 @@ class action_menu implements renderable, templatable {
 
         if ($actionicon instanceof pix_icon) {
             $primary->icon = $actionicon->export_for_pix();
-            $primary->title = !empty($actionicon->attributes['alt']) ? $this->actionicon->attributes['alt'] : '';
+            if (!empty($actionicon->attributes['alt'])) {
+                $primary->title = $actionicon->attributes['alt'];
+            }
         } else {
             $primary->iconraw = $actionicon ? $output->render($actionicon) : '';
         }

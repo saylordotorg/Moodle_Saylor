@@ -104,6 +104,10 @@ class issuer extends persistent {
             'sortorder' => array(
                 'type' => PARAM_INT,
                 'default' => 0,
+            ),
+            'requireconfirmation' => array(
+                'type' => PARAM_BOOL,
+                'default' => true
             )
         );
     }

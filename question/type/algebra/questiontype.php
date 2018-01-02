@@ -27,7 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/question/type/questiontypebase.php');
 require_once($CFG->dirroot . '/question/type/algebra/question.php');
 require_once($CFG->dirroot . '/question/type/algebra/parser.php');
-require_once($CFG->dirroot . '/question/type/algebra/xmlrpc-utils.php');
 
 /**
  * ALGEBRA QUESTION TYPE CLASS
@@ -501,7 +500,7 @@ class qtype_algebra extends question_type {
         $question->variables = array();
         if (!empty($questiondata->options->variables)) {
             foreach ($questiondata->options->variables as $v) {
-                $question->variables[$v->id] = new question_variable($v->id, $v->name, $v->min, $v->max);
+                $question->variables[$v->id] = new qtype_algebra_variable($v->id, $v->name, $v->min, $v->max);
             }
         }
         $question->compareby = $questiondata->options->compareby;
@@ -529,6 +528,8 @@ class qtype_algebra extends question_type {
             $responses[$aid] = new question_possible_response($answer->answer,
                     $answer->fraction);
         }
+        $responses[0] = new question_possible_response(
+                    get_string('didnotmatchanyanswer', 'question'), 0);
         $responses[null] = question_possible_response::no_response();
 
         return array($questiondata->id => $responses);

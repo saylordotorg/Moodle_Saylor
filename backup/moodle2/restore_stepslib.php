@@ -203,9 +203,7 @@ class restore_gradebook_structure_step extends restore_structure_step {
         $data->scaleid   = $this->get_mappingid('scale', $data->scaleid, NULL);
         $data->outcomeid = $this->get_mappingid('outcome', $data->outcomeid, NULL);
 
-        $data->locktime     = $this->apply_date_offset($data->locktime);
-        $data->timecreated  = $this->apply_date_offset($data->timecreated);
-        $data->timemodified = $this->apply_date_offset($data->timemodified);
+        $data->locktime = $this->apply_date_offset($data->locktime);
 
         $coursecategory = $newitemid = null;
         //course grade item should already exist so updating instead of inserting
@@ -264,10 +262,6 @@ class restore_gradebook_structure_step extends restore_structure_step {
         if (!empty($data->userid)) {
             $data->usermodified = $this->get_mappingid('user', $data->usermodified, null);
             $data->locktime     = $this->apply_date_offset($data->locktime);
-            // TODO: Ask, all the rest of locktime/exported... work with time... to be rolled?
-            $data->overridden = $this->apply_date_offset($data->overridden);
-            $data->timecreated  = $this->apply_date_offset($data->timecreated);
-            $data->timemodified = $this->apply_date_offset($data->timemodified);
 
             $gradeexists = $DB->record_exists('grade_grades', array('userid' => $data->userid, 'itemid' => $data->itemid));
             if ($gradeexists) {
@@ -291,9 +285,6 @@ class restore_gradebook_structure_step extends restore_structure_step {
 
         $data->course = $this->get_courseid();
         $data->courseid = $data->course;
-
-        $data->timecreated  = $this->apply_date_offset($data->timecreated);
-        $data->timemodified = $this->apply_date_offset($data->timemodified);
 
         $newitemid = null;
         //no parent means a course level grade category. That may have been created when the course was created
@@ -795,7 +786,8 @@ class restore_rebuild_course_cache extends restore_execution_step {
             if (!$DB->record_exists('course_sections', array('course' => $this->get_courseid(), 'section' => $i))) {
                 $sectionrec = array(
                     'course' => $this->get_courseid(),
-                    'section' => $i);
+                    'section' => $i,
+                    'timemodified' => time());
                 $DB->insert_record('course_sections', $sectionrec); // missing section created
             }
         }
@@ -1575,8 +1567,9 @@ class restore_section_structure_step extends restore_structure_step {
         $section = new stdclass();
         $section->course  = $this->get_courseid();
         $section->section = $data->number;
+        $section->timemodified = $data->timemodified ?? 0;
         // Section doesn't exist, create it with all the info from backup
-        if (!$secrec = $DB->get_record('course_sections', (array)$section)) {
+        if (!$secrec = $DB->get_record('course_sections', ['course' => $this->get_courseid(), 'section' => $data->number])) {
             $section->name = $data->name;
             $section->summary = $data->summary;
             $section->summaryformat = $data->summaryformat;
@@ -1721,8 +1714,12 @@ class restore_section_structure_step extends restore_structure_step {
                     array('id' => $availfield->coursesectionid), MUST_EXIST);
             $newvalue = \core_availability\info::add_legacy_availability_field_condition(
                     $currentvalue, $availfield, $show);
-            $DB->set_field('course_sections', 'availability', $newvalue,
-                    array('id' => $availfield->coursesectionid));
+
+            $section = new stdClass();
+            $section->id = $availfield->coursesectionid;
+            $section->availability = $newvalue;
+            $section->timemodified = time();
+            $DB->update_record('course_sections', $section);
         }
     }
 
@@ -2528,8 +2525,8 @@ class restore_badges_structure_step extends restore_structure_step {
         $params = array(
                 'name'           => $data->name,
                 'description'    => $data->description,
-                'timecreated'    => $this->apply_date_offset($data->timecreated),
-                'timemodified'   => $this->apply_date_offset($data->timemodified),
+                'timecreated'    => $data->timecreated,
+                'timemodified'   => $data->timemodified,
                 'usercreated'    => $data->usercreated,
                 'usermodified'   => $data->usermodified,
                 'issuername'     => $data->issuername,
@@ -2544,7 +2541,7 @@ class restore_badges_structure_step extends restore_structure_step {
                 'attachment'     => $data->attachment,
                 'notification'   => $data->notification,
                 'status'         => BADGE_STATUS_INACTIVE,
-                'nextcron'       => $this->apply_date_offset($data->nextcron)
+                'nextcron'       => $data->nextcron
         );
 
         $newid = $DB->insert_record('badge', $params);
@@ -2721,7 +2718,7 @@ class restore_calendarevents_structure_step extends restore_structure_step {
                 'visible'        => $data->visible,
                 'uuid'           => $data->uuid,
                 'sequence'       => $data->sequence,
-                'timemodified'   => $this->apply_date_offset($data->timemodified),
+                'timemodified'   => $data->timemodified,
                 'priority'       => isset($data->priority) ? $data->priority : null);
         if ($this->name == 'activity_calendar') {
             $params['instance'] = $this->task->get_activityid();
@@ -2953,7 +2950,7 @@ class restore_course_completion_structure_step extends restore_structure_step {
                 'userid' => $data->userid,
                 'course' => $data->course,
                 'criteriaid' => $data->criteriaid,
-                'timecompleted' => $this->apply_date_offset($data->timecompleted)
+                'timecompleted' => $data->timecompleted
             );
             if (isset($data->gradefinal)) {
                 $params['gradefinal'] = $data->gradefinal;
@@ -2983,9 +2980,9 @@ class restore_course_completion_structure_step extends restore_structure_step {
             $params = array(
                 'userid' => $data->userid,
                 'course' => $data->course,
-                'timeenrolled' => $this->apply_date_offset($data->timeenrolled),
-                'timestarted' => $this->apply_date_offset($data->timestarted),
-                'timecompleted' => $this->apply_date_offset($data->timecompleted),
+                'timeenrolled' => $data->timeenrolled,
+                'timestarted' => $data->timestarted,
+                'timecompleted' => $data->timecompleted,
                 'reaggregate' => $data->reaggregate
             );
 
@@ -3687,8 +3684,6 @@ class restore_activity_grades_structure_step extends restore_structure_step {
         $data->idnumber     = $idnumber;
         $data->scaleid      = $this->get_mappingid('scale', $data->scaleid);
         $data->outcomeid    = $this->get_mappingid('outcome', $data->outcomeid);
-        $data->timecreated  = $this->apply_date_offset($data->timecreated);
-        $data->timemodified = $this->apply_date_offset($data->timemodified);
 
         $gradeitem = new grade_item($data, false);
         $gradeitem->insert('restore');
@@ -3714,8 +3709,6 @@ class restore_activity_grades_structure_step extends restore_structure_step {
         if (!empty($data->userid)) {
             $data->usermodified = $this->get_mappingid('user', $data->usermodified, null);
             $data->rawscaleid = $this->get_mappingid('scale', $data->rawscaleid);
-            // TODO: Ask, all the rest of locktime/exported... work with time... to be rolled?
-            $data->overridden = $this->apply_date_offset($data->overridden);
 
             $grade = new grade_grade($data, false);
             $grade->insert('restore');
@@ -3938,6 +3931,14 @@ class restore_block_instance_structure_step extends restore_structure_step {
             $data->configdata = base64_encode(serialize((object)$configdata));
         }
 
+        // Set timecreated, timemodified if not included (older backup).
+        if (empty($data->timecreated)) {
+            $data->timecreated = time();
+        }
+        if (empty($data->timemodified)) {
+            $data->timemodified = $data->timecreated;
+        }
+
         // Create the block instance
         $newitemid = $DB->insert_record('block_instances', $data);
         // Save the mapping (with restorefiles support)
@@ -4041,11 +4042,13 @@ class restore_module_structure_step extends restore_structure_step {
         if (!$data->section) { // no sections in course, create section 0 and 1 and assign module to 1
             $sectionrec = array(
                 'course' => $this->get_courseid(),
-                'section' => 0);
+                'section' => 0,
+                'timemodified' => time());
             $DB->insert_record('course_sections', $sectionrec); // section 0
             $sectionrec = array(
                 'course' => $this->get_courseid(),
-                'section' => 1);
+                'section' => 1,
+                'timemodified' => time());
             $data->section = $DB->insert_record('course_sections', $sectionrec); // section 1
         }
         $data->groupingid= $this->get_mappingid('grouping', $data->groupingid);      // grouping
@@ -4099,7 +4102,12 @@ class restore_module_structure_step extends restore_structure_step {
         } else {
             $sequence = $newitemid;
         }
-        $DB->set_field('course_sections', 'sequence', $sequence, array('id' => $data->section));
+
+        $updatesection = new \stdClass();
+        $updatesection->id = $data->section;
+        $updatesection->sequence = $sequence;
+        $updatesection->timemodified = time();
+        $DB->update_record('course_sections', $updatesection);
 
         // If there is the legacy showavailability data, store this for later use.
         // (This data is not present when restoring 'new' backups.)
@@ -4267,7 +4275,6 @@ class restore_userscompletion_structure_step extends restore_structure_step {
 
         $data->coursemoduleid = $this->task->get_moduleid();
         $data->userid = $this->get_mappingid('user', $data->userid);
-        $data->timemodified = $this->apply_date_offset($data->timemodified);
 
         // Find the existing record
         $existing = $DB->get_record('course_modules_completion', array(
@@ -5183,7 +5190,6 @@ abstract class restore_questions_activity_structure_step extends restore_activit
         if (!property_exists($data, 'variant')) {
             $data->variant = 1;
         }
-        $data->timemodified    = $this->apply_date_offset($data->timemodified);
 
         if (!property_exists($data, 'maxfraction')) {
             $data->maxfraction = 1;
@@ -5218,7 +5224,6 @@ abstract class restore_questions_activity_structure_step extends restore_activit
         unset($data->response);
 
         $data->questionattemptid = $this->get_new_parentid($nameprefix . 'question_attempt');
-        $data->timecreated = $this->apply_date_offset($data->timecreated);
         $data->userid      = $this->get_mappingid('user', $data->userid);
 
         // Everything ready, insert and create mapping (needed by question_sessions)
@@ -5539,6 +5544,58 @@ class restore_completion_defaults_structure_step extends restore_structure_step 
         $this->set_mapping('course_completion_defaults', $oldid, $newid);
     }
 }
+
+/**
+ * Index course after restore.
+ *
+ * @package core_backup
+ * @copyright 2017 The Open University
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class restore_course_search_index extends restore_execution_step {
+    /**
+     * When this step is executed, we add the course context to the queue for reindexing.
+     */
+    protected function define_execution() {
+        $context = \context_course::instance($this->task->get_courseid());
+        \core_search\manager::request_index($context);
+    }
+}
+
+/**
+ * Index activity after restore (when not restoring whole course).
+ *
+ * @package core_backup
+ * @copyright 2017 The Open University
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class restore_activity_search_index extends restore_execution_step {
+    /**
+     * When this step is executed, we add the activity context to the queue for reindexing.
+     */
+    protected function define_execution() {
+        $context = \context::instance_by_id($this->task->get_contextid());
+        \core_search\manager::request_index($context);
+    }
+}
+
+/**
+ * Index block after restore (when not restoring whole course).
+ *
+ * @package core_backup
+ * @copyright 2017 The Open University
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class restore_block_search_index extends restore_execution_step {
+    /**
+     * When this step is executed, we add the block context to the queue for reindexing.
+     */
+    protected function define_execution() {
+        $context = \context_block::instance($this->task->get_blockid());
+        \core_search\manager::request_index($context);
+    }
+}
+
 /**
  * Restore action events.
  *

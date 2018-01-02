@@ -34,15 +34,6 @@ function xmldb_assignfeedback_editpdf_upgrade($oldversion) {
 
     $dbman = $DB->get_manager();
 
-    // Moodle v2.8.0 release upgrade line.
-    // Put any upgrade step following this.
-
-    // Moodle v2.9.0 release upgrade line.
-    // Put any upgrade step following this.
-
-    // Moodle v3.0.0 release upgrade line.
-    // Put any upgrade step following this.
-
     if ($oldversion < 2016021600) {
 
         // Define table assignfeedback_editpdf_queue to be created.
@@ -88,6 +79,9 @@ function xmldb_assignfeedback_editpdf_upgrade($oldversion) {
     }
 
     // Automatically generated Moodle v3.3.0 release upgrade line.
+    // Put any upgrade step following this.
+
+    // Automatically generated Moodle v3.4.0 release upgrade line.
     // Put any upgrade step following this.
 
     return true;

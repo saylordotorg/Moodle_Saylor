@@ -650,6 +650,16 @@ class core_renderer extends renderer_base {
                     'type' => $type, 'title' => $alt->title, 'href' => $alt->url));
         }
 
+        // Add noindex tag if relevant page and setting applied.
+        $allowindexing = isset($CFG->allowindexing) ? $CFG->allowindexing : 0;
+        $loginpages = array('login-index', 'login-signup');
+        if ($allowindexing == 2 || ($allowindexing == 0 && in_array($this->page->pagetype, $loginpages))) {
+            if (!isset($CFG->additionalhtmlhead)) {
+                $CFG->additionalhtmlhead = '';
+            }
+            $CFG->additionalhtmlhead .= '<meta name="robots" content="noindex" />';
+        }
+
         if (!empty($CFG->additionalhtmlhead)) {
             $output .= "\n".$CFG->additionalhtmlhead;
         }
@@ -731,16 +741,26 @@ class core_renderer extends renderer_base {
     public function standard_footer_html() {
         global $CFG, $SCRIPT;
 
+        $output = '';
         if (during_initial_install()) {
             // Debugging info can not work before install is finished,
             // in any case we do not want any links during installation!
-            return '';
+            return $output;
+        }
+
+        // Give plugins an opportunity to add any footer elements.
+        // The callback must always return a string containing valid html footer content.
+        $pluginswithfunction = get_plugins_with_function('standard_footer_html', 'lib.php');
+        foreach ($pluginswithfunction as $plugins) {
+            foreach ($plugins as $function) {
+                $output .= $function();
+            }
         }
 
         // This function is normally called from a layout.php file in {@link core_renderer::header()}
         // but some of the content won't be known until later, so we return a placeholder
         // for now. This will be replaced with the real content in {@link core_renderer::footer()}.
-        $output = $this->unique_performance_info_token;
+        $output .= $this->unique_performance_info_token;
         if ($this->page->devicetypeinuse == 'legacy') {
             // The legacy theme is in use print the notification
             $output .= html_writer::tag('div', get_string('legacythemeinuse'), array('class'=>'legacythemeinuse'));
@@ -791,6 +811,85 @@ class core_renderer extends renderer_base {
         // DO NOT add classes.
         // DO NOT add an id.
         return '<div role="main">'.$this->unique_main_content_token.'</div>';
+    }
+
+    /**
+     * Returns standard navigation between activities in a course.
+     *
+     * @return string the navigation HTML.
+     */
+    public function activity_navigation() {
+        // First we should check if we want to add navigation.
+        $context = $this->page->context;
+        if (($this->page->pagelayout !== 'incourse' && $this->page->pagelayout !== 'frametop')
+            || $context->contextlevel != CONTEXT_MODULE) {
+            return '';
+        }
+
+        // If the activity is in stealth mode, show no links.
+        if ($this->page->cm->is_stealth()) {
+            return '';
+        }
+
+        // Get a list of all the activities in the course.
+        $course = $this->page->cm->get_course();
+        $modules = get_fast_modinfo($course->id)->get_cms();
+
+        // Put the modules into an array in order by the position they are shown in the course.
+        $mods = [];
+        $activitylist = [];
+        foreach ($modules as $module) {
+            // Only add activities the user can access, aren't in stealth mode and have a url (eg. mod_label does not).
+            if (!$module->uservisible || $module->is_stealth() || empty($module->url)) {
+                continue;
+            }
+            $mods[$module->id] = $module;
+
+            // No need to add the current module to the list for the activity dropdown menu.
+            if ($module->id == $this->page->cm->id) {
+                continue;
+            }
+            // Module name.
+            $modname = $module->get_formatted_name();
+            // Display the hidden text if necessary.
+            if (!$module->visible) {
+                $modname .= ' ' . get_string('hiddenwithbrackets');
+            }
+            // Module URL.
+            $linkurl = new moodle_url($module->url, array('forceview' => 1));
+            // Add module URL (as key) and name (as value) to the activity list array.
+            $activitylist[$linkurl->out(false)] = $modname;
+        }
+
+        $nummods = count($mods);
+
+        // If there is only one mod then do nothing.
+        if ($nummods == 1) {
+            return '';
+        }
+
+        // Get an array of just the course module ids used to get the cmid value based on their position in the course.
+        $modids = array_keys($mods);
+
+        // Get the position in the array of the course module we are viewing.
+        $position = array_search($this->page->cm->id, $modids);
+
+        $prevmod = null;
+        $nextmod = null;
+
+        // Check if we have a previous mod to show.
+        if ($position > 0) {
+            $prevmod = $mods[$modids[$position - 1]];
+        }
+
+        // Check if we have a next mod to show.
+        if ($position < ($nummods - 1)) {
+            $nextmod = $mods[$modids[$position + 1]];
+        }
+
+        $activitynav = new \core_course\output\activity_navigation($prevmod, $nextmod, $activitylist);
+        $renderer = $this->page->get_renderer('core', 'course');
+        return $renderer->render($activitynav);
     }
 
     /**
@@ -1799,7 +1898,7 @@ class core_renderer extends renderer_base {
 
         $output = $this->box_start('generalbox modal modal-dialog modal-in-page show', 'notice');
         $output .= $this->box_start('modal-content', 'modal-content');
-        $output .= $this->box_start('modal-header', 'modal-header');
+        $output .= $this->box_start('modal-header p-x-1', 'modal-header');
         $output .= html_writer::tag('h4', get_string('confirm'));
         $output .= $this->box_end();
         $output .= $this->box_start('modal-body', 'modal-body');
@@ -2348,6 +2447,7 @@ class core_renderer extends renderer_base {
      *     - alttext=true (add image alt attribute)
      *     - class = image class attribute (default 'userpicture')
      *     - visibletoscreenreaders=true (whether to be visible to screen readers)
+     *     - includefullname=false (whether to include the user's full name together with the user picture)
      * @return string HTML fragment
      */
     public function user_picture(stdClass $user, array $options = null) {
@@ -2404,6 +2504,11 @@ class core_renderer extends renderer_base {
 
         // get the image html output fisrt
         $output = html_writer::empty_tag('img', $attributes);
+
+        // Show fullname together with the picture when desired.
+        if ($userpicture->includefullname) {
+            $output .= fullname($userpicture->user);
+        }
 
         // then wrap it in link if needed
         if (!$userpicture->link) {
@@ -4307,7 +4412,7 @@ EOD;
         $context->cookieshelpiconformatted = $this->help_icon('cookiesenabled');
         $context->errorformatted = $this->error_text($context->error);
 
-        return $this->render_from_template('core/login', $context);
+        return $this->render_from_template('core/loginform', $context);
     }
 
     /**

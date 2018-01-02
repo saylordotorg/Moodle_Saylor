@@ -704,10 +704,12 @@ function lesson_get_overview_report_table_and_data(lesson $lesson, $currentgroup
         list($esql, $params) = get_enrolled_sql($context, '', $currentgroup, true);
         list($sort, $sortparams) = users_order_by_sql('u');
 
+        $extrafields = get_extra_user_fields($context);
+
         $params['a1lessonid'] = $lesson->id;
         $params['b1lessonid'] = $lesson->id;
         $params['c1lessonid'] = $lesson->id;
-        $ufields = user_picture::fields('u');
+        $ufields = user_picture::fields('u', $extrafields);
         $sql = "SELECT DISTINCT $ufields
                 FROM {user} u
                 JOIN (
@@ -895,16 +897,35 @@ function lesson_get_overview_report_table_and_data(lesson $lesson, $currentgroup
 
     $table = new html_table();
 
+    $headers = [get_string('name')];
+
+    foreach ($extrafields as $field) {
+        $headers[] = get_user_field_name($field);
+    }
+
+    $headers [] = get_string('attempts', 'lesson');
+
     // Set up the table object.
     if ($data->lessonscored) {
-        $table->head = array(get_string('name'), get_string('attempts', 'lesson'), get_string('highscore', 'lesson'));
-    } else {
-        $table->head = array(get_string('name'), get_string('attempts', 'lesson'));
+        $headers [] = get_string('highscore', 'lesson');
     }
-    $table->align = array('center', 'left', 'left');
-    $table->wrap = array('nowrap', 'nowrap', 'nowrap');
+
+    $colcount = count($headers);
+
+    $table->head = $headers;
+
+    $table->align = [];
+    $table->align = array_pad($table->align, $colcount, 'center');
+    $table->align[$colcount - 1] = 'left';
+
+    if ($data->lessonscored) {
+        $table->align[$colcount - 2] = 'left';
+    }
+
+    $table->wrap = [];
+    $table->wrap = array_pad($table->wrap, $colcount, 'nowrap');
+
     $table->attributes['class'] = 'standardtable generaltable';
-    $table->size = array(null, '70%', null);
 
     // print out the $studentdata array
     // going through each student that has attempted the lesson, so, each student should have something to be displayed
@@ -991,14 +1012,21 @@ function lesson_get_overview_report_table_and_data(lesson $lesson, $currentgroup
             }
             // get line breaks in after each attempt
             $attempts = implode("<br />\n", $attempts);
+            $row = [$studentname];
+
+            foreach ($extrafields as $field) {
+                $row[] = $student->$field;
+            }
+
+            $row[] = $attempts;
 
             if ($data->lessonscored) {
                 // Add the grade if the lesson is graded.
-                $table->data[] = array($studentname, $attempts, $bestgrade . "%");
-            } else {
-                // This lesson does not have a grade.
-                $table->data[] = array($studentname, $attempts);
+                $row[] = $bestgrade."%";
             }
+
+            $table->data[] = $row;
+
             // Add the student data.
             $dataforstudent->id = $student->id;
             $dataforstudent->fullname = $studentname;
@@ -1031,6 +1059,7 @@ function lesson_get_user_detailed_report_data(lesson $lesson, $userid, $attempt)
         $lesson->update_effective_access($userid);
     }
 
+    $pageid = 0;
     $lessonpages = $lesson->load_all_pages();
     foreach ($lessonpages as $lessonpage) {
         if ($lessonpage->prevpageid == 0) {
@@ -1078,6 +1107,8 @@ function lesson_get_user_detailed_report_data(lesson $lesson, $userid, $attempt)
     while ($pageid != 0) { // EOL
         $page = $lessonpages[$pageid];
         $answerpage = new stdClass;
+        // Keep the original page object.
+        $answerpage->page = $page;
         $data ='';
 
         $answerdata = new stdClass;
@@ -3001,7 +3032,7 @@ class lesson extends lesson_base {
                         $this->add_message(get_string('numberofpagesviewednotice', 'lesson', $a));
                     }
 
-                    if (!$reviewmode && !$this->properties->retake) {
+                    if (!$reviewmode && $this->properties->ongoing) {
                         $this->add_message(get_string("numberofcorrectanswers", "lesson", $gradeinfo->earned), 'notify');
                         if ($this->properties->grade != GRADE_TYPE_NONE) {
                             $a = new stdClass;
@@ -4094,7 +4125,7 @@ abstract class lesson_page extends lesson_base {
                 $result->feedback .= $OUTPUT->box(format_text($this->get_contents(), $this->properties->contentsformat, $options),
                         'generalbox boxaligncenter');
                 $studentanswer = format_text($result->studentanswer, $result->studentanswerformat,
-                            array('context' => $context, 'para' => true));
+                        array('context' => $context, 'para' => true));
                 $result->feedback .= '<div class="correctanswer generalbox"><em>'
                         . get_string("youranswer", "lesson").'</em> : ' . $studentanswer;
                 if (isset($result->responseformat)) {

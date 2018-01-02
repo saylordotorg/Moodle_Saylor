@@ -147,6 +147,7 @@ class core_calendar_event_mapper_testcase extends advanced_testcase {
         $record->timesort = 0;
         $record->type = 1;
         $record->courseid = 0;
+        $record->categoryid = 0;
 
         foreach ($properties as $name => $value) {
             $record->$name = $value;
@@ -200,6 +201,10 @@ class event_mapper_test_action_event implements action_event_interface {
 
     public function get_description() {
         return $this->event->get_description();
+    }
+
+    public function get_category() {
+        return $this->event->get_category();
     }
 
     public function get_course() {
@@ -256,6 +261,11 @@ class event_mapper_test_action_event implements action_event_interface {
  */
 class event_mapper_test_event implements event_interface {
     /**
+     * @var proxy_interface $categoryproxy Category proxy.
+     */
+    protected $categoryproxy;
+
+    /**
      * @var proxy_interface $courseproxy Course proxy.
      */
     protected $courseproxy;
@@ -310,6 +320,10 @@ class event_mapper_test_event implements event_interface {
 
     public function get_description() {
         return new event_description('asdf', 1);
+    }
+
+    public function get_category() {
+        return $this->categoryproxy;
     }
 
     public function get_course() {

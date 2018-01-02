@@ -399,6 +399,7 @@ final class core_media_manager {
      * @return array Array of 1 or more moodle_url objects
      */
     public function split_alternatives($combinedurl, &$width, &$height) {
+        global $CFG;
         $urls = explode('#', $combinedurl);
         $width = 0;
         $height = 0;
@@ -425,16 +426,11 @@ final class core_media_manager {
                 $url = str_replace($matches[0], '', $url);
             }
 
-            // Clean up url. Allow rtmp:// protocol even though it's not allowed by clean_param(..., PARAM_URL).
-            if ($isrtmp = preg_match('|^(rtmp://)(.*)$|i', trim($url), $matches)) {
-                $url = "http://" . $matches[2];
-            }
-            $url = clean_param($url, PARAM_URL);
-            if (empty($url)) {
+            // Clean up url.
+            $url = fix_utf8($url);
+            include_once($CFG->dirroot . '/lib/validateurlsyntax.php');
+            if (!validateUrlSyntax($url, 's?H?S?F?R?E?u-P-a?I?p?f?q?r?')) {
                 continue;
-            }
-            if ($isrtmp) {
-                $url = preg_replace('|^http://|', $matches[1], $url);
             }
 
             // Turn it into moodle_url object.

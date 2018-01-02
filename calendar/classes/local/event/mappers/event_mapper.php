@@ -54,28 +54,35 @@ class event_mapper implements event_mapper_interface {
 
     public function from_legacy_event_to_event(\calendar_event $legacyevent) {
         $coalesce = function($property) use ($legacyevent) {
-            return property_exists($legacyevent, $property) ? $legacyevent->{$property} : null;
+            try {
+                return $legacyevent->$property;
+            } catch (\coding_exception $e) {
+                // The magic setter throews an exception if the
+                // property doesn't exist.
+                return null;
+            }
         };
 
         return $this->factory->create_instance(
             (object)[
-                $coalesce('id'),
-                $coalesce('name'),
-                $coalesce('description'),
-                $coalesce('format'),
-                $coalesce('courseid'),
-                $coalesce('groupid'),
-                $coalesce('userid'),
-                $coalesce('repeatid'),
-                $coalesce('modulename'),
-                $coalesce('instance'),
-                $coalesce('type'),
-                $coalesce('timestart'),
-                $coalesce('timeduration'),
-                $coalesce('timemodified'),
-                $coalesce('timesort'),
-                $coalesce('visible'),
-                $coalesce('subscription')
+                'id' => $coalesce('id'),
+                'name' => $coalesce('name'),
+                'description' => $coalesce('description'),
+                'format' => $coalesce('format'),
+                'categoryid' => $coalesce('categoryid'),
+                'courseid' => $coalesce('courseid'),
+                'groupid' => $coalesce('groupid'),
+                'userid' => $coalesce('userid'),
+                'repeatid' => $coalesce('repeatid'),
+                'modulename' => $coalesce('modulename'),
+                'instance' => $coalesce('instance'),
+                'eventtype' => $coalesce('eventtype'),
+                'timestart' => $coalesce('timestart'),
+                'timeduration' => $coalesce('timeduration'),
+                'timemodified' => $coalesce('timemodified'),
+                'timesort' => $coalesce('timesort'),
+                'visible' => $coalesce('visible'),
+                'subscriptionid' => $coalesce('subscriptionid')
             ]
         );
     }
@@ -83,8 +90,16 @@ class event_mapper implements event_mapper_interface {
     public function from_event_to_legacy_event(event_interface $event) {
         $action = ($event instanceof action_event_interface) ? $event->get_action() : null;
         $timeduration = $event->get_times()->get_end_time()->getTimestamp() - $event->get_times()->get_start_time()->getTimestamp();
+        $properties = $this->from_event_to_stdclass($event);
 
-        return new \calendar_event($this->from_event_to_stdclass($event));
+        // Normalise for the legacy event because it wants zero rather than null.
+        $properties->courseid = empty($properties->courseid) ? 0 : $properties->courseid;
+        $properties->groupid = empty($properties->groupid) ? 0 : $properties->groupid;
+        $properties->userid = empty($properties->userid) ? 0 : $properties->userid;
+        $properties->modulename = empty($properties->modulename) ? 0 : $properties->modulename;
+        $properties->instance = empty($properties->instance) ? 0 : $properties->instance;
+
+        return new \calendar_event($properties);
     }
 
     public function from_event_to_stdclass(event_interface $event) {
@@ -104,6 +119,7 @@ class event_mapper implements event_mapper_interface {
             'description'      => $event->get_description()->get_value(),
             'format'           => $event->get_description()->get_format(),
             'courseid'         => $event->get_course() ? $event->get_course()->get('id') : null,
+            'categoryid'       => $event->get_category() ? $event->get_category()->get('id') : null,
             'groupid'          => $event->get_group() ? $event->get_group()->get('id') : null,
             'userid'           => $event->get_user() ? $event->get_user()->get('id') : null,
             'repeatid'         => $event->get_repeats()->get_id(),

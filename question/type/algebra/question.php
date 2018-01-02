@@ -331,7 +331,7 @@ class qtype_algebra_question extends question_graded_by_strategy
  * @copyright  2009 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class question_variable {
+class qtype_algebra_variable {
     /** @var integer the answer id. */
     public $id;
 

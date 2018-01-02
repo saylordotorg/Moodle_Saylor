@@ -81,7 +81,7 @@ Feature: Mapping courses in a feedback
       | this is a simple multiple choice | option d |
     And I press "Submit your answers"
     And I press "Continue"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I click on "Course feedback" "link" in the "Feedback" "block"
     And I follow "Answer the questions..."
     And I should not see "Acceptance test site" in the ".feedback_form" "css_element"
@@ -138,7 +138,12 @@ Feature: Mapping courses in a feedback
     And I follow "Map feedback to courses"
     And I set the field "Courses" to "Course 2"
     And I set the field "Courses" to "Course 3"
+    # Weird solution to make the editable field to lose the focus
+    # but with the focus, "save changes" uses to fail because of
+    # the suggestions hiding the button.
+    And I press key "27" in the field "Courses"
     And I press "Save changes"
+    And I should see "Course mapping has been changed"
     And I log out
 
     And I log in as "user1"

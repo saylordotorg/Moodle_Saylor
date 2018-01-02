@@ -535,6 +535,7 @@ class mod_data_external extends external_api {
 
         $result = array(
             'entry' => $entry,
+            'ratinginfo' => \core_rating\external\util::get_rating_info($database, $context, 'mod_data', 'entry', array($record)),
             'warnings' => $warnings
         );
         // Check if we should return the entry rendered.
@@ -557,6 +558,7 @@ class mod_data_external extends external_api {
             array(
                 'entry' => record_exporter::get_read_structure(),
                 'entryviewcontents' => new external_value(PARAM_RAW, 'The entry as is rendered in the site.', VALUE_OPTIONAL),
+                'ratinginfo' => \core_rating\external\util::external_ratings_structure(),
                 'warnings' => new external_warnings()
             )
         );
@@ -797,7 +799,9 @@ class mod_data_external extends external_api {
                 'entries' => new external_multiple_structure(
                     record_exporter::get_read_structure()
                 ),
-                'totalcount' => new external_value(PARAM_INT, 'Total count of records.'),
+                'totalcount' => new external_value(PARAM_INT, 'Total count of records returned by the search.'),
+                'maxcount' => new external_value(PARAM_INT, 'Total count of records that the user could see in the database
+                    (if all the search criterias were removed).', VALUE_OPTIONAL),
                 'listviewcontents' => new external_value(PARAM_RAW, 'The list view contents as is rendered in the site.',
                                                             VALUE_OPTIONAL),
                 'warnings' => new external_warnings()

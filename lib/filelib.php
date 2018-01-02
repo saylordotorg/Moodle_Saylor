@@ -237,6 +237,9 @@ function file_postupdate_standard_editor($data, $field, array $options, $context
     if (!isset($options['maxbytes'])) {
         $options['maxbytes'] = 0; // unlimited
     }
+    if (!isset($options['removeorphaneddrafts'])) {
+        $options['removeorphaneddrafts'] = false; // Don't remove orphaned draft files by default.
+    }
 
     if ($options['trusttext']) {
         $data->{$field.'trust'} = trusttext_trusted($context);
@@ -249,6 +252,10 @@ function file_postupdate_standard_editor($data, $field, array $options, $context
     if ($options['maxfiles'] == 0 or is_null($filearea) or is_null($itemid) or empty($editor['itemid'])) {
         $data->{$field} = $editor['text'];
     } else {
+        // Clean the user drafts area of any files not referenced in the editor text.
+        if ($options['removeorphaneddrafts']) {
+            file_remove_editor_orphaned_files($editor);
+        }
         $data->{$field} = file_save_draft_area_files($editor['itemid'], $context->id, $component, $filearea, $itemid, $options, $editor['text'], $options['forcehttps']);
     }
     $data->{$field.'format'} = $editor['format'];
@@ -429,7 +436,7 @@ function file_prepare_draft_area(&$draftitemid, $contextid, $component, $fileare
             // at this point there should not be any draftfile links yet,
             // because this is a new text from database that should still contain the @@pluginfile@@ links
             // this happens when developers forget to post process the text
-            $text = str_replace("\"$CFG->httpswwwroot/draftfile.php", "\"$CFG->httpswwwroot/brokenfile.php#", $text);
+            $text = str_replace("\"$CFG->wwwroot/draftfile.php", "\"$CFG->wwwroot/brokenfile.php#", $text);
         }
     } else {
         // nothing to do
@@ -503,9 +510,29 @@ function file_rewrite_pluginfile_urls($text, $file, $contextid, $component, $fil
  * (more information will be added as needed).
  */
 function file_get_draft_area_info($draftitemid, $filepath = '/') {
-    global $CFG, $USER;
+    global $USER;
 
     $usercontext = context_user::instance($USER->id);
+    return file_get_file_area_info($usercontext->id, 'user', 'draft', $draftitemid, $filepath);
+}
+
+/**
+ * Returns information about files in an area.
+ *
+ * @param int $contextid context id
+ * @param string $component component
+ * @param string $filearea file area name
+ * @param int $itemid item id or all files if not specified
+ * @param string $filepath path to the directory from which the information have to be retrieved.
+ * @return array with the following entries:
+ *      'filecount' => number of files in the area.
+ *      'filesize' => total size of the files in the area.
+ *      'foldercount' => number of folders in the area.
+ *      'filesize_without_references' => total size of the area excluding file references.
+ * @since Moodle 3.4
+ */
+function file_get_file_area_info($contextid, $component, $filearea, $itemid = 0, $filepath = '/') {
+
     $fs = get_file_storage();
 
     $results = array(
@@ -515,11 +542,8 @@ function file_get_draft_area_info($draftitemid, $filepath = '/') {
         'filesize_without_references' => 0
     );
 
-    if ($filepath != '/') {
-        $draftfiles = $fs->get_directory_files($usercontext->id, 'user', 'draft', $draftitemid, $filepath, true, true);
-    } else {
-        $draftfiles = $fs->get_area_files($usercontext->id, 'user', 'draft', $draftitemid, 'id', true);
-    }
+    $draftfiles = $fs->get_directory_files($contextid, $component, $filearea, $itemid, $filepath, true, true);
+
     foreach ($draftfiles as $file) {
         if ($file->is_directory()) {
             $results['foldercount'] += 1;
@@ -786,6 +810,38 @@ function file_restore_source_field_from_draft_file($storedfile) {
     }
     return $storedfile;
 }
+
+/**
+ * Removes those files from the user drafts filearea which are not referenced in the editor text.
+ *
+ * @param stdClass $editor The online text editor element from the submitted form data.
+ */
+function file_remove_editor_orphaned_files($editor) {
+    global $CFG, $USER;
+
+    // Find those draft files included in the text, and generate their hashes.
+    $context = context_user::instance($USER->id);
+    $baseurl = $CFG->wwwroot . '/draftfile.php/' . $context->id . '/user/draft/' . $editor['itemid'] . '/';
+    $pattern = "/" . preg_quote($baseurl, '/') . "(.+?)[\?\"']/";
+    preg_match_all($pattern, $editor['text'], $matches);
+    $usedfilehashes = [];
+    foreach ($matches[1] as $matchedfilename) {
+        $matchedfilename = urldecode($matchedfilename);
+        $usedfilehashes[] = \file_storage::get_pathname_hash($context->id, 'user', 'draft', $editor['itemid'], '/',
+                                                             $matchedfilename);
+    }
+
+    // Now, compare the hashes of all draft files, and remove those which don't match used files.
+    $fs = get_file_storage();
+    $files = $fs->get_area_files($context->id, 'user', 'draft', $editor['itemid'], 'id', false);
+    foreach ($files as $file) {
+        $tmphash = $file->get_pathnamehash();
+        if (!in_array($tmphash, $usedfilehashes)) {
+            $file->delete();
+        }
+    }
+}
+
 /**
  * Saves files from a draft file area to a real one (merging the list of files).
  * Can rewrite URLs in some content at the same time if desired.
@@ -848,6 +904,7 @@ function file_save_draft_area_files($draftitemid, $contextid, $component, $filea
 
         $newhashes = array();
         $filecount = 0;
+        $context = context::instance_by_id($contextid, MUST_EXIST);
         foreach ($draftfiles as $file) {
             if (!$options['subdirs'] && $file->get_filepath() !== '/') {
                 continue;
@@ -856,8 +913,11 @@ function file_save_draft_area_files($draftitemid, $contextid, $component, $filea
                 continue;
             }
             if (!$file->is_directory()) {
-                if ($options['maxbytes'] and $options['maxbytes'] < $file->get_filesize()) {
-                    // oversized file - should not get here at all
+                // Check to see if this file was uploaded by someone who can ignore the file size limits.
+                $fileusermaxbytes = get_user_max_upload_file_size($context, $options['maxbytes'], 0, 0, $file->get_userid());
+                if ($fileusermaxbytes != USER_CAN_IGNORE_FILE_SIZE_LIMITS
+                        && ($options['maxbytes'] and $options['maxbytes'] < $file->get_filesize())) {
+                    // Oversized file.
                     continue;
                 }
                 if ($options['maxfiles'] != -1 and $options['maxfiles'] <= $filecount) {
@@ -2971,7 +3031,6 @@ class curl {
      * Set HTTP Request Header
      *
      * @param array $header
-     * @param bool $replace If true, will remove any existing headers before appending the new one.
      */
     public function setHeader($header) {
         if (is_array($header)) {
@@ -2980,7 +3039,10 @@ class curl {
             }
         } else {
             // Remove newlines, they are not allowed in headers.
-            $this->header[] = preg_replace('/[\r\n]/', '', $header);
+            $newvalue = preg_replace('/[\r\n]/', '', $header);
+            if (!in_array($newvalue, $this->header)) {
+                $this->header[] = $newvalue;
+            }
         }
     }
 
@@ -4032,7 +4094,7 @@ function file_pluginfile($relativepath, $forcedownload, $preview = null, $offlin
         $filename = array_pop($args);
 
         if ($filearea === 'badgeimage') {
-            if ($filename !== 'f1' && $filename !== 'f2') {
+            if ($filename !== 'f1' && $filename !== 'f2' && $filename !== 'f3') {
                 send_file_not_found();
             }
             if (!$file = $fs->get_file($context->id, 'badges', 'badgeimage', $badge->id, '/', $filename.'.png')) {
@@ -4567,7 +4629,8 @@ function file_pluginfile($relativepath, $forcedownload, $preview = null, $offlin
             // Backup files that were generated by the automated backup systems.
 
             require_login($course);
-            require_capability('moodle/site:config', $context);
+            require_capability('moodle/backup:downloadfile', $context);
+            require_capability('moodle/restore:userinfo', $context);
 
             $filename = array_pop($args);
             $filepath = $args ? '/'.implode('/', $args).'/' : '/';

@@ -1,7 +1,10 @@
 ﻿Version Information
 ===================
-Version 3.3.1.2
+Version 3.4.0.2
   1. Fix colour popup form element not rendering correctly in Boost theme.
+
+Version 3.4.0.1
+  1. First beta version for M3.4.
 
 Version 3.3.1.1
   1. Revert MDL-55074 by applying MDL-57412 - #30.

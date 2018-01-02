@@ -57,6 +57,7 @@ class format_grid extends format_base {
     private static $sectiontitlefontsizes = array(0 => '0', 12 => '12', 13 => '13', 14 => '14', 15 => '15', 16 => '16',
        17 => '17', 18 => '18', 19 => '19', 20 => '20', 21 => '21', 22 => '22', 23 => '23', 24 => '24');
     private $settings;
+    private $section0attop; // Boolean to state if section zero is at the top (true) or in the grid (false).
 
     /**
      * Creates a new instance of class
@@ -73,6 +74,18 @@ class format_grid extends format_base {
             $courseid = $COURSE->id;  // Save lots of global $COURSE as we will never be the site course.
         }
         parent::__construct($format, $courseid);
+
+        $this->section0attop = $this->get_summary_visibility($courseid)->showsummary == 1;
+    }
+
+    /**
+     * States if section 0 is at the top.
+     *
+     * @param stdClass $section Section object from database or just field course_sections section
+     * @return string The default value for the section name.
+     */
+    public function is_section0_attop() {
+        return $this->section0attop;
     }
 
     /**
@@ -465,10 +478,12 @@ class format_grid extends format_base {
             } else {
                 $usercoursedisplay = $course->coursedisplay;
             }
-            $topic0attop = $this->get_summary_visibility($course->id)->showsummary == 1;
             if ($sectionno != 0 && $usercoursedisplay == COURSE_DISPLAY_MULTIPAGE) {
                 $url->param('section', $sectionno);
-            } else if ($sectionno == 0 && $usercoursedisplay == COURSE_DISPLAY_MULTIPAGE && (!$topic0attop)) {
+            } else if ($sectionno == 0 && $usercoursedisplay == COURSE_DISPLAY_MULTIPAGE && (!$this->section0attop)) {
+                $url->param('section', $sectionno);
+            } else if ($sectionno == 0 && $usercoursedisplay == COURSE_DISPLAY_MULTIPAGE && $this->section0attop &&
+                   ($this->get_settings()['setsection0ownpagenogridonesection'] == 2)) {
                 $url->param('section', $sectionno);
             } else {
                 $url->set_anchor('section-' . $sectionno);
@@ -669,6 +684,10 @@ class format_grid extends format_base {
                 'greyouthidden' => array(
                     'default' => get_config('format_grid', 'defaultgreyouthidden'),
                     'type' => PARAM_INT
+                ),
+                'setsection0ownpagenogridonesection' => array(
+                    'default' => get_config('format_grid', 'defaultsection0ownpagenogridonesection'),
+                    'type' => PARAM_INT
                 )
             );
         }
@@ -722,6 +741,7 @@ class format_grid extends format_base {
                 $courseformatoptionsedit['imagecontaineralignment'] = array('label' => get_config(
                             'format_grid', 'defaultimagecontaineralignment'), 'element_type' => 'hidden');
             }
+
             if (has_capability('format/grid:changeimagecontainersize', $context)) {
                 $courseformatoptionsedit['imagecontainerwidth'] = array(
                     'label' => new lang_string('setimagecontainerwidth', 'format_grid'),
@@ -1072,6 +1092,24 @@ class format_grid extends format_base {
                 )
             );
 
+            if (has_capability('format/grid:changeimagecontainernavigation', $context)) {
+                $courseformatoptionsedit['setsection0ownpagenogridonesection'] = array(
+                    'label' => new lang_string('setsection0ownpagenogridonesection', 'format_grid'),
+                    'help' => 'setsection0ownpagenogridonesection',
+                    'help_component' => 'format_grid',
+                    'element_type' => 'select',
+                    'element_attributes' => array(
+                        array(
+                            1 => new lang_string('no'), // No.
+                            2 => new lang_string('yes') // Yes.
+                        )
+                    )
+                );
+            } else {
+                $courseformatoptionsedit['setsection0ownpagenogridonesection'] = array('label' => get_config(
+                    'format_grid', 'defaultsection0ownpagenogridonesection'), 'element_type' => 'hidden');
+            }
+
             $courseformatoptions = array_merge_recursive($courseformatoptions, $courseformatoptionsedit);
         }
         return $courseformatoptions;
@@ -1151,6 +1189,7 @@ class format_grid extends format_base {
         $context = $this->get_context();
 
         $changeimagecontaineralignment = has_capability('format/grid:changeimagecontaineralignment', $context);
+        $changeimagecontainernavigation = has_capability('format/grid:changeimagecontainernavigation', $context);
         $changeimagecontainersize = has_capability('format/grid:changeimagecontainersize', $context);
         $changeimageresizemethod = has_capability('format/grid:changeimageresizemethod', $context);
         $changeimagecontainerstyle = has_capability('format/grid:changeimagecontainerstyle', $context);
@@ -1163,15 +1202,22 @@ class format_grid extends format_base {
         $resetelements = array();
 
         if (($changeimagecontaineralignment) ||
-           ($changeimagecontainersize) ||
-           ($changeimageresizemethod) ||
-           ($changeimagecontainerstyle) ||
-           ($changesectiontitleoptions)) {
+            ($changeimagecontainernavigation) ||
+            ($changeimagecontainersize) ||
+            ($changeimageresizemethod) ||
+            ($changeimagecontainerstyle) ||
+            ($changesectiontitleoptions)) {
 
             if ($changeimagecontaineralignment) {
                 $checkboxname = get_string('resetimagecontaineralignment', 'format_grid') .
                         $OUTPUT->help_icon('resetimagecontaineralignment', 'format_grid');
                 $resetelements[] = & $mform->createElement('checkbox', 'resetimagecontaineralignment', '', $checkboxname);
+            }
+
+            if ($changeimagecontainernavigation) {
+                $checkboxname = get_string('resetimagecontainernavigation', 'format_grid') .
+                        $OUTPUT->help_icon('resetimagecontainernavigation', 'format_grid');
+                $resetelements[] = & $mform->createElement('checkbox', 'resetimagecontainernavigation', '', $checkboxname);
             }
 
             if ($changeimagecontainersize) {
@@ -1214,6 +1260,10 @@ class format_grid extends format_base {
             $checkboxname = get_string('resetallimagecontaineralignment', 'format_grid').
                 $OUTPUT->help_icon('resetallimagecontaineralignment', 'format_grid');
             $resetallelements[] = & $mform->createElement('checkbox', 'resetallimagecontaineralignment', '', $checkboxname);
+
+            $checkboxname = get_string('resetallimagecontainernavigation', 'format_grid').
+                $OUTPUT->help_icon('resetallimagecontainernavigation', 'format_grid');
+            $resetallelements[] = & $mform->createElement('checkbox', 'resetallimagecontainernavigation', '', $checkboxname);
 
             $checkboxname = get_string('resetallimagecontainersize', 'format_grid').
                 $OUTPUT->help_icon('resetallimagecontainersize', 'format_grid');
@@ -1373,6 +1423,7 @@ class format_grid extends format_base {
          *        reset itself is not seen as an update.
          */
         $resetimagecontaineralignment = false;
+        $resetimagecontainernavigation = false;
         $resetimagecontainersize = false;
         $resetimageresizemethod = false;
         $resetimagecontainerstyle = false;
@@ -1380,6 +1431,7 @@ class format_grid extends format_base {
         $resetnewactivity = false;
         $resetfitpopup = false;
         $resetallimagecontaineralignment = false;
+        $resetallimagecontainernavigation = false;
         $resetallimagecontainersize = false;
         $resetallimageresizemethod = false;
         $resetallimagecontainerstyle = false;
@@ -1390,6 +1442,10 @@ class format_grid extends format_base {
         if (isset($data->resetimagecontaineralignment) == true) {
             $resetimagecontaineralignment = true;
             unset($data->resetimagecontaineralignment);
+        }
+        if (isset($data->resetimagecontainernavigation) == true) {
+            $resetimagecontainernavigation = true;
+            unset($data->resetimagecontainernavigation);
         }
         if (isset($data->resetimagecontainersize) == true) {
             $resetimagecontainersize = true;
@@ -1418,6 +1474,10 @@ class format_grid extends format_base {
         if (isset($data->resetallimagecontaineralignment) == true) {
             $resetallimagecontaineralignment = true;
             unset($data->resetallimagecontaineralignment);
+        }
+        if (isset($data->resetallimagecontainernavigation) == true) {
+            $resetallimagecontainernavigation = true;
+            unset($data->resetallimagecontainernavigation);
         }
         if (isset($data->resetallimagecontainersize) == true) {
             $resetallimagecontainersize = true;
@@ -1488,14 +1548,16 @@ class format_grid extends format_base {
 
         // Now we can do the reset.
         if (($resetallimagecontaineralignment) ||
+            ($resetallimagecontainernavigation) ||
             ($resetallimagecontainersize) ||
             ($resetallimageresizemethod) ||
             ($resetallimagecontainerstyle) ||
             ($resetallsectiontitleoptions) ||
             ($resetallnewactivity) ||
             ($resetallfitpopup)) {
-            $this->reset_grid_setting(0, $resetallimagecontaineralignment, $resetallimagecontainersize, $resetallimageresizemethod,
-                $resetallimagecontainerstyle, $resetallsectiontitleoptions, $resetallnewactivity, $resetallfitpopup);
+            $this->reset_grid_setting(0, $resetallimagecontaineralignment, $resetallimagecontainernavigation,
+                $resetallimagecontainersize, $resetallimageresizemethod, $resetallimagecontainerstyle,
+                $resetallsectiontitleoptions, $resetallnewactivity, $resetallfitpopup);
             $changes = true;
         } else if (
             ($resetimagecontaineralignment) ||
@@ -1505,8 +1567,9 @@ class format_grid extends format_base {
             ($resetsectiontitleoptions) ||
             ($resetnewactivity) ||
             ($resetfitpopup)) {
-            $this->reset_grid_setting($this->courseid, $resetimagecontaineralignment, $resetimagecontainersize,
-                $resetimageresizemethod, $resetimagecontainerstyle, $resetsectiontitleoptions, $resetnewactivity, $resetfitpopup);
+            $this->reset_grid_setting($this->courseid, $resetimagecontaineralignment, $resetimagecontainernavigation,
+                $resetimagecontainersize, $resetimageresizemethod, $resetimagecontainerstyle,
+                $resetsectiontitleoptions, $resetnewactivity, $resetfitpopup);
             $changes = true;
         }
 
@@ -1583,6 +1646,7 @@ class format_grid extends format_base {
      * Resets the format setting to the default.
      * @param int $courseid If not 0, then a specific course to reset.
      * @param int $imagecontaineralignmentreset If true, reset the alignment to the default in the settings for the format.
+     * @param int $imagecontainernavigationreset If true, reset the alignment to the default in the settings for the format.
      * @param int $imagecontainersizereset If true, reset the layout to the default in the settings for the format.
      * @param int $imageresizemethodreset If true, reset the image resize method to the default in the settings for the format.
      * @param int $imagecontainerstylereset If true, reset the colour to the default in the settings for the format.
@@ -1590,8 +1654,9 @@ class format_grid extends format_base {
      * @param int $newactivityreset If true, reset the new activity to the default in the settings for the format.
      * @param int $fitpopupreset If true, reset the fit popup to the default in the settings for the format.
      */
-    public function reset_grid_setting($courseid, $imagecontaineralignmentreset, $imagecontainersizereset, $imageresizemethodreset,
-        $imagecontainerstylereset, $sectiontitleoptionsreset, $newactivityreset, $fitpopupreset) {
+    public function reset_grid_setting($courseid, $imagecontaineralignmentreset, $imagecontainernavigationreset,
+        $imagecontainersizereset, $imageresizemethodreset, $imagecontainerstylereset, $sectiontitleoptionsreset,
+        $newactivityreset, $fitpopupreset) {
         global $DB, $USER;
 
         $context = $this->get_context();
@@ -1606,6 +1671,7 @@ class format_grid extends format_base {
 
         $updatedata = array();
         $updateimagecontaineralignment = false;
+        $updateimagecontainernavigation = false;
         $updateimagecontainersize = false;
         $updateimageresizemethod = false;
         $updateimagecontainerstyle = false;
@@ -1615,6 +1681,10 @@ class format_grid extends format_base {
         if ($imagecontaineralignmentreset && has_capability('format/grid:changeimagecontaineralignment', $context) && $resetallifall) {
             $updatedata['imagecontaineralignment'] = get_config('format_grid', 'defaultimagecontaineralignment');
             $updateimagecontaineralignment = true;
+        }
+        if ($imagecontainernavigationreset && has_capability('format/grid:changeimagecontaineralignment', $context) && $resetallifall) {
+            $updatedata['setsection0ownpagenogridonesection'] = get_config('format_grid', 'defaultsection0ownpagenogridonesection');
+            $updateimagecontainernavigation = true;
         }
         if ($imagecontainersizereset && has_capability('format/grid:changeimagecontainersize', $context) && $resetallifall) {
             $updatedata['imagecontainerwidth'] = get_config('format_grid', 'defaultimagecontainerwidth');
@@ -1667,6 +1737,7 @@ class format_grid extends format_base {
 
         foreach ($records as $record) {
             if (($updateimagecontaineralignment) ||
+                ($updateimagecontainernavigation) ||
                 ($updateimagecontainersize) ||
                 ($updateimageresizemethod) ||
                 ($updateimagecontainerstyle) ||
