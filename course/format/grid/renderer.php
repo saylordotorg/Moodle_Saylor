@@ -390,6 +390,7 @@ class format_grid_renderer extends format_section_renderer_base {
         // Print all of the image containers.
         $this->make_block_icon_topics($coursecontext->id, $modinfo, $course, $editing, $hascapvishidsect, $urlpicedit);
         echo html_writer::end_tag('ul');
+
         echo html_writer::end_tag('div');
 
         $rtl = right_to_left();
@@ -728,8 +729,7 @@ class format_grid_renderer extends format_section_renderer_base {
         }
 
         if ($this->settings['showsectiontitlesummary'] == 2) {
-            global $PAGE;
-            $PAGE->requires->js_call_amd('format_grid/tooltip', 'init', array());
+            $this->page->requires->js_call_amd('format_grid/tooltip', 'init');
         }
 
         // Start at 1 to skip the summary block or include the summary block if it's in the grid display.

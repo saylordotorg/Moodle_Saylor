@@ -20,6 +20,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->dirroot . '/question/type/edit_question_form.php');
 require_once($CFG->dirroot . '/question/type/algebra/questiontype.php');
 require_once($CFG->dirroot . '/question/type/algebra/parser.php');
@@ -258,6 +260,7 @@ class qtype_algebra_edit_form extends question_edit_form {
      * @param $files some files - I don't know what this is for! - files defined in the form??
      */
     public function validation($data, $files) {
+
         // Call the base class validation method and keep any errors it generates.
         $errors = parent::validation($data, $files);
 

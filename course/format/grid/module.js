@@ -107,12 +107,14 @@ M.format_grid.init = function(Y, the_editing_on, the_section_redirect, the_num_s
             shadeboxnext.on('click', this.next_section, this);
             document.getElementById("gridshadebox_next").style.display = "";
         }
-        // Remove href link from icon anchors so they don't compete with JavaScript onlick calls.
-        var gridiconcontainer = Y.one("#gridiconcontainer");
-        var icon_links = gridiconcontainer.all("a.gridicon_link");
-        icon_links.each(function (node) {
-            node.setAttribute("href", "#");
-        });
+        if (this.section_redirect === null) {
+            // Remove href link from icon anchors so they don't compete with JavaScript onlick calls.
+            var gridiconcontainer = Y.one("#gridiconcontainer");
+            var icon_links = gridiconcontainer.all("a.gridicon_link");
+            icon_links.each(function (node) {
+                node.setAttribute("href", "#");
+            });
+        }
 
         M.format_grid.shadebox_overlay = document.getElementById('gridshadebox_overlay');
         if (M.format_grid.shadebox_overlay) {

@@ -85,8 +85,7 @@ class qtype_algebra_renderer extends qtype_renderer {
         // Javascript function which the button uses to display the rendering
         // This function sents the source of the iframe to the 'displayformula.php' script giving
         // it an argument of the formula entered by the student.
-        $displayfunction =
-            'function '.$dfname."() {\n".
+        $displayfunction = 'function '.$dfname."() {\n".
             '    var text="vars='.$varnames.'&expr="+escape(document.getElementsByName("'.$inputname.'")[0].value);'."\n".
             "    if(text.length != 0) {\n".
             '      document.getElementsByName("'.$iframename.'")[0].src="'.
