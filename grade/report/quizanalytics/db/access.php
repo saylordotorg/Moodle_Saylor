@@ -15,17 +15,27 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This plugin provides access to Moodle data in form of analytics and reports in real time.
+ * Defines capabilities for the gradebook quizanalytics report
  *
- *
- * @package    local_intelliboard
- * @copyright  2017 IntelliBoard, Inc
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @website    https://intelliboard.net/
+ * @package   gradereport_quizanalytics
+ * @author Moumita Adak <moumita.a@dualcube.com>
+ * @copyright  Dualcube (https://dualcube.com)
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$plugin->version  = 2017112801;
-$plugin->requires = 2011120500;
-$plugin->release = '4.8.3';
-$plugin->maturity = MATURITY_STABLE;
-$plugin->component = 'local_intelliboard';
+defined('MOODLE_INTERNAL') || die();
+
+$capabilities = array(
+
+    'gradereport/quizanalytics:view' => array(
+        'riskbitmask' => RISK_PERSONAL,
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => array(
+            'student' => CAP_ALLOW,
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
+        )
+    ),
+);

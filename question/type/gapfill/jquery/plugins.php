@@ -15,17 +15,14 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This plugin provides access to Moodle data in form of analytics and reports in real time.
+ * Ordering question type javascript plugins definition
  *
- *
- * @package    local_intelliboard
- * @copyright  2017 IntelliBoard, Inc
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @website    https://intelliboard.net/
+ * @package    qtype_gapfill
+ * @copyright  2017
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3
  */
+defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2017112801;
-$plugin->requires = 2011120500;
-$plugin->release = '4.8.3';
-$plugin->maturity = MATURITY_STABLE;
-$plugin->component = 'local_intelliboard';
+$plugins = array(
+    'ui.touch-punch' => array('files' => array('jquery-ui.touch-punch.js')),
+);

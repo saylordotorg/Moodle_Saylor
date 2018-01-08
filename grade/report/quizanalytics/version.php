@@ -15,17 +15,18 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This plugin provides access to Moodle data in form of analytics and reports in real time.
+ * Version details for the quizanalytics gradebook report
  *
- *
- * @package    local_intelliboard
- * @copyright  2017 IntelliBoard, Inc
+ * @package   gradereport_quizanalytics
+ * @author Moumita Adak <moumita.a@dualcube.com>
+ * @copyright  Dualcube (https://dualcube.com)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @website    https://intelliboard.net/
  */
 
-$plugin->version  = 2017112801;
-$plugin->requires = 2011120500;
-$plugin->release = '4.8.3';
-$plugin->maturity = MATURITY_STABLE;
-$plugin->component = 'local_intelliboard';
+defined('MOODLE_INTERNAL') || die();
+
+$plugin->version   = 2017081604;        // The current plugin version (Date: YYYYMMDDXX)
+$plugin->requires  = 2014051200;        // Requires this Moodle version
+$plugin->component = 'gradereport_quizanalytics'; // Full name of the plugin (used for diagnostics).
+$plugin->maturity  = MATURITY_STABLE;
+$plugin->release   = '1.0 (Build: 2017081602)';

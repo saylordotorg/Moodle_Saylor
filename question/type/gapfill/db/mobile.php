@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of the Certificate module for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,17 +15,14 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This plugin provides access to Moodle data in form of analytics and reports in real time.
+ * Certificate module capability definition
  *
- *
- * @package    local_intelliboard
- * @copyright  2017 IntelliBoard, Inc
+ * @package    qtype_gapfill
+ * @copyright  2016 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @website    https://intelliboard.net/
  */
+defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2017112801;
-$plugin->requires = 2011120500;
-$plugin->release = '4.8.3';
-$plugin->maturity = MATURITY_STABLE;
-$plugin->component = 'local_intelliboard';
+$addons = array(
+    "qtype_gapfill" => array()
+);

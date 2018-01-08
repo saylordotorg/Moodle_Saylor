@@ -1,4 +1,4 @@
-<?php
+<?PHP
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -15,17 +15,17 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This plugin provides access to Moodle data in form of analytics and reports in real time.
+ * Version information. When a new version is released version is incremented
  *
- *
- * @package    local_intelliboard
- * @copyright  2017 IntelliBoard, Inc
+ * @package    qtype_gapfill
+ * @copyright  2013 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @website    https://intelliboard.net/
  */
 
-$plugin->version  = 2017112801;
-$plugin->requires = 2011120500;
-$plugin->release = '4.8.3';
-$plugin->maturity = MATURITY_STABLE;
-$plugin->component = 'local_intelliboard';
+defined('MOODLE_INTERNAL') || die();
+
+$plugin->component = 'qtype_gapfill';
+$plugin->version  = 2017122301;
+$plugin->requires = 2015051109;  // Moodle 2.9.9.
+$plugin->release = '1.961';
+$plugin->maturity  = MATURITY_STABLE;
