@@ -234,7 +234,7 @@ def plugins = [
         "name" : 'gradereport_quizanalytics',
         "url" : 'https://github.com/dualcube/moodle-gradereport_quizanalytics',
         "branch" : 'master',
-        "dest" : 'gradereport/quizanalytics'
+        "dest" : 'grade/report/quizanalytics'
     ],
     [
         "name" : 'qtype_gapfill',
