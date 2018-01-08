@@ -217,6 +217,12 @@ def plugins = [
         "url" : 'https://github.com/moodleuulm/moodle-local_boostnavigation',
         "branch" : 'master',
         "dest" : 'local/boostnavigation'
+    ],
+    [
+        "name" : 'qtype_gapfill',
+        "url" : 'https://github.com/marcusgreen/moodle-qtype_gapfill',
+        "branch" : 'master',
+        "dest" : 'question/type/gapfill'
     ]
 ]
 
