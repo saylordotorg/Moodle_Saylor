@@ -1691,7 +1691,7 @@ class qtype_algebra_parser {
                             $i++;
                             continue;
                         } else {
-                            throw new Exception(get_string('missingonearg', 'qtype_algebra', $op));
+                            throw new Exception(get_string('missingonearg', 'qtype_algebra', $tree[$i]->_value));
                         }
                     } else if ($tree[$i]->n_args() == 2) {
                         if ($i > 0 and $i < (count($tree) - 1)) {
@@ -1701,7 +1701,7 @@ class qtype_algebra_parser {
                             array_splice($tree, $i - 1, 1);
                             continue;
                         } else {
-                            throw new Exception(get_string('missingtwoargs', 'qtype_algebra', $op));
+                            throw new Exception(get_string('missingtwoargs', 'qtype_algebra', $tree[$i]->_value));
                         }
                     }
                 } else {

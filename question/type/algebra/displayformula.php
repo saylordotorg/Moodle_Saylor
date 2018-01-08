@@ -22,13 +22,15 @@
 
 /**
  * Script which converts the given formula text into LaTeX code and then
- * displays the appropriate image file. It relies on the LaTeX filter to
- * be present.
+ * displays the appropriate image file. It relies on the LaTeX filter or
+ * the mathJax filter to be present.
  */
 
 require_once('../../../config.php');
 require_once("$CFG->dirroot/question/type/algebra/parser.php");
 global $PAGE, $CFG;
+
+require_login();
 
 $p = new qtype_algebra_parser;
 try {
@@ -74,7 +76,7 @@ if (!empty($CFG->additionalhtmlhead) && stripos($CFG->additionalhtmlhead, 'MathJ
 }
 ?>
     </head>
-    <body bgcolor="#FFFFFF">
+    <body bgcolor="#ffffff">
         <?php echo $text; ?>
     </body>
 </html>

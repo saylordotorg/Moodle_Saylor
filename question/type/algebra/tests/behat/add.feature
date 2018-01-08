@@ -30,7 +30,7 @@ Feature: Test creating an Algebra question
       | id_answer_0          | 2*x                                       |
       | id_fraction_0        | 100%                                      |
       | id_feedback_0        | Well done. 2*x is correct.                |
-      | id_answer_1          | *                                         |
-      | id_fraction_1        | None                                      |
-      | id_feedback_1        | Your answer is incorrect.                 |
+      | id_answer_1          | x                                         |
+      | id_fraction_1        | 20%                                       |
+      | id_feedback_1        | It seems that you forgot something.       |
     Then I should see "algebra-001"

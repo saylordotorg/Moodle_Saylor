@@ -260,6 +260,7 @@ class qtype_algebra_edit_form extends question_edit_form {
      * @param $files some files - I don't know what this is for! - files defined in the form??
      */
     public function validation($data, $files) {
+
         // Call the base class validation method and keep any errors it generates.
         $errors = parent::validation($data, $files);
 

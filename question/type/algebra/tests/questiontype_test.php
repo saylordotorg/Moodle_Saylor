@@ -68,8 +68,7 @@ class qtype_algebra_test extends advanced_testcase {
 
     public function test_get_random_guess_score() {
         $q = test_question_maker::get_question_data('algebra');
-        $q->options->answers[14]->fraction = 0.1;
-        $this->assertEquals(0.1, $this->qtype->get_random_guess_score($q));
+        $this->assertEquals(0, $this->qtype->get_random_guess_score($q));
     }
 
     public function test_get_possible_responses() {
@@ -115,7 +114,7 @@ class qtype_algebra_test extends advanced_testcase {
         }
 
         foreach ($questiondata->options as $optionname => $value) {
-            if ($optionname != 'answers') {
+            if (!in_array($optionname, array('answers', 'variables'))) {
                 $this->assertAttributeEquals($value, $optionname, $actualquestiondata->options);
             }
         }

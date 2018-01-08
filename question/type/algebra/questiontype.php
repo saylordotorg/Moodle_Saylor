@@ -513,11 +513,6 @@ class qtype_algebra extends question_type {
     }
 
     public function get_random_guess_score($questiondata) {
-        foreach ($questiondata->options->answers as $aid => $answer) {
-            if ('*' == trim($answer->answer)) {
-                return $answer->fraction;
-            }
-        }
         return 0;
     }
 

@@ -184,10 +184,6 @@ class qtype_algebra_question extends question_graded_by_strategy
     }
 
     public function compare_response_with_answer(array $response, question_answer $answer) {
-        // Deal with the match anything answer by returning true.
-        if ($answer->answer == '*') {
-            return true;
-        }
         $expr = $this->parse_expression($response['answer']);
         // Check that there is a response and if not return false. We do this here
         // because even an empty response should match a widlcard answer.
