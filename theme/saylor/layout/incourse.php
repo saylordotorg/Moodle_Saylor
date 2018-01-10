@@ -172,7 +172,7 @@ echo $OUTPUT->doctype() ?>
             </div>
         </div>
         <div class="span4">
-        <div class="textwidget"><p><a href="http://creativecommons.org/licenses/by/3.0/" rel="license"><img src="<?php echo $OUTPUT->image_url('ccby', 'theme')?>" style="border-width:0" alt="Creative Commons License"></a><br>&copy; Saylor Academy 2010-2017 except as otherwise noted. Excluding course final exams, content authored by Saylor Academy is available under a <a rel="license" href="http://creativecommons.org/licenses/by/3.0/" target="_blank">Creative Commons Attribution 3.0 Unported</a> license. Third-party materials are the copyright of their respective owners and shared under various licenses. See <a href="https://www.saylor.org/open/licensinginformation/" target="_blank">detailed licensing information</a>.</p>
+        <div class="textwidget"><p><a href="http://creativecommons.org/licenses/by/3.0/" rel="license"><img src="<?php echo $OUTPUT->image_url('ccby', 'theme')?>" style="border-width:0" alt="Creative Commons License"></a><br>&copy; Saylor Academy 2010-2018 except as otherwise noted. Excluding course final exams, content authored by Saylor Academy is available under a <a rel="license" href="http://creativecommons.org/licenses/by/3.0/" target="_blank">Creative Commons Attribution 3.0 Unported</a> license. Third-party materials are the copyright of their respective owners and shared under various licenses. See <a href="https://www.saylor.org/open/licensinginformation/" target="_blank">detailed licensing information</a>.</p>
 <p>Saylor Academy and Saylor.org&reg; are trade names of the Constitution Foundation, a 501(c)(3) organization through which our educational activities are conducted.</p>
 <p><a href="http://www.saylor.org/sitemap">Sitemap</a> | <a href="http://www.saylor.org/terms-of-use">Terms of Use</a> | <a href="http://www.saylor.org/privacy-policy">Privacy Policy</a></p>
 </div>   
@@ -206,16 +206,5 @@ echo $OUTPUT->doctype() ?>
     <?php echo $OUTPUT->standard_end_of_body_html() ?>
 
 </div>
-    <!-- Start of Saylor Academy Zendesk Widget script -->
-    <script>/*<![CDATA[*/window.zEmbed||function(e,t){var n,o,d,i,s,a=[],r=document.createElement("iframe");window.zEmbed=function(){a.push(arguments)},window.zE=window.zE||window.zEmbed,r.src="javascript:false",r.title="",r.role="presentation",(r.frameElement||r).style.cssText="display: none",d=document.getElementsByTagName("script"),d=d[d.length-1],d.parentNode.insertBefore(r,d),i=r.contentWindow,s=i.document;try{o=s}catch(c){n=document.domain,r.src='javascript:var d=document.open();d.domain="'+n+'";void(0);',o=s}o.open()._l=function(){var o=this.createElement("script");n&&(this.domain=n),o.id="js-iframe-async",o.src=e,this.t=+new Date,this.zendeskHost=t,this.zEQueue=a,this.body.appendChild(o)},o.write('<body onload="document._l();">'),o.close()}("//assets.zendesk.com/embeddable_framework/main.js","sayloracademy.zendesk.com");/*]]>*/</script>
-    <!-- End of Saylor Academy Zendesk Widget script -->
-    <script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-ga('create', 'UA-16530955-7', 'auto');
-ga('send', 'pageview');
-</script>
 </body>
 </html>
