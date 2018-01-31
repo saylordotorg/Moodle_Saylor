@@ -82,47 +82,40 @@ M.format_grid.init = function(Y, the_editing_on, the_section_redirect, the_num_s
         // Show the sections when editing.
         Y.all(".grid_section").removeClass('hide_section');
     } else {
-        Y.delegate('click', this.icon_click, Y.config.doc, 'ul.gridicons a.gridicon_link', this);
         var navdrawer = M.format_grid.ourYUI.one('[data-region="drawer"] nav:first-child'); // Flat navigation.
         if (navdrawer) {
             Y.delegate('click', this.navdrawerclick, '[data-region="drawer"] nav:first-child', 'a', this);
         }
-
-        var shadeboxtoggleone = Y.one("#gridshadebox_overlay");
-        if (shadeboxtoggleone) {
-            shadeboxtoggleone.on('click', this.icon_toggle, this);
-        }
-        var shadeboxtoggletwo = Y.one("#gridshadebox_close");
-        if (shadeboxtoggletwo) {
-            shadeboxtoggletwo.on('click', this.icon_toggle, this);
-            document.getElementById("gridshadebox_close").style.display = "";
-        }
-        var shadeboxprevious = Y.one("#gridshadebox_previous");
-        if (shadeboxprevious) {
-            shadeboxprevious.on('click', this.previous_section, this);
-            document.getElementById("gridshadebox_previous").style.display = "";
-        }
-        var shadeboxnext = Y.one("#gridshadebox_next");
-        if (shadeboxnext) {
-            shadeboxnext.on('click', this.next_section, this);
-            document.getElementById("gridshadebox_next").style.display = "";
-        }
         if (this.section_redirect === null) {
-            // Remove href link from icon anchors so they don't compete with JavaScript onlick calls.
-            var gridiconcontainer = Y.one("#gridiconcontainer");
-            var icon_links = gridiconcontainer.all("a.gridicon_link");
-            icon_links.each(function (node) {
-                node.setAttribute("href", "#");
-            });
-        }
+            Y.delegate('click', this.icon_click, Y.config.doc, 'ul.gridicons a.gridicon_link', this);
 
-        M.format_grid.shadebox_overlay = document.getElementById('gridshadebox_overlay');
-        if (M.format_grid.shadebox_overlay) {
-            M.format_grid.shadebox.initialize_shadebox();
-            M.format_grid.shadebox.update_shadebox();
-            window.onresize = function() {
+            var shadeboxtoggleone = Y.one("#gridshadebox_overlay");
+            if (shadeboxtoggleone) {
+                shadeboxtoggleone.on('click', this.icon_toggle, this);
+            }
+            var shadeboxtoggletwo = Y.one("#gridshadebox_close");
+            if (shadeboxtoggletwo) {
+                shadeboxtoggletwo.on('click', this.icon_toggle, this);
+                document.getElementById("gridshadebox_close").style.display = "";
+            }
+            var shadeboxprevious = Y.one("#gridshadebox_previous");
+            if (shadeboxprevious) {
+                shadeboxprevious.on('click', this.previous_section, this);
+                document.getElementById("gridshadebox_previous").style.display = "";
+            }
+            var shadeboxnext = Y.one("#gridshadebox_next");
+            if (shadeboxnext) {
+                shadeboxnext.on('click', this.next_section, this);
+                document.getElementById("gridshadebox_next").style.display = "";
+            }
+            M.format_grid.shadebox_overlay = document.getElementById('gridshadebox_overlay');
+            if (M.format_grid.shadebox_overlay) {
+                M.format_grid.shadebox.initialize_shadebox();
                 M.format_grid.shadebox.update_shadebox();
-            };
+                window.onresize = function() {
+                    M.format_grid.shadebox.update_shadebox();
+                };
+            }
         }
     }
     this.shadebox_content = Y.one("#gridshadebox_content");
@@ -131,7 +124,7 @@ M.format_grid.init = function(Y, the_editing_on, the_section_redirect, the_num_s
     }
     // Show the shadebox of a named anchor in the URL where it is expected to be of the form:
     // #section-X.
-    if ((window.location.hash) && (!the_editing_on)) {
+    if ((this.section_redirect === null) && (window.location.hash) && (!the_editing_on)) {
         var idx = parseInt(window.location.hash.substring(window.location.hash.indexOf("-") + 1));
         var min = 1;
         if (M.format_grid.shadebox_shown_array[0] == 2) { // Section 0 can be shown.

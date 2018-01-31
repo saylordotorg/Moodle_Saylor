@@ -1,7 +1,7 @@
 @qtype @qtype_algebra
-Feature: Preview a Short answer question
+Feature: Preview an Algebra question
   As a teacher
-  In order to check my Short answer questions will work for students
+  In order to check my Algebra questions will work for students
   I need to preview them
 
   Background:

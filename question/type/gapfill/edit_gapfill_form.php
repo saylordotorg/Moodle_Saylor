@@ -157,6 +157,10 @@ class qtype_gapfill_edit_form extends question_edit_form {
         $mform->setDefault('disableregex', $config->disableregex);
         $mform->setAdvanced('disableregex');
 
+         $mform->addElement('advcheckbox', 'letterhints', get_string('letterhints', 'qtype_gapfill'));
+         $mform->setDefault('letterhints', $config->letterhints);
+         $mform->addHelpButton('letterhints', 'letterhints', 'qtype_gapfill');
+
          /* Discards duplicates before processing answers, useful for tables with gaps like [cat|dog][cat|dog] */
         $mform->addElement('advcheckbox', 'noduplicates', get_string('noduplicates', 'qtype_gapfill'));
         $mform->addHelpButton('noduplicates', 'noduplicates', 'qtype_gapfill');
@@ -173,6 +177,10 @@ class qtype_gapfill_edit_form extends question_edit_form {
 
         // Adds hinting features.
         $this->add_interactive_settings(true, true);
+        if ($config->letterhints && $config->addhinttext) {
+            $this->_form->getElement('hint[0]')->setValue(array('text' => get_string('letterhint0', 'qtype_gapfill')));
+            $this->_form->getElement('hint[1]')->setValue(array('text' => get_string('letterhint1', 'qtype_gapfill')));
+        }
     }
 
     /**

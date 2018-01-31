@@ -26,6 +26,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
+require_once($CFG->dirroot . '/question/engine/tests/helpers.php');
+require_once($CFG->dirroot . '/question/type/algebra/tests/helper.php');
 require_once($CFG->dirroot . '/question/type/algebra/parser.php');
 
 
@@ -61,5 +63,9 @@ class qtype_algebra_parser_test extends advanced_testcase {
         $this->assertEquals('\sin \left( 4  x_{} \right) + \cos \left( 5  y_{} \right)', $expr->tex());
         $expr = $p->parse('sin(6*x) + cos(7*y)');
         $this->assertEquals('\sin \left( 6  x_{} \right) + \cos \left( 7  y_{} \right)', $expr->tex());
+        $expr = $p->parse('3x y');
+        $this->assertEquals('3  x_{} y_{}', $expr->tex());
+        $expr = $p->parse('x*y*3');
+        $this->assertEquals('x_{} y_{} \times 3 ', $expr->tex());
     }
 }

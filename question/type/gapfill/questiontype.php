@@ -41,7 +41,7 @@ class qtype_gapfill extends question_type {
      */
     public function extra_question_fields() {
         return array('question_gapfill', 'answerdisplay', 'delimitchars', 'casesensitive',
-            'noduplicates', 'disableregex', 'fixedgapsize', 'optionsaftertext');
+            'noduplicates', 'disableregex', 'fixedgapsize', 'optionsaftertext', 'letterhints');
     }
 
     /**
@@ -59,8 +59,8 @@ class qtype_gapfill extends question_type {
     /**
      * Called during question editing
      *
-     * @global type moodle_database $DB
-     * @param type $question
+     * @global moodle_database $DB
+     * @param stdClass $question
      */
     public function get_question_options($question) {
         global $DB;
@@ -74,9 +74,8 @@ class qtype_gapfill extends question_type {
      * called when previewing or at runtime in a quiz
      *
      * @param question_definition $question
-     * @param type $questiondata
-     * @param type $forceplaintextanswers
-     * @return type
+     * @param stdClass $questiondata
+     * @param boolean $forceplaintextanswers
      */
     protected function initialise_question_answers(question_definition $question, $questiondata, $forceplaintextanswers = true) {
         $question->answers = array();
@@ -112,7 +111,7 @@ class qtype_gapfill extends question_type {
      * Get settings e.g. feedback for correct and incorrect responses
      *
      * @global moodle_database $DB
-     * @param qtype_gapfill_question object $question
+     * @param qtype_gapfill_question $question
      * @return string (json encoded string)
      */
     public function get_itemsettings($question) {
@@ -126,7 +125,7 @@ class qtype_gapfill extends question_type {
      *  (not from within the editing form)
      *
      * @param question_definition $question
-     * @param type $questiondata
+     * @param stdClass $questiondata
      */
     protected function initialise_question_instance(question_definition $question, $questiondata) {
         parent::initialise_question_instance($question, $questiondata);
@@ -202,8 +201,8 @@ class qtype_gapfill extends question_type {
     /**
      * it really does need to be static
      *
-     * @param type $delimitchars
-     * @param type $questiontext
+     * @param string $delimitchars
+     * @param string $questiontext
      * @return array
      */
     public static function get_gaps($delimitchars, $questiontext) {
@@ -221,9 +220,10 @@ class qtype_gapfill extends question_type {
 
     /**
      * Save the units and the answers associated with this question.
+     * @param stdClass $question
      * @return boolean to indicate success or failure.
      * @global moodle_database $DB;
-     */
+     **/
     public function save_question_options($question) {
         /* Save the extra data to your database tables from the
           $question object, which has all the post data from editquestion.html */
@@ -269,6 +269,7 @@ class qtype_gapfill extends question_type {
             $options->disableregex = '';
             $options->fixedgapsize = '';
             $options->optionsaftertext = '';
+            $options->letterhints = '';
             $options->id = $DB->insert_record('question_gapfill', $options);
         }
 
@@ -278,15 +279,16 @@ class qtype_gapfill extends question_type {
         $options->noduplicates = $question->noduplicates;
         $options->disableregex = $question->disableregex;
         $options->fixedgapsize = $question->fixedgapsize;
-        $options->optionsaftertext = $question->optionsaftertext;
+        $options->letterhints = $question->letterhints;
         $options = $this->save_combined_feedback_helper($options, $question, $context, true);
         $DB->update_record('question_gapfill', $options);
     }
 
     /**
+     * Write to the database during editing
      *
      * @global moodle_database $DB
-     * @param type $question
+     * @param stdClass $question
      * @param array $answerfields
      */
     public function update_question_answers($question, array $answerfields) {
@@ -328,8 +330,8 @@ class qtype_gapfill extends question_type {
      * form field
      *
      * @param array $answerwords
-     * @param type $question
-     * @return type array
+     * @param stdClass $question
+     * @return  array
      */
     public function get_answer_fields(array $answerwords, $question) {
         /* this code runs both on saving from a form and from importing and needs
@@ -382,7 +384,8 @@ class qtype_gapfill extends question_type {
      * settings for a gap may be added later
      *
      * @global moodle_database $DB
-     * @param array $formdata
+     * @param stdClass $question
+     * @param string $table
      */
     public function update_item_settings(stdClass $question, $table) {
         global $DB;
@@ -413,7 +416,7 @@ class qtype_gapfill extends question_type {
     /**
      * Called from within questiontypebase
      *
-     * @param  @param object $row with $row->hint, ->shownumcorrect and ->clearwrong set.
+     * @param  string $hint
      * @return question_hint_with_parts
      */
     protected function make_hint($hint) {
@@ -454,11 +457,12 @@ class qtype_gapfill extends question_type {
     }
 
     /**
+     * Create a question from reading in a file in Moodle xml format
      *
      * @param array $data
      * @param stdClass $question (might be an array)
      * @param qformat_xml $format
-     * @param type $extra
+     * @param stdClass $extra
      * @return boolean
      */
     public function import_from_xml($data, $question, qformat_xml $format, $extra = null) {
@@ -516,6 +520,8 @@ class qtype_gapfill extends question_type {
                 "</fixedgapsize>\n";
         $output .= '    <optionsaftertext>' . $question->options->optionsaftertext .
                 "</optionsaftertext>\n";
+        $output .= '    <letterhints>' . $question->options->letterhints .
+                "</letterhints>\n";
         foreach ($question->options->itemsettings as $set) {
             $output .= "      <gapsetting>\n";
             $output .= '        <question>' . $set->question . "</question>\n";

@@ -4,8 +4,9 @@ moodle-local_boostnavigation
 Changes
 -------
 
-### Unreleased
+### v3.2-r17
 
+* 2017-01-15 - Bugfix: Some course section edge cases produced an incorrect ordering of the "Sections" course node.
 * 2017-12-15 - Add support for adding custom nodes to the nav drawer.
 * 2017-12-05 - Added Workaround to travis.yml for fixing Behat tests with TravisCI.
 

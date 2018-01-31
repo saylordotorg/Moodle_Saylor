@@ -107,20 +107,21 @@ class qtype_gapfill_renderer extends qtype_with_combined_feedback_renderer {
             $questiontext .= $question->format_text($fragment, $question->questiontextformat,
                    $qa, 'question', 'questiontext', $question->id);
         }
-        if ($question->optionsaftertext == true) {
-            /* this is to communicate with the mobile app */
-            $questiontext .= "<div id='gapfill_optionsaftertext'></div></div>";
-        }
+
         $output .= "<br/>";
-        if ($question->optionsaftertext == true) {
-            $output .= $questiontext . $answeroptions;
-        } else {
-            if ($question->answerdisplay == 'gapfill' || $question->answerdisplay == 'dropdown') {
-                $output .= $answeroptions . $questiontext;
+        if ($question->answerdisplay == 'dragdrop') {
+            if ($question->optionsaftertext == true) {
+                /* this is to communicate with the mobile app */
+                $questiontext .= "<div id='gapfill_optionsaftertext'></div></div>";
+                $output .= $questiontext . $answeroptions;
             } else {
                 $output .= $answeroptions . '</div>' . $questiontext;
             }
+        } else {
+            /*for gapfill and dropdown rendering */
+            $output .= $questiontext;
         }
+
         if ($qa->get_state() == question_state::$invalid) {
             $output .= html_writer::nonempty_tag('div', $question->get_validation_error(array('answer'
                                 => $output)), array('class' => 'validationerror'));
@@ -216,10 +217,16 @@ class qtype_gapfill_renderer extends qtype_with_combined_feedback_renderer {
         } else if ($question->answerdisplay == "gapfill") {
             /* it is a typetext (gapfill) question */
             $inputattributes['class'] = 'typetext ' . $inputclass;
+            if ($question->letterhints) {
+                $inputattributes = $question->get_letter_hints($qa, $inputattributes, $rightanswer, $currentanswer);
+            }
             return html_writer::empty_tag('input', $inputattributes) . $aftergaptext;
         } else {
             /* it is a drag/drop quesiton type */
             $inputattributes['class'] = 'droptarget ' . $inputclass;
+            if ($question->letterhints) {
+                $inputattributes = $question->get_letter_hints($qa, $inputattributes, $rightanswer, $currentanswer);
+            }
             return html_writer::empty_tag('input', $inputattributes) . $aftergaptext;
         }
     }

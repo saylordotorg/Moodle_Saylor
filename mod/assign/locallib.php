@@ -1130,11 +1130,11 @@ class assign {
                 // Remove all grades from gradebook.
                 require_once($CFG->dirroot.'/mod/assign/lib.php');
                 assign_reset_gradebook($data->courseid);
+            }
 
-                // Reset revealidentities if both submissions and grades have been reset.
-                if ($this->get_instance()->blindmarking && $this->get_instance()->revealidentities) {
-                    $DB->set_field('assign', 'revealidentities', 0, array('id' => $this->get_instance()->id));
-                }
+            // Reset revealidentities for assign if blindmarking is enabled.
+            if ($this->get_instance()->blindmarking) {
+                $DB->set_field('assign', 'revealidentities', 0, array('id' => $this->get_instance()->id));
             }
         }
 
@@ -7632,7 +7632,7 @@ class assign {
             return false;
         }
         $submission->status = ASSIGN_SUBMISSION_STATUS_DRAFT;
-        $this->update_submission($submission, $userid, true, $this->get_instance()->teamsubmission);
+        $this->update_submission($submission, $userid, false, $this->get_instance()->teamsubmission);
 
         // Give each submission plugin a chance to process the reverting to draft.
         $plugins = $this->get_submission_plugins();

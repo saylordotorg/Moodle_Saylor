@@ -47,4 +47,11 @@ if ($ADMIN->fulltree) {
             array('old' => new lang_string('dollars', 'qtype_algebra'),
                   'new' => new lang_string('brackets', 'qtype_algebra')
             )));
+    // TeX operator for multiplication.
+    $settings->add(new admin_setting_configselect('qtype_algebra/multiplyoperator',
+            new lang_string('multiplyoperator', 'qtype_algebra'),
+            '', 'times',
+            array('times' => new lang_string('times', 'qtype_algebra'),
+                  'cdot' => new lang_string('cdot', 'qtype_algebra')
+            )));
 }

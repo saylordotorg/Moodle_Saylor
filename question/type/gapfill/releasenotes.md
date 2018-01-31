@@ -1,7 +1,18 @@
+### Version 1.97 of the Moodle Gapfill question type Feb 2018
+Letter hints, new feature which only works when Interactive with multiple tries behaviour is used. A new checkbox in the question 
+creation form toggles letterhints mode. This takes effect when an interactive question behaviour is selected. There is a global
+checkbox setting for letterhints. If this is on, when a new question is created hints will be inserted into the first and second 
+boxes under multiple tries block. If it is toggled on with an existing question the hints will have to be added by hand in the 
+multiple tries section. Then when a student gives an incorrect response they will be given incrementing letters from the correct
+ answer when they press try again. Thanks to Elton LaClare for the idea for this and to his employer Sojo University Japan 
+ http://www.sojo-u.ac.jp/en for funding.
+
+Bug fix that broke the display of the quiz menu when optionsaftertext was selected but gapfill mode was selected. Thanks to 
+Lizardo Flores for reporting this.
+
 ### Version 1.961 of the Moodle Gapfill question type Dec 2017
 Mainly a bugfix where MS SQL server installations would not create the gapfill settings table.
 My thanks to marisol castro for reporting this. Improvements to phpdoc comments
-
 
 ### Version 1.96 of the Moodle Gapfill question type Oct 2017
 Per gap feedback. This is a significant new feature and allows the creation of feedback that is

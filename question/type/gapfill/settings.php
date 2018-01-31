@@ -45,6 +45,12 @@ if (is_siteadmin()) {
     $settingspage->add(new admin_setting_configcheckbox('qtype_gapfill/optionsaftertext',
         get_string('optionsaftertext', 'qtype_gapfill'),
         get_string('optionsaftertext_text', 'qtype_gapfill') , 0));
+    $settingspage->add(new admin_setting_configcheckbox('qtype_gapfill/letterhints',
+        get_string('letterhints', 'qtype_gapfill'),
+        get_string('letterhints_text', 'qtype_gapfill') , 0));
+    $settingspage->add(new admin_setting_configcheckbox('qtype_gapfill/addhinttext',
+        get_string('addhinttext', 'qtype_gapfill'),
+        get_string('addhinttext_text', 'qtype_gapfill') , 0));
     $settingspage->add(new admin_setting_configtextarea('qtype_gapfill/delimitchars',
          get_string('delimitset', 'qtype_gapfill'),
          get_string('delimitset_text', 'qtype_gapfill'),
