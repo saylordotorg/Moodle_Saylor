@@ -241,6 +241,12 @@ def plugins = [
         "url" : 'https://github.com/marcusgreen/moodle-qtype_gapfill',
         "branch" : 'master',
         "dest" : 'question/type/gapfill'
+    ],
+    [
+        "name" : 'mod_h5p',
+        "url" : 'https://github.com/h5p/h5p-moodle-plugin',
+        "branch" : 'master',
+        "dest" : 'mod/h5p'
     ]
 ]
 
