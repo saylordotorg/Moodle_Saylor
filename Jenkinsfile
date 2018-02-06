@@ -243,10 +243,10 @@ def plugins = [
         "dest" : 'question/type/gapfill'
     ],
     [
-        "name" : 'mod_h5p',
+        "name" : 'mod_hvp',
         "url" : 'https://github.com/h5p/h5p-moodle-plugin',
         "branch" : 'master',
-        "dest" : 'mod/h5p'
+        "dest" : 'mod/hvp'
     ]
 ]
 
