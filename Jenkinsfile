@@ -269,7 +269,7 @@ def StashPlugins(plugins) {
         node {
             deleteDir()
             try {
-                sh "git clone --recurse-submodules -b ${plugins[x].get('branch')} ${plugins[x].get('url')}"
+                git([url: (plugins[x].get("url")), branch: (plugins[x].get("branch"))])
             }
             catch(err) {
                 def failmessage = "Unable to retrieve plugin ${plugins[x].get('name')}: ${err}"
