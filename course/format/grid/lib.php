@@ -57,7 +57,7 @@ class format_grid extends format_base {
     private static $sectiontitlefontsizes = array(0 => '0', 12 => '12', 13 => '13', 14 => '14', 15 => '15', 16 => '16',
        17 => '17', 18 => '18', 19 => '19', 20 => '20', 21 => '21', 22 => '22', 23 => '23', 24 => '24');
     private $settings;
-    private $section0attop; // Boolean to state if section zero is at the top (true) or in the grid (false).
+    private $section0attop = null; // Boolean to state if section zero is at the top (true) or in the grid (false), if null then uninitialized.
 
     /**
      * Creates a new instance of class
@@ -74,8 +74,6 @@ class format_grid extends format_base {
             $courseid = $COURSE->id;  // Save lots of global $COURSE as we will never be the site course.
         }
         parent::__construct($format, $courseid);
-
-        $this->section0attop = $this->get_summary_visibility($courseid)->showsummary == 1;
     }
 
     /**
@@ -85,6 +83,9 @@ class format_grid extends format_base {
      * @return string The default value for the section name.
      */
     public function is_section0_attop() {
+        if (is_null($this->section0attop)) {
+            $this->section0attop = $this->get_summary_visibility($this->courseid)->showsummary == 1;
+        }
         return $this->section0attop;
     }
 
@@ -480,9 +481,9 @@ class format_grid extends format_base {
             }
             if ($sectionno != 0 && $usercoursedisplay == COURSE_DISPLAY_MULTIPAGE) {
                 $url->param('section', $sectionno);
-            } else if ($sectionno == 0 && $usercoursedisplay == COURSE_DISPLAY_MULTIPAGE && (!$this->section0attop)) {
+            } else if ($sectionno == 0 && $usercoursedisplay == COURSE_DISPLAY_MULTIPAGE && (!$this->is_section0_attop())) {
                 $url->param('section', $sectionno);
-            } else if ($sectionno == 0 && $usercoursedisplay == COURSE_DISPLAY_MULTIPAGE && $this->section0attop &&
+            } else if ($sectionno == 0 && $usercoursedisplay == COURSE_DISPLAY_MULTIPAGE && $this->is_section0_attop() &&
                    ($this->get_settings()['setsection0ownpagenogridonesection'] == 2)) {
                 $url->param('section', $sectionno);
             } else {

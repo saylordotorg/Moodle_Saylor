@@ -29,9 +29,9 @@ require_once($CFG->libdir . '/formslib.php');
 $settings = null;
 
 if (is_siteadmin()) {
-    $ADMIN->add('qtypesettings', new admin_category('qtype_gapfill_category', 'Gapfill'));
+    $ADMIN->add('qtypesettings', new admin_category('qtype_gapfill_category', get_string('pluginname', 'qtype_gapfill')));
     $conf = get_config('qtype_gapfill');
-    $settingspage = new admin_settingpage('gfsettings' , 'Settings');
+    $settingspage = new admin_settingpage('gfsettings' , get_string('settings'));
     $ADMIN->add('qtype_gapfill_category', $settingspage);
      $settingspage->add(new admin_setting_configcheckbox('qtype_gapfill/disableregex',
         get_string('disableregex', 'qtype_gapfill'),
@@ -45,6 +45,12 @@ if (is_siteadmin()) {
     $settingspage->add(new admin_setting_configcheckbox('qtype_gapfill/optionsaftertext',
         get_string('optionsaftertext', 'qtype_gapfill'),
         get_string('optionsaftertext_text', 'qtype_gapfill') , 0));
+    $settingspage->add(new admin_setting_configcheckbox('qtype_gapfill/letterhints',
+        get_string('letterhints', 'qtype_gapfill'),
+        get_string('letterhints_text', 'qtype_gapfill') , 0));
+    $settingspage->add(new admin_setting_configcheckbox('qtype_gapfill/addhinttext',
+        get_string('addhinttext', 'qtype_gapfill'),
+        get_string('addhinttext_text', 'qtype_gapfill') , 0));
     $settingspage->add(new admin_setting_configtextarea('qtype_gapfill/delimitchars',
          get_string('delimitset', 'qtype_gapfill'),
          get_string('delimitset_text', 'qtype_gapfill'),

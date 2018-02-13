@@ -26,13 +26,16 @@
  * the mathJax filter to be present.
  */
 
+
 require_once('../../../config.php');
 require_once("$CFG->dirroot/question/type/algebra/parser.php");
-global $PAGE, $CFG;
 
+global $PAGE, $CFG;
 require_login();
 
 $p = new qtype_algebra_parser;
+$validanswer = true;
+
 try {
     $query = urldecode($_SERVER['QUERY_STRING']);
     $m = array();
@@ -45,19 +48,35 @@ try {
         $texexp = '';
     } else {
         $exp = $p->parse($m[2], $vars);
-        if ($CFG->qtype_algebra_texdelimiters == 'old') {
-            $texexp = '$$'.$exp->tex().'$$';
-        } else {
-            $texexp = '\['.$exp->tex().'\]';
+        $texexp = $exp->tex();
+        switch($CFG->qtype_algebra_texdelimiters) {
+            case 'old':
+                $texexp = '$$' . $texexp . '$$';
+                break;
+            case 'new':
+                $texexp = '\\[' . $texexp . '\\]';
+                break;
+            case 'simple';
+                $texexp = '$' . $texexp . '$';
+                break;
+            case 'inline':
+                $texexp = '\\(' . $texexp . '\\)';
+                break;
         }
+
     }
 } catch (Exception $e) {
+    $validanswer = false;
     $texexp = get_string('parseerror', 'qtype_algebra', $e->getMessage());
 }
 $formatoptions = new stdClass;
 $formatoptions->para = false;
 $PAGE->set_context(context_system::instance());
-$text   = format_text($texexp, FORMAT_MOODLE, $formatoptions);
+if ($validanswer) {
+    $text = format_text($texexp, FORMAT_MOODLE, $formatoptions);
+} else {
+    $text = get_string('invalidanswer', 'qtype_algebra');
+}
 ?>
 <html>
     <head>

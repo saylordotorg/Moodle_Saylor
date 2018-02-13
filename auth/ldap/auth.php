@@ -1183,7 +1183,9 @@ class auth_plugin_ldap extends auth_plugin_base {
      *
      */
     function user_update($olduser, $newuser) {
-        global $USER;
+        global $CFG;
+
+        require_once($CFG->dirroot . '/user/profile/lib.php');
 
         if (isset($olduser->username) and isset($newuser->username) and $olduser->username != $newuser->username) {
             error_log($this->errorlogtag.get_string('renamingnotallowed', 'auth_ldap'));
@@ -1724,7 +1726,7 @@ class auth_plugin_ldap extends auth_plugin_base {
                     $sesskey = sesskey();
                     redirect($CFG->wwwroot.'/auth/ldap/ntlmsso_magic.php?sesskey='.$sesskey);
                 } else if ($this->config->ntlmsso_ie_fastpath == AUTH_NTLM_FASTPATH_YESFORM) {
-                    redirect($CFG-wwwroot.'/login/index.php?authldap_skipntlmsso=1');
+                    redirect($CFG->wwwroot.'/login/index.php?authldap_skipntlmsso=1');
                 }
             }
             redirect($CFG->wwwroot.'/auth/ldap/ntlmsso_attempt.php');

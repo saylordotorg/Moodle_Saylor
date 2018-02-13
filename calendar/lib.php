@@ -794,9 +794,6 @@ class calendar_event {
                     \coursecat::get($properties->categoryid, MUST_EXIST, true);
                     // Course context.
                     $this->editorcontext = $this->properties->context;
-                    // We have a course and are within the course context so we had
-                    // better use the courses max bytes value.
-                    $this->editoroptions['maxbytes'] = $course->maxbytes;
                 } else {
                     // If we get here we have a custom event type as used by some
                     // modules. In this case the event will have been added by
@@ -1803,6 +1800,13 @@ function calendar_time_representation($time) {
     $timeformat = get_user_preferences('calendar_timeformat');
     if (empty($timeformat)) {
         $timeformat = get_config(null, 'calendar_site_timeformat');
+    }
+
+    // Allow language customization of selected time format.
+    if ($timeformat === CALENDAR_TF_12) {
+        $timeformat = get_string('strftimetime12', 'langconfig');
+    } else if ($timeformat === CALENDAR_TF_24) {
+        $timeformat = get_string('strftimetime24', 'langconfig');
     }
 
     return userdate($time, empty($timeformat) ? $langtimeformat : $timeformat);
