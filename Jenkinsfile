@@ -269,21 +269,14 @@ def StashPlugins(plugins) {
         node {
             deleteDir()
             try {
-                sh "git clone --recurse-submodules -b ${plugins[x].get('branch')} ${plugins[x].get('url')} ${plugins[x].get('name')}"
+                sh "git clone --recurse-submodules -b ${plugins[x].get('branch')} ${plugins[x].get('url')}"
             }
             catch(err) {
                 def failmessage = "Unable to retrieve plugin ${plugins[x].get('name')}: ${err}"
                 NotifyOnFail(failmessage)
             }
             echo("Stashing: ${plugins[x].get("name")}")
-            try {
-                stash([includes: "${plugins[x].get('name')}/*", name: (plugins[x].get("name"))])
-            }
-            catch(err) {
-                def failmessage = "Unable to stash plugin ${plugins[x].get('name')}: ${err}"
-                NotifyOnFail(failmessage)
-            }
-            
+            stash([name: (plugins[x].get("name"))])
         }
     }
 }
