@@ -1,0 +1,403 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"resource",
+				"resource_dir"
+			],
+			[
+				"boundl",
+				"boundless_resources"
+			],
+			[
+				"acc",
+				"accredible_certificate_records"
+			],
+			[
+				"www",
+				"www-data"
+			],
+			[
+				"glusterfs",
+				"glusterfs-client"
+			],
+			[
+				"call",
+				"call_api_lists"
+			],
+			[
+				"mysql",
+				"mysql_ext_emailfield"
+			],
+			[
+				"mysql_ext",
+				"mysql_ext_table"
+			],
+			[
+				"mysq",
+				"mysql_ext_passwordfield"
+			],
+			[
+				"aff",
+				"affiliation"
+			],
+			[
+				"affi",
+				"affiliations_"
+			],
+			[
+				"code",
+				"code_empstatus"
+			],
+			[
+				"code_",
+				"code_joinreason"
+			],
+			[
+				"conver",
+				"convert_country2code"
+			],
+			[
+				"list",
+				"listusers"
+			],
+			[
+				"membe",
+				"memberlist"
+			],
+			[
+				"mem",
+				"members"
+			],
+			[
+				"henry",
+				"henry__dir"
+			],
+			[
+				"do",
+				"do"
+			]
+		]
+	},
+	"buffers":
+	[
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 87.0,
+		"last_filter": "install",
+		"selected_items":
+		[
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"pa",
+				"Preferences: Browse Packages"
+			],
+			[
+				"pack",
+				"Preferences: Browse Packages"
+			],
+			[
+				"package",
+				"Preferences: Browse Packages"
+			],
+			[
+				"markdown",
+				"Set Syntax: Markdown"
+			],
+			[
+				"Package Control: install",
+				"Package Control: Install Package"
+			],
+			[
+				"Package Control:instal",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 449.0
+	},
+	"console":
+	{
+		"height": 126.0,
+		"history":
+		[
+			"import urllib.request,os,hashlib; h = 'df21e130d211cfc94d9b0905775a7c0f' + '1e3d39e33b79698005270310898eea76'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)",
+			"import urllib.request,os,hashlib; h = '2deb499853c4371624f5a07e27c334aa' + 'bf8c4e67d14fb0525ba4f89698a6d7e1'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)",
+			" import urllib.request,os,hashlib; h = '2deb499853c4371624f5a07e27c334aa' + 'bf8c4e67d14fb0525ba4f89698a6d7e1'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/Users/jazinheira/Documents/moodle-local_affiliations"
+	],
+	"file_history":
+	[
+		"/Users/jazinheira/Desktop/www_resources/WWW_resources_pipe_separated.csv",
+		"/Users/jazinheira/Desktop/www_resources/www_resources_url_list.txt",
+		"/Users/jazinheira/Documents/moodle/mod/quiz/view.php",
+		"/Users/jazinheira/Documents/moodle-local_affiliations/lib.php",
+		"/Users/jazinheira/Documents/moodle-local_affiliations/lang/en/local_affiliations.php",
+		"/Users/jazinheira/Documents/moodle-local_affiliations/settings.php",
+		"/Users/jazinheira/Documents/moodle-local_affiliations/version.php",
+		"/Users/jazinheira/Documents/moodle/login/index.php",
+		"/Users/jazinheira/Documents/moodle/login/signup.php",
+		"/Users/jazinheira/Documents/moodle/login/lib.php",
+		"/Users/jazinheira/Documents/moodle/auth/oauth2/classes/output/renderer.php",
+		"/Users/jazinheira/Documents/moodle/auth/oauth2/login.php",
+		"/Users/jazinheira/Documents/moodle/auth/index.html",
+		"/Users/jazinheira/Documents/moodle-theme_saylor/layout/columns1.php",
+		"/Users/jazinheira/Documents/moodle-theme_saylor/config.php",
+		"/Users/jazinheira/Documents/moodle-theme_saylor/settings.php",
+		"/Users/jazinheira/Documents/moodle-theme_saylor/layout/columns2.php",
+		"/Users/jazinheira/Documents/moodle/question/classes/statistics/responses/analysis_for_class.php",
+		"/Users/jazinheira/Documents/moodle-theme_saylor/templates/saylor_footer.mustache",
+		"/Users/jazinheira/Documents/moodle-local_discoursesso/version.php",
+		"/Users/jazinheira/Documents/moodle/lib/accesslib.php",
+		"/Users/jazinheira/Documents/moodle-mod_accredible/mod_form.php",
+		"/Users/jazinheira/Documents/ansible-aws-playbooks/roles/jenkins/tasks/main.yml",
+		"/Users/jazinheira/Documents/moodle-theme_saylor/templates/saylor_header.mustache",
+		"/Users/jazinheira/Documents/ansible-aws-playbooks/roles/moodle_web_prod/templates/moodle_dirroot_config.php",
+		"/Users/jazinheira/Desktop/boundless_urls/download_resources.sh",
+		"/Users/jazinheira/Desktop/boundless_urls",
+		"/Users/jazinheira/Documents/moodle-block_sayloroverview/templates/courses-view.mustache",
+		"/Users/jazinheira/Documents/Moodle_Saylor/Jenkinsfile",
+		"/var/folders/gx/jt1_xcld0l1fk2sybww6p7w40000gp/T/tmpDLQ5tJ",
+		"/var/folders/gx/jt1_xcld0l1fk2sybww6p7w40000gp/T/tmpBMzYeQ",
+		"/Users/jazinheira/Documents/moodle-block_sayloroverview/classes/output/courses_view.php",
+		"/Users/jazinheira/Documents/moodle-block_sayloroverview/block_sayloroverview.php",
+		"/Users/jazinheira/Documents/moodle-block_sayloroverview/lib.php",
+		"/Users/jazinheira/Documents/moodle-block_sayloroverview/version.php",
+		"/Users/jazinheira/Documents/moodle-block_sayloroverview/lang/en/block_sayloroverview.php",
+		"/Users/jazinheira/Documents/moodle-block_sayloroverview/templates/event-list-group.mustache",
+		"/Users/jazinheira/Documents/moodle-block_sayloroverview/templates/event-list-item.mustache",
+		"/Users/jazinheira/Documents/moodle-block_sayloroverview/templates/event-list-items.mustache",
+		"/Users/jazinheira/Documents/moodle-block_sayloroverview/templates/event-list.mustache",
+		"/Users/jazinheira/Documents/moodle-block_sayloroverview/templates/paging-bar.mustache",
+		"/Users/jazinheira/Documents/moodle-block_sayloroverview/templates/paging-content-item.mustache",
+		"/Users/jazinheira/Documents/moodle-block_sayloroverview/templates/paging-content.mustache",
+		"/Users/jazinheira/Documents/moodle-block_sayloroverview/templates/progress-chart.mustache",
+		"/Users/jazinheira/Documents/moodle-block_sayloroverview/templates/timeline-view-courses.mustache",
+		"/Users/jazinheira/Documents/moodle-block_sayloroverview/templates/timeline-view-dates.mustache",
+		"/Users/jazinheira/Documents/moodle-block_sayloroverview/templates/timeline-view.mustache",
+		"/Users/jazinheira/Documents/moodle-block_sayloroverview/amd/src/tab_preferences.js",
+		"/Users/jazinheira/Documents/moodle-block_sayloroverview/amd/src/event_list.js",
+		"/Users/jazinheira/Documents/moodle-block_sayloroverview/amd/src/event_list_by_course.js",
+		"/Users/jazinheira/Documents/moodle-block_sayloroverview/amd/src/paging_bar.js",
+		"/Users/jazinheira/Documents/moodle-block_sayloroverview/amd/build/event_list.min.js",
+		"/Users/jazinheira/Documents/moodle-block_sayloroverview/amd/build/tab_preferences.min.js",
+		"/Users/jazinheira/Documents/moodle-block_sayloroverview/amd/src/paging_content.js",
+		"/Users/jazinheira/Documents/moodle-block_sayloroverview/amd/build/event_list_by_course.min.js",
+		"/Users/jazinheira/Documents/moodle-block_sayloroverview/amd/build/paging_bar.min.js",
+		"/Users/jazinheira/Documents/moodle-block_sayloroverview/amd/build/paging_content.min.js",
+		"/Users/jazinheira/Documents/moodle-block_sayloroverview/amd/src/calendar_events_repository.js",
+		"/Users/jazinheira/Documents/moodle-block_sayloroverview/templates/main.mustache",
+		"/Users/jazinheira/Documents/moodle-block_sayloroverview/templates/paging-bar-item.mustache",
+		"/Users/jazinheira/Documents/moodle-block_sayloroverview/templates/course-event-list-item.mustache",
+		"/Users/jazinheira/Documents/moodle-block_sayloroverview/templates/course-event-list-items.mustache",
+		"/Users/jazinheira/Documents/moodle-block_sayloroverview/templates/course-event-list.mustache",
+		"/Users/jazinheira/Documents/moodle-block_sayloroverview/templates/course-item.mustache",
+		"/Users/jazinheira/Documents/moodle-block_sayloroverview/templates/course-paging-content-item.mustache",
+		"/Users/jazinheira/Documents/moodle-block_sayloroverview/templates/course-paging-content.mustache",
+		"/Users/jazinheira/Documents/moodle-block_sayloroverview/templates/course-summary.mustache",
+		"/Users/jazinheira/Documents/moodle-block_sayloroverview/templates/courses-view-by-status.mustache",
+		"/Users/jazinheira/Documents/moodle-block_sayloroverview/templates/courses-view-course-item.mustache",
+		"/Users/jazinheira/Documents/moodle-block_sayloroverview/settings.php",
+		"/Users/jazinheira/Documents/moodle-block_sayloroverview/classes/output/main.php",
+		"/Users/jazinheira/Documents/moodle-block_sayloroverview/tests/behat/block_sayloroverview_dashboard.feature",
+		"/Users/jazinheira/Documents/moodle-block_sayloroverview/classes/output/renderer.php",
+		"/Users/jazinheira/Documents/moodle-block_sayloroverview/tests/behat/block_sayloroverview_progress.feature",
+		"/Users/jazinheira/Documents/moodle-block_sayloroverview/db/access.php",
+		"/Users/jazinheira/Documents/moodle-block_sayloroverview/tests/behat/block_myoverview_dashboard.feature",
+		"/Users/jazinheira/Documents/moodle-block_sayloroverview/block_myoverview.php",
+		"/Users/jazinheira/Documents/moodle-block_sayloroverview/lang/en/block_myoverview.php",
+		"/Users/jazinheira/Documents/moodle-theme_saylor/layout/frontpage.php",
+		"/Users/jazinheira/Documents/moodle-theme_saylor/layout/columns3.php",
+		"/Users/jazinheira/Documents/moodle-theme_saylor/layout/course.php",
+		"/Users/jazinheira/Documents/moodle-theme_saylor/renderers.php",
+		"/Users/jazinheira/Documents/moodle-theme_saylor/layout/incourse.php",
+		"/Users/jazinheira/Documents/moodle/lib/outputrenderers.php",
+		"/Users/jazinheira/Documents/moodle-theme_saylor/style/custom.css",
+		"/Users/jazinheira/Documents/saylor-moodlebox/install-moodle.sh",
+		"/Users/jazinheira/Documents/saylor-moodlebox/moodle_config.php",
+		"/Users/jazinheira/Documents/saylor-moodlebox/Vagrantfile",
+		"/Users/jazinheira/Documents/ansible-aws-playbooks/roles/moodle_web_prod/vars/main.yml",
+		"/Users/jazinheira/Documents/ansible-aws-playbooks/roles/moodle_web_prod/tasks/main.yml",
+		"/Users/jazinheira/Documents/ansible-aws-playbooks/roles/php7.0/tasks/main.yml",
+		"/Users/jazinheira/Documents/ansible-aws-playbooks/roles/phpredis/tasks/main.yml",
+		"/Users/jazinheira/Documents/ansible-aws-playbooks/roles/gluster_server_prod/tasks/main.yml",
+		"/Users/jazinheira/Documents/ansible-aws-playbooks/roles/gluster_server_dev/tasks/main.yml",
+		"/Users/jazinheira/Documents/moodle/cache/classes/config.php",
+		"/Users/jazinheira/Documents/moodle-search_elasticsearch/settings.php",
+		"/Users/jazinheira/Documents/moodle-local_discoursesso/settings.php",
+		"/Users/jazinheira/Documents/moodle-mod_accredible/index.php",
+		"/Users/jazinheira/Documents/moodle-mod_accredible/settings.php",
+		"/Users/jazinheira/Documents/moodle-local_discoursesso/lang/en/local_discoursesso.php",
+		"/Users/jazinheira/Documents/moodle-mod_accredible/lang/en/accredible.php",
+		"/Users/jazinheira/Documents/moodle-local_discoursesso/lang/en/local_wsfunc.php",
+		"/Users/jazinheira/Documents/moodle-mod_accredible/version.php",
+		"/Users/jazinheira/Documents/moodle-mod_accredible/locallib.php",
+		"/Users/jazinheira/Documents/moodle-mod_accredible/lib.php",
+		"/Users/jazinheira/Documents/moodle-mod_accredible/vendor/composer/installed.json",
+		"/Users/jazinheira/Documents/moodle-mod_accredible/vendor/autoload.php",
+		"/Users/jazinheira/Documents/moodle/auth/none/auth.php",
+		"/Users/jazinheira/Documents/moodle/auth/none/version.php",
+		"/Users/jazinheira/Documents/ansible-aws-playbooks/roles/discourse/tasks/main.yml",
+		"/Users/jazinheira/Documents/ansible-aws-playbooks/roles/discourse/vars/main.yml",
+		"/Users/jazinheira/Documents/ansible-aws-playbooks/roles/moodle_web_prod/tasks/moodledeploy.yml",
+		"/Users/jazinheira/Documents/ansible-aws-playbooks/roles/moodle_web_dev/tasks/main.yml",
+		"/Users/jazinheira/Documents/ansible-aws-playbooks/roles/gluster_server_dev/vars/main.yml",
+		"/Users/jazinheira/Documents/ansible-aws-playbooks/wordpress-sylr-org.yml",
+		"/Users/jazinheira/Downloads/moodle prod 02 error moodle_error.log",
+		"/Users/jazinheira/Library/Application Support/Sublime Text 3/Packages/User/Markdown (Standard).sublime-settings",
+		"/Users/jazinheira/Library/Application Support/Sublime Text 3/Packages/User/Markdown.sublime-settings",
+		"/Users/jazinheira/Library/Application Support/Sublime Text 3/Packages/MarkdownEditing/Markdown.sublime-settings",
+		"/Users/jazinheira/Dropbox/Writings/Colombia 1/Bogota_Arrival.txt",
+		"/Users/jazinheira/Documents/ansible-aws-playbooks/roles/controller/templates/etc_glusterfs_moodledata_prod_vol",
+		"/Users/jazinheira/Documents/ansible-aws-playbooks/moodle_web_dev.yml",
+		"/Users/jazinheira/Documents/ansible-aws-playbooks/roles/apache2/tasks/main.yml",
+		"/Users/jazinheira/Documents/ansible-aws-playbooks/roles/base/tasks/main.yml",
+		"/Users/jazinheira/Documents/ansible-aws-playbooks/roles/moodle_db_prod/tasks/main.yml",
+		"/Users/jazinheira/Documents/ansible-aws-playbooks/roles/moodle_web_dev/vars/main.yml",
+		"/Users/jazinheira/Documents/moodle-theme_saylor/lib.php",
+		"/Users/jazinheira/Documents/moodle-theme_saylor/style/course.css"
+	],
+	"find":
+	{
+		"height": 23.0
+	},
+	"find_in_files":
+	{
+		"height": 101.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": true,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"sheets":
+			[
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 23.0
+	},
+	"input":
+	{
+		"height": 31.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "",
+	"project": "moodle-local_affiliations.sublime-project",
+	"replace":
+	{
+		"height": 42.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 352.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}

@@ -1,51 +1,43 @@
-.display-table {
-	width:100%;
-	margin-top:20px;
+#page-grade-report-quizanalytics-index .display-table a:hover,
+#page-grade-report-quizanalytics-index .display-table a:focus {
+  text-decoration: none;
 }
-
-.display-table th, .display-table td {
-   border: 1px solid #ddd;
-   padding: 10px;
-   text-align: left;
-   font-size: 13px;
-}
-
-.display-table tr th {
-    background: #999;
-    color: #fff;
-}
-
-.display-table tr:nth-child(odd) td {
-    background: #f6f6f6;
-}
-
-#tabs .ui-widget-header, #tabs .ui-state-default, 
-#tabs .ui-widget-content .ui-state-default, 
-#tabs .ui-widget-header .ui-state-default {
-    border: 1px solid #999;
-    background: #999;
-    color: #fff;
-}
-
-#tabs .ui-state-active, #tabs .ui-widget-content .ui-state-active, #tabs .ui-widget-header .ui-state-active {
-    border: 1px solid #fff;
-    background: #fff;
-    color: #000;
-}
-#tabs .ui-state-default a, #tabs .ui-state-default a:link {
-	color: #fff;
-}
-
-#tabs .ui-state-active a, #tabs .ui-state-active a:link {
-	color: #000;
-}
-
-
 .showanalytics {
-	margin-top:20px;
+  margin-top:20px;
 }
-
-.navbar .popover-region-toggle, .jsenabled .moodle-actionmenu[data-enhance] .toggle-display.textmenu {
+.showanalytics .parentTabs p {
+  font-weight: normal;
+  margin: 20px 0 10px !important;
+}
+.showanalytics .tabbable {
+  border: 1px solid #c5c5c5;
+  border-radius: 3px;
+}
+.showanalytics .parentTabs .tab-content {
+  padding: 0px 15px 15px 15px;
+  position: relative;
+  text-align: center;
+}
+.showanalytics .tabbable ul.nav-tabs {
+  padding-left: 6px;
+  padding-top: 6px; 
+  border-bottom: 1px solid #dadada;
+}
+.showanalytics .nav>li>a:hover, .showanalytics .nav>li>a:focus {
+    background-color: transparent;
+    outline: none;
+}
+.showanalytics ul.nav-tabs li a {
+  border: 1px solid #CCCCCC !important;
+}
+.showanalytics ul.nav-tabs li.active a {
+    color: #333333 !important;
+    background: #EEEEEE !important;
+    border: 1px solid #8FA7BC !important;
+    border-bottom: none !important;
+}
+.navbar .popover-region-toggle,
+.jsenabled .moodle-actionmenu[data-enhance] .toggle-display.textmenu {
   display: inline !important;
 }
 .showanalytics, #dialogbox {
@@ -64,10 +56,10 @@
 .download-canvas {
     display: inline-block;
     background: #f8f8f8 url(images/downloadicon.png) center center no-repeat;
-    height: 35px;
-    background-size: 70% 70%;
+    height: 25px;
+    width: 25px;
+    background-size: 75% 75%;
     border: 4px solid #eee;
-    width: 35px;
     line-height: 30px;
     border-radius: 10px;
     margin-right: 5px;
@@ -78,88 +70,68 @@
 .shareBtn {
     display: inline-block;
     background: #f8f8f8 url(images/fbshare.jpg) center center no-repeat;
-    height: 35px;
+    height: 25px;
+    width: 60px;
     background-size: contain;
     border: 4px solid #eee;
-    width: 70px;
     line-height: 30px;
     border-radius: 10px;
     cursor: pointer;
 }
-.showanalytics .tabContent {
-  position: relative;
-}
 .downloadandshare {
   position: absolute;
-  top: 15px;
-  right: 15px;
+  top: 0px;
+  right: 20px;
   cursor: auto;
 }
-.subtabContent .downloadandshare {
-  top: 35px !important;
-  right: -5px !important; 
+#subtab23 .attemptssnapshot .span6 .downloadandshare {
+  right: 80px; 
 }
-.showanalytics .tabContent {
-  text-align: center;
+#subtab23 .attemptssnapshot .span6 {
+  position: relative;
+  padding-bottom: 20px !important;
 }
-.showanalytics .tabs p {
-  font-weight: normal;
-  margin: 20px 0 10px !important;
-}
-.showanalytics .tabs ul {
-  border: none;
-  background: none; 
-  border-bottom: 1px solid #dadada;
-}
-.showanalytics .tabs ul li a {
-  color: #2F5B83;
-}
-.showanalytics .tabs ul li a:focus {
-  outline: none;
-}
-.showanalytics .tabs ul li {
-  background: none;
-}
-.showanalytics .tabs ul li.ui-state-active {
-  border: 1px solid #8FA7BC !important;
-  border-bottom: none !important;
-  background: #EEEEEE !important;
-}
-.showanalytics .tabs ul li.ui-state-active a {
-  color: #333333 !important;
-}
-.chart-legend li span {
-display: inline-block;
-width: 12px;
-height: 12px;
-margin-right: 5px;
-position: absolute;
-left: 0;
-top: 2px;
+#subtab23 .attemptssnapshot .span6 label {
+  max-width: 300px;
 }
 .chart-legend ul {
-  width: 250px;
-  margin: 0 auto;
+  width: auto;
+  margin-left: 10%;
   display: inline-block;
   float: none;
   text-align: left;
   border-bottom: none !important; 
 }
+
 .chart-legend ul li {
-display: inline-block;
-vertical-align: top;
-line-height: 16px;
-position: relative;
-padding-left: 17px;
-margin: 3px 5px 8px 0;
-text-align: left;
-width: 48%;
+  display: inline-block;
+  vertical-align: top;
+  line-height: 16px;
+  position: relative;
+  padding-left: 17px;
+  margin: 3px 5px 8px 0;
+  text-align: left;
+  width: 38%;
 }
+
+.chart-legend li span {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-right: 5px;
+  position: absolute;
+  left: 0;
+  top: 2px;
+}
+
 .strike{
   text-decoration: line-through !important;
 }
-.attemptssnapshot .col-sm-6 {
-  margin-bottom: 20px;
+
+@media (min-width: 1600px) {
+  #subtab23 .attemptssnapshot .span6 label {
+    max-width: 400px;
+  }
 }
 @media (min-width: 1200px) {
   .row-fluid [class*="span"] {
@@ -167,15 +139,51 @@ width: 48%;
   }
 }
 
-@media (min-width: 768px) {
-  .attemptssnapshot .col-sm-6 {
+@media (min-width: 768px) { 
+  .attemptssnapshot .span6 {
     padding-bottom: 15px !important;
-  } 
+  }
   .showanalytics label {
     margin-top: 50px !important;
   }
-  .showanalytics .col-sm-6 label {
+  .showanalytics .span6 label {
     margin-top: 0px !important;
+  }
+}
+
+@media (max-width: 1280px) { 
+  #subtab23 .span6 .downloadandshare {
+    position: relative;
+    top: -10px !important;
+    right: 55px !important;
+  }
+}
+@media (max-width: 1152px) {
+  .showanalytics .nav-tabs>li>a {
+    padding-right: 3px;
+    padding-left: 3px;
+    margin-right: 2px;
+    font-size: 12px;
+  }
+  .chart-legend ul li {
+    font-size: 13px;
+  }
+  #subtab23 .span6 .downloadandshare {
+    right: 20px !important;
+  }
+}
+@media (max-width: 980px) {
+  .showanalytics .tabbable ul.nav-tabs li {
+    white-space: normal;
+    text-align: left;
+    width: 100%;
+  }
+  .showanalytics .tabbable ul.nav-tabs {
+    padding-right: 6px;
+  }
+  .showanalytics .nav-tabs>li>a {
+    padding-left: 10px;
+    font-size: 14px;
   }
 }
 @media (max-width: 768px) {
@@ -183,69 +191,29 @@ width: 48%;
     position: relative;
     top: 10px;
   }
-  .subtabContent .downloadandshare {
-    top: 10px !important;
-    right: 0px !important;
-  }
-  .showanalytics #subtab3 .col-sm-6 {
+  .showanalytics #subtab23 .span6 {
     padding-bottom: 20px;
   }
   .showanalytics label {
     margin-top: 15px !important;
   }
-  #subtab3 .col-sm-6 .downloadandshare {
-    top: -10px !important;
+  #subtab23 .attemptssnapshot .span6 label {
+    max-width: 60%;
+    padding-left: 20%;
   }
-  .ui-tabs .ui-tabs-nav li{
-    white-space: normal;
-    text-align: left;
+  .chart-legend ul {
+    margin-left: 20% !important;
   }
-}
-@media (max-width: 640px) {
-  .ui-tabs .ui-tabs-nav li{
-    width: 100%;
-  }
-}
-@media (min-width: 769px) and (max-width: 1280px) { 
-  .subtabContent .downloadandshare {
-    top: 57px !important;
-    right: 15px !important;
-  }
-  #tabs-3 .subtabContent .downloadandshare {
-    top: 92px !important;
-    right: 15px !important;
-  }
-  #subtab3 .col-sm-6 .downloadandshare {
-    position: relative;
-    top: -10px !important;
+  #subtab23 .attemptssnapshot .span6 .downloadandshare {
     right: 0px !important;
+    top: -10px !important;
   }
 }
-
-@media (max-width: 1200px) {
-  .chart-legend ul li {
-    width: 100% !important;
-    margin-left: 0px !important;
-  }
-}
-@media (min-width: 1281px) {
-  .subtabContent .downloadandshare {
-    top: 57px !important;
-    right: 15px !important;
-  }
-  #subtab3 .col-sm-6 .downloadandshare {
-    top: 0px !important;
-    right: 0 !important
-  }
-}
-@media screen and (max-width: 480px) {
-  .showanalytics .ui-tabs-panel{
-    padding: 1em 3px;
-  }
-  .canvas-wrap, .canvas-wrap ~ p{
+@media (max-width: 480px) {
+  .canvas-wrap, .canvas-wrap ~ p {
     width: 500px;
   }
-  .mobile_overflow{
+  .mobile_overflow {
     overflow: auto;
   } 
 }

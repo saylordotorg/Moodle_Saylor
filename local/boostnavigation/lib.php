@@ -68,33 +68,16 @@ function local_boostnavigation_extend_navigation(global_navigation $navigation) 
     // Check if admin wanted us to remove the privatefiles node from Boost's nav drawer.
     if (isset($config->removeprivatefilesnode) && $config->removeprivatefilesnode == true) {
         // If yes, do it.
-        // We have to support Moodle core 3.2 and 3.3 versions with MDL-58165 not yet integrated.
-        if (moodle_major_version() == '3.2' && $CFG->version < 2016120503.05 ||
-                moodle_major_version() == '3.3' && $CFG->version < 2017051500.02) {
-            if ($privatefilesnode = local_boostnavigation_find_privatefiles_node($navigation)) {
-                // Hide privatefiles node.
-                $privatefilesnode->showinflatnavigation = false;
-            }
-        } else {
-            if ($privatefilesnode = $navigation->find('privatefiles', global_navigation::TYPE_SETTING)) {
-                // Hide privatefiles node.
-                $privatefilesnode->showinflatnavigation = false;
-            }
+        if ($privatefilesnode = $navigation->find('privatefiles', global_navigation::TYPE_SETTING)) {
+            // Hide privatefiles node.
+            $privatefilesnode->showinflatnavigation = false;
         }
     }
 
-    // Next, we will need the mycourses node in any case and don't want to fetch it more than once.
-    $mycoursesnode = $navigation->find('mycourses', global_navigation::TYPE_ROOTNODE);
-
-    // Check if admin wanted us to remove the mycourses node from Boost's nav drawer.
-    // Or if admin wanted us to collapse the mycourses node.
-    // If one of these two settings is activated, we will need the mycourses node's children and don't want to fetch them more
+    // Next, we will need the mycourses node and the mycourses node children in any case and don't want to fetch them more
     // than once.
-    if (isset($config->removemycoursesnode) && $config->removemycoursesnode == true ||
-        isset($config->collapsemycoursesnode) && $config->collapsemycoursesnode == true) {
-        // Get the mycourses node children.
-        $mycourseschildrennodeskeys = $mycoursesnode->get_children_key_list();
-    }
+    $mycoursesnode = $navigation->find('mycourses', global_navigation::TYPE_ROOTNODE);
+    $mycourseschildrennodeskeys = $mycoursesnode->get_children_key_list();
 
     // Check if admin wanted us to remove the mycourses node from Boost's nav drawer.
     if (isset($config->removemycoursesnode) && $config->removemycoursesnode == true) {
@@ -139,17 +122,23 @@ function local_boostnavigation_extend_navigation(global_navigation $navigation) 
             // Note: We are somehow abusing the hidden node attribute here for our own purposes. In Boost core, it is
             // set to true for invisible courses, but these are currently displayed just as visible courses in the
             // nav drawer, so we accept this abuse.
+            // Additionally, for some crazy reason, the mycourses child nodes also have the isexpandable attribute set to true
+            // by default. We set this to false here as only the mycourses parent node should have isexpandable set to true.
             $userprefmycoursesnode = get_user_preferences('local_boostnavigation-collapse_mycoursesnode',
                     $config->collapsemycoursesnodedefault);
             if ($userprefmycoursesnode == 1) {
                 $mycoursesnode->collapse = true;
                 foreach ($mycourseschildrennodeskeys as $k) {
-                    $mycoursesnode->get($k)->hidden = true;
+                    $childnode = $mycoursesnode->get($k);
+                    $childnode->hidden = true;
+                    $childnode->isexpandable = false;
                 }
             } else {
                 $mycoursesnode->collapse = false;
                 foreach ($mycourseschildrennodeskeys as $k) {
-                    $mycoursesnode->get($k)->hidden = false;
+                    $childnode = $mycoursesnode->get($k);
+                    $childnode->hidden = false;
+                    $childnode->isexpandable = false;
                 }
             }
         }
@@ -157,8 +146,13 @@ function local_boostnavigation_extend_navigation(global_navigation $navigation) 
         // which ship with this plugin.
     } else {
         if ($mycoursesnode) {
-            // Change the isexpandable attribute for the mycourses node to false.
+            // Change the isexpandable attribute for the mycourses parent node to false.
             $mycoursesnode->isexpandable = false;
+            // Change the isexpandable attribute for the mycourses child node to false.
+            foreach ($mycourseschildrennodeskeys as $k) {
+                $childnode = $mycoursesnode->get($k);
+                $childnode->isexpandable = false;
+            }
         }
     }
 
@@ -197,18 +191,9 @@ function local_boostnavigation_extend_navigation(global_navigation $navigation) 
 
             // Only proceed if there are no competencies in course.
             if ($totalcompetencies == 0) {
-                // We have to support Moodle core 3.2 and 3.3 versions with MDL-59879 not yet integrated.
-                if (moodle_major_version() == '3.2' && $CFG->version < 2016120506 ||
-                        moodle_major_version() == '3.3' && $CFG->version < 2017051503) {
-                    if ($competenciesnode = local_boostnavigation_find_competencies_node($navigation)) {
-                        // Remove competencies node (Just hiding it with the showinflatnavigation attribute does not work here).
-                        $competenciesnode->remove();
-                    }
-                } else {
-                    if ($competenciesnode = $navigation->find('competencies', global_navigation::TYPE_SETTING)) {
-                        // Remove competencies node (Just hiding it with the showinflatnavigation attribute does not work here).
-                        $competenciesnode->remove();
-                    }
+                if ($competenciesnode = $navigation->find('competencies', global_navigation::TYPE_SETTING)) {
+                    // Remove competencies node (Just hiding it with the showinflatnavigation attribute does not work here).
+                    $competenciesnode->remove();
                 }
             }
         }
@@ -233,7 +218,8 @@ function local_boostnavigation_extend_navigation(global_navigation $navigation) 
     if (isset($config->insertcoursesectionscoursenode) && $config->insertcoursesectionscoursenode == true ||
             isset($config->insertactivitiescoursenode) && $config->insertactivitiescoursenode == true ||
             isset($config->insertresourcescoursenode) && $config->insertresourcescoursenode == true ||
-            isset($config->insertcustomcoursenodes) && $config->insertcustomcoursenodes == true) {
+            isset($config->insertcustomcoursenodesusers) && $config->insertcustomcoursenodesusers == true ||
+            isset($config->insertcustomcoursenodesadmins) && $config->insertcustomcoursenodesadmins == true) {
         // Fetch course home node.
         $coursehomenode = $PAGE->navigation->find($COURSE->id, navigation_node::TYPE_COURSE);
     }
@@ -381,8 +367,7 @@ function local_boostnavigation_extend_navigation(global_navigation $navigation) 
                         global_navigation::TYPE_ACTIVITY,
                         null,
                         'localboostnavigationresources',
-                        new pix_icon('icon', '', 'mod_page')); // Boost ignores a navigation node's icon currently,
-                                                               // but we set it for future-proofness.
+                        new pix_icon('resources', '', 'local_boostnavigation'));
                 // Add the activities node to the end of the course navigation.
                 $coursehomenode->add_node($resourcesnode);
 
@@ -427,8 +412,7 @@ function local_boostnavigation_extend_navigation(global_navigation $navigation) 
                                     global_navigation::TYPE_ACTIVITY,
                                     null,
                                     'localboostnavigationactivity'.$modname,
-                                    new pix_icon('icon', '', 'mod_page')); // Boost ignores a navigation node's icon currently,
-                                                                           // but we set it for future-proofness.
+                                    new pix_icon('resources', '', 'local_boostnavigation'));
                             // Add the activity course node to the coursehome node.
                             $coursehomenode->add_node($activitynode);
                             // Remember the activity course node's key for collapsing it later.
@@ -442,8 +426,7 @@ function local_boostnavigation_extend_navigation(global_navigation $navigation) 
                                 global_navigation::TYPE_ACTIVITY,
                                 null,
                                 'localboostnavigationactivity'.$modname,
-                                new pix_icon('icon', '', $modname)); // Boost ignores a navigation node's icon currently,
-                                                                     // but we set it for future-proofness.
+                                new pix_icon('activities', '', 'local_boostnavigation'));
                         // Add the activity course node to the coursehome node.
                         $coursehomenode->add_node($activitynode);
                         // Remember the activity course node's key for collapsing it later.
@@ -503,7 +486,11 @@ function local_boostnavigation_extend_navigation(global_navigation $navigation) 
         // Check if admin wanted us to also collapse the custom nodes for users.
         if ($config->collapsecustomnodesusers == true) {
             // Remember the collapsible node for JavaScript.
-            $collapsenodesforjs = array_merge($collapsenodesforjs, $customnodesret);
+            if (!empty($collapsenodesforjs) && is_array($collapsenodesforjs)) {
+                $collapsenodesforjs = array_merge($collapsenodesforjs, $customnodesret);
+            } else {
+                $collapsenodesforjs = $customnodesret;
+            }
         }
     }
 
@@ -517,7 +504,11 @@ function local_boostnavigation_extend_navigation(global_navigation $navigation) 
         // Check if admin wanted us to also collapse the custom nodes for admins.
         if ($config->collapsecustomnodesadmins == true) {
             // Remember the collapsible node for JavaScript.
-            $collapsenodesforjs = array_merge($collapsenodesforjs, $customnodesret);
+            if (!empty($collapsenodesforjs) && is_array($collapsenodesforjs)) {
+                $collapsenodesforjs = array_merge($collapsenodesforjs, $customnodesret);
+            } else {
+                $collapsenodesforjs = $customnodesret;
+            }
         }
     }
 
@@ -533,7 +524,11 @@ function local_boostnavigation_extend_navigation(global_navigation $navigation) 
             // Check if admin wanted us to also collapse the custom course nodes for users.
             if ($config->collapsecustomcoursenodesusers == true) {
                 // Remember the collapsible node for JavaScript.
-                $collapsenodesforjs = array_merge($collapsenodesforjs, $customnodesret);
+                if (!empty($collapsenodesforjs) && is_array($collapsenodesforjs)) {
+                    $collapsenodesforjs = array_merge($collapsenodesforjs, $customnodesret);
+                } else {
+                    $collapsenodesforjs = $customnodesret;
+                }
             }
         }
     }
@@ -550,7 +545,11 @@ function local_boostnavigation_extend_navigation(global_navigation $navigation) 
             // Check if admin wanted us to also collapse the custom course nodes for admins.
             if ($config->collapsecustomcoursenodesadmins == true) {
                 // Remember the collapsible node for JavaScript.
-                $collapsenodesforjs = array_merge($collapsenodesforjs, $customnodesret);
+                if (!empty($collapsenodesforjs) && is_array($collapsenodesforjs)) {
+                    $collapsenodesforjs = array_merge($collapsenodesforjs, $customnodesret);
+                } else {
+                    $collapsenodesforjs = $customnodesret;
+                }
             }
         }
     }
@@ -565,7 +564,11 @@ function local_boostnavigation_extend_navigation(global_navigation $navigation) 
         // Check if admin wanted us to also collapse the custom bottom nodes for users.
         if ($config->collapsecustombottomnodesusers == true) {
             // Remember the collapsible node for JavaScript.
-            $collapsenodesforjs = array_merge($collapsenodesforjs, $customnodesret);
+            if (!empty($collapsenodesforjs) && is_array($collapsenodesforjs)) {
+                $collapsenodesforjs = array_merge($collapsenodesforjs, $customnodesret);
+            } else {
+                $collapsenodesforjs = $customnodesret;
+            }
         }
     }
 
@@ -579,7 +582,11 @@ function local_boostnavigation_extend_navigation(global_navigation $navigation) 
         // Check if admin wanted us to also collapse the custom bottom nodes for admins.
         if ($config->collapsecustombottomnodesadmins == true) {
             // Remember the collapsible node for JavaScript.
-            $collapsenodesforjs = array_merge($collapsenodesforjs, $customnodesret);
+            if (is_array($collapsenodesforjs)) {
+                $collapsenodesforjs = array_merge($collapsenodesforjs, $customnodesret);
+            } else {
+                $collapsenodesforjs = $customnodesret;
+            }
         }
     }
 
@@ -601,7 +608,7 @@ function local_boostnavigation_extend_navigation(global_navigation $navigation) 
  * @param navigation_node $navigation
  */
 function local_boostnavigation_extend_navigation_course(navigation_node $navigation) {
-    global $PAGE;
+    global $PAGE, $COURSE;
 
     // Fetch config.
     $config = get_config('local_boostnavigation');
@@ -622,4 +629,15 @@ function local_boostnavigation_extend_navigation_course(navigation_node $navigat
             $navigation->add_node($competenciesnode);
         }
     }
+}
+
+/**
+ * Get icon mapping for font-awesome.
+ */
+function local_boostnavigation_get_fontawesome_icon_map() {
+    return [
+            'local_boostnavigation:customnode' => 'fa-square local-boostnavigation-fa-sm',
+            'local_boostnavigation:resources' => 'fa-archive',
+            'local_boostnavigation:activities' => 'fa-share-alt',
+    ];
 }

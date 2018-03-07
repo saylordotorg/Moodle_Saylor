@@ -291,7 +291,7 @@ function reengagement_crontask() {
             $activitycompletion->completionstate = COMPLETION_COMPLETE_PASS;
             $activitycompletion->timemodified = $timenow;
             $activitycompletion->userid = $userid;
-            $DB->insert_record('course_modules_completion', $activitycompletion);
+            $completionrecord = $DB->insert_record('course_modules_completion', $activitycompletion);
         } else {
             $updaterecord = new stdClass();
             $updaterecord->id = $completionrecord->id;
@@ -299,6 +299,22 @@ function reengagement_crontask() {
             $updaterecord->timemodified = $timenow;
             $DB->update_record('course_modules_completion', $updaterecord) . " \n";
         }
+        $completioncache = cache::make('core', 'completion');
+        $completioncache->delete($userid . '_' . $reengagement->courseid);
+
+        $cmcontext = context_module::instance($cmid, MUST_EXIST);
+        // Trigger an event for course module completion changed.
+        $event = \core\event\course_module_completion_updated::create(array(
+            'objectid' => $completionrecord->id,
+            'context' => $cmcontext,
+            'relateduserid' => $userid,
+            'other' => array(
+                'relateduserid' => $userid
+            )
+        ));
+        $event->add_record_snapshot('course_modules_completion', $completionrecord);
+        $event->trigger();
+
         $result = false;
         if (($reengagement->emailuser == REENGAGEMENT_EMAILUSER_COMPLETION) ||
                 ($reengagement->emailuser == REENGAGEMENT_EMAILUSER_NEVER) ||
@@ -469,12 +485,13 @@ function reengagement_email_user($reengagement, $inprogress) {
                 $mfieldname = 'm' . $fieldname;
                 $manager->$fieldname = $user->$mfieldname;
             }
-            // Actually send the email.
-            $managersendresult = email_to_user($manager,
-                    $SITE->shortname,
-                    $templateddetails['emailsubjectmanager'],
-                    html_to_text($templateddetails['emailcontentmanager']),
-                    $templateddetails['emailcontentmanager']);
+
+            $managersendresult = reengagement_send_notification($manager,
+                $templateddetails['emailsubjectmanager'],
+                html_to_text($templateddetails['emailcontentmanager']),
+                $templateddetails['emailcontentmanager'],
+                $reengagement
+            );
             if (!$managersendresult) {
                 mtrace("failed to send manager of user $user->id email for reengagement $reengagement->id");
             }
@@ -484,11 +501,12 @@ function reengagement_email_user($reengagement, $inprogress) {
     if (($reengagement->emailrecipient == REENGAGEMENT_RECIPIENT_USER) ||
         ($reengagement->emailrecipient == REENGAGEMENT_RECIPIENT_BOTH)) {
         // We are supposed to send email to the user.
-        $usersendresult = email_to_user($user,
-                $SITE->shortname,
-                $templateddetails['emailsubject'],
-                $plaintext,
-                $templateddetails['emailcontent']);
+        $usersendresult = reengagement_send_notification($user,
+            $templateddetails['emailsubject'],
+            $plaintext,
+            $templateddetails['emailcontent'],
+            $reengagement
+        );
         if (!$usersendresult) {
             mtrace("failed to send user $user->id email for reengagement $reengagement->id");
         }
@@ -515,11 +533,12 @@ function reengagement_email_user($reengagement, $inprogress) {
 
             debugging('', DEBUG_ALL) && mtrace("sending third-party email to: $emailaddress");
 
-            $usersendresult = email_to_user($thirdpartyuser,
-                    $SITE->shortname,
+            $usersendresult = reengagement_send_notification($thirdpartyuser,
                     $templateddetails['emailsubjectthirdparty'],
                     html_to_text($templateddetails['emailcontentthirdparty']),
-                    $templateddetails['emailcontentthirdparty']);
+                    $templateddetails['emailcontentthirdparty'],
+                    $reengagement
+                );
             if (!$usersendresult) {
                 mtrace("failed to send user $user->id email for reengagement $reengagement->id");
             }
@@ -530,6 +549,36 @@ function reengagement_email_user($reengagement, $inprogress) {
 
     return $emailresult;
 }
+
+
+/**
+ * Send reengagement notifications using the messaging system.
+ *
+ * @param object $user
+ * @param string $subject message subject
+ * @param string $messageplain plain text message
+ * @param string $messagehtml html message
+ * @param object $reengagement database record
+ */
+function reengagement_send_notification($userto, $subject, $messageplain, $messagehtml, $reengagement) {
+    $eventdata = new \core\message\message();
+    $eventdata->courseid = $reengagement->courseid;
+    $eventdata->modulename = 'reengagement';
+    $eventdata->userfrom = core_user::get_support_user();
+    $eventdata->userto = $userto;
+    $eventdata->subject = $subject;
+    $eventdata->fullmessage = $messageplain;
+    $eventdata->fullmessageformat = FORMAT_HTML;
+    $eventdata->fullmessagehtml = $messagehtml;
+    $eventdata->smallmessage = $subject;
+
+    // Required for messaging framework
+    $eventdata->name = 'mod_reengagement';
+    $eventdata->component = 'mod_reengagement';
+
+    return message_send($eventdata);
+}
+
 
 /**
  * Template variables into place in supplied email content.
@@ -795,4 +844,103 @@ function reengagement_check_target_completion($userid, $targetcmid) {
         }
     }
     return false;
+}
+
+/**
+ * Method to check if existing user is eligble and cron hasn't run yet.
+ * @param stdclass $course the course record.
+ * @param stdclass $cm the coursemodule we should be checking.
+ * @param stdclass $reengagment the full record.
+ * @return string
+ */
+function reengagement_checkstart($course, $cm, $reengagement) {
+    global $DB, $USER, $OUTPUT;
+    $output = '';
+    $modinfo = get_fast_modinfo($course->id);
+    $cminfo = $modinfo->get_cm($cm->id);
+
+    $ainfomod = new \core_availability\info_module($cminfo);
+
+    // User could have arrived here eligible to start, but before cron had a chance to start them in the activity.
+    // Check for that scenario.
+    $completion = $DB->get_record('course_modules_completion', array('userid' => $USER->id, 'coursemoduleid' => $cm->id));
+    if (empty($completion)) {
+        // User hasn't yet started this activity.
+        $availabilityinfo = '';
+        if (!$ainfomod->is_available($availabilityinfo)) {
+            // User has satisfied all activity completion preconditions, start them on this activity.
+            // Set a RIP record, so we know when to send an email/mark activity as complete by cron later.
+            $reengagementinprogress = new stdClass();
+            $reengagementinprogress->reengagement = $reengagement->id;
+            $reengagementinprogress->completiontime = time() + $reengagement->duration;
+            $reengagementinprogress->emailtime = time() + $reengagement->emaildelay;
+            $reengagementinprogress->userid = $USER->id;
+            $DB->insert_record('reengagement_inprogress', $reengagementinprogress);
+
+            // Set activity completion in-progress record to fit in with normal activity completion requirements.
+            $activitycompletion = new stdClass();
+            $activitycompletion->coursemoduleid = $cm->id;
+            $activitycompletion->completionstate = COMPLETION_INCOMPLETE;
+            $activitycompletion->timemodified = time();
+            $activitycompletion->userid = $USER->id;
+            $DB->insert_record('course_modules_completion', $activitycompletion);
+            // Re-load that same info.
+            $completion = $DB->get_record('course_modules_completion', array('userid' => $USER->id, 'coursemoduleid' => $cm->id));
+
+        } else {
+            // The user has permission to start a reengagement, but not this one (likely due to incomplete prerequiste activities).
+            $report = "This reengagement is not available";
+            if ($availabilityinfo) {
+                $report .= " ( $availabilityinfo ) ";
+            }
+            $output .= $OUTPUT->box($report);
+        }
+    }
+    if (!empty($completion)) {
+        $rip = $DB->get_record('reengagement_inprogress', array('userid' => $USER->id, 'reengagement' => $reengagement->id));
+    }
+    $dateformat = get_string('strftimedatetime', 'langconfig'); // Description of how to format times in user's language.
+    if (!empty($completion) && !empty($rip)) {
+        // User is genuinely in-progress.
+        if ($reengagement->emailuser == REENGAGEMENT_EMAILUSER_TIME && empty($rip->emailsent)) {
+            $emailpending = true;
+            $emailtime = $rip->emailtime;
+        } else if ($reengagement->emailuser == REENGAGEMENT_EMAILUSER_COMPLETION && empty($rip->completed)) {
+            $emailpending = true;
+            $emailtime = $rip->completiontime;
+        } else {
+            $emailpending = false;
+        }
+
+        $datestr = userdate($rip->emailtime, $dateformat);
+        if ($emailpending) {
+            if (empty($reengagement->suppresstarget)) {
+                // You'll get an email at xyz time.
+                $emailmessage = get_string('receiveemailattimex', 'reengagement', $datestr);
+            } else {
+                // There is a target activity, if the target activity is complete, we won't send the email.
+                $targetcomplete = reengagement_check_target_completion($USER->id, $cm->id);
+                if (!$targetcomplete) {
+                    // Message will be sent at xyz time unless you complete target activity.
+                    $emailmessage = get_string('receiveemailattimexunless', 'reengagement', $datestr);
+                } else {
+                    // Message scheduled for xyz time will not be sent because you have completed the target activity.
+                    $emailmessage = get_string('noemailattimex', 'reengagement', $datestr);
+                }
+            }
+            $output .= $OUTPUT->box($emailmessage);
+        }
+
+        // Activity completion can be independent of email time. Show completion time too.
+        if ($completion->completionstate == COMPLETION_INCOMPLETE) {
+            $datestr = userdate($rip->completiontime, $dateformat);
+            // This activity will complete at XYZ time.
+            $completionmessage = get_string('completeattimex', 'reengagement', $datestr);
+        } else {
+            // This activity has been marked as complete.
+            $completionmessage = get_string('activitycompleted', 'reengagement');
+        }
+        $output .= $OUTPUT->box($completionmessage);
+    }
+    return $output;
 }

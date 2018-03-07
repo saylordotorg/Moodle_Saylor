@@ -1,4 +1,12 @@
 $(document).ready(function() {
+	$("#page-grade-report-quizanalytics-index").find("ul.nav").find("li").each(function() {
+		$(this).click(function(e) {
+			if ($(this).hasClass("dropdown")) {
+				$(this).toggleClass("open");
+	  		}
+		});
+	});
+
 	var lastattemptsummary, loggedinuser, mixchart, allusers, questionpercat, timechart,
 	gradeanalysis, quesanalysis, hardestques, allquestions, quizid, rooturl, userid;
 	var attemptssnapshot_arr = [];
@@ -27,40 +35,42 @@ $(document).ready(function() {
 					quizid = totaldata.quizid;
 					rooturl = totaldata.url;
 
-					$(".showanalytics").find(".tabs").find("span.lastattemptsummary").hide();
+					$(".showanalytics").find(".parentTabs").find("span.lastattemptsummary").hide();
 					$(".showanalytics").find("#tabs-1").find("p.lastattemptsummarydes").hide();
 					$(".showanalytics").find("#tabs-1").find("p.attemptsummarydes").show();
 					if (totaldata.userattempts > 1) {
-						$(".showanalytics").find(".tabs").find("span.lastattemptsummary").show();
+						$(".showanalytics").find(".parentTabs").find("span.lastattemptsummary").show();
 						$(".showanalytics").find("#tabs-1").find("p.lastattemptsummarydes").show();
 						$(".showanalytics").find("#tabs-1").find("p.attemptsummarydes").hide();
 					}
 
-					$(".showanalytics").css("display", "block");
 					setTimeout(function() {
-						$( ".tabs" ).tabs();
-						$( ".subtabs" ).tabs();
-						// Center scroll on mobile.
-						if ($(window).width() < 480) {
-							var outerContent = $('.mobile_overflow');
-							var innerContent = $('.canvas-wrap');
-							if (outerContent.length > 0) {
-								outerContent.scrollLeft( (innerContent.width() - outerContent.width()) / 2);
-							}	
-						}
+						$(".showanalytics").find("ul.nav-tabs a").click(function(e) {
+			              e.preventDefault();
+			              $(this).tab('show');
+			              // Center scroll on mobile.
+			              if ($(window).width() < 480) {
+								var outerContent = $('.mobile_overflow');
+								var innerContent = $('.canvas-wrap');
+								if (outerContent.length > 0) {
+									outerContent.scrollLeft( (innerContent.width() - outerContent.width()) / 2);
+								}	
+							}
+			            });
 					}, 100);
 
 					$(".showanalytics").css("display", "block");
+
 					if (totaldata.quizattempt != 1) {
 						$("#tabs-2").find("ul").find("li").find("span.subtab1").show();
-						$("#tabs-2").find(".subtabs").find("#subtab1").find(".subtabmix").show();
 						$("#tabs-2").find("ul").find("li").find("span.subtab2").hide();
-						$("#tabs-2").find(".subtabs").find("#subtab1").find(".subtabtimechart").hide();
+						$("#subtab21").find(".subtabmix").show();
+						$("#subtab21").find(".subtabtimechart").hide();
 					} else {
 						$("#tabs-2").find("ul").find("li").find("span.subtab1").hide();
-						$("#tabs-2").find(".subtabs").find("#subtab1").find(".subtabmix").hide();
 						$("#tabs-2").find("ul").find("li").find("span.subtab2").show();
-						$("#tabs-2").find(".subtabs").find("#subtab1").find(".subtabtimechart").show();
+						$("#subtab21").find(".subtabmix").hide();
+						$("#subtab21").find(".subtabtimechart").show();
 					}
 
 					if(attemptssnapshot_arr.length > 0){
@@ -82,7 +92,7 @@ $(document).ready(function() {
 					};
 					var attemptssnapshotopt = $.extend(totaldata.attemptssnapshot.opt[key], attemptssnapshotopt2);
 
-					$('.attemptssnapshot').append('<div class="col-sm-6"><label style="width: 370px"><canvas id="attemptssnapshot'+key+'"></canvas><div id="js-legend'+key+'" class="chart-legend"></div></label><div class="downloadandshare"><a class="download-canvas" data-canvas_id="attemptssnapshot'+key+'"></a><div class="shareBtn" data-user_id="'+userid+'" data-canvas_id="attemptssnapshot'+key+'"></div></div></div>');
+					$('.attemptssnapshot').append('<div class="span6"><label><canvas id="attemptssnapshot'+key+'"></canvas><div id="js-legend'+key+'" class="chart-legend"></div></label><div class="downloadandshare"><a class="download-canvas" data-canvas_id="attemptssnapshot'+key+'"></a><div class="shareBtn" data-user_id="'+userid+'" data-canvas_id="attemptssnapshot'+key+'"></div></div></div>');
 					var ctx = document.getElementById("attemptssnapshot"+key).getContext('2d');
 					var attemptssnapshot = new Chart(ctx, {
 						type: 'doughnut',
@@ -413,20 +423,6 @@ $(document).ready(function() {
 		var canvasid = $(this).attr("id");
 		$(this).parent().append('<div class="downloadandshare"><a class="download-canvas" data-canvas_id="'+canvasid+'"></a><div class="shareBtn" data-user_id="'+userid+'" data-canvas_id="'+canvasid+'"></div></div>');
 	});
-
-	// center scroll
-	if ($(window).width() < 480) {
-		$('body').on('click', '.showanalytics .ui-tabs-nav li', function(){  
-			var outerContent = $(this).parents('.ui-tabs').find('.ui-tabs-panel.mobile_overflow[aria-hidden="false"]');
-			var innerContent = outerContent.find('.canvas-wrap'); 
-			setTimeout(function(){
-				if (outerContent.length > 0) {
-					var scrollamt = outerContent.scrollLeft( 125 );
-					console.log(scrollamt);
-				}	
-			}, 100);
-		});
-	}	
 });
 
 var canvasquesanalysis = document.getElementById("quesanalysis");
@@ -528,7 +524,6 @@ function postImageToFacebook(token, filename, mimeType, imageData, userid, messa
     	contentType: false,
     	cache: false,
     	success: function (data) {
-    		//console.log("success: ", data);
             // Get image source url
             if(data){
             	FB.ui({

@@ -25,74 +25,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Until MDL-58165 was integrated, Moodle core did not add a key to the privatefiles node when adding it to the navigation,
- * so we need to find it with some overhead on previous versions.
- *
- * @param global_navigation $navigation
- * @return navigation_node
- */
-function local_boostnavigation_find_privatefiles_node(global_navigation $navigation) {
-    // Get front page course node.
-    if ($coursenode = $navigation->find('1', null)) {
-        // Get children of the front page course node.
-        $coursechildrennodeskeys = $coursenode->get_children_key_list();
-
-        // Get text string to look for.
-        $needle = get_string('privatefiles');
-
-        // Check all children to find the privatefiles node.
-        foreach ($coursechildrennodeskeys as $k) {
-            // Get child node.
-            $childnode = $coursenode->get($k);
-            // Check if we have found the privatefiles node.
-            if ($childnode->text == $needle) {
-                // If yes, return the node.
-                return $childnode;
-            }
-        }
-    }
-
-    // This should not happen.
-    return false;
-}
-
-
-/**
- * Until MDL-59879 was integrated, Moodle core did not add a key to the competencies node when adding it to the navigation,
- * so we need to find it with some overhead on previous versions.
- *
- * @param global_navigation $navigation
- * @return navigation_node
- */
-function local_boostnavigation_find_competencies_node(global_navigation $navigation) {
-    global $COURSE;
-
-    // Get coursehome node.
-    if ($coursehomenode = $navigation->find($COURSE->id, navigation_node::TYPE_COURSE)) {
-        // Get children of the front page course node.
-        $coursehomechildrennodeskeys = $coursehomenode->get_children_key_list();
-
-        // Get text string to look for.
-        $needle = get_string('competencies', 'core_competency');
-
-        // Check all children to find the competencies node.
-        foreach ($coursehomechildrennodeskeys as $k) {
-            // Get child node.
-            $childnode = $coursehomenode->get($k);
-            // Check if we have found the competencies node.
-            if ($childnode->text == $needle) {
-                // If yes, return the node.
-                return $childnode;
-            }
-        }
-    }
-
-    // This should not happen.
-    return false;
-}
-
-
-/**
  * Moodle core does not have a built-in functionality to get all keys of all children of a navigation node,
  * so we need to get these ourselves.
  *
@@ -292,6 +224,11 @@ function local_boostnavigation_build_custom_nodes($customnodes, navigation_node 
                     $customnode->collapse = false;
                 }
 
+                // Finally, if the node shouldn't be collapsed or if it does not have children, set the node icon.
+                if (!$collapse || $customnode->has_children() == false) {
+                    $customnode->icon = new pix_icon('customnode', '', 'local_boostnavigation');
+                }
+
                 // Otherwise, if it's a child node.
             } else {
                 // If the nodes should be collapsed and collapsing hasn't been prepared yet, prepare collapsing of the parent node.
@@ -323,6 +260,9 @@ function local_boostnavigation_build_custom_nodes($customnodes, navigation_node 
                 } else {
                     $customnode->hidden = false;
                 }
+
+                // Finally, set the node icon.
+                $customnode->icon = new pix_icon('customnode', '', 'local_boostnavigation');
             }
         }
     }

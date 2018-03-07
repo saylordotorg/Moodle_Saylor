@@ -36,8 +36,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$plugin->version  = 2017102600;
+$plugin->version  = 2018022700;
 $plugin->requires = 2016120500;
-$plugin->release = '1.1.0';
+$plugin->release = '1.1.1';
 $plugin->maturity = MATURITY_STABLE;
 $plugin->component = 'local_sayonara';

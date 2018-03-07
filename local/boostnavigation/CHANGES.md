@@ -4,9 +4,39 @@ moodle-local_boostnavigation
 Changes
 -------
 
+### v3.4-r3
+
+* 2018-02-27 - Change the icon for custom nodes based on early adopter feedback.
+
+### v3.4-r2
+
+* 2018-02-27 - Fix a note in the language pack.
+
+### v3.4-r1
+
+* 2018-02-26 - Always set the data-isexpandable attribute of the mycourses child nodes.
+* 2018-02-22 - Add icons to custom nodes to be displayed in theme_boost_campus
+* 2018-02-21 - Change the icons which were added to the activity nodes to a simple indent. This will simplify our work with theme_boost_campus, thanks for understanding.
+* 2018-02-21 - Bugfix: Collapsing only custom nodes did not work.
+* 2018-02-21 - Fix collapsing of mycourses node in theme_boost_campus.
+* 2018-02-20 - Don't highlight active collapsible custom nodes.
+* 2018-02-20 - Remove all notes about the requirement for MDL-59425 for collapsing nodes as this is now part of Moodle 3.4.
+* 2018-02-20 - Remove fallback for missing node key of competencies files navigation node.
+* 2018-02-20 - Remove fallback for missing node key of private files navigation node.
+* 2018-02-20 - Prepare compatibility for Moodle 3.4, no functionality change.
+
+### v3.3-r1
+
+* 2018-02-20 - Prepare compatibility for Moodle 3.3, no functionality change.
+
+### v3.2-r18
+
+* 2018-02-19 - Bugfix: There was a fatal error with custom course nodes which only appeared in certain plugin configurations.
+* 2018-02-19 - Bugfix: There were problems / debug messages with the setting to remove the competencies node.
+
 ### v3.2-r17
 
-* 2017-01-15 - Bugfix: Some course section edge cases produced an incorrect ordering of the "Sections" course node.
+* 2018-01-15 - Bugfix: Some course section edge cases produced an incorrect ordering of the "Sections" course node.
 * 2017-12-15 - Add support for adding custom nodes to the nav drawer.
 * 2017-12-05 - Added Workaround to travis.yml for fixing Behat tests with TravisCI.
 

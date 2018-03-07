@@ -42,7 +42,7 @@ if (!empty($quizid)) {
 
     $totalnoofquestion = $DB->get_record_sql("SELECT COUNT(qs.questionid) as qnum
                   FROM {quiz_slots} qs, {question} q WHERE q.id = qs.questionid
-                  AND qs.quizid = ?", array($quizid));
+                  AND qs.quizid = ? AND q.qtype != ?", array($quizid, 'description'));
 
     if (!empty($usersgradedattempts)) {
         /**
@@ -61,7 +61,7 @@ if (!empty($quizid)) {
         $catdetails = $DB->get_records_sql("SELECT qc.id, COUNT(qs.questionid) as qnum,
         qc.name FROM {quiz_slots} qs, {question} q, {question_categories} qc
         WHERE q.id = qs.questionid AND qc.id = q.category AND
-        qs.quizid = ? GROUP BY qc.id", array($quizid));
+        qs.quizid = ? AND q.qtype != ? GROUP BY qc.id", array($quizid, 'description'));
 
         $catname = array();
         $catdata = array();
@@ -82,15 +82,15 @@ if (!empty($quizid)) {
             WHERE qatt.questionusageid = quizatt.uniqueid AND
             qattstep.questionattemptid = qatt.id AND q.id = qatt.questionid
             AND qc.id = q.category AND quizatt.quiz = ? AND
-            q.category = ?";
+            q.category = ? AND q.qtype != ?";
 
             $totalcorrectattempts = $DB->get_records_sql($sqlattempt." AND
             qattstep.sequencenumber >= 2 AND (qattstep.state = 'gradedright' OR
-            qattstep.state = 'mangrright')", array($quizid, $catdetail->id));
+            qattstep.state = 'mangrright')", array($quizid, $catdetail->id, 'description'));
 
             $userstotalcorrectattempts = $DB->get_records_sql($sqlattempt." AND
             quizatt.userid = ? AND qattstep.sequencenumber >= 2 AND
-            (qattstep.state = 'gradedright' OR qattstep.state = 'mangrright')", array($quizid, $catdetail->id, $USER->id));
+            (qattstep.state = 'gradedright' OR qattstep.state = 'mangrright')", array($quizid, $catdetail->id, 'description', $USER->id));
 
             $totalquizattempts = count($totalquizattempted);
             $totalquizuserattempts = count($usersgradedattempts);
@@ -276,7 +276,7 @@ if (!empty($quizid)) {
                     WHERE qatt.questionusageid = quizatt.uniqueid
                     AND qattstep.sequencenumber = 2 AND q.id = qatt.questionid
                     AND qattstep.questionattemptid = qatt.id
-                    AND quizatt.userid = ? AND quizatt.quiz= ?";
+                    AND quizatt.userid = ? AND quizatt.quiz= ? AND q.qtype != ?";
 
         $snapdata = array();
         $snapshotdata = array();
@@ -289,8 +289,8 @@ if (!empty($quizid)) {
                     {question_attempt_steps} qattstep, {question} q
                     WHERE qatt.questionusageid = quizatt.uniqueid AND q.id = qatt.questionid
                     AND qattstep.questionattemptid = qatt.id AND qattstep.sequencenumber = 2
-                    AND quizatt.userid = ? AND quizatt.quiz= ? AND quizatt.attempt = ?",
-                    array($USER->id, $quizid, $attemptvalue->attempt));
+                    AND quizatt.userid = ? AND quizatt.quiz= ? AND quizatt.attempt = ? AND q.qtype != ?",
+                    array($USER->id, $quizid, $attemptvalue->attempt, 'description'));
 
                 $timediff = ($attemptvalue->timefinish - $attemptvalue->timestart);
                 $timetaken = round(($timediff / 60), 2);
@@ -298,16 +298,16 @@ if (!empty($quizid)) {
                 $numofunattempt = ($totalnoofquestion->qnum - $numofattempt->anum);
 
                 $correct = $DB->get_record_sql($attemptsql." AND quizatt.attempt = ?
-                AND qattstep.state = 'gradedright'",
-                array($USER->id, $quizid, $attemptvalue->attempt));
+                AND qattstep.state = ?",
+                array($USER->id, $quizid, 'description', $attemptvalue->attempt, 'gradedright'));
 
                 $incorrect = $DB->get_record_sql($attemptsql." AND quizatt.attempt = ?
-                AND qattstep.state = 'gradedwrong'",
-                array($USER->id, $quizid, $attemptvalue->attempt));
+                AND qattstep.state = ?",
+                array($USER->id, $quizid, 'description', $attemptvalue->attempt, 'gradedwrong'));
 
                 $partialcorrect = $DB->get_record_sql($attemptsql." AND quizatt.attempt = ?
-                AND qattstep.state = 'gradedpartial'",
-                array($USER->id, $quizid, $attemptvalue->attempt));
+                AND qattstep.state = ?",
+                array($USER->id, $quizid, 'description', $attemptvalue->attempt, 'gradedpartial'));
 
                 $snapdata[$count][0] = intval($numofunattempt);
                 $snapdata[$count][1] = intval($correct->num);
@@ -503,7 +503,7 @@ if (!empty($quizid)) {
         /* quesanalysis */
         $totalquestions = $DB->get_records_sql("SELECT qs.questionid, q.qtype
         FROM {quiz_slots} qs, {question} q WHERE q.id = qs.questionid AND
-        qs.quizid= ?", array($quizid));
+        qs.quizid= ? AND q.qtype != ?", array($quizid, 'description'));
 
         $totalunattempted = array();
         $correctresponse = array();
