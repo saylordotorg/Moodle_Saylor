@@ -248,6 +248,12 @@ def plugins = [
         "branch" : 'master',
         "dest" : 'mod/hvp'
     ]
+    [
+        "name" : 'local_affiliations',
+        "url" : 'https://github.com/saylordotorg/moodle-local_affiliations',
+        "branch" : 'development',
+        "dest" : 'local/affiliations'
+    ]
 ]
 
 def StashMoodle(moodle_version) {
