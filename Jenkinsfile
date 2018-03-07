@@ -247,7 +247,7 @@ def plugins = [
         "url" : 'https://github.com/saylordotorg/moodle-mod_hvp',
         "branch" : 'master',
         "dest" : 'mod/hvp'
-    ]
+    ],
     [
         "name" : 'local_affiliations',
         "url" : 'https://github.com/saylordotorg/moodle-local_affiliations',
