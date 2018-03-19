@@ -54,9 +54,9 @@ class gapfill_import_form extends moodleform {
      */
     protected function definition() {
         $mform = $this->_form;
-        $mform->addElement('text', 'courseshortname', 'Course');
+        $mform->addElement('text', 'courseshortname', get_string('course'));
         $mform->setType('courseshortname', PARAM_RAW);
-        $mform->addElement('submit', 'submitbutton', 'Import');
+        $mform->addElement('submit', 'submitbutton', get_string('import'));
     }
 
     /**

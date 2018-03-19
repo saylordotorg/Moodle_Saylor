@@ -48,11 +48,22 @@ try {
         $texexp = '';
     } else {
         $exp = $p->parse($m[2], $vars);
-        if ($CFG->qtype_algebra_texdelimiters == 'old') {
-            $texexp = '$$'.$exp->tex().'$$';
-        } else {
-            $texexp = '\['.$exp->tex().'\]';
+        $texexp = $exp->tex();
+        switch($CFG->qtype_algebra_texdelimiters) {
+            case 'old':
+                $texexp = '$$' . $texexp . '$$';
+                break;
+            case 'new':
+                $texexp = '\\[' . $texexp . '\\]';
+                break;
+            case 'simple';
+                $texexp = '$' . $texexp . '$';
+                break;
+            case 'inline':
+                $texexp = '\\(' . $texexp . '\\)';
+                break;
         }
+
     }
 } catch (Exception $e) {
     $validanswer = false;

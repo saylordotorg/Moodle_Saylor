@@ -17,8 +17,8 @@
 /**
  * The question type class for the gapfill question type.
  *
- * @package    qtype_ga[fo;;
- * @copyright &copy; 2017 Marcus Green
+ * @package    qtype_gapfill
+ * @copyright  2018 Marcus Green
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  */
 defined('MOODLE_INTERNAL') || die();
@@ -27,11 +27,14 @@ require_once($CFG->libdir . '/questionlib.php');
 require_once($CFG->dirroot . '/question/engine/lib.php');
 
 /**
- * @copyright Marcus Green 2017
+ * @copyright Marcus Green 2018
  *
  * The gapfill question class
  * Load from database, and initialise class
  * A "fill in the gaps" cloze style question type
+ * @package    qtype_gapfill
+ * @copyright  2017 Marcus Green
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_gapfill extends question_type {
 

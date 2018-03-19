@@ -1,3 +1,11 @@
+### Version 1.971 of the Moodle Gapfill question type Feb 2018
+Bug fix for issue where dragdrop did not work on iOS. Improvements in code standards compliance.
+
+Replaced various hard coded strings with get_string calls to allow for translation. Thanks to Dinis Medeiros for reporting this. 
+
+The text in the letter hint prompt that appears in the Multiple tries section can be customised via the language pack. See instructions
+https://docs.moodle.org/en/Language_customisation#Changing_words_or_phrases
+
 ### Version 1.97 of the Moodle Gapfill question type Feb 2018
 Letter hints, new feature which only works when Interactive with multiple tries behaviour is used. A new checkbox in the question 
 creation form toggles letterhints mode. This takes effect when an interactive question behaviour is selected. There is a global

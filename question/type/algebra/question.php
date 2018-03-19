@@ -126,14 +126,15 @@ class qtype_algebra_question extends question_graded_by_strategy
      * @param $expr expression which will be parsed
      * @return top term of the parse tree or a string if an exception is thrown
      */
-    public function formated_expression($text) {
+    public function formated_expression($text, $vars = null) {
         global $CFG;
-
-        // Create an array of variable names for the parser from the question if defined.
-        $varnames = array();
-        if (isset($this->variables)) {
-            foreach ($this->variables as $var) {
-                $varnames[] = $var->name;
+        if ($vars == null) {
+            // Create an array of variable names for the parser from the question if defined.
+            $vars = array();
+            if (isset($this->variables)) {
+                foreach ($this->variables as $var) {
+                    $vars[] = $var->name;
+                }
             }
         }
         // We now assume that we have a string to parse. Create a parser instance to
@@ -142,16 +143,24 @@ class qtype_algebra_question extends question_graded_by_strategy
         // Perform the actual parsing inside a try-catch block so that any exceptions
         // can be caught and converted into errors.
         try {
-            $exp = $p->parse($text, $varnames);
-            if ($CFG->qtype_algebra_texdelimiters == 'old') {
-                return '$$'.$exp->tex().'$$';
-            } else {
-                return '\['.$exp->tex().'\]';
-            }
-
+            $exp = $p->parse($text, $vars);
+            $texexp = $exp->tex();
         } catch (Exception $e) {
-            return '';
+            $texexp = ' ';
         }
+
+        $delimiters = $CFG->qtype_algebra_texdelimiters;
+        switch($delimiters) {
+            case 'old':
+                return '$$' . $texexp . '$$';
+            case 'new':
+                return '\\[' . $texexp . '\\]';
+            case 'simple';
+                return '$' . $texexp . '$';
+            case 'inline':
+                return '\\(' . $texexp . '\\)';
+        }
+
     }
 
     public function is_same_response(array $prevresponse, array $newresponse) {

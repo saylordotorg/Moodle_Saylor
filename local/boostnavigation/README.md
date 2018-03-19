@@ -9,7 +9,7 @@ Moodle plugin which tries to overcome some fixed appearance behaviours of Boost'
 Requirements
 ------------
 
-This plugin requires Moodle 3.2+
+This plugin requires Moodle 3.4+
 
 
 Motivation for this plugin
@@ -68,11 +68,6 @@ Similar to the "Remove root nodes from Boost's nav drawer" section, enabling any
 ### 8. Collapse bottom nodes in Boost's nav drawer
 
 Similar to the "Collapse root odes in Boost's nav drawer" section, enabling any of these settings will let users collapse nodes at the end of Boost's nav drawer. 
-
-
-Restrictions from MDL-59425
----------------------------
-Some of this plugin's features are only working with Boost installations which have the patch from MDL-59425 (https://tracker.moodle.org/browse/MDL-59425) integrated. This patch will be part of Moodle 3.4, but can be easily backported to your local version of theme_boost if you are able and willing to add a small core hack, in this case you will find the patch on https://github.com/moodle/moodle/commit/d7d2a72faf0cc760f0f0d80402505176f9cbb8bc. The patch is also part of Ulm University's Boost child theme which you can get on https://github.com/moodleuulm/moodle-theme_boost_campus.
 
 
 How this plugin works
@@ -156,9 +151,7 @@ If you want to use this plugin with a RTL language and it doesn't work as-is, yo
 PHP7 Support
 ------------
 
-Since Moodle 3.0, Moodle core basically supports PHP7.
-Please note that PHP7 support is on our roadmap for this plugin, but it has not yet been thoroughly tested for PHP7 support and we are still running it in production on PHP5.
-If you encounter any success or failure with this plugin and PHP7, please let us know.
+Since Moodle 3.4 core, PHP7 is mandatory. We are developing and testing this plugin for PHP7 only.
 
 
 Copyright

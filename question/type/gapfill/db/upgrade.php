@@ -97,5 +97,5 @@ function xmldb_qtype_gapfill_upgrade($oldversion = 0) {
         $dbman->create_table($table);
     }
     // Gapfill savepoint reached.
-    upgrade_plugin_savepoint(true, 2017122305, 'qtype', 'gapfill');
+    upgrade_plugin_savepoint(true, 2018020300, 'qtype', 'gapfill');
 }

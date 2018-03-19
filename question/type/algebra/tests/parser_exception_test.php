@@ -54,7 +54,7 @@ class qtype_algebra_parser_exception_test extends advanced_testcase {
      */
     public function test_parser_wrong_arguments_number() {
         $this->expectException('parser_exception');
-        $this->expectExceptionMessage('Syntax Error: Operator '^' requires two arguments');
+        $this->expectExceptionMessage("Syntax Error: Operator '^' requires two arguments");
         $p = new qtype_algebra_parser;
         $expr = $p->parse('x^');
     }
@@ -72,9 +72,9 @@ class qtype_algebra_parser_exception_test extends advanced_testcase {
     /**
      * Operator missing one argument.
      */
-    public function test_parser_invalid_minus() {
+    public function test_parser_wrong_arguments_number2() {
         $this->expectException('parser_exception');
-        $this->expectExceptionMessage('Syntax Error: Operator '-' requires two arguments');
+        $this->expectExceptionMessage("Syntax Error: Operator '-' requires two arguments");
         $p = new qtype_algebra_parser;
         $expr = $p->parse('x-');
     }

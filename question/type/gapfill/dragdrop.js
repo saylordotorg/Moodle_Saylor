@@ -24,31 +24,29 @@
 /* This should be called script.js and go through the Moodle minify process but that seems to break it */
 /* global $ */
 /* jshint unused:false*/
-require(['jquery', 'jqueryui'], function($, jqui) {
-    $(function() {
-        $(".draggable").draggable({
-            revert: false,
-            helper: 'clone',
-            cursor: 'pointer',
-            scroll: 'false',
-            start: function(event, ui) {
-                $(this).fadeTo('fast', 0.5);
-            },
-            stop: function(event, ui) {
-                $(this).fadeTo(0, 1);
-            }
+$(function () {
+    $(".draggable").draggable({
+        revert: false,
+        helper: 'clone',
+        cursor: 'pointer',
+        scroll: 'false',
+        start: function (event, ui) {
+            $(this).fadeTo('fast', 0.5);
+        },
+        stop: function (event, ui) {
+            $(this).fadeTo(0, 1);
+        }
 
-        });
+    });
 
-        $(".droptarget").droppable({
-            hoverClass: 'active',
-            drop: function(event, ui) {
-                if ($(ui.draggable).hasClass('readonly')) {
-                    return;
-                }
-                this.value = $(ui.draggable).text();
-                $(this).css("background-color", "white");
+    $(".droptarget").droppable({
+        hoverClass: 'active',
+        drop: function (event, ui) {
+            if ($(ui.draggable).hasClass('readonly')) {
+                return;
             }
-        });
+            this.value = $(ui.draggable).text();
+            $(this).css("background-color", "white");
+        }
     });
 });

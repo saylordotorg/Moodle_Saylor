@@ -1,5 +1,5 @@
 @ou @ou_vle @quizaccess @quizaccess_honestycheck
-Feature: Test all the basic functionality of this quiz access rule
+Feature: Test all the basic functionality of honesty check quiz access rule
   In order to stop students cheating
   As an teacher
   I need to make them promise to be good before starting a quiz.
@@ -21,7 +21,7 @@ Feature: Test all the basic functionality of this quiz access rule
   Scenario: Require students to agree, then check the they have to.
     # Add a quiz to a course without the condition, and verify that they can start it as normal.
     Given I log in as "teacher"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I turn editing mode on
     And I add a "Quiz" to section "1" and I fill the form with:
       | Name        | Quiz no honesty check                                    |
@@ -32,7 +32,7 @@ Feature: Test all the basic functionality of this quiz access rule
       | Correct answer                     | False                        |
     And I log out
     And I log in as "student"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Quiz no honesty check"
     And I press "Attempt quiz now"
     Then I should see "Question 1"
@@ -40,7 +40,7 @@ Feature: Test all the basic functionality of this quiz access rule
     # Add a quiz to a course with the condition, and verify that the student is challenged.
     When I log out
     And I log in as "teacher"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I turn editing mode on
     And I add a "Quiz" to section "1" and I fill the form with:
       | Name                                     | Quiz with honesty check                           |
@@ -52,7 +52,7 @@ Feature: Test all the basic functionality of this quiz access rule
       | Correct answer                     | True                        |
     And I log out
     And I log in as "student"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Quiz with honesty check"
     And I press "Attempt quiz now"
     Then I should see "Please read the following message"
@@ -70,7 +70,7 @@ Feature: Test all the basic functionality of this quiz access rule
     # Test that backup and restore keeps the setting.
     When I log out
     And I log in as "teacher"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I turn editing mode on
     And I duplicate "Quiz with honesty check" activity editing the new copy with:
       | Name | Duplicated quiz with honesty check |

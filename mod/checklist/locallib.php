@@ -232,19 +232,20 @@ class checklist_class {
             }
 
             $sectionheading = 0;
-            while (list($itemid, $item) = each($this->items)) {
+            while ($item = current($this->items)) {
                 // Search from current position.
                 if (($item->moduleid == $section) && ($item->itemoptional == CHECKLIST_OPTIONAL_HEADING)) {
-                    $sectionheading = $itemid;
+                    $sectionheading = $item->id;
                     break;
                 }
+                next($this->items);
             }
 
             if (!$sectionheading) {
                 // Search again from the start.
                 foreach ($this->items as $item) {
                     if (($item->moduleid == $section) && ($item->itemoptional == CHECKLIST_OPTIONAL_HEADING)) {
-                        $sectionheading = $itemid;
+                        $sectionheading = $item->id;
                         break;
                     }
                 }
@@ -278,12 +279,15 @@ class checklist_class {
                 if ($this->cm->id == $cmid) {
                     continue; // Do not include this checklist in the list of modules.
                 }
-                if ($mods->get_cm($cmid)->modname == 'label') {
+                if ($mods->get_cm($cmid)->modname === 'label') {
                     continue; // Ignore any labels.
+                }
+                if (isset($mods->get_cm($cmid)->deletioninprogress) && $mods->get_cm($cmid)->deletioninprogress) {
+                    continue; // M3.2 onwards - if cm is in the recycle bin, being deleted, then skip it.
                 }
 
                 $foundit = false;
-                while (list(, $item) = each($this->items)) {
+                while ($item = current($this->items)) {
                     // Search list from current position (will usually be the next item).
                     if (($item->moduleid == $cmid) && ($item->itemoptional != CHECKLIST_OPTIONAL_HEADING)) {
                         $foundit = $item;
@@ -293,6 +297,7 @@ class checklist_class {
                         // Skip any items that are not linked to modules.
                         $nextpos++;
                     }
+                    next($this->items);
                 }
                 if (!$foundit) {
                     // Search list again from the start (just in case).

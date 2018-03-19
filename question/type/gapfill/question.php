@@ -26,7 +26,6 @@
 defined('MOODLE_INTERNAL') || die();
 /**
  * Gapfill question definition class. This class is mainly about
- * what happens at runtime, when the quesiton is part of a quiz
  *
  * @package    qtype_gapfill
  * @copyright  2017 Marcus Green
@@ -129,7 +128,6 @@ class qtype_gapfill_question extends question_graded_automatically_with_countbac
      * How many gaps in this question
      * @var number
      */
-
     public $gapcount;
 
     /**

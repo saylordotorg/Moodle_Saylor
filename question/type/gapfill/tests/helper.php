@@ -17,7 +17,7 @@
 /**
  * Contains the helper class for the select missing words question type tests.
  *
- * @package    qtype
+ * @package    qtype_gapfill
  * @copyright  2013 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

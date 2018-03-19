@@ -23,6 +23,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->dirroot . '/question/type/pmatch/pmatch/interpreter.php');
 require_once($CFG->dirroot . '/question/type/pmatch/spellinglib.php');
 
@@ -306,10 +308,12 @@ class pmatch_parsed_string {
         }
         $misspelledwords = array();
         foreach ($words as $word) {
+            $originalword = $word;
+            $word = core_text::strtolower($word);
             $word = $this->options->strip_sentence_divider($word);
 
             if (!$spellchecker->is_in_dictionary($word)) {
-                $misspelledwords[] = $word;
+                $misspelledwords[] = $originalword;
             }
         }
         return $misspelledwords;

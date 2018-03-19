@@ -66,7 +66,6 @@ $string['setting_collapsemycoursesnodedefault'] = 'Collapse node "My Courses" by
 $string['setting_collapsemycoursesnodeperformancehint'] = 'Please note: This feature will only work if the setting <a href="/admin/search.php?query=navshowmycoursecategories">navshowmycoursecategories</a> is not active. If you enabled navshowmycoursecategories, this setting will be ignored and won\'t do anything.';
 $string['setting_collapsenodesheading'] = 'Collapse root nodes in Boost\'s nav drawer';
 $string['setting_collapsenodestechnicalhint'] = 'Technical background: This is done by adding some JavaScript and CSS code to the page which will show or hide the second-level nodes as soon as the user clicks on the node. The collapse status of the node will be stored in each user\'s session. Thus, the nodes will only be hidden from the nav drawer at runtime, but they will remain in the navigation tree and can still be accessed by other parts of Moodle.';
-$string['setting_collapsenodestemplatehint'] = 'Please note: This feature is only working with Boost installations which have the patch from MDL-59425 integrated. For Boost installations without MDL-59425 integrated, this setting does not have any effect. See README file for details';
 $string['setting_customnodesusagechildnodes'] = 'Custom nodes can be nested with one hierarchy level, i.e. a custom node can have children nodes. The create a child node instead of a parent node, just prefix the custom node title with a hyphen.<br />
 For example:<br />
 Administration|/admin/index.php<br />
@@ -76,7 +75,6 @@ Please note:
 <ul>
 <li>For technical reasons, a parent node always needs a valid URL, even if the node will be made collapsible afterwards.</li>
 <li>Additionally, if a parent node is not shown because a (language or cohort) restriction applies, its children nodes also won\'t be shown.</li>
-<li>For Boost installations without MDL-59425 integrated, the child nodes will be shown but will be visually indistinguishable from their parent nodes. See README file for details</li>
 </ul>';
 $string['setting_customnodesusageadmins'] = 'Each line consists of a link title, a link URL and supported language(s) (optional) - separated by pipe characters. Each custom node needs to be written in a new line.<br />
 For example:<br />

@@ -497,7 +497,7 @@ class format_grid_renderer extends format_section_renderer_base {
             // Now all the normal modules by topic.
             // Everything below uses "section" terminology - each "section" is a topic/module.
             $this->make_block_topics($course, $sections, $modinfo, $editing, $hascapvishidsect, $streditsummary,
-                    $urlpicedit, false);
+                $urlpicedit, false);
 
             echo html_writer::end_tag('div');
             echo html_writer::end_tag('div');
@@ -670,21 +670,24 @@ class format_grid_renderer extends format_section_renderer_base {
     /**
      * States if the icon is to be greyed out.
      *
-     * For logic see: section_availability_message().
+     * For logic see: section_availability_message() + a bit more!
      *
+     * @param stdClass $course The course entry from DB
      * @param section_info $section The course_section entry from DB
      * @param bool $canviewhidden True if user can view hidden sections
      * @return bool Grey out the section icon, true or false?
      */
-    protected function section_greyedout($section, $canviewhidden) {
+    protected function section_greyedout($course, $section, $canviewhidden) {
         global $CFG;
         $sectiongreyedout = false;
         if (!$section->visible) {
             if ($canviewhidden) {
                 $sectiongreyedout = true;
+            } else if (!$course->hiddensections) { // Hidden sections in collapsed form.
+                $sectiongreyedout = true;
             }
         } else if (!$section->uservisible) {
-            if ($section->availableinfo) {
+            if (($section->availableinfo) && ((!$course->hiddensections) || ($canviewhidden))) { // Hidden sections in collapsed form.
                 // Note: We only get to this function if availableinfo is non-empty,
                 // so there is definitely something to print.
                 $sectiongreyedout = true;
@@ -734,25 +737,19 @@ class format_grid_renderer extends format_section_renderer_base {
 
         // Start at 1 to skip the summary block or include the summary block if it's in the grid display.
         $coursenumsections = $this->courseformat->get_last_section_number();
+        $sections = $modinfo->get_section_info_all();
         for ($section = $this->section0attop ? 1 : 0; $section <= $coursenumsections; $section++) {
-            $thissection = $modinfo->get_section_info($section);
+            $thissection = $sections[$section];
 
             // Check if section is visible to user.
-            $sectionvisible = ($thissection->uservisible ||
-                    ($thissection->visible && !$thissection->available &&
-                    !empty($thissection->availableinfo)));
-            $showsection = $hascapvishidsect || $sectionvisible;
+            $showsection = $thissection->uservisible ||
+                ($thissection->visible && !$thissection->available &&
+                !empty($thissection->availableinfo) && ((!$course->hiddensections) || ($hascapvishidsect)));
 
             // If we should grey it out, flag that here.
             $sectiongreyedout = false;
             if ($this->settings['greyouthidden'] == 2) {
-                if (!$showsection) {
-                    $sectiongreyedout = !$thissection->uservisible;
-                } else {
-                    $sectiongreyedout = $this->section_greyedout($thissection, $hascapvishidsect);
-                }
-            } else if ($showsection) {
-                $sectiongreyedout = $this->section_greyedout($thissection, $hascapvishidsect);
+                $sectiongreyedout = $this->section_greyedout($course, $thissection, $hascapvishidsect);
             }
 
             if ($showsection || $sectiongreyedout) {

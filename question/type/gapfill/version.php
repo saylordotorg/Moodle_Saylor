@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'qtype_gapfill';
-$plugin->version  = 2017122305;
+$plugin->version  = 2018020300;
 $plugin->requires = 2015051109;  // Moodle 2.9.9.
-$plugin->release = '1.97';
+$plugin->release = '1.971';
 $plugin->maturity  = MATURITY_STABLE;
