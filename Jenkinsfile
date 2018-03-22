@@ -223,6 +223,12 @@ def plugins = [
         "url" : 'https://github.com/marcusgreen/moodle-qtype_gapfill',
         "branch" : 'master',
         "dest" : 'question/type/gapfill'
+    ],
+    [
+        "name" : 'local_affiliations',
+        "url" : 'https://github.com/saylordotorg/moodle-local_affiliations',
+        "branch" : 'master',
+        "dest" : 'local/affiliations'
     ]
 ]
 
