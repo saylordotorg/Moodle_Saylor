@@ -253,6 +253,12 @@ def plugins = [
         "url" : 'https://github.com/saylordotorg/moodle-local_affiliations',
         "branch" : 'development',
         "dest" : 'local/affiliations'
+    ],
+    [
+        "name" : 'tool_policy',
+        "url" : 'https://github.com/moodlehq/moodle-tool_policy',
+        "branch" : 'MOODLE_34_STABLE',
+        "dest" : 'tool/policy'
     ]
 ]
 
