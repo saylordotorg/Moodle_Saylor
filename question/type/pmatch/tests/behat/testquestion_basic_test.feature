@@ -1,5 +1,5 @@
 @ou @ou_vle @qtype @qtype_pmatch
-Feature: Test all the basic functionality of this question type
+Feature: Test all the basic functionality of testquestion question type
   In order evaluate students understanding
   As an teacher
   I need to create and preview pattern match questions.
@@ -22,14 +22,14 @@ Feature: Test all the basic functionality of this question type
       | Test questions   | pmatch   | My first pattern match question | listen    |
     And the default question test responses exist for question "My first pattern match question"
     And I log in as "teacher"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "Question bank" node in "Course administration"
     When I click on "Preview" "link" in the "My first pattern match question" "table_row"
     And I switch to "questionpreview" window
     And I click on "Test this question" "link"
 
   @javascript
-  Scenario: Create, edit then preview a pattern match question.
+  Scenario: Test basic functionality of testquestion
     # Confirm list responses is correct.
     And I should see "Pattern-match question testing tool: Testing question: My first pattern match question"
     And I should see "What to include in the report"

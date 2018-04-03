@@ -286,12 +286,14 @@ function reengagement_crontask() {
         if (empty($completionrecord)) {
             mtrace("Could not find completion record for updating to complete state - userid: $userid, cmid: $cmid - recreating record.");
             // This might happen when reset_all_state has been triggered, deleting an "in-progress" record. so recreate it.
-            $activitycompletion = new stdClass();
-            $activitycompletion->coursemoduleid = $cmid;
-            $activitycompletion->completionstate = COMPLETION_COMPLETE_PASS;
-            $activitycompletion->timemodified = $timenow;
-            $activitycompletion->userid = $userid;
-            $completionrecord = $DB->insert_record('course_modules_completion', $activitycompletion);
+            $completionrecord = new stdClass();
+            $completionrecord->coursemoduleid = $cmid;
+            $completionrecord->completionstate = COMPLETION_COMPLETE_PASS;
+            $completionrecord->viewed = COMPLETION_VIEWED;
+            $completionrecord->overrideby = null;
+            $completionrecord->timemodified = $timenow;
+            $completionrecord->userid = $userid;
+            $completionrecord->id = $DB->insert_record('course_modules_completion', $completionrecord);
         } else {
             $updaterecord = new stdClass();
             $updaterecord->id = $completionrecord->id;
@@ -421,20 +423,7 @@ function reengagement_email_user($reengagement, $inprogress) {
     if (file_exists($CFG->dirroot.'/totara')) {
         $istotara = true;
     }
-    if ($istotara) {
-        $usersql = "SELECT u.*, manager.id as mid, manager.firstname as mfirstname,
-                        manager.lastname as mlastname, manager.email as memail,
-                        manager.mailformat as mmailformat
-                  FROM {user} u
-             LEFT JOIN {pos_assignment} pa ON u.id = pa.userid and pa.type = " . POSITION_TYPE_PRIMARY . "
-             LEFT JOIN {user} manager ON pa.managerid = manager.id
-                 WHERE u.id = :userid";
-        $params = array('userid' => $inprogress->userid);
-        $user = $DB->get_record_sql($usersql, $params);
-
-    } else {
-        $user = $DB->get_record('user', array('id' => $inprogress->userid));
-    }
+    $user = $DB->get_record('user', array('id' => $inprogress->userid));
     if (!empty($user->deleted)) {
         // User has been deleted - don't send an e-mail.
         return true;
@@ -472,30 +461,26 @@ function reengagement_email_user($reengagement, $inprogress) {
     if ($istotara &&
         ($reengagement->emailrecipient == REENGAGEMENT_RECIPIENT_MANAGER) ||
         ($reengagement->emailrecipient == REENGAGEMENT_RECIPIENT_BOTH)) {
-        // We're supposed to email the user's manager.
-        if (empty($user->mid)) {
-            // ... but the user doesn't have a manager.
-            debugging('', DEBUG_ALL) && mtrace("user $user->id has no manager present - unable to send email to manager");
+        // We're supposed to email the user's manager(s).
+        $managerids = \totara_job\job_assignment::get_all_manager_userids($user->id);
+        if (empty($managerids)) {
+            // User has no manager(s).
+            debugging('', DEBUG_ALL) && mtrace("user $user->id has no managers - not sending any manager emails.");
         } else {
-            // User has a manager.
-            // Create a shell user which contains what we know about the manager.
-            $manager = new stdClass();
-            $fieldnames = array('id', 'firstname', 'lastname', 'email', 'mailformat');
-            foreach ($fieldnames as $fieldname) {
-                $mfieldname = 'm' . $fieldname;
-                $manager->$fieldname = $user->$mfieldname;
+            // User has manager(s).
+            foreach ($managerids as $managerid) {
+                $manager = $DB->get_record('user', array('id' => $managerid));
+                $managersendresult = reengagement_send_notification($manager,
+                    $templateddetails['emailsubjectmanager'],
+                    html_to_text($templateddetails['emailcontentmanager']),
+                    $templateddetails['emailcontentmanager'],
+                    $reengagement
+                );
+                if (!$managersendresult) {
+                    mtrace("failed to send manager of user $user->id email for reengagement $reengagement->id");
+                }
+                $emailresult = $emailresult && $managersendresult;
             }
-
-            $managersendresult = reengagement_send_notification($manager,
-                $templateddetails['emailsubjectmanager'],
-                html_to_text($templateddetails['emailcontentmanager']),
-                $templateddetails['emailcontentmanager'],
-                $reengagement
-            );
-            if (!$managersendresult) {
-                mtrace("failed to send manager of user $user->id email for reengagement $reengagement->id");
-            }
-            $emailresult = $emailresult && $managersendresult;
         }
     }
     if (($reengagement->emailrecipient == REENGAGEMENT_RECIPIENT_USER) ||
@@ -805,9 +790,10 @@ function reengagement_supports($feature) {
  * Process an arbitary number of seconds, and prepare to display it as X minutes, or Y hours or Z weeks.
  *
  * @param int $duration FEATURE_xx constant for requested feature
+ * @param boolean $periodstring - return period as string.
  * @return array
  */
-function reengagement_get_readable_duration($duration) {
+function reengagement_get_readable_duration($duration, $periodstring = false) {
     if ($duration < 300) {
         $period = 60;
         $periodcount = 5;
@@ -819,6 +805,17 @@ function reengagement_get_readable_duration($duration) {
                 $periodcount = floor((int)$duration / (int)$period);
                 break;
             }
+        }
+    }
+    if ($periodstring) {
+        if ($period == 60) {
+            $period = get_string('minutes', 'reengagement');
+        } else if ($period == 3600) {
+            $period = get_string('hours', 'reengagement');
+        } else if ($period == 86400) {
+            $period = get_string('days', 'reengagement');
+        } else if ($period == 604800) {
+            $period = get_string('weeks', 'reengagement');
         }
     }
     return array($periodcount, $period); // Example 5, 60 is 5 minutes.

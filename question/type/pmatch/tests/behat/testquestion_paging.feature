@@ -24,20 +24,20 @@ Feature: Test the paging functionality of the test this question feature of this
     And I log in as "teacher"
 
   @javascript
-  Scenario: Create, edit then preview a pattern match question.
+  Scenario: Test this question paging
     # Confirm list responses pagin options is correctly displayed
     Given I am on the pattern match test responses page for question "My first pattern match question"
     Then I should see "Pattern-match question testing tool: Testing question: My first pattern match question"
     And I should see "What to include in the report"
     And I should see "Showing the responses for the selected question: My first pattern match question"
     And the field "id_pagesize" matches value "50"
-    
+
     # No paging should exist yet
-    Then "div.paging span.current-page" "css_element" should not exist
-    
+    Then ".pagination" "css_element" should not exist
+
     # Set paging to 10 and check results
     When I set the field "id_pagesize" to "10"
     Then I press "id_submitbutton"
     Then the field "id_pagesize" matches value "10"
-    And I should see "1" in the "div.paging span.current-page" "css_element"
-    And I should see "Next" in the "div.paging a.next" "css_element"
+    And I should see "1" in the ".pagination .page-item.active" "css_element"
+    And I should see "Next" in the ".pagination" "css_element"

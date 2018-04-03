@@ -22,7 +22,7 @@ Feature: Test the try rule feature
       | Test questions   | pmatch   | My first pattern match question | listen    |
     And the default question test responses exist for question "My first pattern match question"
     And I log in as "teacher"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "Question bank" node in "Course administration"
     And I click on "Preview" "link" in the "My first pattern match question" "table_row"
     And I switch to "questionpreview" window
@@ -32,7 +32,7 @@ Feature: Test the try rule feature
     And I press "Continue"
 
   @javascript
-  Scenario: Create, edit then preview a pattern match question.
+  Scenario: Test the pmatch try rule feature
     # Confirm list responses is correct.
     Then I should see "Pattern-match question testing tool: Testing question: My first pattern match question"
     And I should see "(Pos=1/6 Neg=6/6 Unm=1 Acc=58%)"

@@ -171,7 +171,7 @@ if ($data = $form->get_data()) {
 			$deleteaffiliates[] = $deleteaffiliateid;
 			foreach ($affiliates as $affiliate) {
 				if ($deleteaffiliateid == $affiliate->id) {
-					$modaltext .= "<li>".$affiliate->fullname."(".$affiliate->shortname.")"."ID: $deleteaffiliateid</li>";
+					$modaltext .= "<li>".$affiliate->fullname."(".$affiliate->shortname.")</li>";
 					break;
 				}
 			}
