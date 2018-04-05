@@ -15,19 +15,17 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information
+ * Plugin version and other meta-data are defined here.
  *
- * @package    mod_reengagement
- * @author     Peter Bulmer <peter.bulmer@catlayst.net.nz>
- * @copyright  2016 Catalyst IT {@link http://www.catalyst.net.nz}
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     tool_policy
+ * @copyright   2018 David Mudrák <david@moodle.com>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2018040500;   // The current module version.
-$plugin->requires  = 2017111300;
-$plugin->component = 'mod_reengagement';
-$plugin->release   = '3.5.1';
-$plugin->maturity  = MATURITY_STABLE;
-$plugin->cron      = 0; // Now uses a scheduled task.
+$plugin->component = 'tool_policy';
+$plugin->release = '34.1.0';
+$plugin->version = 2017111304;
+$plugin->requires = 2017111302;
+$plugin->maturity = MATURITY_BETA;

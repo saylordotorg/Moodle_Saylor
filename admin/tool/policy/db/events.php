@@ -15,19 +15,18 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information
+ * This file defines observers needed by the plugin.
  *
- * @package    mod_reengagement
- * @author     Peter Bulmer <peter.bulmer@catlayst.net.nz>
- * @copyright  2016 Catalyst IT {@link http://www.catalyst.net.nz}
+ * @package    tool_policy
+ * @copyright   2018 Mihail Geshoski <mihail@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2018040500;   // The current module version.
-$plugin->requires  = 2017111300;
-$plugin->component = 'mod_reengagement';
-$plugin->release   = '3.5.1';
-$plugin->maturity  = MATURITY_STABLE;
-$plugin->cron      = 0; // Now uses a scheduled task.
+$observers = [
+    [
+        'eventname'   => '\core\event\user_created',
+        'callback'    => '\tool_policy\api::create_acceptances_user_created',
+    ],
+];
