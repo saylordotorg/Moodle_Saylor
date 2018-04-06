@@ -5,6 +5,7 @@ http://moodle.org/plugins/view.php?plugin=mod_checklist
 
 ==Changes==
 
+* 2018-04-02 - declare plugin stores no user data (for GDPR), this version only compatible with M3.4+
 * 2015-12-23 - hide block from guests / users without 'updateown' capability (and no 'viewreports' capability)
 * 2015-01-01 - Display overview of all courses, when added to My home or Front page (thanks to Richard Wallace for this)
 * 2014-09-08 - Match up to new checklist activity after backup & restore

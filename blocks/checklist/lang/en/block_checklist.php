@@ -11,3 +11,4 @@ $string['nochecklistplugin'] = 'You need to install the latest version of the ch
 $string['notenrolled'] = 'You are not enrolled on any courses';
 $string['nousers'] = 'No users';
 $string['pluginname'] = 'Checklist';
+$string['privacy:null_reason'] = 'The checklist block displays information gathered from one or more checklist activities, but does not store any data itself.';

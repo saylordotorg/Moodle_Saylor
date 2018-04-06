@@ -22,11 +22,7 @@ if (!$course = $DB->get_record('course', array('id' => $courseid))) {
 }
 
 require_login($course->id);
-if ($CFG->version < 2011120100) {
-    $context = get_context_instance(CONTEXT_COURSE, $course->id);
-} else {
-    $context = context_course::instance($course->id);
-}
+$context = context_course::instance($course->id);
 
 require_capability('gradeexport/checklist:view', $context);
 $viewall = has_capability('gradeexport/checklist:viewall', $context);
@@ -257,32 +253,18 @@ foreach ($users as $user) {
 
         } else if ($field == '_startdate') {
             $firstview = null;
-            if ($CFG->branch < 27) {
-                $select = "userid = ? AND course = ? AND module = 'course' AND action = 'view'";
+            $manager = get_log_manager();
+            $readers = $manager->get_readers('\core\log\sql_reader');
+            /** @var \core\log\sql_reader $reader */
+            $reader = reset($readers);
+            if ($reader) {
+                $select = "userid = ? AND courseid = ? AND target = 'course' AND action = 'viewed'";
                 $params = array($user->id, $course->id);
-                $entries = $DB->get_records_select('log', $select, $params, 'time ASC', 'id, time', 0, 1);
-                $entry = reset($entries);
-                if ($entry) {
-                    $firstview = $entry->time;
-                }
-            } else {
-                $manager = get_log_manager();
-                if ($CFG->branch < 29) {
-                    $readers = $manager->get_readers('\core\log\sql_select_reader');
-                } else {
-                    $readers = $manager->get_readers('\core\log\sql_reader');
-                }
-                /** @var \core\log\sql_reader $reader */
-                $reader = reset($readers);
-                if ($reader) {
-                    $select = "userid = ? AND courseid = ? AND target = 'course' AND action = 'viewed'";
-                    $params = array($user->id, $course->id);
-                    $events = $reader->get_events_select($select, $params, 'timecreated ASC', 0, 1);
-                    /** @var \core\event\base $event */
-                    $event = reset($events);
-                    if ($event) {
-                        $firstview = $event->timecreated;
-                    }
+                $events = $reader->get_events_select($select, $params, 'timecreated ASC', 0, 1);
+                /** @var \core\event\base $event */
+                $event = reset($events);
+                if ($event) {
+                    $firstview = $event->timecreated;
                 }
             }
             $datestr = '';
