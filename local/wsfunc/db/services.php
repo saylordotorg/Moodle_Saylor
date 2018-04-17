@@ -49,6 +49,13 @@ $functions = array(
                 'classpath'   => 'local/wsfunc/externallib.php',
                 'description' => 'Get the last access time for a specified user.',
                 'type'        => 'read',
+        ),
+        'local_wsfunc_programpartner_get_users' => array(
+                'classname'   => 'local_wsfunc_external',
+                'methodname'  => 'programpartner_get_users',
+                'classpath'   => 'local/wsfunc/externallib.php',
+                'description' => 'Get a list of users assigned to the ProgramPartner\'s cohorts',
+                'type'        => 'read',
         )
 );
 // We define the services to install as pre-build services. A pre-build service is not editable by administrator.

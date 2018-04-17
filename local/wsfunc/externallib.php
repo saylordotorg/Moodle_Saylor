@@ -659,5 +659,84 @@ class local_wsfunc_external extends external_api {
             array('lastaccess' => new external_value(PARAM_INT, 'Last access time'))
         );
     }
+
+    /**
+     * Returns description of method parameters
+     * @return external_function_parameters
+     */
+    public static function programpartner_get_users_parameters() {
+        return new external_function_parameters(
+            array()
+        );
+    }
+
+    /**
+     * Get user information for users in cohorts assigned via cohort roles.
+     *
+     * 
+     * @return array An array of arrays containing user profiles.
+     */
+    public static function programpartner_get_users() {
+        global $CFG, $DB, $USER;
+        require_once($CFG->dirroot . "/user/lib.php");
+        require_once($CFG->dirroot . "/cohort/lib.php");
+        require_once($CFG->dirroot . "/lib/classes/user.php");
+
+        $cohorts = array();
+        $cohortmemberid = array();
+        $users = array();
+
+        // Get cohortrole records for the user accessing the API.
+        $records = $DB->get_records('tool_cohortroles', array('userid' => $USER->id));
+        // Create a list of cohorts the accessing user has been some sort of role to.
+        foreach ($records as $record) {
+            $cohorts[] = $record->cohortid;
+        }
+
+        // Now get a list of userids in each of these cohorts.
+        foreach ($cohorts as $cohortid) {
+            // Get users in the cohort.
+            $cohortmembers = $DB->get_records('cohort_members', array('cohortid' => $cohortid));
+
+            foreach ($cohortmembers as $cohortmember) {
+                // Add the userids to a list.
+                $cohortmemberid[] = $cohortmember->userid;
+            }
+        }
+
+        // Get user objects for all userids that were previously found.
+        foreach ($cohortmemberid as $userid) {
+            $user = core_user::get_user($userid);
+            if ($user !== false) {
+                $users[] = $user;
+            }
+        }
+
+        // Finally retrieve each users information.
+        $returnedusers = array();
+        foreach ($users as $user) {
+            $userdetails = user_get_user_details_courses($user);
+
+            // Return the user only if details are returned.
+            // Otherwise it means that the $USER was not allowed to search the returned user.
+            if (!empty($userdetails)) {
+                $returnedusers[] = $userdetails;
+            }
+        }
+
+        return $returnedusers;
+
+    }
+
+    /**
+     * Returns description of method result value
+     *
+     * @return external_description
+     */
+    public static function programpartner_get_users_returns() {
+        global $CFG;
+        require_once($CFG->dirroot . "/user/externallib.php");
+        return new external_multiple_structure(core_user_external::user_description());
+    }
  
 }

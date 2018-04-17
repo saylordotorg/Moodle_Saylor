@@ -132,6 +132,20 @@ class manager {
     }
 
     /**
+     * Retrieve the reason for implementing the null provider interface.
+     *
+     * @param  string $component Frankenstyle component name.
+     * @return string The key to retrieve the language string for the null provider reason.
+     */
+    public function get_null_provider_reason(string $component) : string {
+        if ($this->component_implements($component, \core_privacy\local\metadata\null_provider::class)) {
+            return $this->get_provider_classname($component)::get_reason();
+        } else {
+            throw new \coding_exception('Call to undefined method', 'Please only call this method on a null provider.');
+        }
+    }
+
+    /**
      * Get the privacy metadata for all components.
      *
      * @return collection[] The array of collection objects, indexed by frankenstyle component name.
@@ -284,22 +298,9 @@ class manager {
      * @return array the array of frankenstyle component names.
      */
     protected function get_component_list() {
-        $components = [];
-        // Get all plugins.
-        $plugintypes = \core_component::get_plugin_types();
-        foreach ($plugintypes as $plugintype => $typedir) {
-            $plugins = \core_component::get_plugin_list($plugintype);
-            foreach ($plugins as $pluginname => $plugindir) {
-                $components[] = $plugintype . '_' . $pluginname;
-            }
-        }
-        // Get all subsystems.
-        foreach (\core_component::get_core_subsystems() as $name => $path) {
-            if (isset($path)) {
-                $components[] = 'core_' . $name;
-            }
-        }
-        return $components;
+        return array_keys(array_reduce(\core_component::get_component_list(), function($carry, $item) {
+            return array_merge($carry, $item);
+        }, []));
     }
 
     /**
