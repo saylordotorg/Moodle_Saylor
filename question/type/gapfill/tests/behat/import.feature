@@ -1,5 +1,5 @@
 @qtype @qtype_gapfill
-Feature: Test importing drag and drop into text questions
+Feature: Test importing Gapfill questions
   As a teacher
   In order to reuse Gapfill questions
   I need to import them
@@ -15,7 +15,7 @@ Feature: Test importing drag and drop into text questions
       | user     | course | role           |
       | teacher1 | C1     | editingteacher |
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage with editing mode on
 
   @javascript @_file_upload
   Scenario: import drag and drop into text question.

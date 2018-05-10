@@ -17,7 +17,7 @@
 /**
  * Unit tests for the gapfill question type class.
  *
- * @package    qtype_gpfill
+ * @package    qtype_gapfill
  * @copyright  2012 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -36,6 +36,10 @@ require_once($CFG->dirroot . '/question/type/gapfill/tests/helper.php');
  */
 class qtype_gapfill_test extends advanced_testcase {
 
+    /**
+     *  explained here https://docs.moodle.org/dev/Unit_test_API
+     * @var array
+     */
     public static $includecoverage = array(
         'question/type/questiontypebase.php',
         'question/type/gapfill/questiontype.php',
@@ -97,7 +101,7 @@ class qtype_gapfill_test extends advanced_testcase {
 
     public function test_extra_question_fields() {
         $extraquestionfields = array('question_gapfill', 'answerdisplay', 'delimitchars',
-            'casesensitive', 'noduplicates', 'disableregex', 'fixedgapsize', 'optionsaftertext');
+            'casesensitive', 'noduplicates', 'disableregex', 'fixedgapsize', 'optionsaftertext', 'letterhints');
         $this->assertEquals($this->qtype->extra_question_fields(), $extraquestionfields);
     }
 }

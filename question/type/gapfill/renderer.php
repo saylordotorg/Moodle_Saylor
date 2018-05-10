@@ -243,7 +243,7 @@ class qtype_gapfill_renderer extends qtype_with_combined_feedback_renderer {
      */
     public function get_aftergap_text(question_attempt $qa, $fraction, $itemsettings, $rightanswer = "") {
         $aftergaptext = "";
-        if (($fraction == 0) && ($rightanswer <> "") && ($rightanswer <> ".+")) {
+        if (($fraction == 0) && ($rightanswer <> "") && ($rightanswer <> ".+") && ($this->displayoptions->rightanswer)) {
             /* replace | operator with the word or */
             $rightanswerdisplay = preg_replace("/\|/", get_string("or", "qtype_gapfill"), $rightanswer);
             /* replace !! with the 'blank' */

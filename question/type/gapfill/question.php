@@ -15,14 +15,12 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Gapfill question definition class. This class is mainly about
- * what happens at runtime, when the quesiton is part of a quiz
+ * Gapfill question definition class. Mainly about runtime
  *
  * @package    qtype_gapfill
  * @copyright  2017 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 defined('MOODLE_INTERNAL') || die();
 /**
  * Gapfill question definition class. This class is mainly about
