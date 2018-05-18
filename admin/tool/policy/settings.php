@@ -31,7 +31,6 @@ if (empty($CFG->sitepolicyhandler) || $CFG->sitepolicyhandler !== 'tool_policy')
 
 $managecaps = [
     'tool/policy:managedocs',
-    'tool/policy:manageprivacy',
     'tool/policy:viewacceptances',
 ];
 

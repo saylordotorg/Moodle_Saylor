@@ -32,6 +32,7 @@ $userid   = optional_param('userid', $USER->id, PARAM_INT);
 
 $PAGE->set_url(new moodle_url($CFG->wwwroot.'/grade/report/quizanalytics/index.php', array('id' => $courseid)));
 $PAGE->requires->css('/grade/report/quizanalytics/css/styles.css', true);
+$PAGE->requires->css('/grade/report/quizanalytics/css/bootstrap.min.css', true);
 $PAGE->requires->js('/grade/report/quizanalytics/js/jquery.min.js', true);
 ?>
 <script type="text/javascript">
@@ -164,7 +165,7 @@ if (!$getquiz) {
         if (count($getquizattemptsnotgraded) == count($getquizattempts)) {
             $row[] = get_string('notgraded', 'gradereport_quizanalytics');
         } else {
-            $row[] = "<a href='#' class='fetchdata'
+            $row[] = "<a href='#' id='fetchdata' class='fetchdata'
             data-url='".$CFG->wwwroot."/grade/report/quizanalytics/fetchdata.php'
             data-user_id='".$USER->id."' data-quize_id='".$getquizval->id."'
             data-course_id='".$courseid."'>"
@@ -183,7 +184,7 @@ if (!empty($table)) {
 
 $html = '<div class="showanalytics">
             <div class="tabbable parentTabs">
-                <ul class="nav nav-tabs">
+                <ul class="nav nav-tabs alyticsul">
                     <li class="active">
                         <a href="#tabs-1"><span class="lastattemptsummary">Last </span>
                         '.get_string('tab1', 'gradereport_quizanalytics').'</a>
@@ -206,7 +207,7 @@ $html = '<div class="showanalytics">
                     </div>
                     <div class="tab-pane fade" id="tabs-2">
                         <div class="tabbable">
-                            <ul class="nav nav-tabs">
+                            <ul class="nav nav-tabs alyticsul">
                                 <li class="active"><a href="#subtab21">
                                     <span class="subtab1">'.get_string('tab2subtab11', 'gradereport_quizanalytics').'</span>
                                     <span class="subtab2">'.get_string('tab2subtab12', 'gradereport_quizanalytics').'</span>
@@ -248,7 +249,7 @@ $html = '<div class="showanalytics">
                     </div>
                     <div class="tab-pane fade" id="tabs-3">
                         <div class="tabbable">
-                            <ul class="nav nav-tabs">
+                            <ul class="nav nav-tabs alyticsul">
                                 <li class="active">
                                     <a href="#subtab31">'.get_string('tab3subtab1', 'gradereport_quizanalytics').'</a>
                                 </li>
@@ -280,7 +281,7 @@ $html = '<div class="showanalytics">
                     </div>
                     <div class="tab-pane fade" id="tabs-4">
                         <div class="tabbable">
-                            <ul class="nav nav-tabs">
+                            <ul class="nav nav-tabs alyticsul">
                                 <li class="active">
                                     <a href="#subtab41">'.get_string('tab4subtab1', 'gradereport_quizanalytics').'</a>
                                 </li>

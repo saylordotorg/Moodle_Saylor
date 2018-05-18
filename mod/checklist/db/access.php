@@ -14,9 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Capability definitions for the checklist module
- */
+defined('MOODLE_INTERNAL') || die();
+
+// Capability definitions for the checklist module.
 
 $capabilities = array(
     // Check if user is able to add a checklist module (M2.3+ only).

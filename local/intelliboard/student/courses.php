@@ -48,11 +48,7 @@ $params = array(
 	'mode'=> 1
 );
 $intelliboard = intelliboard($params);
-if (isset($intelliboard->content)) {
-    $factorInfo = json_decode($intelliboard->content);
-} else {
-	$factorInfo = '';
-}
+$factorInfo = chart_options();
 
 if($courseid and $action == 'details'){
 	$progress = intelliboard_learner_course_progress($courseid, $USER->id);
@@ -99,6 +95,8 @@ $t20 = get_config('local_intelliboard', 't20');
 $t21 = get_config('local_intelliboard', 't21');
 $t22 = get_config('local_intelliboard', 't22');
 $t47 = get_config('local_intelliboard', 't47');
+$course_chart = get_config('local_intelliboard', 'course_chart');
+$course_activities = get_config('local_intelliboard', 'course_activities');
 
 echo $OUTPUT->header();
 ?>
@@ -180,6 +178,11 @@ echo $OUTPUT->header();
 							<a class="course-details" href="" value="<?php echo $item->id; ?>"><i class="ion-podium"></i>
 								<strong><?php echo get_string('close','local_intelliboard');?></strong>
 							</a>
+                            <?php if($course_activities):?>
+                                <a class="course-activities" href="grades.php">
+                                    <i class="ion-university"></i>
+                                </a>
+                            <?php endif;?>
 						</span>
 						<a class="more" href="<?php echo $CFG->wwwroot; ?>/course/view.php?id=<?php echo $item->id; ?>"><?php echo get_string('view_course_details','local_intelliboard');?></a>
 					</div>

@@ -1,35 +1,34 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-///////////////////////////////////////////////////////////////////////////
-//                                                                       //
-// NOTICE OF COPYRIGHT                                                   //
-//                                                                       //
-// Moodle - Modular Object-Oriented Dynamic Learning Environment         //
-//          http://moodle.com                                            //
-//                                                                       //
-// Copyright (C) 1999 onwards  Martin Dougiamas  http://moodle.com       //
-//                                                                       //
-// This program is free software; you can redistribute it and/or modify  //
-// it under the terms of the GNU General Public License as published by  //
-// the Free Software Foundation; either version 2 of the License, or     //
-// (at your option) any later version.                                   //
-//                                                                       //
-// This program is distributed in the hope that it will be useful,       //
-// but WITHOUT ANY WARRANTY; without even the implied warranty of        //
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         //
-// GNU General Public License for more details:                          //
-//                                                                       //
-//          http://www.gnu.org/copyleft/gpl.html                         //
-//                                                                       //
-///////////////////////////////////////////////////////////////////////////
+/**
+ * Main entry point
+ *
+ * @package   gradeexport_checklist
+ * @copyright 2010 Davo Smith
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
-
-require_once(dirname(dirname(dirname(dirname(__FILE__)))).'/config.php');
+require_once(__DIR__.'/../../../config.php');
+global $CFG, $PAGE, $DB, $CFG;
 require_once($CFG->dirroot.'/grade/lib.php');
 
-$courseid = required_param('id', PARAM_INT);                   // course id
+$courseid = required_param('id', PARAM_INT);
 
-$PAGE->set_url(new moodle_url('/grade/export/checklist/index.php', array('id'=>$courseid)));
+$PAGE->set_url(new moodle_url('/grade/export/checklist/index.php', array('id' => $courseid)));
 if (!$course = $DB->get_record('course', array('id' => $courseid))) {
     print_error('nocourseid');
 }
@@ -45,20 +44,20 @@ if (!$viewall && !$viewdistrict) {
     print_error('nopermission', 'gradeexport_checklist');
 }
 
-// Build navigation
+// Build navigation.
 $strgrades = get_string('grades');
 $strchkgrades = get_string('pluginname', 'gradeexport_checklist');
 
 print_grade_page_head($COURSE->id, 'export', 'checklist', $strchkgrades);
 
-// Get list of appropriate checklists
+// Get list of appropriate checklists.
 $checklists = $DB->get_records('checklist', array('course' => $course->id));
 
 if (empty($checklists)) {
-    print_error('nochecklists','gradeexport_checklist');
+    print_error('nochecklists', 'gradeexport_checklist');
 }
 
-// Get list of districts
+// Get list of districts.
 if ($DB->get_record('user_info_field', array('shortname' => 'district'))) {
     if (!$viewall) {
         $sql = "SELECT ud.data AS district FROM {user_info_data} ud, {user_info_field} uf ";
@@ -68,7 +67,7 @@ if ($DB->get_record('user_info_field', array('shortname' => 'district'))) {
         if ($district) {
             $districts = array($district->district);
         } else {
-            $districts = array(get_string('nodistrict','gradeexport_checklist'));
+            $districts = array(get_string('nodistrict', 'gradeexport_checklist'));
         }
 
     } else {
@@ -82,10 +81,10 @@ if ($DB->get_record('user_info_field', array('shortname' => 'district'))) {
     $districts = false;
 }
 
-// Get list of groups
+// Get list of groups.
 $groupsmenu = array();
-$groupsmenu[0] = get_string('allparticipants'); // Always available - only exports groups user has access to
-if ($course->groupmode == VISIBLEGROUPS or has_capability('moodle/site:accessallgroups', $context)) {
+$groupsmenu[0] = get_string('allparticipants'); // Always available - only exports groups user has access to.
+if ($course->groupmode == VISIBLEGROUPS || has_capability('moodle/site:accessallgroups', $context)) {
     $allowedgroups = groups_get_all_groups($course->id);
 } else {
     $allowedgroups = groups_get_all_groups($course->id, $USER->id);
@@ -97,9 +96,11 @@ if ($allowedgroups) {
     }
 }
 
-echo "<br /><div class=\"checklist_export_options\"><form action='{$CFG->wwwroot}/grade/export/checklist/export.php' method='post'>";
+echo "<br /><div class=\"checklist_export_options\">";
+echo "<form action='{$CFG->wwwroot}/grade/export/checklist/export.php' method='post'>";
 
-echo '<label for="choosechecklist">'.get_string('choosechecklist','gradeexport_checklist').':</label> <select id="choosechecklist" name="choosechecklist">';
+echo '<label for="choosechecklist">'.get_string('choosechecklist', 'gradeexport_checklist').':</label> '.
+    '<select id="choosechecklist" name="choosechecklist">';
 $selected = ' selected="selected" ';
 foreach ($checklists as $checklist) {
     echo "<option $selected value='{$checklist->id}'>{$checklist->name}</option>";
@@ -108,9 +109,10 @@ foreach ($checklists as $checklist) {
 echo '</select><br/>';
 
 if ($districts) {
-    echo '<label for="choosedistrict">'.get_string('choosedistrict','gradeexport_checklist').':</label> <select id="choosedistrict" name="choosedistrict">';
+    echo '<label for="choosedistrict">'.get_string('choosedistrict', 'gradeexport_checklist').
+        ':</label> <select id="choosedistrict" name="choosedistrict">';
     if ($viewall) {
-        echo '<option selected="selected" value="ALL">'.get_string('alldistrict','gradeexport_checklist').'</option>';
+        echo '<option selected="selected" value="ALL">'.get_string('alldistrict', 'gradeexport_checklist').'</option>';
         $selected = '';
     } else {
         $selected = ' selected="selected" ';
@@ -122,20 +124,21 @@ if ($districts) {
     echo '</select><br/>';
 }
 
-if (count($groupsmenu) == 1) {
+if (count($groupsmenu) === 1) {
     $groupname = reset($groupsmenu);
     echo '<input type="hidden" name="group" value="'.key($groupsmenu).'" />';
 } else {
     echo '<label for="group">'.get_string('group').':</label> <select id="group" name="group">';
     $selected = ' selected="selected" ';
-    foreach ($groupsmenu as $groupid=>$groupname) {
+    foreach ($groupsmenu as $groupid => $groupname) {
         echo "<option $selected value='{$groupid}'>$groupname</option>";
         $selected = '';
     }
     echo '</select><br/>';
 }
 
-echo '<label for="exportoptional">'.get_string('exportoptional', 'gradeexport_checklist').':</label> <select id="exportoptional" name="exportoptional">';
+echo '<label for="exportoptional">'.get_string('exportoptional', 'gradeexport_checklist').
+    ':</label> <select id="exportoptional" name="exportoptional">';
 echo '<option selected="selected" value="1">'.get_string('yes').'</option>';
 echo '<option value="0">'.get_string('no').'</option>';
 echo '</select><br/>';
@@ -152,7 +155,7 @@ echo get_string('percentheadings2', 'gradeexport_checklist').'<br/><br/>';
 
 echo '<input type="hidden" name="id" value="'.$course->id.'" />';
 
-echo '<input type="submit" name="export" value="'.get_string('export','gradeexport_checklist').'" />';
+echo '<input type="submit" name="export" value="'.get_string('export', 'gradeexport_checklist').'" />';
 
 echo '</form></div>';
 

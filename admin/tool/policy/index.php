@@ -35,23 +35,19 @@ define('NO_SITEPOLICY_CHECK', true);
 // @codingStandardsIgnoreLine See the {@link page_agreedocs} for the access control checks.
 require(__DIR__.'/../../../config.php');
 
-$action = optional_param('action', null, PARAM_ALPHA);
+$submit = optional_param('submit', null, PARAM_NOTAGS);
+$cancel = optional_param('cancel', null, PARAM_NOTAGS);
 $agreedocs = optional_param_array('agreedoc', null, PARAM_INT);
 $behalfid = optional_param('userid', null, PARAM_INT);
 
 $PAGE->set_context(context_system::instance());
+$PAGE->set_pagelayout('standard');
 $PAGE->set_url('/admin/tool/policy/index.php');
 $PAGE->set_popup_notification_allowed(false);
 
-$haspermissionagreedocs = false;
 if (!empty($USER->id)) {
     // Existing user.
-    if (empty($behalfid) || $behalfid == $USER->id) {
-        $haspermissionagreedocs = has_capability('tool/policy:accept', context_system::instance());
-    } else {
-        $usercontext = \context_user::instance($behalfid);
-        $haspermissionagreedocs = has_capability('tool/policy:acceptbehalf', $usercontext);
-    }
+    $haspermissionagreedocs = api::can_accept_policies($behalfid);
 } else {
     // New user.
     $haspermissionagreedocs = true;
@@ -59,8 +55,13 @@ if (!empty($USER->id)) {
 
 if (!$haspermissionagreedocs) {
     $outputpage = new \tool_policy\output\page_nopermission($behalfid);
+} else if ($cancel) {
+    redirect(new moodle_url('/'));
 } else {
-    $outputpage = new \tool_policy\output\page_agreedocs($agreedocs, $behalfid, $action);
+    if (!$behalfid && \core\session\manager::is_loggedinas()) {
+        $behalfid = $USER->id;
+    }
+    $outputpage = new \tool_policy\output\page_agreedocs($agreedocs, $behalfid, $submit);
 }
 
 $output = $PAGE->get_renderer('tool_policy');

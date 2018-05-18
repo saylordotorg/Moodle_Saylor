@@ -93,6 +93,7 @@
 .intelliboard-courses-grid li .course-stats div{display: inline-block;text-align: center;width: 32%;}
 .intelliboard-courses-grid li .course-stats div span{font-size: 12px;opacity: 0.6}
 .intelliboard-courses-grid li .course-stats div p{font-size: 19px;font-weight: 200;}
+.intelliboard-courses-grid li .course-activities i{vertical-align: bottom;}
 
 .intelliboard-courses-grid li.f1{border-color: #428bca; } /* blue */
 .intelliboard-courses-grid li.f1 .icon,
@@ -112,10 +113,10 @@
 
 
 .intelliboard-origin .avg{margin:20px 0; box-sizing: border-box;border: 1px solid #ddd;border-radius: 5px;}
-.intelliboard-origin p{font-size:17px;font-weight:600; margin:0;padding:15px; display: inline-block;width: 49.7%; box-sizing: border-box; text-align: center;}
+.intelliboard-origin p{font-size:17px;font-weight:600; margin:0;padding:15px; display: inline-block;width: calc(50% - 2px); box-sizing: border-box; text-align: center;}
 .intelliboard-origin p span{font-size:13px;font-weight:400; color: #999; display: block;margin-top: 3px;}
-.intelliboard-origin p.site{color: #1d7fb3;}
-.intelliboard-origin p.user{color: #1db34f; border-right: 1px solid #ddd;}
+.intelliboard-origin p.site{color: #1d7fb3; border-left: 1px solid #ddd;}
+.intelliboard-origin p.user{color: #1db34f;}
 .intelliboard-origin .avg.full p.site,
 .intelliboard-origin .avg.full p.user{display: block;border:0;width: auto;}
 .intelliboard-chart-dash{width:100%;height:250px}
@@ -178,6 +179,7 @@
 .chart-tab .filter-box input{width: 49%; padding:8px 16px;margin-bottom: 0; height:auto;box-sizing: border-box; float: left;margin-right: 2%;}
 .chart-tab .filter-box .intelliboard-dropdown{width: 49%; float: left;}
 .chart-tab .area{ height:350px;}
+.chart-tab .filter-box .intelliboard-dropdown.users{margin-left: 2%;}
 
 .nav-tabs span{float:right;padding-top: 2px;}
 .nav-tabs span a{font-size: 21px; line-height:28px;color:#ddd; margin-left: 8px;}
@@ -197,7 +199,7 @@
 .table-tabs.icono span a.active,
 .table-tabs.icono span a:hover{color:#666;}
 
-.area .google-visualization-tooltip{ padding:5px; height:auto!important;}
+.area:not(.custom-tooltip) .google-visualization-tooltip{ padding:5px; height:auto!important;}
 
 .intelli-instructor-header{	border-bottom: 1px solid #ddd;  margin-bottom: 40px;}
 .intelli-instructor-header .instructor-head{width: 70%;float: left;box-sizing: border-box; border-right: 1px solid #ddd; box-sizing: border-box;padding-top: 10px}
@@ -450,6 +452,26 @@
 .info-progress .goal{border-right:3px solid #686868; z-index:3;}
 .info-hidden{opacity:0;text-indent:-9999px;height: 1px;width:1px;}
 
+
+.intelliboard-content{
+	position: relative;
+}
+#iframe{
+	position: relative;
+}
+#iframe iframe{
+	position: relative;
+	z-index: 1;
+}
+#iframe-loading{
+	position: absolute;
+	top: 80px;
+	left: 0;
+	width: 100%;
+	font-size: 15px;
+	letter-spacing: 1px;
+	text-align: center;
+}
 #daterange.disabled{
 	opacity: 0.4;
 	cursor: default;
@@ -638,3 +660,25 @@ position: relative;
 .intelliboard-analytics .head-box .export-box .btn{margin-left: 5px;}
 .intelliboard-content h4 {font-size: 19px;font-weight: 400;}
 .intelliboard-analytics div.google-visualization-tooltip { padding: 5px;height: auto!important;}
+
+@media screen and (max-width: 600px) {
+	body .intelliboard-origin p{
+		border: 0 !important;
+		width: 100%;
+	}
+}
+@media screen and (max-width: 800px) {
+
+}
+@media screen and (max-width: 1000px) {
+	body .intelliboard-courses-grid{width: 100%; margin-right: 0;}
+	body .intelliboard-courses-grid li{width: 100%; margin-right: 0;}
+	body .intelliboard-box .box40,
+	body .intelliboard-box .box45,
+	body .intelliboard-box .box60,
+	body .intelliboard-box .box50{width: 100%;}
+	body .intelliboard-box > div:not(:first-child){margin-top: 15px;}
+
+    .intelli-instructor-header .instructor-head{float: none;width: 100%;border-right: none;border-bottom: 1px solid #ddd;}
+    .intelli-instructor-header .summary{float: none;width: 100%;box-shadow: none;padding-left: 0;}
+}

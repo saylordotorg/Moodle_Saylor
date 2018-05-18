@@ -912,7 +912,7 @@ class format_grid extends format_base {
                             3 => new lang_string('sectiontitleboxinsidepositionbottom', 'format_grid')
                         )
                     ),
-                    'help' => 'sectiontitleboxposition',
+                    'help' => 'sectiontitleboxinsideposition',
                     'help_component' => 'format_grid'
                 );
                 $courseformatoptionsedit['sectiontitleboxheight'] = array(

@@ -15,8 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file contains tests that walks a question through the interactive
- * behaviour.
+ * These tests walks a question through the interactive behaviour
  *
  * @package    qtype_gapfill
  * @copyright  2012 Marcus Green
@@ -30,7 +29,7 @@ require_once($CFG->dirroot . '/question/type/gapfill/tests/helper.php');
 
 /**
  * Unit tests for the gapfill question type.
- * Not complete, needs more examples.
+ *
  * @copyright  2012 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

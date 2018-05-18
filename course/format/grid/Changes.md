@@ -1,5 +1,8 @@
 History
 =============
+Version 3.4.0.4
+ 1. Fix incorrect help for 'sectiontitleboxinsideposition' setting.
+
 Version 3.4.0.3
   1. Fix double entry for a course in the format_grid_summary when restoring.
   2. Fix logic of showing grid boxes depending on if it is visible against the grey out setting and course 'Hidden sections' option.

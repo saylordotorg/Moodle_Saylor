@@ -145,7 +145,7 @@ incorrec answer was entered */
 }
 
 .que.gapfill input.correctduplicate {
-    background-color: #ffff00;
+    background-color: #ff0;
 }
 
 .que.gapfill input.correct {

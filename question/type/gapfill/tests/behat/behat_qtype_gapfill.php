@@ -15,8 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Behat steps definitions for drag and drop into text. Based on code
- * from ddwtos developed by the Open University
+ * Behat steps definitions for gapfill drag drop into text.
  *
  * @package   qtype_gapfill
  * @category  test
@@ -37,7 +36,7 @@ class behat_qtype_gapfill extends behat_base {
 
     /**
      * Get the xpath for a given gap
-     * @param string $dragitem the gap id number
+     * @param string $gapnumber the gap id number
      * @return string the xpath expression.
      */
     protected function drop_xpath($gapnumber) {

@@ -1,3 +1,13 @@
+### Version 1.972 of the Moodle Gapfill question type May 2018
+Fixed a bug where correct answers were shown even thought it was turned off in the quiz settings checkbox.
+Thanks to Matthias Giger and contributors to the Moodle German language for reporting this. Fixed
+a bug introduced in the last release whereby the value of optionaftertext was not being saved. Thanks
+to Elton LaClare for reporting that. Additional PHPDocs, code standards compliance and confirmation that 
+it works with Moodle 3.5.
+
+Implemented privacy API for GDPR compliance, see discussion here
+https://moodle.org/mod/forum/discuss.php?d=365857
+
 ### Version 1.971 of the Moodle Gapfill question type Feb 2018
 Bug fix for issue where dragdrop did not work on iOS. Improvements in code standards compliance.
 

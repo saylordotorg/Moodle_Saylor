@@ -99,8 +99,7 @@ class page_viewdoc implements renderable, templatable {
         }
 
         if (empty($this->policy)) {
-            // TODO Make this nicer error message.
-            throw new \moodle_exception('err_no_active_version', 'tool_policy');
+            throw new \moodle_exception('errorpolicyversionnotfound', 'tool_policy');
         }
     }
 
@@ -156,11 +155,13 @@ class page_viewdoc implements renderable, templatable {
         $data = (object) [
             'pluginbaseurl' => (new moodle_url('/admin/tool/policy'))->out(false),
             'returnurl' => $this->returnurl ? (new moodle_url($this->returnurl))->out(false) : null,
-            'editurl' => ($this->manage && $this->policy->status != policy_version::STATUS_ARCHIVED) ? (new moodle_url('/admin/tool/policy/editpolicydoc.php',
-                ['policyid' => $this->policy->policyid, 'versionid' => $this->policy->id]))->out(false) : null,
             'numpolicy' => $this->numpolicy ? : null,
             'totalpolicies' => $this->totalpolicies ? : null,
         ];
+        if ($this->manage && $this->policy->status != policy_version::STATUS_ARCHIVED) {
+            $paramsurl = ['policyid' => $this->policy->policyid, 'versionid' => $this->policy->id];
+            $data->editurl = (new moodle_url('/admin/tool/policy/editpolicydoc.php', $paramsurl))->out(false);
+        }
 
         $data->policy = clone($this->policy);
 

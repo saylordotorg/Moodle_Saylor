@@ -136,6 +136,7 @@ $string['pluginname_link'] = 'question/type/algebra';
 $string['pluginname_help'] = 'Student enter a formula as response that include one or more variables. Correctness is evaluted using one of 3 differents methods';
 $string['pluginname'] = 'Algebra';
 $string['pluginnamesummary'] = 'Student enter a formula that can include one or more variables. Correctness is evaluted using one of 3 differents methods.';
+$string['privacy:metadata'] = 'The Algebra question type plugin does not store any personal data.';
 $string['host'] = 'Host url of SAGE server';
 $string['port'] = 'Port of SAGE server';
 $string['uri'] = 'uri of SAGE server';

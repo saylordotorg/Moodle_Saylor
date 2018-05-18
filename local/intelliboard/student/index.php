@@ -47,11 +47,7 @@ $params = array(
     'mode'=> 1
 );
 $intelliboard = intelliboard($params);
-if (isset($intelliboard->content)) {
-    $factorInfo = json_decode($intelliboard->content);
-} else {
-    $factorInfo = '';
-}
+$factorInfo = chart_options();
 
 $action = optional_param('action', '', PARAM_ALPHANUMEXT);
 $search = clean_raw(optional_param('search', '', PARAM_RAW));
@@ -174,6 +170,13 @@ if(get_config('local_intelliboard', 't02')){
 if(get_config('local_intelliboard', 't03')){
     array_push($menu, get_string('last_semester','local_intelliboard'));
 }
+if(get_config('local_intelliboard', 'this_year')){
+    array_push($menu, get_string('this_year','local_intelliboard'));
+}
+if(get_config('local_intelliboard', 'last_year')){
+    array_push($menu, get_string('last_year','local_intelliboard'));
+}
+
 
 echo $OUTPUT->header();
 ?>
@@ -186,10 +189,10 @@ echo $OUTPUT->header();
             <?php if($t5 or $t6): ?>
                 <div class="intelliboard-origin-head clearfix">
                     <?php if($t5): ?>
-                        <a><?php echo get_string('activity_progress', 'local_intelliboard'); ?></a>
+                        <a href="#"><?php echo get_string('activity_progress', 'local_intelliboard'); ?></a>
                     <?php endif; ?>
                     <?php if($t6): ?>
-                        <a class="nofilter"><?php echo get_string('course_progress', 'local_intelliboard'); ?></a>
+                        <a href="#" class="nofilter"><?php echo get_string('course_progress', 'local_intelliboard'); ?></a>
                     <?php endif; ?>
                     <div class="intelliboard-dropdown">
                         <?php foreach($menu as $key=>$value): ?>
@@ -230,7 +233,7 @@ echo $OUTPUT->header();
         <?php if($t9 or $t10 or $t11): ?>
             <div class="intelliboard-box">
                 <?php if($t9 or $t10): ?>
-                    <div class="<?php echo (!$t11)?'box100':'box45'; ?> pull-left">
+                    <div class="<?php echo (!$t11)?'box100':'box45'; ?> pull-right">
                         <ul class="nav nav-tabs">
                             <?php if($t9): ?>
                                 <li role="presentation" class="nav-item active"><a class="nav-link active" href="assignment"><?php echo get_string('assignments', 'local_intelliboard'); ?></a></li>
@@ -399,7 +402,7 @@ echo $OUTPUT->header();
 
 
                 <?php if($t11): ?>
-                    <div class="<?php echo (!$t9 and !$t10)?'box100':'box50'; ?>  pull-right">
+                    <div class="<?php echo (!$t9 and !$t10)?'box100':'box50'; ?>  pull-left">
                         <ul class="nav nav-tabs clearfix">
                             <li role="presentation" class="nav-item active"><a class="nav-link active" href="#"><?php echo get_string('course_progress', 'local_intelliboard'); ?></a></li>
 
@@ -440,8 +443,16 @@ echo $OUTPUT->header();
                                         <a href="<?php echo $CFG->wwwroot; ?>/course/view.php?id=<?php echo s($item->id); ?>"><?php echo format_string($item->fullname); ?></a>
                                     </td>
                                     <?php if($t35): ?>
+                                    <?php
+                                        $completion = 0;
+                                        if ($item->timecompleted) {
+                                            $completion = 100;
+                                        } elseif ($item->completedmodules) {
+                                            $completion = ($item->completedmodules / $item->modules) * 100;
+                                        }
+                                        ?>
                                         <td width="100">
-                                            <div class="intelliboard-progress g1 xl intelliboard-tooltip"  title="<?php echo "Activities: ".s($item->modules).", Completed: ".s($item->completedmodules); ?>"><span style="width:<?php echo ($item->completedmodules) ? (($item->completedmodules / $item->modules) * 100) : 0; ?>%"></span></div>
+                                            <div class="intelliboard-progress g1 xl intelliboard-tooltip"  title="<?php echo "Activities: ".s($item->modules).", Completed: ".s($item->completedmodules); ?>"><span style="width:<?php echo $completion; ?>%"></span></div>
                                         </td>
                                     <?php endif; ?>
 
@@ -479,7 +490,7 @@ echo $OUTPUT->header();
         <?php if($t12 or $t13 or $t14 or $t15): ?>
             <div class="intelliboard-box">
                 <?php if($t12 or $t13): ?>
-                    <div class="<?php echo (!$t14 and !$t15)?'box100':'box40'; ?> pull-left h410">
+                    <div class="<?php echo (!$t14 and !$t15)?'box100':'box40'; ?> pull-right h410">
                         <ul class="nav nav-tabs chart-tabs">
                             <?php if($t12): ?>
                                 <li role="presentation" class="nav-item active"><a class="nav-link active" href="#"><?php echo get_string('activity_participation', 'local_intelliboard'); ?></a></li>
@@ -500,7 +511,7 @@ echo $OUTPUT->header();
                 <?php endif; ?>
 
                 <?php if($t14 or $t15): ?>
-                    <div class="<?php echo (!$t12 and !$t13)?'box100':'box50'; ?> pull-right h410">
+                    <div class="<?php echo (!$t12 and !$t13)?'box100':'box50'; ?> pull-left h410">
                         <ul class="nav nav-tabs chart-tabs">
                             <?php if($t14): ?>
                                 <li role="presentation" class="nav-item active"><a class="nav-link active" href="#"><?php echo get_string('course_success', 'local_intelliboard'); ?></a></li>
@@ -588,6 +599,7 @@ echo $OUTPUT->header();
             jQuery('.nav-tabs li a').click(function(e){
                 e.preventDefault();
                 jQuery(this).parent().parent().find('li').removeClass("active");
+                jQuery(this).parent().parent().find('a').removeClass("active");
                 jQuery(this).parent().parent().find('.intype').val(jQuery(this).attr('href'));
                 jQuery(this).parent().addClass("active");
                 jQuery(this).parent().parent().parent().find('.tab').removeClass("active").eq(jQuery(this).parent().index()).addClass("active");
@@ -685,7 +697,7 @@ echo $OUTPUT->header();
             var options = <?php echo format_string($factorInfo->CourseProgressCalculation); ?>;
             var chart = new google.visualization.ComboChart(document.getElementById('intelliboard-chart-combo'));
             chart.draw(data, options);
-            jQuery('.intelliboard-origin-head a:first').trigger('click');
+            jQuery('.intelliboard-origin-head a:first-child')[0].click();
         }
         <?php endif; ?>
 
@@ -702,7 +714,7 @@ echo $OUTPUT->header();
             var options = <?php echo format_string($factorInfo->ActivityProgressCalculation); ?>;
             var chart = new google.visualization.LineChart(document.getElementById('intelliboard-chart'));
             chart.draw(data, options);
-            jQuery('.intelliboard-origin-head a:first').trigger('click');
+            jQuery('.intelliboard-origin-head a:first-child')[0].click();
         }
         <?php endif; ?>
     </script>

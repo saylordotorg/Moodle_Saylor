@@ -26,8 +26,9 @@ use mod_checklist\local\checklist_comment;
 use mod_checklist\local\checklist_item;
 use mod_checklist\local\output_status;
 
-require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
-require_once(dirname(__FILE__).'/lib.php');
+defined('MOODLE_INTERNAL') || die();
+global $CFG;
+require_once($CFG->dirroot.'/mod/checklist/lib.php');
 
 define("CHECKLIST_TEXT_INPUT_WIDTH", 45);
 define("CHECKLIST_OPTIONAL_NO", 0);
@@ -137,6 +138,14 @@ class checklist_class {
             $this->canlinkcourses = (bool)get_config('mod_checklist', 'linkcourses');
         }
         return $this->canlinkcourses;
+    }
+
+    /**
+     * Force checklist into 'edit dates' mode (really only needed by behat generator).
+     * @param bool $edit
+     */
+    public function set_editing_dates($edit) {
+        $this->editdates = (bool)$edit;
     }
 
     /**
@@ -1734,7 +1743,7 @@ class checklist_class {
         $item->itemoptional = $optional;
         $item->hidden = $hidden;
         $item->duetime = 0;
-        if ($duetime) {
+        if ($this->editdates && $duetime) {
             $item->duetime = make_timestamp($duetime['year'], $duetime['month'], $duetime['day']);
         }
         $item->eventid = 0;
@@ -1785,6 +1794,7 @@ class checklist_class {
                 $event->delete();
             } catch (dml_missing_record_exception $e) {
                 // Just ignore this error - the event is missing, so does not need deleting.
+                $event = null; // Do something here to stop codechecker complaining.
             }
             $item->eventid = 0;
             if ($add) {
@@ -1829,7 +1839,8 @@ class checklist_class {
         }
     }
 
-    protected function updateitem($itemid, $displaytext, $duetime = false, $linkcourseid = null, $linkurl = null, $grouping = null) {
+    protected function updateitem($itemid, $displaytext, $duetime = false, $linkcourseid = null, $linkurl = null,
+                                  $grouping = null) {
         $displaytext = trim($displaytext);
         if ($displaytext == '') {
             return;
@@ -1842,9 +1853,11 @@ class checklist_class {
                 $item = $this->items[$itemid];
                 $oldlinkcourseid = $item->linkcourseid;
                 $item->displaytext = $displaytext;
-                $item->duetime = 0;
-                if ($duetime) {
-                    $item->duetime = make_timestamp($duetime['year'], $duetime['month'], $duetime['day']);
+                if ($this->editdates) {
+                    $item->duetime = 0;
+                    if ($duetime) {
+                        $item->duetime = make_timestamp($duetime['year'], $duetime['month'], $duetime['day']);
+                    }
                 }
                 $item->linkcourseid = $linkcourseid;
                 $item->linkurl = $linkurl;

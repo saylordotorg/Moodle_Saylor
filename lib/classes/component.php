@@ -471,10 +471,8 @@ $cache = '.var_export($cache, true).';
             'plugin'      => null,
             'portfolio'   => $CFG->dirroot.'/portfolio',
             'privacy'     => $CFG->dirroot . '/privacy',
-            'publish'     => $CFG->dirroot.'/course/publish',
             'question'    => $CFG->dirroot.'/question',
             'rating'      => $CFG->dirroot.'/rating',
-            'register'    => $CFG->dirroot.'/'.$CFG->admin.'/registration', // Broken badly if $CFG->admin changed.
             'repository'  => $CFG->dirroot.'/repository',
             'rss'         => $CFG->dirroot.'/rss',
             'role'        => $CFG->dirroot.'/'.$CFG->admin.'/roles',
@@ -483,7 +481,7 @@ $cache = '.var_export($cache, true).';
             'tag'         => $CFG->dirroot.'/tag',
             'timezones'   => null,
             'user'        => $CFG->dirroot.'/user',
-            'userkey'     => null,
+            'userkey'     => $CFG->dirroot.'/lib/userkey',
             'webservice'  => $CFG->dirroot.'/webservice',
         );
 

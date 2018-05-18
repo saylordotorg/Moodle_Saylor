@@ -108,7 +108,7 @@ class mod_checklist_privacy_provider_testcase extends \core_privacy\tests\provid
      * Test for provider::get_metadata().
      */
     public function test_get_metadata() {
-        $collection = new collection('mod_choice');
+        $collection = new collection('mod_checklist');
         $newcollection = provider::get_metadata($collection);
         $itemcollection = $newcollection->get_collection();
         $this->assertCount(3, $itemcollection);
@@ -120,6 +120,10 @@ class mod_checklist_privacy_provider_testcase extends \core_privacy\tests\provid
         $this->assertArrayHasKey('userid', $privacyfields);
         $this->assertArrayHasKey('displaytext', $privacyfields);
         $this->assertEquals('privacy:metadata:checklist_item', $table->get_summary());
+        foreach ($privacyfields as $field) {
+            get_string($field, 'mod_checklist');
+        }
+        get_string($table->get_summary(), 'mod_checklist');
 
         $table = array_shift($itemcollection);
         $this->assertEquals('checklist_check', $table->get_name());
@@ -131,6 +135,10 @@ class mod_checklist_privacy_provider_testcase extends \core_privacy\tests\provid
         $this->assertArrayHasKey('teachertimestamp', $privacyfields);
         $this->assertArrayHasKey('teacherid', $privacyfields);
         $this->assertEquals('privacy:metadata:checklist_check', $table->get_summary());
+        foreach ($privacyfields as $field) {
+            get_string($field, 'mod_checklist');
+        }
+        get_string($table->get_summary(), 'mod_checklist');
 
         $table = array_shift($itemcollection);
         $this->assertEquals('checklist_comment', $table->get_name());
@@ -140,6 +148,10 @@ class mod_checklist_privacy_provider_testcase extends \core_privacy\tests\provid
         $this->assertArrayHasKey('commentby', $privacyfields);
         $this->assertArrayHasKey('text', $privacyfields);
         $this->assertEquals('privacy:metadata:checklist_comment', $table->get_summary());
+        foreach ($privacyfields as $field) {
+            get_string($field, 'mod_checklist');
+        }
+        get_string($table->get_summary(), 'mod_checklist');
     }
 
     /**
@@ -322,8 +334,8 @@ class mod_checklist_privacy_provider_testcase extends \core_privacy\tests\provid
         $this->assertEquals($student->id, $DB->get_field('checklist_check', 'userid', []));
 
         // Delete the data for the first student, for all checklists.
-        $contextlist = new \core_privacy\local\request\approved_contextlist($this->student, 'checklist',
-                                                                            [$ctxs[0]->id, $ctxs[1]->id, $ctxs[2]->id, $ctxs[3]->id]);
+        $contextids = [$ctxs[0]->id, $ctxs[1]->id, $ctxs[2]->id, $ctxs[3]->id];
+        $contextlist = new \core_privacy\local\request\approved_contextlist($this->student, 'checklist', $contextids);
         provider::delete_data_for_user($contextlist);
 
         // After deletion, we should have 1 checked off item, 1 custom item, 1 comment and 13 total items.

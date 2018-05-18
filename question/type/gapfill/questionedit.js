@@ -74,8 +74,6 @@ function Item(text, delimitchars) {
     Item.prototype.get_itemsettings = function(target) {
         var itemid = target.id;
         var underscore = itemid.indexOf("_");
-        /* var id = itemid.substr(2, underscore);
-        var id = id.substr(0, id.indexOf("_"));*/
         /* The instance, normally 0 but incremented if a gap has the same text as another
          * instance is not currently used*/
         this.instance = itemid.substr(underscore + 1);
@@ -188,7 +186,7 @@ $("#id_itemsettings_canvas").on("click", function(e) {
         $('#id_itemsettings_popup .atto_media_button').attr("disabled", 'true');
         $('#id_itemsettings_popup .atto_managefiles_button').attr("disabled", 'true');
         var title = M.util.get_string("additemsettings", "qtype_gapfill");
-        /* the html jquery call will turn any encoded entities such as &gt; to html, i.e. > */
+        /* The html jquery call will turn any encoded entities such as &gt; to html, i.e. > */
         title += ': ' + $("<div/>").html(item.stripdelim()).text();
         require(['jquery', 'jqueryui'], function($, jqui) {
             $("#id_itemsettings_popup").dialog({
