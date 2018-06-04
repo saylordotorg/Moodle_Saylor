@@ -49,7 +49,7 @@ function intelliboard_compl_sql($prefix = "", $sep = true)
         return $prefix . "completionstate IN(1,2)"; //Default completed and passed
     }
 }
-function intelliboard_grade_sql($avg = false, $params = null, $alias = 'g.', $round = 2)
+function intelliboard_grade_sql($avg = false, $params = null, $alias = 'g.', $round = 0)
 {
     $scales = get_config('local_intelliboard', 'scales');
     $raw = get_config('local_intelliboard', 'scale_raw');
@@ -112,13 +112,16 @@ function intelliboard($params, $function = 'sso'){
 
 	require_once($CFG->libdir . '/filelib.php');
 
+    $api = get_config('local_intelliboard', 'api');
+    $url = ($api) ? 'https://api.intelliboard.net/' : intelliboard_url();
+
     $params['email'] = get_config('local_intelliboard', 'te1');
 	$params['apikey'] = get_config('local_intelliboard', 'apikey');
     $params['url'] = $CFG->wwwroot;
 	$params['lang'] = current_language();
 
 	$curl = new curl;
-	$json = $curl->post(intelliboard_url() . 'moodleApi/' . $function, $params, []);
+	$json = $curl->post($url . 'moodleApi/' . $function, $params, []);
 
 	$data = (object)json_decode($json);
 	$data->status = (isset($data->status))?$data->status:'';

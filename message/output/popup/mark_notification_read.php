@@ -15,18 +15,33 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Local plugin "Boost navigation fumbling" - Version file
+ * Mark a notification read and redirect to the relevant content.
  *
- * @package    local_boostnavigation
- * @copyright  2017 Alexander Bias, Ulm University <alexander.bias@uni-ulm.de>
+ * @package    message_popup
+ * @copyright  2018 Michael Hawkins
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+require_once(__DIR__ . '/../../../config.php');
 
-$plugin->component = 'local_boostnavigation';
-$plugin->version = 2018051700;
-$plugin->release = 'v3.4-r4';
-$plugin->requires = 2017111300;
-$plugin->maturity = MATURITY_STABLE;
-$plugin->dependencies = array('theme_boost' => 2017111300);
+require_login(null, false);
+
+if (isguestuser()) {
+    redirect($CFG->wwwroot);
+}
+
+$notificationid = required_param('notificationid', PARAM_INT);
+$redirecturl = optional_param('redirecturl', $CFG->wwwroot, PARAM_LOCALURL);
+
+$notification = $DB->get_record('message', array('id' => $notificationid, 'notification' => 1));
+
+// If found, is unread, so mark read if belongs to this user.
+if ($notification) {
+    if ($USER->id == $notification->useridto) {
+        message_mark_message_read($notification, time());
+    } else {
+        $redirecturl = $CFG->wwwroot;
+    }
+}
+
+redirect($redirecturl);

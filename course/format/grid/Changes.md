@@ -1,7 +1,9 @@
 History
 =============
 Version 3.4.0.4
- 1. Fix incorrect help for 'sectiontitleboxinsideposition' setting.
+  1. Fix incorrect help for 'sectiontitleboxinsideposition' setting.
+  2. Fix for grey out issue - https://moodle.org/mod/forum/discuss.php?d=364153#p1492053.
+  3. Implement Privacy API.
 
 Version 3.4.0.3
   1. Fix double entry for a course in the format_grid_summary when restoring.

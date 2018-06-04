@@ -696,8 +696,10 @@ class format_grid_renderer extends format_section_renderer_base {
             // Check if there is an availability restriction.
             $ci = new \core_availability\info_section($section);
             $fullinfo = $ci->get_full_information();
-            if ($fullinfo) {
+            $information = '';
+            if ($fullinfo && (!$ci->is_available($information))) {
                 $sectiongreyedout = true;
+                $information = '';
             }
         }
         return $sectiongreyedout;
