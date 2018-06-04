@@ -5,7 +5,7 @@
 def mysql_source_dbname = 'moodle'
 def mysql_dest_dbname = 'moodle_test'
 
-def moodle_version = 'MOODLE_34_STABLE'
+def moodle_version = 'MOODLE_35_STABLE'
 
 def plugins = [
     [
@@ -253,12 +253,6 @@ def plugins = [
         "url" : 'https://github.com/saylordotorg/moodle-local_affiliations',
         "branch" : 'development',
         "dest" : 'local/affiliations'
-    ],
-    [
-        "name" : 'tool_policy',
-        "url" : 'https://github.com/moodlehq/moodle-tool_policy',
-        "branch" : 'MOODLE_34_STABLE',
-        "dest" : 'admin/tool/policy'
     ]
 ]
 
