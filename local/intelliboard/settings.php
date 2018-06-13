@@ -97,6 +97,12 @@ if($ADMIN->fulltree){
         $setting = new admin_setting_configcheckbox($name, $title, $description, false, true, false);
         $settings->add($setting);
 
+        $name = 'local_intelliboard/api';
+        $title = new lang_string('api', 'local_intelliboard');
+        $description = new lang_string('api_desc', 'local_intelliboard');
+        $setting = new admin_setting_configcheckbox($name, $title, $description, false, true, false);
+        $settings->add($setting);
+
         $settings->add(new admin_setting_heading('local_intelliboard/filters', new lang_string('filters', 'local_intelliboard'), ''));
 
         $name = 'local_intelliboard/filter1';
@@ -263,6 +269,11 @@ if($ADMIN->fulltree){
         $setting = new admin_setting_configcheckbox($name, $title, '', true, true, false);
         $settings->add($setting);
 
+        $name = 'local_intelliboard/n18';
+        $title = new lang_string('n18', 'local_intelliboard');
+        $setting = new admin_setting_configcheckbox($name, $title, '', true, true, false);
+        $settings->add($setting);
+
         $name = 'local_intelliboard/n7';
         $title = new lang_string('n7', 'local_intelliboard');
         $setting = new admin_setting_configcheckbox($name, $title, '', true, true, false);
@@ -276,6 +287,11 @@ if($ADMIN->fulltree){
         $name = 'local_intelliboard/n16';
         $title = new lang_string('n16', 'local_intelliboard');
         $setting = new admin_setting_configcheckbox($name, $title, '', true, true, false);
+        $settings->add($setting);
+
+        $name = 'local_intelliboard/group_aggregation';
+        $title = new lang_string('group_aggregation', 'local_intelliboard');
+        $setting = new admin_setting_configcheckbox($name, $title, '', false, true, false);
         $settings->add($setting);
 
         $settings->add(new admin_setting_heading('local_intelliboard/ts1', new lang_string('ts1', 'local_intelliboard'), ''));
@@ -331,9 +347,30 @@ if($ADMIN->fulltree){
         $setting = new admin_setting_configcheckbox($name, $title, '', true, true, false);
         $settings->add($setting);
 
+        $name = 'local_intelliboard/t08';
+        $title = new lang_string('t08', 'local_intelliboard');
+        $setting = new admin_setting_configcheckbox($name, $title, '', true, true, false);
+        $settings->add($setting);
+
         $name = 'local_intelliboard/t07';
         $title = new lang_string('t07', 'local_intelliboard');
         $setting = new admin_setting_configcheckbox($name, $title, '', true, true, false);
+        $settings->add($setting);
+
+        $roles_user = $DB->get_records_sql("SELECT r.* 
+                                            FROM {role} r 
+                                              LEFT JOIN {role_context_levels} rcl ON rcl.roleid=r.id
+                                            WHERE rcl.contextlevel=:contextlevel GROUP BY r.id",array('contextlevel'=>CONTEXT_USER));
+        $roles_user = role_fix_names($roles_user);
+        $roles_user_arr = array('0'=>get_string('disable'));
+        foreach($roles_user as $role){
+            $roles_user_arr[$role->id] = $role->localname;
+        }
+
+        $name = 'local_intelliboard/t09';
+        $title = new lang_string('t09', 'local_intelliboard');
+        $desc = new lang_string('select_manager_role', 'local_intelliboard');
+        $setting = new admin_setting_configselect($name, $title, $desc, 0, $roles_user_arr);
         $settings->add($setting);
 
         $settings->add(new admin_setting_heading('local_intelliboard/ts2', new lang_string('ts2', 'local_intelliboard'), ''));
@@ -642,6 +679,11 @@ if($ADMIN->fulltree){
 
         $name = 'local_intelliboard/scale_raw';
         $title = new lang_string('scale_raw', 'local_intelliboard');
+        $setting = new admin_setting_configcheckbox($name, $title, '', false, true, false);
+        $settings->add($setting);
+
+        $name = 'local_intelliboard/scale_real';
+        $title = new lang_string('scale_real', 'local_intelliboard');
         $setting = new admin_setting_configcheckbox($name, $title, '', false, true, false);
         $settings->add($setting);
 

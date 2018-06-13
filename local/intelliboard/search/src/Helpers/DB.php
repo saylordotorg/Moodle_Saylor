@@ -9,7 +9,7 @@ class DB {
 
     private static $systemWords = array(
         'students?', 'users?', 'admins?', 'learners?', 'courses?', 'activity', 'activities',
-        'cohorts?', 'guest', 'teachers?'
+        'cohorts?', 'guest', 'teachers?', 'data'
     );
 
     private static $operators = array(
@@ -33,18 +33,28 @@ class DB {
             "teacher_fullname" => "CONCAT_WS(' ', firstname, lastname)",
             "activity_activity" => function() {
                 return \get_modules_names();
-            }
+            },
+            "config_plugins_type" => "SUBSTRING_INDEX(plugin, '_', 1)",
+            "config_plugins_name" => "REPLACE(TRIM(BOTH '_' FROM SUBSTRING(plugin, POSITION('_' IN plugin))), '_', ' ')",
+            "local_plugins_name" => "REPLACE(TRIM(BOTH '_' FROM SUBSTRING(plugin, POSITION('_' IN plugin))), '_', ' ')",
         );
 
         self::$virtualTables = array(
-            "teacher" => function($settings) {
-                return array('sql' => '{user} AS u INNER JOIN {role_assignments} AS ra ON ra.userid = u.id AND ra.roleid IN(' . $settings['teacher_roles'] . ')', 'alias' => 'u');
+            "teacher" => function($settings, $getter) {
+                $getter->add('tables', '{user} AS u INNER JOIN {role_assignments} AS ra ON ra.userid = u.id AND ra.roleid IN(' . $settings['teacher_roles'] . ')');
+                return 'u';
             },
-            "student" => function($settings) {
-                return array('sql' => '{user} AS u INNER JOIN {role_assignments} AS ra ON ra.userid = u.id AND ra.roleid IN(' . $settings['learner_roles'] . ')', 'alias' => 'u');
+            "student" => function($settings, $getter) {
+                $getter->add('tables', '{user} AS u INNER JOIN {role_assignments} AS ra ON ra.userid = u.id AND ra.roleid IN(' . $settings['learner_roles'] . ')');
+                return 'u';
             },
-            "activity" => function() {
-                return array('sql' => '{modules} as m INNER JOIN {course_modules} as cm ON m.id = cm.module', 'alias' => 'cm');
+            "activity" => function($settings, $getter) {
+                $getter->add('tables', '{modules} as m INNER JOIN {course_modules} as cm ON m.id = cm.module');
+                return 'cm';
+            },
+            "local_plugins" => function($settings, $getter) {
+                $getter->add('tables', '{config_plugins} as cp');
+                return 'cp';
             }
         );
     }
@@ -95,7 +105,9 @@ class DB {
         static::applyFilters($table, $column, $getter, $types, $alias, $settings, $paramFilters, $additionalFields);
 
         if ($like) {
-            $getter->add('filters', "LOWER($column) LIKE LOWER('%$like%')");
+            $getter->add('filters', "LOWER($column) LIKE LOWER(:like)");
+            $getter->setParam('like', "%$like%");
+
         }
 
         if ($id) {
@@ -128,16 +140,17 @@ class DB {
         }, $result));
     }
 
-    public static function getTable($table, $settings) {
+    public static function getTable($table, $settings, $getter) {
 
         if (self::$virtualTables[$table]) {
-            $destination = (self::$virtualTables[$table])($settings);
+            $function = self::$virtualTables[$table];
+            $alias = $function($settings, $getter);
         } else {
             $alias = $table[0];
-            $destination = array('sql' => '{' . $table . '} as ' . $alias, "alias" => $alias);
+            $getter->add('tables', '{' . $table . '} as ' . $alias);
         }
 
-        return $destination;
+        return $alias;
 
     }
 
@@ -148,7 +161,8 @@ class DB {
             if (isset(self::$virtualColumns[$key])) {
 
                 if(is_callable(self::$virtualColumns[$key])) {
-                    $destination = (self::$virtualColumns[$key])($settings);
+                    $function = self::$virtualTables[$table];
+                    $destination = $function($settings);
                 } else {
                     $destination = self::$virtualColumns[$key];
                 }
@@ -168,27 +182,31 @@ class DB {
         $pluralize = 0,
         $escapeSystem = 0,
         $additionalFields = array(),
-        $pattern = null
+        $pattern = null,
+        $prefix = null
     ) {
 
         global $DB;
 
-        $pattern = $pattern? $pattern : ":sentence " . static::getOperator("regexp") . " CONCAT('[[:<:]]', :column, '[[:>:]]')";
         list($table, $column, $getter, $types, $alias) = static::start($table, $column, $params);
+        $variants = array();
+
+        if (!empty($prefix['value'])) {
+            $prefix['value'] = (is_array($prefix['value'])? '(' . implode('|', $prefix['value']) . ')' : $prefix['value']);
+        }
 
         if ($pluralize || in_array('custom', $types)) {
-
             $values = static::getParamsFromDB($table, $column, $params, null, null, null, $pluralize, array(), $additionalFields);
 
-            $values = array_map(function($value) {
+            array_walk($values, function($value) {
                 $value['value'] = trim($value['value']);
-                return $value;
-            }, $values);
+            });
 
             $values = array_filter($values, function($value) use($escapeSystem) {
                 if ($value['value'] === '') {
                     return false;
                 }
+
                 if ($escapeSystem) {
                     $systemWords = implode('|', static::$systemWords);
 
@@ -196,6 +214,7 @@ class DB {
                         return false;
                     }
                 }
+
                 return true;
             });
 
@@ -203,22 +222,45 @@ class DB {
                 return strlen($b['value']) - strlen($a['value']);
             });
 
-            $variants = array();
-
             foreach($values as $value) {
-                $sentence = preg_replace_callback('~\b' . $value['value'] . '\b~i',
-                    function ($matches) use (&$variants, $value) {
+
+                if ($prefix) {
+                    $search = $prefix['type'] === 'prefix'? $prefix['value'] . ' ' . $value['value'] : $value['value']  . ' ' . $prefix['value'];
+                    $replacement = $prefix['type'] === 'prefix'? ':prefix ' : ' :prefix';
+                } else {
+                    $search = $value['value'];
+                    $replacement = ' ';
+                }
+
+                $sentence = preg_replace_callback('~(?:^|\s)' . $search . '(?:\s|$)~i',
+                    function ($matches) use (&$variants, $value, $replacement, $prefix) {
                         $variants[] = $value;
-                        return '';
+
+                        return $prefix? str_replace(':prefix', $matches[1], $replacement) : $replacement;
                     }, $sentence, 1
                 );
+
+                if ($variants) {
+                    break;
+                }
+
             }
 
         } else {
 
+
             static::applyFilters($table, $column, $getter, $types, $alias, $params, array(), $additionalFields);
 
-            $getter->add('filters', str_replace(array(':column', ':sentence'), array($column, "'$sentence'"), $pattern));
+            if ($prefix) {
+                $search = ($prefix['type'] === 'prefix'? ":prefix, ' ',  $column" : "$column, ' ', :prefix");
+                $getter->setParam('prefix', trim($prefix['value']));
+            } else {
+                $search = $column;
+            }
+
+            $pattern = $pattern? $pattern : ":sentence " . static::getOperator("regexp") . " CONCAT('[[:<:]]', :column, '[[:>:]]')";
+
+            $getter->add('filters', str_replace(array(':column', ':sentence'), array($search, "'$sentence'"), $pattern));
             $getter->add('filters', "$column <> ''");
 
             if ($escapeSystem) {
@@ -232,15 +274,14 @@ class DB {
                 $getter->add('filters', "$column NOT IN ($systemWords)");
             }
 
-            $getter->add('columns', "REPLACE('$sentence', $column, '') as replacement");
-
+            $sentence = " $sentence ";
+            $getter->add('columns', "INSERT('$sentence', POSITION(CONCAT(' ', LOWER({$column})) IN '$sentence'), CHAR_LENGTH($column) + 1, ' ') as replacement");
             $data = $getter->release();
             $sql  = $data['sql'] . " ORDER BY CHAR_LENGTH($column) DESC LIMIT 1";
-
-
             $variant = json_decode(json_encode($DB->get_record_sql($sql, $data['params'])), true);
-            $sentence = $variant['replacement'] ?? $sentence;
+            $sentence = !empty($variant['replacement'])? $variant['replacement'] : $sentence;
             $variants = $variant? array(array_diff_key($variant, array('replacement' => 1))) : [];
+
         }
 
         if ($variants && $table === 'role') {
@@ -269,7 +310,9 @@ class DB {
             }
         }
 
-        $result = json_encode($variants);
+        $result = $variants;
+
+        static::removeInitialization();
         return compact('sentence', 'result');
     }
 
@@ -296,7 +339,7 @@ class DB {
         return compact('endings', 'found');
     }
 
-    protected function applyFilters(
+    protected static function applyFilters(
         &$table,
         &$column,
         ParamGetter $getter,
@@ -307,14 +350,17 @@ class DB {
         $additionalFields = array()
     ) {
 
-        $courseFilter   = !empty($paramFilters['course']) ? $paramFilters['course']     : false;
-        $roleFilter     = !empty($paramFilters['role']) ? $paramFilters['role']         : false;
-        $activityFilter = !empty($paramFilters['activity']) ? $paramFilters['activity'] : false;
-        $cohortFilter   = !empty($paramFilters['cohort']) ? $paramFilters['cohort']     : false;
-        $groupFilter    = !empty($paramFilters['group']) ? $paramFilters['group']       : false;
-        $teacherFilter  = !empty($paramFilters['teacher']) ? $paramFilters['teacher']   : false;
-        $enrolFilter    = !empty($paramFilters['enrol']) ? $paramFilters['enrol']       : false;
-        $moduleFilter   = !empty($paramFilters['module']) ? $paramFilters['module']    : false;
+        $courseFilter        = !empty($paramFilters['course']) ? $paramFilters['course']       : false;
+        $roleFilter          = !empty($paramFilters['role']) ? $paramFilters['role']           : false;
+        $activityFilter      = !empty($paramFilters['activity']) ? $paramFilters['activity']   : false;
+        $cohortFilter        = !empty($paramFilters['cohort']) ? $paramFilters['cohort']       : false;
+        $groupFilter         = !empty($paramFilters['group']) ? $paramFilters['group']         : false;
+        $teacherFilter       = !empty($paramFilters['teacher']) ? $paramFilters['teacher']     : false;
+        $enrolFilter         = !empty($paramFilters['enrol']) ? $paramFilters['enrol']         : false;
+        $moduleFilter        = !empty($paramFilters['module']) ? $paramFilters['module']       : false;
+        $userInfoDataFilter  = !empty($paramFilters['userdata']) ? $paramFilters['userdata']   : false;
+        $userInfoFieldFilter = !empty($paramFilters['userfield']) ? $paramFilters['userfield'] : false;
+        $userFilter          = !empty($paramFilters['user']) ? $paramFilters['user']           : false;
 
         $pluginTypes = array('certificate', 'questionnaire');
 
@@ -373,6 +419,12 @@ class DB {
                 $getter->add('filters', 'u.username <> \'guest\'');
             }
 
+            if ($userInfoDataFilter) {
+                $getter->add('tables', 'INNER JOIN {user_info_data} uid ON uid.userid = u.id');
+                $getter->add('filters', 'uid.data = :data');
+                $getter->setParam('data', $userInfoDataFilter);
+            }
+
             if (!empty($settings['external_id'])) {
                 $getter->setParam('external_id_1', $settings['external_id']);
                 $getter->setParam('external_id_2', $settings['external_id']);
@@ -405,7 +457,11 @@ class DB {
 
             if ($teacherFilter) {
                 $getter->add('tables', 'INNER JOIN {context} AS ctx ON ctx.instanceid = c.id AND ctx.contextlevel = 50');
-                $getter->add('tables', 'INNER JOIN {role_assignments} AS ra ON ra.contextid = ctx.id AND ra.roleid IN(' . $settings['teacher_roles'] . ')');
+
+                $sql = 'INNER JOIN {role_assignments} AS ra ON ra.contextid = ctx.id AND ra.roleid';
+                $roles = explode(',', $settings['teacher_roles']);
+
+                ParamGetter::in_sql($getter, 'tables', $sql, $roles);
                 $getter->add('filters', 'ra.userid = :teacher');
                 $getter->setParam('teacher', $teacherFilter);
             }
@@ -474,10 +530,10 @@ class DB {
 
             switch($originalColumn) {
                 case 'student':
-                    $getter->add('filters', 'r.id IN (' . $settings['learner_roles'] . ')');
+                    ParamGetter::in_sql($getter, 'filters', 'r.id', explode(',', $settings['learner_roles']));
                     break;
                 case 'teacher':
-                    $getter->add('filters', 'r.id IN (' . $settings['teacher_roles'] . ')');
+                    ParamGetter::in_sql($getter, 'filters', 'r.id', explode(',', $settings['teacher_roles']));
                     break;
                 case 'user':
                     break;
@@ -506,6 +562,30 @@ class DB {
             }
         }
 
+        if (in_array('local_plugins', $types)) {
+            $getter->add('filters', "$alias.plugin LIKE 'local_%'");
+        }
+
+        if (in_array('user_info_data', $types)) {
+            if ($userInfoFieldFilter) {
+                $getter->add('filters', 'fieldid = :field');
+                $getter->setParam('field', $userInfoFieldFilter);
+            }
+
+            if ($userFilter) {
+                $getter->add('filters', '{user_info_data}.userid = :user');
+                $getter->setParam('user', $userFilter);
+            }
+        }
+
+        if (in_array('user_info_field', $types)) {
+            if ($userInfoDataFilter) {
+                $getter->add('tables', 'INNER JOIN {user_info_data} uid ON uid.fieldid = {user_info_field}.id');
+                $getter->add('filters', 'uid.data = :data');
+                $getter->setParam('data', $userInfoDataFilter);
+            }
+        }
+
         static::addAdditionalFields($getter, $column, $additionalFields, $alias);
 
         if ($required = array_intersect($types, $pluginTypes)) {
@@ -527,8 +607,8 @@ class DB {
     protected static function addAdditionalFields ($getter, $column, $additionalFields = array(), $alias = false) {
         $alias = $alias? $alias . '.' : '';
         if ($additionalFields) {
-
             foreach ($additionalFields as $name => $field) {
+                $field = preg_replace('/\s+/', '', $field);
                 if (strpos($field, '.') === false) {
                     $getter->add('columns', $alias . $field . " as $name");
                 } else {
@@ -557,33 +637,36 @@ class DB {
                 $table = TablesContainer::getById($table)['sql'];
             }
 
+            $column = preg_replace('/\s+/', '', $column);
+            $table = preg_replace('/\s+/', '', $table);
+
             static::init();
 
             $table = trim($table, '{}');
 
-            $actual = static::getTable($table, $settings);
-            $column = static::getColumn($column, $table, $settings);
-
             $getter = new ParamGetter();
             $types = static::detectType($table);
-            $alias = $actual['alias'];
 
-            $getter->add('tables', $actual['sql']);
+            $alias = static::getTable($table, $settings, $getter);
+            $column = static::getColumn($column, $table, $settings);
 
             static::$initialized = array($table, $column, $getter, $types, $alias);
-
         }
 
         return static::$initialized;
     }
 
-    public static function detectType($table) {
+    public static function removeInitialization()
+    {
+        static::$initialized = false;
+    }
+
+    public static function detectType($table)
+    {
         global $DB;
 
         if(in_array($table, array('teacher', 'user', 'student'))) {
             return array('user');
-        } else if (in_array($table, array('course', 'cohort'))) {
-            return array($table);
         } else if (in_array($table, array_merge(array('activity'), array_keys($DB->get_records('modules', array(),null,'name'))))) {
             return array('module', $table);
         } else if (in_array($table, array('auth', 'enrol', 'country'))) {
@@ -596,7 +679,8 @@ class DB {
 
     }
 
-    protected static function getOperator($operator) {
+    protected static function getOperator($operator)
+    {
         global $CFG;
 
         $val = static::$operators[$operator];

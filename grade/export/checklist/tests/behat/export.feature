@@ -1,4 +1,4 @@
-@grade @gradeexport_checklist @checklist
+@grade @gradeexport @gradeexport_checklist @checklist
 Feature: Checklists export without warnings or errors
 
   Background:

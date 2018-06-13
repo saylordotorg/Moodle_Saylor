@@ -51,7 +51,7 @@ class provider implements
      * @return collection A listing of user data stored through this system.
      */
     public static function get_metadata(collection $collection) : collection {
-        $collection->add_database_table('log', [
+        $collection->add_database_table('logstore_standard_log', [
             'eventname' => 'privacy:metadata:log:eventname',
             'userid' => 'privacy:metadata:log:userid',
             'relateduserid' => 'privacy:metadata:log:relateduserid',
@@ -74,10 +74,8 @@ class provider implements
      */
     public static function add_contexts_for_userid(contextlist $contextlist, $userid) {
         $sql = "
-            SELECT ctx.id
-              FROM {context} ctx
-              JOIN {logstore_standard_log} l
-                ON l.contextid = ctx.id
+            SELECT l.contextid
+              FROM {logstore_standard_log} l
              WHERE l.userid = :userid1
                 OR l.relateduserid = :userid2
                 OR l.realuserid = :userid3";

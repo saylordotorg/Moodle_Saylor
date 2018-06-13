@@ -49,6 +49,25 @@ class provider implements
      * @return collection the updated collection of metadata items.
      */
     public static function get_metadata(collection $items) : collection {
+        $items->add_external_location_link(
+            'lti_provider',
+            [
+                'userid' => 'privacy:metadata:userid',
+                'username' => 'privacy:metadata:username',
+                'useridnumber' => 'privacy:metadata:useridnumber',
+                'firstname' => 'privacy:metadata:firstname',
+                'lastname' => 'privacy:metadata:lastname',
+                'fullname' => 'privacy:metadata:fullname',
+                'email' => 'privacy:metadata:email',
+                'role' => 'privacy:metadata:role',
+                'courseid' => 'privacy:metadata:courseid',
+                'courseidnumber' => 'privacy:metadata:courseidnumber',
+                'courseshortname' => 'privacy:metadata:courseshortname',
+                'coursefullname' => 'privacy:metadata:coursefullname',
+            ],
+            'privacy:metadata:externalpurpose'
+        );
+
         $items->add_database_table(
             'lti_submission',
             [
@@ -163,8 +182,9 @@ class provider implements
             return;
         }
 
-        $instanceid = $DB->get_field('course_modules', 'instance', ['id' => $context->instanceid], MUST_EXIST);
-        $DB->delete_records('lti_submission', ['ltiid' => $instanceid]);
+        if ($cm = get_coursemodule_from_id('lti', $context->instanceid)) {
+            $DB->delete_records('lti_submission', ['ltiid' => $cm->instance]);
+        }
     }
 
     /**
@@ -182,7 +202,7 @@ class provider implements
         $userid = $contextlist->get_user()->id;
         foreach ($contextlist->get_contexts() as $context) {
             if (!$context instanceof \context_module) {
-                return;
+                continue;
             }
             $instanceid = $DB->get_field('course_modules', 'instance', ['id' => $context->instanceid], MUST_EXIST);
             $DB->delete_records('lti_submission', ['ltiid' => $instanceid, 'userid' => $userid]);

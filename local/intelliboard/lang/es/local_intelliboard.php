@@ -81,7 +81,7 @@ $string['account'] = 'Información de suscripción';
 $string['te12'] = 'Nombre';
 $string['te13'] = 'Apellido';
 $string['te1'] = 'Correo';
-$string['te1_desc'] = 'Ingrese su nombre, apellido y correo utilizado con suscripción IntelliBoard.net.Si no tiene una suscripción activa, por favor regístrese en <a target="_blank" href="https://intelliboard.net">IntelliBoard.net</a>.Learner and Instructor Dashboard están disponibles con una suscripción de Nivel 4 y superior.';
+$string['te1_desc'] = 'Ingrese su correo utilizado con suscripción IntelliBoard.net.Si no tiene una suscripción activa, por favor regístrese en <a target="_blank" href="https://intelliboard.net">IntelliBoard.net</a>.Learner and Instructor Dashboard están disponibles con una suscripción de Nivel 4 y superior.';
 $string['n1'] = 'Información [Progreso del Aprendiz]';
 $string['n2'] = 'Información [Progreso de Notas]';
 $string['n3'] = 'Información [Progreso de Actividad]';
@@ -105,6 +105,8 @@ $string['t04'] = 'Habilitar cursos completados [título]';
 $string['t05'] = 'Habilitar cursos en progreso [título]';
 $string['t06'] = 'Habilitar nota promedio de cursos [título]';
 $string['t07'] = 'Habilitar Mensajes [título]';
+$string['t08'] = 'Habilitar nota suma de cursos [título]';
+$string['t09'] = 'El instructor puede ver a sus propios alumnos';
 $string['t1'] = 'Habilitar Dashboard del Aprendiz';
 $string['t2'] = 'Habilitar Dashboard';
 $string['t3'] = 'Habilitar cursos';
@@ -212,6 +214,7 @@ $string['graded'] = 'Calificado';
 $string['completed_courses'] = 'Cursos completados';
 $string['courses_in_progress'] = 'Cursos en progreso';
 $string['courses_avg_grade'] = 'Nota promedio de cursos';
+$string['courses_sum_grade'] = 'Nota suma de cursos';
 $string['grades'] = 'Notas';
 $string['messages'] = 'Mensajes';
 $string['x_completions'] = '{$a} Logros';
@@ -386,6 +389,7 @@ $string["topics"] = "Temas";
 $string["scalesettings"] = "Ajustes de escala";
 $string["scales"] = "Habilitar escala personalizada";
 $string["scale_raw"] = "Desactivar escala";
+$string['scale_real'] = 'Mostrar porcentaje real en lugar de porcentaje';
 $string["scale_total"] = "Grado total";
 $string["scale_value"] = "Valor";
 $string["scale_percentage"] = "Porcentaje";
@@ -405,5 +409,61 @@ $string['completions_desc'] = '1) El usuario ha completado esta actividad. No se
 2) El usuario ha completado esta actividad con un grado por encima de la calificación de aprobado. <br>
 3) El usuario ha completado esta actividad, pero su calificación es menor que la calificación de aprobado.';
 
-$string['reportselect'] = 'Please select at least one Report from the drop down menu in the Admin Dashboard before proceeding.';
-$string['monitorselect'] = 'Please select at least one Monitor from the drop down menu in the Admin Dashboard before proceeding.';
+$string['reportselect'] = 'Please select at least one report from App.IntelliBoard.net.  Click on a Report, then Report Settings, and select it in "Visible in Moodle".';
+$string['monitorselect'] = 'Please select at least one monitor from App.IntelliBoard.net.  Click on a Monitors, then Monitors Settings, and select it in "Visible in Moodle".';
+
+
+$string['privacy:metadata:local_intelliboard_assign:rel'] = 'Rel type of record';
+$string['privacy:metadata:local_intelliboard_assign:type'] = 'Moodle Instance Type';
+$string['privacy:metadata:local_intelliboard_assign:instance'] = 'Connected Moodle Instance ID';
+$string['privacy:metadata:local_intelliboard_assign:timecreated'] = 'Records Timestamp';
+
+$string['privacy:metadata:local_intelliboard_details:logid'] = 'Table ID [local_intelliboard_logs]';
+$string['privacy:metadata:local_intelliboard_details:visits'] = 'The number of visits, mouse clicks, per day';
+$string['privacy:metadata:local_intelliboard_details:timespend'] = 'The amount of time spent per hour';
+$string['privacy:metadata:local_intelliboard_details:timepoint'] = 'The hour';
+
+$string['privacy:metadata:local_intelliboard_logs:trackid'] = 'The ID of the table [local_intelliboard_tracking]';
+$string['privacy:metadata:local_intelliboard_logs:visits'] = 'Visits, mouse clicks, per day';
+$string['privacy:metadata:local_intelliboard_logs:timespend'] = 'Timespent, per day';
+$string['privacy:metadata:local_intelliboard_logs:timepoint'] = 'Timestamp of day in year';
+
+$string['privacy:metadata:local_intelliboard_totals:sessions'] = 'Total Number of User Sessions in Moodle';
+$string['privacy:metadata:local_intelliboard_totals:courses'] = 'Total Courses in Moodle';
+$string['privacy:metadata:local_intelliboard_totals:visits'] = 'Total Visits by all Ssers in Moodle';
+$string['privacy:metadata:local_intelliboard_totals:timespend'] = 'Total Users Timespent in Moodle';
+$string['privacy:metadata:local_intelliboard_totals:timepoint'] = 'Timestamp of day in year';
+
+$string['privacy:metadata:local_intelliboard_tracking:userid'] = 'User ID who visits Moodle Page.';
+$string['privacy:metadata:local_intelliboard_tracking:courseid'] = 'Course ID that User Visits';
+$string['privacy:metadata:local_intelliboard_tracking:page'] = 'Page Type [course,module,profile,site]';
+$string['privacy:metadata:local_intelliboard_tracking:param'] = 'Page ID Type';
+$string['privacy:metadata:local_intelliboard_tracking:visits'] = 'Users Visits on a Page';
+$string['privacy:metadata:local_intelliboard_tracking:timespend'] = 'Users Timespent on a Page';
+$string['privacy:metadata:local_intelliboard_tracking:firstaccess'] = 'Users First Access';
+$string['privacy:metadata:local_intelliboard_tracking:lastaccess'] = 'Users Last Access';
+$string['privacy:metadata:local_intelliboard_tracking:useragent'] = 'Users Browser Type';
+$string['privacy:metadata:local_intelliboard_tracking:useros'] = 'Users Operating System';
+$string['privacy:metadata:local_intelliboard_tracking:userlang'] = 'Users Browser Language';
+$string['privacy:metadata:local_intelliboard_tracking:userip'] = 'Users Last IP address';
+
+$string['privacy:metadata:local_intelliboard_ntf:id'] = 'Notification ID';
+$string['privacy:metadata:local_intelliboard_ntf:type'] = 'Notification type';
+$string['privacy:metadata:local_intelliboard_ntf:externalid'] = 'Notification ExternalNID';
+$string['privacy:metadata:local_intelliboard_ntf:userid'] = 'Notification ExternalAppID';
+$string['privacy:metadata:local_intelliboard_ntf:email'] = 'Notification email';
+$string['privacy:metadata:local_intelliboard_ntf:subject'] = 'Notification subject';
+$string['privacy:metadata:local_intelliboard_ntf:message'] = 'Notification message';
+$string['privacy:metadata:local_intelliboard_ntf:state'] = 'Notification status';
+$string['privacy:metadata:local_intelliboard_ntf:attachment'] = 'Notification attachment';
+$string['privacy:metadata:local_intelliboard_ntf:tags'] = 'Notification tags';
+
+$string['privacy:metadata:local_intelliboard_ntf_hst:id'] = 'Notification history ID';
+$string['privacy:metadata:local_intelliboard_ntf_hst:notificationid'] = 'Notification ID';
+$string['privacy:metadata:local_intelliboard_ntf_hst:userid'] = 'Notification ExternalAppID';
+$string['privacy:metadata:local_intelliboard_ntf_hst:notificationname'] = 'Notification name';
+$string['privacy:metadata:local_intelliboard_ntf_hst:email'] = 'Notification history email';
+$string['privacy:metadata:local_intelliboard_ntf_hst:timesent'] = 'Notification history timestamp';
+
+$string['select_manager_role'] = 'Seleccionar rol de administrador';
+$string['group_aggregation'] = 'Agrupación de grupos';

@@ -25,15 +25,7 @@
  */
 
 
-$observers = array (
-    array (
-        'eventname' => '\core\event\user_created',
-        'callback'  => 'local_intelliboard_observer::user_created',
-    ),
-    array (
-        'eventname' => '\core\event\user_enrolment_created',
-        'callback'  => 'local_intelliboard_observer::user_enrolment_created',
-    ),
+$observers = [
     array (
         'eventname' => '\core\event\role_assigned',
         'callback'  => 'local_intelliboard_observer::role_assigned',
@@ -58,4 +50,4 @@ $observers = array (
         'eventname' => '\mod_assign\event\assessable_submitted',
         'callback'  => 'local_intelliboard_observer::assign_attempt_submitted',
     ),
-);
+];

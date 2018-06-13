@@ -600,14 +600,6 @@ function groups_delete_group_members($courseid, $userid=0, $unused=false) {
     }
     $rs->close();
 
-    // TODO MDL-41312 Remove events_trigger_legacy('groups_members_removed').
-    // This event is kept here for backwards compatibility, because it cannot be
-    // translated to a new event as it is wrong.
-    $eventdata = new stdClass();
-    $eventdata->courseid = $courseid;
-    $eventdata->userid   = $userid;
-    events_trigger_legacy('groups_members_removed', $eventdata);
-
     return true;
 }
 
@@ -628,16 +620,12 @@ function groups_delete_groupings_groups($courseid, $showfeedback=false) {
     foreach ($results as $result) {
         groups_unassign_grouping($result->groupingid, $result->groupid, false);
     }
+    $results->close();
 
     // Invalidate the grouping cache for the course
     cache_helper::invalidate_by_definition('core', 'groupdata', array(), array($courseid));
     // Purge the group and grouping cache for users.
     cache_helper::purge_by_definition('core', 'user_group_groupings');
-
-    // TODO MDL-41312 Remove events_trigger_legacy('groups_groupings_groups_removed').
-    // This event is kept here for backwards compatibility, because it cannot be
-    // translated to a new event as it is wrong.
-    events_trigger_legacy('groups_groupings_groups_removed', $courseid);
 
     // no need to show any feedback here - we delete usually first groupings and then groups
 
@@ -658,16 +646,12 @@ function groups_delete_groups($courseid, $showfeedback=false) {
     foreach ($groups as $group) {
         groups_delete_group($group);
     }
+    $groups->close();
 
     // Invalidate the grouping cache for the course
     cache_helper::invalidate_by_definition('core', 'groupdata', array(), array($courseid));
     // Purge the group and grouping cache for users.
     cache_helper::purge_by_definition('core', 'user_group_groupings');
-
-    // TODO MDL-41312 Remove events_trigger_legacy('groups_groups_deleted').
-    // This event is kept here for backwards compatibility, because it cannot be
-    // translated to a new event as it is wrong.
-    events_trigger_legacy('groups_groups_deleted', $courseid);
 
     if ($showfeedback) {
         echo $OUTPUT->notification(get_string('deleted').' - '.get_string('groups', 'group'), 'notifysuccess');
@@ -690,16 +674,12 @@ function groups_delete_groupings($courseid, $showfeedback=false) {
     foreach ($groupings as $grouping) {
         groups_delete_grouping($grouping);
     }
+    $groupings->close();
 
     // Invalidate the grouping cache for the course.
     cache_helper::invalidate_by_definition('core', 'groupdata', array(), array($courseid));
     // Purge the group and grouping cache for users.
     cache_helper::purge_by_definition('core', 'user_group_groupings');
-
-    // TODO MDL-41312 Remove events_trigger_legacy('groups_groupings_deleted').
-    // This event is kept here for backwards compatibility, because it cannot be
-    // translated to a new event as it is wrong.
-    events_trigger_legacy('groups_groupings_deleted', $courseid);
 
     if ($showfeedback) {
         echo $OUTPUT->notification(get_string('deleted').' - '.get_string('groupings', 'group'), 'notifysuccess');
@@ -975,6 +955,7 @@ function groups_calculate_role_people($rs, $context) {
     }
 
     $allroles = role_fix_names(get_all_roles($context), $context);
+    $visibleroles = get_viewable_roles($context);
 
     // Array of all involved roles
     $roles = array();
@@ -1033,14 +1014,15 @@ function groups_calculate_role_people($rs, $context) {
 
     // Now we rearrange the data to store users by role
     foreach ($users as $userid=>$userdata) {
-        $rolecount = count($userdata->roles);
+        $visibleuserroles = array_intersect_key($userdata->roles, $visibleroles);
+        $rolecount = count($visibleuserroles);
         if ($rolecount == 0) {
             // does not have any roles
             $roleid = 0;
         } else if($rolecount > 1) {
             $roleid = '*';
         } else {
-            $userrole = reset($userdata->roles);
+            $userrole = reset($visibleuserroles);
             $roleid = $userrole->id;
         }
         $roles[$roleid]->users[$userid] = $userdata;

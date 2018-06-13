@@ -1575,7 +1575,7 @@ class file_storage {
 
         $existingfile = null;
         if (isset($filerecord->contenthash)) {
-            $existingfile = $DB->get_record('files', array('contenthash' => $filerecord->contenthash));
+            $existingfile = $DB->get_record('files', array('contenthash' => $filerecord->contenthash), '*', IGNORE_MULTIPLE);
         }
         if (!empty($existingfile)) {
             // There is an existing file already available.
@@ -2001,6 +2001,7 @@ class file_storage {
         foreach ($rs as $filerecord) {
             $files[$filerecord->pathnamehash] = $this->get_file_instance($filerecord);
         }
+        $rs->close();
 
         return $files;
     }

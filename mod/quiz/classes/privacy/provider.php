@@ -148,7 +148,8 @@ class provider implements
             " . $qubaid->from . "
             WHERE (
                 qa.userid = :qauserid OR
-                " . $qubaid->where() . "
+                " . $qubaid->where() . " OR
+                qo.id IS NOT NULL
             ) AND qa.preview = 0
         ";
 
@@ -197,7 +198,7 @@ class provider implements
                     cm.id AS cmid
                   FROM {context} c
             INNER JOIN {course_modules} cm ON cm.id = c.instanceid AND c.contextlevel = :contextlevel
-            INNER JOIN {modules} m ON m.id = cm.module AND m.name = 'quiz'
+            INNER JOIN {modules} m ON m.id = cm.module AND m.name = :modname
             INNER JOIN {quiz} q ON q.id = cm.instance
              LEFT JOIN {quiz_overrides} qo ON qo.quiz = q.id AND qo.userid = :qouserid
              LEFT JOIN {quiz_grades} qg ON qg.quiz = q.id AND qg.userid = :qguserid
@@ -205,6 +206,7 @@ class provider implements
 
         $params = [
             'contextlevel'      => CONTEXT_MODULE,
+            'modname'           => 'quiz',
             'qguserid'          => $userid,
             'qouserid'          => $userid,
         ];
@@ -280,19 +282,26 @@ class provider implements
      * @param   context                 $context   The specific context to delete data for.
      */
     public static function delete_data_for_all_users_in_context(\context $context) {
+        if ($context->contextlevel != CONTEXT_MODULE) {
+            // Only quiz module will be handled.
+            return;
+        }
+
         $cm = get_coursemodule_from_id('quiz', $context->instanceid);
         if (!$cm) {
             // Only quiz module will be handled.
             return;
         }
-        $quiz = \quiz::create($cm->instance);
+
+        $quizobj = \quiz::create($cm->instance);
+        $quiz = $quizobj->get_quiz();
 
         // Handle the 'quizaccess' subplugin.
         manager::plugintype_class_callback(
                 'quizaccess',
                 quizaccess_provider::class,
                 'delete_subplugin_data_for_all_users_in_context',
-                [$quiz]
+                [$quizobj]
             );
 
         // Delete all overrides - do not log.
@@ -311,8 +320,20 @@ class provider implements
         global $DB;
 
         foreach ($contextlist as $context) {
+            if ($context->contextlevel != CONTEXT_MODULE) {
+            // Only quiz module will be handled.
+                continue;
+            }
+
             $cm = get_coursemodule_from_id('quiz', $context->instanceid);
-            $quiz = \quiz::create($cm->instance);
+            if (!$cm) {
+                // Only quiz module will be handled.
+                continue;
+            }
+
+            // Fetch the details of the data to be removed.
+            $quizobj = \quiz::create($cm->instance);
+            $quiz = $quizobj->get_quiz();
             $user = $contextlist->get_user();
 
             // Handle the 'quizaccess' quizaccess.
@@ -320,20 +341,21 @@ class provider implements
                     'quizaccess',
                     quizaccess_provider::class,
                     'delete_quizaccess_data_for_user',
-                    [$quiz, $user]
+                    [$quizobj, $user]
                 );
 
+            // Remove overrides for this user.
             $overrides = $DB->get_records('quiz_overrides' , [
-                    'quiz' => $quiz->get_quizid(),
-                    'userid' => $user->id,
-                ]);
+                'quiz' => $quizobj->get_quizid(),
+                'userid' => $user->id,
+            ]);
 
             foreach ($overrides as $override) {
                 quiz_delete_override($quiz, $override->id, false);
             }
 
             // This will delete all question attempts, quiz attempts, and quiz grades for this quiz.
-            quiz_delete_user_attempts($quiz, $user);
+            quiz_delete_user_attempts($quizobj, $user);
         }
     }
 
@@ -355,7 +377,7 @@ class provider implements
                     qa.*
                   FROM {context} c
                   JOIN {course_modules} cm ON cm.id = c.instanceid AND c.contextlevel = :contextlevel
-                  JOIN {modules} m ON m.id = cm.module AND m.name = :modname
+                  JOIN {modules} m ON m.id = cm.module AND m.name = 'quiz'
                   JOIN {quiz} q ON q.id = cm.instance
                   JOIN {quiz_attempts} qa ON qa.quiz = q.id
             " . $qubaid->from. "
@@ -368,7 +390,6 @@ class provider implements
         $params = array_merge(
                 [
                     'contextlevel'      => CONTEXT_MODULE,
-                    'modname'           => 'quiz',
                     'qauserid'          => $userid,
                 ],
                 $qubaid->from_where_params()

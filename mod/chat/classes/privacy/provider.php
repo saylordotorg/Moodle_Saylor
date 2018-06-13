@@ -29,9 +29,11 @@ defined('MOODLE_INTERNAL') || die();
 use context;
 use context_helper;
 use context_module;
+use moodle_recordset;
 use stdClass;
 use core_privacy\local\metadata\collection;
 use core_privacy\local\request\approved_contextlist;
+use core_privacy\local\request\contextlist;
 use core_privacy\local\request\helper;
 use core_privacy\local\request\transform;
 use core_privacy\local\request\writer;
@@ -63,10 +65,26 @@ class provider implements
             'timestamp' => 'privacy:metadata:messages:timestamp',
         ], 'privacy:metadata:messages');
 
-        // The tables chat_messages_current and chat_users are not reported here
+        // The tables chat_messages_current and chat_users are not exported/deleted
         // because they are considered as short-lived data and are deleted on a
-        // regular basis by cron, or during normal requests. MDL-62006 was raised
-        // to discuss and/or implement support for those tables.
+        // regular basis by cron, or during normal requests. TODO MDL-62006.
+
+        $collection->add_database_table('chat_messages_current', [
+            'userid' => 'privacy:metadata:messages:userid',
+            'message' => 'privacy:metadata:messages:message',
+            'issystem' => 'privacy:metadata:messages:issystem',
+            'timestamp' => 'privacy:metadata:messages:timestamp'
+        ], 'privacy:metadata:chat_messages_current');
+
+        $collection->add_database_table('chat_users', [
+            'userid' => 'privacy:metadata:chat_users:userid',
+            'version' => 'privacy:metadata:chat_users:version',
+            'ip' => 'privacy:metadata:chat_users:ip',
+            'firstping' => 'privacy:metadata:chat_users:firstping',
+            'lastping' => 'privacy:metadata:chat_users:lastping',
+            'lastmessageping' => 'privacy:metadata:chat_users:lastmessageping',
+            'lang' => 'privacy:metadata:chat_users:lang'
+        ], 'privacy:metadata:chat_users');
 
         return $collection;
     }
@@ -239,7 +257,7 @@ class provider implements
      * @param callable $export The function to export the dataset, receives the last value from $splitkey and the dataset.
      * @return void
      */
-    protected static function recordset_loop_and_export(\moodle_recordset $recordset, $splitkey, $initial,
+    protected static function recordset_loop_and_export(moodle_recordset $recordset, $splitkey, $initial,
             callable $reducer, callable $export) {
 
         $data = $initial;

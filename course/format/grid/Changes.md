@@ -1,5 +1,13 @@
 History
 =============
+Version 3.5.0.1
+  1. M3.5 version based on V3.4.0.4
+
+Version 3.4.0.4
+  1. Fix incorrect help for 'sectiontitleboxinsideposition' setting.
+  2. Fix for grey out issue - https://moodle.org/mod/forum/discuss.php?d=364153#p1492053.
+  3. Implement Privacy API.
+
 Version 3.4.0.3
   1. Fix double entry for a course in the format_grid_summary when restoring.
   2. Fix logic of showing grid boxes depending on if it is visible against the grey out setting and course 'Hidden sections' option.

@@ -9,7 +9,7 @@ wrong answers. These can then can be selected via dropddropdown lists or javascr
 
 This question type was written by Marcus Green
 
-This question type was created and tested under Moodle 3.1,3.2,3.3,3.4
+This question type was created and tested under Moodle 3.1,3.2,3.3,3.4,3.5
 
 
 Place the files in a directory 
@@ -19,6 +19,8 @@ moodle\question\type\gapfill
 Where moodle is webroot for your install.
 
 Go to Site Administration/Notifications
+Version 1.972 Implement Privacy/GDPR API, minor bug fixes
+Version 1.971 Bug fix for ios dragdrop issue
 Version 1.97 letter hint from correct response added to gaps in interactive mode when incorrect answers added
 Version 1.96 per gap feedback entered via a popup form by clicking on the gap when editing
 Version 1.95 add optionsaftertext  option so draggables appear after text

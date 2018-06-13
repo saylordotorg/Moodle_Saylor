@@ -24,41 +24,6 @@
  * @website    https://intelliboard.net/
  */
 
-require('../../config.php');
-require_once($CFG->libdir.'/adminlib.php');
-require_once($CFG->dirroot .'/local/intelliboard/externallib.php');
-require_once($CFG->dirroot .'/local/intelliboard/locallib.php');
-
-require_login();
-require_capability('local/intelliboard:view', context_system::instance());
-admin_externalpage_setup('intelliboardsettings');
-
-$reports = optional_param_array('report', array(), PARAM_INT);
-
-if($reports){
-	set_config("reports", implode(",", $reports), "local_intelliboard");
-}
-
-$params = array(
-	'reports'=>get_config('local_intelliboard', 'reports'),
-	'type'=>'settings',
-	'do'=>'reportslist'
-);
-$intelliboard = intelliboard($params);
-$PAGE->set_url(new moodle_url("/local/intelliboard/settings.php"));
-$PAGE->set_pagelayout('report');
-$PAGE->set_pagetype('settings');
-$PAGE->set_context(context_system::instance());
-$PAGE->set_title(get_string('intelliboardroot', 'local_intelliboard'));
-$PAGE->set_heading(get_string('intelliboardroot', 'local_intelliboard'));
-$PAGE->requires->css('/local/intelliboard/assets/css/style.css');
-echo $OUTPUT->header();
-?>
-<div class="intelliboard-page">
-	<?php include("views/menu.php"); ?>
-	<div class="intelliboard-content"><?php echo intelliboard_clean($intelliboard->content); ?></div>
-	<a href="<?php echo $CFG->wwwroot; ?>/admin/settings.php?section=local_intelliboard"><?php echo get_string('adv_settings','local_intelliboard');?></a>
-	<?php include("views/footer.php"); ?>
-</div>
-<?php
-echo $OUTPUT->footer();
+$config = [];
+$config['app_url'] = 'https://app.intelliboard.net/';
+$config['api_url'] = 'https://api.intelliboard.net/';

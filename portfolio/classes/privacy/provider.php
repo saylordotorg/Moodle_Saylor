@@ -27,6 +27,9 @@ defined('MOODLE_INTERNAL') || die();
 
 use core_privacy\local\metadata\collection;
 use core_privacy\local\request\context;
+use core_privacy\local\request\contextlist;
+use core_privacy\local\request\approved_contextlist;
+use core_privacy\local\request\transform;
 
 /**
  * Provider for the portfolio API.
@@ -35,10 +38,9 @@ use core_privacy\local\request\context;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class provider implements
-        // The Portfolio subsystem does not store any data itself.
-        // It has no database tables, and it purely acts as a conduit to the various portfolio plugins.
+        // The core portfolio system stores preferences related to the other portfolio subsystems.
         \core_privacy\local\metadata\provider,
-
+        \core_privacy\local\request\plugin\provider,
         // The portfolio subsystem will be called by other components.
         \core_privacy\local\request\subsystem\plugin_provider {
 
@@ -49,7 +51,173 @@ class provider implements
      * @return  collection     A listing of user data stored through this system.
      */
     public static function get_metadata(collection $collection) : collection {
-        return $collection->add_plugintype_link('portfolio', [], 'privacy:metadata');
+        $collection->add_database_table('portfolio_instance_user', [
+            'instance' => 'privacy:metadata:instance',
+            'userid' => 'privacy:metadata:userid',
+            'name' => 'privacy:metadata:name',
+            'value' => 'privacy:metadata:value'
+        ], 'privacy:metadata:instancesummary');
+
+        $collection->add_database_table('portfolio_log', [
+            'userid' => 'privacy:metadata:portfolio_log:userid',
+            'time' => 'privacy:metadata:portfolio_log:time',
+            'caller_class' => 'privacy:metadata:portfolio_log:caller_class',
+            'caller_component' => 'privacy:metadata:portfolio_log:caller_component',
+        ], 'privacy:metadata:portfolio_log');
+
+        // Temporary data is not exported/deleted in privacy API. It is cleaned by cron.
+        $collection->add_database_table('portfolio_tempdata', [
+            'data' => 'privacy:metadata:portfolio_tempdata:data',
+            'expirytime' => 'privacy:metadata:portfolio_tempdata:expirytime',
+            'userid' => 'privacy:metadata:portfolio_tempdata:userid',
+            'instance' => 'privacy:metadata:portfolio_tempdata:instance',
+        ], 'privacy:metadata:portfolio_tempdata');
+
+        $collection->add_plugintype_link('portfolio', [], 'privacy:metadata');
+        return $collection;
+    }
+
+    /**
+     * Get the list of contexts that contain user information for the specified user.
+     *
+     * @param   int $userid The user to search.
+     * @return  contextlist $contextlist The contextlist containing the list of contexts used in this plugin.
+     */
+    public static function get_contexts_for_userid(int $userid) : contextlist {
+        $sql = "SELECT ctx.id
+                  FROM {context} ctx
+                 WHERE ctx.instanceid = :userid AND ctx.contextlevel = :usercontext
+                  AND (EXISTS (SELECT 1 FROM {portfolio_instance_user} WHERE userid = :userid1) OR
+                       EXISTS (SELECT 1 FROM {portfolio_log} WHERE userid = :userid2))
+                 ";
+        $params = ['userid' => $userid, 'usercontext' => CONTEXT_USER, 'userid1' => $userid, 'userid2' => $userid];
+        $contextlist = new contextlist();
+        $contextlist->add_from_sql($sql, $params);
+        return $contextlist;
+    }
+
+    /**
+     * Export all user data for the specified user, in the specified contexts.
+     *
+     * @param approved_contextlist $contextlist The approved contexts to export information for.
+     */
+    public static function export_user_data(approved_contextlist $contextlist) {
+        global $DB;
+
+        if ($contextlist->get_component() != 'core_portfolio') {
+            return;
+        }
+
+        $correctusercontext = array_filter($contextlist->get_contexts(), function($context) use ($contextlist) {
+            if ($context->contextlevel == CONTEXT_USER && $context->instanceid == $contextlist->get_user()->id) {
+                return $context;
+            }
+        });
+
+        if (empty($correctusercontext)) {
+            return;
+        }
+
+        $usercontext = array_shift($correctusercontext);
+
+        $sql = "SELECT pi.id AS instanceid, pi.name,
+                       piu.id AS preferenceid, piu.name AS preference, piu.value,
+                       pl.id AS logid, pl.time AS logtime, pl.caller_class, pl.caller_file,
+                       pl.caller_component, pl.returnurl, pl.continueurl
+                  FROM {portfolio_instance} pi
+             LEFT JOIN {portfolio_instance_user} piu ON piu.instance = pi.id AND piu.userid = :userid1
+             LEFT JOIN {portfolio_log} pl ON pl.portfolio = pi.id AND pl.userid = :userid2
+                 WHERE piu.id IS NOT NULL OR pl.id IS NOT NULL";
+        $params = ['userid1' => $usercontext->instanceid, 'userid2' => $usercontext->instanceid];
+        $instances = [];
+        $rs = $DB->get_recordset_sql($sql, $params);
+        foreach ($rs as $record) {
+            $instances += [$record->name =>
+                (object)[
+                    'name' => $record->name,
+                    'preferences' => [],
+                    'logs' => [],
+                ]
+            ];
+            if ($record->preferenceid) {
+                $instances[$record->name]->preferences[$record->preferenceid] = (object)[
+                    'name' => $record->preference,
+                    'value' => $record->value,
+                ];
+            }
+            if ($record->logid) {
+                $instances[$record->name]->logs[$record->logid] = (object)[
+                    'time' => transform::datetime($record->logtime),
+                    'caller_class' => $record->caller_class,
+                    'caller_file' => $record->caller_file,
+                    'caller_component' => $record->caller_component,
+                    'returnurl' => $record->returnurl,
+                    'continueurl' => $record->continueurl
+                ];
+            }
+        }
+        $rs->close();
+
+        if (!empty($instances)) {
+            foreach ($instances as &$instance) {
+                if (!empty($instance->preferences)) {
+                    $instance->preferences = array_values($instance->preferences);
+                } else {
+                    unset($instance->preferences);
+                }
+                if (!empty($instance->logs)) {
+                    $instance->logs = array_values($instance->logs);
+                } else {
+                    unset($instance->logs);
+                }
+            }
+            \core_privacy\local\request\writer::with_context($contextlist->current())->export_data(
+                    [get_string('privacy:path', 'portfolio')], (object) $instances);
+        }
+    }
+
+    /**
+     * Delete all data for all users in the specified context.
+     *
+     * @param context $context The specific context to delete data for.
+     */
+    public static function delete_data_for_all_users_in_context(\context $context) {
+        global $DB;
+        // Context could be anything, BEWARE!
+        if ($context->contextlevel == CONTEXT_USER) {
+            $DB->delete_records('portfolio_instance_user', ['userid' => $context->instanceid]);
+            $DB->delete_records('portfolio_tempdata', ['userid' => $context->instanceid]);
+            $DB->delete_records('portfolio_log', ['userid' => $context->instanceid]);
+        }
+    }
+
+    /**
+     * Delete all user data for the specified user, in the specified contexts.
+     *
+     * @param   approved_contextlist    $contextlist    The approved contexts and user information to delete information for.
+     */
+    public static function delete_data_for_user(approved_contextlist $contextlist) {
+        global $DB;
+
+        if ($contextlist->get_component() != 'core_portfolio') {
+            return;
+        }
+
+        $correctusercontext = array_filter($contextlist->get_contexts(), function($context) use ($contextlist) {
+            if ($context->contextlevel == CONTEXT_USER && $context->instanceid == $contextlist->get_user()->id) {
+                return $context;
+            }
+        });
+
+        if (empty($correctusercontext)) {
+            return;
+        }
+
+        $usercontext = array_shift($correctusercontext);
+
+        $DB->delete_records('portfolio_instance_user', ['userid' => $usercontext->instanceid]);
+        $DB->delete_records('portfolio_tempdata', ['userid' => $usercontext->instanceid]);
+        $DB->delete_records('portfolio_log', ['userid' => $usercontext->instanceid]);
     }
 
     /**

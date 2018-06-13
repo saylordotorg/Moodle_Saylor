@@ -25,6 +25,7 @@
 $string['asap'] = 'ASAP';
 $string['backtoscheduledtasks'] = 'Back to scheduled tasks';
 $string['blocking'] = 'Blocking';
+$string['clearfaildelay_confirm'] = 'Are you sure you want to clear the fail delay for task \'{$a}\'? After clearing the delay, the task will run according to its normal schedule.';
 $string['component'] = 'Component';
 $string['corecomponent'] = 'Core';
 $string['default'] = 'Default';
@@ -42,6 +43,7 @@ $string['resettasktodefaults'] = 'Reset task schedule to defaults';
 $string['resettasktodefaults_help'] = 'This will discard any local changes and revert the schedule for this task back to its original settings.';
 $string['runnow'] = 'Run now';
 $string['runnow_confirm'] = 'Are you sure you want to run this task \'{$a}\' now? The task will run on the web server and may take some time to complete.';
+$string['runpattern'] = 'Run pattern';
 $string['scheduledtasks'] = 'Scheduled tasks';
 $string['scheduledtaskchangesdisabled'] = 'Modifications to the list of scheduled tasks have been prevented in Moodle configuration';
 $string['taskdisabled'] = 'Task disabled';

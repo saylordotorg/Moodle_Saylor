@@ -56,7 +56,7 @@ matrix:
     include:
           # Run grunt/npm install on highest version ('node' is an alias for the latest node.js version.)
         - php: 7.2
-          env: DB=none     TASK=GRUNT   NVM_VERSION='8.9'
+          env: DB=none     TASK=GRUNT   NVM_VERSION='lts/carbon'
 
     exclude:
         # MySQL - it's just too slow.
@@ -207,7 +207,7 @@ before_script:
         # We need the official upstream for comparison
         git remote add upstream https://github.com/moodle/moodle.git;
 
-        git fetch upstream MOODLE_34_STABLE;
+        git fetch upstream MOODLE_35_STABLE;
         export GIT_PREVIOUS_COMMIT="`git merge-base FETCH_HEAD $TRAVIS_COMMIT`";
         export GIT_COMMIT="$TRAVIS_COMMIT";
         export UPSTREAM_FETCH_HEAD=`git rev-parse FETCH_HEAD`

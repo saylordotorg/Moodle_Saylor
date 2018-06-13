@@ -211,9 +211,9 @@ class course_bin extends base_bin {
         // Get the backup file.
         $file = reset($files);
 
-        // Get a temp directory name and create it.
+        // Get a backup temp directory name and create it.
         $tempdir = \restore_controller::get_tempdir_name($context->id, $user->id);
-        $fulltempdir = make_temp_directory('/backup/' . $tempdir);
+        $fulltempdir = make_backup_temp_directory($tempdir);
 
         // Extract the backup to tempdir.
         $fb = get_file_packer('application/vnd.moodle.backup');
@@ -274,13 +274,25 @@ class course_bin extends base_bin {
         global $DB;
 
         // Grab the course context.
-        $context = \context_course::instance($this->_courseid);
+        $context = \context_course::instance($this->_courseid, IGNORE_MISSING);
 
-        // Delete the files.
-        $fs = get_file_storage();
-        $files = $fs->get_area_files($context->id, 'tool_recyclebin', TOOL_RECYCLEBIN_COURSE_BIN_FILEAREA, $item->id);
-        foreach ($files as $file) {
-            $file->delete();
+        if (!empty($context)) {
+            // Delete the files.
+            $fs = get_file_storage();
+            $fs->delete_area_files($context->id, 'tool_recyclebin', TOOL_RECYCLEBIN_COURSE_BIN_FILEAREA, $item->id);
+        } else {
+            // Course context has been deleted. Find records using $item->id as this is unique for course bin recyclebin.
+            $files = $DB->get_recordset('files', [
+                'component' => 'tool_recyclebin',
+                'filearea' => TOOL_RECYCLEBIN_COURSE_BIN_FILEAREA,
+                'itemid' => $item->id,
+            ]);
+            $fs = get_file_storage();
+            foreach ($files as $filer) {
+                $file = $fs->get_file_instance($filer);
+                $file->delete();
+            }
+            $files->close();
         }
 
         // Delete the record.

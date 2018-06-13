@@ -75,8 +75,7 @@ class provider implements
     public static function get_contexts_for_userid(int $userid) : contextlist {
         $sql = "SELECT ctx.id
                   FROM {auth_oauth2_linked_login} ao
-                  JOIN {user} u ON ao.userid = u.id
-                  JOIN {context} ctx ON ctx.instanceid = u.id AND ctx.contextlevel = :contextlevel
+                  JOIN {context} ctx ON ctx.instanceid = ao.userid AND ctx.contextlevel = :contextlevel
                  WHERE ao.userid = :userid";
         $params = ['userid' => $userid, 'contextlevel' => CONTEXT_USER];
         $contextlist = new contextlist();
@@ -121,10 +120,6 @@ class provider implements
      * @param  \context $context The context to delete data for.
      */
     public static function delete_data_for_all_users_in_context(\context $context) {
-        if (empty($context)) {
-            return;
-        }
-
         if ($context->contextlevel != CONTEXT_USER) {
             return;
         }

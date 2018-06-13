@@ -3659,6 +3659,9 @@ body#page-lib-editor-tinymce-plugins-moodlemedia-preview {
 .moodle-dialogue-base .moodle-dialogue-lightbox {
   background-color: #aaa;
 }
+.pagelayout-popup .moodle-dialogue-base .moodle-dialogue-lightbox {
+  background-color: transparent;
+}
 .moodle-dialogue-base .hidden,
 .moodle-dialogue-base .moodle-dialogue-hidden {
   display: none;
@@ -4795,8 +4798,9 @@ h3.sectionname .inplaceeditable.inplaceeditingon .editinstructions {
   transform: translate(-50%, -50%);
 }
 .overlay-icon-container .loading-icon .icon {
-  height: 40px;
-  width: 40px;
+  height: 30px;
+  width: 30px;
+  font-size: 30px;
 }
 [data-drag-type="move"] {
   cursor: move;
@@ -8124,7 +8128,7 @@ a.ygtvspacer:hover {
   color: #ff6961;
 }
 .messaging-area-container .status.online .online-text {
-  display: block;
+  display: inherit;
 }
 .messaging-area-container .status.online .offline-text {
   display: none;
@@ -9684,6 +9688,9 @@ body.path-question-type .mform fieldset.hidden {
   padding: 0;
   margin: 0.7em 0 0;
 }
+.tag-condition-container {
+  position: relative;
+}
 /* user.less */
 .userprofile .fullprofilelink {
   text-align: center;
@@ -10045,6 +10052,13 @@ body.path-question-type .mform fieldset.hidden {
 }
 .search-areas-actions > div {
   display: inline-block;
+}
+#core-search-areas .lastcol li {
+  margin-left: 24px;
+  text-indent: -24px;
+}
+#core-search-areas .lastcol li > i {
+  text-indent: 0;
 }
 .popover-region {
   float: right;
@@ -15776,6 +15790,9 @@ li.activity.label,
 .choosercontainer #chooseform .option label {
   font-size: 12px;
 }
+.modal:focus {
+  outline: #5e9ed7 auto 5px;
+}
 /* block.invisible vs .invisible
  * block.hidden vs .invisible
  *
@@ -16476,6 +16493,9 @@ body {
 .block_myoverview {
   background-color: transparent;
 }
+.block_myoverview .row-fluid [class*="span"] {
+  margin-left: 0;
+}
 .block_myoverview .event-list-item {
   border-bottom: 1px solid #ddd;
   padding-bottom: 10px;
@@ -16518,6 +16538,14 @@ body {
 .block_myoverview .well {
   background-color: #fff;
   box-shadow: none;
+  margin: 0 5px 10px;
+}
+.block_myoverview .myoverviewimg {
+  height: 150px;
+}
+.block_myoverview .myoverviewimg.courseimage {
+  background-position: center;
+  background-size: cover;
 }
 /**
  * Moodle forms HTML isn't changeable via renderers (yet?) so this
@@ -17314,7 +17342,6 @@ body.path-mod-feedback #region-main .mform.feedback_form .feedback-item-pagebrea
   padding-left: 0.5em;
   padding-right: 0.5em;
 }
-.path-mod-forum .forumheaderlist .discussion .author,
 .path-mod-forum .forumheaderlist .discussion .replies,
 .path-mod-forum .forumheaderlist .discussion .lastpost {
   white-space: normal;
@@ -17326,14 +17353,9 @@ body.path-mod-feedback #region-main .mform.feedback_form .feedback-item-pagebrea
 .path-mod-forum .forumheaderlist .discussion .topic,
 .path-mod-forum .forumheaderlist .discussion .discussionsubscription,
 .path-mod-forum .forumheaderlist .discussion .topic.starter,
-.path-mod-forum .forumheaderlist .discussion .author,
 .path-mod-forum .forumheaderlist .discussion .replies,
 .path-mod-forum .forumheaderlist .discussion .lastpost {
   vertical-align: top;
-}
-.path-mod-forum .forumheaderlist .discussion .picture {
-  margin: 0 20px;
-  float: left;
 }
 .path-mod-forum .forumheaderlist .discussion .unread img {
   margin: 0;
@@ -17584,6 +17606,16 @@ div#dock {
 }
 #page-mod-lesson-view .branchbuttoncontainer .singlebutton input[type="submit"] {
   white-space: normal;
+}
+#page-mod-lesson-view .answeroption .fitemtitle {
+  width: 30%;
+  text-align: left;
+}
+#page-mod-lesson-view .answeroption .fitemtitle label {
+  padding-right: 15px;
+}
+#page-mod-lesson-view .fitem .felement {
+  margin-left: 30%;
 }
 .path-mod-lesson .reviewessay {
   width: 40%;
@@ -18362,6 +18394,16 @@ div#dock {
   padding: 10px;
   height: 300px;
   overflow-y: scroll;
+}
+@media (max-width: 768px) {
+  .backup-restore .backup-section.settings-section .detail-pair {
+    width: 100%;
+  }
+}
+@media (max-width: 900px) {
+  .backup-restore .backup-section.settings-section .detail-pair-label {
+    width: 50%;
+  }
 }
 table.flexible,
 .generaltable {

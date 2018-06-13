@@ -6,6 +6,7 @@ http://moodle.org/plugins/view.php?plugin=mod_checklist
 
 ==Changes==
 
+* 2018-05-28 - fix typo causing major problems with defining roles
 * 2018-04-02 - declare plugin stores no user data (for GDPR), this version only compatible with M3.4+
 * 2017-11-09 - Minor behat test fix to work with Moodle 3.4
 * 2017-05-12 - Update behat test to work with Moodle 3.3

@@ -29,7 +29,7 @@ if ($hassiteconfig
         $choices['1'] = new lang_string('emaildisplayyes');
         $choices['2'] = new lang_string('emaildisplaycourse');
         $temp->add(new admin_setting_configselect('defaultpreference_maildisplay', new lang_string('emaildisplay'),
-            '', 2, $choices));
+            new lang_string('emaildisplay_help'), 2, $choices));
 
         $choices = array();
         $choices['0'] = new lang_string('textformat');
@@ -151,6 +151,7 @@ if ($hassiteconfig
         $temp->add(new admin_setting_configmultiselect('hiddenuserfields', new lang_string('hiddenuserfields', 'admin'),
                    new lang_string('confighiddenuserfields', 'admin'), array(),
                        array('description' => new lang_string('description'),
+                             'email' => new lang_string('email'),
                              'city' => new lang_string('city'),
                              'country' => new lang_string('country'),
                              'timezone' => new lang_string('timezone'),
@@ -227,27 +228,17 @@ if ($hassiteconfig) {
     $setting->set_force_ltr(true);
     $temp->add($setting);
 
+    // See {@link https://gdpr-info.eu/art-8-gdpr/}.
+    $ageofdigitalconsentmap = implode(PHP_EOL, [
+        '*, 16',
+        'AT, 14',
+        'ES, 14',
+        'US, 13'
+    ]);
     $setting = new admin_setting_agedigitalconsentmap('agedigitalconsentmap',
         new lang_string('ageofdigitalconsentmap', 'admin'),
         new lang_string('ageofdigitalconsentmap_desc', 'admin'),
-        // See {@link https://gdpr-info.eu/art-8-gdpr/}.
-        implode(PHP_EOL, [
-            '*, 16',
-            'AT, 14',
-            'CZ, 13',
-            'DE, 14',
-            'DK, 13',
-            'ES, 13',
-            'FI, 15',
-            'GB, 13',
-            'HU, 14',
-            'IE, 13',
-            'LT, 16',
-            'LU, 16',
-            'NL, 16',
-            'PL, 13',
-            'SE, 13',
-        ]),
+        $ageofdigitalconsentmap,
         PARAM_RAW
     );
     $temp->add($setting);

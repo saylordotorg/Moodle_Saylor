@@ -164,17 +164,15 @@ class auth_plugin_ldap extends auth_plugin_base {
         //
         $key = sesskey();
         if (!empty($this->config->ntlmsso_enabled) && $key === $password) {
-            $cf = get_cache_flags($this->pluginconfig.'/ntlmsess');
+            $sessusername = get_cache_flag($this->pluginconfig.'/ntlmsess', $key);
             // We only get the cache flag if we retrieve it before
             // it expires (AUTH_NTLMTIMEOUT seconds).
-            if (!isset($cf[$key]) || $cf[$key] === '') {
+            if (empty($sessusername)) {
                 return false;
             }
 
-            $sessusername = $cf[$key];
             if ($username === $sessusername) {
                 unset($sessusername);
-                unset($cf);
 
                 // Check that the user is inside one of the configured LDAP contexts
                 $validuser = false;
@@ -547,7 +545,9 @@ class auth_plugin_ldap extends auth_plugin_base {
         // Save any custom profile field information
         profile_save_data($user);
 
-        $this->update_user_record($user->username);
+        $userinfo = $this->get_userinfo($user->username);
+        $this->update_user_record($user->username, false, false, $this->is_user_suspended((object) $userinfo));
+
         // This will also update the stored hash to the latest algorithm
         // if the existing hash is using an out-of-date algorithm (or the
         // legacy md5 algorithm).
@@ -667,6 +667,8 @@ class auth_plugin_ldap extends auth_plugin_base {
      */
     function sync_users($do_updates=true) {
         global $CFG, $DB;
+
+        require_once($CFG->dirroot . '/user/profile/lib.php');
 
         print_string('connectingldap', 'auth_ldap');
         $ldapconnection = $this->ldap_connect();
@@ -856,7 +858,9 @@ class auth_plugin_ldap extends auth_plugin_base {
 
                 foreach ($users as $user) {
                     echo "\t"; print_string('auth_dbupdatinguser', 'auth_db', array('name'=>$user->username, 'id'=>$user->id));
-                    if (!$this->update_user_record($user->username, $updatekeys, true)) {
+                    $userinfo = $this->get_userinfo($user->username);
+                    if (!$this->update_user_record($user->username, $updatekeys, true,
+                            $this->is_user_suspended((object) $userinfo))) {
                         echo ' - '.get_string('skipped');
                     }
                     echo "\n";
@@ -919,8 +923,7 @@ class auth_plugin_ldap extends auth_plugin_base {
                 }
 
                 // Save custom profile fields.
-                $updatekeys = $this->get_profile_keys(true);
-                $this->update_user_record($user->username, $updatekeys, false);
+                $this->update_user_record($user->username, $this->get_profile_keys(true), false);
 
                 // Add roles if needed.
                 $this->sync_roles($euser);
@@ -936,111 +939,6 @@ class auth_plugin_ldap extends auth_plugin_base {
         $this->ldap_close();
 
         return true;
-    }
-
-    /**
-     * Update a local user record from an external source.
-     * This is a lighter version of the one in moodlelib -- won't do
-     * expensive ops such as enrolment.
-     *
-     * If you don't pass $updatekeys, there is a performance hit and
-     * values removed from LDAP won't be removed from moodle.
-     *
-     * @param string $username username
-     * @param boolean $updatekeys true to update the local record with the external LDAP values.
-     * @param bool $triggerevent set false if user_updated event should not be triggered.
-     *             This will not affect user_password_updated event triggering.
-     * @return stdClass|bool updated user record or false if there is no new info to update.
-     */
-    function update_user_record($username, $updatekeys = false, $triggerevent = false) {
-        global $CFG, $DB;
-
-        require_once($CFG->dirroot.'/user/profile/lib.php');
-
-        // Just in case check text case
-        $username = trim(core_text::strtolower($username));
-
-        // Get the current user record
-        $user = $DB->get_record('user', array('username'=>$username, 'mnethostid'=>$CFG->mnet_localhost_id));
-        if (empty($user)) { // trouble
-            error_log($this->errorlogtag.get_string('auth_dbusernotexist', 'auth_db', '', $username));
-            print_error('auth_dbusernotexist', 'auth_db', '', $username);
-            die;
-        }
-
-        // Protect the userid from being overwritten
-        $userid = $user->id;
-
-        $needsupdate = false;
-
-        if ($newinfo = $this->get_userinfo($username)) {
-            $newinfo = truncate_userinfo($newinfo);
-
-            if (empty($updatekeys)) { // all keys? this does not support removing values
-                $updatekeys = array_keys($newinfo);
-            }
-
-            if (!empty($updatekeys)) {
-                $newuser = new stdClass();
-                $newuser->id = $userid;
-                // The cast to int is a workaround for MDL-53959.
-                $newuser->suspended = (int)$this->is_user_suspended((object) $newinfo);
-                // Get all custom fields.
-                $profilefields = (array) profile_user_record($user->id, false);
-                $newprofilefields = [];
-
-                foreach ($updatekeys as $key) {
-                    if (isset($newinfo[$key])) {
-                        $value = $newinfo[$key];
-                    } else {
-                        $value = '';
-                    }
-
-                    if (!empty($this->config->{'field_updatelocal_' . $key})) {
-                        if (preg_match('/^profile_field_(.*)$/', $key, $match)) {
-                            // Custom field.
-                            $field = $match[1];
-                            $currentvalue = isset($profilefields[$field]) ? $profilefields[$field] : null;
-                            $newprofilefields[$field] = $value;
-                        } else {
-                            // Standard field.
-                            $currentvalue = isset($user->$key) ? $user->$key : null;
-                            $newuser->$key = $value;
-                        }
-                    }
-
-                    // Only update if it's changed.
-                    if ($currentvalue !== $value) {
-                        $needsupdate = true;
-                    }
-                }
-            }
-
-            if ($needsupdate) {
-                user_update_user($newuser, false, $triggerevent);
-
-                // Now, save the profile fields if the user has any.
-                if ($fields = $DB->get_records('user_info_field')) {
-                    foreach ($fields as $field) {
-                        if (isset($newprofilefields[$field->shortname])) {
-                            $conditions = array('fieldid' => $field->id, 'userid' => $newuser->id);
-                            $id = $DB->get_field('user_info_data', 'id', $conditions);
-                            $data = $newprofilefields[$field->shortname];
-                            if ($id) {
-                                $DB->set_field('user_info_data', 'data', $data, array('id' => $id));
-                            } else {
-                                $record = array('fieldid' => $field->id, 'userid' => $newuser->id, 'data' => $data);
-                                $DB->insert_record('user_info_data', $record);
-                            }
-                        }
-                    }
-                }
-
-                return $DB->get_record('user', array('id' => $userid, 'deleted' => 0));
-            }
-        }
-
-        return false;
     }
 
     /**
@@ -1811,11 +1709,10 @@ class auth_plugin_ldap extends auth_plugin_base {
         global $CFG, $USER, $SESSION;
 
         $key = sesskey();
-        $cf = get_cache_flags($this->pluginconfig.'/ntlmsess');
-        if (!isset($cf[$key]) || $cf[$key] === '') {
+        $username = get_cache_flag($this->pluginconfig.'/ntlmsess', $key);
+        if (empty($username)) {
             return false;
         }
-        $username   = $cf[$key];
 
         // Here we want to trigger the whole authentication machinery
         // to make sure no step is bypassed...
@@ -2232,10 +2129,11 @@ class auth_plugin_ldap extends auth_plugin_base {
                 }
             }
         }
+
         if ($this->config->suspended_attribute && $this->config->sync_suspended) {
             $updatekeys[] = 'suspended';
         }
 
         return $updatekeys;
     }
-} // End of the class
+}
