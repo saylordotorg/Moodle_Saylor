@@ -5,7 +5,7 @@
 def mysql_source_dbname = 'moodle'
 def mysql_dest_dbname = 'moodle_test'
 
-def moodle_version = 'MOODLE_34_STABLE'
+def moodle_version = 'MOODLE_35_STABLE'
 
 def plugins = [
     [
