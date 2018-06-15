@@ -9,10 +9,13 @@ class ParamGetter {
     private $filters = array();
     private $params = array();
 
+    private static $paramCount = 0;
+
     public function add($type, $data)
     {
         if (isset($this->$type) && !in_array($data, $this->$type)) {
-            $this->$type[] = $data;
+            $array = &$this->$type;
+            $array[] = $data;
         }
     }
 
@@ -29,6 +32,21 @@ class ParamGetter {
 
     public function setParam($name, $value) {
         $this->params[$name] = $value;
+    }
+
+    public static function in_sql(ParamGetter $getter, $type, $filter, $params)
+    {
+        $filter .= ' IN(';
+        foreach($params as $value) {
+            $param = 'inparam' . self::$paramCount;
+            $filter .= ':' . $param . ',';
+            $getter->setParam($param, $value);
+            self::$paramCount++;
+        }
+
+        $filter = rtrim($filter, ',') . ')';
+
+        $getter->add($type, $filter);
     }
 
 }

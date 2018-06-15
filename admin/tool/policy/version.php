@@ -24,8 +24,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'tool_policy';
-$plugin->release = '34.5.0';
-$plugin->version = 2017111308;
-$plugin->requires = 2017111302;
-$plugin->maturity = MATURITY_STABLE;
+$plugin->version   = 2018051400;         // The current plugin version (Date: YYYYMMDDXX).
+$plugin->requires  = 2018050800;         // Requires this Moodle version.
+$plugin->component = 'tool_policy';      // Full name of the plugin (used for diagnostics).

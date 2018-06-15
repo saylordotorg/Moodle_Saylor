@@ -32,16 +32,12 @@ if (isguestuser()) {
 
 $notificationid = required_param('notificationid', PARAM_INT);
 $redirecturl = optional_param('redirecturl', $CFG->wwwroot, PARAM_LOCALURL);
+$notification = $DB->get_record('notifications', array('id' => $notificationid));
 
-$notification = $DB->get_record('message', array('id' => $notificationid, 'notification' => 1));
-
-// If found, is unread, so mark read if belongs to this user.
-if ($notification) {
-    if ($USER->id == $notification->useridto) {
-        message_mark_message_read($notification, time());
-    } else {
-        $redirecturl = $CFG->wwwroot;
-    }
+// Check notification belongs to this user.
+if ($USER->id != $notification->useridto) {
+    redirect($CFG->wwwroot);
 }
 
+\core_message\api::mark_notification_as_read($notification);
 redirect($redirecturl);

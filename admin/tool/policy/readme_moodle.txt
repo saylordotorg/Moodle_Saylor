@@ -40,8 +40,6 @@ $(document).bind("user_cookie_consent_changed", function(event, object) {
 }(jQuery));
 ------------------
 
-   2.d. Add /*eslint-ignore*/ to the beginning of the file
-
 3. Copy the following styles from 'css/jquery-eu-cookie-law-popup.css' into the
 "jquery-eu-cookie-law-popup styles" section in 'styles.css':
    .eupopup-container

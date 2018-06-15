@@ -127,12 +127,6 @@ abstract class base_moodleform extends moodleform {
      */
     public function definition_after_data() {
         $buttonarray = array();
-        $buttonarray[] = $this->_form->createElement(
-            'submit',
-            'submitbutton',
-            get_string($this->uistage->get_ui()->get_name().'stage'.$this->uistage->get_stage().'action', 'backup'),
-            array('class' => 'proceedbutton')
-        );
         if (!$this->uistage->is_first_stage()) {
             $buttonarray[] = $this->_form->createElement('submit', 'previous', get_string('previousstage', 'backup'));
         } else if ($this->uistage instanceof backup_ui_stage) {
@@ -141,6 +135,12 @@ abstract class base_moodleform extends moodleform {
                 array('class' => 'oneclickbackup'));
         }
         $buttonarray[] = $this->_form->createElement('cancel', 'cancel', get_string('cancel'), array('class' => 'confirmcancel'));
+        $buttonarray[] = $this->_form->createElement(
+            'submit',
+            'submitbutton',
+            get_string($this->uistage->get_ui()->get_name().'stage'.$this->uistage->get_stage().'action', 'backup'),
+            array('class' => 'proceedbutton')
+        );
         $this->_form->addGroup($buttonarray, 'buttonar', '', array(' '), false);
         $this->_form->closeHeaderBefore('buttonar');
 
@@ -383,7 +383,13 @@ abstract class base_moodleform extends moodleform {
         $this->require_definition_after_data();
 
         $config = new stdClass;
-        $config->title = get_string('confirmcancel', 'backup');
+        if ($this->uistage->get_ui() instanceof import_ui) {
+            $config->title = get_string('confirmcancelimport', 'backup');
+        } else if ($this->uistage->get_ui() instanceof restore_ui) {
+            $config->title = get_string('confirmcancelrestore', 'backup');
+        } else {
+            $config->title = get_string('confirmcancel', 'backup');
+        }
         $config->question = get_string('confirmcancelquestion', 'backup');
         $config->yesLabel = get_string('confirmcancelyes', 'backup');
         $config->noLabel = get_string('confirmcancelno', 'backup');

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "37b61c55c96c0383294bda4347df02d0",
+    "content-hash": "f047772340a956bbf2c02d91536b11c6",
     "packages": [],
     "packages-dev": [
         {
@@ -909,16 +909,16 @@
         },
         {
             "name": "moodlehq/behat-extension",
-            "version": "v3.34.2",
+            "version": "v3.35.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/moodlehq/moodle-behat-extension.git",
-                "reference": "02b9f3c53dc39238e43d41f610fcffcfa76b2fa6"
+                "reference": "e6e92fd551185f73603bad5694e854f3f6906e0e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/moodlehq/moodle-behat-extension/zipball/02b9f3c53dc39238e43d41f610fcffcfa76b2fa6",
-                "reference": "02b9f3c53dc39238e43d41f610fcffcfa76b2fa6",
+                "url": "https://api.github.com/repos/moodlehq/moodle-behat-extension/zipball/e6e92fd551185f73603bad5694e854f3f6906e0e",
+                "reference": "e6e92fd551185f73603bad5694e854f3f6906e0e",
                 "shasum": ""
             },
             "require": {
@@ -955,7 +955,7 @@
                 "Behat",
                 "moodle"
             ],
-            "time": "2018-01-24T19:12:27+00:00"
+            "time": "2018-01-24T14:09:40+00:00"
         },
         {
             "name": "myclabs/deep-copy",

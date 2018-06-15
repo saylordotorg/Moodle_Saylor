@@ -128,7 +128,7 @@ class provider implements
                 if (empty($coursecontextids)) {
                     break;
                 }
-                // Move onto the next context as these will not contain course contexts.
+                // Only course, module, and block contexts are checked.
                 if (in_array($context->contextlevel, [CONTEXT_USER, CONTEXT_SYSTEM, CONTEXT_COURSECAT])) {
                     continue;
                 }

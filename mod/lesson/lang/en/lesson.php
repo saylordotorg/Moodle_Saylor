@@ -393,6 +393,7 @@ $string['ongoing_help'] = 'If enabled, each page will display the student\'s cur
 $string['ongoingcustom'] = 'You have earned {$a->score} point(s) out of {$a->currenthigh} point(s) thus far.';
 $string['ongoingnormal'] = 'You have answered {$a->correct} correctly out of {$a->viewed} attempts.';
 $string['onpostperpage'] = 'Only one posting per grade';
+$string['openafterclose'] = 'You have specified an open date after the close date';
 $string['options'] = 'Options';
 $string['or'] = 'OR';
 $string['ordered'] = 'Ordered';
@@ -583,5 +584,3 @@ $string['yourcurrentgradeis'] = 'Your current grade is {$a}';
 $string['yourcurrentgradeisoutof'] = 'Your current grade is {$a->grade} out of {$a->total}';
 $string['youshouldview'] = 'You should answer at least: {$a}';
 
-// Deprecated since Moodle 3.1.
-$string['configactionaftercorrectanswer'] = 'The default action to take after a correct answer';

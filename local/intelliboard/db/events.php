@@ -25,7 +25,7 @@
  */
 
 
-$observers = array (
+$observers = [
     array (
         'eventname' => '\core\event\role_assigned',
         'callback'  => 'local_intelliboard_observer::role_assigned',
@@ -50,4 +50,4 @@ $observers = array (
         'eventname' => '\mod_assign\event\assessable_submitted',
         'callback'  => 'local_intelliboard_observer::assign_attempt_submitted',
     ),
-);
+];

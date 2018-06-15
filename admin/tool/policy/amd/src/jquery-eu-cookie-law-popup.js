@@ -1,4 +1,3 @@
-/*eslint-disable*/
 /**
  * 	
  * JQUERY EU COOKIE LAW POPUPS

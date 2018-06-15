@@ -244,7 +244,7 @@ class core_course_management_renderer extends plugin_renderer_base {
             );
         } else {
             $icon = $this->output->pix_icon(
-                'i/navigationitem',
+                'i/empty',
                 '',
                 'moodle',
                 array('class' => 'tree-icon', 'title' => get_string('showcategory', 'moodle', $text))
@@ -288,7 +288,7 @@ class core_course_management_renderer extends plugin_renderer_base {
         $html .= html_writer::end_div();
         if ($isexpanded) {
             $html .= html_writer::start_tag('ul',
-                array('class' => 'ml', 'role' => 'group', 'id' => 'subcategoryof'.$category->id));
+                array('class' => 'ml-1', 'role' => 'group', 'id' => 'subcategoryof'.$category->id));
             $catatlevel = \core_course\management\helper::get_expanded_categories($category->path);
             $catatlevel[] = array_shift($selectedcategories);
             $catatlevel = array_unique($catatlevel);
@@ -530,7 +530,7 @@ class core_course_management_renderer extends plugin_renderer_base {
             array('id' => 'course-listing-title', 'tabindex' => '0'));
         $html .= $this->course_listing_actions($category, $course, $perpage);
         $html .= $this->listing_pagination($category, $page, $perpage, false, $viewmode);
-        $html .= html_writer::start_tag('ul', array('class' => 'ml', 'role' => 'group'));
+        $html .= html_writer::start_tag('ul', array('class' => 'ml course-list', 'role' => 'group'));
         foreach ($category->get_courses($options) as $listitem) {
             $html .= $this->course_listitem($category, $listitem, $courseid);
         }

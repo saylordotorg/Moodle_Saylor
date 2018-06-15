@@ -19,6 +19,8 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 
 require_once($CFG->dirroot . '/webservice/tests/helpers.php');
+require_once($CFG->dirroot . '/mod/assign/externallib.php');
+require_once(__DIR__ . '/fixtures/testable_assign.php');
 
 /**
  * External mod assign functions unit tests
@@ -29,14 +31,6 @@ require_once($CFG->dirroot . '/webservice/tests/helpers.php');
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mod_assign_external_testcase extends externallib_advanced_testcase {
-
-    /**
-     * Tests set up
-     */
-    protected function setUp() {
-        global $CFG;
-        require_once($CFG->dirroot . '/mod/assign/externallib.php');
-    }
 
     /**
      * Test get_grades
@@ -1825,11 +1819,13 @@ class mod_assign_external_testcase extends externallib_advanced_testcase {
      * @return array an array containing all the required data for testing
      */
     private function create_submission_for_testing_status($submitforgrading = false) {
-        global $DB, $CFG;
-        require_once($CFG->dirroot . '/mod/assign/tests/base_test.php');
+        global $DB;
 
         // Create a course and assignment and users.
-        $course = self::getDataGenerator()->create_course();
+        $course = self::getDataGenerator()->create_course(array('groupmode' => SEPARATEGROUPS, 'groupmodeforce' => 1));
+
+        $group1 = $this->getDataGenerator()->create_group(array('courseid' => $course->id));
+        $group2 = $this->getDataGenerator()->create_group(array('courseid' => $course->id));
 
         $generator = $this->getDataGenerator()->get_plugin_generator('mod_assign');
         $params = array(
@@ -1851,7 +1847,7 @@ class mod_assign_external_testcase extends externallib_advanced_testcase {
         $cm = get_coursemodule_from_instance('assign', $instance->id);
         $context = context_module::instance($cm->id);
 
-        $assign = new testable_assign($context, $cm, $course);
+        $assign = new mod_assign_testable_assign($context, $cm, $course);
 
         $student1 = self::getDataGenerator()->create_user();
         $student2 = self::getDataGenerator()->create_user();
@@ -1861,6 +1857,11 @@ class mod_assign_external_testcase extends externallib_advanced_testcase {
         $teacher = self::getDataGenerator()->create_user();
         $teacherrole = $DB->get_record('role', array('shortname' => 'teacher'));
         $this->getDataGenerator()->enrol_user($teacher->id, $course->id, $teacherrole->id);
+
+        $this->getDataGenerator()->create_group_member(array('groupid' => $group1->id, 'userid' => $student1->id));
+        $this->getDataGenerator()->create_group_member(array('groupid' => $group1->id, 'userid' => $teacher->id));
+        $this->getDataGenerator()->create_group_member(array('groupid' => $group2->id, 'userid' => $student2->id));
+        $this->getDataGenerator()->create_group_member(array('groupid' => $group2->id, 'userid' => $teacher->id));
 
         $this->setUser($student1);
 
@@ -1900,7 +1901,7 @@ class mod_assign_external_testcase extends externallib_advanced_testcase {
             $assign->submit_for_grading($data, $notices);
         }
 
-        return array($assign, $instance, $student1, $student2, $teacher);
+        return array($assign, $instance, $student1, $student2, $teacher, $group1, $group2);
     }
 
     /**
@@ -1909,7 +1910,7 @@ class mod_assign_external_testcase extends externallib_advanced_testcase {
     public function test_get_submission_status_in_draft_status() {
         $this->resetAfterTest(true);
 
-        list($assign, $instance, $student1, $student2, $teacher) = $this->create_submission_for_testing_status();
+        list($assign, $instance, $student1, $student2, $teacher, $g1, $g2) = $this->create_submission_for_testing_status();
         $studentsubmission = $assign->get_user_submission($student1->id, true);
 
         $result = mod_assign_external::get_submission_status($assign->get_instance()->id);
@@ -1965,7 +1966,7 @@ class mod_assign_external_testcase extends externallib_advanced_testcase {
     public function test_get_submission_status_in_submission_status() {
         $this->resetAfterTest(true);
 
-        list($assign, $instance, $student1, $student2, $teacher) = $this->create_submission_for_testing_status(true);
+        list($assign, $instance, $student1, $student2, $teacher, $g1, $g2) = $this->create_submission_for_testing_status(true);
 
         $result = mod_assign_external::get_submission_status($assign->get_instance()->id);
         // We expect debugging because of the $PAGE object, this won't happen in a normal WS request.
@@ -1995,11 +1996,12 @@ class mod_assign_external_testcase extends externallib_advanced_testcase {
     public function test_get_submission_status_in_submission_status_for_teacher() {
         $this->resetAfterTest(true);
 
-        list($assign, $instance, $student1, $student2, $teacher) = $this->create_submission_for_testing_status(true);
+        list($assign, $instance, $student1, $student2, $teacher, $g1, $g2) = $this->create_submission_for_testing_status(true);
 
         // Now, as teacher, see the grading summary.
         $this->setUser($teacher);
-        $result = mod_assign_external::get_submission_status($assign->get_instance()->id);
+        // First one group.
+        $result = mod_assign_external::get_submission_status($assign->get_instance()->id, 0, $g1->id);
         // We expect debugging because of the $PAGE object, this won't happen in a normal WS request.
         $this->assertDebuggingCalled();
         $result = external_api::clean_returnvalue(mod_assign_external::get_submission_status_returns(), $result);
@@ -2009,12 +2011,41 @@ class mod_assign_external_testcase extends externallib_advanced_testcase {
         $this->assertFalse(isset($result['feedback']));
         $this->assertFalse(isset($result['previousattempts']));
 
-        $this->assertEquals(2, $result['gradingsummary']['participantcount']);
+        $this->assertEquals(1, $result['gradingsummary']['participantcount']);
         $this->assertEquals(0, $result['gradingsummary']['submissiondraftscount']);
         $this->assertEquals(1, $result['gradingsummary']['submissionsenabled']);
-        $this->assertEquals(1, $result['gradingsummary']['submissionssubmittedcount']);
-        $this->assertEquals(1, $result['gradingsummary']['submissionsneedgradingcount']);
+        $this->assertEquals(0, $result['gradingsummary']['submissiondraftscount']);
+        $this->assertEquals(1, $result['gradingsummary']['submissionssubmittedcount']);  // One student from G1 submitted.
+        $this->assertEquals(1, $result['gradingsummary']['submissionsneedgradingcount']);    // One student from G1 submitted.
         $this->assertFalse($result['gradingsummary']['warnofungroupedusers']);
+
+        // Second group.
+        $result = mod_assign_external::get_submission_status($assign->get_instance()->id, 0, $g2->id);
+        $result = external_api::clean_returnvalue(mod_assign_external::get_submission_status_returns(), $result);
+        $this->assertCount(0, $result['warnings']);
+        $this->assertEquals(1, $result['gradingsummary']['participantcount']);
+        $this->assertEquals(0, $result['gradingsummary']['submissionssubmittedcount']); // G2 students didn't submit yet.
+        $this->assertEquals(0, $result['gradingsummary']['submissionsneedgradingcount']);   // G2 students didn't submit yet.
+
+        // Should return also 1 participant if we allow the function to auto-select the group.
+        $result = mod_assign_external::get_submission_status($assign->get_instance()->id);
+        $result = external_api::clean_returnvalue(mod_assign_external::get_submission_status_returns(), $result);
+        $this->assertCount(0, $result['warnings']);
+        $this->assertEquals(1, $result['gradingsummary']['participantcount']);
+        $this->assertEquals(0, $result['gradingsummary']['submissiondraftscount']);
+        $this->assertEquals(1, $result['gradingsummary']['submissionssubmittedcount']); // One student from G1 submitted.
+        $this->assertEquals(1, $result['gradingsummary']['submissionsneedgradingcount']); // One student from G1 submitted.
+
+        // Now check draft submissions.
+        list($assign, $instance, $student1, $student2, $teacher, $g1, $g2) = $this->create_submission_for_testing_status(false);
+        $this->setUser($teacher);
+        $result = mod_assign_external::get_submission_status($assign->get_instance()->id, 0, $g1->id);
+        $result = external_api::clean_returnvalue(mod_assign_external::get_submission_status_returns(), $result);
+        $this->assertCount(0, $result['warnings']);
+        $this->assertEquals(1, $result['gradingsummary']['participantcount']);
+        $this->assertEquals(1, $result['gradingsummary']['submissiondraftscount']); // We have a draft submission.
+        $this->assertEquals(0, $result['gradingsummary']['submissionssubmittedcount']); // We have only draft submissions.
+        $this->assertEquals(0, $result['gradingsummary']['submissionsneedgradingcount']); // We have only draft submissions.
     }
 
     /**
@@ -2025,7 +2056,7 @@ class mod_assign_external_testcase extends externallib_advanced_testcase {
 
         $this->resetAfterTest(true);
 
-        list($assign, $instance, $student1, $student2, $teacher) = $this->create_submission_for_testing_status(true);
+        list($assign, $instance, $student1, $student2, $teacher, $g1, $g2) = $this->create_submission_for_testing_status(true);
         $studentsubmission = $assign->get_user_submission($student1->id, true);
 
         $this->setUser($teacher);
@@ -2118,7 +2149,7 @@ class mod_assign_external_testcase extends externallib_advanced_testcase {
     public function test_get_submission_status_access_control() {
         $this->resetAfterTest(true);
 
-        list($assign, $instance, $student1, $student2, $teacher) = $this->create_submission_for_testing_status();
+        list($assign, $instance, $student1, $student2, $teacher, $g1, $g2) = $this->create_submission_for_testing_status();
 
         $this->setUser($student2);
 
@@ -2324,8 +2355,7 @@ class mod_assign_external_testcase extends externallib_advanced_testcase {
      * submitted.
      */
     public function test_get_participant_group_submission() {
-        global $DB, $CFG;
-        require_once($CFG->dirroot . '/mod/assign/tests/base_test.php');
+        global $DB;
 
         $this->resetAfterTest(true);
 
@@ -2342,7 +2372,7 @@ class mod_assign_external_testcase extends externallib_advanced_testcase {
         $group = $this->getDataGenerator()->create_group(array('courseid' => $course->id));
         $cm = get_coursemodule_from_instance('assign', $assignmodule->id);
         $context = context_module::instance($cm->id);
-        $assign = new testable_assign($context, $cm, $course);
+        $assign = new mod_assign_testable_assign($context, $cm, $course);
 
         groups_add_member($group, $student);
 
