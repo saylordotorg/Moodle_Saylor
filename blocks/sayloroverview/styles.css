@@ -1,0 +1,13 @@
+.progress-chart-container.sayloroverview-progress-chart-container .progress-doughnut .progress-indicator svg .circle {
+    stroke-width: 15px;
+    stroke: #F7B12F;
+    fill: none;
+    stroke-dasharray: 173;
+    stroke-dashoffset: 173;
+    transform: rotate(-90deg);
+    transform-origin: center center;
+}
+
+.progress-chart-container.sayloroverview-progress-chart-container .progress-doughnut .progress-text.has-percent {
+    color: #F7B12F;
+}
