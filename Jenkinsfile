@@ -253,6 +253,12 @@ def plugins = [
         "url" : 'https://github.com/saylordotorg/moodle-local_affiliations',
         "branch" : 'development',
         "dest" : 'local/affiliations'
+    ],
+    [
+        "name" : 'block_sharing_cart',
+        "url" : 'https://github.com/VERSION2-Inc/moodle-block_sharing_cart',
+        "branch" : 'master',
+        "dest" : 'blocks/sharing_cart'
     ]
 ]
 
