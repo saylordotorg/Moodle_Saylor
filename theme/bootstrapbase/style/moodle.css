@@ -6480,7 +6480,6 @@ span.editinstructions {
 .courses .coursebox.even {
   background-color: #f9f9f9;
 }
-.courses .coursebox:hover,
 .course_category_tree .courses > .paging.paging-morelink:hover {
   background-color: #f5f5f5;
 }
@@ -16726,6 +16725,9 @@ form {
 #page-mod-forum-search .c1:first-child {
   *padding-left: 200px;
 }
+.form-inline label:not(.sr-only):not(.accesshide) + select {
+  margin-left: 0.5rem;
+}
 .formsettingheading {
   margin-bottom: 0;
 }
@@ -21836,6 +21838,9 @@ ul.indented-list {
 .card-block {
   padding: 1.25rem;
 }
+.p-0 {
+  padding: 0 !important;
+}
 .p-l-1 {
   padding-left: 14px !important;
 }
@@ -21858,6 +21863,9 @@ ul.indented-list {
 }
 .p-a-1 {
   padding: 14px !important;
+}
+.m-0 {
+  margin: 0 !important;
 }
 .m-l-1 {
   margin-left: 14px !important;
@@ -22065,4 +22073,7 @@ ul.indented-list {
 }
 .bg-faded {
   background-color: #eee;
+}
+.w-100 {
+  width: 100%;
 }

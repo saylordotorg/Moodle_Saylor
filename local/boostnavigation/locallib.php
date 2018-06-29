@@ -110,7 +110,7 @@ function local_boostnavigation_build_custom_nodes($customnodes, navigation_node 
         // Check for the mandatory conditions first.
         // If array contains too less or too many settings, do not proceed and therefore do not create the node.
         // Furthermore check it at least the first two mandatory params are not an empty string.
-        if (count($settings) >= 2 && count($settings) <= 4 && $settings[0] !== '' && $settings[1] !== '') {
+        if (count($settings) >= 2 && count($settings) <= 5 && $settings[0] !== '' && $settings[1] !== '') {
             foreach ($settings as $i => $setting) {
                 $setting = trim($setting);
                 if (!empty($setting)) {
@@ -134,7 +134,7 @@ function local_boostnavigation_build_custom_nodes($customnodes, navigation_node 
                         case 1:
                             // Get the URL.
                             try {
-                                $nodeurl = new moodle_url($setting);
+                                $nodeurl = local_boostnavigation_build_node_url($setting);
                                 $nodevisible = true;
                             } catch (moodle_exception $exception) {
                                 // We're not actually worried about this, we don't want to mess up the navigation
@@ -157,6 +157,15 @@ function local_boostnavigation_build_custom_nodes($customnodes, navigation_node 
                             // Only proceed if something is entered here. This parameter is optional.
                             // If no cohort is given the node will be added to the navigation by default.
                             $nodevisible &= local_boostnavigation_cohort_is_member($USER->id, $setting);
+
+                            break;
+                        // Check for the optional fifth parameter: role filter.
+                        case 4:
+                            // Only proceed if some role is entered here. This parameter is optional.
+                            // If no role shortnames are given, the node will be added to the navigation by default.
+                            // Otherwise, it is checked whether the user has any of the provided roles,
+                            // so that the custom node is displayed.
+                            $nodevisible &= local_boostnavigation_user_has_role_on_page($USER->id, $setting);
 
                             break;
                     }
@@ -276,11 +285,11 @@ function local_boostnavigation_build_custom_nodes($customnodes, navigation_node 
  * regardless of cohort visibility), so we need to get this information ourselves.
  *
  * @param int $userid
- * @param string $cohortidnumber
+ * @param string $setting A comma-seperated whitelist of allowed cohort idnumbers.
  *
  * @return bool
  */
-function local_boostnavigation_cohort_is_member($userid, $cohortidnumber) {
+function local_boostnavigation_cohort_is_member($userid, $setting) {
     global $DB;
 
     // Initialize variable for memberships.
@@ -303,9 +312,87 @@ function local_boostnavigation_cohort_is_member($userid, $cohortidnumber) {
         $allmemberships = $ret;
     }
 
-    // Second: Check if the user if a member of the given cohort.
-    $ismember = in_array($cohortidnumber, $allmemberships);
+    // Second: Check if the user if a member of the given cohort(s).
+    $cohortids = explode(',', $setting);
+    if ($cohortids < 2) {
+        $ismember = in_array($setting, $allmemberships);
+    } else {
+        $ismember = count(array_intersect($cohortids, $allmemberships)) > 0;
+    }
 
     // Return the result.
     return $ismember;
+}
+
+/**
+ * This function takes the plugin's custom node url, replaces placeholders if necessary and returns the url.
+ *
+ * @param string $url
+ * @return object
+ */
+function local_boostnavigation_build_node_url($url) {
+    global $USER, $COURSE, $PAGE;
+
+    // Define placeholders which should be replaced later.
+    $placeholders = array('courseid' => (isset($COURSE->id) ? $COURSE->id : ''),
+            'courseshortname' => (isset($COURSE->shortname) ? $COURSE->shortname : ''),
+            'userid' => (isset($USER->id) ? $USER->id : ''),
+            'userusername' => (isset($USER->username) ? $USER->username : ''),
+            'pagecontextid' => (is_object($PAGE->context) ? $PAGE->context->id : ''),
+            'pagepath' => (is_object($PAGE->url) ? $PAGE->url->out_as_local_url() : ''),
+            'sesskey' => sesskey());
+
+    // Check if there is any placeholder in the url.
+    if (strpos($url, '{') !== false) {
+        // If yes, replace the placeholders in the url.
+        foreach ($placeholders as $search => $replace) {
+            $url = str_replace('{' . $search . '}', $replace, $url);
+        }
+    }
+
+    return new moodle_url($url);
+}
+
+/**
+ * Checks if the user has any of the allowed roles on this page. A comma-seperated list of role shortnames must be provided.
+ * @param int $userid
+ * @param string $setting A comma-seperated whitelist of allowed role shortnames.
+ * @return bool
+ */
+function local_boostnavigation_user_has_role_on_page($userid, $setting) {
+    global $PAGE, $USER;
+
+    // Split optional setting by comma.
+    $showforroles = explode(',', $setting);
+
+    // Is the user's course role switched?
+    if (!empty($USER->access['rsw'][$PAGE->context->path])) {
+        // Check only switched role.
+
+        // Fetch all information for all roles only once and remember for next calls of this function.
+        static $allroles;
+        if ($allroles == null) {
+            $allroles = get_all_roles();
+        }
+
+        // Check if the user has switch to a required role.
+        return in_array($allroles[$USER->access['rsw'][$PAGE->context->path]]->shortname, $showforroles);
+
+        // Or is the user currently having his own role(s)?
+    } else {
+        // Check all of the user's course roles.
+
+        // Retrieve the assigned roles for the current page only once and remember for next calls of this function.
+        static $rolesincontextshortnames;
+        if ($rolesincontextshortnames == null) {
+            $rolesincontext = get_user_roles($PAGE->context, $userid);
+            $rolesincontextshortnames = array();
+            foreach ($rolesincontext as $role) {
+                array_push($rolesincontextshortnames, $role->shortname);
+            }
+        }
+
+        // Check if the user has at least one of the required roles.
+        return count(array_intersect($rolesincontextshortnames, $showforroles)) > 0;
+    }
 }

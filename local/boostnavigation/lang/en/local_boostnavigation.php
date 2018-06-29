@@ -76,7 +76,7 @@ Administration|/admin/index.php<br />
 Please note:
 <ul>
 <li>For technical reasons, a parent node always needs a valid URL, even if the node will be made collapsible afterwards.</li>
-<li>Additionally, if a parent node is not shown because a (language or cohort) restriction applies, its children nodes also won\'t be shown.</li>
+<li>Additionally, if a parent node is not shown because a (language, cohort or role) restriction applies, its children nodes also won\'t be shown.</li>
 </ul>';
 $string['setting_customnodesusageadmins'] = 'Each line consists of a link title, a link URL and supported language(s) (optional) - separated by pipe characters. Each custom node needs to be written in a new line.<br />
 For example:<br />
@@ -90,24 +90,48 @@ Further information to the parameters:
 </ul>
 Please note:
 <ul>
+<li>The link parameter can contain placeholders, for example /course/edit.php?id={courseid} to create a node linking to the current course\'s settings page. Placeholders are encapsulated in curly brackets and will be replaced automatically when the custom node is created.<br />Available placeholders are:
+<ul>
+<li>{courseid}: The course\'s (internal) ID</li>
+<li>{courseshortname}: The course\'s shortname</li>
+<li>{userid}: The logged in user\'s (internal) ID</li>
+<li>{userusername}: The logged in user\'s username</li>
+<li>{pagecontextid}: The current page\'s context ID</li>
+<li>{pagepath}: The current page\'s URL path</li>
+<li>{sesskey}: The sesskey to use in secured URLs</li>
+</ul>
+</li>
 <li>If the custom node does not show up in Boost\'s nav drawer, please check if all mandatory params are set correctly and if the optional language setting fits to your current Moodle user language.</li>
 <li>Due to the way how Boost\'s nav drawer is built in Moodle core, all custom nodes are displayed equally. Adding custom CSS classes, custom HTML element ids or a target attribute to open the link in a new window is impossible.</li>
 </ul>';
-$string['setting_customnodesusageusers'] = 'Each line consists of a link title, a link URL, supported language(s) (optional) and supported cohort(s) (optional) - separated by pipe characters. Each custom node needs to be written in a new line.<br />
+$string['setting_customnodesusageusers'] = 'Each line consists of a link title, a link URL, supported language(s) (optional), supported cohort(s) (optional) and supported role(s) (optional) - separated by pipe characters. Each custom node needs to be written in a new line.<br />
 For example:<br />
 Moodle.org website|http://www.moodle.org|en,de<br />
 Our university|http://www.our-university.edu<br />
-Faculty of mathematics|http://www.our-university.edu/math||math<br /><br />
+Faculty of mathematics|http://www.our-university.edu/math||math<br />
+Teachers\' handbook|http://www.our-university.edu/teacher-handbook|||editingteacher,teacher<br /><br />
 Further information to the parameters:
 <ul>
 <li><b>Title:</b> This text will be shown as the clickable text / label of the custom node.</li>
 <li><b>Link:</b> The link target can be defined by a full web URL(e.g. https://moodle.org) or a relative path within your Moodle instance (e.g. /login/logout.php).</li>
 <li><b>Supported language(s) (optional):</b> This setting can be used for displaying the custom node to users of the specified language only. Separate more than one supported language with commas. If the custom node should be displayed in all languages, then leave this field empty.</li >
-<li><b>Supported cohort(s) (optional):</b> This setting can be used for displaying the custom node to members of the specified cohort only. Use the cohort\'s ID, not the cohort\'s name, for this setting. Separate more than one supported cohort with commas. If the custom node should be displayed for users regardless of any cohort membership, then leave this field empty.
+<li><b>Supported cohort(s) (optional):</b> This setting can be used for displaying the custom node to members of the specified cohort only. Use the cohort\'s ID, not the cohort\'s name, for this setting. Separate more than one supported cohort with commas. If the custom node should be displayed for users regardless of any cohort membership, then leave this field empty.</li>
+<li><b>Supported role(s) (optional):</b> This setting can be used for displaying the custom node only to members with the specified role in each context. Use the role\'s shortname for this setting. Separate more than one supported role with commas. If the custom node should be displayed for users regardless of any role, then leave this field empty.</li>
 </ul>
 Please note:
 <ul>
 <li>Pipe dividing for optional parameters is always needed if they are located between other options. This means that you have to separate params with the pipe character although they are empty. Also see the example for the Faculty of mathematics custom node above.</li>
+<li>The link parameter can contain placeholders, for example /course/edit.php?id={courseid} to create a node linking to the current course\'s settings page. Placeholders are encapsulated in curly brackets and will be replaced automatically when the custom node is created.<br />Available placeholders are:
+<ul>
+<li>{courseid}: The course\'s (internal) ID</li>
+<li>{courseshortname}: The course\'s shortname</li>
+<li>{userid}: The logged in user\'s (internal) ID</li>
+<li>{userusername}: The logged in user\'s username</li>
+<li>{pagecontextid}: The current page\'s context ID</li>
+<li>{pagepath}: The current page\'s URL path</li>
+<li>{sesskey}: The sesskey to use in secured URLs</li>
+</ul>
+</li>
 <li>If the custom node does not show up in Boost\'s nav drawer, please check if all mandatory params are set correctly, if the optional language setting fits to your current Moodle user language and if you are a member of the optional cohort setting.</li>
 <li>Due to the way how Boost\'s nav drawer is built in Moodle core, all custom nodes are displayed equally. Adding custom CSS classes, custom HTML element ids or a target attribute to open the link in a new window is impossible.</li>
 </ul>';

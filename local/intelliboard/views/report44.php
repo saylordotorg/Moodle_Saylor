@@ -32,7 +32,12 @@
 		<div class="intelliboard-progress"><span style="width:<?php echo ($row->completed) ? (($row->completed / $row->users) * 100) : 0; ?>%"></span></div>
 	</li>
 	<?php endforeach; ?>
-	<li class="clearfix"><a style="float:left" href="courses.php"><?php echo get_string('more_courses', 'local_intelliboard'); ?></a>
-		<span style="float:right;color:#ddd;"><?php echo get_string('showing_1_to_10', 'local_intelliboard'); ?></span>
+	<?php if (!empty($report44['data'])): ?>
+	<li class="clearfix">
+		<div class="paging" style="float: right;">
+			<a class="prev <?php echo ($page<=1)?'disabled':''; ?>" href="index.php?page=<?php echo $page-1; ?>&type=courses">Prev</a>
+			<a class="next <?php echo (count($report44['data']) < $length)?'disabled':''; ?>" href="index.php?page=<?php echo $page+1; ?>&type=courses">Next</a>
+		</div>
 	</li>
+	<?php endif; ?>
 </ul>

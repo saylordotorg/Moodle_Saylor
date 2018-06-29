@@ -72,7 +72,7 @@ if ($action == 'intelliboard_learners_progress') {
                 FROM {role_assignments} ra
                     LEFT JOIN {context} ctx ON ctx.id = ra.contextid AND ctx.contextlevel = 50
                     LEFT JOIN {course_modules} cm ON cm.course = ctx.instanceid AND cm.visible = 1
-                    LEFT JOIN {course_modules_completion} cc ON cc.coursemoduleid = cm.id AND cc.completionstate = 1 AND cc.userid = ra.userid
+                    LEFT JOIN {course_modules_completion} cc ON cc.coursemoduleid = cm.id AND cc.completionstate IN(1,2) AND cc.userid = ra.userid
                 WHERE ctx.instanceid = :courseid AND cm.id = :cmid $sql
                 GROUP BY ctx.instanceid", $params);
     } elseif ($courseid) {
@@ -91,7 +91,7 @@ if ($action == 'intelliboard_learners_progress') {
                     COUNT(DISTINCT cmc.id) as completed,
                     MAX(cc.timecompleted) AS timecompleted
                 FROM {course_modules} cm
-                    LEFT JOIN {course_modules_completion} cmc ON cmc.coursemoduleid = cm.id AND cmc.userid = :u1 AND cmc.completionstate = 1
+                    LEFT JOIN {course_modules_completion} cmc ON cmc.coursemoduleid = cm.id AND cmc.userid = :u1 AND cmc.completionstate IN(1,2)
                     LEFT JOIN {course_completions} cc ON cc.course = cm.course AND cc.userid = :u2
                 WHERE cm.course = :courseid AND cm.visible = 1 AND cm.completion > 0
                 GROUP BY cm.course", $params);
@@ -237,7 +237,7 @@ if ($action == 'intelliboard_learners_progress') {
         {course_modules} cm
             LEFT JOIN {modules} m ON m.id = cm.module
             LEFT JOIN (SELECT gi.iteminstance, gi.itemmodule, $grade_avg AS grade FROM {grade_items} gi, {grade_grades} g WHERE gi.itemtype = 'mod' AND g.itemid = gi.id AND g.finalgrade IS NOT NULL AND gi.courseid = :c1 GROUP BY gi.iteminstance, gi.itemmodule) as g ON g.iteminstance = cm.instance AND g.itemmodule = m.name
-            LEFT JOIN (SELECT coursemoduleid, COUNT(id) AS completed FROM {course_modules_completion} WHERE completionstate=1 GROUP BY coursemoduleid) cmc ON cmc.coursemoduleid = cm.id
+            LEFT JOIN (SELECT coursemoduleid, COUNT(id) AS completed FROM {course_modules_completion} WHERE completionstate IN(1,2) GROUP BY coursemoduleid) cmc ON cmc.coursemoduleid = cm.id
             LEFT JOIN (SELECT param, SUM(visits) AS visits, SUM(timespend) AS timespend FROM {local_intelliboard_tracking} WHERE page='module' AND courseid = :c2 AND userid IN (SELECT DISTINCT ra.userid FROM {role_assignments} ra, {context} ctx WHERE ctx.id = ra.contextid AND ctx.instanceid = :c4 AND ctx.contextlevel = 50 $sql1) GROUP BY param) l ON l.param=cm.id
             WHERE cm.visible = 1 AND cm.course = :c3", $params);
 
@@ -439,7 +439,7 @@ if ($action == 'intelliboard_learners_progress') {
             LEFT JOIN {modules} m ON m.id = cm.module
             LEFT JOIN {course_modules_completion} cmc ON cmc.coursemoduleid = cm.id
             LEFT JOIN {user} u ON u.id = cmc.userid
-     WHERE cm.course = :courseid AND cmc.completionstate = 1 AND cmc.timemodified > :timepoint
+     WHERE cm.course = :courseid AND cmc.completionstate IN(1,2) AND cmc.timemodified > :timepoint
      ORDER BY cmc.timemodified DESC", $params, 0, 10);
 
     $users = array();
