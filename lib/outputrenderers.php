@@ -81,10 +81,24 @@ class renderer_base {
         global $CFG;
 
         if ($this->mustache === null) {
+            require_once("{$CFG->libdir}/filelib.php");
+
             $themename = $this->page->theme->name;
             $themerev = theme_get_revision();
 
+            // Create new localcache directory.
             $cachedir = make_localcache_directory("mustache/$themerev/$themename");
+
+            // Remove old localcache directories.
+            $mustachecachedirs = glob("{$CFG->localcachedir}/mustache/*", GLOB_ONLYDIR);
+            foreach ($mustachecachedirs as $localcachedir) {
+                $cachedrev = [];
+                preg_match("/\/mustache\/([0-9]+)$/", $localcachedir, $cachedrev);
+                $cachedrev = isset($cachedrev[1]) ? intval($cachedrev[1]) : 0;
+                if ($cachedrev > 0 && $cachedrev < $themerev) {
+                    fulldelete($localcachedir);
+                }
+            }
 
             $loader = new \core\output\mustache_filesystem_loader();
             $stringhelper = new \core\output\mustache_string_helper();
@@ -2482,12 +2496,13 @@ class core_renderer extends renderer_base {
         global $CFG, $DB;
 
         $user = $userpicture->user;
+        $canviewfullnames = has_capability('moodle/site:viewfullnames', context_system::instance());
 
         if ($userpicture->alttext) {
             if (!empty($user->imagealt)) {
                 $alt = $user->imagealt;
             } else {
-                $alt = get_string('pictureof', '', fullname($user));
+                $alt = get_string('pictureof', '', fullname($user, $canviewfullnames));
             }
         } else {
             $alt = '';
@@ -2519,7 +2534,7 @@ class core_renderer extends renderer_base {
 
         // Show fullname together with the picture when desired.
         if ($userpicture->includefullname) {
-            $output .= fullname($userpicture->user);
+            $output .= fullname($userpicture->user, $canviewfullnames);
         }
 
         // then wrap it in link if needed

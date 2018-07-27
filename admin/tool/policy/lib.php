@@ -83,7 +83,7 @@ function tool_policy_before_standard_html_head() {
     if (!empty($CFG->sitepolicyhandler)
             && $CFG->sitepolicyhandler == 'tool_policy'
             && empty($USER->policyagreed)
-            && isguestuser()) {
+            && (isguestuser() || !isloggedin())) {
         $output = $PAGE->get_renderer('tool_policy');
         $page = new \tool_policy\output\guestconsent();
 
@@ -104,9 +104,12 @@ function tool_policy_standard_footer_html() {
     $output = '';
     if (!empty($CFG->sitepolicyhandler)
             && $CFG->sitepolicyhandler == 'tool_policy') {
-        $url = (new moodle_url('/admin/tool/policy/viewall.php'))->out();
-        $output .= html_writer::link($url, get_string('userpolicysettings', 'tool_policy'));
-        $output = html_writer::div($output, 'policiesfooter');
+        $policies = api::get_current_versions_ids();
+        if (!empty($policies)) {
+            $url = (new moodle_url('/admin/tool/policy/viewall.php'))->out();
+            $output .= html_writer::link($url, get_string('userpolicysettings', 'tool_policy'));
+            $output = html_writer::div($output, 'policiesfooter');
+        }
     }
 
     return $output;
