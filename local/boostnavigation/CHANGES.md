@@ -4,6 +4,36 @@ moodle-local_boostnavigation
 Changes
 -------
 
+### Unreleased
+
+* 2018-07-23 - Remove deprecated strings file as the strings were fully depreated before.
+
+### v3.5-r2
+
+* 2018-07-19 - Adapt the mechanism to de-activate collapsible custom parent nodes.
+* 2018-07-19 - Cleanup: Remove a PHP notice in a forgotten edge case.
+* 2018-07-19 - Split settings onto multiple settings pages.
+* 2018-07-19 - Change collapse node icon to FontAwesome.
+
+### v3.5-r1
+
+* 2018-07-18 - Some changes after navdrawer icons have landed in core.
+* 2018-07-18 - Check compatibility for Moodle 3.5, no functionality change.
+
+### v3.4-r7
+
+* 2018-07-18 - Support guest and non-logged-in users for role specific custom nodes.
+
+### v3.4-r6
+
+* 2018-06-20 - Bugfix: {pagecontextid} placeholder in custom node URLs was broken.
+
+### v3.4-r5
+
+* 2018-06-20 - Bugfix: Display custom nodes for multiple cohorts did not work
+* 2018-06-20 - Add support for role specific custom nodes. With warm greetings from Moodle-DACH18-DevCamp - Cheers Jonathan and Christian
+* 2018-06-19 - Add support for placeholders in custom node URLs.
+
 ### v3.4-r4
 
 * 2018-05-16 - Implement Privacy API.

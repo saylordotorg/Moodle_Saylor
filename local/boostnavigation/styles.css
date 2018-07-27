@@ -24,20 +24,24 @@
 .jsenabled .list-group-item[data-key="localboostnavigationcoursesections"][data-isexpandable="1"][data-collapse="0"] > div::after,
 .jsenabled .list-group-item[data-key="localboostnavigationactivities"][data-isexpandable="1"][data-collapse="0"] > div::after,
 .jsenabled .list-group-item[data-key^="localboostnavigationcustom"][data-isexpandable="1"][data-collapse="0"] > div::after {
-    content: url([[pix:i/dropdown]]);
+    content: "\f0d7";
+    font-family: FontAwesome;
+    font-size: 1.2rem;
     position: absolute;
-    top: 0.75rem;
     right: 0.75rem;
+    top: 0.55rem;
 }
 /* Add the icon for the collapsed node state. */
 .jsenabled .list-group-item[data-key="mycourses"][data-isexpandable="1"][data-collapse="1"] > div::after,
 .jsenabled .list-group-item[data-key="localboostnavigationcoursesections"][data-isexpandable="1"][data-collapse="1"] > div::after,
 .jsenabled .list-group-item[data-key="localboostnavigationactivities"][data-isexpandable="1"][data-collapse="1"] > div::after,
 .jsenabled .list-group-item[data-key^="localboostnavigationcustom"][data-isexpandable="1"][data-collapse="1"] > div::after {
-    content: url([[pix:t/collapsed]]);
+    content: "\f0da";
+    font-family: FontAwesome;
+    font-size: 1.2rem;
     position: absolute;
-    top: 0.75rem;
     right: 0.75rem;
+    top: 0.55rem;
 }
 /* Make sure that the icon does not overlap with the node text. */
 .jsenabled .list-group-item[data-key="mycourses"][data-isexpandable="1"] > div,
@@ -54,14 +58,6 @@
     cursor: pointer;
 }
 
-/* Add activity nodes feature */
-/* Add an indent to the activity nodes because this isn't possible with Navigation node API.
-   Setting !important is necessary because otherwise the child nodes' m-l-0 class would overrule our margin. */
-/* TODO: Remove when MDL-61298 is integrated to Moodle core. */
-.list-group-item[data-key^="localboostnavigationactivity"] > div {
-    margin-left: 1rem !important;
-}
-
 /* Custom nodes feature. */
 /* Add an indent to the custom child nodes because this isn't possible with Navigation node API.
    Setting !important is necessary because otherwise the child nodes' m-l-0 class would overrule our margin. */
@@ -73,15 +69,38 @@
 .list-group-item[data-key="localboostnavigationcustombottomadmins1"] {
     margin-top: 1rem;
 }
-/* The Navigation node API highlights every node as active if its URL matches the current page URL.
-   As we have to add a URL even to collapsible custom nodes, this might have side-effects. Let's prevent the collapsible
-   custom nodes from being highlighted. */
-.list-group-item[data-key^="localboostnavigationcustom"][data-isexpandable="1"][data-isactive="1"] {
-    font-weight: normal;
-}
 /* Add a plugin-specific class to shrink fa-icons. This is needed for the custom nodes' icons.
    Font-Awesome 5 will contain a similar class officially, but currently Moodle still uses Font-Awesome 4.. */
 .local-boostnavigation-fa-sm {
     font-size: 0.5em !important;
     margin-top: 1em !important;
+}
+
+/* Improve node icons. */
+/* Hide the (empty) node icon for heading nodes. */
+.list-group-item[data-key="localboostnavigationcoursesections"] .icon.fa-fw,
+.list-group-item[data-key="localboostnavigationactivities"] .icon.fa-fw {
+    display: none;
+}
+/* Hide the icon for the mycourses node ... */
+.list-group-item[data-key="mycourses"] .icon {
+    display: none;
+}
+/* ... and remove the indent of the mycourses child nodes. */
+.list-group-item[data-parent-key="mycourses"] > div {
+    margin-left: 0 !important;
+}
+/* Hide the icon for collapsible custom parent nodes ... */
+.jsenabled .list-group-item[data-key^="localboostnavigationcustom"][data-isexpandable="1"] .icon {
+    display: none;
+}
+/* ... and remove the indent to the collapsed custom child nodes. Unfortunately, this has to be done for each custom node block
+   individually because the child node does not know (with a CSS-selectable attribute) if its parent node is collapsed or node. */
+.jsenabled .list-group-item[data-key^="localboostnavigationcustomcourseusers"][data-isexpandable="1"]:not([data-parent-key^="localboostnavigationcustomcourseusers"]) ~ .list-group-item[data-parent-key^="localboostnavigationcustomcourseusers"] > div,
+.jsenabled .list-group-item[data-key^="localboostnavigationcustomcourseadmins"][data-isexpandable="1"]:not([data-parent-key^="localboostnavigationcustomcourseadmins"]) ~ .list-group-item[data-parent-key^="localboostnavigationcustomcourseadmins"] > div,
+.jsenabled .list-group-item[data-key^="localboostnavigationcustomrootusers"][data-isexpandable="1"]:not([data-parent-key^="localboostnavigationcustomrootusers"]) ~ .list-group-item[data-parent-key^="localboostnavigationcustomrootusers"] > div,
+.jsenabled .list-group-item[data-key^="localboostnavigationcustomcrootadmins"][data-isexpandable="1"]:not([data-parent-key^="localboostnavigationcustomrootadmins"]) ~ .list-group-item[data-parent-key^="localboostnavigationcustomrooradmins"] > div,
+.jsenabled .list-group-item[data-key^="localboostnavigationcustombottomusers"][data-isexpandable="1"]:not([data-parent-key^="localboostnavigationcustombottomusers"]) ~ .list-group-item[data-parent-key^="localboostnavigationcustombottomusers"] > div,
+.jsenabled .list-group-item[data-key^="localboostnavigationcustombottomadmins"][data-isexpandable="1"]:not([data-parent-key^="localboostnavigationcustombottomadmins"]) ~ .list-group-item[data-parent-key^="localboostnavigationcustombottomadmins"] > div {
+    margin-left: inherit !important;
 }
