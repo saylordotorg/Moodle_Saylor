@@ -259,6 +259,18 @@ def plugins = [
         "url" : 'https://github.com/VERSION2-Inc/moodle-block_sharing_cart',
         "branch" : 'master',
         "dest" : 'blocks/sharing_cart'
+    ],
+    [
+        "name" : 'qtype_coderunner',
+        "url" : 'https://github.com/trampgeek/moodle-qtype_coderunner.git',
+        "branch" : 'master',
+        "dest" : 'question/type/coderunner'
+    ],
+    [
+        "name" : 'qbehaviour_adaptive_adapted_for_coderunner',
+        "url" : 'https://github.com/trampgeek/moodle-qbehaviour_adaptive_adapted_for_coderunner.git',
+        "branch" : 'master',
+        "dest" : 'question/behaviour/adaptive_adapted_for_coderunner'
     ]
 ]
 
