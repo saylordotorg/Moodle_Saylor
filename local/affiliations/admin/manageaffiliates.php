@@ -117,8 +117,8 @@ if ($confirm == md5($USER->sesskey) &&  data_submitted()) {
 		// First, convert the query string param back to an array.
 		parse_str($deleteaffiliatesparam, $output);
 
-		foreach ($output as $deleteaffiliate) {
-			$id = $deleteaffiliate[0];
+		foreach ($output as $deleteaffiliate) { 
+			$id = $deleteaffiliate;
 			// Get the affiliate record.
 			$affiliate = $DB->get_record('local_affiliations_affiliate', array('id' => $id), '*', MUST_EXIST);
 
@@ -171,7 +171,7 @@ if ($data = $form->get_data()) {
 			$deleteaffiliates[] = $deleteaffiliateid;
 			foreach ($affiliates as $affiliate) {
 				if ($deleteaffiliateid == $affiliate->id) {
-					$modaltext .= "<li>".$affiliate->fullname."(".$affiliate->shortname.")"."ID: $deleteaffiliateid</li>";
+					$modaltext .= "<li>".$affiliate->fullname."(".$affiliate->shortname.")</li>";
 					break;
 				}
 			}

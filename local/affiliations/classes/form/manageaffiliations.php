@@ -58,6 +58,9 @@ class manageaffiliations extends moodleform {
 
         $mform->addElement('static', 'addaffiliationsdescription', '', $addaffiliationsdescription);
 
+        // Sort affiliates array, ignoring case.
+        array_multisort (array_column($affiliates, 'fullname'), SORT_ASC, SORT_STRING | SORT_FLAG_CASE, $affiliates);
+
         // Loop through the affiliates and add a checkbox.
         foreach ($affiliates as $affiliate) {
             // Is this user a member of this affiliate's cohort?

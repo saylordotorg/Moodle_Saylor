@@ -49,10 +49,14 @@ class manageaffiliates extends moodleform {
         $mform->disable_form_change_checker();
 
         // Get all the affiliates and load into an array.
+        // $affiliates is an array of objects..
         $affiliates = local_affiliations_get_affiliates();
 
         // Show affiliates currently available.
         $mform->addElement('header', 'currentaffiliatesheader', get_string('currentaffiliatesheader', 'local_affiliations'));
+
+        // Sort affiliates array, ignoring case.
+        array_multisort (array_column($affiliates, 'fullname'), SORT_ASC, SORT_STRING | SORT_FLAG_CASE, $affiliates);
 
         foreach ($affiliates as $affiliate) {
             $mform->addElement('checkbox', 'deleteaffiliates['.$affiliate->id.']', null, "$affiliate->fullname ($affiliate->shortname)", array('group' => 'deleteaffiliates'));
