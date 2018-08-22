@@ -235,6 +235,8 @@ def StashMoodle(moodle_version) {
             catch(err) {
                 NotifyOnFail("Unable to retrieve Moodle: ${err}")
             }
+        // Remove the Moodle .git folder.
+        sh "rm -r .git"
         stash([name: 'moodle'])
     }
 }
@@ -324,6 +326,9 @@ try {
             deleteDir()
             echo("Checking out SCM")
             checkout scm
+
+            // We want to remove all the old package files but preserve the .git folder.
+            sh "shopt -s extglob && rm -r !(.git)"
 
             echo("Beginning unstashing operations")
 
