@@ -34,6 +34,9 @@ require_once($CFG->dirroot . '/mod/quiz/backup/moodle2/restore_mod_quiz_access_s
  * <quizaccess_honestycheck><required>1</required></quizaccess_honestycheck> tag
  * will be in the XML, and this needs to be written to the DB. Otherwise, nothing
  * needs to be written to the DB.
+ *
+ * @copyright 2011 The Open University
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class restore_quizaccess_honestycheck_subplugin extends restore_mod_quiz_access_subplugin {
 
