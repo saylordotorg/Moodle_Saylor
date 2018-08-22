@@ -28,5 +28,6 @@ $string['pluginname'] = 'Adaptive adapted for coderunner';
 $string['precheck'] = 'Precheck';
 $string['precheckedresponse'] = 'Prechecked: {$a}';
 $string['precheckresults'] = 'Precheck results';
+$string['privacy:metadata'] = 'The qbehaviour_adaptive_adapted_for_coderunner question behaviour plugin does not store any personal data.';
 $string['triesremaining'] = 'Tries remaining: {$a}';
 $string['tryagain'] = 'Try again';
