@@ -123,12 +123,6 @@ def plugins = [
         "dest" : 'question/type/pmatch'
     ],
     [
-        "name" : 'local_intelliboard',
-        "url" : 'https://github.com/intelliboard/intelliboard.git',
-        "branch" : 'master',
-        "dest" : 'local/intelliboard'
-    ],
-    [
         "name" : 'qbehaviour_adaptivehints',
         "url" : 'https://github.com/saylordotorg/moodle-qbehaviour_adaptivehints.git',
         "branch" : 'master',
