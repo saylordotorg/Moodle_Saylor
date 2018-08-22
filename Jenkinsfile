@@ -377,7 +377,10 @@ try {
             checkout scm
 
             // We want to remove all the old package files but preserve the .git folder.
-            sh "shopt -s extglob && rm -r !(.git)"
+            sh```#!/bin/bash -xe
+                    shopt -s extglob
+                    rm -r !(.git)
+            ```
 
             echo("Beginning unstashing operations")
 
