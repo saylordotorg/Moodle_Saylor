@@ -367,7 +367,7 @@ try {
             // We want to remove all the old package files but preserve the .git folder.
             sh'''#!/bin/bash -xe
                     shopt -s extglob
-                    rm -r ./!(.git|.|..)
+                    rm -r ./!(.git|.|..|Jenkinsfile)
             '''
 
             echo("Beginning unstashing operations")
