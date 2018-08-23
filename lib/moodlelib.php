@@ -3601,38 +3601,25 @@ function get_extra_user_fields($context, $already = array()) {
         return array();
     }
 
-    // Split showuseridentity on comma (filter needed in case the showuseridentity is empty).
-    $extra = array_filter(explode(',', $CFG->showuseridentity));
-
+    // Split showuseridentity on comma.
+    if (empty($CFG->showuseridentity)) {
+        // Explode gives wrong result with empty string.
+        $extra = array();
+    } else {
+        $extra =  explode(',', $CFG->showuseridentity);
+    }
+    $renumber = false;
     foreach ($extra as $key => $field) {
         if (in_array($field, $already)) {
             unset($extra[$key]);
+            $renumber = true;
         }
     }
-
-    // If the identity fields are also among hidden fields, make sure the user can see them.
-    $hiddenfields = array_filter(explode(',', $CFG->hiddenuserfields));
-    $hiddenidentifiers = array_intersect($extra, $hiddenfields);
-
-    if ($hiddenidentifiers) {
-        if ($context->get_course_context(false)) {
-            // We are somewhere inside a course.
-            $canviewhiddenuserfields = has_capability('moodle/course:viewhiddenuserfields', $context);
-
-        } else {
-            // We are not inside a course.
-            $canviewhiddenuserfields = has_capability('moodle/user:viewhiddendetails', $context);
-        }
-
-        if (!$canviewhiddenuserfields) {
-            // Remove hidden identifiers from the list.
-            $extra = array_diff($extra, $hiddenidentifiers);
-        }
+    if ($renumber) {
+        // For consistency, if entries are removed from array, renumber it
+        // so they are numbered as you would expect.
+        $extra = array_merge($extra);
     }
-
-    // Re-index the entries.
-    $extra = array_values($extra);
-
     return $extra;
 }
 
@@ -6158,7 +6145,7 @@ function setnew_password_and_mail($user, $fasthash = false) {
     $a->sitename    = format_string($site->fullname);
     $a->username    = $user->username;
     $a->newpassword = $newpassword;
-    $a->link        = $CFG->wwwroot .'/login/?lang='.$lang;
+    $a->link        = $CFG->wwwroot .'/login/';
     $a->signoff     = generate_email_signoff();
 
     $message = (string)new lang_string('newusernewpasswordtext', '', $a, $lang);
@@ -6949,7 +6936,6 @@ function get_string_manager($forcereload=false) {
                  $translist = array();
             } else {
                 $translist = explode(',', $CFG->langlist);
-                $translist = array_map('trim', $translist);
             }
 
             if (!empty($CFG->config_php_settings['customstringmanager'])) {

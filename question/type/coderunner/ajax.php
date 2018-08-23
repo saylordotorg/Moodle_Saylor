@@ -43,16 +43,15 @@ $qtype  = required_param('qtype', PARAM_RAW_TRIMMED);
 $courseid = required_param('courseid', PARAM_INT);
 
 header('Content-type: application/json; charset=utf-8');
-
-$coursecontext = context_course::instance($courseid);
-$questiontype = qtype_coderunner::get_prototype($qtype, $coursecontext);
-if ($questiontype === null) {
+try {
+    $coursecontext = context_course::instance($courseid);
+    $questiontype = qtype_coderunner::get_prototype($qtype, $coursecontext);
+    $questiontype->success = true;
+    $questiontype->error = '';
+} catch (moodle_exception $e) {
     $questiontype = new stdClass();
     $questiontype->success = false;
     $questiontype->error = "Error fetching prototype. " . $e->getMessage();
-} else {
-    $questiontype->success = true;
-    $questiontype->error = '';
 }
 echo json_encode($questiontype);
 die();

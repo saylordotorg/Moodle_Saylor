@@ -101,8 +101,6 @@ define(['jquery', 'core/notification', 'core/templates',
         if (!hasLoadedAll(root)) {
             // Only enable the button if we've got more events to load.
             viewMoreButton.prop('disabled', false);
-        } else {
-            viewMoreButton.addClass('hidden');
         }
     };
 

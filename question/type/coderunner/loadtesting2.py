@@ -26,7 +26,6 @@
 '''
 
 import mechanize as mech
-import ssl
 import time
 from multiprocessing import Process, Queue
 from Queue import Empty
@@ -35,9 +34,9 @@ import sys
 import shelve
 import random
 
-SERVER = 'https://exam2018.csse.canterbury.ac.nz/login/index.php?theme=clean'
+SERVER = 'https://quiz2018.csse.canterbury.ac.nz/login/index.php?theme=clean'
 COURSE = 'LoadTesting'
-LANGUAGE = 'PYTHON3'
+LANGUAGE = 'PYTHON'
 NUM_QUESTIONS = 4
 FIRST_QUESTION = 0
 LAST_QUESTION = FIRST_QUESTION + NUM_QUESTIONS - 1
@@ -259,7 +258,6 @@ def quiz_runner(student_num, sim_gap, duration, result_q):
     try:
         print 'Student{} logging in ...'.format(student_num)
         login = SERVER
-        ssl._create_default_https_context = ssl._create_unverified_context
         br = mech.Browser()
         br.set_handle_robots(False)
         br.open(login)

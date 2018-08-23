@@ -22,9 +22,9 @@ Feature: Workflow block - follow a workflow
   @javascript
   Scenario: Try adding a workflow when none are defined.
     When I log in as "manager1"
-    And I am on "Course 1" course homepage
+    And I follow "Course 1"
     And I turn editing mode on
-    And I add the "Workflows" block
+    And I add the "Workflow" block
     Then I should see "There is currently no workflow assigned for this page"
 
   @javascript
@@ -37,9 +37,9 @@ Feature: Workflow block - follow a workflow
     And I log out
 
     When I log in as "manager1"
-    And I am on "Course 1" course homepage
+    And I follow "Course 1"
     And I turn editing mode on
-    And I add the "Workflows" block
+    And I add the "Workflow" block
     And I set the field "workflow" to "Test course workflow"
 
     Then I should see "Test course workflow"
@@ -55,7 +55,7 @@ Feature: Workflow block - follow a workflow
 
     # Check that the finish step script did the right thing.
     When I navigate to "Edit settings" node in "Course administration"
-    Then the field "Course visibility" matches value "Hide"
+    Then the field "Visible" matches value "Hide"
     And I press "Cancel"
 
     When I press "Show names (1)"
@@ -69,17 +69,19 @@ Feature: Workflow block - follow a workflow
     Then I should see "Set the course format" in the "ul.block_workflow_todolist li" "css_element"
 
     When I press "Edit comments"
-    Then I should see "Update comment"
+    Then I should see "Edit comments"
     And I set the field "Update workflow comment" to "This is a comment"
-    And I click on "#id_submitbutton" "css_element"
+    And I press "Save changes"
     And I should see "This is a comment"
 
     # Finish task
     When I press "Finish step"
     Then I should see "Finish step"
-    And I should see "Test course workflow"
+    When I click on "Close" "button" in the "Finish step" "dialogue"
+    Then I should see "Test course workflow"
+    When I press "Finish step"
     And I set the field "Update workflow comment" to "This is the comment set on finishing the step"
-    And I click on "#id_submitbutton" "css_element"
+    And I click on "Finish step" "button" in the "Finish step" "dialogue"
     Then I should see "Prepare your web site"
     And I should see "Any Teacher"
 
@@ -105,28 +107,27 @@ Feature: Workflow block - follow a workflow
     # Teacher actions
     When I log out
     And I log in as "teacher1"
-    And I am on "Course 1" course homepage
+    And I follow "Course 1"
     Then I should see "Test course workflow"
     And I should see "Prepare your web site"
     And I should see "You, or any other Teacher"
 
     # Finish task & course visiblility again.
     When I press "Finish step"
-    And I click on "#id_submitbutton" "css_element"
+    And I click on "Finish step" "button" in the "Finish step" "dialogue"
     Then I should see "The workflow has been completed."
-    And I should see "Workflow overview"
+    And "Workflow overview" "button" in the "Test course workflow" "block" should be visible
     And I reload the page
     And I should see "The workflow has been completed."
     And "Workflow overview" "button" in the "Workflow" "block" should be visible
 
     # Check that the finish step script did the right thing.
+    When I navigate to "Edit settings" node in "Course administration"
+    Then the field "Visible" matches value "Show"
+
     When I log out
     And I log in as "manager1"
-    And I am on "Course 1" course homepage
-    And I navigate to "Edit settings" node in "Course administration"
-    Then the field "Course visibility" matches value "Show"
-
-    And I am on "Course 1" course homepage
+    And I follow "Course 1"
     Then I should see "The workflow has been completed."
     And I click on "Workflow overview" "button" in the "Workflow" "block"
     And I should see "Complete" in the "Configure basic site" "table_row"

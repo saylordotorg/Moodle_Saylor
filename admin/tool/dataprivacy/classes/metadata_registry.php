@@ -70,8 +70,7 @@ class metadata_registry {
                     $internaldata['compliant'] = false;
                 }
                 // Check to see if we are an external plugin.
-                // Plugin names can contain _ characters, limit to 2 to just remove initial plugintype.
-                $componentshortname = explode('_', $component, 2);
+                $componentshortname = explode('_', $component);
                 $shortname = array_pop($componentshortname);
                 if (isset($contributedplugins[$plugintype][$shortname])) {
                     $internaldata['external'] = true;

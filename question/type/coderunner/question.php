@@ -351,13 +351,8 @@ class qtype_coderunner_question extends question_graded_automatically {
         $twigparams = array('STUDENT' => new qtype_coderunner_student($this->student));
         mt_srand($seed);
         $ournewtemplateparams = $twig->render($this->templateparams, $twigparams);
-        if (isset($this->prototypetemplateparams)) {
-            $prototypenewtemplateparams = $twig->render($this->prototypetemplateparams, $twigparams);
-            $this->templateparams = qtype_coderunner_util::merge_json($prototypenewtemplateparams, $ournewtemplateparams);
-        } else {
-            // Missing prototype?
-            $this->templateparams = $ournewtemplateparams;
-        }
+        $prototypenewtemplateparams = $twig->render($this->prototypetemplateparams, $twigparams);
+        $this->templateparams = qtype_coderunner_util::merge_json($prototypenewtemplateparams, $ournewtemplateparams);
     }
 
 
@@ -411,7 +406,7 @@ class qtype_coderunner_question extends question_graded_automatically {
             'stdin'    => '',
             'expected' => '',
             'extra'    => '',
-            'display'  => 'HIDE',
+            'display'  => 0,
             'useasexample' => 0,
             'hiderestiffail' => 0,
             'mark'     => 1
@@ -504,9 +499,9 @@ class qtype_coderunner_question extends question_graded_automatically {
         } else {
             // Load any files from the prototype.
             $this->get_prototype();
-            $files = self::get_data_files($this->prototype, $this->prototype->questionid);
+            $files = $this->get_data_files($this->prototype, $this->prototype->questionid);
         }
-        $files += self::get_data_files($this, $this->id);  // Add in files for this question.
+        $files += $this->get_data_files($this, $this->id);  // Add in files for this question.
         return $files;
     }
 

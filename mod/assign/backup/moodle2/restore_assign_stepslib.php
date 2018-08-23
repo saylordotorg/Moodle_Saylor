@@ -387,12 +387,6 @@ class restore_assign_activity_structure_step extends restore_activity_structure_
             return;
         }
 
-        // Skip group overrides if we are not restoring groupinfo.
-        $groupinfo = $this->get_setting_value('groups');
-        if (!$groupinfo && !is_null($data->groupid)) {
-            return;
-        }
-
         $data->assignid = $this->get_new_parentid('assign');
 
         if (!is_null($data->userid)) {

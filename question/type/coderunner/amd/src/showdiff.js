@@ -236,7 +236,7 @@ define(['jquery'], function($) {
      * @param string hideValue the text in the button when differences are showing
      * @returns undefined
      */
-    function initDiffButton(buttonId, showValue, hideValue, expectedString, gotString) {
+    function initDiffButton(buttonId, showValue, hideValue) {
         var diffButton = $('[id="' + buttonId + '"]'),
             table,
             tableRows,
@@ -249,11 +249,10 @@ define(['jquery'], function($) {
         thEls = table.find('th');
         tableRows = table.find('tbody tr');
 
-        // Find 'Expected' and 'Got' columns
         thEls.each(function() {
-            if ($(this).html() === gotString) {
+            if ($(this).html() === 'Got') {
                 gotCol = columnCount;
-            } else if ($(this).html() === expectedString) {
+            } else if ($(this).html() === 'Expected') {
                 expectedCol = columnCount;
             }
             columnCount += 1;

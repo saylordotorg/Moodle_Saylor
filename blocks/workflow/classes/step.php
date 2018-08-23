@@ -404,9 +404,7 @@ class block_workflow_step {
 
         // Retrieve a list of the step_states.
         $states = $DB->get_records('block_workflow_step_states', array('stepid' => $this->id), null, 'id');
-        $statelist = array_map(function ($a) {
-            return $a->id;
-        }, $states);
+        $statelist = array_map(create_function('$a', 'return $a->id;'), $states);
 
         // Remove all of the state_change history.
         $DB->delete_records_list('block_workflow_state_changes', 'stepstateid', $statelist);
@@ -471,21 +469,11 @@ class block_workflow_step {
             }
         }
 
-        // This comes from a form where the value may be various things like an
-        // empty string. But we strictly want to store NULL in the DB if this is not set.
         if (empty($data->autofinish)) {
             $data->autofinish = null;
         }
         if (empty($data->autofinishoffset)) {
             $data->autofinishoffset = 0;
-        }
-
-        // Same for this field too. Ensure it is really NULL if not set.
-        if (empty($data->extranotify)) {
-            $data->extranotify = null;
-        }
-        if (empty($data->extranotifyoffset)) {
-            $data->extranotifyoffset = 0;
         }
 
         // Validate any changes to the onactivescript, onextranotifyscript and oncompletescript.

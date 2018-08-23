@@ -133,7 +133,7 @@ class step_edit extends moodleform {
             }
         }
 
-        if (isset($data['onextranotifyscript'])) {
+        if (isset($data['onextrascript'])) {
             // Validate the onextranotifyscript.
             $script = $step->validate_script($data['onextranotifyscript']);
             if ($script->errors) {

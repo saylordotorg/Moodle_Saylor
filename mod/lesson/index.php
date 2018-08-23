@@ -85,8 +85,7 @@ if ($usesections) {
     $table->head  = array ($strname, $strgrade, $strdeadline);
     $table->align = array ("left", "center", "center");
 }
-// Get all deadlines.
-$deadlines = lesson_get_user_deadline($course->id);
+
 foreach ($lessons as $lesson) {
     if (!$lesson->visible) {
         //Show dimmed if the mod is hidden
@@ -98,13 +97,12 @@ foreach ($lessons as $lesson) {
     $cm = get_coursemodule_from_instance('lesson', $lesson->id);
     $context = context_module::instance($cm->id);
 
-    $deadline = $deadlines[$lesson->id]->userdeadline;
-    if ($deadline == 0) {
+    if ($lesson->deadline == 0) {
         $due = $strnodeadline;
-    } else if ($deadline > $timenow) {
-        $due = userdate($deadline);
+    } else if ($lesson->deadline > $timenow) {
+        $due = userdate($lesson->deadline);
     } else {
-        $due = "<font color=\"red\">" . userdate($deadline) . "</font>";
+        $due = "<font color=\"red\">".userdate($lesson->deadline)."</font>";
     }
 
     if ($usesections) {

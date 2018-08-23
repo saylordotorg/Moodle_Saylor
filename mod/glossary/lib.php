@@ -3820,10 +3820,10 @@ function glossary_get_entries_by_search($glossary, $context, $query, $fullsearch
                                         $options = array()) {
     global $DB, $USER;
 
-    // Clean terms.
+    // Remove too little terms.
     $terms = explode(' ', $query);
     foreach ($terms as $key => $term) {
-        if (strlen(trim($term, '+-')) < 1) {
+        if (strlen(trim($term, '+-')) < 2) {
             unset($terms[$key]);
         }
     }

@@ -1,5 +1,5 @@
 @ou @ou_vle @block @block_workflow
-Feature: Workflow block - follow a workflow using TinyMCE
+Feature: Workflow block - follow a workflow
   In order to create courses in a bureaucratic organisation
   as a manager and a teacher
   I need to follow a workflow.
@@ -20,28 +20,28 @@ Feature: Workflow block - follow a workflow using TinyMCE
       | student1 | C1     | student        |
 
   @javascript
-  Scenario: Try adding a workflow when none are defined using TinyMCE
+  Scenario: Try adding a workflow when none are defined.
     When I log in as "manager1"
-    And I am on "Course 1" course homepage
+    And I follow "Course 1"
     And I turn editing mode on
-    And I add the "Workflows" block
+    And I add the "Workflow" block
     Then I should see "There is currently no workflow assigned for this page"
 
   @javascript
-  Scenario: Add a workflow to a course and step through it using TinyMCE
+  Scenario: Add a workflow to a course and step through it.
     When I log in as "admin"
     And I navigate to "Workflows" node in "Site administration > Plugins > Blocks"
     And I follow "Import workflow"
     And I upload "blocks/workflow/tests/fixtures/testworkflow.workflow.xml" file to "File" filemanager
     And I press "Import workflow"
     And I navigate to "Manage editors" node in "Site administration > Plugins > Text editors"
-    And I click on "Disable" "link" in the "Atto HTML editor" "table_row"
+    And I click on "disable" "link" in the "Atto HTML editor" "table_row"
     And I log out
 
     When I log in as "manager1"
-    And I am on "Course 1" course homepage
+    And I follow "Course 1"
     And I turn editing mode on
-    And I add the "Workflows" block
+    And I add the "Workflow" block
     And I set the field "workflow" to "Test course workflow"
 
     Then I should see "Test course workflow"
@@ -57,7 +57,7 @@ Feature: Workflow block - follow a workflow using TinyMCE
 
     # Check that the finish step script did the right thing.
     When I navigate to "Edit settings" node in "Course administration"
-    Then the field "Course visibility" matches value "Hide"
+    Then the field "Visible" matches value "Hide"
     And I press "Cancel"
 
     When I press "Show names (1)"
@@ -71,15 +71,17 @@ Feature: Workflow block - follow a workflow using TinyMCE
     Then I should see "Set the course format" in the "ul.block_workflow_todolist li" "css_element"
 
     When I press "Edit comments"
-    Then I should see "Update comment"
+    Then I should see "Edit comments"
     # Cannot actually set a comment, becuase Behat does not support TinyMCE any more.
-    And I click on "#id_submitbutton" "css_element"
+    And I press "Save changes"
 
     # Finish task
     When I press "Finish step"
     Then I should see "Finish step"
-    And I should see "Test course workflow"
-    When I click on "#id_submitbutton" "css_element"
+    When I click on "Close" "button" in the "Finish step" "dialogue"
+    Then I should see "Test course workflow"
+    When I press "Finish step"
+    And I click on "Finish step" "button" in the "Finish step" "dialogue"
     Then I should see "Prepare your web site"
     And I should see "Any Teacher"
 
@@ -104,27 +106,27 @@ Feature: Workflow block - follow a workflow using TinyMCE
     # Teacher actions
     When I log out
     And I log in as "teacher1"
-    And I am on "Course 1" course homepage
+    And I follow "Course 1"
     Then I should see "Test course workflow"
     And I should see "Prepare your web site"
     And I should see "You, or any other Teacher"
 
     # Finish task & course visiblility again.
     When I press "Finish step"
-    And I click on "#id_submitbutton" "css_element"
+    And I click on "Finish step" "button" in the "Finish step" "dialogue"
     Then I should see "The workflow has been completed."
-    And I should see "Workflow overview"
+    And "Workflow overview" "button" in the "Test course workflow" "block" should be visible
     And I reload the page
     And I should see "The workflow has been completed."
     And "Workflow overview" "button" in the "Workflow" "block" should be visible
 
     # Check that the finish step script did the right thing.
     When I navigate to "Edit settings" node in "Course administration"
-    Then the field "Course visibility" matches value "Show"
+    Then the field "Visible" matches value "Show"
 
     When I log out
     And I log in as "manager1"
-    And I am on "Course 1" course homepage
+    And I follow "Course 1"
     Then I should see "The workflow has been completed."
     And I click on "Workflow overview" "button" in the "Workflow" "block"
     And I should see "Complete" in the "Configure basic site" "table_row"

@@ -1504,9 +1504,8 @@ class assign {
         } else if ($plugin->is_visible() && $plugin->is_configurable()) {
             $name = $plugin->get_subtype() . '_' . $plugin->get_type() . '_enabled';
             $label = $plugin->get_name();
+            $label .= ' ' . $this->get_renderer()->help_icon('enabled', $plugin->get_subtype() . '_' . $plugin->get_type());
             $pluginsenabled[] = $mform->createElement('checkbox', $name, '', $label);
-            $helpicon = $this->get_renderer()->help_icon('enabled', $plugin->get_subtype() . '_' . $plugin->get_type());
-            $pluginsenabled[] = $mform->createElement('static', '', '', $helpicon);
 
             $default = get_config($plugin->get_subtype() . '_' . $plugin->get_type(), 'default');
             if ($plugin->get_config('enabled') !== false) {
@@ -3317,12 +3316,11 @@ class assign {
     /**
      * Does this user have grade permission for this assignment?
      *
-     * @param int|stdClass $user The object or id of the user who will do the editing (default to current user).
      * @return bool
      */
-    public function can_grade($user = null) {
+    public function can_grade() {
         // Permissions check.
-        if (!has_capability('mod/assign:grade', $this->context, $user)) {
+        if (!has_capability('mod/assign:grade', $this->context)) {
             return false;
         }
 

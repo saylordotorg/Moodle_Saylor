@@ -258,11 +258,8 @@ function assign_update_events($assign, $override = null) {
         // Only load events for this override.
         if (isset($override->userid)) {
             $conds['userid'] = $override->userid;
-        } else if (isset($override->groupid)) {
-            $conds['groupid'] = $override->groupid;
         } else {
-            // This is not a valid override, it may have been left from a bad import or restore.
-            $conds['groupid'] = $conds['userid'] = 0;
+            $conds['groupid'] = $override->groupid;
         }
     }
     $oldevents = $DB->get_records('event', $conds, 'id ASC');
@@ -1829,25 +1826,20 @@ function assign_check_updates_since(cm_info $cm, $from, $filter = array()) {
  * the ASSIGN_EVENT_TYPE_GRADINGDUE event will not be shown to students on their calendar.
  *
  * @param calendar_event $event
- * @param int $userid User id to use for all capability checks, etc. Set to 0 for current user (default).
  * @return bool Returns true if the event is visible to the current user, false otherwise.
  */
-function mod_assign_core_calendar_is_event_visible(calendar_event $event, $userid = 0) {
+function mod_assign_core_calendar_is_event_visible(calendar_event $event) {
     global $CFG, $USER;
 
     require_once($CFG->dirroot . '/mod/assign/locallib.php');
 
-    if (empty($userid)) {
-        $userid = $USER->id;
-    }
-
-    $cm = get_fast_modinfo($event->courseid, $userid)->instances['assign'][$event->instance];
+    $cm = get_fast_modinfo($event->courseid)->instances['assign'][$event->instance];
     $context = context_module::instance($cm->id);
 
     $assign = new assign($context, $cm, null);
 
     if ($event->eventtype == ASSIGN_EVENT_TYPE_GRADINGDUE) {
-        return $assign->can_grade($userid);
+        return $assign->can_grade();
     } else {
         return true;
     }
@@ -1861,28 +1853,22 @@ function mod_assign_core_calendar_is_event_visible(calendar_event $event, $useri
  *
  * @param calendar_event $event
  * @param \core_calendar\action_factory $factory
- * @param int $userid User id to use for all capability checks, etc. Set to 0 for current user (default).
  * @return \core_calendar\local\event\entities\action_interface|null
  */
 function mod_assign_core_calendar_provide_event_action(calendar_event $event,
-                                                       \core_calendar\action_factory $factory,
-                                                       $userid = 0) {
+                                                       \core_calendar\action_factory $factory) {
 
     global $CFG, $USER;
 
     require_once($CFG->dirroot . '/mod/assign/locallib.php');
 
-    if (empty($userid)) {
-        $userid = $USER->id;
-    }
-
-    $cm = get_fast_modinfo($event->courseid, $userid)->instances['assign'][$event->instance];
+    $cm = get_fast_modinfo($event->courseid)->instances['assign'][$event->instance];
     $context = context_module::instance($cm->id);
 
     $assign = new assign($context, $cm, null);
 
     // Apply overrides.
-    $assign->update_effective_access($userid);
+    $assign->update_effective_access($USER->id);
 
     if ($event->eventtype == ASSIGN_EVENT_TYPE_GRADINGDUE) {
         $name = get_string('grade');
@@ -1891,16 +1877,16 @@ function mod_assign_core_calendar_provide_event_action(calendar_event $event,
             'action' => 'grader'
         ]);
         $itemcount = $assign->count_submissions_need_grading();
-        $actionable = $assign->can_grade($userid) && (time() >= $assign->get_instance()->allowsubmissionsfromdate);
+        $actionable = $assign->can_grade() && (time() >= $assign->get_instance()->allowsubmissionsfromdate);
     } else {
-        $usersubmission = $assign->get_user_submission($userid, false);
+        $usersubmission = $assign->get_user_submission($USER->id, false);
         if ($usersubmission && $usersubmission->status === ASSIGN_SUBMISSION_STATUS_SUBMITTED) {
             // The user has already submitted.
             // We do not want to change the text to edit the submission, we want to remove the event from the Dashboard entirely.
             return null;
         }
 
-        $participant = $assign->get_participant($userid);
+        $participant = $assign->get_participant($USER->id);
 
         if (!$participant) {
             // If the user is not a participant in the assignment then they have
@@ -1915,7 +1901,7 @@ function mod_assign_core_calendar_provide_event_action(calendar_event $event,
             'action' => 'editsubmission'
         ]);
         $itemcount = 1;
-        $actionable = $assign->is_any_submission_plugin_enabled() && $assign->can_edit_submission($userid, $userid);
+        $actionable = $assign->is_any_submission_plugin_enabled() && $assign->can_edit_submission($USER->id);
     }
 
     return $factory->create_instance(

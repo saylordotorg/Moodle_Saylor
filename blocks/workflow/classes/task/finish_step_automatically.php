@@ -21,10 +21,7 @@
  * @copyright 2015 The Open University
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 namespace block_workflow\task;
-defined('MOODLE_INTERNAL') || die();
-
 
 class finish_step_automatically extends \core\task\scheduled_task {
 
@@ -46,7 +43,9 @@ class finish_step_automatically extends \core\task\scheduled_task {
         try {
             block_workflow_autofinish_steps();
         } catch (\Exception $e) {
-            block_workflow_report_scheduled_task_error('automatic step finisher', $e);
+            $error = $e->getMessage();
+            mtrace('Workflow Automatic step finisher stopped at ' . date('H:i:s') );
+            mtrace($error);
         }
     }
 }

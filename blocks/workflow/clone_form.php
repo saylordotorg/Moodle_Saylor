@@ -22,11 +22,10 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+defined('MOODLE_INTERNAL') || die('Direct access to this script is forbidden.');
 
 require_once(dirname(__FILE__) . '/locallib.php');
 require_once($CFG->libdir . '/formslib.php');
-
 
 class clone_workflow extends moodleform {
     protected function definition() {
@@ -69,7 +68,7 @@ class clone_workflow extends moodleform {
             try {
                 $workflow->load_workflow_from_shortname($data['shortname']);
                 $errors['shortname'] = get_string('shortnametaken', 'block_workflow', $workflow->name);
-            } catch (block_workflow_invalid_workflow_exception $e) { // @codingStandardsIgnoreLine
+            } catch (block_workflow_invalid_workflow_exception $e) {
                 // Ignore errors here.
             }
         }

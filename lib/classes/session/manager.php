@@ -712,7 +712,6 @@ class manager {
      * @param \stdClass $user record
      */
     public static function set_user(\stdClass $user) {
-        global $ADMIN;
         $GLOBALS['USER'] = $user;
         unset($GLOBALS['USER']->description); // Conserve memory.
         unset($GLOBALS['USER']->password);    // Improve security.
@@ -723,9 +722,6 @@ class manager {
 
         // Relink session with global $USER just in case it got unlinked somehow.
         $_SESSION['USER'] =& $GLOBALS['USER'];
-
-        // Nullify the $ADMIN tree global. If we're changing users, then this is now stale and must be generated again if needed.
-        $ADMIN = null;
 
         // Init session key.
         sesskey();

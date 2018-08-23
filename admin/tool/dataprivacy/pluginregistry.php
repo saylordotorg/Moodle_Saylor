@@ -38,18 +38,11 @@ $title = get_string('pluginregistry', 'tool_dataprivacy');
 $output = $PAGE->get_renderer('tool_dataprivacy');
 echo $output->header();
 
-if (\tool_dataprivacy\api::is_site_dpo($USER->id)) {
-    // Get data!
-    $metadatatool = new \tool_dataprivacy\metadata_registry();
-    $metadata = $metadatatool->get_registry_metadata();
+// Get data!
+$metadatatool = new \tool_dataprivacy\metadata_registry();
+$metadata = $metadatatool->get_registry_metadata();
 
-    $dataregistry = new tool_dataprivacy\output\data_registry_compliance_page($metadata);
+$dataregistry = new tool_dataprivacy\output\data_registry_compliance_page($metadata);
 
-    echo $output->render($dataregistry);
-} else {
-    $dponamestring = implode (', ', tool_dataprivacy\api::get_dpo_role_names());
-    $message = get_string('privacyofficeronly', 'tool_dataprivacy', $dponamestring);
-    echo $OUTPUT->notification($message, 'error');
-}
-
+echo $output->render($dataregistry);
 echo $OUTPUT->footer();

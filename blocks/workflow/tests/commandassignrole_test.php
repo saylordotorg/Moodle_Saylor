@@ -59,15 +59,9 @@ class block_workflow_command_assignrole_test extends block_workflow_testlib {
         // Test: $result should have a list of roles containing 'teacher' and 'student'.
         $this->assertEquals('array', gettype($result->roles));
         $this->assertEquals(count($result->roles), 2);
-        $this->assertEquals(count(array_filter($result->roles, function ($r) {
-            return ($r->shortname == "manager");
-        })), 0);
-        $this->assertEquals(count(array_filter($result->roles, function ($r) {
-            return ($r->shortname == "teacher");
-        })), 1);
-        $this->assertEquals(count(array_filter($result->roles, function ($r) {
-            return ($r->shortname == "student");
-        })), 1);
+        $this->assertEquals(count(array_filter($result->roles, create_function('$r', 'return ($r->shortname == "manager");'))), 0);
+        $this->assertEquals(count(array_filter($result->roles, create_function('$r', 'return ($r->shortname == "teacher");'))), 1);
+        $this->assertEquals(count(array_filter($result->roles, create_function('$r', 'return ($r->shortname == "student");'))), 1);
 
         // No $state was given so $result->users should be an empty array.
         $this->assertEquals('array', gettype($result->users));
@@ -97,15 +91,9 @@ class block_workflow_command_assignrole_test extends block_workflow_testlib {
         // Test: $result should have a list of roles containing 'teacher' and 'student'.
         $this->assertEquals('array', gettype($result->roles));
         $this->assertEquals(count($result->roles), 2);
-        $this->assertEquals(count(array_filter($result->roles, function ($r) {
-            return ($r->shortname == "manager");
-        })), 0);
-        $this->assertEquals(count(array_filter($result->roles, function ($r) {
-            return ($r->shortname == "teacher");
-        })), 1);
-        $this->assertEquals(count(array_filter($result->roles, function ($r) {
-            return ($r->shortname == "student");
-        })), 1);
+        $this->assertEquals(count(array_filter($result->roles, create_function('$r', 'return ($r->shortname == "manager");'))), 0);
+        $this->assertEquals(count(array_filter($result->roles, create_function('$r', 'return ($r->shortname == "teacher");'))), 1);
+        $this->assertEquals(count(array_filter($result->roles, create_function('$r', 'return ($r->shortname == "student");'))), 1);
 
         // No $state was given so $result->users should be an empty array.
         $this->assertEquals('array', gettype($result->users));
@@ -135,15 +123,9 @@ class block_workflow_command_assignrole_test extends block_workflow_testlib {
         // Test: $result should have a list of roles containing 'student'.
         $this->assertEquals('array', gettype($result->roles));
         $this->assertEquals(count($result->roles), 1);
-        $this->assertEquals(count(array_filter($result->roles, function ($r) {
-            return ($r->shortname == "manager");
-        })), 0);
-        $this->assertEquals(count(array_filter($result->roles, function ($r) {
-            return ($r->shortname == "teacher");
-        })), 0);
-        $this->assertEquals(count(array_filter($result->roles, function ($r) {
-            return ($r->shortname == "student");
-        })), 1);
+        $this->assertEquals(count(array_filter($result->roles, create_function('$r', 'return ($r->shortname == "manager");'))), 0);
+        $this->assertEquals(count(array_filter($result->roles, create_function('$r', 'return ($r->shortname == "teacher");'))), 0);
+        $this->assertEquals(count(array_filter($result->roles, create_function('$r', 'return ($r->shortname == "student");'))), 1);
 
         // No $state was given so $result->users should be an empty array.
         $this->assertEquals('array', gettype($result->users));
@@ -174,15 +156,9 @@ class block_workflow_command_assignrole_test extends block_workflow_testlib {
         // Test: $result should have a list of roles containing 'teacher' and 'student'.
         $this->assertEquals('array', gettype($result->roles));
         $this->assertEquals(count($result->roles), 2);
-        $this->assertEquals(count(array_filter($result->roles, function ($r) {
-            return ($r->shortname == "manager");
-        })), 0);
-        $this->assertEquals(count(array_filter($result->roles, function ($r) {
-            return ($r->shortname == "teacher");
-        })), 1);
-        $this->assertEquals(count(array_filter($result->roles, function ($r) {
-            return ($r->shortname == "student");
-        })), 1);
+        $this->assertEquals(count(array_filter($result->roles, create_function('$r', 'return ($r->shortname == "manager");'))), 0);
+        $this->assertEquals(count(array_filter($result->roles, create_function('$r', 'return ($r->shortname == "teacher");'))), 1);
+        $this->assertEquals(count(array_filter($result->roles, create_function('$r', 'return ($r->shortname == "student");'))), 1);
 
         // A $state was given so $result->users should be an empty array.
         $this->assertEquals('array', gettype($result->users));
@@ -215,15 +191,9 @@ class block_workflow_command_assignrole_test extends block_workflow_testlib {
         // Test: $result should have a list of roles containing 'teacher' and 'student'.
         $this->assertEquals('array', gettype($result->roles));
         $this->assertEquals(count($result->roles), 2);
-        $this->assertEquals(count(array_filter($result->roles, function ($r) {
-            return ($r->shortname == "manager");
-        })), 0);
-        $this->assertEquals(count(array_filter($result->roles, function ($r) {
-            return ($r->shortname == "teacher");
-        })), 1);
-        $this->assertEquals(count(array_filter($result->roles, function ($r) {
-            return ($r->shortname == "student");
-        })), 1);
+        $this->assertEquals(count(array_filter($result->roles, create_function('$r', 'return ($r->shortname == "manager");'))), 0);
+        $this->assertEquals(count(array_filter($result->roles, create_function('$r', 'return ($r->shortname == "teacher");'))), 1);
+        $this->assertEquals(count(array_filter($result->roles, create_function('$r', 'return ($r->shortname == "student");'))), 1);
 
         // A $state was given so $result->users should be an empty array.
         $this->assertEquals('array', gettype($result->users));
@@ -256,15 +226,9 @@ class block_workflow_command_assignrole_test extends block_workflow_testlib {
         // Test: $result should have a list of roles containing 'student'.
         $this->assertEquals('array', gettype($result->roles));
         $this->assertEquals(count($result->roles), 1);
-        $this->assertEquals(count(array_filter($result->roles, function ($r) {
-            return ($r->shortname == "manager");
-        })), 0);
-        $this->assertEquals(count(array_filter($result->roles, function ($r) {
-            return ($r->shortname == "teacher");
-        })), 0);
-        $this->assertEquals(count(array_filter($result->roles, function ($r) {
-            return ($r->shortname == "student");
-        })), 1);
+        $this->assertEquals(count(array_filter($result->roles, create_function('$r', 'return ($r->shortname == "manager");'))), 0);
+        $this->assertEquals(count(array_filter($result->roles, create_function('$r', 'return ($r->shortname == "teacher");'))), 0);
+        $this->assertEquals(count(array_filter($result->roles, create_function('$r', 'return ($r->shortname == "student");'))), 1);
 
         // A $state was given so $result->users should be an empty array.
         $this->assertEquals('array', gettype($result->users));

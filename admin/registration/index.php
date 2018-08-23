@@ -40,9 +40,8 @@ if ($unregistration && \core\hub\registration::is_registered()) {
     if ($siteunregistrationform->is_cancelled()) {
         redirect(new moodle_url('/admin/registration/index.php'));
     } else if ($data = $siteunregistrationform->get_data()) {
-        \core\hub\registration::unregister($data->unpublishalladvertisedcourses,
-            $data->unpublishalluploadedcourses);
-        if (!\core\hub\registration::is_registered()) {
+        if (\core\hub\registration::unregister($data->unpublishalladvertisedcourses,
+            $data->unpublishalluploadedcourses)) {
             redirect(new moodle_url('/admin/registration/index.php'));
         }
     }

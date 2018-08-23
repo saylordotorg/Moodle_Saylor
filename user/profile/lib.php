@@ -432,9 +432,7 @@ class profile_field_base {
             case PROFILE_VISIBLE_ALL:
                 return true;
             case PROFILE_VISIBLE_PRIVATE:
-                if ($this->is_signup_field() && (empty($this->userid) || isguestuser($this->userid))) {
-                    return true;
-                } else if ($this->userid == $USER->id) {
+                if ($this->userid == $USER->id) {
                     return true;
                 } else {
                     return has_capability('moodle/user:viewalldetails', $context);
@@ -454,11 +452,6 @@ class profile_field_base {
 
         if (!$this->is_visible()) {
             return false;
-        }
-
-        if ($this->is_signup_field() && (empty($this->userid) || isguestuser($this->userid))) {
-            // Allow editing the field on the signup page.
-            return true;
         }
 
         $systemcontext = context_system::instance();

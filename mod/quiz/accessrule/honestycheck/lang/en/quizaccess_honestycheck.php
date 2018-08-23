@@ -35,4 +35,3 @@ $string['honestycheckstatement'] = 'I understand that it is important that the a
 $string['notrequired'] = 'not required';
 $string['pluginname'] = 'Acknowledge plagiarism statement access rule';
 $string['youmustagree'] = 'You must agree to this statement before you start the quiz.';
-$string['privacy:metadata'] = 'The Acknowledge plagiarism statement access rule plugin does not store any personal data.';

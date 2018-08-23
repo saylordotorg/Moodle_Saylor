@@ -23,8 +23,6 @@
  */
 
 namespace block_workflow\task;
-defined('MOODLE_INTERNAL') || die();
-
 
 class send_extra_notification extends \core\task\scheduled_task {
 
@@ -46,7 +44,9 @@ class send_extra_notification extends \core\task\scheduled_task {
         try {
             block_workflow_send_extra_notification();
         } catch (\Exception $e) {
-            block_workflow_report_scheduled_task_error('send extra notifications', $e);
+            $error = $e->getMessage();
+            mtrace('Workflow Extra notify stopped at ' . date('H:i:s') );
+            mtrace($error);
         }
     }
 }
