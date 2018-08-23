@@ -99,7 +99,7 @@ Feature: Workflow block - create and edit workflows
     And I press "Save changes"
     And I click on "Edit step" "link" in the "Prepare your web site" "table_row"
     And I click on "Add role to step" "link" in the "Teacher" "table_row"
-        And I follow "Add task"
+    And I follow "Add task"
     And I set the field "Task" to "Add resources"
     And I press "Save changes"
     And I follow "Add task"
@@ -169,6 +169,12 @@ Feature: Workflow block - create and edit workflows
       | Instructions                | Please setup extra notification. |
       | extranotifyoffset           | 1 day before                     |
       | extranotify                 | the course start date            |
+      | Notify while step is active | setgradeitemvisibility visible   |
+
+    And I press "Save changes"
+    Then I should see "The script you specified was invalid. The command setgradeitemvisibility may only be used with an activity"
+
+    When I set the following fields to these values:
       | Notify while step is active | email taskemail to teacher       |
 
     And I press "Save changes"

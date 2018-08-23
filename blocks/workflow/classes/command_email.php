@@ -49,7 +49,7 @@ class block_workflow_command_email extends block_workflow_command {
         $data->errors = array();
 
         // Break down the line. It should be in the format:
-        //      {email} to {rolea} {roleb} {rolen}
+        // email to rolea roleb rolen
         // with any number of role shortnames.
         $line = preg_split('/[\s+]/', $args);
 
@@ -141,7 +141,7 @@ class block_workflow_command_email extends block_workflow_command {
      *                        provided state.
      * @return  void
      */
-    public function execute($args, $state) {
+    public function execute($args, block_workflow_step_state $state) {
         // Validate the command and use it to retrieve the required data.
         $email = $this->parse($args, $state->step(), $state);
 
@@ -154,9 +154,10 @@ class block_workflow_command_email extends block_workflow_command {
         $this->email_params($email, $state);
 
         // Send the e-mail.
-        $eventdata = new stdClass();
+        $eventdata = new core\message\message();
         $eventdata->component   = 'block_workflow';
         $eventdata->name        = 'notification';
+        $eventdata->courseid    = context::instance_by_id($state->contextid)->get_course_context()->instanceid;
         $eventdata->userfrom    = core_user::get_noreply_user();
         $eventdata->subject     = $email->email->subject;
         $eventdata->fullmessage = $email->email->message;
@@ -250,7 +251,9 @@ class block_workflow_command_email extends block_workflow_command {
         $string = str_replace('%%coursename%%', $coursename, $string);
 
         // Replace %%usernames%%.
-        $usernames = array_map(create_function('$a', 'return fullname($a);'), $email->users);
+        $usernames = array_map(function($a) {
+            return fullname($a);
+        }, $email->users);
         $usernames = implode(', ', $usernames);
         $subject = str_replace('%%usernames%%', $usernames, $subject);
         $string = str_replace('%%usernames%%', $usernames, $string);

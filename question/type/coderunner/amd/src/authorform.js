@@ -57,8 +57,7 @@ define(['jquery', 'qtype_coderunner/userinterfacewrapper'], function($, ui) {
 
     // Set up the author edit form UI plugins and event handlers.
     // The strings parameter is an associative array containing a subset of
-    // the strings extracted from lang/xx/qtype_coderunner.php. The particular
-    // subset is specified by constants::author_edit_keys()
+    // the strings extracted from lang/xx/qtype_coderunner.php.
     // The templateParams, passed as a parameter, are needed by the
     // UI plugins.
     function initEditForm(strings, templateParams) {
@@ -81,6 +80,7 @@ define(['jquery', 'qtype_coderunner/userinterfacewrapper'], function($, ui) {
             questiontypeHelpDiv = $('#qtype-help'),
             precheck = $('select#id_precheck'),
             testtypedivs = $('div.testtype'),
+            missingPrototype = $('#id_missing_prototype'),
             uiplugin = $('#id_uiplugin');
 
         // Set up the UI controller for the textarea whose name is
@@ -127,7 +127,7 @@ define(['jquery', 'qtype_coderunner/userinterfacewrapper'], function($, ui) {
             }
 
             if (!uiWrapper) {
-                uiWrapper = new ui.InterfaceWrapper(uiname, taId, strings, params);
+                uiWrapper = new ui.InterfaceWrapper(uiname, taId, params);
             } else {
                 // Wrapper has already been set up - just reload the reqd UI.
                 uiWrapper.loadUi(uiname, params);
@@ -295,6 +295,17 @@ define(['jquery', 'qtype_coderunner/userinterfacewrapper'], function($, ui) {
             }
         }
 
+        // If the missingPrototype hidden element is not empty, insert the
+        // given message as an error at the top of the question
+        function checkForMissingPrototype() {
+            var missingPrototypeMessage = missingPrototype.prop('value'),
+                messagePara = null;
+            if (missingPrototypeMessage !== '') {
+                messagePara = $('<p>' + missingPrototype.prop('value') + '</p>');
+                $('#id_qtype_coderunner_error_div').append(messagePara);
+            }
+        }
+
         /*************************************************************
          *
          * Body of initEditFormWhenReady starts here.
@@ -308,6 +319,8 @@ define(['jquery', 'qtype_coderunner/userinterfacewrapper'], function($, ui) {
             typeCombo.prop('disabled', true);
             customise.prop('disabled', true);
         }
+
+        checkForMissingPrototype();
 
         setCustomisationVisibility(isCustomised);
         if (!isCustomised) {

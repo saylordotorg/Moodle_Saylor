@@ -2,7 +2,6 @@ The Honesty check quiz access rule
 https://moodle.org/plugins/quizaccess_honestycheck
 
 This quiz access rule was created by Tim Hunt at the Open University.
-This version can be used with versions 3.2 of Moodle, or later.
 
 If you install this plugin, there is a new option on the quiz settings form, and
 if the teacher turns that on, then when a student tries to start a quiz attempt,

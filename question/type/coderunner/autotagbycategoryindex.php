@@ -15,7 +15,7 @@
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This version tags all questions in a selected quiz. A different file
+ * This version tags all questions in a selected category. A different file
  * (autotagbyquizindex.php) handles autotagging of all questions in a
  * given quiz.
  * Both scripts are derived from bulktestindex.php, which provides bulk testing of questions.

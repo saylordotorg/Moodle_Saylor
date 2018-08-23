@@ -34,6 +34,9 @@ require_once($CFG->dirroot . '/mod/quiz/backup/moodle2/backup_mod_quiz_access_su
  * <quizaccess_honestycheck><required>1</required></quizaccess_honestycheck> tag
  * will be added to the XML in the appropriate place. Otherwise nothing will be
  * added. This matches the DB structure.
+ *
+ * @copyright 2011 The Open University
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class backup_quizaccess_honestycheck_subplugin extends backup_mod_quiz_access_subplugin {
 

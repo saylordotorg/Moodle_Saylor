@@ -248,6 +248,18 @@ body#page-question-type-coderunner div.edit_code textarea {
     font-family: courier, monospace;
 }
 
+body#page-question-type-coderunner div#id_qtype_coderunner_error_div:empty {
+    display: none;
+}
+
+body#page-question-type-coderunner div#id_qtype_coderunner_error_div {
+    font-size: 120%;
+    font-weight: bold;
+    color: red;
+    border: 2px solid red;
+    padding: 4px;
+}
+
 body#page-question-type-coderunner textarea#id_templateparams {
     resize: both;
 }
@@ -267,6 +279,14 @@ body#page-question-type-coderunner div[id^=fgroup_id_] {
     border-top: 0;
     border-bottom: 0;
     overflow: visible;
+}
+
+body#page-question-type-coderunner label[for^=id_useasexample],
+body#page-question-type-coderunner label[for^=id_hiderestiffail],
+body#page-question-type-coderunner label.form-check
+{
+    padding: 5px;
+    border: 1px solid lightgray;
 }
 
 body#page-question-type-coderunner p.question-type-details-header {
