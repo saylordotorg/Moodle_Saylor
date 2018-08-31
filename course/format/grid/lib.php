@@ -2048,11 +2048,12 @@ class format_grid extends format_base {
 
             if ($convertsuccess == true) {
                 $DB->set_field('format_grid_icon', 'image', $storedfilerecord['filename'],
-                        array('sectionid' => $storedfilerecord['itemid']));
+                    array('sectionid' => $storedfilerecord['itemid']));
 
                 // Set up the displayed image:...
                 $sectionimage->newimage = $storedfilerecord['filename'];
-                $this->setup_displayed_image($sectionimage, $storedfilerecord['contextid'], $this->get_settings());
+                $icbc = self::hex2rgb($this->get_settings()['imagecontainerbackgroundcolour']);
+                $this->setup_displayed_image($sectionimage, $storedfilerecord['contextid'], $this->get_settings(), $icbc, $mime);
             } else {
                 print_error('imagecannotbeused', 'format_grid', $CFG->wwwroot . "/course/view.php?id=" . $this->courseid);
             }
@@ -2071,9 +2072,11 @@ class format_grid extends format_base {
      * @param array $sectionimage Section information from its row in the 'format_grid_icon' table.
      * @param array $contextid The context id to which the image relates.
      * @param array $settings The course settings to apply.
+     * @param array $icbc The 'imagecontainerbackgroundcolour' as an RGB array.
+     * @param string $mime The mime type if already known.
      * @return array The updated $sectionimage data.
      */
-    public function setup_displayed_image($sectionimage, $contextid, $settings) {
+    public function setup_displayed_image($sectionimage, $contextid, $settings, $icbc, $mime = null) {
         global $CFG, $DB;
         require_once($CFG->dirroot . '/repository/lib.php');
         require_once($CFG->libdir . '/gdlib.php');
@@ -2084,21 +2087,9 @@ class format_grid extends format_base {
                 $sectionimage->newimage)) {
             $gridimagepath = $this->get_image_path();
             $convertsuccess = true;
-            $mime = $imagecontainerpathfile->get_mimetype();
-
-            // Updated image.
-            $sectionimage->displayedimageindex++;
-            $created = time();
-            $displayedimagefilerecord = array(
-                'contextid' => $contextid,
-                'component' => 'course',
-                'filearea' => 'section',
-                'itemid' => $sectionimage->sectionid,
-                'filepath' => $gridimagepath,
-                'filename' => $sectionimage->displayedimageindex . '_' . $sectionimage->newimage,
-                'timecreated' => $created,
-                'timemodified' => $created,
-                'mimetype' => $mime);
+            if (!$mime) {
+                $mime = $imagecontainerpathfile->get_mimetype();
+            }
 
             $displayedimageinfo = $this->get_displayed_image_container_properties($settings);
 
@@ -2111,19 +2102,33 @@ class format_grid extends format_base {
             } else {
                 $crop = true;
             }
-            $data = self::generate_image($tmpfilepath, $displayedimageinfo['width'], $displayedimageinfo['height'], $crop);
+            $data = self::generate_image($tmpfilepath, $displayedimageinfo['width'], $displayedimageinfo['height'], $crop, $icbc, $mime);
             if (!empty($data)) {
+                // Updated image.
+                $sectionimage->displayedimageindex++;
+                $created = time();
+                $displayedimagefilerecord = array(
+                    'contextid' => $contextid,
+                    'component' => 'course',
+                    'filearea' => 'section',
+                    'itemid' => $sectionimage->sectionid,
+                    'filepath' => $gridimagepath,
+                    'filename' => $sectionimage->displayedimageindex . '_' . $sectionimage->newimage,
+                    'timecreated' => $created,
+                    'timemodified' => $created,
+                    'mimetype' => $mime);
+
                 if ($fs->file_exists($displayedimagefilerecord['contextid'], $displayedimagefilerecord['component'],
-                                $displayedimagefilerecord['filearea'], $displayedimagefilerecord['itemid'],
-                                $displayedimagefilerecord['filepath'], $displayedimagefilerecord['filename'])) {
+                    $displayedimagefilerecord['filearea'], $displayedimagefilerecord['itemid'],
+                    $displayedimagefilerecord['filepath'], $displayedimagefilerecord['filename'])) {
                     /* This can happen with previous CONTRIB-4099 versions where it was possible for the backup file to
-                      have the 'gridimage' files too.  Therefore without this, then 'create_file_from_string' below will
-                      baulk as the file already exists.   Unfortunately has to be here as the restore mechanism restores
-                      the grid format data for the database and then the files.  And the Grid code is called at the 'data'
-                      stage. */
+                       have the 'gridimage' files too.  Therefore without this, then 'create_file_from_string' below will
+                       baulk as the file already exists.   Unfortunately has to be here as the restore mechanism restores
+                       the grid format data for the database and then the files.  And the Grid code is called at the 'data'
+                       stage. */
                     if ($oldfile = $fs->get_file($displayedimagefilerecord['contextid'], $displayedimagefilerecord['component'],
-                            $displayedimagefilerecord['filearea'], $displayedimagefilerecord['itemid'],
-                            $displayedimagefilerecord['filepath'], $displayedimagefilerecord['filename'])) {
+                        $displayedimagefilerecord['filearea'], $displayedimagefilerecord['itemid'],
+                        $displayedimagefilerecord['filepath'], $displayedimagefilerecord['filename'])) {
                         // Delete old file.
                         $oldfile->delete();
                     }
@@ -2141,7 +2146,7 @@ class format_grid extends format_base {
                     $oldfile->delete();
                 }
                 $DB->set_field('format_grid_icon', 'displayedimageindex', $sectionimage->displayedimageindex,
-                        array('sectionid' => $sectionimage->sectionid));
+                    array('sectionid' => $sectionimage->sectionid));
             } else {
                 print_error('cannotconvertuploadedimagetodisplayedimage', 'format_grid',
                         $CFG->wwwroot . "/course/view.php?id=" . $this->courseid);
@@ -2151,6 +2156,30 @@ class format_grid extends format_base {
         }
 
         return $sectionimage;  // So that the caller can know the new value of displayedimageindex.
+    }
+
+    public function output_section_image($section, $sectionname, $sectionimage, $contextid, $thissection, $gridimagepath) {
+        $content = '';
+        if (is_object($sectionimage) && ($sectionimage->displayedimageindex > 0)) {
+            $imgurl = moodle_url::make_pluginfile_url(
+                $contextid, 'course', 'section', $thissection->id, $gridimagepath,
+                $sectionimage->displayedimageindex . '_' . $sectionimage->image
+            );
+            $content = html_writer::empty_tag('img', array(
+                'src' => $imgurl,
+                'alt' => $sectionname,
+                'role' => 'img',
+                'aria-label' => $sectionname));
+        } else if ($section == 0) {
+            $imgurl = $this->output->image_url('info', 'format_grid');
+            $content = html_writer::empty_tag('img', array(
+                'src' => $imgurl,
+                'alt' => $sectionname,
+                'class' => 'info',
+                'role' => 'img',
+                'aria-label' => $sectionname));
+        }
+        return $content;
     }
 
     public function delete_image($sectionid, $contextid) {
@@ -2241,11 +2270,12 @@ class format_grid extends format_base {
         if (is_array($sectionimages)) {
             $context = $this->get_context();
 
+            $icbc = self::hex2rgb($this->get_settings()['imagecontainerbackgroundcolour']);
             $t = $DB->start_delegated_transaction();
             foreach ($sectionimages as $sectionimage) {
                 if ($sectionimage->displayedimageindex > 0) {
                     $sectionimage->newimage = $sectionimage->image;
-                    $sectionimage = $us->setup_displayed_image($sectionimage, $context->id, $settings);
+                    $sectionimage = $us->setup_displayed_image($sectionimage, $context->id, $settings, $icbc);
                 }
             }
             $t->allow_commit();
@@ -2264,10 +2294,12 @@ class format_grid extends format_base {
      * @param string $filepath the full path to the original image file
      * @param int $requestedwidth the width of the requested image.
      * @param int $requestedheight the height of the requested image.
-     * @param bool false = scale, true = crop.
+     * @param bool $crop false = scale, true = crop.
+     * @param array $icbc The 'imagecontainerbackgroundcolour' as an RGB array.
+     * @param string $mime The mime type.
      * @return string|bool false if a problem occurs or the image data.
      */
-    private static function generate_image($filepath, $requestedwidth, $requestedheight, $crop) {
+    private static function generate_image($filepath, $requestedwidth, $requestedheight, $crop, $icbc, $mime) {
         if (empty($filepath) or empty($requestedwidth) or empty($requestedheight)) {
             return false;
         }
@@ -2287,18 +2319,43 @@ class format_grid extends format_base {
 
         $original = imagecreatefromstring(file_get_contents($filepath));
 
-        if (function_exists('imagepng')) {
-            $imagefnc = 'imagepng';
-            $filters = PNG_NO_FILTER;
-            $quality = 1;
-        } else if (function_exists('imagejpeg')) {
-            $imagefnc = 'imagejpeg';
-            $filters = null;
-            $quality = 90;
-        } else {
-            debugging('Neither JPEG nor PNG are supported at this server, please fix the system configuration' .
-                    ' to have the GD PHP extension installed.');
-            return false;
+        switch ($mime) {
+            case 'image/png':
+                if (function_exists('imagepng')) {
+                    $imagefnc = 'imagepng';
+                    $filters = PNG_NO_FILTER;
+                    $quality = 1;
+                } else {
+                    debugging('PNG\'s are not supported at this server, please fix the system configuration'.
+                        ' to have the GD PHP extension installed.');
+                    return false;
+                }
+                break;
+            case 'image/jpeg':
+                if (function_exists('imagejpeg')) {
+                    $imagefnc = 'imagejpeg';
+                    $filters = null;
+                    $quality = 90;
+                } else {
+                    debugging('JPG\'s are not supported at this server, please fix the system configuration'.
+                        ' to have the GD PHP extension installed.');
+                    return false;
+                }
+                break;
+            case 'image/gif':
+                if (function_exists('imagegif')) {
+                    $imagefnc = 'imagegif';
+                    $filters = null;
+                    $quality = null;
+                } else {
+                    debugging('GIF\'s are not supported at this server, please fix the system configuration'.
+                        ' to have the GD PHP extension installed.');
+                    return false;
+                }
+                break;
+            default:
+                debugging('Mime type \''.$mime.'\' is not supported as an image format in the Grid format.');
+                return false;
         }
 
         $width = $requestedwidth;
@@ -2327,6 +2384,9 @@ class format_grid extends format_base {
                 imagealphablending($tempimage, false);
                 imagefill($tempimage, 0, 0, imagecolorallocatealpha($tempimage, 0, 0, 0, 127));
                 imagesavealpha($tempimage, true);
+            } else if (($imagefnc === 'imagejpeg') || ($imagefnc === 'imagegif')) {
+                imagealphablending($tempimage, false);
+                imagefill($tempimage, 0, 0, imagecolorallocate($tempimage, $icbc['r'], $icbc['g'], $icbc['b']));
             }
         } else {
             $tempimage = imagecreate($width, $height);
@@ -2357,8 +2417,11 @@ class format_grid extends format_base {
                 $finalimage = imagecreatetruecolor($width, $height);
                 if ($imagefnc === 'imagepng') {
                     imagealphablending($finalimage, false);
-                    imagefill($finalimage, 0, 0, imagecolorallocatealpha($tempimage, 0, 0, 0, 127));
+                    imagefill($finalimage, 0, 0, imagecolorallocatealpha($finalimage, 0, 0, 0, 127));
                     imagesavealpha($finalimage, true);
+                } else if (($imagefnc === 'imagejpeg') || ($imagefnc === 'imagegif')) {
+                    imagealphablending($tempimage, false);
+                    imagefill($finalimage, 0, 0, imagecolorallocate($finalimage, $icbc['r'], $icbc['g'], $icbc['b']));
                 }
             } else {
                 $finalimage = imagecreate($width, $height);
@@ -2388,7 +2451,7 @@ class format_grid extends format_base {
             $dsty = floor(($height - $targetheight) / 2);
 
             imagecopybicubic($finalimage, $original, $dstx, $dsty, 0, 0, $targetwidth, $targetheight, $originalwidth,
-                    $originalheight);
+                $originalheight);
         }
 
         ob_start();
@@ -2402,6 +2465,28 @@ class format_grid extends format_base {
         imagedestroy($finalimage);
 
         return $data;
+    }
+
+    /**
+     * Returns the RGB for the given hex.
+     *
+     * @param string $hex
+     * @return array
+     */
+    public static function hex2rgb($hex) {
+        if (strlen($hex) == 3) {
+            $r = substr($hex, 0, 1);
+            $r .= $r;
+            $g = substr($hex, 1, 1);
+            $g .= $g;
+            $b = substr($hex, 2, 1);
+            $b .= $b;
+        } else {
+            $r = substr($hex, 0, 2);
+            $g = substr($hex, 2, 2);
+            $b = substr($hex, 4, 2);
+        }
+        return array('r' => hexdec($r), 'g' => hexdec($g), 'b' => hexdec($b));
     }
 
     /**

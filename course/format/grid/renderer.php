@@ -846,8 +846,9 @@ class format_grid_renderer extends format_section_renderer_base {
                 if (isset($sectionimage->image) && ($sectionimage->displayedimageindex < 1)) {
                     // Set up the displayed image:...
                     $sectionimage->newimage = $sectionimage->image;
+                    $icbc = $this->courseformat->hex2rgb($this->settings['imagecontainerbackgroundcolour']);
                     $sectionimage = $this->courseformat->setup_displayed_image($sectionimage, $contextid,
-                        $this->settings);
+                        $this->settings, $icbc);
                 }
 
                 if ($course->coursedisplay != COURSE_DISPLAY_MULTIPAGE) {
@@ -889,7 +890,7 @@ class format_grid_renderer extends format_section_renderer_base {
                             'hidden' => true, 'aria-label' => $summary));
                     }
 
-                    echo $this->output_section_image($section, $sectionname, $sectionimage, $contextid, $thissection, $gridimagepath);
+                    echo $this->courseformat->output_section_image($section, $sectionname, $sectionimage, $contextid, $thissection, $gridimagepath);
 
                     echo html_writer::end_tag('div');
                     echo html_writer::end_tag('a');
@@ -926,7 +927,7 @@ class format_grid_renderer extends format_section_renderer_base {
                             'hidden' => true, 'aria-label' => $summary));
                     }
 
-                    $content .= $this->output_section_image($section, $sectionname, $sectionimage, $contextid, $thissection, $gridimagepath);
+                    $content .= $this->coursformat->output_section_image($section, $sectionname, $sectionimage, $contextid, $thissection, $gridimagepath);
 
                     $content .= html_writer::end_tag('div');
 
@@ -963,29 +964,6 @@ class format_grid_renderer extends format_section_renderer_base {
                 $this->shadeboxshownarray[$section] = 1;
             }
         }
-    }
-
-    protected function output_section_image($section, $sectionname, $sectionimage, $contextid, $thissection, $gridimagepath) {
-        $content = '';
-        if (is_object($sectionimage) && ($sectionimage->displayedimageindex > 0)) {
-            $imgurl = moodle_url::make_pluginfile_url(
-            $contextid, 'course', 'section', $thissection->id, $gridimagepath,
-            $sectionimage->displayedimageindex . '_' . $sectionimage->image);
-            $content = html_writer::empty_tag('img', array(
-                'src' => $imgurl,
-                'alt' => $sectionname,
-                'role' => 'img',
-                'aria-label' => $sectionname));
-        } else if ($section == 0) {
-            $imgurl = $this->output->image_url('info', 'format_grid');
-            $content = html_writer::empty_tag('img', array(
-                'src' => $imgurl,
-                'alt' => $sectionname,
-                'class' => 'info',
-                'role' => 'img',
-                'aria-label' => $sectionname));
-        }
-        return $content;
     }
 
     private function make_block_icon_topics_editing($thissection, $contextid, $urlpicedit) {
