@@ -16,8 +16,8 @@
 /**
  * Javascript to load and render the paging bar.
  *
- * @module     block_sayloroverview/paging_bar
- * @package    block_sayloroverview
+ * @module     block_myoverview/paging_bar
+ * @package    block_myoverview
  * @copyright  2016 Ryan Wyllie <ryan@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -31,7 +31,7 @@ define(['jquery', 'core/custom_interaction_events'],
     };
 
     var EVENTS = {
-        PAGE_SELECTED: 'block_sayloroverview-paging-bar-page-selected',
+        PAGE_SELECTED: 'block_myoverview-paging-bar-page-selected',
     };
 
     /**

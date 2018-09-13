@@ -1,4 +1,4 @@
-@core @qtype @qtype_gapfill @_switch_window
+@core @qtype @qtype_gapfill @qtype_gapfill_basic @_switch_window
 Feature: Test all the basic functionality of this Gapfill question type
   In order to evaluate students responses, As a teacher I need to
   create and preview wordselect (Select correct words) questions.
@@ -18,7 +18,7 @@ Feature: Test all the basic functionality of this Gapfill question type
   Scenario: Create, edit then preview a gapfill question.
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I navigate to "Question bank" node in "Course administration"
+    And I navigate to "Questions" in current page administration
 
     # Create a new question.
     And I add a "Gapfill" question filling the form with:

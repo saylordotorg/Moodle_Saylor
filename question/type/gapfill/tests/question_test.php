@@ -74,8 +74,31 @@ class qtype_gapfill_question_test extends advanced_testcase {
     }
 
     public function test_compute_final_grade() {
-        // TODO.
+        $question = qtype_gapfill_test_helper::make_question2();
+        $responses = [
+            0 => ['p1' => 'cat', 'p2' => 'cat'],
+            1 => ['p1' => 'cat', 'p2' => 'cat'],
+            2 => ['p1' => 'cat', 'p2' => 'cat']
+        ];
+        $fraction = $question->compute_final_grade($responses, 3);
+        /* With a default mark of 2 this would show a mark of 1
+        This was compared with how the ddwtos question marked */
+        $this->assertEquals($fraction, .5);
     }
+    public function test_discard_duplicates() {
+        $options = [
+            "noduplicates" => 1,
+            'disableregex' => 0,
+            'delimitchars' => '[]'
+        ];
+        $questiontext = 'The [cat] sat on the [mat]';
+        $question = qtype_gapfill_test_helper::make_question2($questiontext, false, $options);
+        $response = array('p1' => 'cat', 'p2' => 'cat');
+        $ddresponse = $question->discard_duplicates($response);
+        $numpartsright = $question->get_num_parts_right($ddresponse);
+        $this->assertEquals($numpartsright, 1);
+    }
+
 
     public function test_is_complete_response() {
         $question = qtype_gapfill_test_helper::make_question('gapfill');
@@ -96,7 +119,7 @@ class qtype_gapfill_question_test extends advanced_testcase {
 
     public function test_get_validation_error() {
         $questiontext = 'The [cat] sat on the [mat]';
-        $question = qtype_gapfill_test_helper::make_question2('gapfill', $questiontext);
+        $question = qtype_gapfill_test_helper::make_question2($questiontext);
         $question->gapcount = 2;
         $this->assertTrue(is_string($question->get_validation_error( array('p1' => '') ) ));
     }

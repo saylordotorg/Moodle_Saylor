@@ -29,40 +29,40 @@
 
 <div class="well well-small">
     <div class="course-info-container" id="course-info-container-{{id}}">
-        <div class="hidden-sm-up hidden-phone">
-            <div class="media">
-                <div class="pull-left">
-                    <div class="media-object">
+        <div class="d-inline-flex d-sm-none align-items-center">
+            <div class="media mr-1">
+                <div class="float-left mr-1">
+                    <div class="media-object m-1">
                         {{> block_sayloroverview/progress-chart}}
                     </div>
                 </div>
-                <div class-"media-body">
+                <div class="media-body my-auto">
                     <h4 class="media-heading"><a href="{{viewurl}}">{{{fullnamedisplay}}}</a></h4>
                     {{#certificate}}
-                    <div class="pull-right">
+                    <div class="float-right">
                         <br><b><h5><a href="{{certificate}}">{{{viewcertificate}}}</a></h5></b>
                     </div>
                     {{/certificate}}
                 </div>
             </div>
         </div>
-        <div class="hidden-xs-down visible-phone">
+        <div class="d-none d-sm-inline-flex my-auto align-items-center">
             <div class="media">
-                <div class="media-left">
-                    <div class="media-object">
+                <div class="media-left mr-3">
+                    <div class="media-object m-1">
                         {{> block_sayloroverview/progress-chart}}
                     </div>
                 </div>
-                <div class="media-body">
-                    <h4 class="h5"><a href="{{viewurl}}">{{{fullnamedisplay}}}</a></h4>
+                <div class="media-body my-auto">
+                    <h3 class="h3"><a href="{{viewurl}}">{{{fullnamedisplay}}}</a></h4>
                 </div>
             </div>
         </div>
-        <p class="text-muted">
+        <p class="text-muted mx-3">
             {{#shortentext}} 140, {{summary}}{{/shortentext}}
         </p>
             {{#certificate}}
-            <div class="hidden-xs-down visible-phone">
+            <div class="d-none d-sm-inline-flex my-auto align-items-center">
                 <div class="text-center">
                     <b><a href="{{certificate}}">{{{viewcertificate}}}</a></b>
                 </div>

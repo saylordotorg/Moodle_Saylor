@@ -1,0 +1,89 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    Page footer.
+}}
+<footer id="page-footer" class="container-fluid p-0 bg-dark text-light">
+    <div id= "footer-container" class="container-fluid p-0">
+        <div id="footer-navbar" class="container-fluid d-inline-flex flex-row align-items-center justify-content-center justify-content-sm-between bg-primary text-white">
+            <div id="footer-logo-share-navbar" class="m-0 my-sm-1 mr-sm-auto d-none d-sm-inline-flex">
+                <div class="d-inline-flex mr-1 my-auto">
+                    <div class="footer-logo" align="center">
+                        <a class="footer-logo" href="/">{{# pix}} logos/logo_white_small, theme_saylor, {{sitename}}{{/pix}}</a>
+                    </div>
+                </div>
+                <div id="footer-share" class="footer-share d-inline-flex flex-row justify-content-start ml-1 mr-auto mt-auto mb-auto">
+                    <a title="Facebook | /SaylorFoundation" target="_blank" href="https://www.facebook.com/SaylorFoundation" class="fa fa-facebook fa-2x p-1"></a>
+                    <a title="Twitter | @saylordotorg" target="_blank" href="https://twitter.com/saylordotorg" class="fa fa-twitter fa-2x p-1"></a>
+                    <a title="Instagram | @saylordotorg" target="_blank" href="https://www.instagram.com/saylordotorg" class="fa fa-instagram fa-2x p-1"></a>
+                    <a title="GitHub | /saylordotorg" target="_blank" href="https://github.com/saylordotorg" class="fa fa-github fa-2x p-1"></a>
+                   <a title="LinkedIn | Saylor Academy" target="_blank" href="https://www.linkedin.com/school/1229385/" class="fa fa-linkedin fa-2x p-1"></a>
+                </div>
+            </div>
+            <div id="footer-links" class="d-inline-flex flex-row flex-nowrap align-items-center justify-content-between justify-content-sm-end mx-auto mr-sm-1 my-2">
+                <ul class="footer-nav d-flex align-items-center justify-content-center list-inline mt-auto mb-auto" >
+                    <li class="list-inline-item"><h4><a href="https://saylor.org/about">About</a></h4></li>
+                    <li class="list-inline-item"><h4><a href="https://saylor.org/become-our-partner">Partner</a></h4></li>
+                    <li class="list-inline-item"><h4><a href="https://www.saylor.org/blog">Blog</a></h4></li>
+                    <li class="list-inline-item"><h4><a href="https://saylor.org/contact">Contact</a></h4></li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="footer-logo-share-bottom-container" class="container-fluid d-sm-none mx-auto my-2 my-sm-0" align="center">
+            <div id="footer-logo-share-bottom" class="d-inline-flex flex-row d-sm-none justify-content-between mx-auto">
+                <div class="d-inline-flex my-1">
+                    <div class="footer-logo mx-auto">
+                        <a class="footer-logo" href="/">{{# pix}} logos/logo_white_small, theme_saylor, {{sitename}}{{/pix}}</a>
+                    </div>
+                </div>
+                <div id="footer-share" class="footer-share d-inline-flex flex-row justify-content-around my-auto mx-auto">
+                    <a title="Facebook | /SaylorFoundation" target="_blank" href="https://www.facebook.com/SaylorFoundation" class="fa fa-facebook fa-3x p-1 mx-auto"></a>
+                    <a title="Twitter | @saylordotorg" target="_blank" href="https://twitter.com/saylordotorg" class="fa fa-twitter fa-3x p-1 mx-auto"></a>
+                    <a title="Instagram | @saylordotorg" target="_blank" href="https://www.instagram.com/saylordotorg" class="fa fa-instagram fa-3x p-1 mx-auto"></a>
+                    <a title="GitHub | /saylordotorg" target="_blank" href="https://github.com/saylordotorg" class="fa fa-github fa-3x p-1"></a>
+                   <a title="LinkedIn | Saylor Academy" target="_blank" href="https://www.linkedin.com/school/1229385/" class="fa fa-linkedin fa-3x p-1 mx-auto"></a>
+                </div>
+            </div>
+        </div>
+
+        <div id="course-footer">{{{ output.course_footer }}}</div>
+
+        {{# output.page_doc_link }}
+            <p class="helplink">{{{ output.page_doc_link }}}</p>
+        {{/ output.page_doc_link }}
+        <div class="tool_usertours-resettourcontainer"></div>
+
+        <div id="footer-text-container" class="font-weight-light d-flex flex-column container-fluid mt-1">
+            <p class="text-left mb-0">© Saylor Academy 2010{{#currentyear}}-{{currentyear}}{{/currentyear}} except as otherwise noted. Excluding course final exams, content authored by Saylor Academy is available under a <a class="text-secondary" rel="license" href="http://creativecommons.org/licenses/by/3.0/" target="_blank">Creative Commons Attribution 3.0 Unported</a> license. Third-party materials are the copyright of their respective owners and shared under various licenses. See <a class="text-secondary" href="https://www.saylor.org/open/licensinginformation" target="_blank">detailed licensing information</a>.</p>
+            <p class="text-left mt-0">Saylor Academy and Saylor.org® are trade names of the Constitution Foundation, a 501(c)(3) organization through which our educational activities are conducted.</p>
+        </div>
+
+        <div class="d-flex-row d-flex-md-inline-row flex-wrap" align="center">
+            <div id="footer-ccby-logo" class="ccby-logo float-md-right mr-md-5">
+                {{# pix}} logos/cc/ccby, theme_saylor, "CCBY"{{/pix}}</a>
+            </div>
+            <div class="col-md-9">
+                <p class="mx-auto my-auto d-flex flex-nowrap"><h5><a href="https://www.saylor.org/sitemap">Sitemap</a> | <a href="https://www.saylor.org/terms-of-use">Terms of Use</a> | <a href="https://www.saylor.org/privacy-policy">Privacy Policy</a></h5></p>
+            </div>
+        </div>
+        <div id="footer-end" class="container-fluid text-center">
+            {{{ output.standard_footer_html }}}
+            {{{ output.standard_end_of_body_html }}}
+        </div>
+    </div>
+</footer>

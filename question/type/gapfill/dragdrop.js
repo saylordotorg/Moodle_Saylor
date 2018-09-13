@@ -30,10 +30,10 @@ $(function () {
         helper: 'clone',
         cursor: 'pointer',
         scroll: 'false',
-        start: function (event, ui) {
+        start: function () {
             $(this).fadeTo('fast', 0.5);
         },
-        stop: function (event, ui) {
+        stop: function () {
             $(this).fadeTo(0, 1);
         }
 
