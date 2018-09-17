@@ -31,5 +31,5 @@ $templatecontext = [
     'currentyear' => date('Y')
 ];
 
-echo $OUTPUT->render_from_template('theme_saylor/login', $templatecontext);
+echo $OUTPUT->render_from_template('/login', $templatecontext);
 

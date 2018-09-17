@@ -1,0 +1,23 @@
+    {{#children}}
+        {{^divider}}
+            {{#url}}
+                <a class="list-group-item list-group-item-action" href="{{{url}}}" title="{{{title}}}">
+                    <div class="m-l-1">
+                        <div class="media">
+                            <span class="media-body">{{{text}}}</span>
+                        </div>
+                    </div>
+                </a>
+            {{/url}}
+        {{/divider}}
+        {{#haschildren}}
+            <div class="list-group-item">
+                <div class="m-l-0">
+                    <div class="media">
+                    <span class="media-body">{{{text}}}</span>
+                    </div>
+                </div>
+            </div>
+                {{> /custom_menu_navdrawer }}
+        {{/haschildren}}
+    {{/children}}

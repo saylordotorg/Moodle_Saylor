@@ -37,9 +37,8 @@ class mobile {
 
     /**
      * Returns the gapfill quetion type for the quiz the mobile app.
-     * @param  array $args Arguments from tool_mobile_get_content WS
      *
-     * @return array  HTML, javascript and otherdata
+     * @return void
      */
     public static function mobile_get_gapfill() {
         global $CFG;

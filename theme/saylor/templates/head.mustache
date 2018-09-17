@@ -1,0 +1,70 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    Page header.
+}}
+{{{ output.doctype }}}
+<html {{{ output.htmlattributes }}}>
+<head>
+    <title>{{{ output.page_title }}}</title>
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="57x57" href="{{{ config.wwwroot }}}/theme/image.php?theme=saylor&component=theme_saylor&image=favicons%2Fapple-icon-57x57">
+    <link rel="apple-touch-icon" sizes="60x60" href="{{{ config.wwwroot }}}/theme/image.php?theme=saylor&component=theme_saylor&image=favicons%2Fapple-icon-60x60">
+    <link rel="apple-touch-icon" sizes="72x72" href="{{{ config.wwwroot }}}/theme/image.php?theme=saylor&component=theme_saylor&image=favicons%2Fapple-icon-72x72">
+    <link rel="apple-touch-icon" sizes="76x76" href="{{{ config.wwwroot }}}/theme/image.php?theme=saylor&component=theme_saylor&image=favicons%2Fapple-icon-76x76">
+    <link rel="apple-touch-icon" sizes="114x114" href="{{{ config.wwwroot }}}/theme/image.php?theme=saylor&component=theme_saylor&image=favicons%2Fapple-icon-114x114">
+    <link rel="apple-touch-icon" sizes="120x120" href="{{{ config.wwwroot }}}/theme/image.php?theme=saylor&component=theme_saylor&image=favicons%2Fapple-icon-120x120">
+    <link rel="apple-touch-icon" sizes="144x144" href="{{{ config.wwwroot }}}/theme/image.php?theme=saylor&component=theme_saylor&image=favicons%2Fapple-icon-144x144">
+    <link rel="apple-touch-icon" sizes="152x152" href="{{{ config.wwwroot }}}/theme/image.php?theme=saylor&component=theme_saylor&image=favicons%2Fapple-icon-152x152">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{{ config.wwwroot }}}/theme/image.php?theme=saylor&component=theme_saylor&image=favicons%2Fapple-icon-180x180">
+    <link rel="icon" type="image/png" sizes="192x192"  href="{{{ config.wwwroot }}}/theme/image.php?theme=saylor&component=theme_saylor&image=favicons%2Fandroid-icon-192x192">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{{ config.wwwroot }}}/theme/image.php?theme=saylor&component=theme_saylor&image=favicons%2Ffavicon-32x32">
+    <link rel="icon" type="image/png" sizes="96x96" href="{{{ config.wwwroot }}}/theme/image.php?theme=saylor&component=theme_saylor&image=favicons%2Ffavicon-96x96">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{{ config.wwwroot }}}/theme/image.php?theme=saylor&component=theme_saylor&image=favicons%2Ffavicon-16x16">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="{{{ config.wwwroot }}}/theme/image.php?theme=saylor&component=theme_saylor&image=favicons%2Fms-icon-144x144">
+    <meta name="theme-color" content="#ffffff">
+    <!-- End Favicons -->
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+      ga('create', 'UA-16530955-1', 'auto');
+      ga('send', 'pageview');
+      ga('set', 'anonymizeIp', true);
+    </script>
+    <!-- End Google Analytics -->
+    <!-- Facebook Pixel Code -->
+    <script>
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+    n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+    document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '1336566346389237'); // Insert your pixel ID here.
+    fbq('track', 'PageView');
+    </script>
+    <noscript><img height="1" width="1" style="display:none"
+    src="https://www.facebook.com/tr?id=1336566346389237&ev=PageView&noscript=1"
+    /></noscript>
+    <!-- DO NOT MODIFY -->
+<!-- End Facebook Pixel Code -->
+    {{{ output.standard_head_html }}}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>

@@ -27,13 +27,13 @@ require_once($CFG->libdir . '/questionlib.php');
 require_once($CFG->dirroot . '/question/engine/lib.php');
 
 /**
- * @copyright Marcus Green 2018
  *
  * The gapfill question class
+ *
  * Load from database, and initialise class
  * A "fill in the gaps" cloze style question type
  * @package    qtype_gapfill
- * @copyright  2017 Marcus Green
+ * @copyright  2018 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_gapfill extends question_type {
@@ -62,7 +62,6 @@ class qtype_gapfill extends question_type {
     /**
      * Called during question editing
      *
-     * @global moodle_database $DB
      * @param stdClass $question
      */
     public function get_question_options($question) {
@@ -113,7 +112,6 @@ class qtype_gapfill extends question_type {
     /**
      * Get settings e.g. feedback for correct and incorrect responses
      *
-     * @global moodle_database $DB
      * @param qtype_gapfill_question $question
      * @return string (json encoded string)
      */
@@ -225,7 +223,6 @@ class qtype_gapfill extends question_type {
      * Save the units and the answers associated with this question.
      * @param stdClass $question
      * @return boolean to indicate success or failure.
-     * @global moodle_database $DB;
      **/
     public function save_question_options($question) {
         /* Save the extra data to your database tables from the
@@ -251,7 +248,6 @@ class qtype_gapfill extends question_type {
     /**
      * Writes to the database, runs from question editing form
      *
-     * @global moodle_database $DB
      * @param stdClass $question
      * @param stdClass $options
      * @param context_course_object $context
@@ -291,7 +287,6 @@ class qtype_gapfill extends question_type {
     /**
      * Write to the database during editing
      *
-     * @global moodle_database $DB
      * @param stdClass $question
      * @param array $answerfields
      */
@@ -387,7 +382,6 @@ class qtype_gapfill extends question_type {
      * The first/main type of data is per gap feedback. Other data relating to
      * settings for a gap may be added later
      *
-     * @global moodle_database $DB
      * @param stdClass $question
      * @param string $table
      */
@@ -496,7 +490,6 @@ class qtype_gapfill extends question_type {
     /**
      * Export question to the Moodle XML format
      *
-     * @global object $CFG
      * @param object $question
      * @param qformat_xml $format
      * @param object $extra

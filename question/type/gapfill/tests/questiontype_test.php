@@ -54,7 +54,6 @@ class qtype_gapfill_test extends advanced_testcase {
     }
     /**
      * template for common example of question instance
-     * @global type $USER
      * @return \stdClass
      */
     protected function get_test_question_data() {

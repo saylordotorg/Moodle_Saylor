@@ -44,7 +44,6 @@ class qtype_gapfill_test_helper extends question_test_helper {
     /**
      * Slight improvements over original make_question class
      *
-     * @param object $type
      * @param string $questiontext
      * @param boolean $casesensitive
      * @param array $poptions

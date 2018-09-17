@@ -17,9 +17,9 @@
 /**
  * Serve question type files
  *
- * @since      2.3
+ * @since      3.5
  * @package    qtype_gapfill
- * @copyright  Marcus Green 2012
+ * @copyright  Marcus Green 2018
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
@@ -35,8 +35,6 @@ defined('MOODLE_INTERNAL') || die();
  * @param array $args extra arguments
  * @param bool $forcedownload whether or not force download
  * @param array $options additional options affecting the file serving
- * @global moodle_database $DB
- * @global type $CFG
  *
  */
 function qtype_gapfill_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options = array()) {

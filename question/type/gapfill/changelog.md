@@ -1,3 +1,6 @@
+### Version 1.974 of the Moodle Gapfill question type Sep 2018
+Spurious debugger statement found in mobile js code
+
 ### Version 1.973 of the Moodle Gapfill question type Sep 2018
 Support for the new Moodle 3.5 mobile app. Huge thanks to Dani Palou from Moodle HQ, 
 without his help I would not have been able to add this capability. Thanks to Elton LaClare

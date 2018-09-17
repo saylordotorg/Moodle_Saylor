@@ -28,12 +28,11 @@ var result = {
          * answered or in the review page then stop any further
          * selections.
          *
-         * @param NodeList draggables
-         * @param MouseEvent event
+         * @param {NodeList} draggables
+         * @param {MouseEvent} event
          * @return {string} value of target
          **/
         function pickAnswerOption(draggables, event) {
-            debugger;
             /* If the question is in a readonly state, e.g. after being
              * answered or in the review page then stop any further
              * selections.
@@ -44,10 +43,10 @@ var result = {
             event.currentTarget.classList.toggle('picked');
             for (var i = 0; i < draggables.length; i++) {
                 if (draggables[i].id == event.currentTarget.id) {
-                    /*continue if this is just picked draggable */
+                    /* Continue if this is just picked draggable */
                     continue;
                 }
-                /*remove picked class from everything else*/
+                /* Remove picked class from everything else*/
                 draggables[i].classList.remove('picked');
             }
             return event.currentTarget.innerHTML;
@@ -68,11 +67,11 @@ var result = {
             }
             var droptargets = this.componentContainer.querySelectorAll('.droptarget');
             for (i = 0; i < droptargets.length; i++) {
-                    /* paste text from last click into the droptarger */
+                    /* Paste text from last click into the droptarger */
                     droptargets[i].addEventListener('click', function(event) {
                         event.currentTarget.value = self.LastItemClicked;
                     });
-                    /* clear contents on double click */
+                    /* Clear contents on double click */
                     droptargets[i].addEventListener('dblclick', function(event) {
                         event.currentTarget.value = '';
                     });

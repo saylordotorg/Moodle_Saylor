@@ -30,13 +30,14 @@
 
 .sayloroverview-pill:not(.active) {
     background-color: #eee !important;
-    border-color: #eee !important;
+    border: 1px solid transparent;
     color: #173140 !important;
     border-radius: .25rem;
 }
 
 .sayloroverview-pill {
     background-color: #f16505 !important;
+    border: 1px solid;
     border-color: #cc5504 !important;
     color: white !important;
     border-radius: .25rem;

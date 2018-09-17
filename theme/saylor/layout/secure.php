@@ -34,5 +34,5 @@ $templatecontext = [
     'hasblocks' => $hasblocks
 ];
 
-echo $OUTPUT->render_from_template('theme_boost/secure', $templatecontext);
+echo $OUTPUT->render_from_template('/secure', $templatecontext);
 
