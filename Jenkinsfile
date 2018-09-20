@@ -223,6 +223,18 @@ def plugins = [
         "url" : 'https://github.com/saylordotorg/moodle-local_affiliations',
         "branch" : 'master',
         "dest" : 'local/affiliations'
+    ],
+    [
+        "name" : 'qtype_coderunner',
+        "url" : 'https://github.com/trampgeek/moodle-qtype_coderunner.git',
+        "branch" : 'master',
+        "dest" : 'question/type/coderunner'
+    ],
+    [
+        "name" : 'qbehaviour_adaptive_adapted_for_coderunner',
+        "url" : 'https://github.com/trampgeek/moodle-qbehaviour_adaptive_adapted_for_coderunner.git',
+        "branch" : 'master',
+        "dest" : 'question/behaviour/adaptive_adapted_for_coderunner'
     ]
 ]
 
