@@ -35,7 +35,11 @@ if (settingsdata > "") {
         settings.push(obj[o]);
     }
 }
-
+/**
+ *
+ * @param {string} text
+ * @param {string} delimitchars
+ */
 function Item(text, delimitchars) {
     this.questionid = $("input[name=id]").val();
     this.gaptext = text;
@@ -47,7 +51,7 @@ function Item(text, delimitchars) {
     this.startchar = this.gaptext.substring(0, 1);
     /* For checking if the end char is the right delimiter */
     this.endchar = this.gaptext.substring(this.len - 1, this.len);
-    this.gaptext_nodelim = '';
+    this.gaptextNodelim = '';
     this.feedback = {};
     this.instance = 0;
     this.feedback.correct = $("#id_corecteditable").html();
@@ -62,16 +66,16 @@ function Item(text, delimitchars) {
     };
     this.stripdelim = function() {
         if (this.startchar === this.l) {
-            this.gaptext_nodelim = this.gaptext.substring(1, this.len);
+            this.gaptextNodelim = this.gaptext.substring(1, this.len);
         }
         if (this.endchar === this.r) {
-            var len = this.gaptext_nodelim.length;
-            this.gaptext_nodelim = this.gaptext_nodelim.substring(0, len - 1);
+            var len = this.gaptextNodelim.length;
+            this.gaptextNodelim = this.gaptextNodelim.substring(0, len - 1);
         }
-        return this.gaptext_nodelim;
+        return this.gaptextNodelim;
     };
     var itemsettings = [];
-    Item.prototype.get_itemsettings = function(target) {
+    Item.prototype.getItemSettings = function(target) {
         var itemid = target.id;
         var underscore = itemid.indexOf("_");
         /* The instance, normally 0 but incremented if a gap has the same text as another
@@ -85,7 +89,7 @@ function Item(text, delimitchars) {
         }
         return itemsettings;
     };
-    this.update_json = function(e) {
+    this.updateJson = function(e) {
         var found = false;
         var id = e.target.id;
         for (var set in settings) {
@@ -113,13 +117,13 @@ function Item(text, delimitchars) {
 
 /* A click on the button */
 $("#id_itemsettings_button").on("click", function() {
-    var atto_islive = ($(".editor_atto")).length;
+    var attoIsLive = ($(".editor_atto")).length;
     /* Show error if Atto is not loaded. It might be because the page has not finished loading
      * or because plain text elements are being used or (perhaps less likely as time goes on)
      * the HTMLarea editor is being used. It might be possible to work with those other editors
      * but limiting to Atto keeps things straightforward and maintainable.
      */
-    if (atto_islive < 1) {
+    if (attoIsLive < 1) {
         $("#id_error_itemsettings_button").css({'display': 'inline', 'color': 'red'});
         $("#id_error_itemsettings_button")[0].innerHTML = M.util.get_string("itemsettingserror", "qtype_gapfill");
         return;
@@ -166,13 +170,13 @@ $("#id_itemsettings_button").on("click", function() {
 /* A click on the text */
 $("#id_itemsettings_canvas").on("click", function(e) {
     /*
-     * questiontext needs to be edditable and the target must start
+     * Questiontext needs to be edditable and the target must start
      * with id followed by one or more digits and an underscore
      * */
     if (!$('#id_questiontexteditable').get(0).isContentEditable && (e.target.id.match(/^id[0-9]+_/))) {
         var delimitchars = $("#id_delimitchars").val();
         var item = new Item(e.target.innerHTML, delimitchars);
-        var itemsettings = item.get_itemsettings(e.target);
+        var itemsettings = item.getItemSettings(e.target);
         if (itemsettings === null || itemsettings.length === 0) {
             $("#id_correcteditable").html('');
             $("#id_incorrecteditable").html('');
@@ -188,7 +192,7 @@ $("#id_itemsettings_canvas").on("click", function(e) {
         var title = M.util.get_string("additemsettings", "qtype_gapfill");
         /* The html jquery call will turn any encoded entities such as &gt; to html, i.e. > */
         title += ': ' + $("<div/>").html(item.stripdelim()).text();
-        require(['jquery', 'jqueryui'], function($, jqui) {
+        require(['jquery', 'jqueryui'], function($) {
             $("#id_itemsettings_popup").dialog({
                 position: {
                     my: 'right',
@@ -203,7 +207,7 @@ $("#id_itemsettings_canvas").on("click", function(e) {
                     {
                         text: "OK",
                         click: function() {
-                            var JSONstr = item.update_json(e);
+                            var JSONstr = item.updateJson(e);
                             $('[class^=atto_]').removeAttr("disabled");
                             $("[name='itemsettings']").val(JSONstr);
                             $(".ui-dialog-content").dialog("close");
@@ -218,6 +222,11 @@ $("#id_itemsettings_canvas").on("click", function(e) {
     }
 });
 
+/**
+ * Convert an object to an array
+ * @param {object} obj
+ * @return {array}
+ */
 function toArray(obj) {
     var arr = [];
     for (var i = 0, iLen = obj.length; i < iLen; i++) {
@@ -236,7 +245,8 @@ var wrapContent = (function() {
         // If element provided, start there, otherwise use the body.
         el = el && el.parentNode ? el : document.body;
         // Get all child nodes as a static array.
-        var node, nodes = toArray(el.childNodes);
+        var node,
+nodes = toArray(el.childNodes);
         if (el.id === "id_questiontextfeedback" && (count > 0)) {
             count = 0;
         }
@@ -245,7 +255,8 @@ var wrapContent = (function() {
         var l = delimitchars.substring(0, 1);
         var r = delimitchars.substring(1, 2);
         var regex = new RegExp("(\\" + l + ".*?\\" + r + ")", "g");
-        var sp, span = document.createElement('span');
+        var sp,
+span = document.createElement('span');
         // Tag names of elements to skip, there are more to add.
         var skip = {'script': '', 'button': '', 'input': '', 'select': '',
             'textarea': '', 'option': ''};
@@ -278,7 +289,7 @@ var wrapContent = (function() {
                                 }
                                 item.id = 'id' + count + '_' + instance;
                                 sp.id = item.id;
-                                var is = item.get_itemsettings(item);
+                                var is = item.getItemSettings(item);
                                 if (item.striptags(is.correctfeedback) > "") {
                                     sp.className = 'hascorrect';
                                 }
@@ -301,6 +312,11 @@ var wrapContent = (function() {
         }
     };
 }());
+/**
+ *
+ * @param {array} source
+ * @return {array} product
+ */
 function copyStyles(source) {
     // The map to return with requested styles and values as KVP.
     var product = {};
@@ -344,4 +360,5 @@ function copyStyles(source) {
             return product;
         }
     }
+    return false;
 }

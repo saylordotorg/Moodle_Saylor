@@ -1,5 +1,5 @@
 <?php
-// This file is part of the Certificate module for Moodle - http://moodle.org/
+// This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,14 +15,39 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Certificate module capability definition
+ * Gapfill question type  capability definition
  *
  * @package    qtype_gapfill
- * @copyright  2016 Marcus Green
+ * @copyright  2018 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
 $addons = array(
-    "qtype_gapfill" => array()
+    "qtype_gapfill" => array(
+        "handlers" => array( // Different places where the add-on will display content.
+            'gapfill' => array( // Handler unique name (can be anything).
+                'displaydata' => array(
+                    'title' => 'Gapfill Question',
+                    'icon' => '/question/type/gapfill/pix/icon.gif',
+                    'class' => '',
+                ),
+                'delegate' => 'CoreQuestionDelegate', // Delegate (where to display the link to the add-on).
+                'method' => 'mobile_get_gapfill',
+                'offlinefunctions' => array(
+                    'mobile_get_gapfill' => array(),
+                    'mobile_get_gapfill' => array(),
+                ), // Function needs caching for offline.
+               'styles' => array(
+                    'url' => '/question/type/gapfill/styles_app.css',
+                    'version' => '1.00'
+
+                ),
+                'lang' => array(
+                    array('Gapfill question', 'pluginname')
+                )
+            )
+        ),
+    )
 );

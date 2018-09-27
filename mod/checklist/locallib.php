@@ -1797,10 +1797,7 @@ class checklist_class {
                 $event = null; // Do something here to stop codechecker complaining.
             }
             $item->eventid = 0;
-            if ($add) {
-                // Don't bother updating the record if we are deleting.
-                $item->update();
-            }
+            $item->update();
 
         } else {  // Add/update event.
             $eventdata = new stdClass();
@@ -1829,6 +1826,8 @@ class checklist_class {
     }
 
     public function setallevents() {
+        $this->clear_orphaned_events();
+
         if (!$this->items) {
             return;
         }
@@ -1836,6 +1835,27 @@ class checklist_class {
         $add = $this->checklist->duedatesoncalendar;
         foreach ($this->items as $item) {
             $this->setevent($item, $add);
+        }
+    }
+
+    protected function clear_orphaned_events() {
+        global $DB, $CFG;
+        require_once($CFG->dirroot.'/calendar/lib.php');
+        $sql = "
+            SELECT e.id
+              FROM {event} e
+             WHERE e.modulename = 'checklist' AND e.instance = :checklistid
+               AND NOT EXISTS (
+                   SELECT 1
+                     FROM {checklist_item} i
+                    WHERE i.checklist = e.instance AND i.eventid = e.id
+               )
+        ";
+        $params = ['checklistid' => $this->checklist->id];
+        $eventids = $DB->get_fieldset_sql($sql, $params);
+        foreach ($eventids as $eventid) {
+            $event = calendar_event::load($eventid);
+            $event->delete();
         }
     }
 

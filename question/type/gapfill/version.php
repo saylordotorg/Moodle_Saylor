@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information. When a new version is released version is incremented
+ * Version information. When a new version is released the version is incremented
  *
  * @package    qtype_gapfill
  * @copyright  2018 Marcus Green
@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'qtype_gapfill';
-$plugin->version  = 2018050700;
+$plugin->version  = 2018091600;
 $plugin->requires = 2016052311;  // Moodle 3.1.11.
-$plugin->release = '1.972';
+$plugin->release = '1.974';
 $plugin->maturity  = MATURITY_STABLE;

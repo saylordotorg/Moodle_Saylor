@@ -24,16 +24,16 @@
 /* This should be called script.js and go through the Moodle minify process but that seems to break it */
 /* global $ */
 /* jshint unused:false*/
-$(function () {
+$(function() {
     $(".draggable").draggable({
         revert: false,
         helper: 'clone',
         cursor: 'pointer',
         scroll: 'false',
-        start: function (event, ui) {
+        start: function() {
             $(this).fadeTo('fast', 0.5);
         },
-        stop: function (event, ui) {
+        stop: function() {
             $(this).fadeTo(0, 1);
         }
 
@@ -41,7 +41,7 @@ $(function () {
 
     $(".droptarget").droppable({
         hoverClass: 'active',
-        drop: function (event, ui) {
+        drop: function(event, ui) {
             if ($(ui.draggable).hasClass('readonly')) {
                 return;
             }

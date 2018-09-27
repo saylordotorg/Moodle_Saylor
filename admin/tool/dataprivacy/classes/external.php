@@ -422,6 +422,85 @@ class external extends external_api {
     }
 
     /**
+     * Parameter description for bulk_approve_data_requests().
+     *
+     * @since Moodle 3.5
+     * @return external_function_parameters
+     */
+    public static function bulk_approve_data_requests_parameters() {
+        return new external_function_parameters([
+            'requestids' => new external_multiple_structure(
+                new external_value(PARAM_INT, 'The request ID', VALUE_REQUIRED)
+            )
+        ]);
+    }
+
+    /**
+     * Bulk approve bulk data request.
+     *
+     * @since Moodle 3.5
+     * @param array $requestids Array consisting the request ID's.
+     * @return array
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws invalid_parameter_exception
+     * @throws restricted_context_exception
+     * @throws moodle_exception
+     */
+    public static function bulk_approve_data_requests($requestids) {
+        $warnings = [];
+        $result = false;
+        $params = external_api::validate_parameters(self::bulk_approve_data_requests_parameters(), [
+            'requestids' => $requestids
+        ]);
+        $requestids = $params['requestids'];
+
+        // Validate context.
+        $context = context_system::instance();
+        self::validate_context($context);
+        require_capability('tool/dataprivacy:managedatarequests', $context);
+
+        foreach ($requestids as $requestid) {
+            // Ensure the request exists.
+            $requestexists = data_request::record_exists($requestid);
+
+            if ($requestexists) {
+                api::approve_data_request($requestid);
+            } else {
+                $warnings[] = [
+                    'item' => $requestid,
+                    'warningcode' => 'errorrequestnotfound',
+                    'message' => get_string('errorrequestnotfound', 'tool_dataprivacy')
+                ];
+            }
+        }
+
+        if (empty($warnings)) {
+            $result = true;
+            // Add notification in the session to be shown when the page is reloaded on the JS side.
+            notification::success(get_string('requestsapproved', 'tool_dataprivacy'));
+        }
+
+        return [
+            'result' => $result,
+            'warnings' => $warnings
+        ];
+    }
+
+    /**
+     * Parameter description for bulk_approve_data_requests().
+     *
+     * @since Moodle 3.5
+     * @return external_description
+     */
+    public static function bulk_approve_data_requests_returns() {
+        return new external_single_structure([
+            'result' => new external_value(PARAM_BOOL, 'The processing result'),
+            'warnings' => new external_warnings()
+        ]);
+    }
+
+    /**
      * Parameter description for deny_data_request().
      *
      * @since Moodle 3.5
@@ -487,6 +566,85 @@ class external extends external_api {
      * @return external_description
      */
     public static function deny_data_request_returns() {
+        return new external_single_structure([
+            'result' => new external_value(PARAM_BOOL, 'The processing result'),
+            'warnings' => new external_warnings()
+        ]);
+    }
+
+    /**
+     * Parameter description for bulk_deny_data_requests().
+     *
+     * @since Moodle 3.5
+     * @return external_function_parameters
+     */
+    public static function bulk_deny_data_requests_parameters() {
+        return new external_function_parameters([
+            'requestids' => new external_multiple_structure(
+                new external_value(PARAM_INT, 'The request ID', VALUE_REQUIRED)
+            )
+        ]);
+    }
+
+    /**
+     * Bulk deny data requests.
+     *
+     * @since Moodle 3.5
+     * @param array $requestids Array consisting of request ID's.
+     * @return array
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws invalid_parameter_exception
+     * @throws restricted_context_exception
+     * @throws moodle_exception
+     */
+    public static function bulk_deny_data_requests($requestids) {
+        $warnings = [];
+        $result = false;
+        $params = external_api::validate_parameters(self::bulk_deny_data_requests_parameters(), [
+            'requestids' => $requestids
+        ]);
+        $requestids = $params['requestids'];
+
+        // Validate context.
+        $context = context_system::instance();
+        self::validate_context($context);
+        require_capability('tool/dataprivacy:managedatarequests', $context);
+
+        foreach ($requestids as $requestid) {
+            // Ensure the request exists.
+            $requestexists = data_request::record_exists($requestid);
+
+            if ($requestexists) {
+                api::deny_data_request($requestid);
+            } else {
+                $warnings[] = [
+                    'item' => $requestid,
+                    'warningcode' => 'errorrequestnotfound',
+                    'message' => get_string('errorrequestnotfound', 'tool_dataprivacy')
+                ];
+            }
+        }
+
+        if (empty($warnings)) {
+            $result = true;
+            // Add notification in the session to be shown when the page is reloaded on the JS side.
+            notification::success(get_string('requestsdenied', 'tool_dataprivacy'));
+        }
+
+        return [
+            'result' => $result,
+            'warnings' => $warnings
+        ];
+    }
+
+    /**
+     * Parameter description for bulk_deny_data_requests().
+     *
+     * @since Moodle 3.5
+     * @return external_description
+     */
+    public static function bulk_deny_data_requests_returns() {
         return new external_single_structure([
             'result' => new external_value(PARAM_BOOL, 'The processing result'),
             'warnings' => new external_warnings()
@@ -1106,6 +1264,287 @@ class external extends external_api {
     public static function confirm_contexts_for_deletion_returns() {
         return new external_single_structure([
             'result' => new external_value(PARAM_BOOL, 'Whether the record was properly marked for deletion or not'),
+            'warnings' => new external_warnings()
+        ]);
+    }
+
+    /**
+     * Parameters for set_context_defaults().
+     *
+     * @return external_function_parameters
+     */
+    public static function set_context_defaults_parameters() {
+        return new external_function_parameters([
+            'contextlevel' => new external_value(PARAM_INT, 'The context level', VALUE_REQUIRED),
+            'category' => new external_value(PARAM_INT, 'The default category for the given context level', VALUE_REQUIRED),
+            'purpose' => new external_value(PARAM_INT, 'The default purpose for the given context level', VALUE_REQUIRED),
+            'activity' => new external_value(PARAM_PLUGIN, 'The plugin name of the activity', VALUE_DEFAULT, null),
+            'override' => new external_value(PARAM_BOOL, 'Whether to override existing instances with the defaults', VALUE_DEFAULT,
+                false),
+        ]);
+    }
+
+    /**
+     * Updates the default category and purpose for a given context level (and optionally, a plugin).
+     *
+     * @param int $contextlevel The context level.
+     * @param int $category The ID matching the category.
+     * @param int $purpose The ID matching the purpose record.
+     * @param int $activity The name of the activity that we're making a defaults configuration for.
+     * @param bool $override Whether to override the purpose/categories of existing instances to these defaults.
+     * @return array
+     */
+    public static function set_context_defaults($contextlevel, $category, $purpose, $activity, $override) {
+        $warnings = [];
+
+        $params = external_api::validate_parameters(self::set_context_defaults_parameters(), [
+            'contextlevel' => $contextlevel,
+            'category' => $category,
+            'purpose' => $purpose,
+            'activity' => $activity,
+            'override' => $override,
+        ]);
+        $contextlevel = $params['contextlevel'];
+        $category = $params['category'];
+        $purpose = $params['purpose'];
+        $activity = $params['activity'];
+        $override = $params['override'];
+
+        // Validate context.
+        $context = context_system::instance();
+        self::validate_context($context);
+
+        // Set the context defaults.
+        $result = api::set_context_defaults($contextlevel, $category, $purpose, $activity, $override);
+
+        return [
+            'result' => $result,
+            'warnings' => $warnings
+        ];
+    }
+
+    /**
+     * Returns for set_context_defaults().
+     *
+     * @return external_single_structure
+     */
+    public static function set_context_defaults_returns() {
+        return new external_single_structure([
+            'result' => new external_value(PARAM_BOOL, 'Whether the context defaults were successfully set or not'),
+            'warnings' => new external_warnings()
+        ]);
+    }
+
+    /**
+     * Parameters for get_category_options().
+     *
+     * @return external_function_parameters
+     */
+    public static function get_category_options_parameters() {
+        return new external_function_parameters([
+            'includeinherit' => new external_value(PARAM_BOOL, 'Include option "Inherit"', VALUE_DEFAULT, true),
+            'includenotset' => new external_value(PARAM_BOOL, 'Include option "Not set"', VALUE_DEFAULT, false),
+        ]);
+    }
+
+    /**
+     * Fetches a list of data category options containing category IDs as keys and the category name for the value.
+     *
+     * @param bool $includeinherit Whether to include the "Inherit" option.
+     * @param bool $includenotset Whether to include the "Not set" option.
+     * @return array
+     */
+    public static function get_category_options($includeinherit, $includenotset) {
+        $warnings = [];
+
+        $params = self::validate_parameters(self::get_category_options_parameters(), [
+            'includeinherit' => $includeinherit,
+            'includenotset' => $includenotset
+        ]);
+        $includeinherit = $params['includeinherit'];
+        $includenotset = $params['includenotset'];
+
+        $context = context_system::instance();
+        self::validate_context($context);
+
+        $categories = api::get_categories();
+        $options = data_registry_page::category_options($categories, $includenotset, $includeinherit);
+        $categoryoptions = [];
+        foreach ($options as $id => $name) {
+            $categoryoptions[] = [
+                'id' => $id,
+                'name' => $name,
+            ];
+        }
+
+        return [
+            'options' => $categoryoptions,
+            'warnings' => $warnings
+        ];
+    }
+
+    /**
+     * Returns for get_category_options().
+     *
+     * @return external_single_structure
+     */
+    public static function get_category_options_returns() {
+        $optiondefinition = new external_single_structure(
+            [
+                'id' => new external_value(PARAM_INT, 'The category ID'),
+                'name' => new external_value(PARAM_TEXT, 'The category name'),
+            ]
+        );
+
+        return new external_single_structure([
+            'options' => new external_multiple_structure($optiondefinition),
+            'warnings' => new external_warnings()
+        ]);
+    }
+
+    /**
+     * Parameters for get_purpose_options().
+     *
+     * @return external_function_parameters
+     */
+    public static function get_purpose_options_parameters() {
+        return new external_function_parameters([
+            'includeinherit' => new external_value(PARAM_BOOL, 'Include option "Inherit"', VALUE_DEFAULT, true),
+            'includenotset' => new external_value(PARAM_BOOL, 'Include option "Not set"', VALUE_DEFAULT, false),
+        ]);
+    }
+
+    /**
+     * Fetches a list of data storage purposes containing purpose IDs as keys and the purpose name for the value.
+     *
+     * @param bool $includeinherit Whether to include the "Inherit" option.
+     * @param bool $includenotset Whether to include the "Not set" option.
+     * @return array
+     */
+    public static function get_purpose_options($includeinherit, $includenotset) {
+        $warnings = [];
+
+        $params = self::validate_parameters(self::get_category_options_parameters(), [
+            'includeinherit' => $includeinherit,
+            'includenotset' => $includenotset
+        ]);
+        $includeinherit = $params['includeinherit'];
+        $includenotset = $params['includenotset'];
+
+        $context = context_system::instance();
+        self::validate_context($context);
+
+        $purposes = api::get_purposes();
+        $options = data_registry_page::purpose_options($purposes, $includenotset, $includeinherit);
+        $purposeoptions = [];
+        foreach ($options as $id => $name) {
+            $purposeoptions[] = [
+                'id' => $id,
+                'name' => $name,
+            ];
+        }
+
+        return [
+            'options' => $purposeoptions,
+            'warnings' => $warnings
+        ];
+    }
+
+    /**
+     * Returns for get_purpose_options().
+     *
+     * @return external_single_structure
+     */
+    public static function get_purpose_options_returns() {
+        $optiondefinition = new external_single_structure(
+            [
+                'id' => new external_value(PARAM_INT, 'The purpose ID'),
+                'name' => new external_value(PARAM_TEXT, 'The purpose name'),
+            ]
+        );
+
+        return new external_single_structure([
+            'options' => new external_multiple_structure($optiondefinition),
+            'warnings' => new external_warnings()
+        ]);
+    }
+
+    /**
+     * Parameters for get_activity_options().
+     *
+     * @return external_function_parameters
+     */
+    public static function get_activity_options_parameters() {
+        return new external_function_parameters([
+            'nodefaults' => new external_value(PARAM_BOOL, 'Whether to fetch all activities or only those without defaults',
+                VALUE_DEFAULT, false),
+        ]);
+    }
+
+    /**
+     * Fetches a list of activity options for setting data registry defaults.
+     *
+     * @param boolean $nodefaults If false, it will fetch all of the activities. Otherwise, it will only fetch the activities
+     *                            that don't have defaults yet (e.g. when adding a new activity module defaults).
+     * @return array
+     */
+    public static function get_activity_options($nodefaults) {
+        $warnings = [];
+
+        $params = self::validate_parameters(self::get_activity_options_parameters(), [
+            'nodefaults' => $nodefaults,
+        ]);
+        $nodefaults = $params['nodefaults'];
+
+        $context = context_system::instance();
+        self::validate_context($context);
+
+        // Get activity module plugin info.
+        $pluginmanager = \core_plugin_manager::instance();
+        $modplugins = $pluginmanager->get_enabled_plugins('mod');
+        $modoptions = [];
+
+        // Get the module-level defaults. data_registry::get_defaults falls back to this when there are no activity defaults.
+        list($levelpurpose, $levelcategory) = data_registry::get_defaults(CONTEXT_MODULE);
+        foreach ($modplugins as $name) {
+            // Check if we have default purpose and category for this module if we want don't want to fetch everything.
+            if ($nodefaults) {
+                list($purpose, $category) = data_registry::get_defaults(CONTEXT_MODULE, $name);
+                // Compare this with the module-level defaults.
+                if ($purpose !== $levelpurpose || $category !== $levelcategory) {
+                    // If the defaults for this activity has been already set, there's no need to add this in the list of options.
+                    continue;
+                }
+            }
+
+            $displayname = $pluginmanager->plugin_name('mod_' . $name);
+            $modoptions[] = (object)[
+                'name' => $name,
+                'displayname' => $displayname
+            ];
+        }
+
+        return [
+            'options' => $modoptions,
+            'warnings' => $warnings
+        ];
+    }
+
+    /**
+     * Returns for get_category_options().
+     *
+     * @return external_single_structure
+     */
+    public static function get_activity_options_returns() {
+        $optionsdefinition = new external_single_structure(
+            [
+                'name' => new external_value(PARAM_TEXT, 'The plugin name of the activity'),
+                'displayname' => new external_value(PARAM_TEXT, 'The display name of the activity'),
+            ]
+        );
+
+        return new external_single_structure([
+            'options' => new external_multiple_structure($optionsdefinition),
             'warnings' => new external_warnings()
         ]);
     }

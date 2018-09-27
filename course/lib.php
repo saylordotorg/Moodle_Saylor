@@ -736,8 +736,8 @@ function get_module_metadata($course, $modnames, $sectionreturn = null) {
 
                     if (!empty($type->help)) {
                         $subtype->help = $type->help;
-                    } else if (get_string_manager()->string_exists('help' . $subtype->name, $modname)) {
-                        $subtype->help = get_string('help' . $subtype->name, $modname);
+                    } else if (get_string_manager()->string_exists('help' . $typename, $modname)) {
+                        $subtype->help = get_string('help' . $typename, $modname);
                     }
                     $subtype->link = new moodle_url($urlbase, array('add' => $modname, 'type' => $typename));
                     $subtype->name = $modname . ':' . $subtype->link;
@@ -1217,6 +1217,9 @@ function course_delete_module($cmid, $async = false) {
             $grade_item->delete('moddelete');
         }
     }
+
+    // Delete associated blogs and blog tag instances.
+    blog_remove_associations_for_module($modcontext->id);
 
     // Delete completion and availability data; it is better to do this even if the
     // features are not turned on, in case they were turned on previously (these will be

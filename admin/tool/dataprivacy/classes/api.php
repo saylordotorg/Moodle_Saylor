@@ -24,7 +24,7 @@
 namespace tool_dataprivacy;
 
 use coding_exception;
-use context_course;
+use context_helper;
 use context_system;
 use core\invalid_persistent_exception;
 use core\message\message;
@@ -94,6 +94,12 @@ class api {
     /** Data delete request completed, account is removed. */
     const DATAREQUEST_STATUS_DELETED = 10;
 
+    /** Approve data request. */
+    const DATAREQUEST_ACTION_APPROVE = 1;
+
+    /** Reject data request. */
+    const DATAREQUEST_ACTION_REJECT = 2;
+
     /**
      * Determines whether the user can contact the site's Data Protection Officer via Moodle.
      *
@@ -105,18 +111,14 @@ class api {
     }
 
     /**
-     * Check's whether the current user has the capability to manage data requests.
+     * Checks whether the current user has the capability to manage data requests.
      *
      * @param int $userid The user ID.
      * @return bool
-     * @throws coding_exception
-     * @throws dml_exception
      */
     public static function can_manage_data_requests($userid) {
-        $context = context_system::instance();
-
-        // A user can manage data requests if he/she has the site DPO role and has the capability to manage data requests.
-        return self::is_site_dpo($userid) && has_capability('tool/dataprivacy:managedatarequests', $context, $userid);
+        // Privacy officers can manage data requests.
+        return self::is_site_dpo($userid);
     }
 
     /**
@@ -137,6 +139,31 @@ class api {
     }
 
     /**
+     * Fetches the list of configured privacy officer roles.
+     *
+     * Every time this function is called, it checks each role if they have the 'managedatarequests' capability and removes
+     * any role that doesn't have the required capability anymore.
+     *
+     * @return int[]
+     * @throws dml_exception
+     */
+    public static function get_assigned_privacy_officer_roles() {
+        $roleids = [];
+
+        // Get roles from config.
+        $configroleids = explode(',', str_replace(' ', '', get_config('tool_dataprivacy', 'dporoles')));
+        if (!empty($configroleids)) {
+            // Fetch roles that have the capability to manage data requests.
+            $capableroles = array_keys(get_roles_with_capability('tool/dataprivacy:managedatarequests'));
+
+            // Extract the configured roles that have the capability from the list of capable roles.
+            $roleids = array_intersect($capableroles, $configroleids);
+        }
+
+        return $roleids;
+    }
+
+    /**
      * Fetches the role shortnames of Data Protection Officer roles.
      *
      * @return array An array of the DPO role shortnames
@@ -144,7 +171,7 @@ class api {
     public static function get_dpo_role_names() : array {
         global $DB;
 
-        $dporoleids = explode(',', str_replace(' ', '', get_config('tool_dataprivacy', 'dporoles')));
+        $dporoleids = self::get_assigned_privacy_officer_roles();
         $dponames = array();
 
         if (!empty($dporoleids)) {
@@ -156,20 +183,15 @@ class api {
     }
 
     /**
-     * Fetches the list of users with the Data Protection Officer role.
-     *
-     * @throws dml_exception
+     * Fetches the list of users with the Privacy Officer role.
      */
     public static function get_site_dpos() {
         // Get role(s) that can manage data requests.
-        $dporoles = explode(',', get_config('tool_dataprivacy', 'dporoles'));
+        $dporoles = self::get_assigned_privacy_officer_roles();
 
         $dpos = [];
         $context = context_system::instance();
         foreach ($dporoles as $roleid) {
-            if (empty($roleid)) {
-                continue;
-            }
             $allnames = get_all_user_name_fields(true, 'u');
             $fields = 'u.id, u.confirmed, u.username, '. $allnames . ', ' .
                       'u.maildisplay, u.mailformat, u.maildigest, u.email, u.emailstop, u.city, '.
@@ -189,15 +211,14 @@ class api {
     }
 
     /**
-     * Checks whether a given user is a site DPO.
+     * Checks whether a given user is a site Privacy Officer.
      *
      * @param int $userid The user ID.
      * @return bool
-     * @throws dml_exception
      */
     public static function is_site_dpo($userid) {
         $dpos = self::get_site_dpos();
-        return array_key_exists($userid, $dpos);
+        return array_key_exists($userid, $dpos) || is_siteadmin();
     }
 
     /**
@@ -619,6 +640,8 @@ class api {
             'requestedby' => $requestedby->fullname,
             'requesttype' => $typetext,
             'requestdate' => userdate($requestdata->timecreated),
+            'requestorigin' => $SITE->fullname,
+            'requestoriginurl' => new moodle_url('/'),
             'requestcomments' => $requestdata->messagehtml,
             'datarequestsurl' => $datarequestsurl
         ];
@@ -1140,5 +1163,92 @@ class api {
         }
 
         return $approvedcollection;
+    }
+
+    /**
+     * Updates the default category and purpose for a given context level (and optionally, a plugin).
+     *
+     * @param int $contextlevel The context level.
+     * @param int $categoryid The ID matching the category.
+     * @param int $purposeid The ID matching the purpose record.
+     * @param int $activity The name of the activity that we're making a defaults configuration for.
+     * @param bool $override Whether to override the purpose/categories of existing instances to these defaults.
+     * @return boolean True if set/unset config succeeds. Otherwise, it throws an exception.
+     */
+    public static function set_context_defaults($contextlevel, $categoryid, $purposeid, $activity = null, $override = false) {
+        global $DB;
+
+        self::check_can_manage_data_registry();
+
+        // Get the class name associated with this context level.
+        $classname = context_helper::get_class_for_level($contextlevel);
+        list($purposevar, $categoryvar) = data_registry::var_names_from_context($classname, $activity);
+
+        // Check the default category to be set.
+        if ($categoryid == context_instance::INHERIT) {
+            unset_config($categoryvar, 'tool_dataprivacy');
+
+        } else {
+            // Make sure the given category ID exists first.
+            $categorypersistent = new category($categoryid);
+            $categorypersistent->read();
+
+            // Then set the new default value.
+            set_config($categoryvar, $categoryid, 'tool_dataprivacy');
+        }
+
+        // Check the default purpose to be set.
+        if ($purposeid == context_instance::INHERIT) {
+            // If the defaults is set to inherit, just unset the config value.
+            unset_config($purposevar, 'tool_dataprivacy');
+
+        } else {
+            // Make sure the given purpose ID exists first.
+            $purposepersistent = new purpose($purposeid);
+            $purposepersistent->read();
+
+            // Then set the new default value.
+            set_config($purposevar, $purposeid, 'tool_dataprivacy');
+        }
+
+        // Unset instances that have been assigned with custom purpose and category, if override was specified.
+        if ($override) {
+            // We'd like to find context IDs that we want to unset.
+            $statements = ["SELECT c.id as contextid FROM {context} c"];
+            // Based on this context level.
+            $params = ['contextlevel' => $contextlevel];
+
+            if ($contextlevel == CONTEXT_MODULE) {
+                // If we're deleting module context instances, we need to make sure the instance ID is in the course modules table.
+                $statements[] = "JOIN {course_modules} cm ON cm.id = c.instanceid";
+                // And that the module is listed on the modules table.
+                $statements[] = "JOIN {modules} m ON m.id = cm.module";
+
+                if ($activity) {
+                    // If we're overriding for an activity module, make sure that the context instance matches that activity.
+                    $statements[] = "AND m.name = :modname";
+                    $params['modname'] = $activity;
+                }
+            }
+            // Make sure this context instance exists in the tool_dataprivacy_ctxinstance table.
+            $statements[] = "JOIN {tool_dataprivacy_ctxinstance} tdc ON tdc.contextid = c.id";
+            // And that the context level of this instance matches the given context level.
+            $statements[] = "WHERE c.contextlevel = :contextlevel";
+
+            // Build our SQL query by gluing the statements.
+            $sql = implode("\n", $statements);
+
+            // Get the context records matching our query.
+            $contextids = $DB->get_fieldset_sql($sql, $params);
+
+            // Delete the matching context instances.
+            foreach ($contextids as $contextid) {
+                if ($instance = context_instance::get_record_by_contextid($contextid, false)) {
+                    self::unset_context_instance($instance);
+                }
+            }
+        }
+
+        return true;
     }
 }
