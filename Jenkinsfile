@@ -45,6 +45,12 @@ def plugins = [
         "dest" : 'mod/hotpot'
     ],
     [
+        "name" : 'block_progress',
+        "url" : 'https://github.com/deraadt/moodle-block_progress.git',
+        "branch" : 'master',
+        "dest" : 'blocks/progress'
+    ],
+    [
         "name" : 'mod_checklist',
         "url" : 'https://github.com/davosmith/moodle-checklist.git',
         "branch" : 'master',
