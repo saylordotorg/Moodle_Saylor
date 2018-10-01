@@ -149,13 +149,13 @@
         </div>
     </div>
 
-    <div class="right-login-column d-flex flex-fill flex-column justify-content-center ml-3">
+    <div class="right-login-column d-flex flex-fill flex-column align-content-center ml-3">
             {{#hasinstructions}}
                 <div class="signup d-flex flex-column justify-content-center text-center mx-auto">
                     <h2>{{#str}}firsttime{{/str}}</h2>
                         {{{instructions}}}
                         {{#cansignup}}
-                            <form class="flex-fill mx-auto" action="{{signupurl}}" method="get" id="signup">
+                            <form class="flex-fill mx-auto mt-3" action="{{signupurl}}" method="get" id="signup">
                                 <button type="submit" class="btn btn-secondary mx-auto">{{#str}}startsignup{{/str}}</button>
                             </form>
                         {{/cansignup}}

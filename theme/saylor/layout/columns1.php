@@ -30,5 +30,5 @@ $templatecontext = [
     'bodyattributes' => $bodyattributes
 ];
 
-echo $OUTPUT->render_from_template('theme_saylor/columns1', $templatecontext);
+echo $OUTPUT->render_from_template('/columns1', $templatecontext);
 

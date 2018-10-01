@@ -125,6 +125,47 @@ class tool_dataprivacy_api_testcase extends advanced_testcase {
     }
 
     /**
+     * Test for \tool_dataprivacy\api::get_assigned_privacy_officer_roles().
+     */
+    public function test_get_assigned_privacy_officer_roles() {
+        global $DB;
+
+        // Erroneously set the manager roles as the PO, even if it doesn't have the managedatarequests capability yet.
+        $managerroleid = $DB->get_field('role', 'id', array('shortname' => 'manager'));
+        set_config('dporoles', $managerroleid, 'tool_dataprivacy');
+        // Get the assigned PO roles when nothing has been set yet.
+        $roleids = api::get_assigned_privacy_officer_roles();
+        // Confirm that the returned list is empty.
+        $this->assertEmpty($roleids);
+
+        $context = context_system::instance();
+
+        // Give the manager role with the capability to manage data requests.
+        assign_capability('tool/dataprivacy:managedatarequests', CAP_ALLOW, $managerroleid, $context->id, true);
+
+        // Give the editing teacher role with the capability to manage data requests.
+        $editingteacherroleid = $DB->get_field('role', 'id', array('shortname' => 'editingteacher'));
+        assign_capability('tool/dataprivacy:managedatarequests', CAP_ALLOW, $editingteacherroleid, $context->id, true);
+
+        // Get the non-editing teacher role ID.
+        $teacherroleid = $DB->get_field('role', 'id', array('shortname' => 'teacher'));
+
+        // Erroneously map the manager and the non-editing teacher roles to the PO role.
+        $badconfig = $managerroleid . ',' . $teacherroleid;
+        set_config('dporoles', $badconfig, 'tool_dataprivacy');
+
+        // Get the assigned PO roles.
+        $roleids = api::get_assigned_privacy_officer_roles();
+
+        // There should only be one PO role.
+        $this->assertCount(1, $roleids);
+        // Confirm it contains the manager role.
+        $this->assertContains($managerroleid, $roleids);
+        // And it does not contain the editing teacher role.
+        $this->assertNotContains($editingteacherroleid, $roleids);
+    }
+
+    /**
      * Test for api::approve_data_request().
      */
     public function test_approve_data_request() {
@@ -1319,6 +1360,164 @@ class tool_dataprivacy_api_testcase extends advanced_testcase {
 
         $this->assertCount(2, $contextids);
         $this->assertEquals($data->contexts->used, $contextids, '', 0.0, 10, true);
+    }
+
+    /**
+     * Data provider for \tool_dataprivacy_api_testcase::test_set_context_defaults
+     */
+    public function set_context_defaults_provider() {
+        $contextlevels = [
+            [CONTEXT_COURSECAT],
+            [CONTEXT_COURSE],
+            [CONTEXT_MODULE],
+            [CONTEXT_BLOCK],
+        ];
+        $paramsets = [
+            [true, true, false, false], // Inherit category and purpose, Not for activity, Don't override.
+            [true, false, false, false], // Inherit category but not purpose, Not for activity, Don't override.
+            [false, true, false, false], // Inherit purpose but not category, Not for activity, Don't override.
+            [false, false, false, false], // Don't inherit both category and purpose, Not for activity, Don't override.
+            [false, false, false, true], // Don't inherit both category and purpose, Not for activity, Override instances.
+        ];
+        $data = [];
+        foreach ($contextlevels as $level) {
+            foreach ($paramsets as $set) {
+                $data[] = array_merge($level, $set);
+            }
+            if ($level == CONTEXT_MODULE) {
+                // Add a combination where defaults for activity is being set.
+                $data[] = [CONTEXT_MODULE, false, false, true, false];
+                $data[] = [CONTEXT_MODULE, false, false, true, true];
+            }
+        }
+        return $data;
+    }
+
+    /**
+     * Test for \tool_dataprivacy\api::set_context_defaults()
+     *
+     * @dataProvider set_context_defaults_provider
+     * @param int $contextlevel The context level
+     * @param bool $inheritcategory Whether to set category value as INHERIT.
+     * @param bool $inheritpurpose Whether to set purpose value as INHERIT.
+     * @param bool $foractivity Whether to set defaults for an activity.
+     * @param bool $override Whether to override instances.
+     */
+    public function test_set_context_defaults($contextlevel, $inheritcategory, $inheritpurpose, $foractivity, $override) {
+        $this->setAdminUser();
+
+        $generator = $this->getDataGenerator();
+
+        // Generate course cat, course, block, assignment, forum instances.
+        $coursecat = $generator->create_category();
+        $course = $generator->create_course(['category' => $coursecat->id]);
+        $block = $generator->create_block('online_users');
+        $assign = $generator->create_module('assign', ['course' => $course->id]);
+        $forum = $generator->create_module('forum', ['course' => $course->id]);
+
+        $coursecatcontext = context_coursecat::instance($coursecat->id);
+        $coursecontext = context_course::instance($course->id);
+        $blockcontext = context_block::instance($block->id);
+
+        list($course, $assigncm) = get_course_and_cm_from_instance($assign->id, 'assign');
+        list($course, $forumcm) = get_course_and_cm_from_instance($forum->id, 'forum');
+        $assigncontext = context_module::instance($assigncm->id);
+        $forumcontext = context_module::instance($forumcm->id);
+
+        // Generate purposes and categories.
+        $category1 = api::create_category((object)['name' => 'Test category 1']);
+        $category2 = api::create_category((object)['name' => 'Test category 2']);
+        $purpose1 = api::create_purpose((object)[
+            'name' => 'Test purpose 1', 'retentionperiod' => 'PT1M', 'lawfulbases' => 'gdpr_art_6_1_a'
+        ]);
+        $purpose2 = api::create_purpose((object)[
+            'name' => 'Test purpose 2', 'retentionperiod' => 'PT1M', 'lawfulbases' => 'gdpr_art_6_1_a'
+        ]);
+
+        // Assign purposes and categories to contexts.
+        $coursecatctxinstance = api::set_context_instance((object) [
+            'contextid' => $coursecatcontext->id,
+            'purposeid' => $purpose1->get('id'),
+            'categoryid' => $category1->get('id'),
+        ]);
+        $coursectxinstance = api::set_context_instance((object) [
+            'contextid' => $coursecontext->id,
+            'purposeid' => $purpose1->get('id'),
+            'categoryid' => $category1->get('id'),
+        ]);
+        $blockctxinstance = api::set_context_instance((object) [
+            'contextid' => $blockcontext->id,
+            'purposeid' => $purpose1->get('id'),
+            'categoryid' => $category1->get('id'),
+        ]);
+        $assignctxinstance = api::set_context_instance((object) [
+            'contextid' => $assigncontext->id,
+            'purposeid' => $purpose1->get('id'),
+            'categoryid' => $category1->get('id'),
+        ]);
+        $forumctxinstance = api::set_context_instance((object) [
+            'contextid' => $forumcontext->id,
+            'purposeid' => $purpose1->get('id'),
+            'categoryid' => $category1->get('id'),
+        ]);
+
+        $categoryid = $inheritcategory ? context_instance::INHERIT : $category2->get('id');
+        $purposeid = $inheritpurpose ? context_instance::INHERIT : $purpose2->get('id');
+        $activity = '';
+        if ($contextlevel == CONTEXT_MODULE && $foractivity) {
+            $activity = 'assign';
+        }
+        $result = api::set_context_defaults($contextlevel, $categoryid, $purposeid, $activity, $override);
+        $this->assertTrue($result);
+
+        $targetctxinstance = false;
+        switch ($contextlevel) {
+            case CONTEXT_COURSECAT:
+                $targetctxinstance = $coursecatctxinstance;
+                break;
+            case CONTEXT_COURSE:
+                $targetctxinstance = $coursectxinstance;
+                break;
+            case CONTEXT_MODULE:
+                $targetctxinstance = $assignctxinstance;
+                break;
+            case CONTEXT_BLOCK:
+                $targetctxinstance = $blockctxinstance;
+                break;
+        }
+        $this->assertNotFalse($targetctxinstance);
+
+        // Check the context instances.
+        $instanceexists = context_instance::record_exists($targetctxinstance->get('id'));
+        if ($override) {
+            // If overridden, context instances on this context level would have been deleted.
+            $this->assertFalse($instanceexists);
+
+            // Check forum context instance.
+            $forumctxexists = context_instance::record_exists($forumctxinstance->get('id'));
+            if ($contextlevel != CONTEXT_MODULE || $foractivity) {
+                // The forum context instance won't be affected in this test if:
+                // - The overridden defaults are not for context modules.
+                // - Only the defaults for assign have been set.
+                $this->assertTrue($forumctxexists);
+            } else {
+                // If we're overriding for the whole course module context level,
+                // then this forum context instance will be deleted as well.
+                $this->assertFalse($forumctxexists);
+            }
+        } else {
+            // Otherwise, the context instance record remains.
+            $this->assertTrue($instanceexists);
+        }
+
+        // Check defaults.
+        list($defaultpurpose, $defaultcategory) = data_registry::get_defaults($contextlevel, $activity);
+        if (!$inheritpurpose) {
+            $this->assertEquals($purposeid, $defaultpurpose);
+        }
+        if (!$inheritcategory) {
+            $this->assertEquals($categoryid, $defaultcategory);
+        }
     }
 
     /**

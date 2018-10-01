@@ -1,15 +1,30 @@
  // https://docs.moodle.org/dev/Creating_a_theme_based_on_boost#Why_do_we_use_pre_and_post_SCSS.3F
 // Post SCSS for the theme.
 
-// Reduce the spacing between the userpicture and the caret.
-img.userpicture {
-    margin-right: -.5rem;
+.content .sectionname {
+	margin-top: .5rem;
 }
 
+// Reduce the spacing between the userpicture and the caret.
+.navbar-nav .avatars img.userpicture {
+    margin-right: -.5rem;
+    margin-left: .5vw;
+}
+
+/** Nav Drawer */
 #nav-drawer {
 	border-right: $card-border-width solid $card-border-color;
 }
+// Hide the Participants node
+#nav-drawer a[data-key="participants"] {
+	display: none;
+}
+// Hide the Grades node
+#nav-drawer a[data-key="grades"] {
+	display: none;
+}
 
+/** Nav Bar */
 .navbar {
     box-shadow: 0 3px 0 $primary;
 }
@@ -18,9 +33,17 @@ img.userpicture {
 	box-shadow: 0 0;
 	margin-bottom: 1rem;
 }
+
 .navbar .btn {
 	background-color: $gray-200;
 	border-color: $gray-200;
+	box-shadow: none;
+	-webkit-box-shadow: none;
+}
+
+.navbar .btn-secondary:not(.disabled):active:focus{
+	box-shadow: none;
+	-webkit-box-shadow: none;
 }
 
 .navbar .nav-link .fa-bars {
@@ -47,13 +70,14 @@ img.userpicture {
 	padding-right: 4px;
 }
 
-// Increase font size for user log in sign up top-right header. */
-.usermenu {
-    font-size: 1.2em;
+
+.navbar-nav li.usermenu {
+	line-height: 1;
+	margin-right: -.5rem;
 }
-.usermenu .login {
-	line-height: 0.25rem;
-	text-align: center;
+
+.navbar-nav .usermenu .login {
+    line-height: 1rem;
 }
 
 #page-login-index #page-wrapper {
@@ -97,6 +121,32 @@ img.userpicture {
     padding-bottom: 5px;
 }
 
+/** Course Catalog */
+
+.coursebox .content .summary {
+	width: 100%;
+	padding-left: .5rem;
+	margin: 0;
+}
+
+.coursebox .content .summary p {
+	margin: 0;
+}
+
+.coursebox .enrolmenticons {
+	display: none;
+}
+
+.coursebox .info .coursename a {
+	background-image: none;
+	padding-left: 0;
+}
+
+.coursebox .moreinfo {
+	float: none;
+	padding-top: 6px;
+}
+
 /** Footer */
 #page-footer a {
 	text-decoration: none;
@@ -119,4 +169,52 @@ img.userpicture {
 #footer-ccby-logo .icon {
 	width: 80px;
 	height: auto;
+}
+
+/** Honesty Check */
+
+#id_honestycheckheader .fcontainer .form-group .form-inline {
+	max-width: 100% !important;
+	flex: 0 0 auto !important;
+}
+
+/** Quiz **/
+
+.path-mod-quiz #mod_quiz_navblock {
+    .qnbutton {
+	    color: $primary;
+	}
+}
+
+.que .info {
+	background-color: $light;
+	border-color: $card-border-color;
+}
+
+.que .content .formulation {
+	background-color: $card-bg;
+	border: 1px solid $card-border-color;
+	border-radius: 2px;
+	color: $body-color;
+}
+
+/** Profile Page */
+
+.userprofile .profile_tree a[href*="/mod/forum"] {
+	display: none;
+}
+
+/** Front Page */
+
+// Hide combo list "Courses" header
+#frontpage-category-combo>h2 {
+	display: none;
+}
+
+/** Progress Bar */
+
+.block_progress .progressBarCell {
+	border: 1px solid $primary-dark-blue;
+	border-radius: .25rem;
+	margin: .25rem 0 0 .25rem;
 }

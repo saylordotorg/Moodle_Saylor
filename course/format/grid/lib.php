@@ -58,6 +58,7 @@ class format_grid extends format_base {
        17 => '17', 18 => '18', 19 => '19', 20 => '20', 21 => '21', 22 => '22', 23 => '23', 24 => '24');
     private $settings;
     private $section0attop = null; // Boolean to state if section zero is at the top (true) or in the grid (false), if null then uninitialized.
+    private $bsfour = false;
 
     /**
      * Creates a new instance of class
@@ -74,6 +75,15 @@ class format_grid extends format_base {
             $courseid = $COURSE->id;  // Save lots of global $COURSE as we will never be the site course.
         }
         parent::__construct($format, $courseid);
+
+        global $PAGE;
+        if (strcmp($PAGE->theme->name, 'boost') === 0) {
+            $this->bsfour = true;
+        } else if (!empty($PAGE->theme->parents)) {
+            if (in_array('boost', $PAGE->theme->parents) === true) {
+                $this->bsfour = true;
+            }
+        }
     }
 
     /**
@@ -1210,85 +1220,165 @@ class format_grid extends format_base {
             ($changesectiontitleoptions)) {
 
             if ($changeimagecontaineralignment) {
-                $checkboxname = get_string('resetimagecontaineralignment', 'format_grid') .
+                if ($this->bsfour) {
+                    $checkboxname = get_string('resetimagecontaineralignment', 'format_grid');
+                    $resetelements[] = & $mform->createElement('checkbox', 'resetimagecontaineralignment', '', $checkboxname);
+                    $resetelements[] = & $mform->createElement('html', $OUTPUT->help_icon('resetimagecontaineralignment', 'format_grid'));
+                } else {
+                    $checkboxname = get_string('resetimagecontaineralignment', 'format_grid').
                         $OUTPUT->help_icon('resetimagecontaineralignment', 'format_grid');
-                $resetelements[] = & $mform->createElement('checkbox', 'resetimagecontaineralignment', '', $checkboxname);
+                    $resetelements[] = & $mform->createElement('checkbox', 'resetimagecontaineralignment', '', $checkboxname);
+                }
             }
 
             if ($changeimagecontainernavigation) {
-                $checkboxname = get_string('resetimagecontainernavigation', 'format_grid') .
+                if ($this->bsfour) {
+                    $checkboxname = get_string('resetimagecontainernavigation', 'format_grid');
+                    $resetelements[] = & $mform->createElement('checkbox', 'resetimagecontainernavigation', '', $checkboxname);
+                    $resetelements[] = & $mform->createElement('html', $OUTPUT->help_icon('resetimagecontainernavigation', 'format_grid'));
+                } else {
+                    $checkboxname = get_string('resetimagecontainernavigation', 'format_grid').
                         $OUTPUT->help_icon('resetimagecontainernavigation', 'format_grid');
-                $resetelements[] = & $mform->createElement('checkbox', 'resetimagecontainernavigation', '', $checkboxname);
+                    $resetelements[] = & $mform->createElement('checkbox', 'resetimagecontainernavigation', '', $checkboxname);
+                }
             }
 
             if ($changeimagecontainersize) {
-                $checkboxname = get_string('resetimagecontainersize', 'format_grid') .
+                if ($this->bsfour) {
+                    $checkboxname = get_string('resetimagecontainersize', 'format_grid');
+                    $resetelements[] = & $mform->createElement('checkbox', 'resetimagecontainersize', '', $checkboxname);
+                    $resetelements[] = & $mform->createElement('html', $OUTPUT->help_icon('resetimagecontainersize', 'format_grid'));
+                } else {
+                    $checkboxname = get_string('resetimagecontainersize', 'format_grid').
                         $OUTPUT->help_icon('resetimagecontainersize', 'format_grid');
-                $resetelements[] = & $mform->createElement('checkbox', 'resetimagecontainersize', '', $checkboxname);
+                    $resetelements[] = & $mform->createElement('checkbox', 'resetimagecontainersize', '', $checkboxname);
+                }
             }
 
             if ($changeimageresizemethod) {
-                $checkboxname = get_string('resetimageresizemethod', 'format_grid') .
+                if ($this->bsfour) {
+                    $checkboxname = get_string('resetimageresizemethod', 'format_grid');
+                    $resetelements[] = & $mform->createElement('checkbox', 'resetimageresizemethod', '', $checkboxname);
+                    $resetelements[] = & $mform->createElement('html', $OUTPUT->help_icon('resetimageresizemethod', 'format_grid'));
+                } else {
+                    $checkboxname = get_string('resetimageresizemethod', 'format_grid').
                         $OUTPUT->help_icon('resetimageresizemethod', 'format_grid');
-                $resetelements[] = & $mform->createElement('checkbox', 'resetimageresizemethod', '', $checkboxname);
+                    $resetelements[] = & $mform->createElement('checkbox', 'resetimageresizemethod', '', $checkboxname);
+                }
             }
 
             if ($changeimagecontainerstyle) {
-                $checkboxname = get_string('resetimagecontainerstyle', 'format_grid') .
+                if ($this->bsfour) {
+                    $checkboxname = get_string('resetimagecontainerstyle', 'format_grid');
+                    $resetelements[] = & $mform->createElement('checkbox', 'resetimagecontainerstyle', '', $checkboxname);
+                    $resetelements[] = & $mform->createElement('html', $OUTPUT->help_icon('resetimagecontainerstyle', 'format_grid'));
+                } else {
+                    $checkboxname = get_string('resetimagecontainerstyle', 'format_grid').
                         $OUTPUT->help_icon('resetimagecontainerstyle', 'format_grid');
-                $resetelements[] = & $mform->createElement('checkbox', 'resetimagecontainerstyle', '', $checkboxname);
+                    $resetelements[] = & $mform->createElement('checkbox', 'resetimagecontainerstyle', '', $checkboxname);
+                }
             }
 
             if ($changesectiontitleoptions) {
-                $checkboxname = get_string('resetsectiontitleoptions', 'format_grid') .
+                if ($this->bsfour) {
+                    $checkboxname = get_string('resetsectiontitleoptions', 'format_grid');
+                    $resetelements[] = & $mform->createElement('checkbox', 'resetsectiontitleoptions', '', $checkboxname);
+                    $resetelements[] = & $mform->createElement('html', $OUTPUT->help_icon('resetsectiontitleoptions', 'format_grid'));
+                } else {
+                    $checkboxname = get_string('resetsectiontitleoptions', 'format_grid').
                         $OUTPUT->help_icon('resetsectiontitleoptions', 'format_grid');
-                $resetelements[] = & $mform->createElement('checkbox', 'resetsectiontitleoptions', '', $checkboxname);
+                    $resetelements[] = & $mform->createElement('checkbox', 'resetsectiontitleoptions', '', $checkboxname);
+                }
             }
         }
 
-        $checkboxname = get_string('resetnewactivity', 'format_grid').
-            $OUTPUT->help_icon('resetnewactivity', 'format_grid');
-        $resetelements[] = & $mform->createElement('checkbox', 'resetnewactivity', '', $checkboxname);
+        if ($this->bsfour) {
+            $checkboxname = get_string('resetnewactivity', 'format_grid');
+            $resetelements[] = & $mform->createElement('checkbox', 'resetnewactivity', '', $checkboxname);
+            $resetelements[] = & $mform->createElement('html', $OUTPUT->help_icon('resetnewactivity', 'format_grid'));
 
-        $checkboxname = get_string('resetfitpopup', 'format_grid').
-            $OUTPUT->help_icon('resetfitpopup', 'format_grid');
-        $resetelements[] = & $mform->createElement('checkbox', 'resepopup', '', $checkboxname);
+            $checkboxname = get_string('resetfitpopup', 'format_grid');
+            $resetelements[] = & $mform->createElement('checkbox', 'resetfitpopup', '', $checkboxname);
+            $resetelements[] = & $mform->createElement('html', $OUTPUT->help_icon('resetfitpopup', 'format_grid'));
+        } else {
+            $checkboxname = get_string('resetnewactivity', 'format_grid').
+                $OUTPUT->help_icon('resetnewactivity', 'format_grid');
+            $resetelements[] = & $mform->createElement('checkbox', 'resetnewactivity', '', $checkboxname);
+
+            $checkboxname = get_string('resetfitpopup', 'format_grid').
+                $OUTPUT->help_icon('resetfitpopup', 'format_grid');
+            $resetelements[] = & $mform->createElement('checkbox', 'resepopup', '', $checkboxname);
+        }
         $elements[] = $mform->addGroup($resetelements, 'resetgroup', get_string('resetgrp', 'format_grid'), null, false);
 
         if ($resetall) {
             $resetallelements = array();
 
-            $checkboxname = get_string('resetallimagecontaineralignment', 'format_grid').
-                $OUTPUT->help_icon('resetallimagecontaineralignment', 'format_grid');
-            $resetallelements[] = & $mform->createElement('checkbox', 'resetallimagecontaineralignment', '', $checkboxname);
+            if ($this->bsfour) {
+                $checkboxname = get_string('resetallimagecontaineralignment', 'format_grid');
+                $resetallelements[] = & $mform->createElement('checkbox', 'resetallimagecontaineralignment', '', $checkboxname);
+                $resetallelements[] = & $mform->createElement('html', $OUTPUT->help_icon('resetallimagecontaineralignment', 'format_grid'));
 
-            $checkboxname = get_string('resetallimagecontainernavigation', 'format_grid').
-                $OUTPUT->help_icon('resetallimagecontainernavigation', 'format_grid');
-            $resetallelements[] = & $mform->createElement('checkbox', 'resetallimagecontainernavigation', '', $checkboxname);
+                $checkboxname = get_string('resetallimagecontainernavigation', 'format_grid');
+                $resetallelements[] = & $mform->createElement('checkbox', 'resetallimagecontainernavigation', '', $checkboxname);
+                $resetallelements[] = & $mform->createElement('html', $OUTPUT->help_icon('resetallimagecontainernavigation', 'format_grid'));
 
-            $checkboxname = get_string('resetallimagecontainersize', 'format_grid').
-                $OUTPUT->help_icon('resetallimagecontainersize', 'format_grid');
-            $resetallelements[] = & $mform->createElement('checkbox', 'resetallimagecontainersize', '', $checkboxname);
+                $checkboxname = get_string('resetallimagecontainersize', 'format_grid');
+                $resetallelements[] = & $mform->createElement('checkbox', 'resetallimagecontainersize', '', $checkboxname);
+                $resetallelements[] = & $mform->createElement('html', $OUTPUT->help_icon('resetallimagecontainersize', 'format_grid'));
 
-            $checkboxname = get_string('resetallimageresizemethod', 'format_grid').
-                $OUTPUT->help_icon('resetallimageresizemethod', 'format_grid');
-            $resetallelements[] = & $mform->createElement('checkbox', 'resetallimageresizemethod', '', $checkboxname);
+                $checkboxname = get_string('resetallimageresizemethod', 'format_grid');
+                $resetallelements[] = & $mform->createElement('checkbox', 'resetallimageresizemethod', '', $checkboxname);
+                $resetallelements[] = & $mform->createElement('html', $OUTPUT->help_icon('resetallimageresizemethod', 'format_grid'));
 
-            $checkboxname = get_string('resetallimagecontainerstyle', 'format_grid').
-                $OUTPUT->help_icon('resetallimagecontainerstyle', 'format_grid');
-            $resetallelements[] = & $mform->createElement('checkbox', 'resetallimagecontainerstyle', '', $checkboxname);
+                $checkboxname = get_string('resetallimagecontainerstyle', 'format_grid');
+                $resetallelements[] = & $mform->createElement('checkbox', 'resetallimagecontainerstyle', '', $checkboxname);
+                $resetallelements[] = & $mform->createElement('html', $OUTPUT->help_icon('resetallimagecontainerstyle', 'format_grid'));
 
-            $checkboxname = get_string('resetallsectiontitleoptions', 'format_grid').
-                $OUTPUT->help_icon('resetallsectiontitleoptions', 'format_grid');
-            $resetallelements[] = & $mform->createElement('checkbox', 'resetallsectiontitleoptions', '', $checkboxname);
+                $checkboxname = get_string('resetallsectiontitleoptions', 'format_grid');
+                $resetallelements[] = & $mform->createElement('checkbox', 'resetallsectiontitleoptions', '', $checkboxname);
+                $resetallelements[] = & $mform->createElement('html', $OUTPUT->help_icon('resetallsectiontitleoptions', 'format_grid'));
 
-            $checkboxname = get_string('resetallnewactivity', 'format_grid').
-                $OUTPUT->help_icon('resetallnewactivity', 'format_grid');
-            $resetallelements[] = & $mform->createElement('checkbox', 'resetallnewactivity', '', $checkboxname);
+                $checkboxname = get_string('resetallnewactivity', 'format_grid');
+                $resetallelements[] = & $mform->createElement('checkbox', 'resetallnewactivity', '', $checkboxname);
+                $resetallelements[] = & $mform->createElement('html', $OUTPUT->help_icon('resetallnewactivity', 'format_grid'));
 
-            $checkboxname = get_string('resetallfitpopup', 'format_grid').
-                $OUTPUT->help_icon('resetallfitpopup', 'format_grid');
-            $resetallelements[] = & $mform->createElement('checkbox', 'resetallfitpopup', '', $checkboxname);
+                $checkboxname = get_string('resetallfitpopup', 'format_grid');
+                $resetallelements[] = & $mform->createElement('checkbox', 'resetallfitpopup', '', $checkboxname);
+                $resetallelements[] = & $mform->createElement('html', $OUTPUT->help_icon('resetallfitpopup', 'format_grid'));
+            } else {
+                $checkboxname = get_string('resetallimagecontaineralignment', 'format_grid').
+                    $OUTPUT->help_icon('resetallimagecontaineralignment', 'format_grid');
+                $resetallelements[] = & $mform->createElement('checkbox', 'resetallimagecontaineralignment', '', $checkboxname);
+
+                $checkboxname = get_string('resetallimagecontainernavigation', 'format_grid').
+                    $OUTPUT->help_icon('resetallimagecontainernavigation', 'format_grid');
+                $resetallelements[] = & $mform->createElement('checkbox', 'resetallimagecontainernavigation', '', $checkboxname);
+
+                $checkboxname = get_string('resetallimagecontainersize', 'format_grid').
+                    $OUTPUT->help_icon('resetallimagecontainersize', 'format_grid');
+                $resetallelements[] = & $mform->createElement('checkbox', 'resetallimagecontainersize', '', $checkboxname);
+
+                $checkboxname = get_string('resetallimageresizemethod', 'format_grid').
+                    $OUTPUT->help_icon('resetallimageresizemethod', 'format_grid');
+                $resetallelements[] = & $mform->createElement('checkbox', 'resetallimageresizemethod', '', $checkboxname);
+
+                $checkboxname = get_string('resetallimagecontainerstyle', 'format_grid').
+                    $OUTPUT->help_icon('resetallimagecontainerstyle', 'format_grid');
+                $resetallelements[] = & $mform->createElement('checkbox', 'resetallimagecontainerstyle', '', $checkboxname);
+
+                $checkboxname = get_string('resetallsectiontitleoptions', 'format_grid').
+                    $OUTPUT->help_icon('resetallsectiontitleoptions', 'format_grid');
+                $resetallelements[] = & $mform->createElement('checkbox', 'resetallsectiontitleoptions', '', $checkboxname);
+
+                $checkboxname = get_string('resetallnewactivity', 'format_grid').
+                    $OUTPUT->help_icon('resetallnewactivity', 'format_grid');
+                $resetallelements[] = & $mform->createElement('checkbox', 'resetallnewactivity', '', $checkboxname);
+
+                $checkboxname = get_string('resetallfitpopup', 'format_grid').
+                    $OUTPUT->help_icon('resetallfitpopup', 'format_grid');
+                $resetallelements[] = & $mform->createElement('checkbox', 'resetallfitpopup', '', $checkboxname);
+            }
 
             $elements[] = $mform->addGroup($resetallelements, 'resetallgroup', get_string('resetallgrp', 'format_grid'), null,
                 false);

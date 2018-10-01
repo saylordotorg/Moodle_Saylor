@@ -174,10 +174,10 @@ $expand-green-900:     #009400 !default;
 // Theme variables
 $primary:       $primary-light-blue !default;
 $secondary:     $primary-orange !default;
-$success:       $expand-green-500 !default;
-$info:          $expand-teal-500 !default;
+$success:       $expand-green-900 !default;
+$info:          $expand-teal-700 !default;
 $warning:       $expand-yellow-700 !default;
-$danger:        $expand-red-500 !default;
+$danger:        $expand-red-700 !default;
 $light:         $gray-100 !default;
 $dark:          $gray-600 !default;
 
@@ -218,6 +218,33 @@ $theme-colors: (
     dark: $dark
 );
 
+// Fonts
+@font-face {
+    font-family: 'Comfortaa';
+    src: url([[font:theme|Comfortaa-Regular.ttf]]) format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Open_Sans';
+    src: url([[font:theme|OpenSans-Regular.ttf]]) format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Raleway';
+    src: url([[font:theme|Raleway-Regular.ttf]]) format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+$font-family-sans-serif: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !default;
+$font-family-base: "Open_Sans", $font-family-sans-serif !default;
+$font-family-header: "Raleway", $font-family-sans-serif;
+$font-family-buttons: "Comfortaa", $font-family-sans-serif;
+
 // Import FontAwesome.
 @import "fontawesome";
 
@@ -234,6 +261,28 @@ $theme-colors: (
 
 body {
     -webkit-font-smoothing: antialiased;
+}
+
+h6 { font-family: $font-family-header;
+}
+
+h5 { font-family: $font-family-header;
+}
+
+h4 { font-family: $font-family-header;
+}
+
+h3 { font-family: $font-family-header;
+}
+
+h2 { font-family: $font-family-header;
+}
+
+h1 { font-family: $font-family-header;
+}
+
+.btn {
+    font-family: $font-family-buttons;
 }
 
 .filemanager-container,

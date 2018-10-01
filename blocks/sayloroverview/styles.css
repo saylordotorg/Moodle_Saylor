@@ -20,11 +20,10 @@
 }
 
 .block_sayloroverview .pagination .page-link:focus {
-	box-shadow: 0 !important;
+	box-shadow: none !important;
 }
 
 .block_sayloroverview a, a:visited {
-    color: inherit;
     text-decoration: none !important;
 }
 
@@ -41,4 +40,8 @@
     border-color: #cc5504 !important;
     color: white !important;
     border-radius: .25rem;
+}
+
+.block_sayloroverview .media-body h3 {
+    padding-bottom: .25rem;
 }

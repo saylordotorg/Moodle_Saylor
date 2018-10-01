@@ -8593,9 +8593,6 @@ a.dimmed_text:visited,
   #page-admin-report-backups-index .backup-unfinished[href]:focus, #page-admin-index .adminwarning.availableupdatesinfo .moodleupdateinfo.maturity50 .info.release[href]:focus {
     background-color: #c9302c; }
 
-.custom-select {
-  width: auto; }
-
 .fade.in {
   opacity: 1; }
 
@@ -9659,14 +9656,6 @@ body#page-lib-editor-tinymce-plugins-moodlemedia-preview {
 .path-rating .ratingtable td.time {
   white-space: nowrap;
   text-align: center; }
-
-.initialbarlabel {
-  display: inline-block;
-  width: 6em;
-  float: left;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap; }
 
 /* Moodle Dialogue Settings (moodle-core-dialogue)  */
 .moodle-dialogue-base .moodle-dialogue-lightbox {

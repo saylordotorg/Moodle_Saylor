@@ -53,5 +53,5 @@ $templatecontext = [
 ];
 
 $templatecontext['flatnavigation'] = $PAGE->flatnav;
-echo $OUTPUT->render_from_template('theme_saylor/columns2', $templatecontext);
+echo $OUTPUT->render_from_template('/columns2', $templatecontext);
 
