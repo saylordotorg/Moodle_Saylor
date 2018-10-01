@@ -45,3 +45,8 @@
 .block_sayloroverview .media-body h3 {
     padding-bottom: .25rem;
 }
+
+.block_sayloroverview img.empty-placeholder-image {
+    width: 30%;
+    min-width: 10rem;
+}
