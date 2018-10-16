@@ -383,8 +383,5 @@ $definitions = array(
         'simplekeys' => true,
         'simpledata' => true,
         'ttl' => 1800,
-        'invalidationevents' => array(
-            'createduser',
-        )
     ),
 );

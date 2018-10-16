@@ -76,6 +76,8 @@ $string['dataprivacy:downloadownrequest'] = 'Download your own exported data';
 $string['dataprivacy:downloadallrequests'] = 'Download exported data for everyone';
 $string['dataregistry'] = 'Data registry';
 $string['dataregistryinfo'] = 'The data registry enables categories (types of data) and purposes (the reasons for processing data) to be set for all content on the site - from users and courses down to activities and blocks. For each purpose, a retention period may be set. When a retention period has expired, the data is flagged and listed for deletion, awaiting admin confirmation.';
+$string['dataretentionexplanation'] = 'This summary shows the default categories and purposes for retaining user\'s information on this system. Certain areas of the system may have more specific categories and purposes than those listed here.';
+$string['dataretentionsummary'] = 'Data retention summary';
 $string['datarequestcreatedforuser'] = 'Data request created for {$a}';
 $string['datarequestemailsubject'] = 'Data request: {$a}';
 $string['datarequests'] = 'Data requests';
@@ -244,6 +246,15 @@ $string['requesttypeexport'] = 'Export all of my personal data';
 $string['requesttypeexportshort'] = 'Export';
 $string['requesttypeothers'] = 'General inquiry';
 $string['requesttypeothersshort'] = 'Message';
+$string['requireallenddatesforuserdeletion'] = 'Consider courses without end date as active';
+$string['requireallenddatesforuserdeletion_desc'] = 'When calculating user expiry, several factors are considered:
+
+* the user\'s last login time is compared against the retention period for users; and
+* whether the user is actively enrolled in any courses.
+
+When checking the active enrolment of a corse, if the course has no end date then this setting is used to determine whether that course is considered active or not.
+
+If the course has no end date, and this setting is enabled, then the user cannot be deleted.';
 $string['requiresattention'] = 'Requires attention.';
 $string['requiresattentionexplanation'] = 'This plugin does not implement the Moodle privacy API. If this plugin stores any personal data it will not be able to be exported or deleted through Moodle\'s privacy system.';
 $string['resultdeleted'] = 'You recently requested to have your account and personal data in {$a} to be deleted. This process has been completed and you will no longer be able to log in.';
@@ -274,6 +285,7 @@ $string['statuspending'] = 'Pending';
 $string['statusrejected'] = 'Rejected';
 $string['subjectscope'] = 'Subject scope';
 $string['subjectscope_help'] = 'The subject scope lists the roles which may be assigned in this context.';
+$string['summary'] = 'Registry configuration summary';
 $string['user'] = 'User';
 $string['viewrequest'] = 'View the request';
 $string['visible'] = 'Expand all';
