@@ -18,12 +18,14 @@
  * Theme version info
  *
  * @package   theme_saylor
- * @copyright 2012
+ * @copyright 2018
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die;
 
-$plugin->version   = 2017060900;
-$plugin->requires  = 2014110400;
 $plugin->component = 'theme_saylor';
+$plugin->version   = 2018101800;
+$plugin->maturity = MATURITY_STABLE;
+$plugin->requires  = 2018051300;
+$plugin->dependencies = ['theme_boost' => '2018051300'];

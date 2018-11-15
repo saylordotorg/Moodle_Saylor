@@ -58,7 +58,6 @@ class format_grid extends format_base {
        17 => '17', 18 => '18', 19 => '19', 20 => '20', 21 => '21', 22 => '22', 23 => '23', 24 => '24');
     private $settings;
     private $section0attop = null; // Boolean to state if section zero is at the top (true) or in the grid (false), if null then uninitialized.
-    private $bsfour = false;
 
     /**
      * Creates a new instance of class
@@ -75,15 +74,6 @@ class format_grid extends format_base {
             $courseid = $COURSE->id;  // Save lots of global $COURSE as we will never be the site course.
         }
         parent::__construct($format, $courseid);
-
-        global $PAGE;
-        if (strcmp($PAGE->theme->name, 'boost') === 0) {
-            $this->bsfour = true;
-        } else if (!empty($PAGE->theme->parents)) {
-            if (in_array('boost', $PAGE->theme->parents) === true) {
-                $this->bsfour = true;
-            }
-        }
     }
 
     /**
@@ -1177,7 +1167,7 @@ class format_grid extends format_base {
      * @return array array of references to the added form elements.
      */
     public function create_edit_form_elements(&$mform, $forsection = false) {
-        global $CFG, $COURSE, $OUTPUT, $USER;
+        global $CFG, $COURSE, $OUTPUT, $PAGE, $USER;
         MoodleQuickForm::registerElementType('gfcolourpopup', "$CFG->dirroot/course/format/grid/js/gf_colourpopup.php",
                 'MoodleQuickForm_gfcolourpopup');
 
@@ -1210,6 +1200,15 @@ class format_grid extends format_base {
         $elements[] = $mform->addElement('header', 'gfreset', get_string('gfreset', 'format_grid'));
         $mform->addHelpButton('gfreset', 'gfreset', 'format_grid', '', true);
 
+        $bsfour = false;
+        if (strcmp($PAGE->theme->name, 'boost') === 0) {
+            $bsfour = true;
+        } else if (!empty($PAGE->theme->parents)) {
+            if (in_array('boost', $PAGE->theme->parents) === true) {
+                $bsfour = true;
+            }
+        }
+
         $resetelements = array();
 
         if (($changeimagecontaineralignment) ||
@@ -1220,7 +1219,7 @@ class format_grid extends format_base {
             ($changesectiontitleoptions)) {
 
             if ($changeimagecontaineralignment) {
-                if ($this->bsfour) {
+                if ($bsfour) {
                     $checkboxname = get_string('resetimagecontaineralignment', 'format_grid');
                     $resetelements[] = & $mform->createElement('checkbox', 'resetimagecontaineralignment', '', $checkboxname);
                     $resetelements[] = & $mform->createElement('html', $OUTPUT->help_icon('resetimagecontaineralignment', 'format_grid'));
@@ -1232,7 +1231,7 @@ class format_grid extends format_base {
             }
 
             if ($changeimagecontainernavigation) {
-                if ($this->bsfour) {
+                if ($bsfour) {
                     $checkboxname = get_string('resetimagecontainernavigation', 'format_grid');
                     $resetelements[] = & $mform->createElement('checkbox', 'resetimagecontainernavigation', '', $checkboxname);
                     $resetelements[] = & $mform->createElement('html', $OUTPUT->help_icon('resetimagecontainernavigation', 'format_grid'));
@@ -1244,7 +1243,7 @@ class format_grid extends format_base {
             }
 
             if ($changeimagecontainersize) {
-                if ($this->bsfour) {
+                if ($bsfour) {
                     $checkboxname = get_string('resetimagecontainersize', 'format_grid');
                     $resetelements[] = & $mform->createElement('checkbox', 'resetimagecontainersize', '', $checkboxname);
                     $resetelements[] = & $mform->createElement('html', $OUTPUT->help_icon('resetimagecontainersize', 'format_grid'));
@@ -1256,7 +1255,7 @@ class format_grid extends format_base {
             }
 
             if ($changeimageresizemethod) {
-                if ($this->bsfour) {
+                if ($bsfour) {
                     $checkboxname = get_string('resetimageresizemethod', 'format_grid');
                     $resetelements[] = & $mform->createElement('checkbox', 'resetimageresizemethod', '', $checkboxname);
                     $resetelements[] = & $mform->createElement('html', $OUTPUT->help_icon('resetimageresizemethod', 'format_grid'));
@@ -1268,7 +1267,7 @@ class format_grid extends format_base {
             }
 
             if ($changeimagecontainerstyle) {
-                if ($this->bsfour) {
+                if ($bsfour) {
                     $checkboxname = get_string('resetimagecontainerstyle', 'format_grid');
                     $resetelements[] = & $mform->createElement('checkbox', 'resetimagecontainerstyle', '', $checkboxname);
                     $resetelements[] = & $mform->createElement('html', $OUTPUT->help_icon('resetimagecontainerstyle', 'format_grid'));
@@ -1280,7 +1279,7 @@ class format_grid extends format_base {
             }
 
             if ($changesectiontitleoptions) {
-                if ($this->bsfour) {
+                if ($bsfour) {
                     $checkboxname = get_string('resetsectiontitleoptions', 'format_grid');
                     $resetelements[] = & $mform->createElement('checkbox', 'resetsectiontitleoptions', '', $checkboxname);
                     $resetelements[] = & $mform->createElement('html', $OUTPUT->help_icon('resetsectiontitleoptions', 'format_grid'));
@@ -1292,7 +1291,7 @@ class format_grid extends format_base {
             }
         }
 
-        if ($this->bsfour) {
+        if ($bsfour) {
             $checkboxname = get_string('resetnewactivity', 'format_grid');
             $resetelements[] = & $mform->createElement('checkbox', 'resetnewactivity', '', $checkboxname);
             $resetelements[] = & $mform->createElement('html', $OUTPUT->help_icon('resetnewactivity', 'format_grid'));
@@ -1314,7 +1313,7 @@ class format_grid extends format_base {
         if ($resetall) {
             $resetallelements = array();
 
-            if ($this->bsfour) {
+            if ($bsfour) {
                 $checkboxname = get_string('resetallimagecontaineralignment', 'format_grid');
                 $resetallelements[] = & $mform->createElement('checkbox', 'resetallimagecontaineralignment', '', $checkboxname);
                 $resetallelements[] = & $mform->createElement('html', $OUTPUT->help_icon('resetallimagecontaineralignment', 'format_grid'));
@@ -2248,7 +2247,7 @@ class format_grid extends format_base {
         return $sectionimage;  // So that the caller can know the new value of displayedimageindex.
     }
 
-    public function output_section_image($section, $sectionname, $sectionimage, $contextid, $thissection, $gridimagepath) {
+    public function output_section_image($section, $sectionname, $sectionimage, $contextid, $thissection, $gridimagepath, $output) {
         $content = '';
         if (is_object($sectionimage) && ($sectionimage->displayedimageindex > 0)) {
             $imgurl = moodle_url::make_pluginfile_url(
@@ -2261,7 +2260,7 @@ class format_grid extends format_base {
                 'role' => 'img',
                 'aria-label' => $sectionname));
         } else if ($section == 0) {
-            $imgurl = $this->output->image_url('info', 'format_grid');
+            $imgurl = $output->image_url('info', 'format_grid');
             $content = html_writer::empty_tag('img', array(
                 'src' => $imgurl,
                 'alt' => $sectionname,

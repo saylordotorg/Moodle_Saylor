@@ -1,7 +1,17 @@
 # CHANGE HISTORY
 
-### 6 October 2018. 3.5.2
+### 29 October 2018. 3.5.3
 
+ * Bug fix: installing CodeRunner on Moodle 3.5 with error debug messages
+   enabled resulted in messages "Error: mdb->get_record() found more than one record!"
+   when browsing the question bank. Alternatively, if CodeRunner was
+   installed on a freshly built Moodle 3.5, the CR_PROTOTYPES category
+   became a proxy for the Top category in the system category and its name
+   was hidden.
+
+### 18 October 2018. 3.5.2+
+
+* Fix broken PHP question type and add test cases for it.
 * Fix GraphUI plugin to prevent new arcs from exactly overlying old ones
 * Bug fix: nodejs question type not working with strict mode. Also,
   renamed question type from nodejs-2 to just nodejs (as it used to be).

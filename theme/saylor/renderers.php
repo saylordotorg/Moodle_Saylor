@@ -26,339 +26,226 @@
 defined('MOODLE_INTERNAL') || die();
 
 // course renderer
+require_once($CFG->dirroot . "/theme/boost/classes/output/core_renderer.php");
 require_once($CFG->dirroot . "/course/renderer.php");
-require_once($CFG->dirroot . "/completion/completion_completion.php");
 
-class theme_saylor_core_renderer extends core_renderer
+class theme_saylor_core_renderer extends theme_boost\output\core_renderer
 {
-
-    /**
-     * Return the standard string that says whether you are logged in (and switched
-     * roles/logged in as another user).
-     * @param bool $withlinks if false, then don't include any links in the HTML produced.
-     * If not set, the default is the nologinlinks option from the theme config.php file,
-     * and if that is not set, then links are included.
+   /**
+     * Override the standard boost user menu construction in order to use some 
+     * custom greetings.
+     *
+     * Construct a user menu, returning HTML that can be echoed out by a
+     * layout file.
+     *
+     * @param stdClass $user A user object, usually $USER.
+     * @param bool $withlinks true if a dropdown should be built.
      * @return string HTML fragment.
      */
-    public function login_info($withlinks = null) {
-        global $USER, $CFG, $DB, $SESSION;
+    public function user_menu($user = null, $withlinks = null) {
+        global $USER, $CFG;
+        require_once($CFG->dirroot . '/user/lib.php');
 
-        if (during_initial_install()) {
-            return '';
+        if (is_null($user)) {
+            $user = $USER;
         }
 
+        // Note: this behaviour is intended to match that of core_renderer::login_info,
+        // but should not be considered to be good practice; layout options are
+        // intended to be theme-specific. Please don't copy this snippet anywhere else.
         if (is_null($withlinks)) {
             $withlinks = empty($this->page->layout_options['nologinlinks']);
         }
 
-        $course = $this->page->course;
-        if (\core\session\manager::is_loggedinas()) {
-            $realuser = \core\session\manager::get_realuser();
-            $fullname = fullname($realuser, true);
-            if ($withlinks) {
-                $loginastitle = get_string('loginas');
-                $realuserinfo = " [<a href=\"$CFG->wwwroot/course/loginas.php?id=$course->id&amp;sesskey=".sesskey()."\"";
-                $realuserinfo .= "title =\"".$loginastitle."\">$fullname</a>] ";
-            } else {
-                $realuserinfo = " [$fullname] ";
-            }
-        } else {
-            $realuserinfo = '';
+        // Add a class for when $withlinks is false.
+        $usermenuclasses = 'usermenu';
+        if (!$withlinks) {
+            $usermenuclasses .= ' withoutlinks';
+        }
+
+        $returnstr = "";
+
+        // If during initial install, return the empty return string.
+        if (during_initial_install()) {
+            return $returnstr;
         }
 
         $loginpage = $this->is_login_page();
         $loginurl = get_login_url();
+        // If not logged in, show the typical not-logged-in string.
+        if (!isloggedin()) {
+            $returnstr = get_string('loggedinnotgreeting', 'theme_saylor');
+            if (!$loginpage) {
+                $returnstr .= " <a href=\"$loginurl\">".get_string('logintext', 'theme_saylor').'</a>';
+            }
+            return html_writer::div(
+                html_writer::span(
+                    $returnstr,
+                    'login'
+                ),
+                $usermenuclasses
+            );
 
-        if (empty($course->id)) {
-            // $course->id is not defined during installation
-            return '';
-        } else if (isloggedin()) {
-            $context = context_course::instance($course->id);
+        }
 
-            $fullname = fullname($USER, true);
-            // Since Moodle 2.0 this link always goes to the public profile page (not the course profile page)
-            if ($withlinks) {
-                $linktitle = get_string('viewprofile');
-                $username = "<a href=\"$CFG->wwwroot/user/profile.php?id=$USER->id\" title=\"$linktitle\">$fullname</a>";
-            } else {
-                $username = $fullname;
-            }
-            if (is_mnet_remote_user($USER) and $idprovider = $DB->get_record('mnet_host', array('id' => $USER->mnethostid))) {
-                if ($withlinks) {
-                    $username .= " from <a href=\"{$idprovider->wwwroot}\">{$idprovider->name}</a>";
-                } else {
-                    $username .= " from {$idprovider->name}";
-                }
-            }
-            if (isguestuser()) {
-                $loggedinas = get_string('loggedinnotgreeting', 'theme_saylor');
-                if (!$loginpage && $withlinks) {
-                    $loggedinas .= " <a href=\"$loginurl\">".get_string('logintext', 'theme_saylor').'</a>';
-                }
-            } else if (is_role_switched($course->id)) { // Has switched roles
-                $rolename = '';
-                if ($role = $DB->get_record('role', array('id' => $USER->access['rsw'][$context->path]))) {
-                    $rolename = ': '.role_get_name($role, $context);
-                }
-                $loggedinas = get_string('loggedinas', 'moodle', $username).$rolename;
-                if ($withlinks) {
-                    $url = new moodle_url('/course/switchrole.php', array('id' => $course->id, 'sesskey' => sesskey(), 'switchrole' => 0, 'returnurl' => $this->page->url->out_as_local_url(false)));
-                    $loggedinas .= ' '.html_writer::tag('a', get_string('switchrolereturn'), array('href' => $url)).'';
-                }
-            } else {
-                $loggedinas = $realuserinfo.get_string('loggedingreeting', 'theme_saylor', $username);
-                if ($withlinks) {
-                    $loggedinas .= " | <a href=\"$CFG->wwwroot/login/logout.php?sesskey=".sesskey()."\">".get_string('logouttext', 'theme_saylor').'</a>';
-                }
-            }
-        } else {
-            $loggedinas = get_string('loggedinnotgreeting', 'theme_saylor');
+        // If logged in as a guest user, show a string to that effect.
+        if (isguestuser()) {
+            $returnstr = get_string('loggedinnotgreeting', 'theme_saylor');
             if (!$loginpage && $withlinks) {
-                $loggedinas .= " <a href=\"$loginurl\">".get_string('logintext', 'theme_saylor').'</a>';
-            }
-        }
-
-        $loggedinas = '<div class="logininfo">'.$loggedinas.'</div>';
-
-        if (isset($SESSION->justloggedin)) {
-            unset($SESSION->justloggedin);
-            if (!empty($CFG->displayloginfailures)) {
-                if (!isguestuser()) {
-                    // Include this file only when required.
-                    require_once($CFG->dirroot . '/user/lib.php');
-                    if ($count = user_count_login_failures($USER)) {
-                        $loggedinas .= '<div class="loginfailures">';
-                        $a = new stdClass();
-                        $a->attempts = $count;
-                        $loggedinas .= get_string('failedloginattempts', '', $a);
-                        if (file_exists("$CFG->dirroot/report/log/index.php") and has_capability('report/log:view', context_system::instance())) {
-                            $loggedinas .= ' ('.html_writer::link(new moodle_url('/report/log/index.php', array('chooselog' => 1,
-                                    'id' => 0 , 'modid' => 'site_errors')), get_string('logs')).')';
-                        }
-                        $loggedinas .= '</div>';
-                    }
-                }
-            }
-        }
-
-        return $loggedinas;
-    }
-
-    /*
-     * This renders the navbar.
-     * Uses bootstrap compatible html.
-     */
-    public function navbar() {
-        $items = $this->page->navbar->get_items();
-        $breadcrumbs = array();
-        foreach ($items as $item) {
-            $item->hideicon = true;
-            $breadcrumbs[] = $this->render($item);
-        }
-        $divider = '<span class="divider">/</span>';
-        $listitems = '<li>'.join(" $divider</li><li>", $breadcrumbs).'</li>';
-        $title = '<span class="accesshide">'.get_string('pagepath').'</span>';
-        return $title . "<ul class=\"breadcrumb\">$listitems</ul>";
-    }
-
-    /*
-     * Overriding the custom_menu function ensures the custom menu is
-     * always shown, even if no menu items are configured in the global
-     * theme settings page.
-     */
-    public function custom_menu($custommenuitems = '') {
-        global $CFG;
-
-        if (!empty($CFG->custommenuitems)) {
-            $custommenuitems .= $CFG->custommenuitems;
-        }
-        $custommenu = new custom_menu($custommenuitems, current_language());
-        return $this->render_custom_menu($custommenu);
-    }
-
-    /*
-     * This renders the bootstrap top menu.
-     *
-     * This renderer is needed to enable the Bootstrap style navigation.
-     */
-    protected function render_custom_menu(custom_menu $menu) {
-        global $CFG, $USER;
-
-        // $branchurlb   = new moodle_url('/');
-        // $branch = $menu->add("<i class='fa fa-home'></i>", $branchurlb, "title", -10000);
-
-        if (isloggedin() && !isguestuser()) {
-               $mycoursetitle = "My Courses";
-                 $branchtitle = "My Courses";
-               $branchlabel = ''.$branchtitle;
-            $branchurl   = new moodle_url('/my/index.php');
-            $branchsort  = 10000;
-
-            $branch = $menu->add($branchlabel, $branchurl, $branchtitle, $branchsort);
-            if ($courses = enrol_get_my_courses(null, 'fullname ASC')) {
-                foreach ($courses as $course) {
-                    // Setting up params array for completion_completion object
-                    $params = array (
-                    'userid' => $USER->id,
-                    'course' => $course->id
-                               );
-
-                           // Create completion_completion object; will use to check whether the course is completed before adding to the menu.
-                           $ccompletion = new completion_completion($params);
-
-                           // Only add course to menu if course is not completed and is visible.
-                    if ($course->visible && !$ccompletion->is_complete()) {
-                            $branch->add(format_string($course->fullname), new moodle_url('/course/view.php?id='.$course->id), format_string($course->shortname));
-                    }
-                }
-            } else {
-                  $noenrolments = get_string('noenrolments', 'theme_saylor');
-                $branch->add('<em>'.$noenrolments.'</em>', new moodle_url('/'), $noenrolments);
-            }
-        }
-
-        // TODO: eliminate this duplicated logic, it belongs in core, not
-        // here. See MDL-39565.
-        $addlangmenu = true;
-        $langs = get_string_manager()->get_list_of_translations();
-        if (count($langs) < 2
-            or empty($CFG->langmenu)
-            or ($this->page->course != SITEID and !empty($this->page->course->lang))
-        ) {
-            $addlangmenu = false;
-        }
-
-        if (!$menu->has_children() && $addlangmenu === false) {
-            return '';
-        }
-
-        $content = '<ul class="nav">';
-        foreach ($menu->get_children() as $item) {
-            $content .= $this->render_custom_menu_item($item, 1);
-        }
-
-        return $content.'</ul>';
-    }
-
-    /*
-     * This code renders the custom menu items for the
-     * bootstrap dropdown menu.
-     */
-    protected function render_custom_menu_item(custom_menu_item $menunode, $level = 0) {
-        static $submenucount = 0;
-
-        if ($menunode->has_children()) {
-            if ($level == 1) {
-                $class = 'dropdown';
-            } else {
-                $class = 'dropdown-submenu';
+                $returnstr .= " <a href=\"$loginurl\">".get_string('logintext', 'theme_saylor').'</a>';
             }
 
-            $content = html_writer::start_tag('li', array('class' => $class));
-            // If the child has menus render it as a sub menu.
-            $submenucount++;
-            if ($menunode->get_url() !== null) {
-                $url = $menunode->get_url();
-            } else {
-                $url = '#cm_submenu_'.$submenucount;
-            }
-            $content .= html_writer::start_tag('a', array('href' => $url, 'class' => 'dropdown-toggle', 'data-toggle' => 'dropdown', 'title' => $menunode->get_title()));
-            $content .= $menunode->get_text();
-            if ($level == 1) {
-                $content .= '<i class="fa fa-caret-down"></i>';
-            }
-            $content .= '</a>';
-            $content .= '<ul class="dropdown-menu">';
-            foreach ($menunode->get_children() as $menunode) {
-                $content .= $this->render_custom_menu_item($menunode, 0);
-            }
-            $content .= '</ul>';
-        } else {
-            $content = '<li>';
-            // The node doesn't have children so produce a final menuitem.
-            if ($menunode->get_url() !== null) {
-                $url = $menunode->get_url();
-            } else {
-                $url = '#';
-            }
-            $content .= html_writer::link($url, $menunode->get_text(), array('title' => $menunode->get_title()));
+            return html_writer::div(
+                html_writer::span(
+                    $returnstr,
+                    'login'
+                ),
+                $usermenuclasses
+            );
         }
-        return $content;
-    }
 
-    /**
-     * Renders tabtree
-     *
-     * @param  tabtree $tabtree
-     * @return string
-     */
-    protected function render_tabtree(tabtree $tabtree) {
-        if (empty($tabtree->subtree)) {
-            return '';
+        // Get some navigation opts.
+        $opts = user_get_user_navigation_info($user, $this->page);
+
+        $avatarclasses = "avatars";
+        $avatarcontents = html_writer::span($opts->metadata['useravatar'], 'avatar current');
+        $usertextcontents = get_string('loggedingreeting', 'theme_saylor', $opts->metadata['userfullname']);
+
+        // Other user.
+        if (!empty($opts->metadata['asotheruser'])) {
+            $avatarcontents .= html_writer::span(
+                $opts->metadata['realuseravatar'],
+                'avatar realuser'
+            );
+            $usertextcontents = $opts->metadata['realuserfullname'];
+            $usertextcontents .= html_writer::tag(
+                'span',
+                get_string(
+                    'loggedinas',
+                    'moodle',
+                    html_writer::span(
+                        $opts->metadata['userfullname'],
+                        'value'
+                    )
+                ),
+                array('class' => 'meta viewingas')
+            );
         }
-        $firstrow = $secondrow = '';
-        foreach ($tabtree->subtree as $tab) {
-            $firstrow .= $this->render($tab);
-            if (($tab->selected || $tab->activated) && !empty($tab->subtree) && $tab->subtree !== array()) {
-                $secondrow = $this->tabtree($tab->subtree);
-            }
+
+        // Role.
+        if (!empty($opts->metadata['asotherrole'])) {
+            $role = core_text::strtolower(preg_replace('#[ ]+#', '-', trim($opts->metadata['rolename'])));
+            $usertextcontents .= html_writer::span(
+                $opts->metadata['rolename'],
+                'meta role role-' . $role
+            );
         }
-        return html_writer::tag('ul', $firstrow, array('class' => 'nav nav-tabs')) . $secondrow;
-    }
 
-    /**
-     * Renders tabobject (part of tabtree)
-     *
-     * This function is called from {@link core_renderer::render_tabtree()}
-     * and also it calls itself when printing the $tabobject subtree recursively.
-     *
-     * @param  tabobject $tabobject
-     * @return string HTML fragment
-     */
-    protected function render_tabobject(tabobject $tab) {
-        if ($tab->selected or $tab->activated) {
-            return html_writer::tag('li', html_writer::tag('a', $tab->text), array('class' => 'active'));
-        } else if ($tab->inactive) {
-            return html_writer::tag('li', html_writer::tag('a', $tab->text), array('class' => 'disabled'));
-        } else {
-            if (!($tab->link instanceof moodle_url)) {
-                // backward compartibility when link was passed as quoted string
-                $link = "<a href=\"$tab->link\" title=\"$tab->title\">$tab->text</a>";
-            } else {
-                $link = html_writer::link($tab->link, $tab->text, array('title' => $tab->title));
-            }
-            return html_writer::tag('li', $link);
+        // User login failures.
+        if (!empty($opts->metadata['userloginfail'])) {
+            $usertextcontents .= html_writer::span(
+                $opts->metadata['userloginfail'],
+                'meta loginfailures'
+            );
         }
-    }
 
+        // MNet.
+        if (!empty($opts->metadata['asmnetuser'])) {
+            $mnet = strtolower(preg_replace('#[ ]+#', '-', trim($opts->metadata['mnetidprovidername'])));
+            $usertextcontents .= html_writer::span(
+                $opts->metadata['mnetidprovidername'],
+                'meta mnet mnet-' . $mnet
+            );
+        }
 
-    public function saylorblocks($region, $classes = array(), $tag = 'aside') {
-        $classes = (array)$classes;
-        $classes[] = 'block-region';
-        $attributes = array(
-            'id' => 'block-region-'.preg_replace('#[^a-zA-Z0-9_\-]+#', '-', $region),
-            'class' => join(' ', $classes),
-            'data-blockregion' => $region,
-            'data-droptarget' => '1'
+        $returnstr .= html_writer::span(
+            html_writer::span($usertextcontents, 'usertext') .
+            html_writer::span($avatarcontents, $avatarclasses),
+            'userbutton'
         );
-        return html_writer::tag($tag, $this->blocks_for_region($region), $attributes);
+
+        // Create a divider (well, a filler).
+        $divider = new action_menu_filler();
+        $divider->primary = false;
+
+        $am = new action_menu();
+        $am->set_menu_trigger(
+            $returnstr
+        );
+        $am->set_alignment(action_menu::TR, action_menu::BR);
+        $am->set_nowrap_on_items();
+        if ($withlinks) {
+            $navitemcount = count($opts->navitems);
+            $idx = 0;
+            foreach ($opts->navitems as $key => $value) {
+
+                switch ($value->itemtype) {
+                    case 'divider':
+                        // If the nav item is a divider, add one and skip link processing.
+                        $am->add($divider);
+                        break;
+
+                    case 'invalid':
+                        // Silently skip invalid entries (should we post a notification?).
+                        break;
+
+                    case 'link':
+                        // Process this as a link item.
+                        $pix = null;
+                        if (isset($value->pix) && !empty($value->pix)) {
+                            $pix = new pix_icon($value->pix, $value->title, null, array('class' => 'iconsmall'));
+                        } else if (isset($value->imgsrc) && !empty($value->imgsrc)) {
+                            $value->title = html_writer::img(
+                                $value->imgsrc,
+                                $value->title,
+                                array('class' => 'iconsmall')
+                            ) . $value->title;
+                        }
+
+                        $al = new action_menu_link_secondary(
+                            $value->url,
+                            $pix,
+                            $value->title,
+                            array('class' => 'icon')
+                        );
+                        if (!empty($value->titleidentifier)) {
+                            $al->attributes['data-title'] = $value->titleidentifier;
+                        }
+                        $am->add($al);
+                        break;
+                }
+
+                $idx++;
+
+                // Add dividers after the first item and before the last item.
+                if ($idx == 1 || $idx == $navitemcount - 1) {
+                    $am->add($divider);
+                }
+            }
+        }
+
+        return html_writer::div(
+            $this->render($am),
+            $usermenuclasses
+        );
     }
 
     /*
-    * This code shows an enroll button in main course view to logged in user or Login/sign up link when suer is not logged in.
+    * This code shows an enroll button in main course view to logged in user or Login/sign up link when user is not logged in.
     */
     public function saylor_custom_enroll_button() {
         global $COURSE, $PAGE;
-
-        // show nothing if user is already on enroll page.
+        // Show nothing if the page layout is not course or incourse.
+        if (!($PAGE->pagelayout == 'course' || $PAGE->pagelayout == 'incourse')) {
+            return "";
+        }
+        // Show nothing if user is already on enroll page.
         if ($PAGE->pagetype == 'enrol-index') {
                 return "";
         }
-
         $output = html_writer::start_tag('div', array('id' => 'enroll-button-container', 'class' => 'enroll-container'));
         $output .= html_writer::start_tag('div', array('id' => 'main-enroll-button', 'class' => 'center-block'));
         $coursecontext = context_course::instance($COURSE->id);
-
         if (isguestuser() || !isloggedin()) {
             $link = new moodle_url('/login/index.php');
             $output .= get_string('loginorsignupmessage', 'theme_saylor', $link->out());
@@ -366,40 +253,32 @@ class theme_saylor_core_renderer extends core_renderer
             $link = new moodle_url('/enrol/index.php', array('id' => $COURSE->id));
             $output .= $this->single_button($link->out(), get_string('enrolme', 'core_enrol'));
         };
-
         // Adding div that closes the main-enroll-button or the login/signup message.
         $output .= html_writer::end_tag('div');
-
         // Adding div that closes the enroll-button-container.
         $output .= html_writer::end_tag('div');
-
         return $output;
     }
-
 }
 
-class theme_saylor_core_course_renderer extends core_course_renderer
+class theme_saylor_core_course_renderer extends \core_course_renderer
 {
            // Change searchcriteria to only focus on courses from category 2.
     protected function coursecat_courses(coursecat_helper $chelper, $courses, $totalcount = null) {
         global $CFG;
-
         // New array with filtered courses.
         $coursestorender = array();
-
         // First, create whitelist of courses in cat 2.
         $options['recursive'] = true;
         $options['coursecontacts'] = false;
         $options['summary'] = false;
         $options['sort']['idnumber'] = 1;
-
         $cat2courselist = coursecat::get(2)->get_courses($options);
         // Check all courses and put those with id 2 in whitelist.
         foreach ($cat2courselist as $cat2course) {
             $id = $cat2course->__get('id');
             $cat2courses[$id] = $id;
         }
-
         // Get list of courses and check if each course is in category 2.
         foreach ($courses as $course) {
             $courseisincat2 = false; // False = 0
@@ -410,16 +289,13 @@ class theme_saylor_core_course_renderer extends core_course_renderer
                     break;
                 }
             }
-
             // If you are an admin you can see everything otherwise you see only courses in cat 2.
             if ($courseisincat2 == false && !is_siteadmin()) {
                 continue;
             }
-
             // Add filtered courses from whitelist into a new array.
             $coursestorender[] = $course;
         }
-
         if ($totalcount === null) {
             $totalcount = count($coursestorender);
         }
@@ -427,7 +303,6 @@ class theme_saylor_core_course_renderer extends core_course_renderer
             // Courses count is cached during courses retrieval.
             return '';
         }
-
         if ($chelper->get_show_courses() == self::COURSECAT_SHOW_COURSES_AUTO) {
             // In 'auto' course display mode we analyse if number of courses is more or less than $CFG->courseswithsummarieslimit.
             if ($totalcount <= $CFG->courseswithsummarieslimit) {
@@ -436,7 +311,6 @@ class theme_saylor_core_course_renderer extends core_course_renderer
                 $chelper->set_show_courses(self::COURSECAT_SHOW_COURSES_COLLAPSED);
             }
         }
-
         // Prepare content of paging bar if it is needed.
         $paginationurl = $chelper->get_courses_display_option('paginationurl');
         $paginationallowall = $chelper->get_courses_display_option('paginationallowall');
@@ -463,17 +337,13 @@ class theme_saylor_core_course_renderer extends core_course_renderer
             $pagingbar = html_writer::tag('div', html_writer::link($paginationurl->out(false, array('perpage' => $CFG->coursesperpage)),
                 get_string('showperpage', '', $CFG->coursesperpage)), array('class' => 'paging paging-showperpage'));
         }
-
         // Display list of courses.
         $attributes = $chelper->get_and_erase_attributes('courses');
         $content = html_writer::start_tag('div', $attributes);
-
         if (!empty($pagingbar)) {
             $content .= $pagingbar;
         }
-
         $coursecount = 0;
-
         // Renders each course that we want rendered.
         foreach ($coursestorender as $course) {
             $classes = ($coursecount % 2) ? 'odd' : 'even';
@@ -486,14 +356,12 @@ class theme_saylor_core_course_renderer extends core_course_renderer
             $content .= $this->coursecat_coursebox($chelper, $course, $classes);
             $coursecount += 1;
         }
-
         if (!empty($pagingbar)) {
             $content .= $pagingbar;
         }
         if (!empty($morelink)) {
             $content .= $morelink;
         }
-
         $content .= html_writer::end_tag('div'); // .courses
         return $content;
     }
