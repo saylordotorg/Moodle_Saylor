@@ -311,7 +311,7 @@ def CopyDatabase(mysql_user, mysql_password, mysql_source_host, mysql_source_dbn
         sh "mysql -h ${mysql_dest_host} -u ${mysql_user} --password=${mysql_password} --execute=\"drop database ${mysql_dest_dbname}\""
         sh "mysql -h ${mysql_dest_host} -u ${mysql_user} --password=${mysql_password} --execute=\"create database ${mysql_dest_dbname}\""
         // Piping output of dump directly to mysql to increase speed of transfer. 
-        sh "mysqldump --single-transaction --host ${mysql_source_host} -u ${mysql_user} --password=${mysql_password} ${mysql_source_dbname} --ignore-table=mdl_logstore_standard_log | mysql -h ${mysql_dest_host} -u ${mysql_user} --password=${mysql_password} ${mysql_dest_dbname}"
+        sh "mysqldump --single-transaction --host ${mysql_source_host} -u ${mysql_user} --password=${mysql_password} --ignore-table=${mysql_source_dbname}.mdl_logstore_standard_log ${mysql_source_dbname} | mysql -h ${mysql_dest_host} -u ${mysql_user} --password=${mysql_password} ${mysql_dest_dbname}"
     }
 
 }
