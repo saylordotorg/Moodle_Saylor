@@ -16,7 +16,7 @@
 /**
  * Javascript used to save the user's tab preference.
  *
- * @package    block_sayloroverview
+ * @package    block_myoverview
  * @copyright  2017 Mark Nelson <markn@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -43,7 +43,7 @@ define(['jquery', 'core/ajax', 'core/custom_interaction_events',
                 args: {
                     preferences: [
                         {
-                            type: 'block_sayloroverview_last_tab',
+                            type: 'block_myoverview_last_tab',
                             value: tabname
                         }
                     ]

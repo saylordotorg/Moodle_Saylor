@@ -16,9 +16,9 @@
 /**
  * A javascript module to retrieve calendar events from the server.
  *
- * @module     block_sayloroverview/calendar_events_repository
+ * @module     block_myoverview/calendar_events_repository
  * @class      repository
- * @package    block_sayloroverview
+ * @package    block_myoverview
  * @copyright  2016 Ryan Wyllie <ryan@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

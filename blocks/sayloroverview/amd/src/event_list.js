@@ -17,14 +17,14 @@
  * Javascript to load and render the list of calendar events for a
  * given day range.
  *
- * @module     block_sayloroverview/event_list
- * @package    block_sayloroverview
+ * @module     block_myoverview/event_list
+ * @package    block_myoverview
  * @copyright  2016 Ryan Wyllie <ryan@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 define(['jquery', 'core/notification', 'core/templates',
         'core/custom_interaction_events',
-        'block_sayloroverview/calendar_events_repository'],
+        'block_myoverview/calendar_events_repository'],
         function($, Notification, Templates, CustomEvents, CalendarEventsRepository) {
 
     var SECONDS_IN_DAY = 60 * 60 * 24;
@@ -40,8 +40,8 @@ define(['jquery', 'core/notification', 'core/templates',
     };
 
     var TEMPLATES = {
-        EVENT_LIST_ITEMS: 'block_sayloroverview/event-list-items',
-        COURSE_EVENT_LIST_ITEMS: 'block_sayloroverview/course-event-list-items'
+        EVENT_LIST_ITEMS: 'block_myoverview/event-list-items',
+        COURSE_EVENT_LIST_ITEMS: 'block_myoverview/course-event-list-items'
     };
 
     /**
@@ -101,6 +101,8 @@ define(['jquery', 'core/notification', 'core/templates',
         if (!hasLoadedAll(root)) {
             // Only enable the button if we've got more events to load.
             viewMoreButton.prop('disabled', false);
+        } else {
+            viewMoreButton.addClass('hidden');
         }
     };
 
@@ -369,7 +371,7 @@ define(['jquery', 'core/notification', 'core/templates',
             // Render the events.
             return render(root, calendarEvents).then(function(renderCount) {
                 if (renderCount < calendarEvents.length) {
-                    // if the number of events that was rendered is less than
+                    // If the number of events that was rendered is less than
                     // the number we sent for rendering we can assume that there
                     // are no groups to add them in. Since the ordering of the
                     // events is guaranteed it means that any future requests will

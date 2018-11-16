@@ -9,5 +9,44 @@
 }
 
 .progress-chart-container.sayloroverview-progress-chart-container .progress-doughnut .progress-text.has-percent {
-    color: #F7B12F;
+    color: #f16505;
+    font-weight: bold;
+}
+
+.progress-chart-container.sayloroverview-progress-chart-container .progress-doughnut .progress-indicator svg .circle {
+	stroke-width: 15px;
+	stroke: #f77504;
+	fill: none;
+}
+
+.block_sayloroverview .pagination .page-link:focus {
+	box-shadow: none !important;
+}
+
+.block_sayloroverview a, a:visited {
+    text-decoration: none !important;
+}
+
+.sayloroverview-pill:not(.active) {
+    background-color: #eee !important;
+    border: 1px solid transparent;
+    color: #173140 !important;
+    border-radius: .25rem;
+}
+
+.sayloroverview-pill {
+    background-color: #f16505 !important;
+    border: 1px solid;
+    border-color: #cc5504 !important;
+    color: white !important;
+    border-radius: .25rem;
+}
+
+.block_sayloroverview .media-body h3 {
+    padding-bottom: .25rem;
+}
+
+.block_sayloroverview img.empty-placeholder-image {
+    width: 30%;
+    min-width: 10rem;
 }
