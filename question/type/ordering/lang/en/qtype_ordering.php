@@ -28,6 +28,7 @@ $string['pluginname_link'] = 'question/type/ordering';
 $string['pluginnameadding'] = 'Adding an Ordering question';
 $string['pluginnameediting'] = 'Editing an Ordering question';
 $string['pluginnamesummary'] = 'Put jumbled items into a meaningful order.';
+$string['privacy:metadata'] = 'The ordering question type plugin does not store any personal data.';
 
 $string['editingordering'] = 'Editing ordering question';
 $string['addingordering'] = 'Adding a Ordering question';
@@ -79,6 +80,7 @@ $string['longestorderedsubset'] = 'Longest ordered subset';
 $string['noresponsedetails'] = 'Sorry, no details of the response to this question are available.';
 $string['noscore'] = 'No score';
 $string['notenoughanswers'] = 'Ordering questions must have more than {$a} answers.';
+$string['positionx'] = 'Position {$a}';
 $string['relativeallpreviousandnext'] = 'Relative to ALL the previous and next items';
 $string['relativenextexcludelast'] = 'Relative to the next item (excluding last)';
 $string['relativenextincludelast'] = 'Relative to the next item (including last)';

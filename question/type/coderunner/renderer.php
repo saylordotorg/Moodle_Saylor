@@ -191,6 +191,10 @@ class qtype_coderunner_renderer extends qtype_renderer {
 
         $q = $qa->get_question();
         $outcome = unserialize($toserialised);
+        if ($outcome === false) {
+            $outcome = new qtype_coderunner_testing_outcome(0, 0, false);
+            $outcome->set_status(qtype_coderunner_testing_outcome::STATUS_UNSERIALIZE_FAILED);
+        }
         $resultsclass = $this->results_class($outcome, $q->allornothing);
         $isprecheck = $outcome->is_precheck($qa);
         if ($isprecheck) {
@@ -204,7 +208,10 @@ class qtype_coderunner_renderer extends qtype_renderer {
         }
 
         $fb .= html_writer::start_tag('div', array('class' => $resultsclass));
-        if ($outcome->run_failed()) {
+        if ($outcome->invalid()) {
+            $fb .= html_writer::tag('h5', get_string('unserializefailed', 'qtype_coderunner'),
+                    array('class' => 'run_failed_error'));
+        } else if ($outcome->run_failed()) {
             $fb .= html_writer::tag('h5', get_string('run_failed', 'qtype_coderunner'));;
             $fb .= html_writer::tag('p', s($outcome->errormessage),
                     array('class' => 'run_failed_error'));
@@ -590,14 +597,14 @@ class qtype_coderunner_renderer extends qtype_renderer {
             'id' => $buttonid,
             'name' => $buttonid,
             'value' => get_string('reset', 'qtype_coderunner'),
-            'class' => 'answer_reset_btn');
+            'class' => 'answer_reset_btn',
+            'data-reload-text' => $preload);
         $html = html_writer::empty_tag('input', $attributes);
 
         $PAGE->requires->js_call_amd('qtype_coderunner/resetbutton',
             'initResetButton',
             array($buttonid,
                   $responsefieldid,
-                  $preload,
                   get_string('confirmreset', 'qtype_coderunner')
             )
         );

@@ -229,6 +229,37 @@ class theme_saylor_core_renderer extends theme_boost\output\core_renderer
             $usermenuclasses
         );
     }
+    /*
+    * This controls open graph meta property logic.
+    */
+    public function get_open_graph_properties() {
+        global $COURSE, $PAGE, $SITE;
+
+        $imagedomain = "https://resources.saylor.org/og/";
+
+        // Set default properties.
+        $title = $PAGE->title;
+        $type = "website";
+        $url = $PAGE->url;
+        $image = "default-1200x1200.png";
+        $description = $SITE->summary;
+
+        // Show different info in courses, such as the title and images.
+        if ($PAGE->pagelayout == 'course' || $PAGE->pagelayout == 'incourse') {
+            $title = $SITE->shortname.": ".str_replace("Course: ", "", $PAGE->title);
+            $image = $COURSE->shortname."-1200x1200.png";
+            $description = $COURSE->summary;
+        }
+
+        $properties = new stdClass();
+        $properties->title = $title;
+        $properties->type = $type;
+        $properties->url = $url;
+        $properties->image = $imagedomain.$image;
+        $properties->description = $description;
+
+        return $properties;
+    }
 
     /*
     * This code shows an enroll button in main course view to logged in user or Login/sign up link when user is not logged in.

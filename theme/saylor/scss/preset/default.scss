@@ -319,8 +319,8 @@ h1 { font-family: $font-family-header;
 
 // Button primary and secondary text should always be white.
 // Sometimes it was showing up as the secondary color.
-.btn-primary, .btn-secondary {
-    color: $white !important;
+.btn .btn-primary, .btn .btn-secondary {
+    color: $white;
 }
 
 /** Page Backgrounds */
