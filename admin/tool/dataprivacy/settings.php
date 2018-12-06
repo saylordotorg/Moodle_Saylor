@@ -34,6 +34,14 @@ if ($hassiteconfig) {
                 new lang_string('contactdataprotectionofficer_desc', 'tool_dataprivacy'), 0)
         );
 
+        // Automatically create delete data request for users upon user deletion.
+        // Automatically create delete data request for pre-existing deleted users.
+        // Disabled by default.
+        $privacysettings->add(new admin_setting_configcheckbox('tool_dataprivacy/automaticdeletionrequests',
+                new lang_string('automaticdeletionrequests', 'tool_dataprivacy'),
+                new lang_string('automaticdeletionrequests_desc', 'tool_dataprivacy'), 0)
+        );
+
         // Set days approved data requests will be accessible. 1 week default.
         $privacysettings->add(new admin_setting_configduration('tool_dataprivacy/privacyrequestexpiry',
                 new lang_string('privacyrequestexpiry', 'tool_dataprivacy'),
@@ -66,6 +74,12 @@ if ($hassiteconfig) {
                 new lang_string('requireallenddatesforuserdeletion', 'tool_dataprivacy'),
                 new lang_string('requireallenddatesforuserdeletion_desc', 'tool_dataprivacy'),
                 1));
+
+        // Whether the data retention summary should be shown in the page footer and in the user profile page.
+        $privacysettings->add(new admin_setting_configcheckbox('tool_dataprivacy/showdataretentionsummary',
+            new lang_string('showdataretentionsummary', 'tool_dataprivacy'),
+            new lang_string('showdataretentionsummary_desc', 'tool_dataprivacy'),
+            1));
     }
 }
 

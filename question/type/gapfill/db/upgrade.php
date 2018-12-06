@@ -54,18 +54,18 @@ function xmldb_qtype_gapfill_upgrade($oldversion = 0) {
             $dbman->add_field($table, $field);
         }
         if (!$dbman->field_exists('question_gapfill', 'letterhints')) {
-            $field = new xmldb_field('letterhints', XMLDB_TYPE_INTEGER, '1', null, true, null, 0, 'optionsaftertext');
+            $field = new xmldb_field('letterhints', XMLDB_TYPE_INTEGER, '1', null, null, null, '0', 'optionsaftertext');
             $table = new xmldb_table('question_gapfill');
             $dbman->add_field($table, $field);
         }
         if (!$dbman->table_exists('question_gapfill_settings')) {
             $table = new xmldb_table('question_gapfill_settings');
             $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
-            $table->add_field('question', XMLDB_TYPE_CHAR, '10', null, true, null, null);
-            $table->add_field('itemid', XMLDB_TYPE_CHAR, '10', null, true, null, null);
-            $table->add_field('gaptext', XMLDB_TYPE_CHAR, '255', null, true, null, null);
-            $table->add_field('correctfeedback', XMLDB_TYPE_TEXT, '512', null, true, null, null);
-            $table->add_field('incorrectfeedback', XMLDB_TYPE_TEXT, '512', null, true, null, null);
+            $table->add_field('question', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'id');
+            $table->add_field('itemid', XMLDB_TYPE_TEXT, null, null, null, null, null, 'question');
+            $table->add_field('gaptext', XMLDB_TYPE_TEXT, null, null, null, null, null, 'itemid');
+            $table->add_field('correctfeedback', XMLDB_TYPE_TEXT, null, null, null, null, null, 'gaptext');
+            $table->add_field('incorrectfeedback', XMLDB_TYPE_TEXT, null, null, null, null, null, 'correctfeedback');
             $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
             $dbman->create_table($table);
         }

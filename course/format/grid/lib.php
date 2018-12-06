@@ -1051,7 +1051,7 @@ class format_grid extends format_base {
                 $courseformatoptionsedit['sectiontitlesummarybackgroundcolour'] = array(
                     'label' => $defaults['defaultsectiontitlesummarybackgroundcolour'], 'element_type' => 'hidden');
                 $courseformatoptionsedit['sectiontitlesummarybackgroundopacity'] = array(
-                    'label' => $defaults['defaultsectiontitlesummarybackgroundopacity'], 'element_type' => 'hidden');
+                    'label' => get_config('format_grid', 'defaultsectiontitlesummarybackgroundopacity'), 'element_type' => 'hidden');
             }
 
             $courseformatoptionsedit['newactivity'] = array(
