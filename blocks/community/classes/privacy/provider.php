@@ -26,13 +26,11 @@ namespace block_community\privacy;
 
 defined('MOODLE_INTERNAL') || die();
 
-use core_privacy\local\request\approved_contextlist;
-use core_privacy\local\request\contextlist;
-use core_privacy\local\request\writer;
-use core_privacy\local\request\deletion_criteria;
-use core_privacy\local\metadata\collection;
-use core_privacy\local\request\userlist;
-use core_privacy\local\request\approved_userlist;
+use \core_privacy\local\request\approved_contextlist;
+use \core_privacy\local\request\contextlist;
+use \core_privacy\local\request\writer;
+use \core_privacy\local\request\deletion_criteria;
+use \core_privacy\local\metadata\collection;
 
 /**
  * Privacy Subsystem implementation for block_community.
@@ -40,10 +38,7 @@ use core_privacy\local\request\approved_userlist;
  * @copyright  2018 Zig Tan <zig@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class provider implements
-        \core_privacy\local\metadata\provider,
-        \core_privacy\local\request\core_userlist_provider,
-        \core_privacy\local\request\plugin\provider {
+class provider implements \core_privacy\local\metadata\provider, \core_privacy\local\request\plugin\provider {
 
     /**
      * Returns information about how block_community stores its data.
@@ -91,33 +86,6 @@ class provider implements
         $contextlist->add_from_sql($sql, $params);
 
         return $contextlist;
-    }
-
-    /**
-     * Get the list of users within a specific context.
-     *
-     * @param userlist $userlist The userlist containing the list of users who have data in this context/plugin combination.
-     */
-    public static function get_users_in_context(userlist $userlist) {
-        $context = $userlist->get_context();
-
-        if (!$context instanceof \context_user) {
-            return;
-        }
-
-        $params = [
-            'contextid' => $context->id,
-            'contextuser' => CONTEXT_USER,
-        ];
-
-        $sql = "SELECT bc.userid as userid
-                  FROM {block_community} bc
-                  JOIN {context} ctx
-                       ON ctx.instanceid = bc.userid
-                       AND ctx.contextlevel = :contextuser
-                 WHERE ctx.id = :contextid";
-
-        $userlist->add_from_sql('userid', $sql, $params);
     }
 
     /**
@@ -184,21 +152,6 @@ class provider implements
         $userid = $context->instanceid;
 
         $DB->delete_records('block_community', ['userid' => $userid]);
-    }
-
-    /**
-     * Delete multiple users within a single context.
-     *
-     * @param approved_userlist $userlist The approved context and user information to delete information for.
-     */
-    public static function delete_data_for_users(approved_userlist $userlist) {
-        global $DB;
-
-        $context = $userlist->get_context();
-
-        if ($context instanceof \context_user) {
-            $DB->delete_records('block_community', ['userid' => $context->instanceid]);
-        }
     }
 
     /**

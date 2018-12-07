@@ -194,10 +194,10 @@ class api {
 
         // Check that we are receiving a moodle_url object, themes can override get_logo_url and may return incorrect values.
         if (($logourl = $OUTPUT->get_logo_url()) && $logourl instanceof moodle_url) {
-            $settings['logourl'] = clean_param($logourl->out(false), PARAM_URL);
+            $settings['logourl'] = $logourl->out(false);
         }
         if (($compactlogourl = $OUTPUT->get_compact_logo_url()) && $compactlogourl instanceof moodle_url) {
-            $settings['compactlogourl'] = clean_param($compactlogourl->out(false), PARAM_URL);
+            $settings['compactlogourl'] = $compactlogourl->out(false);
         }
 
         // Identity providers.

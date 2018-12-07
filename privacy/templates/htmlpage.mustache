@@ -49,12 +49,17 @@
 <head>
     <meta charset="UTF-8">
     <title>Data export</title>
-    <link rel="stylesheet" type="text/css" href="moodle.css" />
+    {{^righttoleft}}
+    <link rel="stylesheet" href="bootstrap.min.css">
+    {{/righttoleft}}
+    {{#righttoleft}}
+    <link rel="stylesheet" href="rtlbootstrap.min.css">
+    {{/righttoleft}}
     <link rel="stylesheet" type="text/css" href="general.css" />
 </head>
 <body>
     <nav class="navbar navbar-light bg-light border-bottom">
-        <a class="navbar-brand" href="https://moodle.org" title="Moodle">
+        <a class="navbar-brand" href="https://www.moodle.org" title="Moodle">
             <img class="moodle-logo" src="pix/moodlelogo.svg" alt="Moodle logo" />
         </a>
         <span class="navbar-brand">{{#str}}broughtbymoodle, core_privacy{{/str}}</span>

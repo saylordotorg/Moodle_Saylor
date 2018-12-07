@@ -85,10 +85,9 @@ class login_change_password_form extends moodleform {
     function validation($data, $files) {
         global $USER;
         $errors = parent::validation($data, $files);
-        $reason = null;
 
         // ignore submitted username
-        if (!$user = authenticate_user_login($USER->username, $data['password'], true, $reason, false)) {
+        if (!$user = authenticate_user_login($USER->username, $data['password'], true)) {
             $errors['password'] = get_string('invalidlogin');
             return $errors;
         }

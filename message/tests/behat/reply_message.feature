@@ -1,4 +1,4 @@
-@core @core_message @javascript
+@core @message @javascript
 Feature: Reply message
   In order to communicate with fellow users
   As a user

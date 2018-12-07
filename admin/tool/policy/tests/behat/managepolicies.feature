@@ -64,6 +64,7 @@ Feature: Manage policies
     And I set the field "I agree to the Policy1" to "1"
     And I press "Next"
     And I navigate to "Users > Privacy and policies > Manage policies" in site administration
+    And I open the action menu in "Policy1" "table_row"
     And I click on "Edit" "link" in the "Policy1" "table_row"
     And "Draft" "field" should not exist
     And "Active" "field" should not exist
@@ -86,6 +87,7 @@ Feature: Manage policies
     And I set the field "I agree to the Policy1" to "1"
     And I press "Next"
     And I navigate to "Users > Privacy and policies > Manage policies" in site administration
+    And I open the action menu in "Policy1" "table_row"
     And I click on "Edit" "link" in the "Policy1" "table_row"
     And I set the field "Version" to "v2"
     And I press "Save as draft"
@@ -104,6 +106,7 @@ Feature: Manage policies
     And I set the field "I agree to the Policy1" to "1"
     And I press "Next"
     And I navigate to "Users > Privacy and policies > Manage policies" in site administration
+    And I open the action menu in "Policy1" "table_row"
     And I click on "Edit" "link" in the "Policy1" "table_row"
     And I set the field "Name" to "Policy2"
     And I set the field "Version" to "v2"
@@ -113,6 +116,7 @@ Feature: Manage policies
       | Policy2 Site policy, All users | Active        | v2         | 0 of 4 (0%) |
     And I should not see "Policy1"
     And I should not see "v1"
+    And I open the action menu in "Policy2" "table_row"
     And I click on "View previous versions" "link" in the "Policy2" "table_row"
     And I should see "Policy2 previous versions"
     And I should not see "v2"
@@ -127,6 +131,7 @@ Feature: Manage policies
       | Policy1    | v1       | full text2 | short text2 | draft    |
     And I log in as "manager"
     And I navigate to "Users > Privacy and policies > Manage policies" in site administration
+    And I open the action menu in "Policy1" "table_row"
     And I click on "Edit" "link" in the "Policy1" "table_row"
     And I set the field "Version" to "v2"
     And "Draft" "field" should exist
@@ -139,6 +144,7 @@ Feature: Manage policies
       | Name                           | Policy status | Version    | Agreements   |
       | Policy1 Site policy, All users | Draft         | v2         | N/A          |
     And I should not see "v1"
+    And I open the action menu in "Policy1" "table_row"
     And "View previous versions" "link" should not exist
     And I log out
 
@@ -148,6 +154,7 @@ Feature: Manage policies
       | Policy1    | v1       | full text2 | short text2 | draft    |
     And I log in as "manager"
     And I navigate to "Users > Privacy and policies > Manage policies" in site administration
+    And I open the action menu in "Policy1" "table_row"
     And I click on "Edit" "link" in the "Policy1" "table_row"
     And I set the field "Version" to "v2"
     And I set the field "Active" to "1"
@@ -156,6 +163,7 @@ Feature: Manage policies
       | Name                           | Policy status | Version    | Agreements   |
       | Policy1 Site policy, All users | Active        | v2         | 0 of 4 (0%)  |
     And I should not see "v1"
+    And I open the action menu in "Policy1" "table_row"
     And "View previous versions" "link" should not exist
     And I log out
 
@@ -165,12 +173,14 @@ Feature: Manage policies
       | Policy1    | v1       | full text2 | short text2 | draft    |
     And I log in as "manager"
     And I navigate to "Users > Privacy and policies > Manage policies" in site administration
+    And I open the action menu in "Policy1" "table_row"
     And I click on "Set status to \"Active\"" "link" in the "Policy1" "table_row"
     Then I should see "All users will be required to agree to this new policy version to be able to use the site."
     And I press "Continue"
     And the following should exist in the "tool-policy-managedocs-wrapper" table:
       | Name                           | Policy status | Version    | Agreements   |
       | Policy1 Site policy, All users | Active        | v1         | 0 of 4 (0%)  |
+    And I open the action menu in "Policy1" "table_row"
     And "View previous versions" "link" should not exist
     And I log out
 
@@ -183,12 +193,14 @@ Feature: Manage policies
     And I set the field "I agree to the Policy1" to "1"
     And I press "Next"
     And I navigate to "Users > Privacy and policies > Manage policies" in site administration
+    And I open the action menu in "Policy1" "table_row"
     And I click on "Set status to \"Inactive\"" "link" in the "Policy1" "table_row"
     Then I should see "You are about to inactivate policy"
     And I press "Continue"
     And the following should exist in the "tool-policy-managedocs-wrapper" table:
       | Name                           | Policy status | Version    | Agreements   |
       | Policy1 Site policy, All users | Inactive      | v1         | 1 of 4 (25%) |
+    And I open the action menu in "Policy1" "table_row"
     And I click on "Create a new draft" "link" in the "Policy1" "table_row"
     And I set the field "Version" to "v2"
     And I set the field "Name" to "Policy2"
@@ -204,6 +216,7 @@ Feature: Manage policies
       | Policy2 Site policy, All users | Draft         | v2         | N/A          |
     And I should not see "v1"
     And I should not see "Policy1"
+    And I open the action menu in "Policy2" "table_row"
     And I click on "View previous versions" "link" in the "Policy2" "table_row"
     And I should see "Policy2 previous versions"
     And the following should exist in the "tool-policy-managedocs-wrapper" table:
@@ -221,8 +234,10 @@ Feature: Manage policies
     And I set the field "I agree to the Policy1" to "1"
     And I press "Next"
     And I navigate to "Users > Privacy and policies > Manage policies" in site administration
+    And I open the action menu in "Policy1" "table_row"
     And I click on "Set status to \"Inactive\"" "link" in the "Policy1" "table_row"
     And I press "Continue"
+    And I open the action menu in "Policy1" "table_row"
     And I click on "Create a new draft" "link" in the "Policy1" "table_row"
     And I set the field "Version" to "v2"
     And I set the field "Name" to "Policy2"
@@ -233,6 +248,7 @@ Feature: Manage policies
       | Policy2 Site policy, All users | Active        | v2         | 0 of 4 (0%)  |
     And I should not see "v1"
     And I should not see "Policy1"
+    And I open the action menu in "Policy2" "table_row"
     And I click on "View previous versions" "link" in the "Policy2" "table_row"
     And I should see "Policy2 previous versions"
     And the following should exist in the "tool-policy-managedocs-wrapper" table:

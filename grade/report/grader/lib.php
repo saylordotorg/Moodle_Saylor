@@ -1901,40 +1901,37 @@ class grade_report_grader extends grade_report {
      * @return array An associative array of HTML sorting links+arrows
      */
     public function get_sort_arrows(array $extrafields = array()) {
-        global $OUTPUT, $CFG;
+        global $OUTPUT;
         $arrows = array();
 
         $strsortasc   = $this->get_lang_string('sortasc', 'grades');
         $strsortdesc  = $this->get_lang_string('sortdesc', 'grades');
+        $strfirstname = $this->get_lang_string('firstname');
+        $strlastname  = $this->get_lang_string('lastname');
         $iconasc = $OUTPUT->pix_icon('t/sort_asc', $strsortasc, '', array('class' => 'iconsmall sorticon'));
         $icondesc = $OUTPUT->pix_icon('t/sort_desc', $strsortdesc, '', array('class' => 'iconsmall sorticon'));
 
-        // Sourced from tablelib.php
-        // Check the full name display for sortable fields.
-        if (has_capability('moodle/site:viewfullnames', $this->context)) {
-            $nameformat = $CFG->alternativefullnameformat;
-        } else {
-            $nameformat = $CFG->fullnamedisplay;
-        }
+        $firstlink = html_writer::link(new moodle_url($this->baseurl, array('sortitemid'=>'firstname')), $strfirstname);
+        $lastlink = html_writer::link(new moodle_url($this->baseurl, array('sortitemid'=>'lastname')), $strlastname);
 
-        if ($nameformat == 'language') {
-            $nameformat = get_string('fullnamedisplay');
-        }
+        $arrows['studentname'] = $lastlink;
 
-        $arrows['studentname'] = '';
-        $requirednames = order_in_string(get_all_user_name_fields(), $nameformat);
-        if (!empty($requirednames)) {
-            foreach ($requirednames as $name) {
-                $arrows['studentname'] .= html_writer::link(
-                    new moodle_url($this->baseurl, array('sortitemid' => $name)), $this->get_lang_string($name)
-                );
-                if ($this->sortitemid == $name) {
-                    $arrows['studentname'] .= $this->sortorder == 'ASC' ? $iconasc : $icondesc;
-                }
-                $arrows['studentname'] .= ' / ';
+        if ($this->sortitemid === 'lastname') {
+            if ($this->sortorder == 'ASC') {
+                $arrows['studentname'] .= $iconasc;
+            } else {
+                $arrows['studentname'] .= $icondesc;
             }
+        }
 
-            $arrows['studentname'] = substr($arrows['studentname'], 0, -3);
+        $arrows['studentname'] .= ' ' . $firstlink;
+
+        if ($this->sortitemid === 'firstname') {
+            if ($this->sortorder == 'ASC') {
+                $arrows['studentname'] .= $iconasc;
+            } else {
+                $arrows['studentname'] .= $icondesc;
+            }
         }
 
         foreach ($extrafields as $field) {

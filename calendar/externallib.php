@@ -403,9 +403,7 @@ class core_calendar_external extends external_api {
                 'timesortfrom' => new external_value(PARAM_INT, 'Time sort from', VALUE_DEFAULT, 0),
                 'timesortto' => new external_value(PARAM_INT, 'Time sort to', VALUE_DEFAULT, null),
                 'aftereventid' => new external_value(PARAM_INT, 'The last seen event id', VALUE_DEFAULT, 0),
-                'limitnum' => new external_value(PARAM_INT, 'Limit number', VALUE_DEFAULT, 20),
-                'limittononsuspendedevents' => new external_value(PARAM_BOOL,
-                        'Limit the events to courses the user is not suspended in', VALUE_DEFAULT, false)
+                'limitnum' => new external_value(PARAM_INT, 'Limit number', VALUE_DEFAULT, 20)
             )
         );
     }
@@ -421,7 +419,7 @@ class core_calendar_external extends external_api {
      * @return array
      */
     public static function get_calendar_action_events_by_timesort($timesortfrom = 0, $timesortto = null,
-                                                       $aftereventid = 0, $limitnum = 20, $limittononsuspendedevents = false) {
+                                                       $aftereventid = 0, $limitnum = 20) {
         global $CFG, $PAGE, $USER;
 
         require_once($CFG->dirroot . '/calendar/lib.php');
@@ -434,7 +432,6 @@ class core_calendar_external extends external_api {
                 'timesortto' => $timesortto,
                 'aftereventid' => $aftereventid,
                 'limitnum' => $limitnum,
-                'limittononsuspendedevents' => $limittononsuspendedevents
             ]
         );
         $context = \context_user::instance($USER->id);
@@ -449,8 +446,7 @@ class core_calendar_external extends external_api {
             $params['timesortfrom'],
             $params['timesortto'],
             $params['aftereventid'],
-            $params['limitnum'],
-            $params['limittononsuspendedevents']
+            $params['limitnum']
         );
 
         $exportercache = new events_related_objects_cache($events);

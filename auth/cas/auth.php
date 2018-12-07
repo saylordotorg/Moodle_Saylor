@@ -154,7 +154,6 @@ class auth_plugin_cas extends auth_plugin_ldap {
             $frm = new stdClass();
             $frm->username = phpCAS::getUser();
             $frm->password = 'passwdCas';
-            $frm->logintoken = \core\session\manager::get_login_token();
 
             // Redirect to a course if multi-auth is activated, authCAS is set to CAS and the courseid is specified.
             if ($this->config->multiauth && !empty($courseid)) {
@@ -168,7 +167,6 @@ class auth_plugin_cas extends auth_plugin_ldap {
             $frm = new stdClass();
             $frm->username = 'guest';
             $frm->password = 'guest';
-            $frm->logintoken = \core\session\manager::get_login_token();
             return;
         }
 

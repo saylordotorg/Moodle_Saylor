@@ -199,12 +199,11 @@ class event_vault implements event_vault_interface {
         $timesortfrom = null,
         $timesortto = null,
         event_interface $afterevent = null,
-        $limitnum = 20,
-        $limittononsuspendedevents = false
+        $limitnum = 20
     ) {
         $courseids = array_map(function($course) {
             return $course->id;
-        }, enrol_get_all_users_courses($user->id, $limittononsuspendedevents));
+        }, enrol_get_all_users_courses($user->id));
 
         $groupids = array_reduce($courseids, function($carry, $courseid) use ($user) {
             $groupings = groups_get_user_groups($courseid, $user->id);

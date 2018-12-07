@@ -192,8 +192,7 @@ class helper {
             }
         }
         $data->isonline = null;
-        $user = \core_user::get_user($data->userid);
-        if (self::show_online_status($user)) {
+        if (self::show_online_status($userfields)) {
             $data->isonline = self::is_online($userfields->lastaccess);
         }
         $data->isblocked = isset($contact->blocked) ? (bool) $contact->blocked : false;

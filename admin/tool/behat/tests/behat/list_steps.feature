@@ -11,7 +11,7 @@ Feature: List the system steps definitions
 
   @javascript
   Scenario: Accessing the list
-    Then I should see "Step definitions"
+    Then I should see "Steps definitions"
     And I should not see "There aren't steps definitions matching this filter"
 
   @javascript

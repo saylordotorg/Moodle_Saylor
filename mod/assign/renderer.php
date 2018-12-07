@@ -1021,9 +1021,7 @@ class mod_assign_renderer extends plugin_renderer_base {
             $grade = null;
             foreach ($history->grades as $onegrade) {
                 if ($onegrade->attemptnumber == $submission->attemptnumber) {
-                    if ($onegrade->grade != ASSIGN_GRADE_NOT_SET) {
-                        $grade = $onegrade;
-                    }
+                    $grade = $onegrade;
                     break;
                 }
             }

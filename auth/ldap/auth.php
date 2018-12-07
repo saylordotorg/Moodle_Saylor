@@ -1725,8 +1725,7 @@ class auth_plugin_ldap extends auth_plugin_base {
 
         // Here we want to trigger the whole authentication machinery
         // to make sure no step is bypassed...
-        $reason = null;
-        $user = authenticate_user_login($username, $key, false, $reason, false);
+        $user = authenticate_user_login($username, $key);
         if ($user) {
             complete_user_login($user);
 

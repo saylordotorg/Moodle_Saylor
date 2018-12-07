@@ -86,8 +86,6 @@ test
         $this->setAdminUser();
         $PAGE->set_url('/');
         $CFG->theme = 'clean';
-        $PAGE->reset_theme_and_output();
-        $PAGE->initialise_theme_and_output();
 
         // Set the configuration.
         set_config('customusermenuitems', $data);

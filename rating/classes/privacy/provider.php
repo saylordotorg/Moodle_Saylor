@@ -25,7 +25,6 @@
 namespace core_rating\privacy;
 
 use \core_privacy\local\metadata\collection;
-use \core_privacy\local\request\userlist;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -46,9 +45,7 @@ class provider implements
         // as a result.
 
         // The ratings subsystem provides a data service to other components.
-        \core_privacy\local\request\subsystem\plugin_provider,
-        \core_privacy\local\request\shared_userlist_provider
-    {
+        \core_privacy\local\request\subsystem\plugin_provider {
 
     /**
      * Returns metadata about the ratings subsystem.
@@ -216,30 +213,5 @@ class provider implements
         $DB->delete_records_select('rating',
             'contextid = :contextid AND component = :component AND ratingarea = :ratingarea AND itemid ' . $itemidstest,
             $params);
-    }
-
-    /**
-     * Add the list of users who have rated in the specified constraints.
-     *
-     * @param   userlist    $userlist The userlist to add the users to.
-     * @param   string      $alias An alias prefix to use for rating selects to avoid interference with your own sql.
-     * @param   string      $component The component to check.
-     * @param   string      $area The rating area to check.
-     * @param   string      $insql The SQL to use in a sub-select for the itemid query.
-     * @param   array       $params The params required for the insql.
-     */
-    public static function get_users_in_context_from_sql(
-            userlist $userlist, string $alias, string $component, string $area, string $insql, $params) {
-        // Discussion authors.
-        $sql = "SELECT {$alias}.userid
-                  FROM {rating} {$alias}
-                 WHERE {$alias}.component = :{$alias}component
-                   AND {$alias}.ratingarea = :{$alias}ratingarea
-                   AND {$alias}.itemid IN ({$insql})";
-
-        $params["{$alias}component"] = $component;
-        $params["{$alias}ratingarea"] = $area;
-
-        $userlist->add_from_sql('userid', $sql, $params);
     }
 }

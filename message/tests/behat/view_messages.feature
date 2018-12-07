@@ -1,4 +1,4 @@
-@core @core_message @javascript
+@core @message @javascript
 Feature: View messages
   In order to communicate with fellow users
   As a user
