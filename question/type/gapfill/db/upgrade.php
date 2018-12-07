@@ -31,7 +31,7 @@ function xmldb_qtype_gapfill_upgrade($oldversion = 0) {
     global $DB;
 
     $dbman = $DB->get_manager();
-    if ($oldversion < 2018091600) {
+    if ($oldversion < 2017111700) {
         if (!$dbman->field_exists('question_gapfill', 'noduplicates')) {
             $field = new xmldb_field('noduplicates', XMLDB_TYPE_INTEGER, '1');
             $table = new xmldb_table('question_gapfill');
@@ -69,8 +69,8 @@ function xmldb_qtype_gapfill_upgrade($oldversion = 0) {
             $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
             $dbman->create_table($table);
         }
-        // Gapfill savepoint reached.
-        upgrade_plugin_savepoint(true, 2018091600, 'qtype', 'gapfill');
+         // Gapfill savepoint reached.
+         upgrade_plugin_savepoint(true, 2018091600, 'qtype', 'gapfill');
     }
     return true;
 }
