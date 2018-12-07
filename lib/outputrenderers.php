@@ -2496,7 +2496,7 @@ class core_renderer extends renderer_base {
         global $CFG, $DB;
 
         $user = $userpicture->user;
-        $canviewfullnames = has_capability('moodle/site:viewfullnames', context_system::instance());
+        $canviewfullnames = has_capability('moodle/site:viewfullnames', $this->page->context);
 
         if ($userpicture->alttext) {
             if (!empty($user->imagealt)) {
@@ -3418,6 +3418,7 @@ EOD;
         $am->set_menu_trigger(
             $returnstr
         );
+        $am->set_action_label(get_string('usermenu'));
         $am->set_alignment(action_menu::TR, action_menu::BR);
         $am->set_nowrap_on_items();
         if ($withlinks) {

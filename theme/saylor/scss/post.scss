@@ -206,6 +206,13 @@
 	color: $body-color;
 }
 
+// student response area grading background change
+.que.essay .content .formulation .ablock .answer .qtype_essay_editor.qtype_essay_response.readonly{
+    background-color: $expand-pink-100;
+    border-radius: .25rem;
+    padding: .25rem;
+}
+
 /** Profile Page */
 
 .userprofile .profile_tree a[href*="/mod/forum"] {

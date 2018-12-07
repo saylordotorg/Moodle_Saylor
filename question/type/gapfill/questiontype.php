@@ -53,12 +53,7 @@ class qtype_gapfill extends question_type {
      * exist in the plugin folder and ensures they get included.
      * It also includes the jquery files required for this plugin
      */
-    public function find_standard_scripts() {
-        global $PAGE;
-            $PAGE->requires->jquery();
-            $PAGE->requires->jquery_plugin('ui');
-            $PAGE->requires->jquery_plugin('ui.touch-punch', 'qtype_gapfill');
-    }
+
     /**
      * Called during question editing
      *
@@ -184,6 +179,11 @@ class qtype_gapfill extends question_type {
         return parent::save_question($question, $form);
     }
 
+    public function find_standard_scripts() {
+        global $CFG, $PAGE;
+        parent::find_standard_scripts();
+        $PAGE->requires->js_call_amd('qtype_gapfill/dragdrop', 'init');
+    }
 
     /**
      * chop the delimit string into a two element array

@@ -981,8 +981,6 @@ class api {
         $cache = \cache::make('core', 'presignup');
         $cache->delete('tool_policy_userpolicyagreed');
         $cache->delete('tool_policy_viewedpolicies');
-        $cache->delete('tool_policy_issignup');
-        $cache->delete('isminor');
 
         // Get all active policies.
         $currentpolicyversions = static::get_current_versions_ids(policy_version::AUDIENCE_LOGGEDIN);

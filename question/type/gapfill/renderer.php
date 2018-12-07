@@ -68,10 +68,6 @@ class qtype_gapfill_renderer extends qtype_with_combined_feedback_renderer {
         $this->displayoptions = $options;
         $question = $qa->get_question();
         $this->itemsettings = json_decode($question->itemsettings);
-
-        if ($question->answerdisplay == "dragdrop") {
-            $PAGE->requires->js('/question/type/gapfill/dragdrop.js');
-        }
         $seranswers = $qa->get_step(0)->get_qt_var('_allanswers');
         $this->allanswers = unserialize($seranswers);
         $output = "";

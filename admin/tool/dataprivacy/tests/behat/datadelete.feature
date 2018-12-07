@@ -20,6 +20,13 @@ Feature: Data delete from the privacy API
       | parent | tired | User         | victim    |
     And the following config values are set as admin:
       | contactdataprotectionofficer | 1  | tool_dataprivacy |
+    And the following data privacy "categories" exist:
+      | name          |
+      | Site category |
+    And the following data privacy "purposes" exist:
+      | name         | retentionperiod |
+      | Site purpose | P10Y           |
+    And I set the site category and purpose to "Site category" and "Site purpose"
 
   @javascript
   Scenario: As admin, delete a user and their data
@@ -30,7 +37,7 @@ Feature: Data delete from the privacy API
     And I log in as "admin"
     And I navigate to "Users > Privacy and policies > Data requests" in site administration
     And I follow "New request"
-    And I set the field "Requesting for" to "Victim User 1"
+    And I set the field "User" to "Victim User 1"
     And I set the field "Type" to "Delete all of my personal data"
     And I press "Save changes"
     Then I should see "Victim User 1"
@@ -38,7 +45,7 @@ Feature: Data delete from the privacy API
     And I run all adhoc tasks
     And I reload the page
     And I should see "Awaiting approval" in the "Victim User 1" "table_row"
-    And I follow "Actions"
+    And I open the action menu in "Victim User 1" "table_row"
     And I follow "Approve request"
     And I press "Approve request"
     And I should see "Approved" in the "Victim User 1" "table_row"
@@ -67,7 +74,7 @@ Feature: Data delete from the privacy API
     And I log out
     And I log in as "admin"
     And I navigate to "Users > Privacy and policies > Data requests" in site administration
-    And I follow "Actions"
+    And I open the action menu in "Victim User 1" "table_row"
     And I follow "Approve request"
     And I press "Approve request"
 
@@ -93,7 +100,7 @@ Feature: Data delete from the privacy API
     And I follow "Profile" in the user menu
     And I follow "Data requests"
     And I follow "New request"
-    And I set the field "Requesting for" to "Victim User 1"
+    And I set the field "User" to "Victim User 1"
     And I set the field "Type" to "Delete all of my personal data"
     And I press "Save changes"
     Then I should see "Victim User 1"
@@ -105,7 +112,7 @@ Feature: Data delete from the privacy API
     And I log out
     And I log in as "admin"
     And I navigate to "Users > Privacy and policies > Data requests" in site administration
-    And I follow "Actions"
+    And I open the action menu in "Victim User 1" "table_row"
     And I follow "Approve request"
     And I press "Approve request"
 
