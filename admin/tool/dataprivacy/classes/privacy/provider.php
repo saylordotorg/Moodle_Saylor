@@ -30,9 +30,11 @@ use context;
 use context_user;
 use core_privacy\local\metadata\collection;
 use core_privacy\local\request\approved_contextlist;
+use \core_privacy\local\request\approved_userlist;
 use core_privacy\local\request\contextlist;
 use core_privacy\local\request\helper;
 use core_privacy\local\request\transform;
+use \core_privacy\local\request\userlist;
 use core_privacy\local\request\writer;
 use dml_exception;
 use stdClass;
@@ -49,6 +51,9 @@ use tool_dataprivacy\local\helper as tool_helper;
 class provider implements
         // This tool stores user data.
         \core_privacy\local\metadata\provider,
+
+        // This plugin is capable of determining which users have data within it.
+        \core_privacy\local\request\core_userlist_provider,
 
         // This tool may provide access to and deletion of user data.
         \core_privacy\local\request\plugin\provider,
@@ -101,6 +106,32 @@ class provider implements
     }
 
     /**
+     * Get the list of users who have data within a context.
+     *
+     * @param   userlist    $userlist   The userlist containing the list of users who have data in this context/plugin combination.
+     *
+     */
+    public static function get_users_in_context(userlist $userlist) {
+        $context = $userlist->get_context();
+
+        if (!is_a($context, \context_user::class)) {
+            return;
+        }
+
+        $params = [
+            'contextlevel' => CONTEXT_USER,
+            'contextid' => $context->id,
+        ];
+
+        $sql = "SELECT instanceid AS userid
+                  FROM {context}
+                 WHERE id = :contextid
+                       AND contextlevel = :contextlevel";
+
+        $userlist->add_from_sql('userid', $sql, $params);
+    }
+
+    /**
      * Export all user data for the specified user, in the specified contexts.
      *
      * @param approved_contextlist $contextlist The approved contexts to export information for.
@@ -136,6 +167,8 @@ class provider implements
             $data->type = tool_helper::get_shortened_request_type_string($record->type);
             // Status.
             $data->status = tool_helper::get_request_status_string($record->status);
+            // Creation method.
+            $data->creationmethod = tool_helper::get_request_creation_method_string($record->creationmethod);
             // Comments.
             $data->comments = $record->comments;
             // The DPO's comment about this request.
@@ -173,6 +206,15 @@ class provider implements
     }
 
     /**
+     * Delete multiple users within a single context.
+     *
+     * @param   approved_userlist    $userlist The approved context and user information to delete information for.
+     *
+     */
+    public static function delete_data_for_users(approved_userlist $userlist) {
+    }
+
+    /**
      * Export all user preferences for the plugin.
      *
      * @param   int $userid The userid of the user whose data is to be exported.
@@ -193,6 +235,10 @@ class provider implements
                     case tool_helper::FILTER_STATUS:
                         $option->category = get_string('requeststatus', 'tool_dataprivacy');
                         $option->name = tool_helper::get_request_status_string($value);
+                        break;
+                    case tool_helper::FILTER_CREATION:
+                        $option->category = get_string('requestcreation', 'tool_dataprivacy');
+                        $option->name = tool_helper::get_request_creation_method_string($value);
                         break;
                 }
                 $descriptions[] = get_string('filteroption', 'tool_dataprivacy', $option);

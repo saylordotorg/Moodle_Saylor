@@ -1,7 +1,15 @@
 History
 =============
+Version 3.5.0.3
+  1. New: French 'New activity image', thanks to Momar -> https://github.com/Momardiakhate.
+  2. Fix PHPUnit test with 'defaultsectiontitlesummarybackgroundopacity' failure.
+
 Version 3.5.0.2
   1. Fix CONTRIB-7270 - Popovers not working as expected in Grid reset options section of settings - Boost theme.
+  2. Foundation theme support.
+  3. Fix: Boost theme shadebox adjustment.
+  4. Fix: Convert displayed image to original mime type instead of only png patch when section zero in the grid.
+  5. Fix: Cope with non-sequential section numbers.
 
 Version 3.5.0.1
   1. M3.5 version based on V3.4.0.4

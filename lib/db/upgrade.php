@@ -2167,7 +2167,7 @@ function xmldb_main_upgrade($oldversion) {
         $table = new xmldb_table('message_user_actions');
 
         // Conditionally launch add index.
-        $index = new xmldb_index('userid_messageid_action', XMLDB_INDEX_UNIQUE, array('userid, messageid, action'));
+        $index = new xmldb_index('userid_messageid_action', XMLDB_INDEX_UNIQUE, array('userid', 'messageid', 'action'));
         if (!$dbman->index_exists($table, $index)) {
             $dbman->add_index($table, $index);
         }
@@ -2181,7 +2181,7 @@ function xmldb_main_upgrade($oldversion) {
         $table = new xmldb_table('messages');
 
         // Conditionally launch add index.
-        $index = new xmldb_index('conversationid_timecreated', XMLDB_INDEX_NOTUNIQUE, array('conversationid, timecreated'));
+        $index = new xmldb_index('conversationid_timecreated', XMLDB_INDEX_NOTUNIQUE, array('conversationid', 'timecreated'));
         if (!$dbman->index_exists($table, $index)) {
             $dbman->add_index($table, $index);
         }
@@ -2312,6 +2312,29 @@ function xmldb_main_upgrade($oldversion) {
 
         // Main savepoint reached.
         upgrade_main_savepoint(true, 2018051702.02);
+    }
+
+    if ($oldversion < 2018051703.06) {
+        // Update the FB logo URL.
+        $oldurl = 'https://facebookbrand.com/wp-content/themes/fb-branding/prj-fb-branding/assets/images/fb-art.png';
+        $newurl = 'https://facebookbrand.com/wp-content/uploads/2016/05/flogo_rgb_hex-brc-site-250.png';
+
+        $updatesql = "UPDATE {oauth2_issuer}
+                         SET image = :newimage
+                       WHERE image = :oldimage";
+        $params = [
+            'newimage' => $newurl,
+            'oldimage' => $oldurl
+        ];
+
+        $DB->execute($updatesql, $params);
+
+        upgrade_main_savepoint(true, 2018051703.06);
+    }
+
+    if ($oldversion < 2018051703.09) {
+        upgrade_delete_orphaned_file_records();
+        upgrade_main_savepoint(true, 2018051703.09);
     }
 
     return true;

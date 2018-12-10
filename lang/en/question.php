@@ -269,7 +269,7 @@ $string['questiondoesnotexist'] = 'This question does not exist';
 $string['questionname'] = 'Question name';
 $string['questionno'] = 'Question {$a}';
 $string['questionsaveerror'] = 'Errors occur during saving question - ({$a})';
-$string['questionsinuse'] = '(* Questions marked by an asterisk are already in use in some quizzes. These question will not be deleted from these quizzes but only from the category list.)';
+$string['questionsinuse'] = '(* Questions marked by an asterisk are already in use in some quizzes. These questions will not be deleted from these quizzes but only from the category list.)';
 $string['questionsmovedto'] = 'Questions still in use moved to "{$a}" in the parent course category.';
 $string['questionsrescuedfrom'] = 'Questions saved from context {$a}.';
 $string['questionsrescuedfrominfo'] = 'These questions (some of which may be hidden) were saved when context {$a} was deleted because they are still used by some quizzes or other activities.';
@@ -386,7 +386,7 @@ $string['penaltyforeachincorrecttry_help'] = 'When questions are run using the \
 
 The penalty is a proportion of the total question grade, so if the question is worth three marks, and the penalty is 0.3333333, then the student will score 3 if they get the question right first time, 2 if they get it right second try, and 1 of they get it right on the third try.';
 $string['previewquestion'] = 'Preview question: {$a}';
-$string['privacy:metadata:database:question'] = 'The details about an specific question.';
+$string['privacy:metadata:database:question'] = 'The details about a specific question.';
 $string['privacy:metadata:database:question:createdby'] = 'The person who created the question.';
 $string['privacy:metadata:database:question:generalfeedback'] = 'The general feedback for this question.';
 $string['privacy:metadata:database:question:modifiedby'] = 'The person who last updated the question.';
@@ -429,7 +429,7 @@ $string['restart'] = 'Start again';
 $string['restartwiththeseoptions'] = 'Start again with these options';
 $string['restoremultipletopcats'] = 'The backup file contains more than one top-level question categories for context {$a}.';
 $string['rightanswer'] = 'Right answer';
-$string['rightanswer_help'] = 'an automatically generated summary of the correct response. This can be limited, so you may wish to consider explaining the correct solution in the general feedback for the question, and turning this option off.';
+$string['rightanswer_help'] = 'An automatically generated summary of the correct response. This can be limited, so you may wish to consider explaining the correct solution in the general feedback for the question, and turning this option off.';
 $string['saved'] = 'Saved: {$a}';
 $string['saveflags'] = 'Save the state of the flags';
 $string['settingsformultipletries'] = 'Multiple tries';

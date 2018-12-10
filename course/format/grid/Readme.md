@@ -153,8 +153,7 @@ the service will expedite the response.
 It takes time and effort to maintain the format, therefore sponsorships are appreciated.
 
 When reporting an issue you can post in the course format's forum on Moodle.org (currently 'moodle.org/mod/forum/view.php?id=47'), 
-on Moodle tracker 'tracker.moodle.org' ensuring that you chose the 'Non-core contributed modules' and 'Course Format: Grid'
-for the component or contact us direct (details at the bottom).
+on https://github.com/gjb2048/moodle-format_grid/issues or contact me direct (details at the bottom).
 
 It is essential that you provide as much information as possible, the critical information being the contents of the format's 
 version.php file.  Other version information such as specific Moodle version, theme name and version also helps.  A screen shot

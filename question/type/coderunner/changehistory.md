@@ -1,7 +1,41 @@
 # CHANGE HISTORY
 
-### 14 August 2019. 3.5.1
-Fix error in Privacy Provider (failing with PHP versions 7.x).Thanks to Sam Marshall.
+### 18 November 2018. 3.5.3+
+
+ * Bug fix: answerbox preloads of greater than ~1k generated debugging error
+   messages (if developer-level messages were enabled). Thanks Tim Hunt.
+ * Bug fix: Twig-all was not being applied to the question's General Feedback.
+ * Improve handling of a failed unserialise of a legacy question attempt, which
+   can (rarely) occur if a complete course, including student activity attempts,
+   is moved between sites with different Moodle versions or database charsets.
+ * Improve handling of Twig errors when editing questions that use TwigAll in
+   conjunction with ValidateOnSave.
+
+### 29 October 2018. 3.5.3
+
+ * Bug fix: installing CodeRunner on Moodle 3.5 with error debug messages
+   enabled resulted in messages "Error: mdb->get_record() found more than one record!"
+   when browsing the question bank. Alternatively, if CodeRunner was
+   installed on a freshly built Moodle 3.5, the CR_PROTOTYPES category
+   became a proxy for the Top category in the system category and its name
+   was hidden.
+
+### 18 October 2018. 3.5.2+
+
+* Fix broken PHP question type and add test cases for it.
+* Fix GraphUI plugin to prevent new arcs from exactly overlying old ones
+* Bug fix: nodejs question type not working with strict mode. Also,
+  renamed question type from nodejs-2 to just nodejs (as it used to be).
+* Add trivial nodejs question sample to samples folder.
+* Add the UOC Python3 tkinter question type to the samples folder.
+* Improve error message when duplicate question prototypes are found.
+* Bug fix: behat export test not working with latest Moodle versions (Thanks
+  Tim Hunt).
+
+
+### 14 August 2018. 3.5.1
+
+* Fix error in Privacy Provider (failing with PHP versions 7.x).Thanks to Sam Marshall.
 
 ### 10 July 2018. 3.5.0
 

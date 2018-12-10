@@ -319,7 +319,7 @@ Set the penalty regime to \'0\' for zero penalties on all submissions.';
 $string['memorylimit'] = 'MemLimit (MB)';
 $string['missinganswers'] = 'missing answers';
 $string['missingoutput'] = 'You must supply the expected output from this test case.';
-$string['missingprototype'] = 'This question was defined to be of type \'{$a->crtype}\' but the prototype does not exist or is unavailable in this context. You should Cancel and try to (re)install the prototype.
+$string['missingprototype'] = 'This question was defined to be of type \'{$a->crtype}\' but the prototype does not exist, or is non-unique, or is unavailable in this context. You should Cancel and try to (re)install the prototype.
 Proceed to edit only if you know what you are doing!';
 $string['missingprototypes'] = 'Missing prototypes';
 $string['missingprototypewhenrunning'] = 'Broken question (missing prototype \'{$a->crtype}\'). Cannot be run.';
@@ -572,15 +572,14 @@ form and then extending the template (q.v.) to handle the new language.</p>
 <p>The submitted program code is run as-is for each test case. The testcode
 and extra fields of each test case are ignored.</p>';
 
-$string['qtype_nodejs-2'] = '<p>A JavaScript question type, run using nodejs. The
+$string['qtype_nodejs'] = '<p>A JavaScript question type, run using nodejs. The
 test program to be executed starts with the student answer. That is followed
 by each of the test case codes in turn, with a separator string being printed
 between them. However, if there is any standard input present for any of the
 test cases, a separate test run will be done for each test case.</p><p>
 If there is a risk of side-effects from a test case affecting later test cases
 you can add standard input to any one of the test cases to force the one-run-per-test-case
-mode. [The question type name is <i>nodejs-2</i> rather than just <i>nodejs</i>
-for historical reasons.]</p>';
+mode.</p>';
 
 $string['qtype_octave_function'] = '<p>A question type that specifies an
 Octave function, which the student has to submit in its entirety. Each test
@@ -1096,6 +1095,7 @@ $string['unauthorisedbulktest'] = 'You do not have suitable access to any CodeRu
 $string['unauthoriseddbaccess'] = 'You are not authorised to use this script';
 $string['unknownerror'] = 'An unexpected error occurred. The sandbox may be down. Try again shortly.';
 $string['unknowncombinatorgraderfield'] = 'Unknown field name ({$a->fieldname}) in combinator grader output';
+$string['unserializefailed'] = 'Stored test results could not be deserialised. Perhaps try regrading?';
 $string['useasexample'] = 'Use as example';
 $string['useace'] = 'Template uses ace';
 

@@ -48,6 +48,7 @@ $templatecontext = [
     'regionmainsettingsmenu' => $regionmainsettingsmenu,
     'hasregionmainsettingsmenu' => !empty($regionmainsettingsmenu),
     'currentyear' => date('Y'),
+    'opengraph' => $OUTPUT->get_open_graph_properties(),
 ];
 
 $templatecontext['flatnavigation'] = $PAGE->flatnav;

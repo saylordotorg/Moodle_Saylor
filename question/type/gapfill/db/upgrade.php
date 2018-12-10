@@ -31,46 +31,52 @@ function xmldb_qtype_gapfill_upgrade($oldversion = 0) {
     global $DB;
 
     $dbman = $DB->get_manager();
-    if ($oldversion < 2018091600) {
+    if ($oldversion < 2017070201) {
         if (!$dbman->field_exists('question_gapfill', 'noduplicates')) {
             $field = new xmldb_field('noduplicates', XMLDB_TYPE_INTEGER, '1');
             $table = new xmldb_table('question_gapfill');
             $dbman->add_field($table, $field);
         }
-
         if (!$dbman->field_exists('question_gapfill', 'disableregex')) {
             $field = new xmldb_field('disableregex', XMLDB_TYPE_INTEGER, '1');
             $table = new xmldb_table('question_gapfill');
             $dbman->add_field($table, $field);
         }
+
         if (!$dbman->field_exists('question_gapfill', 'fixedgapsize')) {
             $field = new xmldb_field('fixedgapsize', XMLDB_TYPE_INTEGER, '1');
             $table = new xmldb_table('question_gapfill');
             $dbman->add_field($table, $field);
         }
+
         if (!$dbman->field_exists('question_gapfill', 'optionsaftertext')) {
             $field = new xmldb_field('optionsaftertext', XMLDB_TYPE_INTEGER, '1', null, true, null, 0, 'fixedgapsize');
             $table = new xmldb_table('question_gapfill');
             $dbman->add_field($table, $field);
         }
+
         if (!$dbman->field_exists('question_gapfill', 'letterhints')) {
-            $field = new xmldb_field('letterhints', XMLDB_TYPE_INTEGER, '1', null, true, null, 0, 'optionsaftertext');
+            $field = new xmldb_field('letterhints', XMLDB_TYPE_INTEGER, '1', null, null, null, '0', 'optionsaftertext');
             $table = new xmldb_table('question_gapfill');
             $dbman->add_field($table, $field);
         }
+        upgrade_plugin_savepoint(true, 2017070201, 'qtype', 'gapfill');
+    }
+
+    if ($oldversion < 2017111700) {
         if (!$dbman->table_exists('question_gapfill_settings')) {
             $table = new xmldb_table('question_gapfill_settings');
             $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
-            $table->add_field('question', XMLDB_TYPE_CHAR, '10', null, true, null, null);
-            $table->add_field('itemid', XMLDB_TYPE_CHAR, '10', null, true, null, null);
-            $table->add_field('gaptext', XMLDB_TYPE_CHAR, '255', null, true, null, null);
-            $table->add_field('correctfeedback', XMLDB_TYPE_TEXT, '512', null, true, null, null);
-            $table->add_field('incorrectfeedback', XMLDB_TYPE_TEXT, '512', null, true, null, null);
+            $table->add_field('question', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'id');
+            $table->add_field('itemid', XMLDB_TYPE_TEXT, null, null, null, null, null, 'question');
+            $table->add_field('gaptext', XMLDB_TYPE_TEXT, null, null, null, null, null, 'itemid');
+            $table->add_field('correctfeedback', XMLDB_TYPE_TEXT, null, null, null, null, null, 'gaptext');
+            $table->add_field('incorrectfeedback', XMLDB_TYPE_TEXT, null, null, null, null, null, 'correctfeedback');
             $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
             $dbman->create_table($table);
         }
         // Gapfill savepoint reached.
-        upgrade_plugin_savepoint(true, 2018091600, 'qtype', 'gapfill');
+        upgrade_plugin_savepoint(true, 2017111700, 'qtype', 'gapfill');
     }
     return true;
 }

@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die;
 
 $plugin->component = 'theme_saylor';
-$plugin->version   = 2017061000;
-$plugin->maturity = MATURITY_ALPHA;
+$plugin->version   = 2018101800;
+$plugin->maturity = MATURITY_STABLE;
 $plugin->requires  = 2018051300;
 $plugin->dependencies = ['theme_boost' => '2018051300'];

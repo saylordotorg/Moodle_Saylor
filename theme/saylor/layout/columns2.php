@@ -50,6 +50,7 @@ $templatecontext = [
     'hasregionmainsettingsmenu' => !empty($regionmainsettingsmenu),
     'saylorcustomenrollbutton' => $saylor_custom_enroll_button,
     'currentyear' => date('Y'),
+    'opengraph' => $OUTPUT->get_open_graph_properties(),
 ];
 
 $templatecontext['flatnavigation'] = $PAGE->flatnav;

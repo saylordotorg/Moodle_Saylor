@@ -100,6 +100,7 @@ class qtype_gapfill_test_helper extends question_test_helper {
 
         $questiondata = (object) array(
                     'id' => '2',
+                    'idnumber' => '1',
                     'category' => '2',
                     'contextid' => '1',
                     'parent' => '0',

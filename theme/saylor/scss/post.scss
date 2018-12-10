@@ -80,8 +80,16 @@
     line-height: 1rem;
 }
 
-#page-login-index #page-wrapper {
-	background-image: url([[pix:theme_saylor|login_background_ocean]]);
+#page-login-index #page-wrapper,
+#page-login-verify_age_location #page-wrapper,
+#page-admin-tool-policy-index #page-wrapper,
+#page-admin-tool-policy-view #page-wrapper,
+#page-login-signup #page-wrapper {
+	// We have to use rgba here in order to use transparency over the image.
+	// It's the rgb value of $primary-dark-blue.
+	background:
+		linear-gradient(rgba(23, 49, 64, 0.5), rgba(23, 49, 64, 0.5)),
+		url([[pix:theme_saylor|backgrounds/login_background_bridge]]);
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center bottom;
@@ -198,6 +206,13 @@
 	color: $body-color;
 }
 
+// student response area grading background change
+.que.essay .content .formulation .ablock .answer .qtype_essay_editor.qtype_essay_response.readonly{
+    background-color: $expand-pink-100;
+    border-radius: .25rem;
+    padding: .25rem;
+}
+
 /** Profile Page */
 
 .userprofile .profile_tree a[href*="/mod/forum"] {
@@ -217,4 +232,13 @@
 	border: 1px solid $primary-dark-blue;
 	border-radius: .25rem;
 	margin: .25rem 0 0 .25rem;
+}
+
+/** Resources */
+// Hide the resource navigation at the bottom of the resources.
+// It's confusing students.
+// Eventually, override the renderer to go to next unit.
+
+#region-main>.card>.card-body>.m-t-2 {
+	display: none;
 }

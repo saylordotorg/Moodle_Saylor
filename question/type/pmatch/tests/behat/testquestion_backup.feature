@@ -25,8 +25,8 @@ Feature: Test backup and restore of a pmatch question with responses and matches
     And I should see "Pos=0/0 Neg=0/0 Unm=13 Acc=0%"
     And I should see "1" in the "testing one two three four" "table_row"
     # Now mark responses in order to test their backup.
-    When I click on "Select all" "link"
-    And I press "Test the question using these responses"
+    When I set the field "tqheadercheckbox" to "1"
+    And I press "Test selected responses"
     And I press "Continue"
     # Make a backup and restore to new course.
     Given I am on homepage
@@ -36,11 +36,12 @@ Feature: Test backup and restore of a pmatch question with responses and matches
       | Schema | Course name | Course 2 |
     Then I should see "Course 2"
     # Check the new course's testquestion data.
-    When I navigate to "Question bank" node in "Course administration"
+    When I navigate to "Question bank" in current page administration
     Then I should see "My first pattern match question"
     When I follow "Edit"
     Then I should see "Editing a Pattern match question"
-    When I navigate to "Question bank" node in "Course administration"
+    When I am on "Course 1" course homepage
+    And I navigate to "Question bank" in current page administration
     And I follow "Preview"
     And I switch to "questionpreview" window
     And I follow "Test this question"

@@ -369,7 +369,7 @@ class format_grid_renderer extends format_section_renderer_base {
 
         // Start at 1 to skip the summary block or include the summary block if it's in the grid display.
         if ($this->section0attop) {
-            $this->section0attop = $this->make_block_topic0($course, $sections, $modinfo, $editing, $urlpicedit,
+            $this->section0attop = $this->make_block_topic0($course, $sections[0], $editing, $urlpicedit,
                     $streditsummary, false);
             // For the purpose of the grid shade box shown array topic 0 is not shown.
             $this->shadeboxshownarray[0] = 1;
@@ -388,7 +388,7 @@ class format_grid_renderer extends format_section_renderer_base {
 
         echo html_writer::start_tag('ul', array('class' => $gridiconsclass));
         // Print all of the image containers.
-        $this->make_block_icon_topics($coursecontext->id, $modinfo, $course, $editing, $hascapvishidsect, $urlpicedit);
+        $this->make_block_icon_topics($coursecontext->id, $sections, $course, $editing, $hascapvishidsect, $urlpicedit);
         echo html_writer::end_tag('ul');
 
         echo html_writer::end_tag('div');
@@ -491,11 +491,11 @@ class format_grid_renderer extends format_section_renderer_base {
 
             // Print Section 0 with general activities.
             if (!$this->section0attop) {
-                $this->make_block_topic0($course, $sections, $modinfo, $editing, $urlpicedit, $streditsummary, false);
+                $this->make_block_topic0($course, $sections[0], $editing, $urlpicedit, $streditsummary, false);
             }
 
-            // Now all the normal modules by topic.
-            // Everything below uses "section" terminology - each "section" is a topic/module.
+            /* Now all the normal modules by topic.
+               Everything below uses "section" terminology - each "section" is a topic/module. */
             $this->make_block_topics($course, $sections, $modinfo, $editing, $hascapvishidsect, $streditsummary,
                 $urlpicedit, false);
 
@@ -596,23 +596,14 @@ class format_grid_renderer extends format_section_renderer_base {
     /**
      * Makes section zero.
      */
-    private function make_block_topic0($course, $sections, $modinfo, $editing, $urlpicedit, $streditsummary,
+    private function make_block_topic0($course, $sectionzero, $editing, $urlpicedit, $streditsummary,
             $onsectionpage) {
-        $section = 0;
-        if (!array_key_exists($section, $sections)) {
-            return false;
-        }
-
-        $thissection = $modinfo->get_section_info($section);
-        if (!is_object($thissection)) {
-            return false;
-        }
 
         if ($this->section0attop) {
             echo html_writer::start_tag('ul', array('class' => 'gtopics-0'));
         }
 
-        $sectionname = $this->courseformat->get_section_name($thissection);
+        $sectionname = $this->courseformat->get_section_name($sectionzero);
         echo html_writer::start_tag('li', array(
             'id' => 'section-0',
             'class' => 'section main' . ($this->section0attop ? '' : ' grid_section hide_section'),
@@ -628,11 +619,11 @@ class format_grid_renderer extends format_section_renderer_base {
 
         echo html_writer::start_tag('div', array('class' => 'summary'));
 
-        echo $this->format_summary_text($thissection);
+        echo $this->format_summary_text($sectionzero);
 
         if ($editing) {
             echo html_writer::link(
-                            new moodle_url('editsection.php', array('id' => $thissection->id)),
+                            new moodle_url('editsection.php', array('id' => $sectionzero->id)),
                                 html_writer::empty_tag('img', array('src' => $urlpicedit,
                                                                      'alt' => $streditsummary,
                                                                      'class' => 'iconsmall edit')),
@@ -640,10 +631,10 @@ class format_grid_renderer extends format_section_renderer_base {
         }
         echo html_writer::end_tag('div');
 
-        echo $this->courserenderer->course_section_cm_list($course, $thissection, 0);
+        echo $this->courserenderer->course_section_cm_list($course, $sectionzero, 0);
 
         if ($editing) {
-            echo $this->courserenderer->course_section_add_cm_control($course, $thissection->section, 0, 0);
+            echo $this->courserenderer->course_section_add_cm_control($course, $sectionzero->section, 0, 0);
 
             if ($this->section0attop) {
                 $strhidesummary = get_string('hide_summary', 'format_grid');
@@ -708,7 +699,7 @@ class format_grid_renderer extends format_section_renderer_base {
     /**
      * Makes the grid image containers.
      */
-    private function make_block_icon_topics($contextid, $modinfo, $course, $editing, $hascapvishidsect,
+    private function make_block_icon_topics($contextid, $sections, $course, $editing, $hascapvishidsect,
             $urlpicedit) {
         global $CFG;
 
@@ -739,9 +730,11 @@ class format_grid_renderer extends format_section_renderer_base {
 
         // Start at 1 to skip the summary block or include the summary block if it's in the grid display.
         $coursenumsections = $this->courseformat->get_last_section_number();
-        $sections = $modinfo->get_section_info_all();
-        for ($section = $this->section0attop ? 1 : 0; $section <= $coursenumsections; $section++) {
-            $thissection = $sections[$section];
+
+        foreach ($sections as $section => $thissection) {
+            if (($this->section0attop) && ($section == 0)) {
+                continue;
+            }
 
             // Check if section is visible to user.
             $showsection = $thissection->uservisible ||
@@ -890,7 +883,8 @@ class format_grid_renderer extends format_section_renderer_base {
                             'hidden' => true, 'aria-label' => $summary));
                     }
 
-                    echo $this->courseformat->output_section_image($section, $sectionname, $sectionimage, $contextid, $thissection, $gridimagepath);
+                    echo $this->courseformat->output_section_image(
+                        $section, $sectionname, $sectionimage, $contextid, $thissection, $gridimagepath, $this->output);
 
                     echo html_writer::end_tag('div');
                     echo html_writer::end_tag('a');
@@ -927,7 +921,8 @@ class format_grid_renderer extends format_section_renderer_base {
                             'hidden' => true, 'aria-label' => $summary));
                     }
 
-                    $content .= $this->coursformat->output_section_image($section, $sectionname, $sectionimage, $contextid, $thissection, $gridimagepath);
+                    $content .= $this->courseformat->output_section_image(
+                        $section, $sectionname, $sectionimage, $contextid, $thissection, $gridimagepath, $this->output);
 
                     $content .= html_writer::end_tag('div');
 
@@ -1040,9 +1035,7 @@ class format_grid_renderer extends format_section_renderer_base {
 
         $coursenumsections = $this->courseformat->get_last_section_number();
 
-        for ($section = 1; $section <= $coursenumsections; $section++) {
-            $thissection = $modinfo->get_section_info($section);
-
+        foreach ($sections as $section => $thissection) {
             if (!$hascapvishidsect && !$thissection->visible && $course->hiddensections) {
                 unset($sections[$section]);
                 continue;

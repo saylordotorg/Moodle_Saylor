@@ -2783,14 +2783,6 @@ function calendar_add_subscription($sub) {
         unset($sub->groupcourseid);
     }
 
-    // Pull the group id back out of the value. The form saves the value
-    // as "<courseid>-<groupid>" to allow the javascript to work correctly.
-    if (!empty($sub->groupid)) {
-        list($courseid, $groupid) = explode('-', $sub->groupid);
-        $sub->courseid = $courseid;
-        $sub->groupid = $groupid;
-    }
-
     // Default course id if none is set.
     if (empty($sub->courseid)) {
         if ($sub->eventtype === 'site') {
@@ -3814,7 +3806,7 @@ function calendar_get_allowed_event_types(int $courseid = null) {
                 $ctxfields = context_helper::get_preload_record_columns_sql('ctx');
                 $sql = "SELECT
                             c.id, c.visible, {$ctxfields}
-                        FROM {course}
+                        FROM {course} c
                         JOIN {context} ctx ON (ctx.instanceid = c.id AND ctx.contextlevel = :contextlevel)";
                 $params = [
                     'contextlevel' => CONTEXT_COURSE,
