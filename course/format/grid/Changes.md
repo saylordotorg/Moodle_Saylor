@@ -1,5 +1,8 @@
 History
 =============
+Version 3.6.0.1
+  1. Beta version for Moodle 3.6.
+
 Version 3.5.0.3
   1. New: French 'New activity image', thanks to Momar -> https://github.com/Momardiakhate.
   2. Fix PHPUnit test with 'defaultsectiontitlesummarybackgroundopacity' failure.

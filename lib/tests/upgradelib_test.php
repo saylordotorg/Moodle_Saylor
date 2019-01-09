@@ -961,6 +961,7 @@ class core_upgradelib_testcase extends advanced_testcase {
             $itemid    = $key;
             $filepath  = '/';
             $filename  = 'userfile.txt';
+
             $filerecord = array(
                 'contextid' => $usercontext->id,
                 'component' => $component,

@@ -1544,6 +1544,7 @@ class core_calendar_externallib_testcase extends externallib_advanced_testcase {
                 'text' => '',
                 'format' => 1,
             ],
+            'location' => 'Test',
             'duration' => 1,
             'timedurationuntil' => [
                 'day' => $timedurationuntil->format('j'),
@@ -1602,6 +1603,7 @@ class core_calendar_externallib_testcase extends externallib_advanced_testcase {
                 'format' => 1,
                 'itemid' => 0
             ],
+            'location' => 'Test',
             'duration' => 1,
             'timedurationuntil' => [
                 'day' => $timedurationuntil->format('j'),
@@ -1665,6 +1667,7 @@ class core_calendar_externallib_testcase extends externallib_advanced_testcase {
                 'text' => '',
                 'format' => 1,
             ],
+            'location' => 'Test',
             'duration' => 1,
             'timedurationuntil' => [
                 'day' => $timedurationuntil->format('j'),
@@ -1726,6 +1729,7 @@ class core_calendar_externallib_testcase extends externallib_advanced_testcase {
                 'format' => 1,
                 'itemid' => 0
             ],
+            'location' => 'Test',
             'duration' => 1,
             'timedurationuntil' => [
                 'day' => $timedurationuntil->format('j'),
@@ -1790,6 +1794,7 @@ class core_calendar_externallib_testcase extends externallib_advanced_testcase {
                 'text' => '',
                 'format' => 1,
             ],
+            'location' => 'Test',
             'duration' => 1,
             'timedurationuntil' => [
                 'day' => $timedurationuntil->format('j'),
@@ -1854,6 +1859,7 @@ class core_calendar_externallib_testcase extends externallib_advanced_testcase {
                 'format' => 1,
                 'itemid' => 0,
             ],
+            'location' => 'Test',
             'duration' => 1,
             'timedurationuntil' => [
                 'day' => $timedurationuntil->format('j'),
@@ -1922,6 +1928,7 @@ class core_calendar_externallib_testcase extends externallib_advanced_testcase {
                 'text' => '',
                 'format' => 1,
             ],
+            'location' => 'Test',
             'duration' => 1,
             'timedurationuntil' => [
                 'day' => $timedurationuntil->format('j'),
@@ -1987,6 +1994,7 @@ class core_calendar_externallib_testcase extends externallib_advanced_testcase {
                 'text' => '',
                 'format' => 1,
             ],
+            'location' => 'Test',
             'duration' => 1,
             'timedurationuntil' => [
                 'day' => $timedurationuntil->format('j'),
@@ -2054,6 +2062,7 @@ class core_calendar_externallib_testcase extends externallib_advanced_testcase {
                 'format' => 1,
                 'itemid' => 0
             ],
+            'location' => 'Test',
             'duration' => 1,
             'timedurationuntil' => [
                 'day' => $timedurationuntil->format('j'),
@@ -2126,6 +2135,7 @@ class core_calendar_externallib_testcase extends externallib_advanced_testcase {
                 'format' => 1,
                 'itemid' => 0
             ],
+            'location' => 'Test',
             'duration' => 1,
             'timedurationuntil' => [
                 'day' => $timedurationuntil->format('j'),
@@ -2199,6 +2209,7 @@ class core_calendar_externallib_testcase extends externallib_advanced_testcase {
                 'format' => 1,
                 'itemid' => 0
             ],
+            'location' => 'Test',
             'duration' => 1,
             'timedurationuntil' => [
                 'day' => $timedurationuntil->format('j'),
@@ -2271,6 +2282,7 @@ class core_calendar_externallib_testcase extends externallib_advanced_testcase {
                 'text' => '',
                 'format' => 1,
             ],
+            'location' => 'Test',
             'duration' => 1,
             'timedurationuntil' => [
                 'day' => $timedurationuntil->format('j'),

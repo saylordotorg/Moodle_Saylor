@@ -1207,6 +1207,8 @@ class format_grid extends format_base {
             if (in_array('boost', $PAGE->theme->parents) === true) {
                 $bsfour = true;
             }
+        } else if (strcmp($PAGE->theme->name, 'foundation') === 0) {
+            $bsfour = true;
         }
 
         $resetelements = array();

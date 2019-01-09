@@ -409,6 +409,7 @@ class provider implements
                 $eventdetails = (object) [
                     'name' => $event->name,
                     'description' => $event->description,
+                    'location' => $event->location,
                     'eventtype' => $event->eventtype,
                     'timestart' => transform::datetime($event->timestart),
                     'timeduration' => $event->timeduration
@@ -636,6 +637,7 @@ class provider implements
                        details.id as eventid,
                        details.name as name,
                        details.description as description,
+                       details.location as location,
                        details.eventtype as eventtype,
                        details.timestart as timestart,
                        details.timeduration as timeduration

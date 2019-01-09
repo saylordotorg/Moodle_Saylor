@@ -207,6 +207,11 @@ class user_picture implements renderable {
     public $includefullname = false;
 
     /**
+     * @var bool Include user authentication token.
+     */
+    public $includetoken = false;
+
+    /**
      * User picture constructor.
      *
      * @param stdClass $user user record with at least id, picture, imagealt, firstname and lastname set.
@@ -403,7 +408,8 @@ class user_picture implements renderable {
                 $path .= $page->theme->name.'/';
             }
             // Set the image URL to the URL for the uploaded file and return.
-            $url = moodle_url::make_pluginfile_url($contextid, 'user', 'icon', NULL, $path, $filename);
+            $url = moodle_url::make_pluginfile_url(
+                    $contextid, 'user', 'icon', null, $path, $filename, false, $this->includetoken);
             $url->param('rev', $this->user->picture);
             return $url;
         }
@@ -4507,7 +4513,8 @@ class action_menu implements renderable, templatable {
             }
         } else {
             $primary->title = get_string('actionsmenu');
-            $actionicon = new pix_icon('t/edit_menu', '', 'moodle', ['class' => 'iconsmall actionmenu', 'title' => $primary->title]);
+            $iconattributes = ['class' => 'iconsmall actionmenu', 'title' => $primary->title];
+            $actionicon = new pix_icon('t/edit_menu', '', 'moodle', $iconattributes);
         }
 
         if ($actionicon instanceof pix_icon) {

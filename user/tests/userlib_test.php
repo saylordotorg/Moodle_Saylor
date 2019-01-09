@@ -587,7 +587,6 @@ class core_userliblib_testcase extends advanced_testcase {
 
         // Remove capability moodle/user:viewdetails in course 2.
         assign_capability('moodle/user:viewdetails', CAP_PROHIBIT, $studentrole->id, $coursecontext);
-        $coursecontext->mark_dirty();
         // Set current user to user 1.
         $this->setUser($user1);
         // User 1 can see User 1's profile.
@@ -692,13 +691,11 @@ class core_userliblib_testcase extends advanced_testcase {
         $systemcontext = context_system::instance();
         assign_capability('moodle/user:viewdetails', CAP_PREVENT, $managerrole->id, $systemcontext, true);
         assign_capability('moodle/user:viewalldetails', CAP_PREVENT, $managerrole->id, $systemcontext, true);
-        $systemcontext->mark_dirty();
 
         // And override these to 'Allow' in a specific course.
         $course4context = context_course::instance($course4->id);
         assign_capability('moodle/user:viewalldetails', CAP_ALLOW, $managerrole->id, $course4context, true);
         assign_capability('moodle/user:viewdetails', CAP_ALLOW, $managerrole->id, $course4context, true);
-        $course4context->mark_dirty();
 
         // The manager now shouldn't have viewdetails in the system or user context.
         $this->setUser($user9);
@@ -938,6 +935,12 @@ class core_userliblib_testcase extends advanced_testcase {
         $userset = user_get_participants($course->id, $group->id, $accesssince + 1, $roleids['student'], 0, -1, 'searchforthis');
 
         $this->assertEquals($student1->id, $userset->current()->id);
+        $this->assertEquals(1, iterator_count($userset));
+
+        // Search for users without any group.
+        $userset = user_get_participants($course->id, USERSWITHOUTGROUP, 0, $roleids['student'], 0, -1, '');
+
+        $this->assertEquals($student3->id, $userset->current()->id);
         $this->assertEquals(1, iterator_count($userset));
     }
 

@@ -375,7 +375,8 @@ class core_enrol_externallib_testcase extends externallib_advanced_testcase {
             'enablecompletion' => true,
             'showgrades'       => true,
             'startdate'        => $timenow,
-            'enddate'          => $timenow + WEEKSECS
+            'enddate'          => $timenow + WEEKSECS,
+            'marker'           => 1
         );
 
         $coursedata2 = array(
@@ -395,7 +396,17 @@ class core_enrol_externallib_testcase extends externallib_advanced_testcase {
         $this->getDataGenerator()->enrol_user($otherstudent->id, $course1->id, $studentroleid);
         $this->getDataGenerator()->enrol_user($student->id, $course2->id, $studentroleid);
 
+        // Force last access.
+        $timenow = time();
+        $lastaccess = array(
+            'userid' => $student->id,
+            'courseid' => $course1->id,
+            'timeaccess' => $timenow
+        );
+        $DB->insert_record('user_lastaccess', $lastaccess);
+
         // Force completion, setting at least one criteria.
+        require_once($CFG->dirroot.'/completion/criteria/completion_criteria_self.php');
         $criteriadata = new stdClass();
         $criteriadata->id = $course1->id;
         // Self completion.
@@ -406,6 +417,11 @@ class core_enrol_externallib_testcase extends externallib_advanced_testcase {
 
         $ccompletion = new completion_completion(array('course' => $course1->id, 'userid' => $student->id));
         $ccompletion->mark_complete();
+
+        // Set course hidden and favourited.
+        set_user_preference('block_myoverview_hidden_course_' . $course1->id, 1, $student);
+        $ufservice = \core_favourites\service_factory::get_service_for_user_context(\context_user::instance($student->id));
+        $ufservice->create_favourite('core_course', 'courses', $course1->id, \context_system::instance());
 
         $this->setUser($student);
         // Call the external function.
@@ -430,13 +446,26 @@ class core_enrol_externallib_testcase extends externallib_advanced_testcase {
                 foreach ($coursedata1 as $fieldname => $value) {
                     $this->assertEquals($courseenrol[$fieldname], $course1->$fieldname);
                 }
-                // Check progress.
+                // Text extra fields.
+                $this->assertEquals($course1->fullname, $courseenrol['displayname']);
+                $this->assertEquals([], $courseenrol['overviewfiles']);
+                $this->assertEquals($timenow, $courseenrol['lastaccess']);
                 $this->assertEquals(100.0, $courseenrol['progress']);
+                $this->assertEquals(true, $courseenrol['completed']);
+                $this->assertTrue($courseenrol['completionhascriteria']);
+                $this->assertTrue($courseenrol['hidden']);
+                $this->assertTrue($courseenrol['isfavourite']);
             } else {
                 // Check language pack. Should be empty since an incorrect one was used when creating the course.
                 $this->assertEmpty($courseenrol['lang']);
-                // Check progress.
+                $this->assertEquals($course2->fullname, $courseenrol['displayname']);
+                $this->assertEquals([], $courseenrol['overviewfiles']);
+                $this->assertEquals(0, $courseenrol['lastaccess']);
                 $this->assertEquals(0, $courseenrol['progress']);
+                $this->assertEquals(false, $courseenrol['completed']);
+                $this->assertFalse($courseenrol['completionhascriteria']);
+                $this->assertFalse($courseenrol['hidden']);
+                $this->assertFalse($courseenrol['isfavourite']);
             }
         }
 
@@ -448,9 +477,16 @@ class core_enrol_externallib_testcase extends externallib_advanced_testcase {
         $this->assertEquals(2, count($enrolledincourses));
         foreach ($enrolledincourses as $courseenrol) {
             if ($courseenrol['id'] == $course1->id) {
+                $this->assertEquals($timenow, $courseenrol['lastaccess']);
                 $this->assertEquals(100.0, $courseenrol['progress']);
+                $this->assertTrue($courseenrol['completionhascriteria']);
+                $this->assertFalse($courseenrol['isfavourite']);    // This always false.
+                $this->assertFalse($courseenrol['hidden']); // This always false.
             } else {
                 $this->assertEquals(0, $courseenrol['progress']);
+                $this->assertFalse($courseenrol['completionhascriteria']);
+                $this->assertFalse($courseenrol['isfavourite']);    // This always false.
+                $this->assertFalse($courseenrol['hidden']); // This always false.
             }
         }
 
@@ -459,9 +495,17 @@ class core_enrol_externallib_testcase extends externallib_advanced_testcase {
 
         $enrolledincourses = core_enrol_external::get_users_courses($student->id);
         $enrolledincourses = external_api::clean_returnvalue(core_enrol_external::get_users_courses_returns(), $enrolledincourses);
-        $this->assertEquals(1, count($enrolledincourses));  // I see only the course I share.
+        $this->assertEquals(1, count($enrolledincourses));
 
+        $this->assertEquals($timenow, $enrolledincourses[0]['lastaccess']); // I can see this, not hidden.
         $this->assertEquals(null, $enrolledincourses[0]['progress']);   // I can't see this, private.
+
+        // Change some global profile visibility fields.
+        $CFG->hiddenuserfields = 'lastaccess';
+        $enrolledincourses = core_enrol_external::get_users_courses($student->id);
+        $enrolledincourses = external_api::clean_returnvalue(core_enrol_external::get_users_courses_returns(), $enrolledincourses);
+
+        $this->assertEquals(0, $enrolledincourses[0]['lastaccess']); // I can't see this, hidden by global setting.
     }
 
     /**

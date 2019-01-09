@@ -38,6 +38,11 @@ define('SEPARATEGROUPS', 1);
  */
 define('VISIBLEGROUPS', 2);
 
+/**
+ * This is for filtering users without any group.
+ */
+define('USERSWITHOUTGROUP', -1);
+
 
 /**
  * Determines if a group with a given groupid exists.
@@ -293,152 +298,6 @@ function groups_get_all_groups($courseid, $userid=0, $groupingid=0, $fields='g.*
     }
 
     return $results;
-}
-
-/**
- * Gets array of all groups in a set of course.
- *
- * @category group
- * @param array $courses Array of course objects or course ids.
- * @return array Array of groups indexed by course id.
- */
-function groups_get_all_groups_for_courses($courses) {
-    global $DB;
-
-    if (empty($courses)) {
-        return [];
-    }
-
-    $groups = [];
-    $courseids = [];
-
-    foreach ($courses as $course) {
-        $courseid = is_object($course) ? $course->id : $course;
-        $groups[$courseid] = [];
-        $courseids[] = $courseid;
-    }
-
-    $groupfields = [
-        'g.id as gid',
-        'g.courseid',
-        'g.idnumber',
-        'g.name',
-        'g.description',
-        'g.descriptionformat',
-        'g.enrolmentkey',
-        'g.picture',
-        'g.hidepicture',
-        'g.timecreated',
-        'g.timemodified'
-    ];
-
-    $groupsmembersfields = [
-        'gm.id as gmid',
-        'gm.groupid',
-        'gm.userid',
-        'gm.timeadded',
-        'gm.component',
-        'gm.itemid'
-    ];
-
-    $concatidsql = $DB->sql_concat_join("'-'", ['g.id', 'COALESCE(gm.id, 0)']) . ' AS uniqid';
-    list($courseidsql, $params) = $DB->get_in_or_equal($courseids);
-    $groupfieldssql = implode(',', $groupfields);
-    $groupmembersfieldssql = implode(',', $groupsmembersfields);
-    $sql = "SELECT {$concatidsql}, {$groupfieldssql}, {$groupmembersfieldssql}
-              FROM {groups} g
-         LEFT JOIN {groups_members} gm
-                ON gm.groupid = g.id
-             WHERE g.courseid {$courseidsql}";
-
-    $results = $DB->get_records_sql($sql, $params);
-
-    // The results will come back as a flat dataset thanks to the left
-    // join so we will need to do some post processing to blow it out
-    // into a more usable data structure.
-    //
-    // This loop will extract the distinct groups from the result set
-    // and add it's list of members to the object as a property called
-    // 'members'. Then each group will be added to the result set indexed
-    // by it's course id.
-    //
-    // The resulting data structure for $groups should be:
-    // $groups = [
-    //      '1' = [
-    //          '1' => (object) [
-    //              'id' => 1,
-    //              <rest of group properties>
-    //              'members' => [
-    //                  '1' => (object) [
-    //                      <group member properties>
-    //                  ],
-    //                  '2' => (object) [
-    //                      <group member properties>
-    //                  ]
-    //              ]
-    //          ],
-    //          '2' => (object) [
-    //              'id' => 2,
-    //              <rest of group properties>
-    //              'members' => [
-    //                  '1' => (object) [
-    //                      <group member properties>
-    //                  ],
-    //                  '3' => (object) [
-    //                      <group member properties>
-    //                  ]
-    //              ]
-    //          ]
-    //      ]
-    // ]
-    //
-    foreach ($results as $key => $result) {
-        $groupid = $result->gid;
-        $courseid = $result->courseid;
-        $coursegroups = $groups[$courseid];
-        $groupsmembersid = $result->gmid;
-        $reducefunc = function($carry, $field) use ($result) {
-            // Iterate over the groups properties and pull
-            // them out into a separate object.
-            list($prefix, $field) = explode('.', $field);
-
-            if (property_exists($result, $field)) {
-                $carry[$field] = $result->{$field};
-            }
-
-            return $carry;
-        };
-
-        if (isset($coursegroups[$groupid])) {
-            $group = $coursegroups[$groupid];
-        } else {
-            $initial = [
-                'id' => $groupid,
-                'members' => []
-            ];
-            $group = (object) array_reduce(
-                $groupfields,
-                $reducefunc,
-                $initial
-            );
-        }
-
-        if (!empty($groupsmembersid)) {
-            $initial = ['id' => $groupsmembersid];
-            $groupsmembers = (object) array_reduce(
-                $groupsmembersfields,
-                $reducefunc,
-                $initial
-            );
-
-            $group->members[$groupsmembers->userid] = $groupsmembers;
-        }
-
-        $coursegroups[$groupid] = $group;
-        $groups[$courseid] = $coursegroups;
-    }
-
-    return $groups;
 }
 
 /**
@@ -1122,15 +981,20 @@ function groups_group_visible($groupid, $course, $cm = null, $userid = null) {
  * Get sql and parameters that will return user ids for a group
  *
  * @param int $groupid
+ * @param context $context Course context or a context within a course. Mandatory when $groupid = USERSWITHOUTGROUP
  * @return array($sql, $params)
+ * @throws coding_exception if empty or invalid context submitted when $groupid = USERSWITHOUTGROUP
  */
-function groups_get_members_ids_sql($groupid) {
-    $groupjoin = groups_get_members_join($groupid, 'u.id');
+function groups_get_members_ids_sql($groupid, context $context = null) {
+    $groupjoin = groups_get_members_join($groupid, 'u.id', $context);
 
     $sql = "SELECT DISTINCT u.id
               FROM {user} u
             $groupjoin->joins
              WHERE u.deleted = 0";
+    if (!empty($groupjoin->wheres)) {
+        $sql .= ' AND '. $groupjoin->wheres;
+    }
 
     return array($sql, $groupjoin->params);
 }
@@ -1138,20 +1002,42 @@ function groups_get_members_ids_sql($groupid) {
 /**
  * Get sql join to return users in a group
  *
- * @param int $groupid
+ * @param int $groupid The groupid, 0 means all groups and USERSWITHOUTGROUP no group
  * @param string $useridcolumn The column of the user id from the calling SQL, e.g. u.id
+ * @param context $context Course context or a context within a course. Mandatory when $groupid = USERSWITHOUTGROUP
  * @return \core\dml\sql_join Contains joins, wheres, params
+ * @throws coding_exception if empty or invalid context submitted when $groupid = USERSWITHOUTGROUP
  */
-function groups_get_members_join($groupid, $useridcolumn) {
+function groups_get_members_join($groupid, $useridcolumn, context $context = null) {
     // Use unique prefix just in case somebody makes some SQL magic with the result.
     static $i = 0;
     $i++;
     $prefix = 'gm' . $i . '_';
 
-    $join = "JOIN {groups_members} {$prefix}gm ON ({$prefix}gm.userid = $useridcolumn AND {$prefix}gm.groupid = :{$prefix}gmid)";
-    $param = array("{$prefix}gmid" => $groupid);
+    $coursecontext = (!empty($context)) ? $context->get_course_context() : null;
+    if ($groupid == USERSWITHOUTGROUP && empty($coursecontext)) {
+        // Throw an exception if $context is empty or invalid because it's needed to get the users without any group.
+        throw new coding_exception('Missing or wrong $context parameter in an attempt to get members without any group');
+    }
 
-    return new \core\dml\sql_join($join, '', $param);
+    if ($groupid == USERSWITHOUTGROUP) {
+        // Get members without any group.
+        $join = "LEFT JOIN (
+                    SELECT g.courseid, m.groupid, m.userid
+                    FROM {groups_members} m
+                    JOIN {groups} g ON g.id = m.groupid
+                ) {$prefix}gm ON ({$prefix}gm.userid = $useridcolumn AND {$prefix}gm.courseid = :{$prefix}gcourseid)";
+        $where = "{$prefix}gm.userid IS NULL";
+        $param = array("{$prefix}gcourseid" => $coursecontext->instanceid);
+    } else {
+        // Get members of defined groupid.
+        $join = "JOIN {groups_members} {$prefix}gm
+                ON ({$prefix}gm.userid = $useridcolumn AND {$prefix}gm.groupid = :{$prefix}gmid)";
+        $where = '';
+        $param = array("{$prefix}gmid" => $groupid);
+    }
+
+    return new \core\dml\sql_join($join, $where, $param);
 }
 
 /**

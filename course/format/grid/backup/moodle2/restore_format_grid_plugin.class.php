@@ -139,7 +139,7 @@ class restore_format_grid_plugin extends restore_format_plugin {
      * section 1 which was id 129 but now 162 as the debug code told me.  '94' is just the context id.  The url was originally
      * created in '_make_block_icon_topics' of lib.php of the format.
      * Still need courseid in the 'format_grid_icon' table as it is used in discovering what records to remove when deleting a
-     * course, see lib.php 'format_grid_delete_course'.
+     * course.
      */
     public function process_gridsection($data) {
         global $DB;

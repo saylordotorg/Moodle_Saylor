@@ -25,7 +25,6 @@ defined('MOODLE_INTERNAL') || die();
 /** Include required files */
 require_once(__DIR__ . '/deprecatedlib.php');
 require_once($CFG->libdir.'/filelib.php');
-require_once($CFG->libdir.'/eventslib.php');
 
 /// CONSTANTS ///////////////////////////////////////////////////////////
 
@@ -1322,7 +1321,9 @@ function forum_user_complete($course, $user, $mod, $forum) {
             }
             $discussion = $discussions[$post->discussion];
 
+            forum_print_post_start($post);
             forum_print_post($post, $discussion, $forum, $cm, $course, false, false, false);
+            forum_print_post_end($post);
         }
     } else {
         echo "<p>".get_string("noposts", "forum")."</p>";
@@ -1630,7 +1631,7 @@ function forum_print_recent_activity($course, $viewfullnames, $timestart) {
 
         $list .= html_writer::start_tag('li');
         $list .= html_writer::start_div('head');
-        $list .= html_writer::div(userdate($post->modified, $strftimerecent), 'date');
+        $list .= html_writer::div(userdate_htmltime($post->modified, $strftimerecent), 'date');
         if (!$authorhidden) {
             $list .= html_writer::div(fullname($post, $viewfullnames), 'name');
         }
@@ -1643,7 +1644,7 @@ function forum_print_recent_activity($course, $viewfullnames, $timestart) {
             $discussionurl->set_anchor('p'. $post->id);
         }
         $post->subject = break_up_long_words(format_string($post->subject, true));
-        $list .= html_writer::link($discussionurl, $post->subject);
+        $list .= html_writer::link($discussionurl, $post->subject, ['rel' => 'bookmark']);
         $list .= html_writer::end_div(); // Info.
         $list .= html_writer::end_tag('li');
     }
@@ -3101,7 +3102,103 @@ function forum_get_course_forum($courseid, $type) {
 }
 
 /**
+ * Return a static array of posts that are open.
+ *
+ * @return array
+ */
+function forum_post_nesting_cache() {
+    static $nesting = array();
+    return $nesting;
+}
+
+/**
+ * Return true for the first time this post was started
+ *
+ * @param int $id The id of the post to start
+ * @return bool
+ */
+function forum_should_start_post_nesting($id) {
+    $cache = forum_post_nesting_cache();
+    if (!array_key_exists($id, $cache)) {
+        $cache[$id] = 1;
+        return true;
+    } else {
+        $cache[$id]++;
+        return false;
+    }
+}
+
+/**
+ * Return true when all the opens are nested with a close.
+ *
+ * @param int $id The id of the post to end
+ * @return bool
+ */
+function forum_should_end_post_nesting($id) {
+    $cache = forum_post_nesting_cache();
+    if (!array_key_exists($id, $cache)) {
+        return true;
+    } else {
+        $cache[$id]--;
+        if ($cache[$id] == 0) {
+            unset($cache[$id]);
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * Start a forum post container
+ *
+ * @param object $post The post to print.
+ * @param bool $return Return the string or print it
+ * @return string
+ */
+function forum_print_post_start($post, $return = false) {
+    $output = '';
+
+    if (forum_should_start_post_nesting($post->id)) {
+        $attributes = [
+            'id' => 'p'.$post->id,
+            'tabindex' => -1,
+            'class' => 'relativelink'
+        ];
+        $output .= html_writer::start_tag('article', $attributes);
+    }
+    if ($return) {
+        return $output;
+    }
+    echo $output;
+    return;
+}
+
+/**
+ * End a forum post container
+ *
+ * @param object $post The post to print.
+ * @param bool $return Return the string or print it
+ * @return string
+ */
+function forum_print_post_end($post, $return = false) {
+    $output = '';
+
+    if (forum_should_end_post_nesting($post->id)) {
+        $output .= html_writer::end_tag('article');
+    }
+    if ($return) {
+        return $output;
+    }
+    echo $output;
+    return;
+}
+
+/**
  * Print a forum post
+ * This function should always be surrounded with calls to forum_print_post_start
+ * and forum_print_post_end to create the surrounding container for the post.
+ * Replies can be nested before forum_print_post_end and should reflect the structure of
+ * thread.
  *
  * @global object
  * @global object
@@ -3196,23 +3293,23 @@ function forum_print_post($post, $discussion, $forum, &$cm, $course, $ownpost=fa
             echo $output;
             return;
         }
-        $output .= html_writer::tag('a', '', array('id'=>'p'.$post->id));
-        $output .= html_writer::start_tag('div', array('class'=>'forumpost clearfix',
-                                                       'role' => 'region',
+
+        $output .= html_writer::start_tag('div', array('class' => 'forumpost clearfix',
                                                        'aria-label' => get_string('hiddenforumpost', 'forum')));
-        $output .= html_writer::start_tag('div', array('class'=>'row header'));
-        $output .= html_writer::tag('div', '', array('class'=>'left picture')); // Picture
+        $output .= html_writer::start_tag('header', array('class' => 'row header'));
+        $output .= html_writer::tag('div', '', array('class' => 'left picture', 'role' => 'presentation')); // Picture.
         if ($post->parent) {
-            $output .= html_writer::start_tag('div', array('class'=>'topic'));
+            $output .= html_writer::start_tag('div', array('class' => 'topic'));
         } else {
-            $output .= html_writer::start_tag('div', array('class'=>'topic starter'));
+            $output .= html_writer::start_tag('div', array('class' => 'topic starter'));
         }
         $output .= html_writer::tag('div', get_string('forumsubjecthidden','forum'), array('class' => 'subject',
-                                                                                           'role' => 'header')); // Subject.
-        $output .= html_writer::tag('div', get_string('forumauthorhidden', 'forum'), array('class' => 'author',
-                                                                                           'role' => 'header')); // Author.
+                                                                                           'role' => 'header',
+                                                                                           'id' => ('headp' . $post->id))); // Subject.
+        $authorclasses = array('class' => 'author');
+        $output .= html_writer::tag('address', get_string('forumauthorhidden', 'forum'), $authorclasses); // Author.
         $output .= html_writer::end_tag('div');
-        $output .= html_writer::end_tag('div'); // row
+        $output .= html_writer::end_tag('header'); // Header.
         $output .= html_writer::start_tag('div', array('class'=>'row'));
         $output .= html_writer::tag('div', '&nbsp;', array('class'=>'left side')); // Groups
         $output .= html_writer::tag('div', get_string('forumbodyhidden','forum'), array('class'=>'content')); // Content
@@ -3237,17 +3334,13 @@ function forum_print_post($post, $discussion, $forum, &$cm, $course, $ownpost=fa
             echo $output;
             return;
         }
-        $output .= html_writer::tag('a', '', [
-                'id' => "p{$post->id}",
-            ]);
         $output .= html_writer::start_tag('div', [
                 'class' => 'forumpost clearfix',
-                'role' => 'region',
                 'aria-label' => get_string('forumbodydeleted', 'forum'),
             ]);
 
-        $output .= html_writer::start_tag('div', array('class' => 'row header'));
-        $output .= html_writer::tag('div', '', array('class' => 'left picture'));
+        $output .= html_writer::start_tag('header', array('class' => 'row header'));
+        $output .= html_writer::tag('div', '', array('class' => 'left picture', 'role' => 'presentation'));
 
         $classes = ['topic'];
         if (!empty($post->parent)) {
@@ -3259,16 +3352,14 @@ function forum_print_post($post, $discussion, $forum, &$cm, $course, $ownpost=fa
         $output .= html_writer::tag('div', get_string('forumsubjectdeleted', 'forum'), [
                 'class' => 'subject',
                 'role' => 'header',
+                'id' => ('headp' . $post->id)
             ]);
 
         // Author.
-        $output .= html_writer::tag('div', '', [
-                'class' => 'author',
-                'role' => 'header',
-            ]);
+        $output .= html_writer::tag('address', '', ['class' => 'author']);
 
         $output .= html_writer::end_tag('div');
-        $output .= html_writer::end_tag('div'); // End row.
+        $output .= html_writer::end_tag('header'); // End header.
         $output .= html_writer::start_tag('div', ['class' => 'row']);
         $output .= html_writer::tag('div', '&nbsp;', ['class' => 'left side']); // Groups.
         $output .= html_writer::tag('div', get_string('forumbodydeleted', 'forum'), ['class' => 'content']); // Content.
@@ -3323,14 +3414,13 @@ function forum_print_post($post, $discussion, $forum, &$cm, $course, $ownpost=fa
     // Determine if we need to shorten this post
     $shortenpost = ($link && (strlen(strip_tags($post->message)) > $CFG->forum_longpost));
 
-
     // Prepare an array of commands
     $commands = array();
 
     // Add a permalink.
     $permalink = new moodle_url($discussionlink);
     $permalink->set_anchor('p' . $post->id);
-    $commands[] = array('url' => $permalink, 'text' => get_string('permalink', 'forum'));
+    $commands[] = array('url' => $permalink, 'text' => get_string('permalink', 'forum'), 'attributes' => ['rel' => 'bookmark']);
 
     // SPECIAL CASE: The front page can display a news item post to non-logged in users.
     // Don't display the mark read / unread controls in this case.
@@ -3346,7 +3436,7 @@ function forum_print_post($post, $discussion, $forum, &$cm, $course, $ownpost=fa
         } else {
             $url->set_anchor('p'.$post->id);
         }
-        $commands[] = array('url'=>$url, 'text'=>$text);
+        $commands[] = array('url'=>$url, 'text'=>$text, 'attributes' => ['rel' => 'bookmark']);
     }
 
     // Zoom in to the parent specifically
@@ -3357,7 +3447,7 @@ function forum_print_post($post, $discussion, $forum, &$cm, $course, $ownpost=fa
         } else {
             $url->set_anchor('p'.$post->parent);
         }
-        $commands[] = array('url'=>$url, 'text'=>$str->parent);
+        $commands[] = array('url'=>$url, 'text'=>$str->parent, 'attributes' => ['rel' => 'bookmark']);
     }
 
     // Hack for allow to edit news posts those are not displayed yet until they are displayed
@@ -3443,17 +3533,16 @@ function forum_print_post($post, $discussion, $forum, &$cm, $course, $ownpost=fa
     $postbyuser->post = $post->subject;
     $postbyuser->user = $postuser->fullname;
     $discussionbyuser = get_string('postbyuser', 'forum', $postbyuser);
-    $output .= html_writer::tag('a', '', array('id'=>'p'.$post->id));
     // Begin forum post.
     $output .= html_writer::start_div('forumpost clearfix' . $forumpostclass . $topicclass,
-        ['role' => 'region', 'aria-label' => $discussionbyuser]);
+        ['aria-label' => $discussionbyuser]);
     // Begin header row.
-    $output .= html_writer::start_div('row header clearfix');
+    $output .= html_writer::start_tag('header', ['class' => 'row header clearfix']);
 
     // User picture.
     if (!$authorhidden) {
         $picture = $OUTPUT->user_picture($postuser, ['courseid' => $course->id]);
-        $output .= html_writer::div($picture, 'left picture');
+        $output .= html_writer::div($picture, 'left picture', ['role' => 'presentation']);
         $topicclass = 'topic' . $topicclass;
     }
 
@@ -3463,26 +3552,25 @@ function forum_print_post($post, $discussion, $forum, &$cm, $course, $ownpost=fa
     if (empty($post->subjectnoformat)) {
         $postsubject = format_string($postsubject);
     }
-    $output .= html_writer::div($postsubject, 'subject', ['role' => 'heading', 'aria-level' => '2']);
+    $output .= html_writer::div($postsubject, 'subject', ['role' => 'heading', 'aria-level' => '1', 'id' => ('headp' . $post->id)]);
 
     if ($authorhidden) {
-        $bytext = userdate($post->created);
+        $bytext = userdate_htmltime($post->created);
     } else {
         $by = new stdClass();
-        $by->date = userdate($post->created);
+        $by->date = userdate_htmltime($post->created);
         $by->name = html_writer::link($postuser->profilelink, $postuser->fullname);
         $bytext = get_string('bynameondate', 'forum', $by);
     }
     $bytextoptions = [
-        'role' => 'heading',
-        'aria-level' => '2',
+        'class' => 'author'
     ];
-    $output .= html_writer::div($bytext, 'author', $bytextoptions);
+    $output .= html_writer::tag('address', $bytext, $bytextoptions);
     // End topic column.
     $output .= html_writer::end_div();
 
     // End header row.
-    $output .= html_writer::end_div();
+    $output .= html_writer::end_tag('header');
 
     // Row with the forum post content.
     $output .= html_writer::start_div('row maincontent clearfix');
@@ -3539,7 +3627,7 @@ function forum_print_post($post, $discussion, $forum, &$cm, $course, $ownpost=fa
     $output .= html_writer::end_tag('div'); // Content mask
     $output .= html_writer::end_tag('div'); // Row
 
-    $output .= html_writer::start_tag('div', array('class'=>'row side'));
+    $output .= html_writer::start_tag('nav', array('class' => 'row side'));
     $output .= html_writer::tag('div','&nbsp;', array('class'=>'left'));
     $output .= html_writer::start_tag('div', array('class'=>'options clearfix'));
 
@@ -3556,12 +3644,16 @@ function forum_print_post($post, $discussion, $forum, &$cm, $course, $ownpost=fa
     $commandhtml = array();
     foreach ($commands as $command) {
         if (is_array($command)) {
-            $commandhtml[] = html_writer::link($command['url'], $command['text']);
+            $attributes = ['class' => 'nav-item nav-link'];
+            if (isset($command['attributes'])) {
+                $attributes = array_merge($attributes, $command['attributes']);
+            }
+            $commandhtml[] = html_writer::link($command['url'], $command['text'], $attributes);
         } else {
             $commandhtml[] = $command;
         }
     }
-    $output .= html_writer::tag('div', implode(' | ', $commandhtml), array('class'=>'commands'));
+    $output .= html_writer::tag('div', implode(' ', $commandhtml), array('class' => 'commands nav'));
 
     // Output link to post if required
     if ($link) {
@@ -3599,7 +3691,7 @@ function forum_print_post($post, $discussion, $forum, &$cm, $course, $ownpost=fa
 
     // Close remaining open divs
     $output .= html_writer::end_tag('div'); // content
-    $output .= html_writer::end_tag('div'); // row
+    $output .= html_writer::end_tag('nav'); // row
     $output .= html_writer::end_tag('div'); // forumpost
 
     // Mark the forum post as read if required
@@ -3933,7 +4025,7 @@ function forum_print_discussion_header(&$post, $forum, $group = -1, $datestring 
     }
 
     echo '<a href="'.$CFG->wwwroot.'/mod/forum/discuss.php?d='.$post->discussion.$parenturl.'">'.
-          userdate($usedate, $datestring).'</a>';
+          userdate_htmltime($usedate, $datestring).'</a>';
     echo "</td>\n";
 
     // is_guest should be used here as this also checks whether the user is a guest in the current course.
@@ -5688,8 +5780,10 @@ function forum_print_latest_discussions($course, $forum, $maxdiscussions = -1, $
 
                 $discussion->forum = $forum->id;
 
+                forum_print_post_start($discussion);
                 forum_print_post($discussion, $discussion, $forum, $cm, $course, $ownpost, 0, $link, false,
                         '', null, true, $forumtracked);
+                forum_print_post_end($discussion);
             break;
         }
     }
@@ -5810,6 +5904,7 @@ function forum_print_discussion($course, $cm, $forum, $discussion, $post, $mode,
 
     $postread = !empty($post->postread);
 
+    forum_print_post_start($post);
     forum_print_post($post, $discussion, $forum, $cm, $course, $ownpost, $reply, false,
                          '', '', $postread, true, $forumtracked);
 
@@ -5828,6 +5923,7 @@ function forum_print_discussion($course, $cm, $forum, $discussion, $post, $mode,
             forum_print_posts_nested($course, $cm, $forum, $discussion, $post, $reply, $forumtracked, $posts);
             break;
     }
+    forum_print_post_end($post);
 }
 
 
@@ -5860,8 +5956,10 @@ function forum_print_posts_flat($course, &$cm, $forum, $discussion, $post, $mode
 
         $postread = !empty($post->postread);
 
+        forum_print_post_start($post);
         forum_print_post($post, $discussion, $forum, $cm, $course, $ownpost, $reply, $link,
                              '', '', $postread, true, $forumtracked);
+        forum_print_post_end($post);
     }
 }
 
@@ -5893,8 +5991,10 @@ function forum_print_posts_threaded($course, &$cm, $forum, $discussion, $parent,
 
                 $postread = !empty($post->postread);
 
+                forum_print_post_start($post);
                 forum_print_post($post, $discussion, $forum, $cm, $course, $ownpost, $reply, $link,
                                      '', '', $postread, true, $forumtracked);
+                forum_print_post_end($post);
             } else {
                 if (!forum_user_can_see_post($forum, $discussion, $post, null, $cm, true)) {
                     if (forum_user_can_see_post($forum, $discussion, $post, null, $cm, false)) {
@@ -5909,7 +6009,7 @@ function forum_print_posts_threaded($course, &$cm, $forum, $discussion, $parent,
                 } else {
                     $by = new stdClass();
                     $by->name = fullname($post, $canviewfullnames);
-                    $by->date = userdate($post->modified);
+                    $by->date = userdate_htmltime($post->modified);
                     $byline = ' ' . get_string("bynameondate", "forum", $by);
                     $subject = format_string($post->subject, true);
                 }
@@ -5966,9 +6066,11 @@ function forum_print_posts_nested($course, &$cm, $forum, $discussion, $parent, $
             $post->subject = format_string($post->subject);
             $postread = !empty($post->postread);
 
+            forum_print_post_start($post);
             forum_print_post($post, $discussion, $forum, $cm, $course, $ownpost, $reply, $link,
                                  '', '', $postread, true, $forumtracked);
             forum_print_posts_nested($course, $cm, $forum, $discussion, $post, $reply, $forumtracked, $posts);
+            forum_print_post_end($post);
             echo "</div>\n";
         }
     }
@@ -6155,7 +6257,7 @@ function forum_print_recent_mod_activity($activity, $courseid, $detail, $modname
     $output .= html_writer::link($discussionurl, $content->subject);
     $output .= html_writer::end_div();
 
-    $timestamp = userdate($activity->timestamp);
+    $timestamp = userdate_htmltime($activity->timestamp);
     if ($authorhidden) {
         $authornamedate = $timestamp;
     } else {
@@ -8461,22 +8563,19 @@ function mod_forum_get_completion_active_rule_descriptions($cm) {
     foreach ($cm->customdata['customcompletionrules'] as $key => $val) {
         switch ($key) {
             case 'completiondiscussions':
-                if (empty($val)) {
-                    continue;
+                if (!empty($val)) {
+                    $descriptions[] = get_string('completiondiscussionsdesc', 'forum', $val);
                 }
-                $descriptions[] = get_string('completiondiscussionsdesc', 'forum', $val);
                 break;
             case 'completionreplies':
-                if (empty($val)) {
-                    continue;
+                if (!empty($val)) {
+                    $descriptions[] = get_string('completionrepliesdesc', 'forum', $val);
                 }
-                $descriptions[] = get_string('completionrepliesdesc', 'forum', $val);
                 break;
             case 'completionposts':
-                if (empty($val)) {
-                    continue;
+                if (!empty($val)) {
+                    $descriptions[] = get_string('completionpostsdesc', 'forum', $val);
                 }
-                $descriptions[] = get_string('completionpostsdesc', 'forum', $val);
                 break;
             default:
                 break;

@@ -484,7 +484,7 @@ class core_user_externallib_testcase extends externallib_advanced_testcase {
      * Test create_users
      */
     public function test_create_users() {
-         global $USER, $CFG, $DB;
+        global $DB;
 
         $this->resetAfterTest(true);
 
@@ -508,40 +508,94 @@ class core_user_externallib_testcase extends externallib_advanced_testcase {
                 ], [
                     'type' => 'invalidpreference',
                     'value' => 'abcd'
-                ]]
-            );
+                ]
+            ],
+            'department' => 'College of Science',
+            'institution' => 'National Institute of Physics',
+            'phone1' => '01 2345 6789',
+            'maildisplay' => 1,
+            'interests' => 'badminton, basketball, cooking,  '
+        );
+
+        // User with an authentication method done externally.
+        $user2 = array(
+            'username' => 'usernametest2',
+            'firstname' => 'First Name User Test 2',
+            'lastname' => 'Last Name User Test 2',
+            'email' => 'usertest2@example.com',
+            'auth' => 'oauth2'
+        );
 
         $context = context_system::instance();
         $roleid = $this->assignUserCapability('moodle/user:create', $context->id);
         $this->assignUserCapability('moodle/user:editprofile', $context->id, $roleid);
 
         // Call the external function.
-        $createdusers = core_user_external::create_users(array($user1));
+        $createdusers = core_user_external::create_users(array($user1, $user2));
 
         // We need to execute the return values cleaning process to simulate the web service server.
         $createdusers = external_api::clean_returnvalue(core_user_external::create_users_returns(), $createdusers);
 
         // Check we retrieve the good total number of created users + no error on capability.
-        $this->assertEquals(1, count($createdusers));
+        $this->assertCount(2, $createdusers);
 
         foreach($createdusers as $createduser) {
             $dbuser = $DB->get_record('user', array('id' => $createduser['id']));
-            $this->assertEquals($dbuser->username, $user1['username']);
-            $this->assertEquals($dbuser->idnumber, $user1['idnumber']);
-            $this->assertEquals($dbuser->firstname, $user1['firstname']);
-            $this->assertEquals($dbuser->lastname, $user1['lastname']);
-            $this->assertEquals($dbuser->email, $user1['email']);
-            $this->assertEquals($dbuser->description, $user1['description']);
-            $this->assertEquals($dbuser->city, $user1['city']);
-            $this->assertEquals($dbuser->country, $user1['country']);
-            $this->assertEquals('atto', get_user_preferences('htmleditor', null, $dbuser));
-            $this->assertEquals(null, get_user_preferences('invalidpreference', null, $dbuser));
+
+            if ($createduser['username'] === $user1['username']) {
+                $usertotest = $user1;
+                $this->assertEquals('atto', get_user_preferences('htmleditor', null, $dbuser));
+                $this->assertEquals(null, get_user_preferences('invalidpreference', null, $dbuser));
+                // Confirm user interests have been saved.
+                $interests = core_tag_tag::get_item_tags_array('core', 'user', $createduser['id'],
+                        core_tag_tag::BOTH_STANDARD_AND_NOT, 0, false);
+                // There should be 3 user interests.
+                $this->assertCount(3, $interests);
+
+            } else if ($createduser['username'] === $user2['username']) {
+                $usertotest = $user2;
+            }
+
+            foreach ($dbuser as $property => $value) {
+                if ($property === 'password') {
+                    if ($usertotest === $user2) {
+                        // External auth mechanisms don't store password in the user table.
+                        $this->assertEquals(AUTH_PASSWORD_NOT_CACHED, $value);
+                    } else {
+                        // Skip hashed passwords.
+                        continue;
+                    }
+                }
+                // Confirm that the values match.
+                if (isset($usertotest[$property])) {
+                    $this->assertEquals($usertotest[$property], $value);
+                }
+            }
         }
 
         // Call without required capability
         $this->unassignUserCapability('moodle/user:create', $context->id, $roleid);
         $this->expectException('required_capability_exception');
-        $createdusers = core_user_external::create_users(array($user1));
+        core_user_external::create_users(array($user1));
+    }
+
+    /**
+     * Test create_users with password and createpassword parameter not set.
+     */
+    public function test_create_users_empty_password() {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $user = [
+            'username' => 'usernametest1',
+            'firstname' => 'First Name User Test 1',
+            'lastname' => 'Last Name User Test 1',
+            'email' => 'usertest1@example.com',
+        ];
+
+        // This should throw an exception because either password or createpassword param must be passed for auth_manual.
+        $this->expectException(invalid_parameter_exception::class);
+        core_user_external::create_users([$user]);
     }
 
     /**
@@ -701,8 +755,14 @@ class core_user_externallib_testcase extends externallib_advanced_testcase {
                 ], [
                     'type' => 'invialidpreference',
                     'value' => 'abcd'
-                ]]
-            );
+                ]
+            ],
+            'department' => 'College of Science',
+            'institution' => 'National Institute of Physics',
+            'phone1' => '01 2345 6789',
+            'maildisplay' => 1,
+            'interests' => 'badminton, basketball, cooking,  '
+        );
 
         $context = context_system::instance();
         $roleid = $this->assignUserCapability('moodle/user:update', $context->id);
@@ -739,8 +799,17 @@ class core_user_externallib_testcase extends externallib_advanced_testcase {
         $this->assertEquals($dbuser->city, $user1['city']);
         $this->assertEquals($dbuser->country, $user1['country']);
         $this->assertNotEquals(0, $dbuser->picture, 'Picture must be set to the new icon itemid for this user');
+        $this->assertEquals($dbuser->department, $user1['department']);
+        $this->assertEquals($dbuser->institution, $user1['institution']);
+        $this->assertEquals($dbuser->phone1, $user1['phone1']);
+        $this->assertEquals($dbuser->maildisplay, $user1['maildisplay']);
         $this->assertEquals('atto', get_user_preferences('htmleditor', null, $dbuser));
         $this->assertEquals(null, get_user_preferences('invalidpreference', null, $dbuser));
+
+        // Confirm user interests have been saved.
+        $interests = core_tag_tag::get_item_tags_array('core', 'user', $user1['id'], core_tag_tag::BOTH_STANDARD_AND_NOT, 0, false);
+        // There should be 3 user interests.
+        $this->assertCount(3, $interests);
 
         // Confirm no picture change when parameter is not supplied.
         unset($user1['userpicture']);
@@ -1207,6 +1276,40 @@ class core_user_externallib_testcase extends externallib_advanced_testcase {
         $this->assertCount(0, $result['saved']);
         $this->assertEquals('nopermission', $result['warnings'][0]['warningcode']);
         $this->assertEquals($user2->id, $result['warnings'][0]['itemid']);
+    }
+
+    /**
+     * Test update_user_preferences unsetting an existing preference.
+     */
+    public function test_update_user_preferences_unset() {
+        global $DB;
+        $this->resetAfterTest(true);
+
+        $user = self::getDataGenerator()->create_user();
+
+        // Save users preferences.
+        $this->setAdminUser();
+        $preferences = array(
+            array(
+                'name' => 'htmleditor',
+                'value' => 'atto',
+                'userid' => $user->id,
+            )
+        );
+
+        $result = core_user_external::set_user_preferences($preferences);
+        $result = external_api::clean_returnvalue(core_user_external::set_user_preferences_returns(), $result);
+        $this->assertCount(0, $result['warnings']);
+        $this->assertCount(1, $result['saved']);
+
+        // Get preference from DB to avoid cache.
+        $this->assertEquals('atto', $DB->get_field('user_preferences', 'value',
+            array('userid' => $user->id, 'name' => 'htmleditor')));
+
+        // Now, unset.
+        $result = core_user_external::update_user_preferences($user->id, null, array(array('type' => 'htmleditor')));
+
+        $this->assertEquals(0, $DB->count_records('user_preferences', array('userid' => $user->id, 'name' => 'htmleditor')));
     }
 
     /**

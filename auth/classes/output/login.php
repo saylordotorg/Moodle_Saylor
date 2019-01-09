@@ -87,10 +87,15 @@ class login implements renderable, templatable {
         $this->canloginasguest = $CFG->guestloginbutton and !isguestuser();
         $this->canloginbyemail = !empty($CFG->authloginviaemail);
         $this->cansignup = $CFG->registerauth == 'email' || !empty($CFG->registerauth);
-        $this->cookieshelpicon = new help_icon('cookiesenabled', 'core');
+        if ($CFG->rememberusername == 0) {
+            $this->cookieshelpicon = new help_icon('cookiesenabledonlysession', 'core');
+            $this->rememberusername = false;
+        } else {
+            $this->cookieshelpicon = new help_icon('cookiesenabled', 'core');
+            $this->rememberusername = true;
+        }
 
         $this->autofocusform = !empty($CFG->loginpageautofocus);
-        $this->rememberusername = isset($CFG->rememberusername) && $CFG->rememberusername != 0;
 
         $this->forgotpasswordurl = new moodle_url('/login/forgot_password.php');
         $this->loginurl = new moodle_url('/login/index.php');

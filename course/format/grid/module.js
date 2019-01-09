@@ -366,7 +366,10 @@ M.format_grid.shadebox.initialize_shadebox = function() {
     var gridshadebox_content = M.format_grid.ourYUI.one('#gridshadebox_content');
     if (gridshadebox_content.hasClass('absolute')) {
         var top = 50;
-        var pageelement = M.format_grid.ourYUI.one('#region-main');
+        var pageelement = M.format_grid.ourYUI.one('#page-content'); // All themes.
+        if (!pageelement) {
+            pageelement = M.format_grid.ourYUI.one('#region-main'); // Fallback.
+        }
         if (pageelement) {
             var pageelementDOM = pageelement.getDOMNode();
             top = pageelementDOM.offsetTop + pageelementDOM.clientTop;

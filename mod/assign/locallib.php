@@ -87,7 +87,6 @@ require_once($CFG->dirroot . '/mod/assign/feedbackplugin.php');
 require_once($CFG->dirroot . '/mod/assign/submissionplugin.php');
 require_once($CFG->dirroot . '/mod/assign/renderable.php');
 require_once($CFG->dirroot . '/mod/assign/gradingtable.php');
-require_once($CFG->libdir . '/eventslib.php');
 require_once($CFG->libdir . '/portfolio/caller.php');
 
 use \mod_assign\output\grading_app;
@@ -5337,12 +5336,14 @@ class assign {
     public function get_assign_grading_summary_renderable($activitygroup = null) {
 
         $instance = $this->get_instance();
+        $cm = $this->get_course_module();
 
         $draft = ASSIGN_SUBMISSION_STATUS_DRAFT;
         $submitted = ASSIGN_SUBMISSION_STATUS_SUBMITTED;
+        $isvisible = $cm->visible;
 
         if ($activitygroup === null) {
-            $activitygroup = groups_get_activity_group($this->get_course_module());
+            $activitygroup = groups_get_activity_group($cm);
         }
 
         if ($instance->teamsubmission) {
@@ -5360,7 +5361,8 @@ class assign {
                                                   $this->count_submissions_need_grading($activitygroup),
                                                   $instance->teamsubmission,
                                                   $warnofungroupedusers,
-                                                  $this->can_grade());
+                                                  $this->can_grade(),
+                                                  $isvisible);
         } else {
             // The active group has already been updated in groups_print_activity_menu().
             $countparticipants = $this->count_participants($activitygroup);
@@ -5375,8 +5377,8 @@ class assign {
                                                   $this->count_submissions_need_grading($activitygroup),
                                                   $instance->teamsubmission,
                                                   false,
-                                                  $this->can_grade());
-
+                                                  $this->can_grade(),
+                                                  $isvisible);
         }
 
         return $summary;
@@ -5461,6 +5463,9 @@ class assign {
         if (isset($grade->feedbacktext)) {
             $gradebookgrade['feedback'] = $grade->feedbacktext;
         }
+        if (isset($grade->feedbackfiles)) {
+            $gradebookgrade['feedbackfiles'] = $grade->feedbackfiles;
+        }
 
         return $gradebookgrade;
     }
@@ -5504,6 +5509,7 @@ class assign {
             // Remove the grade (if it exists) from the gradebook as it is not 'final'.
             $grade->grade = -1;
             $grade->feedbacktext = '';
+            $grade->feebackfiles = [];
         }
 
         if ($submission != null) {
@@ -6608,6 +6614,7 @@ class assign {
                         // This is the feedback plugin chose to push comments to the gradebook.
                         $grade->feedbacktext = $plugin->text_for_gradebook($grade);
                         $grade->feedbackformat = $plugin->format_for_gradebook($grade);
+                        $grade->feedbackfiles = $plugin->files_for_gradebook($grade);
                     }
                 }
             }
@@ -6708,6 +6715,7 @@ class assign {
             if ($plugin && $plugin->is_enabled() && $plugin->is_visible()) {
                 $grade->feedbacktext = $plugin->text_for_gradebook($grade);
                 $grade->feedbackformat = $plugin->format_for_gradebook($grade);
+                $grade->feedbackfiles = $plugin->files_for_gradebook($grade);
             }
             $this->gradebook_item_update(null, $grade);
         }
@@ -7986,6 +7994,7 @@ class assign {
                     // This is the feedback plugin chose to push comments to the gradebook.
                     $grade->feedbacktext = $plugin->text_for_gradebook($grade);
                     $grade->feedbackformat = $plugin->format_for_gradebook($grade);
+                    $grade->feedbackfiles = $plugin->files_for_gradebook($grade);
                 }
             }
         }
@@ -8463,6 +8472,7 @@ class assign {
                     if ($grade) {
                         $gradebookgrade->feedback = $gradebookplugin->text_for_gradebook($grade);
                         $gradebookgrade->feedbackformat = $gradebookplugin->format_for_gradebook($grade);
+                        $gradebookgrade->feedbackfiles = $gradebookplugin->files_for_gradebook($grade);
                     }
                 }
                 $grades[$gradebookgrade->userid] = $gradebookgrade;
@@ -8744,13 +8754,23 @@ class assign {
     }
 
     /**
-     * Update the module completion status (set it viewed).
+     * Update the module completion status (set it viewed) and trigger module viewed event.
      *
      * @since Moodle 3.2
      */
     public function set_module_viewed() {
         $completion = new completion_info($this->get_course());
         $completion->set_module_viewed($this->get_course_module());
+
+        // Trigger the course module viewed event.
+        $assigninstance = $this->get_instance();
+        $event = \mod_assign\event\course_module_viewed::create(array(
+                'objectid' => $assigninstance->id,
+                'context' => $this->get_context()
+        ));
+
+        $event->add_record_snapshot('assign', $assigninstance);
+        $event->trigger();
     }
 
     /**
