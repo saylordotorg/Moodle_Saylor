@@ -259,6 +259,12 @@ def plugins = [
         "url" : 'https://github.com/trampgeek/moodle-qbehaviour_adaptive_adapted_for_coderunner.git',
         "branch" : 'master',
         "dest" : 'question/behaviour/adaptive_adapted_for_coderunner'
+    ],
+    [
+        "name" : 'enrol_auto',
+        "url" : 'https://github.com/bynare/moodle-enrol_auto.git',
+        "branch" : 'master',
+        "dest" : 'enrol/auto'
     ]
 ]
 
