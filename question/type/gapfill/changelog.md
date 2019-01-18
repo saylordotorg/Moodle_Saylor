@@ -1,19 +1,23 @@
-### Version 1.975 of the Moodle Gapfill question type Dec 2018
+### Version 1.975 of the Moodle Gapfill question type Jan 2019
 Added a collection of sample english language questions in 
 examples\en\english_language.xml that can be imported.
 
-The value for "show number of correct responses" checkbox on hints didn't do anything. That
-is now fixed. My thanks to Dr Anna Stefaidou for reporting this. 
+Briefly tested with the Embed question filter
+https://moodle.org/plugins/filter_embedquestion
+
+When using Adaptive question behaviour the gapfeedback was always for a correct answer. Thanks to Joseph Rézeau for reporting that. Joseph also helped with improving the strings which will
+help with translation.
+
+The value for "show number of correct responses" checkbox on hints didn't do anything. That is now fixed. My thanks to Dr Anna Stefaidou for reporting this. 
 
 Changed fixedgapsize default to on for fresh installs (change in install.xml)
 
-Fixed issue in mobile app where it gave the 'tap to select' prompt even when the question
-was in drop down mode.
+Fixed issue in mobile app where it gave the 'tap to select' prompt even when the question was in drop down mode.
 
 Fixed an error message "Can not add jQuery plugins after starting page output!"
 That showed when the question type was used in simple lesson 
 https://moodle.org/plugins/mod_simplelesson
-and debug output was turned on. This would probably shown in other modules that use the question engine.
+and debug output was turned on. This would have shown in other modules that use the question engine.
 
 Converted dragdrop.js to use amd modules, which is the standard 
 moodle way of handling javascript.  

@@ -15,9 +15,9 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template block_myoverview/courses-view-by-status
+    @template block_sayloroverview/courses-view-by-status
 
-    This template renders the courses view for the myoverview block.
+    This template renders the courses view for the sayloroverview block.
 
     Example context (json):
     {}
@@ -28,11 +28,11 @@
     {{> block_sayloroverview/course-paging-content }}
 
     <div class="text-xs-center text-center">
-        {{> block_myoverview/paging-bar }}
+        {{> block_sayloroverview/paging-bar }}
     </div>
 </div>
 {{#js}}
-require(['jquery', 'block_myoverview/paging_bar', 'block_myoverview/paging_content'],
+require(['jquery', 'block_sayloroverview/paging_bar', 'block_sayloroverview/paging_content'],
     function($, PagingBar, PagingContent) {
 
     var root = $('#{{$id}}courses-view-status-{{uniqid}}{{/id}}');

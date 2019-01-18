@@ -15,9 +15,9 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template block_myoverview/courses-view
+    @template block_sayloroverview/courses-view
 
-    This template renders the courses view for the myoverview block.
+    This template renders the courses view for the sayloroverview block.
 
     Example context (json):
     {}
@@ -27,19 +27,19 @@
     <div class="d-flex justify-content-center">
         <ul class="nav nav-pills mt-1 mb-3 d-flex justify-content-center">
             <li class="nav-item">
-                <a class="nav-link sayloroverview-pill active" href="#myoverview_courses_view_in_progress" data-toggle="tab">
+                <a class="nav-link sayloroverview-pill active" href="#sayloroverview_courses_view_in_progress" data-toggle="tab">
                     {{#str}} inprogress, block_sayloroverview {{/str}}
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link sayloroverview-pill" href="#myoverview_courses_view_past" data-toggle="tab">
+                <a class="nav-link sayloroverview-pill" href="#sayloroverview_courses_view_past" data-toggle="tab">
                     {{#str}} past, block_sayloroverview {{/str}}
                 </a>
             </li>
         </ul>
     </div>
     <div class="tab-content">
-        <div class="tab-pane active fade show" id="myoverview_courses_view_in_progress">
+        <div class="tab-pane active fade show" id="sayloroverview_courses_view_in_progress">
             {{#inprogress}}
                 {{< block_sayloroverview/courses-view-by-status }}
                     {{$id}}courses-view-in-progress{{/id}}
@@ -54,11 +54,11 @@
                          src="{{urls.nocourses}}"
                          alt="{{#str}} nocoursesinprogress, block_sayloroverview {{/str}}"
                          role="presentation">
-                    <p class="text-muted mt-3">{{#str}} nocoursesinprogress, block_myoverview {{/str}}</p>
+                    <p class="text-muted mt-3">{{#str}} nocoursesinprogress, block_sayloroverview {{/str}}</p>
                 </div>
             {{/inprogress}}
         </div>
-        <div class="tab-pane fade" id="myoverview_courses_view_past">
+        <div class="tab-pane fade" id="sayloroverview_courses_view_past">
             {{#past}}
                 {{< block_sayloroverview/courses-view-by-status }}
                     {{$id}}courses-view-past{{/id}}

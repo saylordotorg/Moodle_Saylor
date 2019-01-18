@@ -238,8 +238,13 @@ class qtype_gapfill_renderer extends qtype_with_combined_feedback_renderer {
      * @return string
      */
     public function get_aftergap_text(question_attempt $qa, $fraction, $itemsettings, $rightanswer = "") {
+        /* If the display options are set to not display the right answer
+        then don't display the aftergap text either */
+        if (!$this->displayoptions->rightanswer) {
+            return false;
+        }
         $aftergaptext = "";
-        if (($fraction == 0) && ($rightanswer <> "") && ($rightanswer <> ".+") && ($this->displayoptions->rightanswer)) {
+        if (($fraction == 0) && ($rightanswer <> "") && ($rightanswer <> ".+")) {
             /* replace | operator with the word or */
             $rightanswerdisplay = preg_replace("/\|/", get_string("or", "qtype_gapfill"), $rightanswer);
             /* replace !! with the 'blank' */
@@ -250,14 +255,14 @@ class qtype_gapfill_renderer extends qtype_with_combined_feedback_renderer {
              * was given */
             $aftergaptext = $this->feedback_image($fraction);
             $aftergaptext .= "<span class='aftergapfeedback' title='" .
-                    get_string("correctanswer", "qtype_gapfill") . "'>" . $delim["l"] .
-                    $rightanswerdisplay . $delim["r"] . "</span>";
+                get_string("correctanswer", "qtype_gapfill") . "'>" . $delim["l"] .
+                $rightanswerdisplay . $delim["r"] . "</span>";
             $aftergaptext .= " <span class='gapfeedbackincorrect' title='feedback' >"
-                    .$this->get_feedback($itemsettings, false)."</span>";
+                . $this->get_feedback($itemsettings, false) . "</span>";
         } else {
             $aftergaptext = $this->feedback_image($fraction);
-            $aftergaptext .= " <span class='gapfeedbackcorrect' title='feedback' >".
-                    $this->get_feedback($itemsettings, true)."</span>";
+            $aftergaptext .= " <span class='gapfeedbackcorrect' title='feedback' >" .
+                $this->get_feedback($itemsettings, true) . "</span>";
         }
         return $aftergaptext;
     }

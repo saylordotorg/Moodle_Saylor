@@ -80,7 +80,6 @@ Feature: Test all the basic functionality of this Gapfill question type
     And I type "xxx" into gap "2" in the gapfill question
 
     And I press "Check"
-    And I should see "a correct response feedback"
     And I should see "Your answer is partially correct."
     And I should see "Mark 1.00 out of 2.00"
     And I wait "1" seconds

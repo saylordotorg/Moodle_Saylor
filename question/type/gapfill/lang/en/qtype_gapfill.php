@@ -26,7 +26,6 @@ defined('MOODLE_INTERNAL') || die();
 $string['additemsettings'] = 'Add Gap settings';
 $string['casesensitive'] = 'Case Sensitive';
 $string['casesensitive_help'] = 'When this is checked, if the correct answer is CAT, cat will be flagged as a wrong answer';
-$string['casesensitive_text'] = 'An answer of CAT will will be treated as different to cat';
 $string['noduplicates'] = 'No Duplicates';
 $string['noduplicates_help'] = 'When checked, each answer must be unique, useful where each field has a | operator, i.e. what are the colours of the Olympic medals and each field has [gold|silver|bronze], if the student enters gold in every field only the first will get a mark (the others will still get a tick though). It is really more like discard duplicate answers for marking purposes';
 
@@ -63,7 +62,6 @@ $string['disableregexset_text'] = 'Disable regular expression processing of resp
 $string['fixedgapsize'] = 'Fixed Gap Size';
 $string['fixedgapsize_help'] = 'When attempting the question all gaps will be set to the same size as the largest gap. This removes gap size as a clue to the correct answer, e.g. if the gaps are [red] and [yellow] it would be clear that the yellow went in the biggest gap';
 $string['fixedgapsizeset_text'] = 'Sets the size of every gap to that of the biggest gap';
-$string['delimitset'] = 'Delimit Chars';
 $string['itemsettingsbutton'] = 'Gap settings';
 $string['itemsettingserror'] = 'Only works with Atto editor. Go to Editor preferences to switch to Atto';
 $string['moreoptions'] = 'More Options.';
@@ -96,6 +94,7 @@ $string['letterhint1'] = 'The next letter of the correct answer will be added wh
 $string['courseshortname_help'] = 'Enter the shortname of the course to import question to. This does a standard xml question import from the file example_questions.xml in the gapfill question type folder.';
 $string['questiontext'] = "Question text";
 $string['questiontext_help'] = "Put delimiters around the words that will become the text";
+
 $string['example1'] = 'Drag the verbs into the gaps. He [laughed] and [sat] down';
 $string['distractor1'] = 'blue,shoe,small';
 $string['example2'] = 'Select the verbs from the dropdowns. He [laughed] and [sat] down';

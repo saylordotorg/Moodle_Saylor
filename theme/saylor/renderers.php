@@ -304,7 +304,7 @@ class theme_saylor_core_course_renderer extends \core_course_renderer
         $options['coursecontacts'] = false;
         $options['summary'] = false;
         $options['sort']['idnumber'] = 1;
-        $cat2courselist = coursecat::get(2)->get_courses($options);
+        $cat2courselist = core_course_category::get(2)->get_courses($options);
         // Check all courses and put those with id 2 in whitelist.
         foreach ($cat2courselist as $cat2course) {
             $id = $cat2course->__get('id');

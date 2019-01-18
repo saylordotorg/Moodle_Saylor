@@ -1,6 +1,12 @@
  // https://docs.moodle.org/dev/Creating_a_theme_based_on_boost#Why_do_we_use_pre_and_post_SCSS.3F
 // Post SCSS for the theme.
 
+#page-wrapper {
+	min-height: 100%;
+	height: auto;
+	padding-bottom: 1rem;
+}
+
 .content .sectionname {
 	margin-top: .5rem;
 }

@@ -46,7 +46,8 @@ $capabilities = array(
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
             'manager' => CAP_ALLOW
-        )
+        ),
+        'clonepermissionsfrom' => 'mod/page:view'
     ),
 
     'mod/accredible:manage' => array(

@@ -15,9 +15,9 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template block_myoverview/event-list-group
+    @template block_sayloroverview/event-list-group
 
-    This template renders a list of events for the myoverview block.
+    This template renders a list of events for the sayloroverview block.
 
     Example context (json):
     {
@@ -69,7 +69,7 @@
     <h5 class="h6 m-t-1 {{$extratitleclasses}}{{/extratitleclasses}}" id="event-list-title-{{uniqid}}"><strong>{{$title}}{{/title}}</strong></h5>
     <ul class="list-group unstyled" data-region="event-list" aria-describedby="event-list-title-{{uniqid}}">
         {{$eventlistitems}}
-            {{> block_myoverview/event-list-items }}
+            {{> block_sayloroverview/event-list-items }}
         {{/eventlistitems}}
     </ul>
 </div>

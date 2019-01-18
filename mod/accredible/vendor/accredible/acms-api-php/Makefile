@@ -6,5 +6,5 @@ update:
 	composer update
 
 test:
-	phpunit tests
+	vendor/bin/phpunit tests
 
