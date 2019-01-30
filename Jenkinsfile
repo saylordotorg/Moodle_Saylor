@@ -247,6 +247,12 @@ def plugins = [
         "url" : 'https://github.com/justinhunt/moodle-atto_generico.git',
         "branch" : 'master',
         "dest" : 'lib/editor/atto/plugins/generico'
+    ],
+        [
+        "name" : 'mod_hvp',
+        "url" : 'https://github.com/h5p/h5p-moodle-plugin',
+        "branch" : 'stable',
+        "dest" : 'mod/hvp'
     ]
 ]
 
