@@ -5,7 +5,7 @@
 def mysql_source_dbname = 'moodle'
 def mysql_dest_dbname = 'moodle_test'
 
-def moodle_version = 'MOODLE_35_STABLE_policy_fix'
+def moodle_version = 'MOODLE_36_STABLE'
 
 def plugins = [
     [
@@ -254,7 +254,7 @@ def StashMoodle(moodle_version) {
     node {
         deleteDir()
             try {
-                git([url: 'https://github.com/saylordotorg/moodle.git', branch: "${moodle_version}"])
+                git([url: 'https://github.com/moodle/moodle.git', branch: "${moodle_version}"])
             }
             catch(err) {
                 NotifyOnFail("Unable to retrieve Moodle: ${err}")
