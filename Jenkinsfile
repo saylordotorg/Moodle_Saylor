@@ -253,6 +253,12 @@ def plugins = [
         "url" : 'https://github.com/h5p/h5p-moodle-plugin',
         "branch" : 'stable',
         "dest" : 'mod/hvp'
+    ],
+    [
+        "name" : 'enrol_auto',
+        "url" : 'https://github.com/bynare/moodle-enrol_auto.git',
+        "branch" : 'master',
+        "dest" : 'enrol/auto'
     ]
 ]
 
