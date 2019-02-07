@@ -1,5 +1,5 @@
 <section class="list qtype-gapfill-container qtype-gapfill" ion-list *ngIf="question.text || question.text === ''">
-    <ion-item text-wrap class="addon-qtype-gapfill-container draggable qtext">
+    <ion-item text-wrap class="addon-qtype-gapfill-container qtext">
         <p *ngIf="question.isdragdrop && !question.readOnly" class="core-info-card" icon-start>
             <ion-icon name="information-circle"></ion-icon>
             {{ 'core.question.howtodraganddrop' | translate }}

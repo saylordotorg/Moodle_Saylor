@@ -374,11 +374,15 @@ class calendar_event_exporter extends event_exporter_base {
      * Get the correct minimum midnight day limit based on the event start time
      * and the module's minimum timestamp limit.
      *
+     * @deprecated since Moodle 3.6. Please use get_timestamp_min_limit().
+     * @todo final deprecation. To be removed in Moodle 4.0
      * @param DateTimeInterface $starttime The event start time
      * @param array $min The module's minimum limit for the event
      * @return array Returns an array with mindaytimestamp and mindayerror keys.
      */
     protected function get_module_timestamp_min_limit(\DateTimeInterface $starttime, $min) {
+        debugging('get_module_timestamp_min_limit() has been deprecated. Please call get_timestamp_min_limit() instead.',
+                DEBUG_DEVELOPER);
         return $this->get_timestamp_min_limit($starttime, $min);
     }
 
@@ -386,11 +390,15 @@ class calendar_event_exporter extends event_exporter_base {
      * Get the correct maximum midnight day limit based on the event start time
      * and the module's maximum timestamp limit.
      *
+     * @deprecated since Moodle 3.6. Please use get_timestamp_max_limit().
+     * @todo final deprecation. To be removed in Moodle 4.0
      * @param DateTimeInterface $starttime The event start time
      * @param array $max The module's maximum limit for the event
      * @return array Returns an array with maxdaytimestamp and maxdayerror keys.
      */
     protected function get_module_timestamp_max_limit(\DateTimeInterface $starttime, $max) {
+        debugging('get_module_timestamp_max_limit() has been deprecated. Please call get_timestamp_max_limit() instead.',
+                DEBUG_DEVELOPER);
         return $this->get_timestamp_max_limit($starttime, $max);
     }
 }

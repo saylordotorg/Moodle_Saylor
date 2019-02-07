@@ -1644,6 +1644,37 @@ class core_questionlib_testcase extends advanced_testcase {
     }
 
     /**
+     * Tests that question_has_capability_on does not throw exception on broken questions.
+     */
+    public function test_question_has_capability_on_broken_question() {
+        global $DB;
+
+        // Create the test data.
+        $generator = $this->getDataGenerator();
+        $questiongenerator = $generator->get_plugin_generator('core_question');
+
+        $category = $generator->create_category();
+        $context = context_coursecat::instance($category->id);
+        $questioncat = $questiongenerator->create_question_category([
+            'contextid' => $context->id,
+        ]);
+
+        // Create a cloze question.
+        $question = $questiongenerator->create_question('multianswer', null, [
+            'category' => $questioncat->id,
+        ]);
+        // Now, break the question.
+        $DB->delete_records('question_multianswer', ['question' => $question->id]);
+
+        $this->setAdminUser();
+
+        $result = question_has_capability_on($question->id, 'tag');
+        $this->assertTrue($result);
+
+        $this->assertDebuggingCalled();
+    }
+
+    /**
      * Tests for the deprecated question_has_capability_on function when passing a stdClass as parameter.
      *
      * @dataProvider question_capability_on_question_provider
@@ -1669,7 +1700,6 @@ class core_questionlib_testcase extends advanced_testcase {
         foreach ($capabilities as $capname => $capvalue) {
             assign_capability($capname, $capvalue, $roleid, $context->id);
         }
-        $context->mark_dirty();
 
         $this->setUser($user);
 
@@ -1719,7 +1749,6 @@ class core_questionlib_testcase extends advanced_testcase {
         foreach ($capabilities as $capname => $capvalue) {
             assign_capability($capname, $capvalue, $roleid, $context->id);
         }
-        $context->mark_dirty();
 
         // Create the question.
         $qtype = 'truefalse';
@@ -1771,7 +1800,6 @@ class core_questionlib_testcase extends advanced_testcase {
         foreach ($capabilities as $capname => $capvalue) {
             assign_capability($capname, $capvalue, $roleid, $context->id);
         }
-        $context->mark_dirty();
 
         // Create the question.
         $qtype = 'truefalse';
@@ -1823,7 +1851,6 @@ class core_questionlib_testcase extends advanced_testcase {
         foreach ($capabilities as $capname => $capvalue) {
             assign_capability($capname, $capvalue, $roleid, $context->id);
         }
-        $context->mark_dirty();
 
         // Create the question.
         $qtype = 'truefalse';
@@ -1881,8 +1908,6 @@ class core_questionlib_testcase extends advanced_testcase {
         foreach ($capabilities as $capname => $capvalue) {
             assign_capability($capname, $capvalue, $roleid, $newcontext->id);
         }
-        $context->mark_dirty();
-        $newcontext->mark_dirty();
 
         // Create the question.
         $qtype = 'truefalse';
@@ -1938,7 +1963,6 @@ class core_questionlib_testcase extends advanced_testcase {
         foreach ($capabilities as $capname => $capvalue) {
             assign_capability($capname, $capvalue, $roleid, $context->id);
         }
-        $context->mark_dirty();
 
         // Create the question.
         $question = $questiongenerator->create_question('truefalse', null, [
@@ -2006,5 +2030,35 @@ class core_questionlib_testcase extends advanced_testcase {
         $this->assertEquals($cat0->id, $parentcategories[0]);
         $this->assertEquals($cat1->id, $parentcategories[1]);
         $this->assertCount(2, $parentcategories);
+    }
+
+    public function test_question_get_export_single_question_url() {
+        $generator = $this->getDataGenerator();
+
+        // Create a course and an activity.
+        $course = $generator->create_course();
+        $quiz = $generator->create_module('quiz', ['course' => $course->id]);
+
+        // Create a question in each place.
+        $questiongenerator = $generator->get_plugin_generator('core_question');
+        $courseqcat = $questiongenerator->create_question_category(['contextid' => context_course::instance($course->id)->id]);
+        $courseq = $questiongenerator->create_question('truefalse', null, ['category' => $courseqcat->id]);
+        $quizqcat = $questiongenerator->create_question_category(['contextid' => context_module::instance($quiz->cmid)->id]);
+        $quizq = $questiongenerator->create_question('truefalse', null, ['category' => $quizqcat->id]);
+        $systemqcat = $questiongenerator->create_question_category();
+        $systemq = $questiongenerator->create_question('truefalse', null, ['category' => $systemqcat->id]);
+
+        // Verify some URLs.
+        $this->assertEquals(new moodle_url('/question/exportone.php',
+                ['id' => $courseq->id, 'courseid' => $course->id, 'sesskey' => sesskey()]),
+                question_get_export_single_question_url(question_bank::load_question_data($courseq->id)));
+
+        $this->assertEquals(new moodle_url('/question/exportone.php',
+                ['id' => $quizq->id, 'cmid' => $quiz->cmid, 'sesskey' => sesskey()]),
+                question_get_export_single_question_url(question_bank::load_question($quizq->id)));
+
+        $this->assertEquals(new moodle_url('/question/exportone.php',
+                ['id' => $systemq->id, 'courseid' => SITEID, 'sesskey' => sesskey()]),
+                question_get_export_single_question_url(question_bank::load_question($systemq->id)));
     }
 }

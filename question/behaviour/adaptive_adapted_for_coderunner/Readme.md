@@ -18,9 +18,12 @@ top level folder of your Moodle install:
 For full install instructions, see the
 [CodeRunner install instructions](https://github.com/trampgeek/moodle-qtype_coderunner/blob/master/Readme.md).
 
-CHANGE HISTORY
+## CHANGE HISTORY
+25/01/19: V1.3.6. Fix bug in privacy provider (not working with pre-version7 PHP).
 03/8/18: V1.3.5 Implement Moodle Privacy API (null provider).
+
 28/4/18: V1.3.4 Change state string to "Precheck" after a precheck. [Thanks to Tim Hunt.]
+
 20/5/17: V1.3.3 Prevent resubmission of an unchanged answer from being penalised.
 
 2/03/17: Prevent penalties being applied when grading fails due to a sandbox error
@@ -31,7 +34,7 @@ with all-or-nothing grading turned off.
 4/01/17: Fix bug - previous answers were not being correctly loaded into the
 answer boxes when "Each attempt builds on the last" was used.
 
-Updated 9/11/16 to provide *Precheck* capabilities (an extra button that
+9/11/16: Provide *Precheck* capabilities (an extra button that
 students can click to get a penalty-free run that provides limited checking
 of their code).
 

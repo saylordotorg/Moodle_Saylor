@@ -41,7 +41,7 @@ if (is_siteadmin()) {
         get_string('fixedgapsizeset_text', 'qtype_gapfill') , 0));
     $settingspage->add(new admin_setting_configcheckbox('qtype_gapfill/casesensitive',
         get_string('casesensitive', 'qtype_gapfill'),
-        get_string('casesensitive_text', 'qtype_gapfill') , 0));
+        get_string('casesensitive_help', 'qtype_gapfill') , 0));
     $settingspage->add(new admin_setting_configcheckbox('qtype_gapfill/optionsaftertext',
         get_string('optionsaftertext', 'qtype_gapfill'),
         get_string('optionsaftertext_text', 'qtype_gapfill') , 0));
@@ -52,7 +52,7 @@ if (is_siteadmin()) {
         get_string('addhinttext', 'qtype_gapfill'),
         get_string('addhinttext_text', 'qtype_gapfill') , 0));
     $settingspage->add(new admin_setting_configtextarea('qtype_gapfill/delimitchars',
-         get_string('delimitset', 'qtype_gapfill'),
+         get_string('delimitchars', 'qtype_gapfill'),
          get_string('delimitset_text', 'qtype_gapfill'),
          "[ ],{ },# #,@ @", PARAM_RAW, 20, 3));
     $ADMIN->add('qtype_gapfill_category',

@@ -153,29 +153,125 @@
         "description": "Provides a simple API and specification that abstracts away the details of HTTP into a single PHP function."
     },
     {
-        "name": "guzzlehttp/guzzle",
-        "version": "5.3.1",
-        "version_normalized": "5.3.1.0",
+        "name": "accredible/acms-api-php",
+        "version": "v0.2.4",
+        "version_normalized": "0.2.4.0",
         "source": {
             "type": "git",
-            "url": "https://github.com/guzzle/guzzle.git",
-            "reference": "70f1fa53b71c4647bf2762c09068a95f77e12fb8"
+            "url": "https://github.com/accredible/acms-php-api.git",
+            "reference": "a7f121267771a799ce2ea61f724feb351f28e44d"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/guzzle/guzzle/zipball/70f1fa53b71c4647bf2762c09068a95f77e12fb8",
-            "reference": "70f1fa53b71c4647bf2762c09068a95f77e12fb8",
+            "url": "https://api.github.com/repos/accredible/acms-php-api/zipball/a7f121267771a799ce2ea61f724feb351f28e44d",
+            "reference": "a7f121267771a799ce2ea61f724feb351f28e44d",
+            "shasum": ""
+        },
+        "require": {
+            "guzzlehttp/guzzle": "~5.0",
+            "php": ">=5.4"
+        },
+        "require-dev": {
+            "phpunit/phpunit": "^4.6 || ^5.0"
+        },
+        "time": "2017-12-08T10:59:49+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "ACMS\\": "src",
+                "ACMS\\Tests\\": "tests"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Alan Heppenstall",
+                "email": "alan@accredible.com"
+            }
+        ],
+        "description": "PHP wrappers for Accredible ACMS API"
+    },
+    {
+        "name": "soundasleep/html2text",
+        "version": "0.5.0",
+        "version_normalized": "0.5.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/soundasleep/html2text.git",
+            "reference": "cdb89f6ffa2c4cc78f8ed9ea6ee0594a9133ccad"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/soundasleep/html2text/zipball/cdb89f6ffa2c4cc78f8ed9ea6ee0594a9133ccad",
+            "reference": "cdb89f6ffa2c4cc78f8ed9ea6ee0594a9133ccad",
+            "shasum": ""
+        },
+        "require": {
+            "ext-dom": "*",
+            "ext-libxml": "*",
+            "php": ">=5.3.2"
+        },
+        "require-dev": {
+            "phpunit/phpunit": ">=4.0",
+            "soundasleep/component-tests": "dev-master"
+        },
+        "time": "2017-04-19T22:01:50+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Html2Text\\": "src"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "EPL-1.0"
+        ],
+        "authors": [
+            {
+                "name": "Jevon Wright",
+                "homepage": "https://jevon.org",
+                "role": "Developer"
+            }
+        ],
+        "description": "A PHP script to convert HTML into a plain text format",
+        "homepage": "https://github.com/soundasleep/html2text",
+        "keywords": [
+            "email",
+            "html",
+            "php",
+            "text"
+        ]
+    },
+    {
+        "name": "guzzlehttp/guzzle",
+        "version": "5.3.2",
+        "version_normalized": "5.3.2.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/guzzle/guzzle.git",
+            "reference": "f9acb4761844317e626a32259205bec1f1bc60d2"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/guzzle/guzzle/zipball/f9acb4761844317e626a32259205bec1f1bc60d2",
+            "reference": "f9acb4761844317e626a32259205bec1f1bc60d2",
             "shasum": ""
         },
         "require": {
             "guzzlehttp/ringphp": "^1.1",
-            "php": ">=5.4.0"
+            "php": ">=5.4.0",
+            "react/promise": "^2.2"
         },
         "require-dev": {
             "ext-curl": "*",
             "phpunit/phpunit": "^4.0"
         },
-        "time": "2016-07-15T19:28:39+00:00",
+        "time": "2018-01-15T07:18:01+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -205,45 +301,5 @@
             "rest",
             "web service"
         ]
-    },
-    {
-        "name": "accredible/acms-api-php",
-        "version": "v0.1.4",
-        "version_normalized": "0.1.4.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/accredible/acms-php-api.git",
-            "reference": "6e619add285c96d5bc2a60dad4246371ad9f4535"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/accredible/acms-php-api/zipball/6e619add285c96d5bc2a60dad4246371ad9f4535",
-            "reference": "6e619add285c96d5bc2a60dad4246371ad9f4535",
-            "shasum": ""
-        },
-        "require": {
-            "guzzlehttp/guzzle": "~5.0",
-            "php": ">=5.4"
-        },
-        "time": "2017-11-15T14:26:34+00:00",
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "ACMS\\": "src",
-                "ACMS\\Tests\\": "tests"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Alan Heppenstall",
-                "email": "alan@accredible.com"
-            }
-        ],
-        "description": "PHP wrappers for Accredible ACMS API"
     }
 ]

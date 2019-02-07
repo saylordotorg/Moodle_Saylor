@@ -22,7 +22,7 @@ Feature: Preview an Algebra question
       | Test questions   | algebra   | algebra-001 | simplemath |
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I navigate to "Question bank" node in "Course administration"
+    And I navigate to "Question bank" in current page administration
 
   @javascript @_switch_window
   Scenario: Preview an Algebra question with correct answer

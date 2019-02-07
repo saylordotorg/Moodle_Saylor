@@ -25,6 +25,7 @@
 $string['asap'] = 'ASAP';
 $string['backtoscheduledtasks'] = 'Back to scheduled tasks';
 $string['blocking'] = 'Blocking';
+$string['cannotfindthepathtothecli'] = 'Cannot find the path to the PHP CLI executable so task execution aborted. Set the \'Path to PHP CLI\' setting in Site administration / Server / System paths.';
 $string['clearfaildelay_confirm'] = 'Are you sure you want to clear the fail delay for task \'{$a}\'? After clearing the delay, the task will run according to its normal schedule.';
 $string['component'] = 'Component';
 $string['corecomponent'] = 'Core';
@@ -33,7 +34,7 @@ $string['disabled'] = 'Disabled';
 $string['disabled_help'] = 'Disabled scheduled tasks are not executed from cron, however they can still be executed manually via the CLI tool.';
 $string['edittaskschedule'] = 'Edit task schedule: {$a}';
 $string['enablerunnow'] = 'Allow \'Run now\' for scheduled tasks';
-$string['enablerunnow_desc'] = 'Allows administrators to run a single scheduled task immediately, rather than waiting for it to run as scheduled. The task runs on the web server, so some sites may wish to disable this feature to avoid potential performance issues.';
+$string['enablerunnow_desc'] = 'Allows administrators to run a single scheduled task immediately, rather than waiting for it to run as scheduled. The feature requires \'Path to PHP CLI\' (pathtophp) to be set in System paths. The task runs on the web server, so you may wish to disable this feature to avoid potential performance issues.';
 $string['faildelay'] = 'Fail delay';
 $string['lastruntime'] = 'Last run';
 $string['nextruntime'] = 'Next run';
@@ -58,3 +59,4 @@ $string['taskscheduleminute_help'] = 'Minute field for task schedule. The field 
 $string['taskschedulemonth'] = 'Month';
 $string['taskschedulemonth_help'] = 'Month field for task schedule. The field uses the same format as unix cron. Some examples are:<br/><ul><li><strong>*</strong> Every month</li><li><strong>*/2</strong> Every second month</li><li><strong>1</strong> Every January</li><li><strong>1,5</strong> Every January and May</li></ul>';
 $string['privacy:metadata'] = 'The Scheduled task configuration plugin does not store any personal data.';
+

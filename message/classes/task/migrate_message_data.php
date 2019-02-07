@@ -123,7 +123,14 @@ class migrate_message_data extends \core\task\adhoc_task {
         global $DB;
 
         if (!$conversationid = \core_message\api::get_conversation_between_users([$userid, $otheruserid])) {
-            $conversationid = \core_message\api::create_conversation_between_users([$userid, $otheruserid]);
+            $conversation = \core_message\api::create_conversation(
+                \core_message\api::MESSAGE_CONVERSATION_TYPE_INDIVIDUAL,
+                [
+                    $userid,
+                    $otheruserid
+                ]
+            );
+            $conversationid = $conversation->id;
         }
 
         // First, get the rows from the 'message' table.
@@ -229,7 +236,7 @@ class migrate_message_data extends \core\task\adhoc_task {
         }
 
         // Check if we need to mark this message as deleted for the user to.
-        if ($message->timeusertodeleted) {
+        if ($message->timeusertodeleted and ($message->useridfrom != $message->useridto)) {
             $mua = new \stdClass();
             $mua->userid = $message->useridto;
             $mua->messageid = $messageid;

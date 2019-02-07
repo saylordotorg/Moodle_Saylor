@@ -50,6 +50,10 @@ div#gridshadebox_overlay {
     margin: 0 30px 10px 15px;
 }
 
+#gridshadebox_content ul.gtopics .sectionname {
+    margin-top: .5rem;
+}
+
 #changenumsections {
     margin-right: 15px;
 }

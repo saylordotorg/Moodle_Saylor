@@ -70,7 +70,12 @@ function local_boostnavigation_get_all_childrenkeys(navigation_node $navigationn
 function local_boostnavigation_build_custom_nodes($customnodes, navigation_node $node,
         $keyprefix='localboostnavigationcustom', $showinflatnavigation=true, $collapse=false,
         $collapsedefault=false) {
-    global $USER;
+    global $USER, $FULLME;
+
+    // Build full page URL if we have it available to be used down below.
+    if (!empty($FULLME)) {
+        $pagefullurl = new moodle_url($FULLME);
+    }
 
     // Initialize counter which is later used for the node IDs.
     $nodecount = 0;
@@ -103,6 +108,8 @@ function local_boostnavigation_build_custom_nodes($customnodes, navigation_node 
         $nodevisible = false;
         $nodeischild = false;
         $nodekey = null;
+        $nodelanguage = null;
+        $nodeicon = null;
 
         // Make a new array on delimiter "|".
         $settings = explode('|', $line);
@@ -110,7 +117,7 @@ function local_boostnavigation_build_custom_nodes($customnodes, navigation_node 
         // Check for the mandatory conditions first.
         // If array contains too less or too many settings, do not proceed and therefore do not create the node.
         // Furthermore check it at least the first two mandatory params are not an empty string.
-        if (count($settings) >= 2 && count($settings) <= 5 && $settings[0] !== '' && $settings[1] !== '') {
+        if (count($settings) >= 2 && count($settings) <= 7 && $settings[0] !== '' && $settings[1] !== '') {
             foreach ($settings as $i => $setting) {
                 $setting = trim($setting);
                 if (!empty($setting)) {
@@ -120,10 +127,10 @@ function local_boostnavigation_build_custom_nodes($customnodes, navigation_node 
                             // Check if this is a child node and get the node title.
                             if (substr($setting, 0, 1) == '-') {
                                 $nodeischild = true;
-                                $nodetitle = substr($setting, 1);
+                                $nodetitle = local_boostnavigation_build_node_title(substr($setting, 1));
                             } else {
                                 $nodeischild = false;
-                                $nodetitle = $setting;
+                                $nodetitle = local_boostnavigation_build_node_title($setting);
                             }
 
                             // Set the node to be basically visible.
@@ -149,7 +156,8 @@ function local_boostnavigation_build_custom_nodes($customnodes, navigation_node 
                             // Only proceed if something is entered here. This parameter is optional.
                             // If no language is given the node will be added to the navigation by default.
                             $nodelanguages = array_map('trim', explode(',', $setting));
-                            $nodevisible &= in_array(current_language(), $nodelanguages);
+                            $nodelanguage = in_array(current_language(), $nodelanguages);
+                            $nodevisible &= $nodelanguage;
 
                             break;
                         // Check for the optional fourth param: cohort filter.
@@ -166,6 +174,24 @@ function local_boostnavigation_build_custom_nodes($customnodes, navigation_node 
                             // Otherwise, it is checked whether the user has any of the provided roles,
                             // so that the custom node is displayed.
                             $nodevisible &= local_boostnavigation_user_has_role_on_page($USER->id, $setting);
+
+                            break;
+                        // Check for the optional sixth parameter: system role filter.
+                        case 5:
+                            // Only proceed if some role is entered here. This parameter is optional.
+                            // If no system role shortnames are given, the node will be added to the navigation by default.
+                            // Otherwise, it is checked whether the user has any of the provided roles,
+                            // so that the custom node is displayed.
+                            $nodevisible &= local_boostnavigation_user_has_role_on_system($USER->id, $setting);
+
+                            break;
+                        // Check for the optional seventh parameter: icon.
+                        case 6:
+                            // Only proceed if some valid FontAwesome icon is entered here. This parameter is optional.
+                            // If no valid icon is given, the node will be added to the navigation with the default icon.
+                            if (local_boostnavigation_verify_faicon($setting) == true) {
+                                $nodeicon = new pix_icon($setting, '', 'local_boostnavigation');
+                            }
 
                             break;
                     }
@@ -241,7 +267,11 @@ function local_boostnavigation_build_custom_nodes($customnodes, navigation_node 
 
                 // Finally, if the node shouldn't be collapsed or if it does not have children, set the node icon.
                 if (!$collapse || $customnode->has_children() == false) {
-                    $customnode->icon = new pix_icon('customnode', '', 'local_boostnavigation');
+                    if ($nodeicon instanceof pix_icon) {
+                        $customnode->icon = $nodeicon;
+                    } else {
+                        $customnode->icon = new pix_icon('customnode', '', 'local_boostnavigation');
+                    }
                 }
 
                 // Otherwise, if it's a child node.
@@ -276,8 +306,20 @@ function local_boostnavigation_build_custom_nodes($customnodes, navigation_node 
                     $customnode->hidden = false;
                 }
 
+                // For some strange reason, Moodle core does only compare the URL base when searching the active navigation node.
+                // This will result in the wrong node being highlighted if we add multiple nodes which only differ by the URL
+                // parameter as custom nodes.
+                // We try to overcome this problem as best as possible by actively setting the active node.
+                if ($pagefullurl instanceof moodle_url && $nodeurl->compare($pagefullurl, URL_MATCH_PARAMS)) {
+                    $customnode->make_active();
+                }
+
                 // Finally, set the node icon.
-                $customnode->icon = new pix_icon('customnode', '', 'local_boostnavigation');
+                if ($nodeicon instanceof pix_icon) {
+                    $customnode->icon = $nodeicon;
+                } else {
+                    $customnode->icon = new pix_icon('customnode', '', 'local_boostnavigation');
+                }
             }
         }
     }
@@ -342,6 +384,7 @@ function local_boostnavigation_build_node_url($url) {
     // Define placeholders which should be replaced later.
     $placeholders = array('courseid' => (isset($COURSE->id) ? $COURSE->id : ''),
             'courseshortname' => (isset($COURSE->shortname) ? $COURSE->shortname : ''),
+            'editingtoggle' => ($PAGE->user_is_editing() ? 'off' : 'on'),
             'userid' => (isset($USER->id) ? $USER->id : ''),
             'userusername' => (isset($USER->username) ? $USER->username : ''),
             'pagecontextid' => (is_object($PAGE->context) ? $PAGE->context->id : ''),
@@ -357,6 +400,50 @@ function local_boostnavigation_build_node_url($url) {
     }
 
     return new moodle_url($url);
+}
+
+/**
+ * This function takes the plugin's custom node title, replaces placeholders if necessary and returns the title.
+ *
+ * @param string $title
+ * @return string
+ */
+function local_boostnavigation_build_node_title($title) {
+    global $USER, $COURSE, $PAGE;
+
+    // Define placeholders which should be replaced later.
+    $placeholders = array('coursefullname' => (isset($COURSE->fullname) ? format_string($COURSE->fullname) : ''),
+            'courseshortname' => (isset($COURSE->shortname) ? $COURSE->shortname : ''),
+            'editingtoggle' => ($PAGE->user_is_editing() ? get_string('turneditingoff') : get_string('turneditingon')),
+            'userfullname' => fullname($USER),
+            'userusername' => (isset($USER->username) ? $USER->username : ''));
+
+    // Check if there is any placeholder in the title.
+    if (strpos($title, '{') !== false) {
+        // If yes, replace the placeholders in the title.
+        foreach ($placeholders as $search => $replace) {
+            $title = str_replace('{' . $search . '}', $replace, $title);
+        }
+    }
+
+    return $title;
+}
+
+/**
+ * Checks if the provided string is a valid FontAwesome icon name.
+ * @param string $icon
+ * @return bool
+ */
+function local_boostnavigation_verify_faicon($icon) {
+    // The regex to identify a FontAwesome icon name.
+    $faiconpattern = '~^fa-[\w\d-]+$~';
+
+    // Check if it's matching the Font Awesome pattern.
+    if (preg_match($faiconpattern, $icon) > 0) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 /**
@@ -421,4 +508,36 @@ function local_boostnavigation_user_has_role_on_page($userid, $setting) {
         // Check if the user has at least one of the required roles.
         return count(array_intersect($rolesincontextshortnames, $showforroles)) > 0;
     }
+}
+
+/**
+ * Checks if the user has any of the allowed global system roles.
+ * @param int $userid
+ * @param string $setting A comma-separated whitelist of allowed system role shortnames.
+ * @return bool
+ */
+function local_boostnavigation_user_has_role_on_system($userid, $setting) {
+
+    // Split optional setting by comma.
+    $showforroles = explode(',', $setting);
+
+    // Retrieve the assigned roles for the system context only once and remember for next calls of this function.
+    static $rolesinsystemshortnames;
+    if ($rolesinsystemshortnames == null) {
+        // Get the assigned roles.
+        $rolesinsystem = get_user_roles(context_system::instance(), $userid);
+        $rolesinsystemshortnames = array();
+        foreach ($rolesinsystem as $role) {
+            array_push($rolesinsystemshortnames, $role->shortname);
+        }
+
+        // Is the user an admin?
+        if (is_siteadmin($userid)) {
+            // Add it to the list of system roles.
+            array_push($rolesinsystemshortnames, 'admin');
+        }
+    }
+
+    // Check if the user has at least one of the required roles.
+    return count(array_intersect($rolesinsystemshortnames, $showforroles)) > 0;
 }

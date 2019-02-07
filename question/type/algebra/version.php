@@ -23,8 +23,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'qtype_algebra';
-$plugin->version   = 2018020401;
+$plugin->version   = 2019020201;
 
-$plugin->requires  = 2013050100;
-$plugin->release   = '1.71 for Moodle 2.8, ... 3.5';
+$plugin->requires  = 2016052300;
+$plugin->release   = '1.8 for Moodle 3.0 ... 3.6';
 $plugin->maturity  = MATURITY_STABLE;

@@ -96,7 +96,7 @@ class qtype_gapfill_question_test extends advanced_testcase {
         $response = array('p1' => 'cat', 'p2' => 'cat');
         $ddresponse = $question->discard_duplicates($response);
         $numpartsright = $question->get_num_parts_right($ddresponse);
-        $this->assertEquals($numpartsright, 1);
+        $this->assertEquals($numpartsright[0], 1);
     }
 
 

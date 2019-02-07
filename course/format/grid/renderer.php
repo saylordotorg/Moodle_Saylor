@@ -39,6 +39,7 @@ class format_grid_renderer extends format_section_renderer_base {
     private $settings; // Settings array.
     private $shadeboxshownarray = array(); // Value of 1 = not shown, value of 2 = shown - to reduce ambiguity in JS.
     private $portable = 0; // 1 = mobile, 2 = tablet.
+    protected $initialsection = -1;
 
     /**
      * Constructor method, calls the parent constructor - MDL-21097
@@ -246,7 +247,7 @@ class format_grid_renderer extends format_section_renderer_base {
     }
 
     /**
-     * Output the html for a single section page .
+     * Output the html for a single section page.
      *
      * @param stdClass $course The course entry from DB
      * @param array $sections (argument not used)
@@ -516,6 +517,7 @@ class format_grid_renderer extends format_section_renderer_base {
             $PAGE->user_is_editing(),
             $sectionredirect,
             $coursenumsections,
+            $this->initialsection,
             json_encode($this->shadeboxshownarray)));
         if (!$PAGE->user_is_editing()) {
             // Initialise the key control functionality...
@@ -1219,5 +1221,9 @@ class format_grid_renderer extends format_section_renderer_base {
 
     public function set_portable($portable) {
         $this->portable = $portable;
+    }
+
+    public function set_initialsection($initialsection) {
+        $this->initialsection = $initialsection;
     }
 }

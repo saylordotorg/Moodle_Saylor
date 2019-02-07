@@ -292,7 +292,7 @@ $string['sensitivedatareasons'] = 'Sensitive personal data processing reasons';
 $string['sensitivedatareasons_help'] = 'Select one or more applicable reasons that exempts the prohibition of processing sensitive personal data tied to this purpose. For more information, please see  <a href="https://gdpr-info.eu/art-9-gdpr/" target="_blank">GDPR Art. 9.2</a>';
 $string['setdefaults'] = 'Set defaults';
 $string['showdataretentionsummary'] = 'Show data retention summary';
-$string['showdataretentionsummary_desc'] = 'If enabled, a link to the data retention summary is shown in the page footer and in the user profile page.';
+$string['showdataretentionsummary_desc'] = 'If enabled, a link to the data retention summary is displayed in the page footer and in users\' profiles.';
 $string['statusapproved'] = 'Approved';
 $string['statusawaitingapproval'] = 'Awaiting approval';
 $string['statuscancelled'] = 'Cancelled';
@@ -301,7 +301,6 @@ $string['statusready'] = 'Download ready';
 $string['statusdeleted'] = 'Deleted';
 $string['statusdetail'] = 'Status:';
 $string['statusexpired'] = 'Expired';
-$string['statuspreprocessing'] = 'Pre-processing';
 $string['statusprocessing'] = 'Processing';
 $string['statuspending'] = 'Pending';
 $string['statusrejected'] = 'Rejected';
@@ -333,3 +332,6 @@ $string['role_help'] = 'The role which the override should apply to.';
 $string['duplicaterole'] = 'Role already specified';
 $string['purposeoverview'] = 'A purpose describes the intended use and retention policy for stored data. The basis for storing and retaining that data is also described in the purpose.';
 $string['roleoverrideoverview'] = 'The default retention policy can be overridden for specific user roles, allowing you to specify a longer, or a shorter, retention policy. A user is only expired when all of their roles have expired.';
+
+// Deprecated since Moodle 3.6.
+$string['statuspreprocessing'] = 'Pre-processing';

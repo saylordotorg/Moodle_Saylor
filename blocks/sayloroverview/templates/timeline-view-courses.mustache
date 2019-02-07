@@ -15,9 +15,9 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template block_myoverview/timeline-view-courses
+    @template block_sayloroverview/timeline-view-courses
 
-    This template renders the timeline view by courses for the myoverview block.
+    This template renders the timeline view by courses for the sayloroverview block.
 
     Example context (json):
     {}
@@ -28,12 +28,12 @@
             {{#haspages}}
                 {{#pages}}
                     <ul class="list-group unstyled hidden" data-region="course-block">
-                        {{#courses}} {{> block_myoverview/course-item }} {{/courses}}
+                        {{#courses}} {{> block_sayloroverview/course-item }} {{/courses}}
                     </ul>
                 {{/pages}}
                 <div class="text-xs-center text-center m-t-1">
                     <button type="button" class="btn btn-secondary" data-action="more-courses">
-                        {{#str}} morecourses, block_myoverview {{/str}}
+                        {{#str}} morecourses, block_sayloroverview {{/str}}
                         <span class="hidden" data-region="loading-icon-container">
                             {{> core/loading }}
                         </span>
@@ -44,9 +44,9 @@
                 <div class="text-xs-center text-center m-t-3">
                     <img class="empty-placeholder-image-lg"
                          src="{{urls.noevents}}"
-                         alt="{{#str}} nocoursesinprogress, block_myoverview {{/str}}"
+                         alt="{{#str}} nocoursesinprogress, block_sayloroverview {{/str}}"
                          role="presentation">
-                    <p class="text-muted m-t-1">{{#str}} nocoursesinprogress, block_myoverview {{/str}}</p>
+                    <p class="text-muted m-t-1">{{#str}} nocoursesinprogress, block_sayloroverview {{/str}}</p>
                 </div>
             {{/haspages}}
         {{/inprogress}}
@@ -54,15 +54,15 @@
             <div class="text-xs-center text-center m-t-3">
                 <img class="empty-placeholder-image-lg"
                      src="{{urls.noevents}}"
-                     alt="{{#str}} nocoursesinprogress, block_myoverview {{/str}}"
+                     alt="{{#str}} nocoursesinprogress, block_sayloroverview {{/str}}"
                      role="presentation">
-                <p class="text-muted m-t-1">{{#str}} nocoursesinprogress, block_myoverview {{/str}}</p>
+                <p class="text-muted m-t-1">{{#str}} nocoursesinprogress, block_sayloroverview {{/str}}</p>
             </div>
         {{/inprogress}}
     {{/coursesview}}
 </div>
 {{#js}}
-    require(['jquery', 'core/custom_interaction_events', 'block_myoverview/event_list_by_course'],
+    require(['jquery', 'core/custom_interaction_events', 'block_sayloroverview/event_list_by_course'],
         function($, CustomEvents, EventListByCourse) {
 
         var root = $("#sort-by-courses-view-{{uniqid}}");

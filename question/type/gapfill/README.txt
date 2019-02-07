@@ -1,4 +1,4 @@
-Gapfill question type V1.974 for Moodle 
+Gapfill question type V1.975 for Moodle 
 
 A very easy to use Cloze question type that supports drag/drop answers that work on mobile devices and the mobile app. 
 Teachers can define the question with square braces to define the missing words. For example The [cat] sat on the [mat]. 
@@ -9,7 +9,7 @@ wrong answers. These can then can be selected via dropddropdown lists or javascr
 
 This question type was written by Marcus Green
 
-This question type was created and tested under Moodle 3.1,3.2,3.3,3.4,3.5
+This question type was created and tested under Moodle 3.1,3.2,3.3,3.4,3.5,3.6
 
 
 Place the files in a directory 

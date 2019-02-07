@@ -15,6 +15,10 @@ class ComposerStaticInit8d947361c0083b855c1b429cc511cf33
         array (
             'React\\Promise\\' => 14,
         ),
+        'H' => 
+        array (
+            'Html2Text\\' => 10,
+        ),
         'G' => 
         array (
             'GuzzleHttp\\Stream\\' => 18,
@@ -32,6 +36,10 @@ class ComposerStaticInit8d947361c0083b855c1b429cc511cf33
         'React\\Promise\\' => 
         array (
             0 => __DIR__ . '/..' . '/react/promise/src',
+        ),
+        'Html2Text\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/soundasleep/html2text/src',
         ),
         'GuzzleHttp\\Stream\\' => 
         array (

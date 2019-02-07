@@ -59,7 +59,7 @@ function xmldb_enrol_paypal_upgrade($oldversion) {
     // Automatically generated Moodle v3.5.0 release upgrade line.
     // Put any upgrade step following this.
 
-    if ($oldversion < 2018051401) {
+    if ($oldversion < 2018053000) {
 
         // Define field instanceid to be added to enrol_paypal.
         // For some reason, some Moodle instances that are upgraded from old versions do not have this field.
@@ -72,10 +72,10 @@ function xmldb_enrol_paypal_upgrade($oldversion) {
         }
 
         // Paypal savepoint reached.
-        upgrade_plugin_savepoint(true, 2018051401, 'enrol', 'paypal');
+        upgrade_plugin_savepoint(true, 2018053000, 'enrol', 'paypal');
     }
 
-    if ($oldversion < 2018051402) {
+    if ($oldversion < 2018062500) {
 
         // Define key courseid (foreign) to be added to enrol_paypal.
         $table = new xmldb_table('enrol_paypal');
@@ -85,10 +85,10 @@ function xmldb_enrol_paypal_upgrade($oldversion) {
         $dbman->add_key($table, $key);
 
         // Paypal savepoint reached.
-        upgrade_plugin_savepoint(true, 2018051402, 'enrol', 'paypal');
+        upgrade_plugin_savepoint(true, 2018062500, 'enrol', 'paypal');
     }
 
-    if ($oldversion < 2018051403) {
+    if ($oldversion < 2018062501) {
 
         // Define key userid (foreign) to be added to enrol_paypal.
         $table = new xmldb_table('enrol_paypal');
@@ -98,10 +98,10 @@ function xmldb_enrol_paypal_upgrade($oldversion) {
         $dbman->add_key($table, $key);
 
         // Paypal savepoint reached.
-        upgrade_plugin_savepoint(true, 2018051403, 'enrol', 'paypal');
+        upgrade_plugin_savepoint(true, 2018062501, 'enrol', 'paypal');
     }
 
-    if ($oldversion < 2018051404) {
+    if ($oldversion < 2018062502) {
 
         // Define key instanceid (foreign) to be added to enrol_paypal.
         $table = new xmldb_table('enrol_paypal');
@@ -111,10 +111,10 @@ function xmldb_enrol_paypal_upgrade($oldversion) {
         $dbman->add_key($table, $key);
 
         // Paypal savepoint reached.
-        upgrade_plugin_savepoint(true, 2018051404, 'enrol', 'paypal');
+        upgrade_plugin_savepoint(true, 2018062502, 'enrol', 'paypal');
     }
 
-    if ($oldversion < 2018051405) {
+    if ($oldversion < 2018062503) {
 
         $table = new xmldb_table('enrol_paypal');
 
@@ -135,8 +135,11 @@ function xmldb_enrol_paypal_upgrade($oldversion) {
         }
 
         // Paypal savepoint reached.
-        upgrade_plugin_savepoint(true, 2018051405, 'enrol', 'paypal');
+        upgrade_plugin_savepoint(true, 2018062503, 'enrol', 'paypal');
     }
+
+    // Automatically generated Moodle v3.6.0 release upgrade line.
+    // Put any upgrade step following this.
 
     return true;
 }

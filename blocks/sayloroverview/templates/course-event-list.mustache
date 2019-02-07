@@ -15,9 +15,9 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template block_myoverview/course-event-list
+    @template block_sayloroverview/course-event-list
 
-    This template renders a list of events for the myoverview block
+    This template renders a list of events for the sayloroverview block
     sort by courses view.
 
     Example context (json):
@@ -32,51 +32,51 @@
      id="event-list-container-{{$courseid}}{{/courseid}}">
 
     <div data-region="event-list-content">
-        {{< block_myoverview/event-list-group }}
-            {{$title}}{{#str}} recentlyoverdue, block_myoverview {{/str}}{{/title}}
+        {{< block_sayloroverview/event-list-group }}
+            {{$title}}{{#str}} recentlyoverdue, block_sayloroverview {{/str}}{{/title}}
             {{$extratitleclasses}}text-danger{{/extratitleclasses}}
             {{$startday}}-14{{/startday}}
             {{$endday}}0{{/endday}}
             {{$eventlistitems}}
-                {{> block_myoverview/course-event-list-items }}
+                {{> block_sayloroverview/course-event-list-items }}
             {{/eventlistitems}}
-        {{/ block_myoverview/event-list-group }}
-        {{< block_myoverview/event-list-group }}
+        {{/ block_sayloroverview/event-list-group }}
+        {{< block_sayloroverview/event-list-group }}
             {{$title}}{{#str}} today {{/str}}{{/title}}
             {{$extratitleclasses}}{{/extratitleclasses}}
             {{$startday}}0{{/startday}}
             {{$endday}}1{{/endday}}
             {{$eventlistitems}}
-                {{> block_myoverview/course-event-list-items }}
+                {{> block_sayloroverview/course-event-list-items }}
             {{/eventlistitems}}
-        {{/ block_myoverview/event-list-group }}
-        {{< block_myoverview/event-list-group }}
-            {{$title}}{{#str}} next7days, block_myoverview {{/str}}{{/title}}
+        {{/ block_sayloroverview/event-list-group }}
+        {{< block_sayloroverview/event-list-group }}
+            {{$title}}{{#str}} next7days, block_sayloroverview {{/str}}{{/title}}
             {{$extratitleclasses}}{{/extratitleclasses}}
             {{$startday}}1{{/startday}}
             {{$endday}}7{{/endday}}
             {{$eventlistitems}}
-                {{> block_myoverview/course-event-list-items }}
+                {{> block_sayloroverview/course-event-list-items }}
             {{/eventlistitems}}
-        {{/ block_myoverview/event-list-group }}
-        {{< block_myoverview/event-list-group }}
-            {{$title}}{{#str}} next30days, block_myoverview {{/str}}{{/title}}
+        {{/ block_sayloroverview/event-list-group }}
+        {{< block_sayloroverview/event-list-group }}
+            {{$title}}{{#str}} next30days, block_sayloroverview {{/str}}{{/title}}
             {{$extratitleclasses}}{{/extratitleclasses}}
             {{$startday}}7{{/startday}}
             {{$endday}}30{{/endday}}
             {{$eventlistitems}}
-                {{> block_myoverview/course-event-list-items }}
+                {{> block_sayloroverview/course-event-list-items }}
             {{/eventlistitems}}
-        {{/ block_myoverview/event-list-group }}
-        {{< block_myoverview/event-list-group }}
-            {{$title}}{{#str}} future, block_myoverview {{/str}}{{/title}}
+        {{/ block_sayloroverview/event-list-group }}
+        {{< block_sayloroverview/event-list-group }}
+            {{$title}}{{#str}} future, block_sayloroverview {{/str}}{{/title}}
             {{$extratitleclasses}}{{/extratitleclasses}}
             {{$startday}}30{{/startday}}
             {{$endday}}{{/endday}}
             {{$eventlistitems}}
-                {{> block_myoverview/course-event-list-items }}
+                {{> block_sayloroverview/course-event-list-items }}
             {{/eventlistitems}}
-        {{/ block_myoverview/event-list-group }}
+        {{/ block_sayloroverview/event-list-group }}
 
         <div class="text-xs-center text-center m-y-2">
             <button type="button" class="btn btn-secondary" data-action="view-more">
@@ -90,17 +90,17 @@
     <div class="hidden text-xs-center text-center m-y-3" data-region="empty-message">
         <img class="empty-placeholder-image-sm"
              src="{{urls.noevents}}"
-             alt="{{#str}} noevents, block_myoverview {{/str}}"
+             alt="{{#str}} noevents, block_sayloroverview {{/str}}"
              role="presentation">
-        <p class="text-muted m-t-1">{{#str}} noevents, block_myoverview {{/str}}</p>
+        <p class="text-muted m-t-1">{{#str}} noevents, block_sayloroverview {{/str}}</p>
         <a href="{{viewurl}}" class="btn btn-secondary text-primary"
-           aria-label="{{#str}} viewcoursename, block_myoverview, {{fullnamedisplay}} {{/str}}">
-            {{#str}} viewcourse, block_myoverview {{/str}}
+           aria-label="{{#str}} viewcoursename, block_sayloroverview, {{fullnamedisplay}} {{/str}}">
+            {{#str}} viewcourse, block_sayloroverview {{/str}}
         </a>
     </div>
 </div>
 {{#js}}
-require(['jquery', 'block_myoverview/event_list'], function($, EventList) {
+require(['jquery', 'block_sayloroverview/event_list'], function($, EventList) {
     var root = $("#event-list-container-{{$courseid}}{{/courseid}}");
     EventList.registerEventListeners(root);
 });

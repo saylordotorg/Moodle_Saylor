@@ -171,7 +171,7 @@ function xmldb_tool_dataprivacy_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2018051406, 'tool', 'dataprivacy');
     }
 
-    if ($oldversion < 2018051407) {
+    if ($oldversion < 2018082100) {
 
         // Changing precision of field status on table tool_dataprivacy_request to (2).
         $table = new xmldb_table('tool_dataprivacy_request');
@@ -181,10 +181,10 @@ function xmldb_tool_dataprivacy_upgrade($oldversion) {
         $dbman->change_field_precision($table, $field);
 
         // Dataprivacy savepoint reached.
-        upgrade_plugin_savepoint(true, 2018051407, 'tool', 'dataprivacy');
+        upgrade_plugin_savepoint(true, 2018082100, 'tool', 'dataprivacy');
     }
 
-    if ($oldversion < 2018051411) {
+    if ($oldversion < 2018100401) {
         // Define table tool_dataprivacy_purposerole to be created.
         $table = new xmldb_table('tool_dataprivacy_purposerole');
 
@@ -245,10 +245,10 @@ function xmldb_tool_dataprivacy_upgrade($oldversion) {
         $dbman->change_field_notnull($table, $field);
 
         // Dataprivacy savepoint reached.
-        upgrade_plugin_savepoint(true, 2018051411, 'tool', 'dataprivacy');
+        upgrade_plugin_savepoint(true, 2018100401, 'tool', 'dataprivacy');
     }
 
-    if ($oldversion < 2018051413) {
+    if ($oldversion < 2018100406) {
         // Define field sensitivedatareasons to be added to tool_dataprivacy_purpose.
         $table = new xmldb_table('tool_dataprivacy_request');
         $field = new xmldb_field('creationmethod', XMLDB_TYPE_INTEGER, 10, null, XMLDB_NOTNULL, null, 0, 'timemodified');
@@ -259,10 +259,47 @@ function xmldb_tool_dataprivacy_upgrade($oldversion) {
         }
 
         // Dataprivacy savepoint reached.
-        upgrade_plugin_savepoint(true, 2018051413, 'tool', 'dataprivacy');
+        upgrade_plugin_savepoint(true, 2018100406, 'tool', 'dataprivacy');
     }
 
-    if ($oldversion < 2018051415) {
+
+    if ($oldversion < 2018110700) {
+        // Define table tool_dataprivacy_ctxlst_ctx to be dropped.
+        $table = new xmldb_table('tool_dataprivacy_ctxlst_ctx');
+
+        // Conditionally launch drop table for tool_dataprivacy_ctxlst_ctx.
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+
+        // Define table tool_dataprivacy_rqst_ctxlst to be dropped.
+        $table = new xmldb_table('tool_dataprivacy_rqst_ctxlst');
+
+        // Conditionally launch drop table for tool_dataprivacy_rqst_ctxlst.
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+
+        // Define table tool_dataprivacy_contextlist to be dropped.
+        $table = new xmldb_table('tool_dataprivacy_contextlist');
+
+        // Conditionally launch drop table for tool_dataprivacy_contextlist.
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+
+        // Update all requests which were in states Pending, or Pre-Processing, to Awaiting approval.
+        $DB->set_field('tool_dataprivacy_request', 'status', 2, ['status' => 0]);
+        $DB->set_field('tool_dataprivacy_request', 'status', 2, ['status' => 1]);
+
+        // Remove the old initiate_data_request_task adhoc entries.
+        $DB->delete_records('task_adhoc', ['classname' => '\tool_dataprivacy\task\initiate_data_request_task']);
+
+        // Dataprivacy savepoint reached.
+        upgrade_plugin_savepoint(true, 2018110700, 'tool', 'dataprivacy');
+    }
+
+    if ($oldversion < 2018112500) {
         // Delete orphaned data privacy requests.
         $sql = "SELECT r.id
                   FROM {tool_dataprivacy_request} r LEFT JOIN {user} u ON r.userid = u.id
@@ -273,8 +310,11 @@ function xmldb_tool_dataprivacy_upgrade($oldversion) {
             $DB->delete_records_list('tool_dataprivacy_request', 'id', $orphaned);
         }
 
-        upgrade_plugin_savepoint(true, 2018051415, 'tool', 'dataprivacy');
+        upgrade_plugin_savepoint(true, 2018112500, 'tool', 'dataprivacy');
     }
+
+    // Automatically generated Moodle v3.6.0 release upgrade line.
+    // Put any upgrade step following this.
 
     return true;
 }

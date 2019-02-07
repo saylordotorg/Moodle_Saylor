@@ -6,20 +6,20 @@ A topics based format that uses a grid of user selectable images to pop up a lig
 
 Required version of Moodle
 ==========================
-This version works with Moodle 3.5 version 2018051700.00 (Build: 20180517) and above within the 3.5 branch until the
+This version works with Moodle 3.6.1 version 2018120301.00 (Build: 20181205) and above within the 3.6 branch until the
 next release.
 
 Please ensure that your hardware and software complies with 'Requirements' in 'Installing Moodle' on
-'docs.moodle.org/35/en/Installing_Moodle'.
+'docs.moodle.org/36/en/Installing_Moodle'.
 
 Free Software
 =============
 The Grid format is 'free' software under the terms of the GNU GPLv3 License, please see 'COPYING.txt'.
 
 The primary source for downloading this branch of the format is https://moodle.org/plugins/view.php?plugin=format_grid
-with 'Select Moodle version:' set at 'Moodle 3.5'.
+with 'Select Moodle version:' set at 'Moodle 3.6'.
 
-The secondary source is a tagged version with the v3.5 prefix on https://github.com/gjb2048/moodle-courseformat_grid/tags
+The secondary source is a tagged version with the v3.6 prefix on https://github.com/gjb2048/moodle-courseformat_grid/tags
 
 If you download from the development area - https://github.com/gjb2048/moodle-courseformat_grid/ - consider that
 the code is unstable and not for use in production environments.  This is because I develop the next version in stages
@@ -153,8 +153,7 @@ the service will expedite the response.
 It takes time and effort to maintain the format, therefore sponsorships are appreciated.
 
 When reporting an issue you can post in the course format's forum on Moodle.org (currently 'moodle.org/mod/forum/view.php?id=47'), 
-on Moodle tracker 'tracker.moodle.org' ensuring that you chose the 'Non-core contributed modules' and 'Course Format: Grid'
-for the component or contact us direct (details at the bottom).
+on https://github.com/gjb2048/moodle-format_grid/issues or contact me direct (details at the bottom).
 
 It is essential that you provide as much information as possible, the critical information being the contents of the format's 
 version.php file.  Other version information such as specific Moodle version, theme name and version also helps.  A screen shot

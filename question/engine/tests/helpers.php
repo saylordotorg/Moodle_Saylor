@@ -170,6 +170,7 @@ class test_question_maker {
 
         $q->id = 0;
         $q->category = 0;
+        $q->idnumber = null;
         $q->parent = 0;
         $q->questiontextformat = FORMAT_HTML;
         $q->generalfeedbackformat = FORMAT_HTML;
@@ -190,6 +191,7 @@ class test_question_maker {
 
         $qdata->id = 0;
         $qdata->category = 0;
+        $qdata->idnumber = null;
         $qdata->contextid = 0;
         $qdata->parent = 0;
         $qdata->questiontextformat = FORMAT_HTML;
@@ -774,6 +776,20 @@ abstract class qbehaviour_walkthrough_test_base extends question_testcase {
     protected function delete_quba() {
         question_engine::delete_questions_usage_by_activity($this->quba->get_id());
         $this->quba = null;
+    }
+
+    /**
+     * Asserts if the manual comment for the question is equal to the provided arguments.
+     * @param $comment Comment text
+     * @param $commentformat Comment format
+     */
+    protected function check_comment($comment, $commentformat) {
+        $actualcomment = $this->quba->get_question_attempt($this->slot)->get_manual_comment();
+
+        $this->assertEquals(
+                [$comment, $commentformat],
+                [$actualcomment[0], $actualcomment[1]]
+        );
     }
 
     protected function check_current_state($state) {

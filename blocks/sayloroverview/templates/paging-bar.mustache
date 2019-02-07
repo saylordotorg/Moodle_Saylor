@@ -15,7 +15,7 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template block_myoverview/paging-bar
+    @template block_sayloroverview/paging-bar
 
     This template renders the bootstrap style paging bar.
 
@@ -57,38 +57,38 @@
 
     <ul class="pagination">
         {{#previous}}
-            {{< block_myoverview/paging-bar-item }}
+            {{< block_sayloroverview/paging-bar-item }}
                 {{$item-content}}
                     <span aria-hidden="true">&laquo;</span>
                     <span class="sr-only">{{#str}}previous{{/str}}</span>
                 {{/item-content}}
-            {{/ block_myoverview/paging-bar-item }}
+            {{/ block_sayloroverview/paging-bar-item }}
         {{/previous}}
         {{#first}}
-            {{< block_myoverview/paging-bar-item }}
+            {{< block_sayloroverview/paging-bar-item }}
                 {{$pagenumber}}first{{/pagenumber}}
-            {{/ block_myoverview/paging-bar-item }}
+            {{/ block_sayloroverview/paging-bar-item }}
         {{/first}}
         {{#pages}}
-            {{> block_myoverview/paging-bar-item }}
+            {{> block_sayloroverview/paging-bar-item }}
         {{/pages}}
         {{#last}}
-            {{< block_myoverview/paging-bar-item }}
+            {{< block_sayloroverview/paging-bar-item }}
                 {{$pagenumber}}last{{/pagenumber}}
-            {{/ block_myoverview/paging-bar-item }}
+            {{/ block_sayloroverview/paging-bar-item }}
         {{/last}}
         {{#next}}
-            {{< block_myoverview/paging-bar-item }}
+            {{< block_sayloroverview/paging-bar-item }}
                 {{$item-content}}
                     <span aria-hidden="true">&raquo;</span>
                     <span class="sr-only">{{#str}}next{{/str}}</span>
                 {{/item-content}}
-            {{/ block_myoverview/paging-bar-item }}
+            {{/ block_sayloroverview/paging-bar-item }}
         {{/next}}
     </ul>
 </nav>
 {{#js}}
-require(['jquery', 'block_myoverview/paging_bar'], function($, PagingBar) {
+require(['jquery', 'block_sayloroverview/paging_bar'], function($, PagingBar) {
     var root = $('#{{$pagingbarid}}paging-bar-{{uniqid}}{{/pagingbarid}}');
     PagingBar.registerEventListeners(root);
 });

@@ -40,7 +40,7 @@ If you have git installed, simply visit the Moodle /mod directory and clone this
 
 #### Get your API key
 
-Make sure you have your API key from Accredible. It's available from the settings page on our dashboard: [https://www.accredible.com/issuer/dashboard](https://www.accredible.com/issuer/dashboard).
+Make sure you have your API key from Accredible. It's available from the settings page on our dashboard: [https://dashboard.accredible.com](https://dashboard.accredible.com).
 
 #### Continue Moodle set up
 

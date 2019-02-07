@@ -15,7 +15,7 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template block_myoverview/course-item
+    @template block_sayloroverview/course-item
 
     This template renders the each course block containing a summary and calendar events.
 
@@ -33,11 +33,11 @@
             {{> block_sayloroverview/course-summary }}
         </div>
         <div class="col-lg-9">
-            {{< block_myoverview/course-event-list }}
+            {{< block_sayloroverview/course-event-list }}
                 {{$limit}}10{{/limit}}
                 {{$offset}}0{{/offset}}
                 {{$courseid}}{{id}}{{/courseid}}
-            {{/ block_myoverview/course-event-list }}
+            {{/ block_sayloroverview/course-event-list }}
         </div>
     </div>
 </div>

@@ -16,6 +16,16 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
 
     $temp->add(new admin_setting_configexecutable('pathtosassc', new lang_string('pathtosassc', 'admin'), new lang_string('pathtosassc_help', 'admin'), ''));
 
+    $temp->add(new admin_setting_configcheckbox('contextlocking', new lang_string('contextlocking', 'core_admin'),
+        new lang_string('contextlocking_desc', 'core_admin'), 0));
+
+    $temp->add(new admin_setting_configcheckbox(
+            'contextlockappliestoadmin',
+            new lang_string('contextlockappliestoadmin', 'core_admin'),
+            new lang_string('contextlockappliestoadmin_desc', 'core_admin'),
+            1
+        ));
+
     $temp->add(new admin_setting_configcheckbox('forceclean', new lang_string('forceclean', 'core_admin'),
         new lang_string('forceclean_desc', 'core_admin'), 0));
 
@@ -83,7 +93,8 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
         $ADMIN->add('development', new admin_externalpage('mnettestclient', new lang_string('testclient', 'mnet'), "$CFG->wwwroot/$CFG->admin/mnet/testclient.php"));
     }
 
-    $ADMIN->add('development', new admin_externalpage('purgecaches', new lang_string('purgecaches','admin'), "$CFG->wwwroot/$CFG->admin/purgecaches.php"));
+    $ADMIN->add('development', new admin_externalpage('purgecaches', new lang_string('purgecachespage', 'admin'),
+            "$CFG->wwwroot/$CFG->admin/purgecaches.php"));
 
     $ADMIN->add('development', new admin_externalpage('thirdpartylibs', new lang_string('thirdpartylibs','admin'), "$CFG->wwwroot/$CFG->admin/thirdpartylibs.php"));
 } // end of speedup

@@ -25,9 +25,13 @@ Feature: Test all the basic functionality of this Gapfill question type
       | Question name             | Gapfill-001                   |
       | Question text             | The cat [sat] on the [mat]    |
       | General feedback          | This is general feedback      |
-      | Hint 1                    | First hint                    |
-      | Hint 2                    | Second hint                   |
-
+      | Penalty for each incorrect try      | 0.3333333                              |
+      | Hint 1                              | Incorrect placements will be removed.  |
+      | id_hintclearwrong_0                 | 1                                      |
+      | id_hintshownumcorrect_0             | 1                                      |
+      | Hint 2                              | Incorrect placements will be removed.  |
+      | id_hintclearwrong_1                 | 0                                      |
+      | id_hintshownumcorrect_1             | 1                                      |
     Then I should see "Gapfill-001"
 
     When I click on "Edit" "link" in the "Gapfill-001" "table_row"
@@ -76,7 +80,6 @@ Feature: Test all the basic functionality of this Gapfill question type
     And I type "xxx" into gap "2" in the gapfill question
 
     And I press "Check"
-    And I should see "a correct response feedback"
     And I should see "Your answer is partially correct."
     And I should see "Mark 1.00 out of 2.00"
     And I wait "1" seconds
@@ -133,14 +136,24 @@ Feature: Test all the basic functionality of this Gapfill question type
     #first attempt
     And I press "Start again with these options"
     And I type "sat" into gap "1" in the gapfill question
-    And I type "xxx" into gap "2" in the gapfill question
+    And I type "rugnotmat" into gap "2" in the gapfill question
 
     And I press "Check"
     And I should see "Your answer is partially correct."
 
+    #This next line is shown because the box was checked in
+    #the first hint for "Show the number of correct responses"
+    And I should see "You completed 1 gap correctly out of 2."
+    And I wait "2" seconds
+
     ################################################
     #second attempt
     And I press "Try again"
+
+    #confirm that the wrong response has been cleared (set within hints)
+    And I should not see "rugnotmat"
+    And I wait "2" seconds
+
     And I drag "sat" into gap "1" in the gapfill question
     And I drag "mat" into gap "2" in the gapfill question
 
