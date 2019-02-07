@@ -248,12 +248,6 @@ def plugins = [
         "branch" : 'master',
         "dest" : 'lib/editor/atto/plugins/generico'
     ],
-        [
-        "name" : 'mod_hvp',
-        "url" : 'https://github.com/h5p/h5p-moodle-plugin.git',
-        "branch" : 'stable',
-        "dest" : 'mod/hvp'
-    ],
     [
         "name" : 'enrol_auto',
         "url" : 'https://github.com/bynare/moodle-enrol_auto.git',
