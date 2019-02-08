@@ -32,16 +32,26 @@ require __DIR__ . '/vendor/autoload.php';
 use ACMS\Api;
 
 /**
- * Sync the selected course information with a group on Accredible - returns a group ID
+ * Sync the selected course information with a group on Accredible - returns a group ID. Optionally takes a group ID so we can set it and change the assigned group.
  *
  * @param stdClass $course 
  * @param int|null $instance_id
  * @return int $groupid
  */
-function sync_course_with_accredible($course, $instance_id = null) {
+function sync_course_with_accredible($course, $instance_id = null, $group_id = null) {
 	global $DB, $CFG;
 
 	$api = new Api($CFG->accredible_api_key);
+
+	$description = Html2Text\Html2Text::convert($course->summary);
+	if(empty($description)){
+		$description = "Recipient has compeleted the achievement.";
+	}
+
+	// Just use the saved group ID
+	if($group_id == null){
+		$group_id = $accredible_certificate->groupid;
+	}
 
 	// Update an existing
 	if(null != $instance_id){
@@ -50,7 +60,7 @@ function sync_course_with_accredible($course, $instance_id = null) {
 
 		try {
 		    // Update the group
-			$group = $api->update_group($accredible_certificate->groupid, null, $course->fullname, $course->summary, new moodle_url('/course/view.php', array('id' => $course->id)));
+			$group = $api->update_group($group_id, null, $course->fullname, $description, new moodle_url('/course/view.php', array('id' => $course->id)));
 
 			return $group->group->id;
 		} catch (ClientException $e) {
@@ -58,13 +68,13 @@ function sync_course_with_accredible($course, $instance_id = null) {
 		  	// include the achievement id that triggered the error
 		  	// direct the user to accredible's support
 		  	// dump the achievement id to debug_info
-		  	throw new moodle_exception('groupsyncerror', 'accredible', 'https://accredible.com/contact/support', $course->id, $course->id);
+		  	throw new moodle_exception('groupsyncerror', 'accredible', 'https://help.accredible.com/hc/en-us', $course->id, $course->id);
 		}
 	// making a new group
 	} else {
 		try {
 		    // Make a new Group on Accredible - use a random number to deal with duplicate course names.
-			$group = $api->create_group($course->shortname . mt_rand(), $course->fullname, $course->summary, new moodle_url('/course/view.php', array('id' => $course->id)));
+			$group = $api->create_group($course->shortname . mt_rand(), $course->fullname, $description, new moodle_url('/course/view.php', array('id' => $course->id)));
 
 			return $group->group->id;
 		} catch (ClientException $e) {
@@ -72,7 +82,7 @@ function sync_course_with_accredible($course, $instance_id = null) {
 		  	// include the achievement id that triggered the error
 		  	// direct the user to accredible's support
 		  	// dump the achievement id to debug_info
-		  	throw new moodle_exception('groupsyncerror', 'accredible', 'https://accredible.com/contact/support', $course->id, $course->id);
+		  	throw new moodle_exception('groupsyncerror', 'accredible', 'https://help.accredible.com/hc/en-us', $course->id, $course->id);
 		}
 	}
 }
@@ -126,7 +136,7 @@ function accredible_get_credentials($group_id, $email= null) {
         $exceptionparam->group_id = $group_id;
         $exceptionparam->email = $email;
         $exceptionparam->last_response = $credentials_page;
-	  	throw new moodle_exception('getcredentialserror', 'accredible', 'https://accredible.com/contact/support', $exceptionparam);
+	  	throw new moodle_exception('getcredentialserror', 'accredible', 'https://help.accredible.com/hc/en-us', $exceptionparam);
 	}
 }	
 
@@ -155,7 +165,7 @@ function accredible_check_for_existing_credential($group_id, $email) {
 	  	// include the achievement id that triggered the error
 	  	// direct the user to accredible's support
 	  	// dump the achievement id to debug_info
-	  	throw new moodle_exception('groupsyncerror', 'accredible', 'https://accredible.com/contact/support', $group_id, $group_id);
+	  	throw new moodle_exception('groupsyncerror', 'accredible', 'https://help.accredible.com/hc/en-us', $group_id, $group_id);
 	}
 }
 
@@ -262,7 +272,42 @@ function create_credential($user, $group_id, $event = null, $issued_on = null){
 	  	// include the achievement id that triggered the error
 	  	// direct the user to accredible's support
 	  	// dump the achievement id to debug_info
-	  	throw new moodle_exception('credentialcreateerror', 'accredible', 'https://accredible.com/contact/support', $user->email, $group_id);
+	  	throw new moodle_exception('credentialcreateerror', 'accredible', 'https://help.accredible.com/hc/en-us', $user->email, $group_id);
+	}
+}
+
+/**
+ * Create a credential given a user and an existing group
+ * @param stdObject $user 
+ * @param int $group_id 
+ * @return stdObject
+ */
+function create_credential_legacy($user, $achievement_name, $course_name, $course_description, $course_link, $issued_on, $event = null){
+	global $CFG;
+
+	$api = new Api($CFG->accredible_api_key);
+
+	try {
+		$credential = $api->create_credential_legacy(fullname($user), $user->email, $achievement_name, $issued_on, null, $course_name, $course_description, $course_link);
+
+		// log an event now we've created the credential if possible
+		if($event != null){
+			$certificate_event = \mod_accredible\event\certificate_created::create(array(
+								  'objectid' => $credential->credential->id,
+								  'context' => context_module::instance($event->contextinstanceid),
+								  'relateduserid' => $event->relateduserid
+								));
+			$certificate_event->trigger();
+		}
+		
+		return $credential->credential;
+
+	} catch (ClientException $e) {
+	    // throw API exception
+	  	// include the achievement id that triggered the error
+	  	// direct the user to accredible's support
+	  	// dump the achievement id to debug_info
+	  	throw new moodle_exception('credentialcreateerror', 'accredible', 'https://help.accredible.com/hc/en-us', $user->email, $group_id);
 	}
 }
 
@@ -289,35 +334,30 @@ function accredible_get_groups() {
 	  	// include the achievement id that triggered the error
 	  	// direct the user to accredible's support
 	  	// dump the achievement id to debug_info
-	  	throw new moodle_exception('getgroupserror', 'accredible', 'https://accredible.com/contact/support');
+	  	throw new moodle_exception('getgroupserror', 'accredible', 'https://help.accredible.com/hc/en-us');
+	}
+}
+
+/**
+ * Get the SSO link for a recipient
+ * @return type
+ */
+function accredible_get_recipient_sso_linik($group_id, $email) {
+	global $CFG;
+
+	$api = new Api($CFG->accredible_api_key);
+
+	try {
+		$response = $api->recipient_sso_link(null, null, $email, null, $group_id, null);
+
+		return $response->link;
+
+	} catch (Exception $e) {
+	    return null;
 	}
 }
 
 // old below here
-
-
-/**
- * List all of the ceritificates with a specific achievement id
- *
- * @param string $achievement_id
- * @return array[stdClass] $certificates
- */
-function accredible_get_issued($achievement_id) {
-	global $CFG;
-
-	$curl = curl_init('https://api.accredible.com/v1/credentials?full_view=true&achievement_id='.urlencode($achievement_id));
-	curl_setopt( $curl, CURLOPT_HTTPHEADER, array( 'Authorization: Token token="'.$CFG->accredible_api_key.'"' ) );
-	curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-	if(!$result = json_decode( curl_exec($curl) )) {
-	  // throw API exception
-	  // include the achievement id that triggered the error
-	  // direct the user to accredible's support
-	  // dump the achievement id to debug_info
-	  throw new moodle_exception('getissuederror', 'accredible', 'https://accredible.com/contact/support', $achievement_id, $achievement_id);
-	}
-	curl_close($curl);
-	return $result->credentials;
-}
 
 /**
  * List all of the issuer's templates
@@ -334,7 +374,7 @@ function accredible_get_templates() {
 	  // throw API exception
 	  // direct the user to accredible's support
 	  // dump the achievement id to debug_info
-	  throw new moodle_exception('gettemplateserror', 'accredible', 'https://accredible.com/contact/support');
+	  throw new moodle_exception('gettemplateserror', 'accredible', 'https://help.accredible.com/hc/en-us');
 	}
 	curl_close($curl);
 	$templates = array();
@@ -359,35 +399,25 @@ function accredible_issue_default_certificate($user_id, $certificate_id, $name, 
 	// Issue certs
 	$accredible_certificate = $DB->get_record('accredible', array('id'=>$certificate_id));
 
-	$certificate = array();
-  $course_url = new moodle_url('/course/view.php', array('id' => $accredible_certificate->course));
-	$certificate['name'] = $accredible_certificate->certificatename;
-	$certificate['template_name'] = $accredible_certificate->achievementid;
-	$certificate['description'] = $accredible_certificate->description;
-  $certificate['course_link'] = $course_url->__toString();
-	$certificate['recipient'] = array('name' => $name, 'email'=> $email);
-    $certificate['issued_on'] = $issued_on;
 
-	$curl = curl_init('https://api.accredible.com/v1/credentials');
-	curl_setopt($curl, CURLOPT_POST, 1);
-	curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query( array('credential' => $certificate) ));
-	curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-	curl_setopt( $curl, CURLOPT_HTTPHEADER, array( 'Authorization: Token token="'.$CFG->accredible_api_key.'"' ) );
-	if(!$result = curl_exec($curl)) {
-		// TODO - log this because an exception cannot be thrown in an event callback
-	}
-	curl_close($curl);
+  	$course_url = new moodle_url('/course/view.php', array('id' => $accredible_certificate->course));
+  	$course_link = $course_url->__toString();
+
+  	$api = new Api($CFG->accredible_api_key);
+	$credential = $api->create_credential_legacy($name, $email, $accredible_certificate->achievementid, $issued_on, null, $accredible_certificate->certificatename, $accredible_certificate->description, $course_link);
 
 	// evidence item posts
-	$credential_id = json_decode($result)->credential->id;
+	$credential_id = $credential->credential->id;
 	if($grade) {
-		$grade_evidence = array('string_object' => (string) $grade, 'description' => $quiz_name, 'custom'=> true, 'category' => 'grade' );
 		if($grade < 50) {
-		    $grade_evidence['hidden'] = true;
+		    $hidden = true;
+		} else {
+			$hidden = false;
 		}
-	  accredible_post_evidence($credential_id, $grade_evidence, false);
+
+		$response = $api->create_evidence_item_grade($grade, $quiz_name, $credential_id, $hidden);
 	}
-  if($transcript = accredible_get_transcript($accredible_certificate->course, $user_id, $accredible_certificate->finalquiz)) {
+  	if($transcript = accredible_get_transcript($accredible_certificate->course, $user_id, $accredible_certificate->finalquiz)) {
 	  accredible_post_evidence($credential_id, $transcript, false);
 	}
 	accredible_post_essay_answers($user_id, $accredible_certificate->course, $credential_id);
@@ -710,7 +740,7 @@ function accredible_post_evidence($credential_id, $evidence_item, $allow_excepti
     // include the user id that triggered the error
     // direct the user to accredible's support
     // dump the post to debug_info
-    throw new moodle_exception('evidenceadderror', 'accredible', 'https://accredible.com/contact/support', $credential_id, curl_error($curl));
+    throw new moodle_exception('evidenceadderror', 'accredible', 'https://help.accredible.com/hc/en-us', $credential_id, curl_error($curl));
 	}
 	curl_close($curl);
 }
@@ -790,8 +820,9 @@ function accredible_post_essay_answers($user_id, $course_id, $credential_id) {
 	}
 }
 
+
 function accredible_course_duration_evidence($user_id, $course_id, $credential_id, $completed_timestamp = null) {
-	global $DB;
+	global $DB, $CFG;
 
 	$sql = "SELECT enrol.id, ue.timestart
 					FROM mdl_enrol enrol, mdl_user_enrolments ue 
@@ -799,27 +830,14 @@ function accredible_course_duration_evidence($user_id, $course_id, $credential_i
 	$enrolment = $DB->get_record_sql($sql, array($user_id, $course_id));
 	$enrolment_timestamp = $enrolment->timestart;
 
-    if (!isset($completed_timestamp)) {
-        $completed_timestamp = time();
+	if (!isset($completed_timestamp)) {
+        $completed_timestamp = date("Y-m-d");
     }
 
-	$duration_info = array(
-		'start_date' =>  date("Y-m-d", $enrolment_timestamp),
-		'end_date' => date("Y-m-d", (int) $completed_timestamp),
-		'duration_in_days' => floor( ((int) $completed_timestamp - $enrolment_timestamp) / 86400)
-	);
-
-	$evidence_item = array(
-		'description' => 'Completed in ' . $duration_info['duration_in_days'] . ' days', 
-		'category' => 'course_duration'
-	);
-	$evidence_item['string_object'] = json_encode($duration_info);
-	$evidence_item['hidden'] = true;
-
-	// post the evidence if the startdate exists and isn't 0 (epoch)
-	if($enrolment_timestamp && $enrolment_timestamp != 0){
-		accredible_post_evidence($credential_id, $evidence_item, false);	
-	}
+    if($enrolment_timestamp && $enrolment_timestamp != 0 && (strtotime($enrolment_timestamp) < strtotime($completed_timestamp))){
+    	$api = new Api($CFG->accredible_api_key);
+		$api->create_evidence_item_duration($enrolment_timestamp, $completed_timestamp, $credential_id, true);
+    }
 }
 
 /* accredible_manual_issue_completion_timestamp()

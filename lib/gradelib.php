@@ -252,6 +252,7 @@ function grade_update($source, $courseid, $itemtype, $itemmodule, $iteminstance,
         $rawgrade       = false;
         $feedback       = false;
         $feedbackformat = FORMAT_MOODLE;
+        $feedbackfiles = [];
         $usermodified   = $USER->id;
         $datesubmitted  = null;
         $dategraded     = null;
@@ -268,6 +269,10 @@ function grade_update($source, $courseid, $itemtype, $itemmodule, $iteminstance,
             $feedbackformat = $grade['feedbackformat'];
         }
 
+        if (array_key_exists('feedbackfiles', $grade)) {
+            $feedbackfiles = $grade['feedbackfiles'];
+        }
+
         if (array_key_exists('usermodified', $grade)) {
             $usermodified = $grade['usermodified'];
         }
@@ -281,7 +286,8 @@ function grade_update($source, $courseid, $itemtype, $itemmodule, $iteminstance,
         }
 
         // update or insert the grade
-        if (!$grade_item->update_raw_grade($userid, $rawgrade, $source, $feedback, $feedbackformat, $usermodified, $dategraded, $datesubmitted, $grade_grade)) {
+        if (!$grade_item->update_raw_grade($userid, $rawgrade, $source, $feedback, $feedbackformat, $usermodified,
+                $dategraded, $datesubmitted, $grade_grade, $feedbackfiles)) {
             $failed = true;
         }
     }
@@ -466,7 +472,7 @@ function grade_get_grades($courseid, $itemtype, $itemmodule, $iteminstance, $use
 
                 switch ($grade_item->gradetype) {
                     case GRADE_TYPE_NONE:
-                        continue;
+                        break;
 
                     case GRADE_TYPE_VALUE:
                         $item->scaleid = 0;
@@ -537,7 +543,17 @@ function grade_get_grades($courseid, $itemtype, $itemmodule, $iteminstance, $use
                         if (is_null($grade->feedback)) {
                             $grade->str_feedback = '';
                         } else {
-                            $grade->str_feedback = format_text($grade->feedback, $grade->feedbackformat);
+                            $feedback = file_rewrite_pluginfile_urls(
+                                $grade->feedback,
+                                'pluginfile.php',
+                                $grade_grades[$userid]->get_context()->id,
+                                GRADE_FILE_COMPONENT,
+                                GRADE_FEEDBACK_FILEAREA,
+                                $grade_grades[$userid]->id
+                            );
+
+                            $grade->str_feedback = format_text($feedback, $grade->feedbackformat,
+                                ['context' => $grade_grades[$userid]->get_context()]);
                         }
 
                         $item->grades[$userid] = $grade;
@@ -1112,7 +1128,7 @@ function grade_recover_history_grades($userid, $courseid) {
  *
  * @param int $courseid The course ID
  * @param int $userid If specified try to do a quick regrading of the grades of this user only
- * @param object $updated_item Optional grade item to be marked for regrading
+ * @param object $updated_item Optional grade item to be marked for regrading. It is required if $userid is set.
  * @param \core\progress\base $progress If provided, will be used to update progress on this long operation.
  * @return bool true if ok, array of errors if problems found. Grade item id => error message
  */
@@ -1246,7 +1262,7 @@ function grade_regrade_final_grades($courseid, $userid=null, $updated_item=null,
                 if ($updateddependencies === false) {
                     // If no direct descendants are marked as updated, then we don't need to update this grade item. We then mark it
                     // as final.
-
+                    $count++;
                     $finalids[] = $gid;
                     continue;
                 }

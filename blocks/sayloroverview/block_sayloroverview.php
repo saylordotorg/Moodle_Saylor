@@ -51,7 +51,7 @@ class block_sayloroverview extends block_base {
         }
 
         // Check if the tab to select wasn't passed in the URL, if so see if the user has any preference.
-        if (!$tab = optional_param('myoverviewtab', null, PARAM_ALPHA)) {
+        if (!$tab = optional_param('sayloroverviewtab', null, PARAM_ALPHA)) {
             // Check if the user has no preference, if so get the site setting.
             if (!$tab = get_user_preferences('block_sayloroverview_last_tab')) {
                 $config = get_config('block_sayloroverview');
@@ -88,7 +88,7 @@ class block_sayloroverview extends block_base {
     }
 
     public function html_attributes() {
-        $attributes['class'] = 'block_myoverview block'; // Append our class to class attribute
+        $attributes['class'] = 'block_sayloroverview block'; // Append our class to class attribute
         return $attributes;
     }
 }

@@ -196,7 +196,6 @@ class core_accesslib_testcase extends advanced_testcase {
 
         // Prevent the capability for this user role.
         assign_capability($capability, CAP_PROHIBIT, $role->id, $coursecontext);
-        $coursecontext->mark_dirty();
         $this->assertFalse(has_capability($capability, $coursecontext, $user->id));
 
         // Again, we seed the cache first by checking initial enrolment,
@@ -2335,6 +2334,40 @@ class core_accesslib_testcase extends advanced_testcase {
 
     }
 
+    /**
+     * Test that enrolled users SQL does not return any values for users
+     * without a group when $context is not a valid course context.
+     */
+    public function test_get_enrolled_sql_userswithoutgroup() {
+        global $DB;
+
+        $this->resetAfterTest();
+
+        $systemcontext = context_system::instance();
+        $course = $this->getDataGenerator()->create_course();
+        $coursecontext = context_course::instance($course->id);
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+
+        $this->getDataGenerator()->enrol_user($user1->id, $course->id);
+        $this->getDataGenerator()->enrol_user($user2->id, $course->id);
+
+        $group = $this->getDataGenerator()->create_group(array('courseid' => $course->id));
+        groups_add_member($group, $user1);
+
+        $enrolled   = get_enrolled_users($coursecontext);
+        $this->assertCount(2, $enrolled);
+
+        // Get users without any group on the course context.
+        $enrolledwithoutgroup = get_enrolled_users($coursecontext, '', USERSWITHOUTGROUP);
+        $this->assertCount(1, $enrolledwithoutgroup);
+        $this->assertFalse(isset($enrolledwithoutgroup[$user1->id]));
+
+        // Get users without any group on the system context (it should throw an exception).
+        $this->expectException('coding_exception');
+        get_enrolled_users($systemcontext, '', USERSWITHOUTGROUP);
+    }
+
     public function get_enrolled_sql_provider() {
         return array(
             array(
@@ -2734,12 +2767,17 @@ class core_accesslib_testcase extends advanced_testcase {
         $this->assertEquals(array($systemcontext->id=>$systemcontext), $systemcontext->get_parent_contexts(true));
         $this->assertEquals(array(), $systemcontext->get_parent_context_ids());
         $this->assertEquals(array($systemcontext->id), $systemcontext->get_parent_context_ids(true));
+        $this->assertEquals(array(), $systemcontext->get_parent_context_paths());
+        $this->assertEquals(array($systemcontext->id => $systemcontext->path), $systemcontext->get_parent_context_paths(true));
 
         $this->assertEquals($systemcontext, $frontpagecontext->get_parent_context());
         $this->assertEquals(array($systemcontext->id=>$systemcontext), $frontpagecontext->get_parent_contexts());
         $this->assertEquals(array($frontpagecontext->id=>$frontpagecontext, $systemcontext->id=>$systemcontext), $frontpagecontext->get_parent_contexts(true));
         $this->assertEquals(array($systemcontext->id), $frontpagecontext->get_parent_context_ids());
         $this->assertEquals(array($frontpagecontext->id, $systemcontext->id), $frontpagecontext->get_parent_context_ids(true));
+        $this->assertEquals(array($systemcontext->id => $systemcontext->path), $frontpagecontext->get_parent_context_paths());
+        $expected = array($systemcontext->id => $systemcontext->path, $frontpagecontext->id => $frontpagecontext->path);
+        $this->assertEquals($expected, $frontpagecontext->get_parent_context_paths(true));
 
         $this->assertFalse($systemcontext->get_parent_context());
         $frontpagecontext = context_course::instance($SITE->id);
@@ -3212,7 +3250,7 @@ class core_accesslib_testcase extends advanced_testcase {
         $context = context_course::instance($course->id);
         $this->assertEquals($categorycontext, $context->get_parent_context());
         $dirty = get_cache_flags('accesslib/dirtycontexts', time()-2);
-        $this->assertTrue(isset($dirty[$oldpath]));
+        $this->assertFalse(isset($dirty[$oldpath]));
         $this->assertTrue(isset($dirty[$context->path]));
 
 
@@ -3238,7 +3276,7 @@ class core_accesslib_testcase extends advanced_testcase {
         $DB->delete_records('cache_flags', array());
         $context->delete(); // Should delete also linked blocks.
         $dirty = get_cache_flags('accesslib/dirtycontexts', time()-2);
-        $this->assertTrue(isset($dirty[$context->path]));
+        $this->assertFalse(isset($dirty[$context->path]));
         $this->assertFalse($DB->record_exists('context', array('id'=>$context->id)));
         $this->assertFalse($DB->record_exists('context', array('id'=>$bicontext->id)));
         $this->assertFalse($DB->record_exists('context', array('contextlevel'=>CONTEXT_MODULE, 'instanceid'=>$testpages[4])));
@@ -3258,7 +3296,7 @@ class core_accesslib_testcase extends advanced_testcase {
         $DB->delete_records('cache_flags', array());
         context_helper::delete_instance(CONTEXT_COURSE, $lastcourse);
         $dirty = get_cache_flags('accesslib/dirtycontexts', time()-2);
-        $this->assertTrue(isset($dirty[$coursecontext->path]));
+        $this->assertFalse(isset($dirty[$coursecontext->path]));
         $this->assertEquals(0, context_inspection::test_context_cache_size());
         $this->assertFalse($DB->record_exists('context', array('contextlevel'=>CONTEXT_COURSE, 'instanceid'=>$lastcourse)));
         context_course::instance($lastcourse);
@@ -3349,6 +3387,88 @@ class core_accesslib_testcase extends advanced_testcase {
         $this->assertDebuggingCalled('get_context_instance() is deprecated, please use context_xxxx::instance() instead.', DEBUG_DEVELOPER);
         get_system_context();
         $this->assertDebuggingCalled('get_system_context() is deprecated, please use context_system::instance() instead.', DEBUG_DEVELOPER);
+    }
+
+    /**
+     * Helper that verifies a list of capabilities, as returned by
+     * $context->get_capabilities() contains certain capabilities.
+     *
+     * @param array $expected a list of capability names
+     * @param array $actual a list of capability info from $context->get_capabilities().
+     */
+    protected function assert_capability_list_contains($expected, $actual) {
+        $actualnames = [];
+        foreach ($actual as $cap) {
+            $actualnames[$cap->name] = $cap->name;
+        }
+        $this->assertArraySubset(array_combine($expected, $expected), $actualnames);
+    }
+
+    /**
+     * Test that context_system::get_capabilities returns capabilities relevant to all modules.
+     */
+    public function test_context_module_caps_returned_by_get_capabilities_in_sys_context() {
+        $actual = context_system::instance()->get_capabilities();
+
+        // Just test a few representative capabilities.
+        $expectedcapabilities = ['moodle/site:accessallgroups', 'moodle/site:viewfullnames',
+                'repository/upload:view', 'atto/recordrtc:recordaudio'];
+
+        $this->assert_capability_list_contains($expectedcapabilities, $actual);
+    }
+
+    /**
+     * Test that context_coursecat::get_capabilities returns capabilities relevant to all modules.
+     */
+    public function test_context_module_caps_returned_by_get_capabilities_in_course_cat_context() {
+        $this->resetAfterTest(true);
+        $generator = $this->getDataGenerator();
+        $cat = $generator->create_category();
+
+        $actual = context_coursecat::instance($cat->id)->get_capabilities();
+
+        // Just test a few representative capabilities.
+        $expectedcapabilities = ['moodle/site:accessallgroups', 'moodle/site:viewfullnames',
+                'repository/upload:view', 'atto/recordrtc:recordaudio'];
+
+        $this->assert_capability_list_contains($expectedcapabilities, $actual);
+    }
+
+    /**
+     * Test that context_course::get_capabilities returns capabilities relevant to all modules.
+     */
+    public function test_context_module_caps_returned_by_get_capabilities_in_course_context() {
+        $this->resetAfterTest(true);
+        $generator = $this->getDataGenerator();
+        $cat = $generator->create_category();
+        $course = $generator->create_course(['category' => $cat->id]);
+
+        $actual = context_course::instance($course->id)->get_capabilities();
+
+        // Just test a few representative capabilities.
+        $expectedcapabilities = ['moodle/site:accessallgroups', 'moodle/site:viewfullnames',
+                'repository/upload:view', 'atto/recordrtc:recordaudio'];
+
+        $this->assert_capability_list_contains($expectedcapabilities, $actual);
+    }
+
+    /**
+     * Test that context_module::get_capabilities returns capabilities relevant to all modules.
+     */
+    public function test_context_module_caps_returned_by_get_capabilities_mod_context() {
+        $this->resetAfterTest(true);
+        $generator = $this->getDataGenerator();
+        $cat = $generator->create_category();
+        $course = $generator->create_course(['category' => $cat->id]);
+        $page = $generator->create_module('page', ['course' => $course->id]);
+
+        $actual = context_module::instance($page->cmid)->get_capabilities();
+
+        // Just test a few representative capabilities.
+        $expectedcapabilities = ['moodle/site:accessallgroups', 'moodle/site:viewfullnames',
+                'repository/upload:view', 'atto/recordrtc:recordaudio'];
+
+        $this->assert_capability_list_contains($expectedcapabilities, $actual);
     }
 
     /**
@@ -3699,6 +3819,47 @@ class core_accesslib_testcase extends advanced_testcase {
         set_config('profileroles', "");
         $this->setUser($user2);
         $this->assertEquals($expectedteacher, get_profile_roles($coursecontext));
+    }
+
+    /**
+     * Ensure that the get_parent_contexts() function limits the number of queries it performs.
+     */
+    public function test_get_parent_contexts_preload() {
+        global $DB;
+
+        $this->resetAfterTest();
+
+        /*
+         * Given the following data structure:
+         * System
+         * - Category
+         * --- Category
+         * ----- Category
+         * ------- Category
+         * --------- Course
+         * ----------- Activity (Forum)
+         */
+
+        $contexts = [];
+
+        $cat1 = $this->getDataGenerator()->create_category();
+        $cat2 = $this->getDataGenerator()->create_category(['parent' => $cat1->id]);
+        $cat3 = $this->getDataGenerator()->create_category(['parent' => $cat2->id]);
+        $cat4 = $this->getDataGenerator()->create_category(['parent' => $cat3->id]);
+        $course = $this->getDataGenerator()->create_course(['category' => $cat4->id]);
+        $forum = $this->getDataGenerator()->create_module('forum', ['course' => $course->id]);
+
+        $modcontext = context_module::instance($forum->cmid);
+
+        context_helper::reset_caches();
+
+        // There should only be a single DB query.
+        $predbqueries = $DB->perf_get_reads();
+
+        $parents = $modcontext->get_parent_contexts();
+        // Note: For some databases There is one read, plus one FETCH, plus one CLOSE.
+        // These all show as reads, when there has actually only been a single query.
+        $this->assertLessThanOrEqual(3, $DB->perf_get_reads() - $predbqueries);
     }
 }
 

@@ -242,7 +242,7 @@ real estate to the tool, and others provide a more integrated feel with the Mood
 $string['launchoptions'] = 'Launch options';
 $string['leaveblank'] = 'Leave blank if you do not need them';
 $string['lti'] = 'LTI';
-$string['lti:addinstance'] = 'Add new external tool activities';
+$string['lti:addinstance'] = 'Add a new external tool';
 $string['lti:addcoursetool'] = 'Add course-specific tool configurations';
 $string['lti:grade'] = 'View grades returned by the external tool';
 $string['lti:manage'] = 'Be an Instructor when the tool is launched';

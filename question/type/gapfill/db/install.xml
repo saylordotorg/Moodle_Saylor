@@ -13,7 +13,7 @@
         <FIELD NAME="casesensitive" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="make marking case sensitive, e.g. if the answer is cat Cat will also be accepted as correct" PREVIOUS="delimitchars" NEXT="noduplicates"/>
         <FIELD NAME="noduplicates" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="Discard any duplicate answers given. Useful where multiple fields can take the same value through the use of the or (|) operator." PREVIOUS="casesensitive" NEXT="disableregex"/>
         <FIELD NAME="disableregex" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="disable use of regular expressions for answer comparisons use plain strcmp" PREVIOUS="noduplicates" NEXT="fixedgapsize"/>        
-        <FIELD NAME="fixedgapsize" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="all gaps set to the same size in the renderer" PREVIOUS="disableregex" NEXT="correctfeedback"/>
+        <FIELD NAME="fixedgapsize" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="1" SEQUENCE="false" COMMENT="all gaps set to the same size in the renderer" PREVIOUS="disableregex" NEXT="correctfeedback"/>
         <FIELD NAME="optionsaftertext" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="Show options after text" PREVIOUS="fixedgapsize" NEXT="correctfeedback"/>
         <FIELD NAME="letterhints" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="Add letters from correct response incrementally in interactive mode" PREVIOUS="optionsaftertext" NEXT="correctfeedback"/>
         <FIELD NAME="correctfeedback" TYPE="text" NOTNULL="false" SEQUENCE="false" PREVIOUS="optionsaftertext" NEXT="correctfeedbackformat"/>

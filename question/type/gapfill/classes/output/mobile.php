@@ -24,6 +24,8 @@
 
 namespace qtype_gapfill\output;
 
+
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -36,25 +38,20 @@ defined('MOODLE_INTERNAL') || die();
 class mobile {
 
     /**
-     * Returns the gapfill quetion type for the quiz the mobile app.
+     * Returns the gapfill question type for the quiz in the mobile app.
      *
      * @return void
      */
     public static function mobile_get_gapfill() {
         global $CFG;
-        $templatepath = $CFG->wwwroot . '/question/type/gapfill/mobile/addon-qtype-gapfill.html';
-        $template = file_get_contents($templatepath);
-        $jsfilepath = $CFG->wwwroot . '/question/type/gapfill/javascript/mobile.js';
-        $jscontent = file_get_contents($jsfilepath);
-        global $CFG;
         return [
             'templates' => [
                 [
                     'id' => 'main',
-                    'html' => $template
-                ]
+                    'html' => file_get_contents($CFG->dirroot .'/question/type/gapfill/mobile/addon-qtype-gapfill.html')
+                    ]
             ],
-            'javascript' => $jscontent
+            'javascript' => file_get_contents($CFG->dirroot . '/question/type/gapfill/mobile/mobile.js')
         ];
     }
 }

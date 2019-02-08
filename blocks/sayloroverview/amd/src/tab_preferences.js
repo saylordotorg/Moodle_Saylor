@@ -16,7 +16,7 @@
 /**
  * Javascript used to save the user's tab preference.
  *
- * @package    block_myoverview
+ * @package    block_sayloroverview
  * @copyright  2017 Mark Nelson <markn@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -36,14 +36,14 @@ define(['jquery', 'core/ajax', 'core/custom_interaction_events',
             // Bootstrap does not change the URL when using BS tabs, so need to do this here.
             // Also check to make sure the browser supports the history API.
             if (typeof window.history.pushState === "function") {
-                window.history.pushState(null, null, '?myoverviewtab=' + tabname);
+                window.history.pushState(null, null, '?sayloroverviewtab=' + tabname);
             }
             var request = {
                 methodname: 'core_user_update_user_preferences',
                 args: {
                     preferences: [
                         {
-                            type: 'block_myoverview_last_tab',
+                            type: 'block_sayloroverview_last_tab',
                             value: tabname
                         }
                     ]

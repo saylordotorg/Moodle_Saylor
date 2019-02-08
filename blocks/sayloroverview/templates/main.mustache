@@ -15,20 +15,20 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template block_myoverview/main
+    @template block_sayloroverview/main
 
-    This template renders the main content area for the myoverview block.
+    This template renders the main content area for the sayloroverview block.
 
     Example context (json):
     {}
 }}
 
-<div id="block-myoverview-{{uniqid}}" class="block-myoverview" data-region="myoverview">
+<div id="block-sayloroverview-{{uniqid}}" class="block-sayloroverview" data-region="sayloroverview">
     <div class="tab-content content-centred">
-        <div role="tabpanel" class="tab-pane fade {{#viewingtimeline}}in active{{/viewingtimeline}}" id="myoverview_timeline_view">
-            {{> block_myoverview/timeline-view }}
+        <div role="tabpanel" class="tab-pane fade {{#viewingtimeline}}in active{{/viewingtimeline}}" id="sayloroverview_timeline_view">
+            {{> block_sayloroverview/timeline-view }}
         </div>
-        <div role="tabpanel" class="tab-pane fade {{#viewingcourses}}in active{{/viewingcourses}}" id="myoverview_courses_view">
+        <div role="tabpanel" class="tab-pane fade {{#viewingcourses}}in active{{/viewingcourses}}" id="sayloroverview_courses_view">
             {{#coursesview}}
                 {{> block_sayloroverview/courses-view }}
             {{/coursesview}}
@@ -36,8 +36,8 @@
     </div>
 </div>
 {{#js}}
-require(['jquery', 'block_myoverview/tab_preferences'], function($, TabPreferences) {
-    var root = $('#block-myoverview-view-choices-{{uniqid}}');
+require(['jquery', 'block_sayloroverview/tab_preferences'], function($, TabPreferences) {
+    var root = $('#block-sayloroverview-view-choices-{{uniqid}}');
     TabPreferences.registerEventListeners(root);
 });
 {{/js}}

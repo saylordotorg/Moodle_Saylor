@@ -1,5 +1,16 @@
 # CHANGE HISTORY
 
+### 30 January 2018. 3.6.0
+
+ * Add a new experimental feature that allows students to attach files to
+   their submissions. The attached files are loaded into the working directory
+   during the run.
+ * Add a *Feedback* dropdown to the question authoring form that allows the
+   question author to display or hide the result table regardless of the
+   behaviour mode chosen for the quiz.
+ * Fix bug in missing prototype error message (extraneous junk included, due
+   to an exception being thrown).
+
 ### 18 November 2018. 3.5.3+
 
  * Bug fix: answerbox preloads of greater than ~1k generated debugging error

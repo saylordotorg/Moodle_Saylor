@@ -178,7 +178,11 @@ class qtype_gapfill extends question_type {
         $form->defaultmark = count($gaps);
         return parent::save_question($question, $form);
     }
-
+    /**
+     * Communicate with the dragdrop.js script
+     *
+     * @return void
+     */
     public function find_standard_scripts() {
         global $CFG, $PAGE;
         parent::find_standard_scripts();

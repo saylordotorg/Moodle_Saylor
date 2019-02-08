@@ -1,3 +1,63 @@
+.block_sayloroverview {
+  background-color: transparent;
+}
+.block_sayloroverview .row-fluid [class*="span"] {
+  margin-left: 0;
+}
+.block_sayloroverview .event-list-item {
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+}
+.block_sayloroverview .event-list-item:last-of-type {
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
+.block_sayloroverview .event-list-item .event-icon {
+  vertical-align: middle;
+}
+.block_sayloroverview .event-list-item .event-icon::before {
+  content: '';
+  display: inline-block;
+  height: 100%;
+  vertical-align: middle;
+}
+.block_sayloroverview .event-list-item .event-name-container {
+  vertical-align: middle;
+  max-width: calc(100% - 50px);
+}
+.block_sayloroverview .event-list-item .event-name-container .event-name {
+  display: block;
+}
+.block_sayloroverview .empty-placeholder-image-sm {
+  height: 50px;
+}
+.block_sayloroverview .empty-placeholder-image-lg {
+  height: 125px;
+}
+.block_sayloroverview .courses-view-course-item {
+  height: 220px;
+  overflow-y: hidden;
+}
+.block_sayloroverview h4 {
+  font-weight: normal;
+}
+.block_sayloroverview .well {
+  background-color: #fff;
+  box-shadow: none;
+  margin: 0 5px 10px;
+}
+.block_sayloroverview .sayloroverviewimg {
+  height: 150px;
+}
+.block_sayloroverview .sayloroverviewimg.courseimage {
+  background-position: center;
+  background-size: cover;
+}
+
+
+
 .progress-chart-container.sayloroverview-progress-chart-container .progress-doughnut .progress-indicator svg .circle {
     stroke-width: 15px;
     stroke: #F7B12F;

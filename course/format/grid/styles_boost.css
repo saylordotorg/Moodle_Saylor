@@ -42,6 +42,10 @@ div#gridshadebox_overlay {
     z-index: 1000;
 }
 
+#gridshadebox_content ul.gtopics .sectionname {
+    margin-top: .5rem;
+}
+
 #gridshadebox_close {
     z-index: 1000;
 }

@@ -15,7 +15,7 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template block_myoverview/course-paging-content-item
+    @template block_sayloroverview/course-paging-content-item
 
     This template renders each course block.
 
@@ -37,11 +37,11 @@
         ]
     }
 }}
-{{< block_myoverview/paging-content-item }}
+{{< block_sayloroverview/paging-content-item }}
     {{$classes}} {{/classes}}
     {{$content}}
         {{#courses}}
             {{> block_sayloroverview/courses-view-course-item }}
         {{/courses}}
     {{/content}}
-{{/ block_myoverview/paging-content-item }}
+{{/ block_sayloroverview/paging-content-item }}

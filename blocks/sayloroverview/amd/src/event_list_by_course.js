@@ -16,16 +16,16 @@
 /**
  * Javascript to load and render the list of calendar events grouping by course.
  *
- * @module     block_myoverview/events_by_course_list
- * @package    block_myoverview
+ * @module     block_sayloroverview/events_by_course_list
+ * @package    block_sayloroverview
  * @copyright  2016 Simey Lameze <simey@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 define(
 [
     'jquery',
-    'block_myoverview/event_list',
-    'block_myoverview/calendar_events_repository'
+    'block_sayloroverview/event_list',
+    'block_sayloroverview/calendar_events_repository'
 ],
 function($, EventList, EventsRepository) {
 

@@ -17,14 +17,14 @@
  * Javascript to load and render the list of calendar events for a
  * given day range.
  *
- * @module     block_myoverview/event_list
- * @package    block_myoverview
+ * @module     block_sayloroverview/event_list
+ * @package    block_sayloroverview
  * @copyright  2016 Ryan Wyllie <ryan@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 define(['jquery', 'core/notification', 'core/templates',
         'core/custom_interaction_events',
-        'block_myoverview/calendar_events_repository'],
+        'block_sayloroverview/calendar_events_repository'],
         function($, Notification, Templates, CustomEvents, CalendarEventsRepository) {
 
     var SECONDS_IN_DAY = 60 * 60 * 24;
@@ -40,8 +40,8 @@ define(['jquery', 'core/notification', 'core/templates',
     };
 
     var TEMPLATES = {
-        EVENT_LIST_ITEMS: 'block_myoverview/event-list-items',
-        COURSE_EVENT_LIST_ITEMS: 'block_myoverview/course-event-list-items'
+        EVENT_LIST_ITEMS: 'block_sayloroverview/event-list-items',
+        COURSE_EVENT_LIST_ITEMS: 'block_sayloroverview/course-event-list-items'
     };
 
     /**

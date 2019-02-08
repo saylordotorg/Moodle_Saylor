@@ -136,23 +136,14 @@ class qtype_ordering_edit_form extends question_edit_form {
 
         $this->add_repeat_elements($mform, $name, $elements, $options);
 
-        $repeats = $this->get_answer_repeats($this->question);
-        if (optional_param('addanswers', 0, PARAM_RAW)) {
-            $repeats += optional_param('addanswerscount', 0, PARAM_INT);
-        }
-
         // Adjust HTML editor and removal buttons.
-        $this->adjust_html_editors($mform, $name, $repeats);
+        $this->adjust_html_editors($mform, $name);
 
         // Adding feedback fields (=Combined feedback).
-        if (method_exists($this, 'add_combined_feedback_fields')) {
-            $this->add_combined_feedback_fields(false);
-        }
-
+        $this->add_combined_feedback_fields(false);
+        
         // Adding interactive settings (=Multiple tries).
-        if (method_exists($this, 'add_interactive_settings')) {
-            $this->add_interactive_settings(false, false);
-        }
+        $this->add_interactive_settings(false, false);
     }
 
     /**
@@ -219,7 +210,7 @@ class qtype_ordering_edit_form extends question_edit_form {
      * @param string $name
      * @param int $repeats
      */
-    protected function adjust_html_editors($mform, $name, $repeats) {
+    protected function adjust_html_editors($mform, $name) {
 
         // Cache the number of formats supported
         // by the preferred editor for each format.
@@ -233,49 +224,57 @@ class qtype_ordering_edit_form extends question_edit_form {
 
         $defaultanswerformat = get_config('qtype_ordering', 'defaultanswerformat');
 
-        for ($i = 0; $i < $repeats; $i++) {
+        $repeats = 'count'.$name.'s'; // e.g. countanswers
+        if ($mform->elementExists($repeats)) {
+            // Use mform element to get number of repeats
+            $repeats = $mform->getElement($repeats)->getValue();
+        } else {
+            // Determine number of repeats by object sniffing
+            $repeats = 0;
+            while ($mform->elementExists($name."[$repeats]")) {
+                $repeats++;
+            }
+        }
 
-            $editor = $name . '[' . $i . ']';
-            if ($mform->elementExists($editor)) {
-                $editor = $mform->getElement($editor);
+        for ($i=0; $i < $repeats; $i++) {
+            $editor = $mform->getElement($name."[$i]");
 
-                if (isset($ids[$i])) {
-                    $id = $ids[$i];
+            if (isset($ids[$i])) {
+                $id = $ids[$i];
+            } else {
+                $id = 0;
+            }
+
+            // The old/new name of the button to remove the HTML editor
+            // old : the name of the button when added by repeat_elements
+            // new : the simplified name of the button to satisfy "no_submit_button_pressed()" in lib/formslib.php.
+            $oldname = $name.'removeeditor['.$i.']';
+            $newname = $name.'removeeditor_'.$i;
+
+            // Remove HTML editor, if necessary.
+            if (optional_param($newname, 0, PARAM_RAW)) {
+                $format = $this->reset_editor_format($editor, FORMAT_MOODLE);
+                $_POST['answer'][$i]['format'] = $format; // Overwrite incoming data.
+            } else if ($id) {
+                $format = $this->question->options->answers[$id]->answerformat;
+            } else {
+                $format = $this->reset_editor_format($editor, $defaultanswerformat);
+            }
+
+            // Check we have a submit button - it should always be there !!
+            if ($mform->elementExists($oldname)) {
+                if (! isset($count[$format])) {
+                    $editor = editors_get_preferred_editor($format);
+                    $count[$format] = $editor->get_supported_formats();
+                    $count[$format] = count($count[$format]);
+                }
+                if ($count[$format] > 1) {
+                    $mform->removeElement($oldname);
                 } else {
-                    $id = 0;
+                    $submit = $mform->getElement($oldname);
+                    $submit->setName($newname);
                 }
-
-                // The old/new name of the button to remove the HTML editor
-                // old : the name of the button when added by repeat_elements
-                // new : the simplified name of the button to satisfy "no_submit_button_pressed()" in lib/formslib.php.
-                $oldname = $name.'removeeditor['.$i.']';
-                $newname = $name.'removeeditor_'.$i;
-
-                // Remove HTML editor, if necessary.
-                if (optional_param($newname, 0, PARAM_RAW)) {
-                    $format = $this->reset_editor_format($editor, FORMAT_MOODLE);
-                    $_POST['answer'][$i]['format'] = $format; // Overwrite incoming data.
-                } else if ($id) {
-                    $format = $this->question->options->answers[$id]->answerformat;
-                } else {
-                    $format = $this->reset_editor_format($editor, $defaultanswerformat);
-                }
-
-                // Check we have a submit button - it should always be there !!
-                if ($mform->elementExists($oldname)) {
-                    if (! isset($count[$format])) {
-                        $editor = editors_get_preferred_editor($format);
-                        $count[$format] = $editor->get_supported_formats();
-                        $count[$format] = count($count[$format]);
-                    }
-                    if ($count[$format] > 1) {
-                        $mform->removeElement($oldname);
-                    } else {
-                        $submit = $mform->getElement($oldname);
-                        $submit->setName($newname);
-                    }
-                    $mform->registerNoSubmitButton($newname);
-                }
+                $mform->registerNoSubmitButton($newname);
             }
         }
     }
@@ -289,18 +288,13 @@ class qtype_ordering_edit_form extends question_edit_form {
     public function data_preprocessing($question) {
 
         $question = parent::data_preprocessing($question);
-        if (method_exists($this, 'data_preprocessing_answers')) {
-            $question = $this->data_preprocessing_answers($question, true);
-        }
+        $question = $this->data_preprocessing_answers($question, true);
 
         // Preprocess feedback.
-        if (method_exists($this, 'data_preprocessing_combined_feedback')) {
-            $question = $this->data_preprocessing_combined_feedback($question);
-        }
-        if (method_exists($this, 'data_preprocessing_hints')) {
-            $question = $this->data_preprocessing_hints($question, false, false);
-        }
-
+        $question = $this->data_preprocessing_combined_feedback($question);
+        
+        $question = $this->data_preprocessing_hints($question, false, false);
+        
         // Preprocess answers and fractions.
         $question->answer     = array();
         $question->fraction   = array();

@@ -42,7 +42,7 @@ $string['chooseexam'] = 'Choose final quiz';
 $string['completionissueheader'] = 'Auto-issue criteria: by course completion';
 $string['completionissuecheckbox'] = 'Yes, issue upon course completion';
 $string['dashboardlink'] = 'Accredible dashboard link';
-$string['dashboardlinktext'] = 'To delete or style credentials, log in to the <a href="https://accredible.com/issuer/login" target="_blank">dashboard</a>';
+$string['dashboardlinktext'] = 'To delete or style credentials, log in to the <a href="https://dashboard.accredible.com" target="_blank">dashboard</a>';
 $string['datecreated'] = 'Date created';
 $string['description'] = 'Description';
 $string['eventcertificatecreated'] = 'A credential was posted to Accredible';
@@ -73,6 +73,6 @@ $string['viewimgincomplete'] = 'Course still in progress';
 $string['viewsubheaderold'] = 'Achievement ID: {$a}';
 $string['viewsubheader'] = 'Group ID: {$a}';
 
-$string['gotodashboard'] = 'To update the appearance of your badges and certificates, visit: <a href="https://www.accredible.com/issuer/dashboard" target="_blank">https://www.accredible.com/issuer/dashboard</a>';
-$string['activitydescription'] = 'This module automatically creates and updates a Credential Group on Accredible. Any certificates and badges issued are in this group and their appearance and information can be updated on <a href="https://www.accredible.com/issuer/dashboard" target="_blank">the dashboard</a>.';
+$string['gotodashboard'] = 'To update the appearance of your badges and certificates, visit: <a href="https://dashboard.accredible.com" target="_blank">https://dashboard.accredible.com</a>';
+$string['activitydescription'] = 'This module automatically creates and updates a Credential Group on Accredible. Any certificates and badges issued are in this group and their appearance and information can be updated on <a href="https://dashboard.accredible.com" target="_blank">the dashboard</a>.';
 $string['overview'] = 'Overview';

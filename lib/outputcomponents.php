@@ -207,6 +207,11 @@ class user_picture implements renderable {
     public $includefullname = false;
 
     /**
+     * @var bool Include user authentication token.
+     */
+    public $includetoken = false;
+
+    /**
      * User picture constructor.
      *
      * @param stdClass $user user record with at least id, picture, imagealt, firstname and lastname set.
@@ -403,7 +408,8 @@ class user_picture implements renderable {
                 $path .= $page->theme->name.'/';
             }
             // Set the image URL to the URL for the uploaded file and return.
-            $url = moodle_url::make_pluginfile_url($contextid, 'user', 'icon', NULL, $path, $filename);
+            $url = moodle_url::make_pluginfile_url(
+                    $contextid, 'user', 'icon', null, $path, $filename, false, $this->includetoken);
             $url->param('rev', $this->user->picture);
             return $url;
         }
@@ -519,12 +525,19 @@ class help_icon implements renderable, templatable {
         $data->icon = (new pix_icon('help', $alt, 'core', ['class' => 'iconhelp']))->export_for_template($output);
         $data->linktext = $this->linktext;
         $data->title = get_string('helpprefix2', '', trim($title, ". \t"));
-        $data->url = (new moodle_url('/help.php', [
+
+        $options = [
             'component' => $this->component,
             'identifier' => $this->identifier,
             'lang' => current_language()
-        ]))->out(false);
+        ];
 
+        // Debugging feature lets you display string identifier and component.
+        if (isset($CFG->debugstringids) && $CFG->debugstringids && optional_param('strings', 0, PARAM_INT)) {
+            $options['strings'] = 1;
+        }
+
+        $data->url = (new moodle_url('/help.php', $options))->out(false);
         $data->ltr = !right_to_left();
         return $data;
     }
@@ -4507,7 +4520,8 @@ class action_menu implements renderable, templatable {
             }
         } else {
             $primary->title = get_string('actionsmenu');
-            $actionicon = new pix_icon('t/edit_menu', '', 'moodle', ['class' => 'iconsmall actionmenu', 'title' => $primary->title]);
+            $iconattributes = ['class' => 'iconsmall actionmenu', 'title' => $primary->title];
+            $actionicon = new pix_icon('t/edit_menu', '', 'moodle', $iconattributes);
         }
 
         if ($actionicon instanceof pix_icon) {

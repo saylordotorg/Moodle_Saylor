@@ -823,15 +823,6 @@ function choice_get_response_data($choice, $cm, $groupmode, $onlyactive) {
 }
 
 /**
- * Returns all other caps used in module
- *
- * @return array
- */
-function choice_get_extra_capabilities() {
-    return array('moodle/site:accessallgroups');
-}
-
-/**
  * @uses FEATURE_GROUPS
  * @uses FEATURE_GROUPINGS
  * @uses FEATURE_MOD_INTRO
@@ -1453,10 +1444,9 @@ function mod_choice_get_completion_active_rule_descriptions($cm) {
     foreach ($cm->customdata['customcompletionrules'] as $key => $val) {
         switch ($key) {
             case 'completionsubmit':
-                if (empty($val)) {
-                    continue;
+                if (!empty($val)) {
+                    $descriptions[] = get_string('completionsubmit', 'choice');
                 }
-                $descriptions[] = get_string('completionsubmit', 'choice');
                 break;
             default:
                 break;

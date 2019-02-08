@@ -1,15 +1,19 @@
-.hascorrect {
+/* classes without the que prefix are used in the
+question editing form
+*/
+
+.gapfill .hascorrect {
     background: lightblue;
     border: solid thin black;
 }
 
-.hasnotcorrect {
+.gapfill .hasnocorrect {
     border: solid thin black;
     box-shadow: 3px 3px #7bc1f7;
     font-style: italic;
 }
 
-.attobackground {
+.gapfill .attobackground {
     background: lightgrey;
     border-radius: .25rem;
     border: 1px solid rgba(0, 0, 0, .15);
@@ -24,11 +28,13 @@
     width: 100%;
 }
 
-.item {
+.gapfill .item {
     background: white;
 }
 
-.gapfeedbackincorrect {
+/* elements shown via renderer.php at runtime */
+
+.que.gapfill span.gapfeedbackincorrect {
     background: #faa;
     background-color: #faa;
     border-radius: 0.25em;
@@ -36,7 +42,7 @@
     color: darkslategray;
 }
 
-.gapfeedbackcorrect {
+.que.gapfill span.gapfeedbackcorrect {
     background: #afa;
     background-color: #afa;
     border-radius: 0.25em;
