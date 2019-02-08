@@ -24,8 +24,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once($CFG->libdir . '/eventslib.php');
-
 // For composer dependencies
 require __DIR__ . '/vendor/autoload.php';
 
