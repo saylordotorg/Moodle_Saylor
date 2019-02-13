@@ -301,7 +301,7 @@ class qtype_coderunner_bulk_tester {
         global $DB;
 
         return $DB->get_records_sql("
-            SELECT q.id, ctx.id as contextid, qc.id as category, q.*, opts.*
+            SELECT q.id, ctx.id as contextid, qc.id as category, qc.name as categoryname, q.*, opts.*
               FROM {context} ctx
               JOIN {question_categories} qc ON qc.contextid = ctx.id
               JOIN {question} q ON q.category = qc.id
@@ -384,6 +384,7 @@ class qtype_coderunner_bulk_tester {
      * @param int $questionid the id of the question to be tested
      * @return array with 2 elements: the status (one of pass, fail, missinganswer
      *  or exception) and a string message describing the outcome.
+     * TODO: extend to handle questions that have sample answer attachments.
      */
     private function load_and_test_question($questionid) {
         try {

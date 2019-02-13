@@ -85,8 +85,11 @@ $string['course'] = 'Import help';
 $string['courseshortname'] = 'Course Shortname';
 $string['visitquestions'] = 'Click <a href={$a}>here</a> to visit the questions';
 $string['letterhints'] = 'Letter hints';
+
+/* Used in the settings */
 $string['addhinttext'] = 'Add hint text to editing form';
-$string['addhinttext_text'] = 'Automatically add hint text to the first hint fields';
+$string['addhinttext_text'] = 'Populate first two hints in the Multiple tries section of the form';
+
 $string['letterhints_help'] = 'Add letter from correct answer as a hint in interactive mode when an incorrect response is given. Hints must be in Multiple tries for this to work';
 $string['letterhints_text'] = 'Add letter from correct answer as a hint in interactive mode when an incorrect response is given';
 $string['letterhint0'] = 'The first letter of the correct answer will be added to each incorrect gap when you press try again.';

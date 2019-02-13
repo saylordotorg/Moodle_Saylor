@@ -230,15 +230,23 @@ echo '}';
 echo '/* ]]> */';
 echo '</style>';
 
-$sectionparam = optional_param('section', -1, PARAM_INT);
+if ($sectionid) {
+    /* The section id has been specified so use the value of $displaysection as that
+       will be set to the actual section number. */
+    $sectionparam = $displaysection;
+} else {
+    $sectionparam = optional_param('section', -1, PARAM_INT);
+}
 if ($sectionparam != -1) {
     if (($sectionparam == 0) && $courseformat->is_section0_attop() && ($gfsettings['setsection0ownpagenogridonesection'] == 1)) {
         // Don't allow an old section 0 link to work.
         $sectionparam = -1;
     } else if ($gfsettings['coursedisplay'] == COURSE_DISPLAY_SINGLEPAGE) {
-        // Don't allow an old single page link to work.
+        // Don't allow an old single page link to work, but set the current section.
+        $renderer->set_initialsection($sectionparam);
         $sectionparam = -1;
     } else {
+        $renderer->set_initialsection($sectionparam);
         $displaysection = $sectionparam;
     }
 }

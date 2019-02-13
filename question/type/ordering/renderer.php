@@ -76,48 +76,14 @@ class qtype_ordering_renderer extends qtype_with_combined_feedback_renderer {
         $sortableid        = 'id_sortable_'.$question->id;
         $ablockid          = 'id_ablock_'.$question->id;
 
-        switch ($question->options->layouttype) {
-            case qtype_ordering_question::LAYOUT_VERTICAL:
-                $axis = 'y';
-                break;
-            case qtype_ordering_question::LAYOUT_HORIZONTAL:
-                $axis = '';
-                break;
-            default: $axis = '';
-        }
-
         $result = '';
 
         if ($options->readonly) {
             // Items cannot be dragged in readonly mode.
-        } else if (method_exists($PAGE->requires, 'js_call_amd')) {
-            // Moodle >= 2.9
-            $params = array($sortableid, $responseid, $ablockid, $axis);
-            $PAGE->requires->js_call_amd('qtype_ordering/ordering', 'init', $params);
         } else {
-            // Moodle <= 2.8
-            $script = "\n";
-            $script .= "//<![CDATA[\n";
-            $script .= "if (window.$) {\n";
-            $script .= "    $(function(){\n";
-            $script .= "        $('#$sortableid').sortable({\n";
-            $script .= "            axis: '$axis',\n";
-            $script .= "            containment: '#$ablockid',\n";
-            $script .= "            opacity: 0.6,\n";
-            $script .= "            update: function(event, ui){\n";
-            $script .= "                var ItemsOrder = $(this).sortable('toArray');\n";
-            $script .= "                $('#$responseid').val(ItemsOrder.toString());\n";
-            $script .= "            }\n";
-            $script .= "        });\n";
-            $script .= "        $('#$sortableid').disableSelection();\n";
-            $script .= "    });\n";
-            $script .= "    $(document).ready(function(){\n";
-            $script .= "        var ItemsOrder = $('#$sortableid').sortable('toArray');\n";
-            $script .= "        $('#$responseid').val(ItemsOrder).toString();\n";
-            $script .= "    });\n";
-            $script .= "}\n";
-            $script .= "//]]>\n";
-            $result .= html_writer::tag('script', $script, array('type' => 'text/javascript'));
+            // Initialise JavaScript.
+            $params = array($sortableid, $responseid);
+            $PAGE->requires->js_call_amd('qtype_ordering/reorder', 'init', $params);
         }
 
         $result .= html_writer::tag('div', $question->format_questiontext($qa), array('class' => 'qtext'));
@@ -131,6 +97,10 @@ class qtype_ordering_renderer extends qtype_with_combined_feedback_renderer {
 
             // Set layout class.
             $layoutclass = $question->get_ordering_layoutclass();
+            $activeclass = '';
+            if ($qa->get_state()->is_active()) {
+                $activeclass = ' orderingactive';
+            }
 
             // Generate ordering items.
             foreach ($currentresponse as $position => $answerid) {
@@ -144,9 +114,9 @@ class qtype_ordering_renderer extends qtype_with_combined_feedback_renderer {
 
                 if ($printeditems == false) {
                     $printeditems = true;
-                    $result .= html_writer::start_tag('div', array('class' => 'ablock', 'id' => $ablockid, 'contenteditable' => 'true'));
-                    $result .= html_writer::start_tag('div', array('class' => 'answer ordering', 'contenteditable' => 'false'));
-                    $result .= html_writer::start_tag('ul',  array('class' => 'sortablelist', 'id' => $sortableid));
+                    $result .= html_writer::start_tag('div', array('class' => 'ablock', 'id' => $ablockid));
+                    $result .= html_writer::start_tag('div', array('class' => 'answer ordering'));
+                    $result .= html_writer::start_tag('ul',  array('class' => 'sortablelist' . $activeclass, 'id' => $sortableid));
                 }
 
                 // Set the CSS class and correctness img for this response.

@@ -252,11 +252,11 @@ class theme_saylor_core_renderer extends theme_boost\output\core_renderer
         }
 
         $properties = new stdClass();
-        $properties->title = $title;
+        $properties->title = html_entity_decode($title);
         $properties->type = $type;
         $properties->url = $url;
         $properties->image = $imagedomain.$image;
-        $properties->description = $description;
+        $properties->description = html_entity_decode($description);
 
         return $properties;
     }

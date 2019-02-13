@@ -29,12 +29,17 @@ $p = new qtype_algebra_parser;
 
 $vars  = required_param('vars', PARAM_RAW);
 $expr  = required_param('expr', PARAM_RAW);
+
+// This should be accessed by only valid logged in user.
+require_login(null, false);
+
 /*
 if (!confirm_sesskey()) {
     header('HTTP/1.1 403 Forbidden');
     die();
 }
 */
+
 try {
     $vars = explode(',', $vars);
     if (empty($expr)) {

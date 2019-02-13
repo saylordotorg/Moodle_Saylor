@@ -1,5 +1,8 @@
 History
 =============
+Version 3.6.0.2
+  1. Cope with 'sectionid' url parameter.
+
 Version 3.6.0.1
   1. Beta version for Moodle 3.6.
 
