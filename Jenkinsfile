@@ -261,10 +261,10 @@ def plugins = [
         "dest" : 'question/behaviour/adaptive_adapted_for_coderunner'
     ],
     [
-        "name" : 'enrol_auto',
-        "url" : 'https://github.com/bynare/moodle-enrol_auto.git',
+        "name" : 'autoenrol',
+        "url" : 'https://github.com/bobopinna/moodle-enrol_autoenrol.git',
         "branch" : 'master',
-        "dest" : 'enrol/auto'
+        "dest" : 'enrol/autoenrol'
     ]
 ]
 
