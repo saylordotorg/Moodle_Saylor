@@ -247,12 +247,6 @@ def plugins = [
         "url" : 'https://github.com/justinhunt/moodle-atto_generico.git',
         "branch" : 'master',
         "dest" : 'lib/editor/atto/plugins/generico'
-    ],
-    [
-        "name" : 'enrol_auto',
-        "url" : 'https://github.com/bynare/moodle-enrol_auto.git',
-        "branch" : 'master',
-        "dest" : 'enrol/auto'
     ]
 ]
 
