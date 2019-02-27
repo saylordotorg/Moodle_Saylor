@@ -1,5 +1,15 @@
 # CHANGE HISTORY
 
+### 26 February 2019. 3.6.0+
+
+ * Bug fix: the Reset Answer button was not working correctly with TableUI
+   questions.
+ * Improve detection of syntax errors in penalty regime and extend syntax to
+   allow space separation as well as comma separation.
+ * Prevent annoying flashing of GraphUI help screen.
+ * Document linkargs in C program question type language string.
+ * Add youtube video links to Readme.md
+
 ### 30 January 2018. 3.6.0
 
  * Add a new experimental feature that allows students to attach files to

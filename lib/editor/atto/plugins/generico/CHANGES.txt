@@ -1,0 +1,24 @@
+Version 1.1.1(Build 2018090300)
+-Added support for Cloud Poodll API token
+
+Version 1.1.0(Build 2018041000)
+-Implemented new Moodle Privacy API
+
+Version 2017040601
+Fixed so 'name' not 'key' of template was displayed in the popup dialog
+
+Version 2016112701
+Fixed formatting of buttons for boost theme in Moodle 3.2
+
+Version 2016030900
+Added support for MOODLEPAGEID variable. This allows you to get the id parameter to the URL of the Moodle page
+
+Version 2016011101
+Fixed bug where datavars variable form fields were not being displayed in popup form
+
+Version 2016011100
+Added support for DATASET variable
+
+Version 2016011100
+Added a new field for instructions for each template in the Generico Filter. If not blank, this will be displayed in the popup dialog for each template when using the Generico Atto plugin.
+Also added the ability to upload a custom icon, in place of the nice grey G that is the current icon. Apparently G connotes "bold" in some languages so it can be confusing.

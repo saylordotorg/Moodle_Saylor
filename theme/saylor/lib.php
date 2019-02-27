@@ -123,7 +123,7 @@ function theme_saylor_extend_navigation_course(navigation_node $parentnode, stdC
     if ($showquizmenu && has_capability('mod/quiz:manage', $context)) {
         // Add our edit setting nodes.
         $activitysettingsnode = navigation_node::create('Edit activity settings',
-            new moodle_url('/mod/quiz/edit.php', array('cmid' => $PAGE->cm->id)),
+            new moodle_url('/course/modedit.php', array('update' => $PAGE->cm->id, 'return' => 1)),
             global_navigation::TYPE_SECTION,
             null,
             'themesayloractivitysettings');
@@ -131,7 +131,7 @@ function theme_saylor_extend_navigation_course(navigation_node $parentnode, stdC
         $PAGE->navigation->add_node($activitysettingsnode);
         // Add the edit quiz node.
         $quizeditnode = navigation_node::create('Edit quiz',
-            new moodle_url('/course/modedit.php', array('update' => $PAGE->cm->id, 'return' => 1)),
+            new moodle_url('/mod/quiz/edit.php', array('cmid' => $PAGE->cm->id)),
             global_navigation::TYPE_SECTION,
             null,
             'themesayloreditquiz');
