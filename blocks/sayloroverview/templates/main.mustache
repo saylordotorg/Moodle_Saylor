@@ -25,9 +25,6 @@
 
 <div id="block-sayloroverview-{{uniqid}}" class="block-sayloroverview" data-region="sayloroverview">
     <div class="tab-content content-centred">
-        <div role="tabpanel" class="tab-pane fade {{#viewingtimeline}}in active{{/viewingtimeline}}" id="sayloroverview_timeline_view">
-            {{> block_sayloroverview/timeline-view }}
-        </div>
         <div role="tabpanel" class="tab-pane fade {{#viewingcourses}}in active{{/viewingcourses}}" id="sayloroverview_courses_view">
             {{#coursesview}}
                 {{> block_sayloroverview/courses-view }}
@@ -37,7 +34,7 @@
 </div>
 {{#js}}
 require(['jquery', 'block_sayloroverview/tab_preferences'], function($, TabPreferences) {
-    var root = $('#block-sayloroverview-view-choices-{{uniqid}}');
+    var root = $('#block-sayloroverview-view-choices-{{uniqid}}');there were different ones and thought you had done them
     TabPreferences.registerEventListeners(root);
 });
 {{/js}}

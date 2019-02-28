@@ -142,6 +142,9 @@ with nearly 300 students and experienced only light to moderate load factors
 on an 8-core Moodle server. The Jobe server, which runs student submissions
 (see below), is even more lightly loaded during such an exam.
 
+Some videos introducing CodeRunner and explaining question authoring
+are available in [this youtube channel](https://coderunner.org.nz/mod/url/view.php?id=472).
+
 ## Installation
 
 This chapter describes how to install CodeRunner. It assumes the
@@ -1159,7 +1162,7 @@ albeit with only four different names, as follows:
 
 1. Set the template parameters field of the question authoring form to
     ```
-    { "name": "{{ random(["Bob", "Carol", "Ted", "Alice" }}" }
+    { "name": "{{ random(["Bob", "Carol", "Ted", "Alice"]) }}" }
     ```
 1. Turn on the *Twig All* checkbox, so that all fields of the question will
    get processed by Twig, once the template parameters have been set up.
@@ -1857,7 +1860,8 @@ Writing UI plugins is, however, not a job for the faint hearted.
 
 NOTE: User-defined question types are very powerful but are not for the faint
 of heart. There are some known pitfalls, so please read the following very
-carefully.
+carefully. You may also wish to watch the short [video introducing user-defined
+question types](https://www.youtube.com/watch?v=W-En_LN6qh4).
 
 As explained earlier, each question type is defined by a prototype question,
 which is just
@@ -2050,12 +2054,12 @@ of the following form (assuming the sandbox language is Python3):
 
 
 For a fully working version of such a question type, see the implementation
-of the built-in multilanguage question type, `BUILT\_IN\_PROTOTYPE\_multilanguage`.
+of the built-in multilanguage question type, `BUILT_IN_PROTOTYPE_multilanguage`.
 If you're a system administrator, you'll find the question prototype in the
 System/CR_PROTOTYPES category. If not, create a new question of
 type *multilanguage*, customise it, and examine its template. You can also
 inspect the entire question prototype in XML form within the repository
-file `db/builtin\_PROTOTYPES.xml`. Note that the prototype is
+file `db/builtin_PROTOTYPES.xml`. Note that the prototype is
 a non-combinator question, i.e. it does a separate run for each test case, which
 isn't efficient for sluggish languages like Java.
 

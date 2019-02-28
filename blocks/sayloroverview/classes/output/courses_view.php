@@ -80,8 +80,6 @@ class courses_view implements renderable, templatable {
                 'context' => $context
             ]);
             $exportedcourse = $exporter->export($output);
-            // Convert summary to plain text.
-            $exportedcourse->summary = content_to_text($exportedcourse->summary, $exportedcourse->summaryformat);
 
             $courseprogress = null;
 

@@ -7287,1159 +7287,6 @@ cheapest, costly)</li>
 <!-- question: 0  -->
   <question type="category">
     <category>
-      <text>$course$/top/Default for qb/Gapfill English Language Questions/Forming Questions</text>
-    </category>
-    <info format="moodle_auto_format">
-      <text></text>
-    </info>
-  </question>
-
-<!-- question: 1730  -->
-  <question type="description">
-    <name>
-      <text>Forming Questions Useful Links</text>
-    </name>
-    <questiontext format="html">
-      <text><![CDATA[<p><a href="http://www.bbc.co.uk/learningenglish/english/course/lower-intermediate/unit-1/session-2" target="_blank">http://www.bbc.co.uk/learningenglish/english/course/lower-intermediate/unit-1/session-2</a><br></p><p><a href="https://learnenglish.britishcouncil.org/en/beginner-grammar/question-forms-subjectobject-questions" target="_blank">https://learnenglish.britishcouncil.org/en/beginner-grammar/question-forms-subjectobject-questions</a><br></p>]]></text>
-    </questiontext>
-    <generalfeedback format="html">
-      <text></text>
-    </generalfeedback>
-    <defaultgrade>0.0000000</defaultgrade>
-    <penalty>0.0000000</penalty>
-    <hidden>0</hidden>
-    <idnumber></idnumber>
-    <tags>
-      <tag><text>description</text>
-</tag>
-    </tags>
-  </question>
-
-<!-- question: 1731  -->
-  <question type="gapfill">
-    <name>
-      <text>DidYouBuy</text>
-    </name>
-    <questiontext format="html">
-      <text><![CDATA[<p>When you went to the shop, [did] you buy [some] milk.<br></p>]]></text>
-    </questiontext>
-    <generalfeedback format="html">
-      <text></text>
-    </generalfeedback>
-    <defaultgrade>2.0000000</defaultgrade>
-    <penalty>0.3333333</penalty>
-    <hidden>0</hidden>
-    <idnumber></idnumber>
-    <answerdisplay>dragdrop</answerdisplay>
-    <delimitchars>[]</delimitchars>
-    <casesensitive>0</casesensitive>
-    <noduplicates>0</noduplicates>
-    <disableregex>0</disableregex>
-    <fixedgapsize>1</fixedgapsize>
-    <optionsaftertext>0</optionsaftertext>
-    <letterhints>0</letterhints>
-    <answer fraction="100" format="moodle_auto_format">
-      <text>did</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <answer fraction="100" format="moodle_auto_format">
-      <text>some</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <answer fraction="0" format="moodle_auto_format">
-      <text>do</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <answer fraction="0" format="moodle_auto_format">
-      <text>does</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <answer fraction="0" format="moodle_auto_format">
-      <text>a</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <answer fraction="0" format="moodle_auto_format">
-      <text>an</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <delimitchars>[]</delimitchars>
-    <answerdisplay>dragdrop</answerdisplay>
-    <casesensitive>0</casesensitive>
-    <noduplicates>0</noduplicates>
-    <disableregex>0</disableregex>
-    <fixedgapsize>1</fixedgapsize>
-    <optionsaftertext>0</optionsaftertext>
-    <letterhints>0</letterhints>
-    <!-- Gapfill release:1.975 version:2018120800 Moodle version:2018120301.04 release:3.6.1+ (Build: 20181214) -->
-    <correctfeedback format="html">
-      <text>Your answer is correct.</text>
-    </correctfeedback>
-    <partiallycorrectfeedback format="html">
-      <text>Your answer is partially correct.</text>
-    </partiallycorrectfeedback>
-    <incorrectfeedback format="html">
-      <text>Your answer is incorrect.</text>
-    </incorrectfeedback>
-    <tags>
-      <tag><text>gapfill</text>
-</tag>
-      <tag><text>forming_questions</text>
-</tag>
-      <tag><text>adpq_50</text>
-</tag>
-      <tag><text>to_do</text>
-</tag>
-      <tag><text>quantity</text>
-</tag>
-    </tags>
-  </question>
-
-<!-- question: 1732  -->
-  <question type="gapfill">
-    <name>
-      <text>HaveYouGot</text>
-    </name>
-    <questiontext format="html">
-      <text><![CDATA[<p>[Have] you [got] a car?<br></p>]]></text>
-    </questiontext>
-    <generalfeedback format="html">
-      <text></text>
-    </generalfeedback>
-    <defaultgrade>2.0000000</defaultgrade>
-    <penalty>0.3333333</penalty>
-    <hidden>0</hidden>
-    <idnumber></idnumber>
-    <answerdisplay>dragdrop</answerdisplay>
-    <delimitchars>[]</delimitchars>
-    <casesensitive>0</casesensitive>
-    <noduplicates>0</noduplicates>
-    <disableregex>0</disableregex>
-    <fixedgapsize>1</fixedgapsize>
-    <optionsaftertext>0</optionsaftertext>
-    <letterhints>0</letterhints>
-    <answer fraction="100" format="moodle_auto_format">
-      <text>Have</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <answer fraction="100" format="moodle_auto_format">
-      <text>got</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <answer fraction="0" format="moodle_auto_format">
-      <text>Had</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <answer fraction="0" format="moodle_auto_format">
-      <text>Has</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <answer fraction="0" format="moodle_auto_format">
-      <text>get</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <delimitchars>[]</delimitchars>
-    <answerdisplay>dragdrop</answerdisplay>
-    <casesensitive>0</casesensitive>
-    <noduplicates>0</noduplicates>
-    <disableregex>0</disableregex>
-    <fixedgapsize>1</fixedgapsize>
-    <optionsaftertext>0</optionsaftertext>
-    <letterhints>0</letterhints>
-    <!-- Gapfill release:1.975 version:2018120800 Moodle version:2018120301.04 release:3.6.1+ (Build: 20181214) -->
-    <correctfeedback format="html">
-      <text>Your answer is correct.</text>
-    </correctfeedback>
-    <partiallycorrectfeedback format="html">
-      <text>Your answer is partially correct.</text>
-    </partiallycorrectfeedback>
-    <incorrectfeedback format="html">
-      <text>Your answer is incorrect.</text>
-    </incorrectfeedback>
-    <tags>
-      <tag><text>gapfill</text>
-</tag>
-      <tag><text>forming_questions</text>
-</tag>
-      <tag><text>adpq_60</text>
-</tag>
-      <tag><text>to_have</text>
-</tag>
-    </tags>
-  </question>
-
-<!-- question: 1733  -->
-  <question type="gapfill">
-    <name>
-      <text>HaveYouGot</text>
-    </name>
-    <questiontext format="html">
-      <text><![CDATA[<p>[Have] you got a laptop computer?<br></p>]]></text>
-    </questiontext>
-    <generalfeedback format="html">
-      <text></text>
-    </generalfeedback>
-    <defaultgrade>1.0000000</defaultgrade>
-    <penalty>0.3333333</penalty>
-    <hidden>0</hidden>
-    <idnumber></idnumber>
-    <answerdisplay>dragdrop</answerdisplay>
-    <delimitchars>[]</delimitchars>
-    <casesensitive>0</casesensitive>
-    <noduplicates>0</noduplicates>
-    <disableregex>0</disableregex>
-    <fixedgapsize>1</fixedgapsize>
-    <optionsaftertext>0</optionsaftertext>
-    <letterhints>0</letterhints>
-    <answer fraction="100" format="moodle_auto_format">
-      <text>Have</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <answer fraction="0" format="moodle_auto_format">
-      <text>Has</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <answer fraction="0" format="moodle_auto_format">
-      <text>How</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <answer fraction="0" format="moodle_auto_format">
-      <text>Do</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <answer fraction="0" format="moodle_auto_format">
-      <text>Does</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <delimitchars>[]</delimitchars>
-    <answerdisplay>dragdrop</answerdisplay>
-    <casesensitive>0</casesensitive>
-    <noduplicates>0</noduplicates>
-    <disableregex>0</disableregex>
-    <fixedgapsize>1</fixedgapsize>
-    <optionsaftertext>0</optionsaftertext>
-    <letterhints>0</letterhints>
-    <!-- Gapfill release:1.975 version:2018120800 Moodle version:2018120301.04 release:3.6.1+ (Build: 20181214) -->
-    <correctfeedback format="html">
-      <text>Your answer is correct.</text>
-    </correctfeedback>
-    <partiallycorrectfeedback format="html">
-      <text>Your answer is partially correct.</text>
-    </partiallycorrectfeedback>
-    <incorrectfeedback format="html">
-      <text>Your answer is incorrect.</text>
-    </incorrectfeedback>
-    <tags>
-      <tag><text>gapfill</text>
-</tag>
-      <tag><text>forming_questions</text>
-</tag>
-      <tag><text>adpq_50</text>
-</tag>
-      <tag><text>to_have</text>
-</tag>
-    </tags>
-  </question>
-
-<!-- question: 1734  -->
-  <question type="gapfill">
-    <name>
-      <text>HowDoYou</text>
-    </name>
-    <questiontext format="html">
-      <text>[How] much did your phone cost?</text>
-    </questiontext>
-    <generalfeedback format="html">
-      <text></text>
-    </generalfeedback>
-    <defaultgrade>1.0000000</defaultgrade>
-    <penalty>0.3333333</penalty>
-    <hidden>0</hidden>
-    <idnumber></idnumber>
-    <answerdisplay>dragdrop</answerdisplay>
-    <delimitchars>[]</delimitchars>
-    <casesensitive>0</casesensitive>
-    <noduplicates>0</noduplicates>
-    <disableregex>0</disableregex>
-    <fixedgapsize>1</fixedgapsize>
-    <optionsaftertext>0</optionsaftertext>
-    <letterhints>0</letterhints>
-    <answer fraction="100" format="moodle_auto_format">
-      <text>How</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <answer fraction="0" format="moodle_auto_format">
-      <text>Who</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <answer fraction="0" format="moodle_auto_format">
-      <text>What</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <answer fraction="0" format="moodle_auto_format">
-      <text>When</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <answer fraction="0" format="moodle_auto_format">
-      <text>Why</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <delimitchars>[]</delimitchars>
-    <answerdisplay>dragdrop</answerdisplay>
-    <casesensitive>0</casesensitive>
-    <noduplicates>0</noduplicates>
-    <disableregex>0</disableregex>
-    <fixedgapsize>1</fixedgapsize>
-    <optionsaftertext>0</optionsaftertext>
-    <letterhints>0</letterhints>
-    <!-- Gapfill release:1.975 version:2018120800 Moodle version:2018120301.04 release:3.6.1+ (Build: 20181214) -->
-    <correctfeedback format="html">
-      <text>Your answer is correct.</text>
-    </correctfeedback>
-    <partiallycorrectfeedback format="html">
-      <text>Your answer is partially correct.</text>
-    </partiallycorrectfeedback>
-    <incorrectfeedback format="html">
-      <text>Your answer is incorrect.</text>
-    </incorrectfeedback>
-    <tags>
-      <tag><text>gapfill</text>
-</tag>
-      <tag><text>forming_questions</text>
-</tag>
-      <tag><text>adpq_50</text>
-</tag>
-    </tags>
-  </question>
-
-<!-- question: 1735  -->
-  <question type="gapfill">
-    <name>
-      <text>Is anyone</text>
-    </name>
-    <questiontext format="html">
-      <text><![CDATA[<p>[Is] everyone listening?<br></p>]]></text>
-    </questiontext>
-    <generalfeedback format="html">
-      <text></text>
-    </generalfeedback>
-    <defaultgrade>1.0000000</defaultgrade>
-    <penalty>0.3333333</penalty>
-    <hidden>0</hidden>
-    <idnumber></idnumber>
-    <answerdisplay>dragdrop</answerdisplay>
-    <delimitchars>[]</delimitchars>
-    <casesensitive>0</casesensitive>
-    <noduplicates>0</noduplicates>
-    <disableregex>0</disableregex>
-    <fixedgapsize>1</fixedgapsize>
-    <optionsaftertext>0</optionsaftertext>
-    <letterhints>0</letterhints>
-    <answer fraction="100" format="moodle_auto_format">
-      <text>Is</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <answer fraction="0" format="moodle_auto_format">
-      <text>Has</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <answer fraction="0" format="moodle_auto_format">
-      <text>Had</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <answer fraction="0" format="moodle_auto_format">
-      <text>Have</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <answer fraction="0" format="moodle_auto_format">
-      <text>Are</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <delimitchars>[]</delimitchars>
-    <answerdisplay>dragdrop</answerdisplay>
-    <casesensitive>0</casesensitive>
-    <noduplicates>0</noduplicates>
-    <disableregex>0</disableregex>
-    <fixedgapsize>1</fixedgapsize>
-    <optionsaftertext>0</optionsaftertext>
-    <letterhints>0</letterhints>
-    <!-- Gapfill release:1.975 version:2018120800 Moodle version:2018120301.04 release:3.6.1+ (Build: 20181214) -->
-    <correctfeedback format="html">
-      <text>Your answer is correct.</text>
-    </correctfeedback>
-    <partiallycorrectfeedback format="html">
-      <text>Your answer is partially correct.</text>
-    </partiallycorrectfeedback>
-    <incorrectfeedback format="html">
-      <text>Your answer is incorrect.</text>
-    </incorrectfeedback>
-    <tags>
-      <tag><text>gapfill</text>
-</tag>
-      <tag><text>forming_questions</text>
-</tag>
-      <tag><text>adpq_40</text>
-</tag>
-    </tags>
-  </question>
-
-<!-- question: 1736  -->
-  <question type="gapfill">
-    <name>
-      <text>WhatAreYouDoing</text>
-    </name>
-    <questiontext format="html">
-      <text><![CDATA[<p>[What] are you doing?<br></p>]]></text>
-    </questiontext>
-    <generalfeedback format="html">
-      <text></text>
-    </generalfeedback>
-    <defaultgrade>1.0000000</defaultgrade>
-    <penalty>0.3333333</penalty>
-    <hidden>0</hidden>
-    <idnumber></idnumber>
-    <answerdisplay>dropdown</answerdisplay>
-    <delimitchars>[]</delimitchars>
-    <casesensitive>0</casesensitive>
-    <noduplicates>0</noduplicates>
-    <disableregex>0</disableregex>
-    <fixedgapsize>1</fixedgapsize>
-    <optionsaftertext>0</optionsaftertext>
-    <letterhints>0</letterhints>
-    <answer fraction="100" format="moodle_auto_format">
-      <text>What</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <answer fraction="0" format="moodle_auto_format">
-      <text>Who</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <answer fraction="0" format="moodle_auto_format">
-      <text>Where</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <delimitchars>[]</delimitchars>
-    <answerdisplay>dropdown</answerdisplay>
-    <casesensitive>0</casesensitive>
-    <noduplicates>0</noduplicates>
-    <disableregex>0</disableregex>
-    <fixedgapsize>1</fixedgapsize>
-    <optionsaftertext>0</optionsaftertext>
-    <letterhints>0</letterhints>
-    <!-- Gapfill release:1.975 version:2018120800 Moodle version:2018120301.04 release:3.6.1+ (Build: 20181214) -->
-    <correctfeedback format="html">
-      <text>Your answer is correct.</text>
-    </correctfeedback>
-    <partiallycorrectfeedback format="html">
-      <text>Your answer is partially correct.</text>
-    </partiallycorrectfeedback>
-    <incorrectfeedback format="html">
-      <text>Your answer is incorrect.</text>
-    </incorrectfeedback>
-    <tags>
-      <tag><text>gapfill</text>
-</tag>
-      <tag><text>forming_questions</text>
-</tag>
-    </tags>
-  </question>
-
-<!-- question: 1737  -->
-  <question type="gapfill">
-    <name>
-      <text>WhatDoYouWantToDo</text>
-    </name>
-    <questiontext format="html">
-      <text><![CDATA[When we get there [what] do you want to eat for lunch?<br>]]></text>
-    </questiontext>
-    <generalfeedback format="html">
-      <text></text>
-    </generalfeedback>
-    <defaultgrade>1.0000000</defaultgrade>
-    <penalty>0.3333333</penalty>
-    <hidden>0</hidden>
-    <idnumber></idnumber>
-    <answerdisplay>dragdrop</answerdisplay>
-    <delimitchars>[]</delimitchars>
-    <casesensitive>0</casesensitive>
-    <noduplicates>0</noduplicates>
-    <disableregex>0</disableregex>
-    <fixedgapsize>1</fixedgapsize>
-    <optionsaftertext>0</optionsaftertext>
-    <letterhints>0</letterhints>
-    <answer fraction="100" format="moodle_auto_format">
-      <text>what</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <answer fraction="0" format="moodle_auto_format">
-      <text>where</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <answer fraction="0" format="moodle_auto_format">
-      <text>why</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <answer fraction="0" format="moodle_auto_format">
-      <text>how</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <delimitchars>[]</delimitchars>
-    <answerdisplay>dragdrop</answerdisplay>
-    <casesensitive>0</casesensitive>
-    <noduplicates>0</noduplicates>
-    <disableregex>0</disableregex>
-    <fixedgapsize>1</fixedgapsize>
-    <optionsaftertext>0</optionsaftertext>
-    <letterhints>0</letterhints>
-    <!-- Gapfill release:1.975 version:2018120800 Moodle version:2018120301.04 release:3.6.1+ (Build: 20181214) -->
-    <correctfeedback format="html">
-      <text>Your answer is correct.</text>
-    </correctfeedback>
-    <partiallycorrectfeedback format="html">
-      <text>Your answer is partially correct.</text>
-    </partiallycorrectfeedback>
-    <incorrectfeedback format="html">
-      <text>Your answer is incorrect.</text>
-    </incorrectfeedback>
-    <tags>
-      <tag><text>gapfill</text>
-</tag>
-      <tag><text>forming_questions</text>
-</tag>
-      <tag><text>adpq_30</text>
-</tag>
-    </tags>
-  </question>
-
-<!-- question: 1738  -->
-  <question type="gapfill">
-    <name>
-      <text>WhatIsYourName</text>
-    </name>
-    <questiontext format="html">
-      <text><![CDATA[<p>[What] is your name?<br></p>]]></text>
-    </questiontext>
-    <generalfeedback format="html">
-      <text></text>
-    </generalfeedback>
-    <defaultgrade>1.0000000</defaultgrade>
-    <penalty>0.3333333</penalty>
-    <hidden>0</hidden>
-    <idnumber></idnumber>
-    <answerdisplay>dragdrop</answerdisplay>
-    <delimitchars>[]</delimitchars>
-    <casesensitive>0</casesensitive>
-    <noduplicates>0</noduplicates>
-    <disableregex>0</disableregex>
-    <fixedgapsize>1</fixedgapsize>
-    <optionsaftertext>0</optionsaftertext>
-    <letterhints>0</letterhints>
-    <answer fraction="100" format="moodle_auto_format">
-      <text>What</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <answer fraction="0" format="moodle_auto_format">
-      <text>When</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <answer fraction="0" format="moodle_auto_format">
-      <text>Who</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <answer fraction="0" format="moodle_auto_format">
-      <text>Why</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <delimitchars>[]</delimitchars>
-    <answerdisplay>dragdrop</answerdisplay>
-    <casesensitive>0</casesensitive>
-    <noduplicates>0</noduplicates>
-    <disableregex>0</disableregex>
-    <fixedgapsize>1</fixedgapsize>
-    <optionsaftertext>0</optionsaftertext>
-    <letterhints>0</letterhints>
-    <!-- Gapfill release:1.975 version:2018120800 Moodle version:2018120301.04 release:3.6.1+ (Build: 20181214) -->
-    <correctfeedback format="html">
-      <text>Your answer is correct.</text>
-    </correctfeedback>
-    <partiallycorrectfeedback format="html">
-      <text>Your answer is partially correct.</text>
-    </partiallycorrectfeedback>
-    <incorrectfeedback format="html">
-      <text>Your answer is incorrect.</text>
-    </incorrectfeedback>
-    <tags>
-      <tag><text>gapfill</text>
-</tag>
-      <tag><text>forming_questions</text>
-</tag>
-    </tags>
-  </question>
-
-<!-- question: 1739  -->
-  <question type="gapfill">
-    <name>
-      <text>WhenDidYouArrive</text>
-    </name>
-    <questiontext format="html">
-      <text><![CDATA[<p>[When] did you arrive yesterday?</p>]]></text>
-    </questiontext>
-    <generalfeedback format="html">
-      <text></text>
-    </generalfeedback>
-    <defaultgrade>1.0000000</defaultgrade>
-    <penalty>0.3333333</penalty>
-    <hidden>0</hidden>
-    <idnumber></idnumber>
-    <answerdisplay>dragdrop</answerdisplay>
-    <delimitchars>[]</delimitchars>
-    <casesensitive>0</casesensitive>
-    <noduplicates>0</noduplicates>
-    <disableregex>0</disableregex>
-    <fixedgapsize>1</fixedgapsize>
-    <optionsaftertext>0</optionsaftertext>
-    <letterhints>0</letterhints>
-    <answer fraction="100" format="moodle_auto_format">
-      <text>When</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <answer fraction="0" format="moodle_auto_format">
-      <text>What</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <answer fraction="0" format="moodle_auto_format">
-      <text>Who</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <answer fraction="0" format="moodle_auto_format">
-      <text>If</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <delimitchars>[]</delimitchars>
-    <answerdisplay>dragdrop</answerdisplay>
-    <casesensitive>0</casesensitive>
-    <noduplicates>0</noduplicates>
-    <disableregex>0</disableregex>
-    <fixedgapsize>1</fixedgapsize>
-    <optionsaftertext>0</optionsaftertext>
-    <letterhints>0</letterhints>
-    <!-- Gapfill release:1.975 version:2018120800 Moodle version:2018120301.04 release:3.6.1+ (Build: 20181214) -->
-    <correctfeedback format="html">
-      <text>Your answer is correct.</text>
-    </correctfeedback>
-    <partiallycorrectfeedback format="html">
-      <text>Your answer is partially correct.</text>
-    </partiallycorrectfeedback>
-    <incorrectfeedback format="html">
-      <text>Your answer is incorrect.</text>
-    </incorrectfeedback>
-    <tags>
-      <tag><text>gapfill</text>
-</tag>
-      <tag><text>forming_questions</text>
-</tag>
-      <tag><text>tense</text>
-</tag>
-      <tag><text>past_tense</text>
-</tag>
-      <tag><text>adpq_50</text>
-</tag>
-    </tags>
-  </question>
-
-<!-- question: 1740  -->
-  <question type="gapfill">
-    <name>
-      <text>WhereIsIt</text>
-    </name>
-    <questiontext format="html">
-      <text><![CDATA[<p>I cannot find the drill, [where] did you put it?<br></p>]]></text>
-    </questiontext>
-    <generalfeedback format="html">
-      <text></text>
-    </generalfeedback>
-    <defaultgrade>1.0000000</defaultgrade>
-    <penalty>0.3333333</penalty>
-    <hidden>0</hidden>
-    <idnumber></idnumber>
-    <answerdisplay>dragdrop</answerdisplay>
-    <delimitchars>[]</delimitchars>
-    <casesensitive>0</casesensitive>
-    <noduplicates>0</noduplicates>
-    <disableregex>0</disableregex>
-    <fixedgapsize>1</fixedgapsize>
-    <optionsaftertext>0</optionsaftertext>
-    <letterhints>0</letterhints>
-    <answer fraction="100" format="moodle_auto_format">
-      <text>where</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <answer fraction="0" format="moodle_auto_format">
-      <text>when</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <answer fraction="0" format="moodle_auto_format">
-      <text>how</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <answer fraction="0" format="moodle_auto_format">
-      <text>what</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <delimitchars>[]</delimitchars>
-    <answerdisplay>dragdrop</answerdisplay>
-    <casesensitive>0</casesensitive>
-    <noduplicates>0</noduplicates>
-    <disableregex>0</disableregex>
-    <fixedgapsize>1</fixedgapsize>
-    <optionsaftertext>0</optionsaftertext>
-    <letterhints>0</letterhints>
-    <!-- Gapfill release:1.975 version:2018120800 Moodle version:2018120301.04 release:3.6.1+ (Build: 20181214) -->
-    <correctfeedback format="html">
-      <text>Your answer is correct.</text>
-    </correctfeedback>
-    <partiallycorrectfeedback format="html">
-      <text>Your answer is partially correct.</text>
-    </partiallycorrectfeedback>
-    <incorrectfeedback format="html">
-      <text>Your answer is incorrect.</text>
-    </incorrectfeedback>
-    <tags>
-      <tag><text>gapfill</text>
-</tag>
-      <tag><text>forming_questions</text>
-</tag>
-      <tag><text>adpq_40</text>
-</tag>
-    </tags>
-  </question>
-
-<!-- question: 1741  -->
-  <question type="gapfill">
-    <name>
-      <text>WhichPerson</text>
-    </name>
-    <questiontext format="html">
-      <text><![CDATA[<p>[Which] person got the highest score?<br></p>]]></text>
-    </questiontext>
-    <generalfeedback format="html">
-      <text></text>
-    </generalfeedback>
-    <defaultgrade>1.0000000</defaultgrade>
-    <penalty>0.3333333</penalty>
-    <hidden>0</hidden>
-    <idnumber></idnumber>
-    <answerdisplay>dragdrop</answerdisplay>
-    <delimitchars>[]</delimitchars>
-    <casesensitive>0</casesensitive>
-    <noduplicates>0</noduplicates>
-    <disableregex>0</disableregex>
-    <fixedgapsize>1</fixedgapsize>
-    <optionsaftertext>0</optionsaftertext>
-    <letterhints>0</letterhints>
-    <answer fraction="100" format="moodle_auto_format">
-      <text>Which</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <answer fraction="0" format="moodle_auto_format">
-      <text>Who</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <answer fraction="0" format="moodle_auto_format">
-      <text>Where</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <answer fraction="0" format="moodle_auto_format">
-      <text>Why</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <delimitchars>[]</delimitchars>
-    <answerdisplay>dragdrop</answerdisplay>
-    <casesensitive>0</casesensitive>
-    <noduplicates>0</noduplicates>
-    <disableregex>0</disableregex>
-    <fixedgapsize>1</fixedgapsize>
-    <optionsaftertext>0</optionsaftertext>
-    <letterhints>0</letterhints>
-    <!-- Gapfill release:1.975 version:2018120800 Moodle version:2018120301.04 release:3.6.1+ (Build: 20181214) -->
-    <correctfeedback format="html">
-      <text>Your answer is correct.</text>
-    </correctfeedback>
-    <partiallycorrectfeedback format="html">
-      <text>Your answer is partially correct.</text>
-    </partiallycorrectfeedback>
-    <incorrectfeedback format="html">
-      <text>Your answer is incorrect.</text>
-    </incorrectfeedback>
-    <tags>
-      <tag><text>gapfill</text>
-</tag>
-      <tag><text>forming_questions</text>
-</tag>
-      <tag><text>adpq_40</text>
-</tag>
-    </tags>
-  </question>
-
-<!-- question: 1742  -->
-  <question type="gapfill">
-    <name>
-      <text>WhoMadeTheTea</text>
-    </name>
-    <questiontext format="html">
-      <text><![CDATA[<p>[Who] [made] [the] [tea]?<br></p>]]></text>
-    </questiontext>
-    <generalfeedback format="html">
-      <text></text>
-    </generalfeedback>
-    <defaultgrade>4.0000000</defaultgrade>
-    <penalty>0.3333333</penalty>
-    <hidden>0</hidden>
-    <idnumber></idnumber>
-    <answerdisplay>dragdrop</answerdisplay>
-    <delimitchars>[]</delimitchars>
-    <casesensitive>0</casesensitive>
-    <noduplicates>0</noduplicates>
-    <disableregex>0</disableregex>
-    <fixedgapsize>1</fixedgapsize>
-    <optionsaftertext>0</optionsaftertext>
-    <letterhints>0</letterhints>
-    <answer fraction="100" format="moodle_auto_format">
-      <text>Who</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <answer fraction="100" format="moodle_auto_format">
-      <text>made</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <answer fraction="100" format="moodle_auto_format">
-      <text>the</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <answer fraction="100" format="moodle_auto_format">
-      <text>tea</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <answer fraction="0" format="moodle_auto_format">
-      <text>stop</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <answer fraction="0" format="moodle_auto_format">
-      <text>when</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <delimitchars>[]</delimitchars>
-    <answerdisplay>dragdrop</answerdisplay>
-    <casesensitive>0</casesensitive>
-    <noduplicates>0</noduplicates>
-    <disableregex>0</disableregex>
-    <fixedgapsize>1</fixedgapsize>
-    <optionsaftertext>0</optionsaftertext>
-    <letterhints>0</letterhints>
-    <!-- Gapfill release:1.975 version:2018120800 Moodle version:2018120301.04 release:3.6.1+ (Build: 20181214) -->
-    <correctfeedback format="html">
-      <text>Your answer is correct.</text>
-    </correctfeedback>
-    <partiallycorrectfeedback format="html">
-      <text>Your answer is partially correct.</text>
-    </partiallycorrectfeedback>
-    <incorrectfeedback format="html">
-      <text>Your answer is incorrect.</text>
-    </incorrectfeedback>
-    <tags>
-      <tag><text>gapfill</text>
-</tag>
-      <tag><text>forming_questions</text>
-</tag>
-      <tag><text>adpq_80</text>
-</tag>
-    </tags>
-  </question>
-
-<!-- question: 1743  -->
-  <question type="gapfill">
-    <name>
-      <text>WhyAre</text>
-    </name>
-    <questiontext format="html">
-      <text>You should have been here an hour ago, [why] are you so late?</text>
-    </questiontext>
-    <generalfeedback format="html">
-      <text></text>
-    </generalfeedback>
-    <defaultgrade>1.0000000</defaultgrade>
-    <penalty>0.3333333</penalty>
-    <hidden>0</hidden>
-    <idnumber></idnumber>
-    <answerdisplay>dragdrop</answerdisplay>
-    <delimitchars>[]</delimitchars>
-    <casesensitive>0</casesensitive>
-    <noduplicates>0</noduplicates>
-    <disableregex>0</disableregex>
-    <fixedgapsize>1</fixedgapsize>
-    <optionsaftertext>0</optionsaftertext>
-    <letterhints>0</letterhints>
-    <answer fraction="100" format="moodle_auto_format">
-      <text>why</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <answer fraction="0" format="moodle_auto_format">
-      <text>when</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <answer fraction="0" format="moodle_auto_format">
-      <text>what</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <answer fraction="0" format="moodle_auto_format">
-      <text>who</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <delimitchars>[]</delimitchars>
-    <answerdisplay>dragdrop</answerdisplay>
-    <casesensitive>0</casesensitive>
-    <noduplicates>0</noduplicates>
-    <disableregex>0</disableregex>
-    <fixedgapsize>1</fixedgapsize>
-    <optionsaftertext>0</optionsaftertext>
-    <letterhints>0</letterhints>
-    <!-- Gapfill release:1.975 version:2018120800 Moodle version:2018120301.04 release:3.6.1+ (Build: 20181214) -->
-    <correctfeedback format="html">
-      <text>Your answer is correct.</text>
-    </correctfeedback>
-    <partiallycorrectfeedback format="html">
-      <text>Your answer is partially correct.</text>
-    </partiallycorrectfeedback>
-    <incorrectfeedback format="html">
-      <text>Your answer is incorrect.</text>
-    </incorrectfeedback>
-    <tags>
-      <tag><text>gapfill</text>
-</tag>
-      <tag><text>forming_questions</text>
-</tag>
-      <tag><text>adpq_50</text>
-</tag>
-    </tags>
-  </question>
-
-<!-- question: 1744  -->
-  <question type="gapfill">
-    <name>
-      <text>WillYouMakeTea</text>
-    </name>
-    <questiontext format="html">
-      <text><![CDATA[<p>[Will] [you] [make] [tea]?</p>]]></text>
-    </questiontext>
-    <generalfeedback format="html">
-      <text></text>
-    </generalfeedback>
-    <defaultgrade>4.0000000</defaultgrade>
-    <penalty>0.3333333</penalty>
-    <hidden>0</hidden>
-    <idnumber></idnumber>
-    <answerdisplay>dragdrop</answerdisplay>
-    <delimitchars>[]</delimitchars>
-    <casesensitive>1</casesensitive>
-    <noduplicates>0</noduplicates>
-    <disableregex>0</disableregex>
-    <fixedgapsize>0</fixedgapsize>
-    <optionsaftertext>0</optionsaftertext>
-    <letterhints>0</letterhints>
-    <answer fraction="100" format="moodle_auto_format">
-      <text>Will</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <answer fraction="100" format="moodle_auto_format">
-      <text>you</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <answer fraction="100" format="moodle_auto_format">
-      <text>make</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <answer fraction="100" format="moodle_auto_format">
-      <text>tea</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <answer fraction="0" format="moodle_auto_format">
-      <text>will</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <answer fraction="0" format="moodle_auto_format">
-      <text>You</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <answer fraction="0" format="moodle_auto_format">
-      <text>Make</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <answer fraction="0" format="moodle_auto_format">
-      <text>Tea</text>
-      <feedback format="moodle_auto_format">
-        <text></text>
-      </feedback>
-    </answer>
-    <delimitchars>[]</delimitchars>
-    <answerdisplay>dragdrop</answerdisplay>
-    <casesensitive>1</casesensitive>
-    <noduplicates>0</noduplicates>
-    <disableregex>0</disableregex>
-    <fixedgapsize>0</fixedgapsize>
-    <optionsaftertext>0</optionsaftertext>
-    <letterhints>0</letterhints>
-    <!-- Gapfill release:1.975 version:2018120800 Moodle version:2018120301.04 release:3.6.1+ (Build: 20181214) -->
-    <correctfeedback format="html">
-      <text>Your answer is correct.</text>
-    </correctfeedback>
-    <partiallycorrectfeedback format="html">
-      <text>Your answer is partially correct.</text>
-    </partiallycorrectfeedback>
-    <incorrectfeedback format="html">
-      <text>Your answer is incorrect.</text>
-    </incorrectfeedback>
-    <tags>
-      <tag><text>forming_questions</text>
-</tag>
-      <tag><text>gapfill</text>
-</tag>
-    </tags>
-  </question>
-
-<!-- question: 0  -->
-  <question type="category">
-    <category>
       <text>$course$/top/Default for qb/Gapfill English Language Questions/Quantity</text>
     </category>
     <info format="html">
@@ -22236,6 +21083,1776 @@ cheapest, costly)</li>
       <tag><text>adpq_80</text>
 </tag>
       <tag><text>confusingly_similar_words</text>
+</tag>
+    </tags>
+  </question>
+
+<!-- question: 0  -->
+  <question type="category">
+    <category>
+      <text>$course$/top/Default for qb/Gapfill English Language Questions/Forming Questions</text>
+    </category>
+    <info format="html">
+      <text></text>
+    </info>
+  </question>
+
+<!-- question: 2270  -->
+  <question type="description">
+    <name>
+      <text>Forming Questions Useful Links</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p><a href="http://www.bbc.co.uk/learningenglish/english/course/lower-intermediate/unit-1/session-2" target="_blank">http://www.bbc.co.uk/learningenglish/english/course/lower-intermediate/unit-1/session-2</a><br></p><p><a href="https://learnenglish.britishcouncil.org/en/beginner-grammar/question-forms-subjectobject-questions" target="_blank">https://learnenglish.britishcouncil.org/en/beginner-grammar/question-forms-subjectobject-questions</a><br></p><p><a href="https://dictionary.cambridge.org/grammar/british-grammar/questions-and-negative-sentences/questions-wh-questions" target="_blank">https://dictionary.cambridge.org/grammar/british-grammar/questions-and-negative-sentences/questions-wh-questions</a><br></p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>0.0000000</defaultgrade>
+    <penalty>0.0000000</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <tags>
+      <tag><text>description</text>
+</tag>
+    </tags>
+  </question>
+
+<!-- question: 2271  -->
+  <question type="gapfill">
+    <name>
+      <text>BreadPurchase</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>[Did] [you] [buy] [the] [bread]?</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>5.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <answerdisplay>dragdrop</answerdisplay>
+    <delimitchars>[]</delimitchars>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>1</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>Did</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>you</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>buy</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>the</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>bread</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <delimitchars>[]</delimitchars>
+    <answerdisplay>dragdrop</answerdisplay>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>1</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <!-- Gapfill release:1.975 version:2018120800 Moodle version:2018120301.04 release:3.6.1+ (Build: 20181214) -->
+    <correctfeedback format="html">
+      <text>Your answer is correct.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Your answer is partially correct.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Your answer is incorrect.</text>
+    </incorrectfeedback>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+      <tag><text>forming_questions</text>
+</tag>
+      <tag><text>adpq_60</text>
+</tag>
+      <tag><text>word_order</text>
+</tag>
+    </tags>
+  </question>
+
+<!-- question: 2272  -->
+  <question type="gapfill">
+    <name>
+      <text>CapitalCityOfUK</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Which [city] [is] [the] [capital] [of] [the] [UK] ?</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>7.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <answerdisplay>dragdrop</answerdisplay>
+    <delimitchars>[]</delimitchars>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>1</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>city</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>is</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>the</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>capital</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>of</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>the</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>UK</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>an</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <delimitchars>[]</delimitchars>
+    <answerdisplay>dragdrop</answerdisplay>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>1</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <!-- Gapfill release:1.975 version:2018120800 Moodle version:2018120301.04 release:3.6.1+ (Build: 20181214) -->
+    <correctfeedback format="html">
+      <text>Your answer is correct.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Your answer is partially correct.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Your answer is incorrect.</text>
+    </incorrectfeedback>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+      <tag><text>forming_questions</text>
+</tag>
+      <tag><text>adpq_80</text>
+</tag>
+      <tag><text>word_order</text>
+</tag>
+    </tags>
+  </question>
+
+<!-- question: 2273  -->
+  <question type="gapfill">
+    <name>
+      <text>DayBeforeTodayEating</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>[What] [were] [you] [eating]?</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>4.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <answerdisplay>dragdrop</answerdisplay>
+    <delimitchars>[]</delimitchars>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>1</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>What</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>were</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>you</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>eating</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>was</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <delimitchars>[]</delimitchars>
+    <answerdisplay>dragdrop</answerdisplay>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>1</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <!-- Gapfill release:1.975 version:2018120800 Moodle version:2018120301.04 release:3.6.1+ (Build: 20181214) -->
+    <correctfeedback format="html">
+      <text>Your answer is correct.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Your answer is partially correct.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Your answer is incorrect.</text>
+    </incorrectfeedback>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+      <tag><text>forming_questions</text>
+</tag>
+      <tag><text>adpq_60</text>
+</tag>
+      <tag><text>word_order</text>
+</tag>
+    </tags>
+  </question>
+
+<!-- question: 2274  -->
+  <question type="gapfill">
+    <name>
+      <text>DeathOfQueenVictoria</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>[When] [did] [queen] [Victoria] [die] ?</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>5.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <answerdisplay>dragdrop</answerdisplay>
+    <delimitchars>[]</delimitchars>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>1</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>When</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>did</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>queen</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>Victoria</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>die</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <delimitchars>[]</delimitchars>
+    <answerdisplay>dragdrop</answerdisplay>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>1</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <!-- Gapfill release:1.975 version:2018120800 Moodle version:2018120301.04 release:3.6.1+ (Build: 20181214) -->
+    <correctfeedback format="html">
+      <text>Your answer is correct.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Your answer is partially correct.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Your answer is incorrect.</text>
+    </incorrectfeedback>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+      <tag><text>forming_questions</text>
+</tag>
+      <tag><text>adpq_80</text>
+</tag>
+      <tag><text>word_order</text>
+</tag>
+    </tags>
+  </question>
+
+<!-- question: 2275  -->
+  <question type="gapfill">
+    <name>
+      <text>DidYouBuy</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>When you went to the shop, [did] you buy [some] milk.<br></p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>2.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <answerdisplay>dragdrop</answerdisplay>
+    <delimitchars>[]</delimitchars>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>1</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>did</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>some</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>do</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>does</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>a</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>an</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <delimitchars>[]</delimitchars>
+    <answerdisplay>dragdrop</answerdisplay>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>1</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <!-- Gapfill release:1.975 version:2018120800 Moodle version:2018120301.04 release:3.6.1+ (Build: 20181214) -->
+    <correctfeedback format="html">
+      <text>Your answer is correct.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Your answer is partially correct.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Your answer is incorrect.</text>
+    </incorrectfeedback>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+      <tag><text>forming_questions</text>
+</tag>
+      <tag><text>adpq_50</text>
+</tag>
+      <tag><text>to_do</text>
+</tag>
+      <tag><text>quantity</text>
+</tag>
+    </tags>
+  </question>
+
+<!-- question: 2276  -->
+  <question type="gapfill">
+    <name>
+      <text>HaveYouGot</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>[Have] you [got] a car?<br></p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>2.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <answerdisplay>dragdrop</answerdisplay>
+    <delimitchars>[]</delimitchars>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>1</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>Have</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>got</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>Had</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>Has</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>get</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <delimitchars>[]</delimitchars>
+    <answerdisplay>dragdrop</answerdisplay>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>1</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <!-- Gapfill release:1.975 version:2018120800 Moodle version:2018120301.04 release:3.6.1+ (Build: 20181214) -->
+    <correctfeedback format="html">
+      <text>Your answer is correct.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Your answer is partially correct.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Your answer is incorrect.</text>
+    </incorrectfeedback>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+      <tag><text>forming_questions</text>
+</tag>
+      <tag><text>adpq_60</text>
+</tag>
+      <tag><text>to_have</text>
+</tag>
+    </tags>
+  </question>
+
+<!-- question: 2277  -->
+  <question type="gapfill">
+    <name>
+      <text>HaveYouGot</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>[Have] you got a laptop computer?<br></p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <answerdisplay>dragdrop</answerdisplay>
+    <delimitchars>[]</delimitchars>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>1</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>Have</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>Has</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>How</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>Do</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>Does</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <delimitchars>[]</delimitchars>
+    <answerdisplay>dragdrop</answerdisplay>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>1</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <!-- Gapfill release:1.975 version:2018120800 Moodle version:2018120301.04 release:3.6.1+ (Build: 20181214) -->
+    <correctfeedback format="html">
+      <text>Your answer is correct.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Your answer is partially correct.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Your answer is incorrect.</text>
+    </incorrectfeedback>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+      <tag><text>forming_questions</text>
+</tag>
+      <tag><text>adpq_50</text>
+</tag>
+      <tag><text>to_have</text>
+</tag>
+    </tags>
+  </question>
+
+<!-- question: 2278  -->
+  <question type="gapfill">
+    <name>
+      <text>HowDoYou</text>
+    </name>
+    <questiontext format="html">
+      <text>[How] much did your phone cost?</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <answerdisplay>dragdrop</answerdisplay>
+    <delimitchars>[]</delimitchars>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>1</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>How</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>Who</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>What</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>When</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>Why</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <delimitchars>[]</delimitchars>
+    <answerdisplay>dragdrop</answerdisplay>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>1</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <!-- Gapfill release:1.975 version:2018120800 Moodle version:2018120301.04 release:3.6.1+ (Build: 20181214) -->
+    <correctfeedback format="html">
+      <text>Your answer is correct.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Your answer is partially correct.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Your answer is incorrect.</text>
+    </incorrectfeedback>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+      <tag><text>forming_questions</text>
+</tag>
+      <tag><text>adpq_50</text>
+</tag>
+    </tags>
+  </question>
+
+<!-- question: 2279  -->
+  <question type="gapfill">
+    <name>
+      <text>Is anyone</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>[Is] everyone listening?<br></p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <answerdisplay>dragdrop</answerdisplay>
+    <delimitchars>[]</delimitchars>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>1</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>Is</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>Has</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>Had</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>Have</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>Are</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <delimitchars>[]</delimitchars>
+    <answerdisplay>dragdrop</answerdisplay>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>1</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <!-- Gapfill release:1.975 version:2018120800 Moodle version:2018120301.04 release:3.6.1+ (Build: 20181214) -->
+    <correctfeedback format="html">
+      <text>Your answer is correct.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Your answer is partially correct.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Your answer is incorrect.</text>
+    </incorrectfeedback>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+      <tag><text>forming_questions</text>
+</tag>
+      <tag><text>adpq_40</text>
+</tag>
+    </tags>
+  </question>
+
+<!-- question: 2280  -->
+  <question type="gapfill">
+    <name>
+      <text>LocationOfHabitation</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>[Where] [do] [you] [live]?</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>4.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <answerdisplay>dragdrop</answerdisplay>
+    <delimitchars>[]</delimitchars>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>1</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>Where</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>do</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>you</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>live</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>am</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>are</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <delimitchars>[]</delimitchars>
+    <answerdisplay>dragdrop</answerdisplay>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>1</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <!-- Gapfill release:1.975 version:2018120800 Moodle version:2018120301.04 release:3.6.1+ (Build: 20181214) -->
+    <correctfeedback format="html">
+      <text>Your answer is correct.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Your answer is partially correct.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Your answer is incorrect.</text>
+    </incorrectfeedback>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+      <tag><text>forming_questions</text>
+</tag>
+      <tag><text>adpq_80</text>
+</tag>
+      <tag><text>word_order</text>
+</tag>
+    </tags>
+  </question>
+
+<!-- question: 2281  -->
+  <question type="gapfill">
+    <name>
+      <text>SportsPlayed</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>[Do] [you] [play] [football] [or] [tennis]?<br></p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>6.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <answerdisplay>dragdrop</answerdisplay>
+    <delimitchars>[]</delimitchars>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>1</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>Do</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>you</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>play</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>football</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>or</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>tennis</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>What</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <delimitchars>[]</delimitchars>
+    <answerdisplay>dragdrop</answerdisplay>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>1</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <!-- Gapfill release:1.975 version:2018120800 Moodle version:2018120301.04 release:3.6.1+ (Build: 20181214) -->
+    <correctfeedback format="html">
+      <text>Your answer is correct.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Your answer is partially correct.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Your answer is incorrect.</text>
+    </incorrectfeedback>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+      <tag><text>forming_questions</text>
+</tag>
+      <tag><text>adpq_60</text>
+</tag>
+      <tag><text>word_order</text>
+</tag>
+    </tags>
+  </question>
+
+<!-- question: 2282  -->
+  <question type="gapfill">
+    <name>
+      <text>StartOfFilm</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>What [time] [does] [the] [film] [start]?</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>5.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <answerdisplay>dragdrop</answerdisplay>
+    <delimitchars>[]</delimitchars>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>1</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>time</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>does</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>the</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>film</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>start</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <delimitchars>[]</delimitchars>
+    <answerdisplay>dragdrop</answerdisplay>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>1</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <!-- Gapfill release:1.975 version:2018120800 Moodle version:2018120301.04 release:3.6.1+ (Build: 20181214) -->
+    <correctfeedback format="html">
+      <text>Your answer is correct.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Your answer is partially correct.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Your answer is incorrect.</text>
+    </incorrectfeedback>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+      <tag><text>forming_questions</text>
+</tag>
+      <tag><text>adpq_80</text>
+</tag>
+      <tag><text>word_order</text>
+</tag>
+    </tags>
+  </question>
+
+<!-- question: 2283  -->
+  <question type="gapfill">
+    <name>
+      <text>WhatAreYouDoing</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>[What] are you doing?<br></p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <answerdisplay>dropdown</answerdisplay>
+    <delimitchars>[]</delimitchars>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>1</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>What</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>Who</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>Where</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <delimitchars>[]</delimitchars>
+    <answerdisplay>dropdown</answerdisplay>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>1</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <!-- Gapfill release:1.975 version:2018120800 Moodle version:2018120301.04 release:3.6.1+ (Build: 20181214) -->
+    <correctfeedback format="html">
+      <text>Your answer is correct.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Your answer is partially correct.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Your answer is incorrect.</text>
+    </incorrectfeedback>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+      <tag><text>forming_questions</text>
+</tag>
+    </tags>
+  </question>
+
+<!-- question: 2284  -->
+  <question type="gapfill">
+    <name>
+      <text>WhatDoYouWantToDo</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[When we get there [what] do you want to eat for lunch?<br>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <answerdisplay>dragdrop</answerdisplay>
+    <delimitchars>[]</delimitchars>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>1</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>what</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>where</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>why</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>how</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <delimitchars>[]</delimitchars>
+    <answerdisplay>dragdrop</answerdisplay>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>1</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <!-- Gapfill release:1.975 version:2018120800 Moodle version:2018120301.04 release:3.6.1+ (Build: 20181214) -->
+    <correctfeedback format="html">
+      <text>Your answer is correct.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Your answer is partially correct.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Your answer is incorrect.</text>
+    </incorrectfeedback>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+      <tag><text>forming_questions</text>
+</tag>
+      <tag><text>adpq_30</text>
+</tag>
+    </tags>
+  </question>
+
+<!-- question: 2285  -->
+  <question type="gapfill">
+    <name>
+      <text>WhatIsYourName</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>[What] is your name?<br></p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <answerdisplay>dragdrop</answerdisplay>
+    <delimitchars>[]</delimitchars>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>1</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>What</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>When</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>Who</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>Why</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <delimitchars>[]</delimitchars>
+    <answerdisplay>dragdrop</answerdisplay>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>1</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <!-- Gapfill release:1.975 version:2018120800 Moodle version:2018120301.04 release:3.6.1+ (Build: 20181214) -->
+    <correctfeedback format="html">
+      <text>Your answer is correct.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Your answer is partially correct.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Your answer is incorrect.</text>
+    </incorrectfeedback>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+      <tag><text>forming_questions</text>
+</tag>
+    </tags>
+  </question>
+
+<!-- question: 2286  -->
+  <question type="gapfill">
+    <name>
+      <text>WhenDidYouArrive</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>[When] did you arrive yesterday?</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <answerdisplay>dragdrop</answerdisplay>
+    <delimitchars>[]</delimitchars>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>1</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>When</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>What</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>Who</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>If</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <delimitchars>[]</delimitchars>
+    <answerdisplay>dragdrop</answerdisplay>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>1</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <!-- Gapfill release:1.975 version:2018120800 Moodle version:2018120301.04 release:3.6.1+ (Build: 20181214) -->
+    <correctfeedback format="html">
+      <text>Your answer is correct.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Your answer is partially correct.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Your answer is incorrect.</text>
+    </incorrectfeedback>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+      <tag><text>forming_questions</text>
+</tag>
+      <tag><text>tense</text>
+</tag>
+      <tag><text>past_tense</text>
+</tag>
+      <tag><text>adpq_50</text>
+</tag>
+    </tags>
+  </question>
+
+<!-- question: 2287  -->
+  <question type="gapfill">
+    <name>
+      <text>WhereIsIt</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>I cannot find the drill, [where] did you put it?<br></p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <answerdisplay>dragdrop</answerdisplay>
+    <delimitchars>[]</delimitchars>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>1</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>where</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>when</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>how</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>what</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <delimitchars>[]</delimitchars>
+    <answerdisplay>dragdrop</answerdisplay>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>1</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <!-- Gapfill release:1.975 version:2018120800 Moodle version:2018120301.04 release:3.6.1+ (Build: 20181214) -->
+    <correctfeedback format="html">
+      <text>Your answer is correct.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Your answer is partially correct.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Your answer is incorrect.</text>
+    </incorrectfeedback>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+      <tag><text>forming_questions</text>
+</tag>
+      <tag><text>adpq_40</text>
+</tag>
+    </tags>
+  </question>
+
+<!-- question: 2288  -->
+  <question type="gapfill">
+    <name>
+      <text>WhichPerson</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>[Which] person got the highest score?<br></p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <answerdisplay>dragdrop</answerdisplay>
+    <delimitchars>[]</delimitchars>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>1</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>Which</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>Who</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>Where</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>Why</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <delimitchars>[]</delimitchars>
+    <answerdisplay>dragdrop</answerdisplay>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>1</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <!-- Gapfill release:1.975 version:2018120800 Moodle version:2018120301.04 release:3.6.1+ (Build: 20181214) -->
+    <correctfeedback format="html">
+      <text>Your answer is correct.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Your answer is partially correct.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Your answer is incorrect.</text>
+    </incorrectfeedback>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+      <tag><text>forming_questions</text>
+</tag>
+      <tag><text>adpq_40</text>
+</tag>
+    </tags>
+  </question>
+
+<!-- question: 2289  -->
+  <question type="gapfill">
+    <name>
+      <text>WhoMadeTheTea</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>[Who] [made] [the] [tea]?<br></p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>4.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <answerdisplay>dragdrop</answerdisplay>
+    <delimitchars>[]</delimitchars>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>1</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>Who</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>made</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>the</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>tea</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>stop</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>when</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <delimitchars>[]</delimitchars>
+    <answerdisplay>dragdrop</answerdisplay>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>1</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <!-- Gapfill release:1.975 version:2018120800 Moodle version:2018120301.04 release:3.6.1+ (Build: 20181214) -->
+    <correctfeedback format="html">
+      <text>Your answer is correct.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Your answer is partially correct.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Your answer is incorrect.</text>
+    </incorrectfeedback>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+      <tag><text>forming_questions</text>
+</tag>
+      <tag><text>adpq_80</text>
+</tag>
+    </tags>
+  </question>
+
+<!-- question: 2290  -->
+  <question type="gapfill">
+    <name>
+      <text>WhyAre</text>
+    </name>
+    <questiontext format="html">
+      <text>You should have been here an hour ago, [why] are you so late?</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <answerdisplay>dragdrop</answerdisplay>
+    <delimitchars>[]</delimitchars>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>1</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>why</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>when</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>what</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>who</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <delimitchars>[]</delimitchars>
+    <answerdisplay>dragdrop</answerdisplay>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>1</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <!-- Gapfill release:1.975 version:2018120800 Moodle version:2018120301.04 release:3.6.1+ (Build: 20181214) -->
+    <correctfeedback format="html">
+      <text>Your answer is correct.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Your answer is partially correct.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Your answer is incorrect.</text>
+    </incorrectfeedback>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+      <tag><text>forming_questions</text>
+</tag>
+      <tag><text>adpq_50</text>
+</tag>
+    </tags>
+  </question>
+
+<!-- question: 2291  -->
+  <question type="gapfill">
+    <name>
+      <text>WillYouMakeTea</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>[Will] [you] [make] [tea]?</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>4.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <answerdisplay>dragdrop</answerdisplay>
+    <delimitchars>[]</delimitchars>
+    <casesensitive>1</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>0</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>Will</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>you</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>make</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>tea</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>will</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>You</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>Make</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>Tea</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <delimitchars>[]</delimitchars>
+    <answerdisplay>dragdrop</answerdisplay>
+    <casesensitive>1</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>0</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <!-- Gapfill release:1.975 version:2018120800 Moodle version:2018120301.04 release:3.6.1+ (Build: 20181214) -->
+    <correctfeedback format="html">
+      <text>Your answer is correct.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Your answer is partially correct.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Your answer is incorrect.</text>
+    </incorrectfeedback>
+    <tags>
+      <tag><text>forming_questions</text>
+</tag>
+      <tag><text>gapfill</text>
 </tag>
     </tags>
   </question>

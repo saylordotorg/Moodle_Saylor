@@ -1,5 +1,7 @@
 History
 =============
+Version 3.6.0.3
+
 Version 3.6.0.2
   1. Cope with 'sectionid' url parameter.
 
