@@ -733,6 +733,9 @@ class format_grid_renderer extends format_section_renderer_base {
         // Start at 1 to skip the summary block or include the summary block if it's in the grid display.
         $coursenumsections = $this->courseformat->get_last_section_number();
 
+        // Are we using WebP for the displayed image?
+        $iswebp = (get_config('format_grid', 'defaultdisplayedimagefiletype') == 2);
+
         foreach ($sections as $section => $thissection) {
             if (($this->section0attop) && ($section == 0)) {
                 continue;
@@ -836,8 +839,8 @@ class format_grid_renderer extends format_section_renderer_base {
                     $sectionimage = $sectionimages[$thissection->id];
                 }
 
-                // If the image is set then check that displayedimageindex is greater than 0 otherwise create the displayed image.
-                // This is a catch-all for existing courses.
+                /* If the image is set then check that displayedimageindex is greater than 0 otherwise create the displayed image.
+                   This is a catch-all for existing courses. */
                 if (isset($sectionimage->image) && ($sectionimage->displayedimageindex < 1)) {
                     // Set up the displayed image:...
                     $sectionimage->newimage = $sectionimage->image;
@@ -886,7 +889,7 @@ class format_grid_renderer extends format_section_renderer_base {
                     }
 
                     echo $this->courseformat->output_section_image(
-                        $section, $sectionname, $sectionimage, $contextid, $thissection, $gridimagepath, $this->output);
+                        $section, $sectionname, $sectionimage, $contextid, $thissection, $gridimagepath, $this->output, $iswebp);
 
                     echo html_writer::end_tag('div');
                     echo html_writer::end_tag('a');
@@ -924,7 +927,7 @@ class format_grid_renderer extends format_section_renderer_base {
                     }
 
                     $content .= $this->courseformat->output_section_image(
-                        $section, $sectionname, $sectionimage, $contextid, $thissection, $gridimagepath, $this->output);
+                        $section, $sectionname, $sectionimage, $contextid, $thissection, $gridimagepath, $this->output, $iswebp);
 
                     $content .= html_writer::end_tag('div');
 

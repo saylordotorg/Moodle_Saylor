@@ -1,6 +1,7 @@
 History
 =============
 Version 3.6.0.3
+  1. New: WebP displayed image support.
 
 Version 3.6.0.2
   1. Cope with 'sectionid' url parameter.
