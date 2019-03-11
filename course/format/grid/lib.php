@@ -163,6 +163,14 @@ class format_grid extends format_base {
     }
 
     /**
+     * Gets the default image file type.
+     * @return int Default image file type.
+     */
+    public static function get_default_image_file_type() {
+        return 1; // Original.
+    }
+
+    /**
      * Gets the default border colour.
      * @return string Default border colour.
      */
@@ -727,7 +735,7 @@ class format_grid extends format_base {
                         )
                     ),
                     'help' => 'coursedisplay',
-                    'help_component' => 'moodle',
+                    'help_component' => 'moodle'
                 )
             );
             if (has_capability('format/grid:changeimagecontaineralignment', $context)) {
@@ -1726,10 +1734,15 @@ class format_grid extends format_base {
     public function update_section_format_options($data) {
         $data = (array) $data;
 
-        // Resets the displayed image because changing the section name / details deletes the file.
-        // See CONTRIB-4784.
-        global $DB;
-        $DB->set_field('format_grid_icon', 'displayedimageindex', 0, array('sectionid' => $data['id']));
+        /* Resets the displayed image because changing the section name / details deletes the file.
+           See CONTRIB-4784. */
+        $sectionimage = $this->get_image($this->courseid, $data['id']);
+        if ($sectionimage) {
+            $contextid = $this->get_context()->id;
+            $fs = get_file_storage();
+            $gridimagepath = $this->get_image_path();
+            $this->delete_displayed_image($contextid, $sectionimage, $gridimagepath, $fs);
+        }
 
         return parent::update_section_format_options($data);
     }
@@ -2193,7 +2206,13 @@ class format_grid extends format_base {
             } else {
                 $crop = true;
             }
-            $data = self::generate_image($tmpfilepath, $displayedimageinfo['width'], $displayedimageinfo['height'], $crop, $icbc, $mime);
+            $iswebp = (get_config('format_grid', 'defaultdisplayedimagefiletype') == 2);
+            if ($iswebp) { // WebP.
+                $newmime = 'image/webp';
+            } else {
+                $newmime = $mime;
+            }
+            $data = self::generate_image($tmpfilepath, $displayedimageinfo['width'], $displayedimageinfo['height'], $crop, $icbc, $newmime);
             if (!empty($data)) {
                 // Updated image.
                 $sectionimage->displayedimageindex++;
@@ -2209,20 +2228,12 @@ class format_grid extends format_base {
                     'timemodified' => $created,
                     'mimetype' => $mime);
 
-                if ($fs->file_exists($displayedimagefilerecord['contextid'], $displayedimagefilerecord['component'],
-                    $displayedimagefilerecord['filearea'], $displayedimagefilerecord['itemid'],
-                    $displayedimagefilerecord['filepath'], $displayedimagefilerecord['filename'])) {
-                    /* This can happen with previous CONTRIB-4099 versions where it was possible for the backup file to
-                       have the 'gridimage' files too.  Therefore without this, then 'create_file_from_string' below will
-                       baulk as the file already exists.   Unfortunately has to be here as the restore mechanism restores
-                       the grid format data for the database and then the files.  And the Grid code is called at the 'data'
-                       stage. */
-                    if ($oldfile = $fs->get_file($displayedimagefilerecord['contextid'], $displayedimagefilerecord['component'],
-                        $displayedimagefilerecord['filearea'], $displayedimagefilerecord['itemid'],
-                        $displayedimagefilerecord['filepath'], $displayedimagefilerecord['filename'])) {
-                        // Delete old file.
-                        $oldfile->delete();
-                    }
+                $this->remove_existing_new_displayed_image($displayedimagefilerecord, $fs);
+
+                if ($iswebp) { // WebP.
+                    // Displayed image is a webp image from the original, so change a few things.
+                    $displayedimagefilerecord['filename'] = $sectionimage->displayedimageindex . '_' . $sectionimage->newimage.'.webp';
+                    $displayedimagefilerecord['mimetype'] = $newmime;
                 }
                 $fs->create_file_from_string($displayedimagefilerecord, $data);
             } else {
@@ -2231,9 +2242,13 @@ class format_grid extends format_base {
             unlink($tmpfilepath);
 
             if ($convertsuccess == true) {
-                // Now safe to delete old file if it exists.
+                // Now safe to delete old file(s) if they exist.
                 if ($oldfile = $fs->get_file($contextid, 'course', 'section', $sectionimage->sectionid, $gridimagepath,
                         ($sectionimage->displayedimageindex - 1) . '_' . $sectionimage->image)) {
+                    $oldfile->delete();
+                }
+                if ($oldfile = $fs->get_file($contextid, 'course', 'section', $sectionimage->sectionid, $gridimagepath,
+                        ($sectionimage->displayedimageindex - 1) . '_' . $sectionimage->image.'.webp')) {
                     $oldfile->delete();
                 }
                 $DB->set_field('format_grid_icon', 'displayedimageindex', $sectionimage->displayedimageindex,
@@ -2249,12 +2264,51 @@ class format_grid extends format_base {
         return $sectionimage;  // So that the caller can know the new value of displayedimageindex.
     }
 
-    public function output_section_image($section, $sectionname, $sectionimage, $contextid, $thissection, $gridimagepath, $output) {
+    protected function remove_existing_new_displayed_image($displayedimagefilerecord, $fs) {
+        // Can happen if previously updating the section name did not delete the displayed image.
+        if ($fs->file_exists($displayedimagefilerecord['contextid'], $displayedimagefilerecord['component'],
+            $displayedimagefilerecord['filearea'], $displayedimagefilerecord['itemid'],
+            $displayedimagefilerecord['filepath'], $displayedimagefilerecord['filename'])) {
+            /* This can happen with previous CONTRIB-4099 versions where it was possible for the backup file to
+               have the 'gridimage' files too.  Therefore without this, then 'create_file_from_string' below will
+               baulk as the file already exists.   Unfortunately has to be here as the restore mechanism restores
+               the grid format data for the database and then the files.  And the Grid code is called at the 'data'
+               stage. */
+            if ($oldfile = $fs->get_file($displayedimagefilerecord['contextid'], $displayedimagefilerecord['component'],
+                $displayedimagefilerecord['filearea'], $displayedimagefilerecord['itemid'],
+                $displayedimagefilerecord['filepath'], $displayedimagefilerecord['filename'])) {
+                // Delete old file.
+                $oldfile->delete();
+            }
+        }
+        // WebP version.
+        if ($fs->file_exists($displayedimagefilerecord['contextid'], $displayedimagefilerecord['component'],
+            $displayedimagefilerecord['filearea'], $displayedimagefilerecord['itemid'],
+            $displayedimagefilerecord['filepath'], $displayedimagefilerecord['filename'].'.webp')) {
+            /* This can happen with previous CONTRIB-4099 versions where it was possible for the backup file to
+               have the 'gridimage' files too.  Therefore without this, then 'create_file_from_string' below will
+               baulk as the file already exists.   Unfortunately has to be here as the restore mechanism restores
+               the grid format data for the database and then the files.  And the Grid code is called at the 'data'
+               stage. */
+            if ($oldfile = $fs->get_file($displayedimagefilerecord['contextid'], $displayedimagefilerecord['component'],
+                $displayedimagefilerecord['filearea'], $displayedimagefilerecord['itemid'],
+                $displayedimagefilerecord['filepath'], $displayedimagefilerecord['filename'].'.webp')) {
+                // Delete old file.
+                $oldfile->delete();
+            }
+        }
+    }
+
+    public function output_section_image($section, $sectionname, $sectionimage, $contextid, $thissection, $gridimagepath, $output, $iswebp) {
         $content = '';
         if (is_object($sectionimage) && ($sectionimage->displayedimageindex > 0)) {
+            $filename = $sectionimage->displayedimageindex . '_' . $sectionimage->image;
+            if ($iswebp) {
+                $filename .= '.webp';
+            }
             $imgurl = moodle_url::make_pluginfile_url(
                 $contextid, 'course', 'section', $thissection->id, $gridimagepath,
-                $sectionimage->displayedimageindex . '_' . $sectionimage->image
+                $filename
             );
             $content = html_writer::empty_tag('img', array(
                 'src' => $imgurl,
@@ -2284,10 +2338,14 @@ class format_grid extends format_base {
                 if ($file = $fs->get_file($contextid, 'course', 'section', $sectionid, '/', $sectionimage->image)) {
                     $file->delete();
                     $DB->set_field('format_grid_icon', 'image', null, array('sectionid' => $sectionimage->sectionid));
-                    // Delete the displayed image.
+                    // Delete the displayed image(s).
                     $gridimagepath = $this->get_image_path();
                     if ($file = $fs->get_file($contextid, 'course', 'section', $sectionid, $gridimagepath,
                             $sectionimage->displayedimageindex . '_' . $sectionimage->image)) {
+                        $file->delete();
+                    }
+                    if ($file = $fs->get_file($contextid, 'course', 'section', $sectionid, $gridimagepath,
+                            $sectionimage->displayedimageindex . '_' . $sectionimage->image.'.webp')) {
                         $file->delete();
                     }
                 }
@@ -2312,9 +2370,13 @@ class format_grid extends format_base {
                     if ($file = $fs->get_file($context->id, 'course', 'section', $sectionimage->sectionid, '/',
                             $sectionimage->image)) {
                         $file->delete();
-                        // Delete the displayed image.
+                        // Delete the displayed image(s).
                         if ($file = $fs->get_file($context->id, 'course', 'section', $sectionimage->sectionid, $gridimagepath,
                                 $sectionimage->displayedimageindex . '_' . $sectionimage->image)) {
+                            $file->delete();
+                        }
+                        if ($file = $fs->get_file($context->id, 'course', 'section', $sectionimage->sectionid, $gridimagepath,
+                                $sectionimage->displayedimageindex . '_' . $sectionimage->image.'.webp')) {
                             $file->delete();
                         }
                     }
@@ -2329,21 +2391,31 @@ class format_grid extends format_base {
 
         if (is_array($sectionimages)) {
             global $DB;
-
-            $context = $this->get_context();
+            $contextid = $this->get_context()->id;
             $fs = get_file_storage();
             $gridimagepath = $this->get_image_path();
             $t = $DB->start_delegated_transaction();
 
             foreach ($sectionimages as $sectionimage) {
                 // Delete the displayed image.
-                if ($file = $fs->get_file($context->id, 'course', 'section', $sectionimage->sectionid, $gridimagepath,
-                        $sectionimage->displayedimageindex . '_' . $sectionimage->image)) {
-                    $file->delete();
-                    $DB->set_field('format_grid_icon', 'displayedimageindex', 0, array('sectionid' => $sectionimage->sectionid));
-                }
+                $this->delete_displayed_image($contextid, $sectionimage, $gridimagepath, $fs);
             }
             $t->allow_commit();
+        }
+    }
+
+    protected function delete_displayed_image($contextid, $sectionimage, $gridimagepath, $fs) {
+        global $DB;
+
+        if ($file = $fs->get_file($contextid, 'course', 'section', $sectionimage->sectionid, $gridimagepath,
+            $sectionimage->displayedimageindex . '_' . $sectionimage->image)) {
+            $file->delete();
+            $DB->set_field('format_grid_icon', 'displayedimageindex', 0, array('sectionid' => $sectionimage->sectionid));
+        }
+        if ($file = $fs->get_file($contextid, 'course', 'section', $sectionimage->sectionid, $gridimagepath,
+            $sectionimage->displayedimageindex . '_' . $sectionimage->image.'.webp')) {
+            $file->delete();
+            $DB->set_field('format_grid_icon', 'displayedimageindex', 0, array('sectionid' => $sectionimage->sectionid));
         }
     }
 
@@ -2408,7 +2480,7 @@ class format_grid extends format_base {
             return false;
         }
 
-        $original = imagecreatefromstring(file_get_contents($filepath));
+        $original = imagecreatefromstring(file_get_contents($filepath)); // Need to alter / check for webp support.
 
         switch ($mime) {
             case 'image/png':
@@ -2429,6 +2501,19 @@ class format_grid extends format_base {
                     $quality = 90;
                 } else {
                     debugging('JPG\'s are not supported at this server, please fix the system configuration'.
+                        ' to have the GD PHP extension installed.');
+                    return false;
+                }
+                break;
+            /* Moodle does not yet natively support webp as a mime type, but have here for us on the displayed image and
+               not yet as a source image. */
+            case 'image/webp':
+                if (function_exists('imagewebp')) {
+                    $imagefnc = 'imagewebp';
+                    $filters = null;
+                    $quality = 90;
+                } else {
+                    debugging('WEBP\'s are not supported at this server, please fix the system configuration'.
                         ' to have the GD PHP extension installed.');
                     return false;
                 }
@@ -2475,7 +2560,7 @@ class format_grid extends format_base {
                 imagealphablending($tempimage, false);
                 imagefill($tempimage, 0, 0, imagecolorallocatealpha($tempimage, 0, 0, 0, 127));
                 imagesavealpha($tempimage, true);
-            } else if (($imagefnc === 'imagejpeg') || ($imagefnc === 'imagegif')) {
+            } else if (($imagefnc === 'imagejpeg') || ($imagefnc === 'imagewebp') || ($imagefnc === 'imagegif')) {
                 imagealphablending($tempimage, false);
                 imagefill($tempimage, 0, 0, imagecolorallocate($tempimage, $icbc['r'], $icbc['g'], $icbc['b']));
             }
@@ -2714,4 +2799,15 @@ function callback_grid_load_content(&$navigation, $course, $coursenode) {
  */
 function callback_grid_definition() {
     return get_string('topic', 'format_grid');
+}
+
+function grid_format_update_displayed_images() {
+    global $DB;
+
+    if ($gridformatcourses = $DB->get_records('course', array('format' => 'grid'), '', 'id')) {
+        foreach ($gridformatcourses as $gridformatcourse) {
+            $courseformat = course_get_format($gridformatcourse->id);
+            $courseformat->delete_displayed_images();
+        }
+    }
 }
