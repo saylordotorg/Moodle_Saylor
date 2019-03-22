@@ -20,7 +20,33 @@
 {{{ output.doctype }}}
 <html {{{ output.htmlattributes }}}>
 <head>
-    <title>{{{ output.page_title }}}</title>
+    {{#opengraph}}
+    <title>{{opengraph.title}}</title>
+    <meta name="description" content="{{opengraph.description}}">
+    {{/opengraph}}
+    {{#opengraph.canonical}}
+    <link rel="canonical" href="{{opengraph.canonical}}" />
+    {{/opengraph.canonical}}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Open Graph -->
+    {{#opengraph}}
+    <meta property="og:title" content="{{opengraph.title}}" />
+    <meta property="og:type" content="{{opengraph.type}}" />
+    <meta property="og:url" content="{{opengraph.url}}" />
+    <meta property="og:image" content="{{opengraph.image}}" />
+    <meta property="og:image:secure_url" content="{{opengraph.image}}" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" /> 
+    <meta property="og:image:height" content="1200" />
+    <meta property="og:description" content="{{opengraph.description}}" />
+    <meta property="og:site_name" content="{{sitename}}" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="{{sitename}}" />
+    <meta name="twitter:title" content="{{opengraph.title}}" />
+    <meta name="twitter:description" content="{{opengraph.description}}" />
+    <meta name="twitter:image" content="{{opengraph.image}}" />
+    {{/opengraph}}
+    <!-- End Open Graph -->
     <!-- Favicons -->
     <link rel="apple-touch-icon" sizes="57x57" href="{{{ config.wwwroot }}}/theme/image.php?theme=saylor&component=theme_saylor&image=favicons%2Fapple-icon-57x57">
     <link rel="apple-touch-icon" sizes="180x180" href="{{{ config.wwwroot }}}/theme/image.php?theme=saylor&component=theme_saylor&image=favicons%2Fapple-touch-icon">
@@ -58,24 +84,4 @@
     <!-- DO NOT MODIFY -->
     <!-- End Facebook Pixel Code -->
     {{{ output.standard_head_html }}}
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Open Graph -->
-    {{#opengraph}}
-    <meta property="og:title" content="{{opengraph.title}}" />
-    <meta property="og:type" content="{{opengraph.type}}" />
-    <meta property="og:url" content="{{opengraph.url}}" />
-    <meta property="og:image" content="{{opengraph.image}}" />
-    <meta property="og:image:secure_url" content="{{opengraph.image}}" />
-    <meta property="og:image:type" content="image/png" />
-    <meta property="og:image:width" content="1200" /> 
-    <meta property="og:image:height" content="1200" />
-    <meta property="og:description" content="{{opengraph.description}}" />
-    <meta property="og:site_name" content="{{sitename}}" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="{{sitename}}" />
-    <meta name="twitter:title" content="{{opengraph.title}}" />
-    <meta name="twitter:description" content="{{opengraph.description}}" />
-    <meta name="twitter:image" content="{{opengraph.image}}" />
-    {{/opengraph}}
-    <!-- End Open Graph -->
 </head>

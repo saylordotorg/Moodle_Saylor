@@ -199,6 +199,28 @@ function local_boostnavigation_extend_navigation(global_navigation $navigation) 
         }
     }
 
+    // Check if admin wanted us to remove the grades node from Boost's nav drawer.
+    if (isset($config->removegradescoursenode) && $config->removegradescoursenode == true) {
+        // Only proceed if we are inside a course and we are _not_ on the frontpage.
+        if ($PAGE->context->get_course_context(false) == true && $COURSE->id != SITEID) {
+            if ($gradesnode = $navigation->find('grades', global_navigation::TYPE_SETTING)) {
+                // Remove grades node (Just hiding it with the showinflatnavigation attribute does not work here).
+                $gradesnode->remove();
+            }
+        }
+    }
+
+    // Check if admin wanted us to remove the participants node from Boost's nav drawer.
+    if (isset($config->removeparticipantscoursenode) && $config->removeparticipantscoursenode == true) {
+        // Only proceed if we are inside a course and we are _not_ on the frontpage.
+        if ($PAGE->context->get_course_context(false) == true && $COURSE->id != SITEID) {
+            if ($participantsnode = $navigation->find('participants', global_navigation::TYPE_CONTAINER)) {
+                // Remove participants node (Just hiding it with the showinflatnavigation attribute does not work here).
+                $participantsnode->remove();
+            }
+        }
+    }
+
     // Check if admin wants us to insert the coursesections node in Boost's nav drawer.
     // Or if admin wants us to insert the activities and / or resources node in Boost's nav drawer.
     // If one of these three settings is activated, we will need the modinfo and don't want
@@ -677,10 +699,10 @@ function local_boostnavigation_get_fontawesome_icon_map() {
             $settings = explode('|', $line);
 
             // Check if there is an icon configured.
-            if (!empty($settings[6])) {
+            if (!empty($settings[7])) {
 
                 // Pick the setting which represents the icon.
-                $icon = trim($settings[6]);
+                $icon = trim($settings[7]);
 
                 // If a valid icon is given, we remember it for the iconmapping.
                 if (local_boostnavigation_verify_faicon($icon)) {

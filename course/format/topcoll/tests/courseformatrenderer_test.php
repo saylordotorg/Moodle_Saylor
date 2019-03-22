@@ -211,7 +211,7 @@ class format_topcoll_courseformatrenderer_testcase extends advanced_testcase {
         $thevalue .= '<div class="left side"><span class="cps_centre">1</span></div><div class="right side">';
         $thevalue .= '<a title="View only &#039;Topic 1&#039;" class="cps_centre" ';
         $thevalue .= 'href="'.$CFG->wwwroot.'/course/view.php?id='.$this->course->id.'&amp;section=1">Topic<br />1</a>';
-        $thevalue .= '</div><div class="content"><div class="sectionhead toggle toggle-arrow" id="toggle-1">';
+        $thevalue .= '</div><div class="content"><div class="sectionhead toggle toggle-arrow" id="toggle-1" tabindex="0">';
         $thevalue .= '<span class="toggle_closed the_toggle tc-medium" role="button" aria-pressed="false">';
         $thevalue .= '<h3 class="sectionname">Section 1<div class="cttoggle"> - Toggle</div></h3>';
         $thevalue .= '<div class="section_availability"></div></span></div>';
@@ -279,7 +279,7 @@ class format_topcoll_courseformatrenderer_testcase extends advanced_testcase {
         $theoutput .= '<div class="left side"><span class="cps_centre">1</span></div><div class="right side">';
         $theoutput .= '<a title="View only &#039;Topic 1&#039;" class="cps_centre" ';
         $theoutput .= 'href="'.$CFG->wwwroot.'/course/view.php?id='.$this->course->id.'&amp;section=1">Topic<br />1</a>';
-        $theoutput .= '</div><div class="content"><div class="sectionhead toggle toggle-arrow" id="toggle-1">';
+        $theoutput .= '</div><div class="content"><div class="sectionhead toggle toggle-arrow" id="toggle-1" tabindex="0">';
         $theoutput .= '<span class="toggle_closed the_toggle tc-medium" role="button" aria-pressed="false">';
         $theoutput .= '<h3 class="sectionname">Section 1<div class="cttoggle"> - Toggle</div></h3>';
         $theoutput .= '<div class="section_availability"></div></span></div>';
@@ -309,7 +309,7 @@ class format_topcoll_courseformatrenderer_testcase extends advanced_testcase {
         $theoutput .= '<div class="left side"><span class="cps_centre">1</span></div><div class="right side">';
         $theoutput .= '<a title="View only &#039;Topic 1&#039;" class="cps_centre" ';
         $theoutput .= 'href="'.$CFG->wwwroot.'/course/view.php?id='.$this->course->id.'&amp;section=1">Topic<br />1</a>';
-        $theoutput .= '</div><div class="content"><div class="sectionhead toggle toggle-arrow" id="toggle-1">';
+        $theoutput .= '</div><div class="content"><div class="sectionhead toggle toggle-arrow" id="toggle-1" tabindex="0">';
         $theoutput .= '<span class="toggle_closed the_toggle tc-medium" role="button" aria-pressed="false">';
         $theoutput .= '<h3 class="sectionname">Section 1<div class="cttoggle"> - Toggle</div></h3>';
         $theoutput .= '<div class="section_availability"></div></span></div>';
@@ -361,28 +361,36 @@ class format_topcoll_courseformatrenderer_testcase extends advanced_testcase {
 
     public function test_toggle_all() {
         global $CFG;
+        $ariahidden = '';
+        if ($CFG->version >= 2018120302.07) {
+            $ariahidden = 'aria-hidden="true" ';
+        }
 
         $this->init();
         $theclass = self::call_method($this->outputus, 'toggle_all', array());
         $thevalue = '<li class="tcsection main clearfix" id="toggle-all"><div class="left side"><img class="icon spacer" ';
-        $thevalue .= 'width="1" height="1" alt="" src="'.$CFG->wwwroot.'/theme/image.php/_s/boost/core/1/spacer" />';
-        $thevalue .= '</div><div class="right side"><img class="icon spacer" width="1" height="1" alt="" src="';
+        $thevalue .= 'width="1" height="1" alt="" '.$ariahidden.'src="'.$CFG->wwwroot.'/theme/image.php/_s/boost/core/1/spacer" />';
+        $thevalue .= '</div><div class="right side"><img class="icon spacer" width="1" height="1" alt="" '.$ariahidden.'src="';
         $thevalue .= $CFG->wwwroot.'/theme/image.php/_s/boost/core/1/spacer" /></div><div class="content">';
         $thevalue .= '<div class="sectionbody toggle-arrow-hover toggle-arrow"><h4><span class="on tc-medium" id="';
-        $thevalue .= 'toggles-all-opened" role="button">Open all</span><span class="off tc-medium" id="toggles-all-closed" ';
-        $thevalue .= 'role="button">Close all</span></h4></div></div></li>';
+        $thevalue .= 'toggles-all-opened" role="button" tabindex="0">Open all</span><span class="off tc-medium" id="toggles-all-closed" ';
+        $thevalue .= 'role="button" tabindex="0">Close all</span></h4></div></div></li>';
         $this->assertEquals($thevalue, $theclass);
     }
 
     public function test_display_instructions() {
         global $CFG;
+        $ariahidden = '';
+        if ($CFG->version >= 2018120302.07) {
+            $ariahidden = 'aria-hidden="true" ';
+        }
 
         $this->init();
         $theclass = self::call_method($this->outputus, 'display_instructions', array());
         $thevalue = '<li class="tcsection main clearfix" id="topcoll-display-instructions"><div class="left side">';
-        $thevalue .= '<img class="icon spacer" width="1" height="1" alt="" src="';
+        $thevalue .= '<img class="icon spacer" width="1" height="1" alt="" '.$ariahidden.'src="';
         $thevalue .= $CFG->wwwroot.'/theme/image.php/_s/boost/core/1/spacer" /></div><div class="right side">';
-        $thevalue .= '<img class="icon spacer" width="1" height="1" alt="" src="';
+        $thevalue .= '<img class="icon spacer" width="1" height="1" alt="" '.$ariahidden.'src="';
         $thevalue .= $CFG->wwwroot.'/theme/image.php/_s/boost/core/1/spacer" /></div><div class="content">';
         $thevalue .= '<div class="sectionbody"><p class="topcoll-display-instructions">Instructions: Clicking on the section ';
         $thevalue .= 'name will show / hide the section.</p></div></div></li>';
