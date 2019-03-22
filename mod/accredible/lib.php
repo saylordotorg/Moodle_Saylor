@@ -25,6 +25,7 @@
  */
 
 require_once($CFG->dirroot . '/mod/accredible/locallib.php');
+require_once($CFG->libdir  . '/eventslib.php');
 
 /**
  * Add certificate instance.
