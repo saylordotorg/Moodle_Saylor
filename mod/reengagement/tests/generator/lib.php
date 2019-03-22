@@ -15,19 +15,27 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information
+ * mod_reengagement data generator.
  *
- * @package    mod_reengagement
- * @author     Peter Bulmer <peter.bulmer@catlayst.net.nz>
- * @copyright  2016 Catalyst IT {@link http://www.catalyst.net.nz}
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package mod_reengagement
+ * @category test
+ * @copyright 2019 Matt Clarkson <mattc@catalyst.net.nz>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2019011700;   // The current module version.
-$plugin->requires  = 2018111800; // Requires 3.6
-$plugin->component = 'mod_reengagement';
-$plugin->release   = '3.6.1';
-$plugin->maturity  = MATURITY_STABLE;
-$plugin->cron      = 0; // Now uses a scheduled task.
+/**
+ * mod_reengagement data generator class.
+ *
+ * @package mod_reengagement
+ * @category test
+ * @copyright 2019 Matt Clarkson <mattc@catalyst.net.nz>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class mod_reengagement_generator extends testing_module_generator {
+
+    public function create_instance($record = null, array $options = null) {
+        return parent::create_instance($record, $options);
+    }
+}
