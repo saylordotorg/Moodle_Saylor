@@ -238,7 +238,7 @@ class theme_saylor_core_renderer extends theme_boost\output\core_renderer
         $imagedomain = "https://resources.saylor.org/og/";
 
         // Set default properties.
-        $title = $PAGE->title;
+        $title = str_replace($SITE->shortname.": ", "", $PAGE->title)." | ".$SITE->shortname;
         $type = "website";
         $url = $PAGE->url;
         $image = "default-1200x1200.png";
@@ -246,9 +246,17 @@ class theme_saylor_core_renderer extends theme_boost\output\core_renderer
 
         // Show different info in courses, such as the title and images.
         if ($PAGE->pagelayout == 'course' || $PAGE->pagelayout == 'incourse') {
-            $title = $SITE->shortname.": ".str_replace("Course: ", "", $PAGE->title);
+            $title = str_replace("Course: ", "", $PAGE->title)." | ".$SITE->shortname;
+            // Filter out instances where the course name is listed twice 
+            // where a resource has the course name in it (like the final exams).
+            $title = str_replace($COURSE->shortname.": ".$COURSE->shortname.": ", $COURSE->shortname.": ", $title);
             $image = $COURSE->shortname."-1200x1200.png";
             $description = preg_replace('~((\{.*\})|(<.+>.*</.+>))~s', '', $COURSE->summary);
+            $canonical = "/course/".$COURSE->shortname;
+        }
+        elseif ($PAGE->pagetype == 'site-index') {
+            // Set canonical url for the frontpage, whether there is ?redirect=0 or not.
+            $canonical = "/";
         }
 
         $properties = new stdClass();
@@ -257,6 +265,9 @@ class theme_saylor_core_renderer extends theme_boost\output\core_renderer
         $properties->url = $url;
         $properties->image = $imagedomain.$image;
         $properties->description = html_entity_decode($description);
+        if (isset($canonical)) {
+            $properties->canonical = $canonical;
+        }
 
         return $properties;
     }
