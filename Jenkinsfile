@@ -82,7 +82,7 @@ def plugins = [
     ],
     [
         "name" : 'mod_accredible',
-        "url" : 'https://github.com/saylordotorg/moodle-mod_accredible.git',
+        "url" : 'https://github.com/accredible/moodle-mod_accredible.git',
         "branch" : 'master',
         "dest" : 'mod/accredible'
     ],
@@ -179,7 +179,7 @@ def plugins = [
     [
         "name" : 'mod_reengagement',
         "url" : 'https://github.com/catalyst/moodle-mod_reengagement.git',
-        "branch" : 'MOODLE_35_STABLE',
+        "branch" : 'master',
         "dest" : 'mod/reengagement'
     ],
     [
@@ -191,14 +191,8 @@ def plugins = [
     [
         "name" : 'block_sayloroverview',
         "url" : 'https://github.com/saylordotorg/moodle-block_sayloroverview.git',
-        "branch" : 'development',
-        "dest" : 'blocks/sayloroverview'
-    ],
-    [
-        "name" : 'local_abtesting',
-        "url" : 'https://github.com/saylordotorg/moodle-local_abtesting.git',
         "branch" : 'master',
-        "dest" : 'local/abtesting'
+        "dest" : 'blocks/sayloroverview'
     ],
     [
         "name" : 'block_completion_progress',
@@ -207,22 +201,16 @@ def plugins = [
         "dest" : 'blocks/completion_progress'
     ],
     [
+        "name" : 'local_abtesting',
+        "url" : 'https://github.com/saylordotorg/moodle-local_abtesting.git',
+        "branch" : 'master',
+        "dest" : 'local/abtesting'
+    ],
+    [
         "name" : 'local_boostnavigation',
         "url" : 'https://github.com/moodleuulm/moodle-local_boostnavigation',
         "branch" : 'master',
         "dest" : 'local/boostnavigation'
-    ],
-    [
-        "name" : 'local_sayonara',
-        "url" : 'https://github.com/saylordotorg/moodle-local_sayonara',
-        "branch" : 'development',
-        "dest" : 'local/sayonara'
-    ],
-    [
-        "name" : 'gradereport_quizanalytics',
-        "url" : 'https://github.com/dualcube/moodle-gradereport_quizanalytics',
-        "branch" : 'master',
-        "dest" : 'grade/report/quizanalytics'
     ],
     [
         "name" : 'qtype_gapfill',
@@ -231,22 +219,10 @@ def plugins = [
         "dest" : 'question/type/gapfill'
     ],
     [
-        "name" : 'mod_hvp',
-        "url" : 'https://github.com/saylordotorg/moodle-mod_hvp',
-        "branch" : 'master',
-        "dest" : 'mod/hvp'
-    ],
-    [
         "name" : 'local_affiliations',
         "url" : 'https://github.com/saylordotorg/moodle-local_affiliations',
-        "branch" : 'development',
-        "dest" : 'local/affiliations'
-    ],
-    [
-        "name" : 'block_sharing_cart',
-        "url" : 'https://github.com/VERSION2-Inc/moodle-block_sharing_cart',
         "branch" : 'master',
-        "dest" : 'blocks/sharing_cart'
+        "dest" : 'local/affiliations'
     ],
     [
         "name" : 'qtype_coderunner',
@@ -259,12 +235,6 @@ def plugins = [
         "url" : 'https://github.com/trampgeek/moodle-qbehaviour_adaptive_adapted_for_coderunner.git',
         "branch" : 'master',
         "dest" : 'question/behaviour/adaptive_adapted_for_coderunner'
-    ],
-    [
-        "name" : 'autoenrol',
-        "url" : 'https://github.com/bobopinna/moodle-enrol_autoenrol.git',
-        "branch" : 'master',
-        "dest" : 'enrol/autoenrol'
     ],
     [
         "name" : 'filter_generico',
@@ -291,7 +261,6 @@ def StashMoodle(moodle_version) {
             }
         // Remove the Moodle .git folder.
         sh "rm -r .git"
-
         stash([name: 'moodle'])
     }
 }
