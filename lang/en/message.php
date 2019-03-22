@@ -36,6 +36,7 @@ $string['blockcontact'] = 'Block contact';
 $string['blockedusers'] = 'Blocked users';
 $string['blockuser'] = 'Block user';
 $string['blockuserconfirm'] = 'Are you sure you want to block {$a}?';
+$string['blockuserconfirmbutton'] = 'Block';
 $string['blocknoncontacts'] = 'Prevent non-contacts from messaging me';
 $string['canceledit'] = 'Cancel editing messages';
 $string['contactableprivacy'] = 'Accept messages from:';
@@ -255,7 +256,7 @@ $string['viewunreadmessageswith'] = 'View unread messages with {$a}';
 $string['writeamessage'] = 'Write a message...';
 $string['wouldliketocontactyou'] = 'Would like to contact you';
 $string['you'] = 'You:';
-$string['youhaveblockeduser'] = 'You have blocked this user in the past';
+$string['youhaveblockeduser'] = 'You have blocked this user.';
 $string['yourcontactrequestpending'] = 'Your contact request is pending with {$a}';
 
 // Deprecated since Moodle 3.6.

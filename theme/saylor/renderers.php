@@ -242,13 +242,13 @@ class theme_saylor_core_renderer extends theme_boost\output\core_renderer
         $type = "website";
         $url = $PAGE->url;
         $image = "default-1200x1200.png";
-        $description = $SITE->summary;
+        $description = preg_replace('~((\{.*\})|(<.+>.*</.+>))~s', '', $SITE->summary);
 
         // Show different info in courses, such as the title and images.
         if ($PAGE->pagelayout == 'course' || $PAGE->pagelayout == 'incourse') {
             $title = $SITE->shortname.": ".str_replace("Course: ", "", $PAGE->title);
             $image = $COURSE->shortname."-1200x1200.png";
-            $description = $COURSE->summary;
+            $description = preg_replace('~((\{.*\})|(<.+>.*</.+>))~s', '', $COURSE->summary);
         }
 
         $properties = new stdClass();

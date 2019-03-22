@@ -22857,4 +22857,1051 @@ cheapest, costly)</li>
     </tags>
   </question>
 
+<!-- question: 0  -->
+  <question type="category">
+    <category>
+      <text>$course$/top/Default for qb/Gapfill English Language Questions/Subject verb agreement</text>
+    </category>
+    <info format="moodle_auto_format">
+      <text></text>
+    </info>
+  </question>
+
+<!-- question: 3645  -->
+  <question type="description">
+    <name>
+      <text>SubjectVerbAgreementResources</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p><a href="https://www.teachingenglish.org.uk/blogs/sundaresh07/subject-verb-agreement" target="_blank">https://www.teachingenglish.org.uk/blogs/sundaresh07/subject-verb-agreement</a><br></p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>0.0000000</defaultgrade>
+    <penalty>0.0000000</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+  </question>
+
+<!-- question: 3646  -->
+  <question type="gapfill">
+    <name>
+      <text>HePlays</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>He [plays] football on Saturdays.<br></p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <answerdisplay>dragdrop</answerdisplay>
+    <delimitchars>[]</delimitchars>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>1</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>plays</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>playing</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>played</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>play</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <delimitchars>[]</delimitchars>
+    <answerdisplay>dragdrop</answerdisplay>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>1</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <!-- Gapfill release:1.975 version:2018120800 Moodle version:2018120301.04 release:3.6.1+ (Build: 20181214) -->
+    <correctfeedback format="html">
+      <text>Your answer is correct.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Your answer is partially correct.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text><![CDATA[This is about subject and verb agreement. Because it is about me the subject is singular he and <i>play </i>is the singular. If it were multiple, e.g. with friends it would be "he <i>plays </i>football with his friends"<br>]]></text>
+    </incorrectfeedback>
+    <hint format="html">
+      <text>The first letter of the correct answer will be added to each incorrect gap when you press try again.</text>
+    </hint>
+    <hint format="html">
+      <text>The next letter of the correct answer will be added when you press try again</text>
+    </hint>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+      <tag><text>subject_verb_agreement</text>
+</tag>
+      <tag><text>adpq_40</text>
+</tag>
+    </tags>
+  </question>
+
+<!-- question: 3647  -->
+  <question type="gapfill">
+    <name>
+      <text>IAmGoingHome</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>I [am] going home<br></p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <answerdisplay>dragdrop</answerdisplay>
+    <delimitchars>[]</delimitchars>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>1</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>am</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>are</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>be</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <delimitchars>[]</delimitchars>
+    <answerdisplay>dragdrop</answerdisplay>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>1</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <!-- Gapfill release:1.975 version:2018120800 Moodle version:2018120301.04 release:3.6.1+ (Build: 20181214) -->
+    <correctfeedback format="html">
+      <text>Your answer is correct.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Your answer is partially correct.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Your answer is incorrect.</text>
+    </incorrectfeedback>
+    <hint format="html">
+      <text>The first letter of the correct answer will be added to each incorrect gap when you press try again.</text>
+    </hint>
+    <hint format="html">
+      <text>The next letter of the correct answer will be added when you press try again</text>
+    </hint>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+      <tag><text>subject_verb_agreement</text>
+</tag>
+    </tags>
+  </question>
+
+<!-- question: 3648  -->
+  <question type="gapfill">
+    <name>
+      <text>IAmHappy</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>I [am] happy.</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <answerdisplay>dragdrop</answerdisplay>
+    <delimitchars>[]</delimitchars>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>0</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>am</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>are</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>be</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>to</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <delimitchars>[]</delimitchars>
+    <answerdisplay>dragdrop</answerdisplay>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>0</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <!-- Gapfill release:1.975 version:2018120800 Moodle version:2018120301.04 release:3.6.1+ (Build: 20181214) -->
+    <correctfeedback format="html">
+      <text>Your answer is correct.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Your answer is partially correct.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Your answer is incorrect.</text>
+    </incorrectfeedback>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+      <tag><text>subject_verb_agreement</text>
+</tag>
+      <tag><text>adpq_30</text>
+</tag>
+    </tags>
+  </question>
+
+<!-- question: 3649  -->
+  <question type="gapfill">
+    <name>
+      <text>ICycledToWork</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Arranged the words to make a sentence.</p><p>[I] [cycled] [to] [work]</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>4.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <answerdisplay>dragdrop</answerdisplay>
+    <delimitchars>[]</delimitchars>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>1</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>I</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>cycled</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>to</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>work</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>Cycled</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <delimitchars>[]</delimitchars>
+    <answerdisplay>dragdrop</answerdisplay>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>1</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <!-- Gapfill release:1.975 version:2018120800 Moodle version:2018120301.04 release:3.6.1+ (Build: 20181214) -->
+    <correctfeedback format="html">
+      <text>Your answer is correct.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Your answer is partially correct.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Your answer is incorrect.</text>
+    </incorrectfeedback>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+      <tag><text>subject_verb_agreement</text>
+</tag>
+    </tags>
+  </question>
+
+<!-- question: 3650  -->
+  <question type="gapfill">
+    <name>
+      <text>IHadAHeadAche</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>[I] [had] [a] [headache]<br></p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>4.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <answerdisplay>dragdrop</answerdisplay>
+    <delimitchars>[]</delimitchars>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>1</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>I</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>had</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>a</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>headache</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>Me</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>me</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>i</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>did</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <delimitchars>[]</delimitchars>
+    <answerdisplay>dragdrop</answerdisplay>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>1</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <!-- Gapfill release:1.975 version:2018120800 Moodle version:2018120301.04 release:3.6.1+ (Build: 20181214) -->
+    <correctfeedback format="html">
+      <text>Your answer is correct.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Your answer is partially correct.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Your answer is incorrect.</text>
+    </incorrectfeedback>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+      <tag><text>subject_verb_agreement</text>
+</tag>
+    </tags>
+  </question>
+
+<!-- question: 3651  -->
+  <question type="gapfill">
+    <name>
+      <text>IHaveBeen</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>I [have] been happy all day.<br></p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <answerdisplay>dropdown</answerdisplay>
+    <delimitchars>[]</delimitchars>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>0</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>have</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>has</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>was</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <delimitchars>[]</delimitchars>
+    <answerdisplay>dropdown</answerdisplay>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>0</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <!-- Gapfill release:1.975 version:2018120800 Moodle version:2018120301.04 release:3.6.1+ (Build: 20181214) -->
+    <correctfeedback format="html">
+      <text>Your answer is correct.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Your answer is partially correct.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Your answer is incorrect.</text>
+    </incorrectfeedback>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+      <tag><text>subject_verb_agreement</text>
+</tag>
+    </tags>
+  </question>
+
+<!-- question: 3652  -->
+  <question type="gapfill">
+    <name>
+      <text>IWasAsleep</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>I [was] asleep when the phone rang.<br></p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <answerdisplay>dragdrop</answerdisplay>
+    <delimitchars>[]</delimitchars>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>0</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>was</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>am</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>were</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>wasd</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <delimitchars>[]</delimitchars>
+    <answerdisplay>dragdrop</answerdisplay>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>0</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <!-- Gapfill release:1.975 version:2018120800 Moodle version:2018120301.04 release:3.6.1+ (Build: 20181214) -->
+    <correctfeedback format="html">
+      <text>Your answer is correct.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Your answer is partially correct.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text><![CDATA[Because the subject I is singular <u><i>was </i></u>is used. If the subject was plural such as we, then it would be "We <u><i>were </i></u>asleep"<br>]]></text>
+    </incorrectfeedback>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+      <tag><text>subject_verb_agreement</text>
+</tag>
+    </tags>
+  </question>
+
+<!-- question: 3653  -->
+  <question type="gapfill">
+    <name>
+      <text>IWasWaiting</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>I [was] waiting for you.<br></p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <answerdisplay>dragdrop</answerdisplay>
+    <delimitchars>[]</delimitchars>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>0</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>was</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>were</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>werm</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>werd</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <delimitchars>[]</delimitchars>
+    <answerdisplay>dragdrop</answerdisplay>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>0</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <!-- Gapfill release:1.975 version:2018120800 Moodle version:2018120301.04 release:3.6.1+ (Build: 20181214) -->
+    <correctfeedback format="html">
+      <text>Your answer is correct.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Your answer is partially correct.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text><![CDATA[Because I is singlular it must be matched by the singular <i>was</i>. If it was a plural subect, for example <i>we</i>, then it would be we <i>were </i>waiting for you.<br>]]></text>
+    </incorrectfeedback>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+      <tag><text>subject_verb_agreement</text>
+</tag>
+    </tags>
+  </question>
+
+<!-- question: 3654  -->
+  <question type="gapfill">
+    <name>
+      <text>LondonIsABigAreABig</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>London [is] a big city.</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <answerdisplay>dragdrop</answerdisplay>
+    <delimitchars>[]</delimitchars>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>0</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>is</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>are</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>am</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <delimitchars>[]</delimitchars>
+    <answerdisplay>dragdrop</answerdisplay>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>0</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <!-- Gapfill release:1.975 version:2018120800 Moodle version:2018120301.04 release:3.6.1+ (Build: 20181214) -->
+    <correctfeedback format="html">
+      <text>Your answer is correct.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Your answer is partially correct.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Your answer is incorrect.</text>
+    </incorrectfeedback>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+      <tag><text>subject_verb_agreement</text>
+</tag>
+    </tags>
+  </question>
+
+<!-- question: 3655  -->
+  <question type="gapfill">
+    <name>
+      <text>MyFatherAndMotherAreIsAm</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p><p>My father and mother [are] retired<br></p><br></p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <answerdisplay>dragdrop</answerdisplay>
+    <delimitchars>[]</delimitchars>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>0</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>are</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>is</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>am</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <delimitchars>[]</delimitchars>
+    <answerdisplay>dragdrop</answerdisplay>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>0</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <!-- Gapfill release:1.975 version:2018120800 Moodle version:2018120301.04 release:3.6.1+ (Build: 20181214) -->
+    <correctfeedback format="html">
+      <text>Your answer is correct.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Your answer is partially correct.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Your answer is incorrect.</text>
+    </incorrectfeedback>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+      <tag><text>subject_verb_agreement</text>
+</tag>
+    </tags>
+  </question>
+
+<!-- question: 3656  -->
+  <question type="gapfill">
+    <name>
+      <text>MySisterIsAre</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>My sister [is] a teacher<br></p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <answerdisplay>dragdrop</answerdisplay>
+    <delimitchars>[]</delimitchars>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>0</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>is</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>are</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>am</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <delimitchars>[]</delimitchars>
+    <answerdisplay>dragdrop</answerdisplay>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>0</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <!-- Gapfill release:1.975 version:2018120800 Moodle version:2018120301.04 release:3.6.1+ (Build: 20181214) -->
+    <correctfeedback format="html">
+      <text>Your answer is correct.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Your answer is partially correct.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Your answer is incorrect.</text>
+    </incorrectfeedback>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+      <tag><text>subject_verb_agreement</text>
+</tag>
+    </tags>
+  </question>
+
+<!-- question: 3657  -->
+  <question type="gapfill">
+    <name>
+      <text>StudentsHaveLeft</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>All the students [have] left school.<br></p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <answerdisplay>dropdown</answerdisplay>
+    <delimitchars>[]</delimitchars>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>0</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>have</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>has</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>are</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <delimitchars>[]</delimitchars>
+    <answerdisplay>dropdown</answerdisplay>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>0</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <!-- Gapfill release:1.975 version:2018120800 Moodle version:2018120301.04 release:3.6.1+ (Build: 20181214) -->
+    <correctfeedback format="html">
+      <text>Your answer is correct.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Your answer is partially correct.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Your answer is incorrect.</text>
+    </incorrectfeedback>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+      <tag><text>subject_verb_agreement</text>
+</tag>
+    </tags>
+  </question>
+
+<!-- question: 3658  -->
+  <question type="gapfill">
+    <name>
+      <text>WashSheAsslep</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Was [she] asleep?<br></p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <answerdisplay>dropdown</answerdisplay>
+    <delimitchars>[]</delimitchars>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>0</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>she</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>her</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>they</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <delimitchars>[]</delimitchars>
+    <answerdisplay>dropdown</answerdisplay>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>0</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <!-- Gapfill release:1.975 version:2018120800 Moodle version:2018120301.04 release:3.6.1+ (Build: 20181214) -->
+    <correctfeedback format="html">
+      <text>Your answer is correct.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Your answer is partially correct.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Your answer is incorrect.</text>
+    </incorrectfeedback>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+      <tag><text>subject_verb_agreement</text>
+</tag>
+    </tags>
+  </question>
+
+<!-- question: 3659  -->
+  <question type="gapfill">
+    <name>
+      <text>WeAre</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>We [are] going swimming.<br></p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <answerdisplay>dragdrop</answerdisplay>
+    <delimitchars>[]</delimitchars>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>0</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>are</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>am</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>be</text>
+      <feedback format="moodle_auto_format">
+        <text></text>
+      </feedback>
+    </answer>
+    <delimitchars>[]</delimitchars>
+    <answerdisplay>dragdrop</answerdisplay>
+    <casesensitive>0</casesensitive>
+    <noduplicates>0</noduplicates>
+    <disableregex>0</disableregex>
+    <fixedgapsize>0</fixedgapsize>
+    <optionsaftertext>0</optionsaftertext>
+    <letterhints>0</letterhints>
+    <!-- Gapfill release:1.975 version:2018120800 Moodle version:2018120301.04 release:3.6.1+ (Build: 20181214) -->
+    <correctfeedback format="html">
+      <text>Your answer is correct.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Your answer is partially correct.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Your answer is incorrect.</text>
+    </incorrectfeedback>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+      <tag><text>subject_verb_agreement</text>
+</tag>
+    </tags>
+  </question>
+
 </quiz>

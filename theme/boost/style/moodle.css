@@ -9004,6 +9004,7 @@ form.popupform div {
   overflow: auto; }
 
 .no-overflow > .generaltable {
+  position: relative;
   margin-bottom: 0;
   min-height: 10em; }
 
@@ -11153,6 +11154,10 @@ div.editor_atto_toolbar button .icon {
     padding-right: 0.5rem;
     padding-left: 0.5rem;
     content: "/"; }
+
+@media (min-width: 576px) {
+  #page-admin-search .container {
+    overflow-wrap: break-word; } }
 
 .blockmovetarget .accesshide {
   position: relative;
@@ -15773,9 +15778,6 @@ div#dock {
 .path-mod-assign [data-region="grade-actions-panel"] [data-region="grade-actions"] .collapse-buttons {
   top: auto; }
 
-.path-mod-assign .no-overflow {
-  overflow: initial; }
-
 .path-mod-assign #page-content [data-region="grade-panel"] .mform:not(.unresponsive) .fcontainer .fitem.popout .felement {
   height: calc(100% - 4rem); }
 
@@ -16170,6 +16172,7 @@ p.arrow_button {
   left: 40vw; }
 
 .path-grade-report-grader #region-main {
+  overflow-x: visible;
   min-width: 100%;
   width: auto;
   display: inline-flex; }

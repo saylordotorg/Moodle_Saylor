@@ -4,6 +4,20 @@ moodle-local_boostnavigation
 Changes
 -------
 
+### v3.6-r1
+
+* 2019-03-13 - Check compatibility for Moodle 3.6, no functionality change.
+
+### v3.5-r8
+
+* 2019-03-12 - Allow participants node to be removed from the course navigation.
+* 2019-03-12 - Allow grade node to be removed from the course navigation - Credits to Dan Marsden.
+* 2019-03-12 - Add support for setting the node id attribute.
+* 2019-03-12 - Announce undocumented parameters for custom nodes for admins.  
+* 2019-03-12 - Add logical combination operator for the cohort, role and system role settings - Credits to Adrian Perez for the idea.
+* 2019-03-11 - Add node with icon to example section.
+* 2019-03-11 - Target link to FontAwesome icon list to FontAwesome 4.7.0 which is still used by Moodle core.
+
 ### v3.5-r7
 
 * 2019-02-06 - Add the new custom node definition fields to the settings description.

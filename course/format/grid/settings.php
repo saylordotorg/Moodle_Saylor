@@ -83,19 +83,6 @@ if ($ADMIN->fulltree) {
     );
     $settings->add(new admin_setting_configselect($name, $title, $description, $default, $choices));
 
-    // Displayed image file type - 1 = original, 2 = webp.
-    $name = 'format_grid/defaultdisplayedimagefiletype';
-    $title = get_string('defaultdisplayedimagefiletype', 'format_grid');
-    $description = get_string('defaultdisplayedimagefiletype_desc', 'format_grid');
-    $default = format_grid::get_default_image_file_type();
-    $choices = array(
-        1 => new lang_string('original', 'format_grid'),
-        2 => new lang_string('webp', 'format_grid')
-    );
-    $setting = new admin_setting_configselect($name, $title, $description, $default, $choices);
-    $setting->set_updatedcallback('grid_format_update_displayed_images');
-    $settings->add($setting);
-
     // Default border colour in hexadecimal RGB with preceding '#'.
     $name = 'format_grid/defaultbordercolour';
     $title = get_string('defaultbordercolour', 'format_grid');
@@ -319,6 +306,19 @@ if ($ADMIN->fulltree) {
         2 => new lang_string('yes')   // Yes.
     );
     $settings->add(new admin_setting_configselect($name, $title, $description, $default, $choices));
+
+    // Displayed image file type - 1 = original, 2 = webp.
+    $name = 'format_grid/defaultdisplayedimagefiletype';
+    $title = get_string('defaultdisplayedimagefiletype', 'format_grid');
+    $description = get_string('defaultdisplayedimagefiletype_desc', 'format_grid');
+    $default = format_grid::get_default_image_file_type();
+    $choices = array(
+        1 => new lang_string('original', 'format_grid'),
+        2 => new lang_string('webp', 'format_grid')
+    );
+    $setting = new admin_setting_configselect($name, $title, $description, $default, $choices);
+    $setting->set_updatedcallback('grid_format_update_displayed_images');
+    $settings->add($setting);
 
     // Grey out hidden sections.
     $name = 'format_grid/defaultgreyouthidden';

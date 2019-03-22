@@ -34,6 +34,7 @@ $string['correctorder'] = 'The correct order for these items is as follows:';
 $string['defaultanswerformat'] = 'Default answer format';
 $string['defaultquestionname'] = 'Drag the following items into the correct order.';
 
+$string['duplicatesnotallowed'] = 'Duplication of draggable items is not allowed. The string "{$a->text}" is already used in {$a->item}.';
 $string['editingordering'] = 'Editing ordering question';
 
 $string['gradedetails'] = 'Grade details';

@@ -90,6 +90,7 @@ Further information to the parameters:
 </ul>
 Please note:
 <ul>
+<li>Custom nodes for admins are processed by the same function as custom nodes for users are. Thus, in addition to the parameters which are given above, the same list of parameters that custom nodes for users support are also supported here. Feel free to use them here if you really need them for any special scenario even if they are not documented here once more for the sake of simplicity.</li>
 <li>The title parameter can contain placeholders, for example {coursefullname} to create a node labeled with the current course\'s full name. Placeholders are encapsulated in curly brackets and will be replaced automatically when the custom node is created.<br />Available placeholders are:
 <ul>
 <li>{coursefullname}: The course\'s full name</li>
@@ -114,12 +115,14 @@ Please note:
 <li>If the custom node does not show up in Boost\'s nav drawer, please check if all mandatory params are set correctly and if the optional language setting fits to your current Moodle user language.</li>
 <li>Due to the way how Boost\'s nav drawer is built in Moodle core, all custom nodes are displayed equally. Adding custom CSS classes, custom HTML element ids or a target attribute to open the link in a new window is impossible.</li>
 </ul>';
-$string['setting_customnodesusageusers'] = 'Each line consists of a link title, a link URL, supported language(s) (optional), supported cohort(s) (optional), supported role(s) (optional), supported global roles(s) (optional) and an icon (optional) - separated by pipe characters. Each custom node needs to be written in a new line.<br />
+$string['setting_customnodesusageusers'] = 'Each line consists of a link title, a link URL, supported language(s) (optional), supported cohort(s) (optional), supported role(s) (optional), supported global roles(s) (optional), the logical combination operator (optional), an icon (optional) and the ID attribute (optional) - separated by pipe characters. Each custom node needs to be written in a new line.<br />
 For example:<br />
 Moodle.org website|http://www.moodle.org|en,de<br />
 Our university|http://www.our-university.edu<br />
 Faculty of mathematics|http://www.our-university.edu/math||math<br />
-Teachers\' handbook|http://www.our-university.edu/teacher-handbook|||editingteacher,teacher<br /><br />
+Teachers\' handbook|http://www.our-university.edu/teacher-handbook|||editingteacher,teacher<br />
+Student information course|/course/view.php?id=1234||||||fa-graduation-cap<br />
+{editingtoggle}|/course/view.php?id={courseid}&sesskey={sesskey}&edit={editingtoggle}|||editingteacher|admin,manager|OR|editing<br /<br />
 Further information to the parameters:
 <ul>
 <li><b>Title:</b> This text will be shown as the clickable text / label of the custom node.</li>
@@ -128,7 +131,9 @@ Further information to the parameters:
 <li><b>Supported cohort(s) (optional):</b> This setting can be used for displaying the custom node to members of the specified cohort only. Use the cohort\'s ID, not the cohort\'s name, for this setting. Separate more than one supported cohort with commas. If the custom node should be displayed for users regardless of any cohort membership, then leave this field empty.</li>
 <li><b>Supported role(s) (optional):</b> This setting can be used for displaying the custom node only to members with the specified role in each context. Use the role\'s shortname for this setting. Separate more than one supported role with commas. If the custom node should be displayed for users regardless of any role, then leave this field empty.</li>
 <li><b>Supported system role(s) (optional):</b> This setting can be used for displaying the custom node only to users with the specified role in system context. Use the role\'s shortname for this setting. The shortname \'admin\' is supported to check if the user is a site admin. Separate more than one supported role with commas. If the custom node should be displayed for users regardless of any system role, then leave this field empty.</li>
-<li><b>Icon (optional):</b> This icon will be used as icon for the custom node, for example fa-flag. Use a Font Awesome icon identifier (<a href="http://fontawesome.io/icons/">See the icon list on fontawesome.io</a>) to identify which icon should be used. Font Awesome is included in Boost, classic Moodle pix icons are not supported here. If you just want to use a standard bullet icon for the custom node, then leave this field empty.</li>
+<li><b>Logical combination operator (optional):</b> This setting can be used to change the logical combination of the optional parameters for cohort, role and system role. If you set this setting to AND or leave this setting empty, the optional parameters for cohort, role and system role will be logically combined with AND and the custom node will only be shown if ALL parameters apply. If you set this setting to OR, the optional parameters for cohort, role and system role will be logically combined with OR and the custom node will be shown if ANY of the parameters apply. This gives you the flexibility to create, for example, a node which is shown to users with a given course role as well as to users with a given system role as shown in our example above.</li>
+<li><b>Icon (optional):</b> This icon will be used as icon for the custom node, for example fa-flag. Use a Font Awesome icon identifier (<a href="https://fontawesome.com/v4.7.0/icons/">See the icon list on fontawesome.com</a>) to identify which icon should be used. Font Awesome is included in Boost, classic Moodle pix icons are not supported here. If you just want to use a standard bullet icon for the custom node, then leave this field empty. Custom nodes which don\'t get a standard bullet icon automatically also can\'t get a custom icon currently.</li>
+<li><b>ID attribute (optional):</b> This setting can be used for setting the ID attribute of the custom node to the given fixed value. The given ID value is cleaned for alphanumeric characters only and prefixed by the particular custom node area, for example setting the ID of a node in the bottom nodes for admins area to \'my_node\' will result in an ID attribute filled with \'localboostnavigationcustombottomadminsmynode\'. This setting gives you the ability to reference a custom node in CSS selectors or even in custom JavaScript code. Setting the same ID to multiple nodes is not forbidden here, but please note that duplicate ID attributes are discouraged in HTML pages. If this field is empty, the custom node will get an automatically generated ID which is not really suitable for referencing.</li>
 </ul>
 Please note:
 <ul>
@@ -191,6 +196,8 @@ $string['setting_removedashboardnode_desc'] = 'Enabling this setting will remove
 $string['setting_removedashboardnode'] = 'Remove "Dashboard" node';
 $string['setting_removefirsthomenode_desc'] = 'Enabling this setting will remove the "Home" or "Dashboard" node, depending on what the user chose to be his home page, from Boost\'s nav drawer.';
 $string['setting_removefirsthomenode'] = 'Remove first "Home" or "Dashboard" node';
+$string['setting_removegradescoursenode_desc'] = 'Enabling this setting will remove the "Grades" node from Boost\'s nav drawer. It is removed for all users, regardless of a users capabilities and regardless of the setting \'Show gradebook to students\' in the course settings.';
+$string['setting_removegradescoursenode'] = 'Remove "Grades" node';
 $string['setting_removehomenode_desc'] = 'Enabling this setting will remove the "Home" node from Boost\'s nav drawer.';
 $string['setting_removehomenode'] = 'Remove "Home" node';
 $string['setting_removemycoursesnode_desc'] = 'Enabling this setting will remove the "My courses" node from Boost\'s nav drawer.';
@@ -198,6 +205,8 @@ $string['setting_removemycoursesnode'] = 'Remove "My courses" node';
 $string['setting_removemycoursesnodeperformancehint'] = 'Please note: If you enable this setting and have also enabled the setting <a href="/admin/search.php?query=navshowmycoursecategories">navshowmycoursecategories</a>, removing the "My courses" node takes more time and you should consider disabling the navshowmycoursecategories setting.';
 $string['setting_removenodesheading'] = 'Remove root nodes from Boost\'s nav drawer';
 $string['setting_removenodestechnicalhint'] = 'Technical background: This is done by setting the node\'s showinflatnavigation attribute to false. Thus, the node will only be hidden from the nav drawer, but it will remain in the navigation tree and can still be accessed by other parts of Moodle.';
+$string['setting_removeparticipantscoursenode_desc'] = 'Enabling this setting will remove the "Participants" node from Boost\'s nav drawer. It is removed for all users, regardless of a users capabilities.';
+$string['setting_removeparticipantscoursenode'] = 'Remove "Participants" node';
 $string['setting_removeprivatefilesnode_desc'] = 'Enabling this setting will remove the "Private files" node from Boost\'s nav drawer.';
 $string['setting_removeprivatefilesnode'] = 'Remove "Private files" node';
 $string['setting_removesecondhomenode_desc'] = 'Enabling this setting will remove the "Home" or "Dashboard" node, depending on what the user chose not to be his home page, from Boost\'s nav drawer.';
