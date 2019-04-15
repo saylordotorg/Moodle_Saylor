@@ -4,6 +4,20 @@ moodle-local_boostnavigation
 Changes
 -------
 
+### Unreleased
+
+* 2019-04-12 - Add the possibility to remember the collapse status only for the current session.
+* 2019-04-12 - Add option to position custom nodes - Credits to Jean-Roch.
+* 2019-04-12 - Fix a wrong node example in the language pack.
+
+### v3.6-r3
+
+* 2019-03-29 - Bugfix: Remove debugging notices about undefined properties when running unit tests - Credits to G El-Zoghbi.
+
+### v3.6-r2
+
+* 2019-03-28 - Remove user preferences when being uninstalled.
+
 ### v3.6-r1
 
 * 2019-03-13 - Check compatibility for Moodle 3.6, no functionality change.

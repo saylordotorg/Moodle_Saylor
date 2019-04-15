@@ -15,24 +15,26 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Install file for the reengagement module.
- *
- * @package    mod_reengagement
- * @author     Peter Bulmer
- * @copyright  2016 Catalyst IT {@link http://www.catalyst.net.nz}
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * Configurable Reports
+ * A Moodle block for creating customizable reports
+ * @package blocks
+ * @author: Juan leyva <http://www.twitter.com/jleyvadelgado>
+ * @date: 2009
  */
 
-defined('MOODLE_INTERNAL') || die();
+if (!defined('MOODLE_INTERNAL')) {
+    //  It must be included from a Moodle page.
+    die('Direct access to this script is forbidden.');
+}
 
-/**
- * Code run after the reengagment database tables have been created.
- *
- * @return bool
- */
-function xmldb_reengagement_install() {
-    $settings = array('s__enablecompletion' => 1, 's__enableavailability' => 1);
-    admin_write_settings($settings);
+require_once($CFG->libdir.'/formslib.php');
 
-    return true;
+class min_form extends moodleform {
+    public function definition() {
+        global $DB, $USER, $CFG;
+        $mform =& $this->_form;
+        $this->_customdata['compclass']->add_form_elements($mform, $this->_customdata['report']->components);
+        // Buttons.
+        $this->add_action_buttons(true, get_string('add'));
+    }
 }

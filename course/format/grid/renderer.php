@@ -553,22 +553,20 @@ class format_grid_renderer extends format_section_renderer_base {
         if ($section->section && has_capability('moodle/course:setcurrentsection', $coursecontext)) {
             if ($course->marker == $section->section) {  // Show the "light globe" on/off.
                 $url->param('marker', 0);
-                $markedthissection = get_string('markedthissection', 'format_grid');
                 $highlightoff = get_string('highlightoff');
                 $controls['highlight'] = array('url' => $url, "icon" => 'i/marked',
                                                'name' => $highlightoff,
-                                               'pixattr' => array('class' => '', 'alt' => $markedthissection),
-                                               'attr' => array('class' => 'editing_highlight', 'title' => $markedthissection,
+                                               'pixattr' => array('class' => ''),
+                                               'attr' => array('class' => 'editing_highlight',
                                                'data-action' => 'removemarker'));
                 $url->param('marker', 0);
             } else {
                 $url->param('marker', $section->section);
-                $markthissection = get_string('markthissection', 'format_grid');
                 $highlight = get_string('highlight');
                 $controls['highlight'] = array('url' => $url, "icon" => 'i/marker',
                                                'name' => $highlight,
-                                               'pixattr' => array('class' => '', 'alt' => $markthissection),
-                                               'attr' => array('class' => 'editing_highlight', 'title' => $markthissection,
+                                               'pixattr' => array('class' => ''),
+                                               'attr' => array('class' => 'editing_highlight',
                                                'data-action' => 'setmarker'));
             }
         }
@@ -737,8 +735,8 @@ class format_grid_renderer extends format_section_renderer_base {
         $iswebp = (get_config('format_grid', 'defaultdisplayedimagefiletype') == 2);
 
         foreach ($sections as $section => $thissection) {
-            if (($this->section0attop) && ($section == 0)) {
-                continue;
+            if ((($this->section0attop) && ($section == 0)) || ($section > $coursenumsections)) {
+                continue;  // Section 0 at the top and not in the grid / orphaned section.
             }
 
             // Check if section is visible to user.
@@ -1043,6 +1041,10 @@ class format_grid_renderer extends format_section_renderer_base {
         foreach ($sections as $section => $thissection) {
             if (!$hascapvishidsect && !$thissection->visible && $course->hiddensections) {
                 unset($sections[$section]);
+                continue;
+            }
+            if ($section > $coursenumsections) {
+                // Orphaned section.
                 continue;
             }
 
