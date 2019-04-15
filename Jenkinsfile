@@ -247,6 +247,12 @@ def plugins = [
         "url" : 'https://github.com/justinhunt/moodle-atto_generico.git',
         "branch" : 'master',
         "dest" : 'lib/editor/atto/plugins/generico'
+    ],
+    [
+        "name" : 'block_configurablereports',
+        "url" : 'https://github.com/jleyva/moodle-block_configurablereports.git',
+        "branch" : 'MOODLE_36_STABLE',
+        "dest" : 'blocks/configurablereports'
     ]
 ]
 
