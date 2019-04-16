@@ -253,6 +253,12 @@ def plugins = [
         "url" : 'https://github.com/jleyva/moodle-block_configurablereports.git',
         "branch" : 'MOODLE_36_STABLE',
         "dest" : 'blocks/configurable_reports'
+    ],
+    [
+        "name" : 'mod_hvp',
+        "url" : 'https://github.com/h5p/h5p-moodle-plugin',
+        "branch" : 'release',
+        "dest" : 'mod/hvp'
     ]
 ]
 
