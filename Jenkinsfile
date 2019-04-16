@@ -343,7 +343,7 @@ def NotifyOnFail(err) {
     def message = "Build failed: ${env.JOB_NAME} ${env.BUILD_NUMBER} on ${env.BRANCH_NAME} -> ${err}"
 
     // List of people to @ in Slack since this is important.
-    def slack_recipients = '@ja @sharmi'
+    def slack_recipients = '@ja'
 
     //Slack
     slackSend color: 'danger', message: "${slack_recipients} ${message}"
