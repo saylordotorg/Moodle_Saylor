@@ -775,9 +775,9 @@ function accredible_post_essay_answers($user_id, $course_id, $credential_id) {
 				    qa.questionsummary AS question,
 				    qa.responsesummary AS answer
 				 
-				FROM mdl_quiz_attempts quiza
-				JOIN mdl_question_usages qu ON qu.id = quiza.uniqueid
-				JOIN mdl_question_attempts qa ON qa.questionusageid = qu.id
+				FROM ".$CFG->prefix."quiz_attempts quiza
+				JOIN ".$CFG->prefix."question_usages qu ON qu.id = quiza.uniqueid
+				JOIN ".$CFG->prefix."question_attempts qa ON qa.questionusageid = qu.id
 				 
 				WHERE quiza.id = ? && qa.behaviour = 'manualgraded'
 				 
@@ -812,7 +812,7 @@ function accredible_course_duration_evidence($user_id, $course_id, $credential_i
 	global $DB, $CFG;
 
 	$sql = "SELECT enrol.id, ue.timestart
-					FROM mdl_enrol enrol, mdl_user_enrolments ue 
+					FROM ".$CFG->prefix."enrol enrol, ".$CFG->prefix."user_enrolments ue 
 					WHERE enrol.id = ue.enrolid AND ue.userid = ? AND enrol.courseid = ?";
 	$enrolment = $DB->get_record_sql($sql, array($user_id, $course_id));
 	$enrolment_timestamp = $enrolment->timestart;
