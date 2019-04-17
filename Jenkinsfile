@@ -283,35 +283,7 @@ def StashPlugins(plugins) {
         node {
             deleteDir()
             try {
-                git {
-                  branch(plugins[x].get("branch"))
-                  remote {
-                    url(plugins[x].get("url"))
-                  }
-                  traits {            
-                    submoduleOptionTrait {
-                      extension {
-                        disableSubmodules(false)
-                        recursiveSubmodules(true)
-                        trackingSubmodules(false)
-                        reference(null)
-                        timeout(null)
-                        parentCredentials(true)
-                      }
-                    }
-
-                    cloneOptionTrait {
-                      extension {
-                        shallow (false)
-                        noTags (false)
-                        reference (null)
-                        depth(0)
-                        honorRefspec (false)
-                        timeout (10)
-                      }
-                    }
-                  }
-                }
+                git([url: (plugins[x].get("url")), branch: (plugins[x].get("branch"))])
             }
             catch(err) {
                 def failmessage = "Unable to retrieve plugin ${plugins[x].get('name')}: ${err}"
@@ -371,7 +343,7 @@ def NotifyOnFail(err) {
     def message = "Build failed: ${env.JOB_NAME} ${env.BUILD_NUMBER} on ${env.BRANCH_NAME} -> ${err}"
 
     // List of people to @ in Slack since this is important.
-    def slack_recipients = '@ja'
+    def slack_recipients = '@ja @sharmi'
 
     //Slack
     slackSend color: 'danger', message: "${slack_recipients} ${message}"
