@@ -1,5 +1,15 @@
 History
 =============
+Version 3.6.0.5
+  1. Apply MDL-64819 - #91.
+
+Version 3.6.0.4.1
+  1. Fix existing courses have an incorrect number of courses when upgrading to 3.6.0.4 - #90.
+     Note: If on a version prior to 3.6.0.4 then bypass and install 3.6.0.4.1 or above.
+
+Version 3.6.0.4
+  1. Put back 'numsections'.  Thanks to "King's College London" for funding this enhancement.
+
 Version 3.6.0.3
   1. New: WebP displayed image support.
 

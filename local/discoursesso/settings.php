@@ -43,5 +43,17 @@ if ( $hassiteconfig ){
 	$settings->add(
 		new admin_setting_configtext('discoursesso_discourse_url', get_string('discourseurllabel', 'local_discoursesso'), get_string('discourseurlhelp', 'local_discoursesso'), 'https://discourse.example', PARAM_TEXT)
 	);
+
+	$name = 'local_discoursesso/locale';
+    $label = get_string('localelabel', 'local_discoursesso');
+    $help = get_string('localehelp', 'local_discoursesso');
+    $setting = new admin_setting_configcheckbox($name, $label, $help, 1);
+    $settings->add($setting);
+
+	$name = 'local_discoursesso/adminsync';
+    $label = get_string('adminsynclabel', 'local_discoursesso');
+    $help = get_string('adminsynchelp', 'local_discoursesso');
+    $setting = new admin_setting_configcheckbox($name, $label, $help, 1);
+    $settings->add($setting);
  
 }

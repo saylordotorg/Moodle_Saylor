@@ -13,7 +13,7 @@ unzip it, and place it in the directory `moodle/question/behaviour/adaptive_adap
 Alternatively, get the code using git by running the following command in the
 top level folder of your Moodle install:
 
-    git clone git://github.com/trampgeek/moodle-qbehaviour_adaptive_adapted_for_coderunner.git question/behaviour/adaptive_adapted_for_coderunner
+    git clone https://github.com/trampgeek/moodle-qbehaviour_adaptive_adapted_for_coderunner.git question/behaviour/adaptive_adapted_for_coderunner
 
 For full install instructions, see the
 [CodeRunner install instructions](https://github.com/trampgeek/moodle-qtype_coderunner/blob/master/Readme.md).

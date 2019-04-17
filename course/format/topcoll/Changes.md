@@ -1,5 +1,10 @@
 ﻿Version Information
 ===================
+Version 3.6.0.3
+  1. Apply MDL-64819 - #61.
+  2. Fix phpunit tests for MDL-64492 - thanks to Rossco Hellmans for the patch - #59.
+  3. Added SVG version of one section icon - thanks to Luca Bösch for the patch - #60.
+
 Version 3.6.0.2
   1. Fix invalid HTML in case of zero section elements - thanks to Mario Wehr for raising this - #47.
   2. Fix: PHP Unit test failure (due to MDL-62680) - thanks to Anupama Dharmajan for the patch - #52.

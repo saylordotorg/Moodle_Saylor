@@ -28,7 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 $string['pluginname'] = 'Saylor';
 
 $string['advancedsettings'] = 'Advanced settings';
-
+$string['bannerdescription'] = 'Build new skills or work towards a degree at your own pace with free Saylor Academy college courses.';
 $string['choosereadme'] = 'Theme Saylor is a child theme of Boost.';                
 $string['configtitle'] = 'Saylor theme settings';
 $string['generalsettings'] = 'General settings';
@@ -42,7 +42,7 @@ $string['rawscss_desc'] = 'Use this field to provide SCSS or CSS code which will
 $string['rawscsspre'] = 'Raw initial SCSS';
 $string['rawscsspre_desc'] = 'In this field you can provide initialising SCSS code, it will be injected before everything else. Most of the time you will use this setting to define variables.';
 $string['region-side-pre'] = 'Right';
-
+$string['signupidps'] = 'Create a new account using:';
 $string['logintext'] = 'Log in or Sign up';
 $string['loggedingreeting'] = 'Hi, {$a}!';
 $string['loggedinnotgreeting'] = '';
