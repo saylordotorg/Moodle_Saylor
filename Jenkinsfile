@@ -256,8 +256,8 @@ def plugins = [
     ],
     [
         "name" : 'mod_hvp',
-        "url" : 'https://github.com/h5p/h5p-moodle-plugin',
-        "branch" : 'release',
+        "url" : 'https://github.com/saylordotorg/moodle-mod_hvp.git',
+        "branch" : 'master',
         "dest" : 'mod/hvp'
     ]
 ]
