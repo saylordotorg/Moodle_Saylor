@@ -41,4 +41,3 @@ Feature: Test duplicating a quiz containing an Algebra question
       | id_answer_0          | 7*x                                               |
       | id_fraction_0        | 100%                                              |
       | id_feedback_0        | This is a very good answer.                       |
-

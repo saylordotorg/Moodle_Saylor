@@ -51,6 +51,7 @@ $templatecontext = [
     'saylorcustomenrollbutton' => $saylor_custom_enroll_button,
     'currentyear' => date('Y'),
     'opengraph' => $OUTPUT->get_open_graph_properties(),
+    'courseproperties' => $OUTPUT->get_course_properties(),
 ];
 
 $templatecontext['flatnavigation'] = $PAGE->flatnav;

@@ -46,6 +46,7 @@ $string['unknownterm'] = 'Syntax Error: Unknown term found at \'{$a}\' in the ex
 $string['algebraoptions'] = 'Options';
 $string['answermustbegiven'] = 'You must enter an answer if there is a grade or feedback.';
 $string['answerno'] = 'Answer {$a}';
+$string['answerx'] = 'Answer {no}';
 $string['addmoreanswerblanks'] = 'Blanks for {no} More Answers';
 $string['addmorevariableblanks'] = 'Blanks for {no} More Variables';
 $string['allfunctions'] = 'All Functions';

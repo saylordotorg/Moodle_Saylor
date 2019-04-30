@@ -7259,6 +7259,11 @@ button.bg-dark:focus {
   left: 0;
   z-index: 1030; }
 
+.sticky-top {
+  position: sticky;
+  top: 0;
+  z-index: 1020; }
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -12522,7 +12527,9 @@ span.editinstructions {
   height: 60px;
   /* fixed header height*/
   margin-top: -60px;
-  /* negative fixed header height */ }
+  /* negative fixed header height */
+  width: 1px;
+  pointer-events: none; }
 
 .pagelayout-embedded :target {
   padding-top: initial;
@@ -14216,6 +14223,21 @@ a.ygtvspacer:hover {
     min-height: 1.5rem; }
   .message-drawer .section .collapsing {
     overflow: hidden; }
+  .message-drawer .message .tail {
+    content: '';
+    bottom: 0;
+    width: 0;
+    height: 0;
+    border: 0.5rem solid transparent;
+    position: relative; }
+  .message-drawer .message.send .tail {
+    right: 0;
+    margin-right: -0.5rem;
+    border-bottom-color: #ced4da; }
+  .message-drawer .message.received .tail {
+    left: 0;
+    margin-left: -0.5rem;
+    border-bottom-color: #fff; }
   .message-drawer .lazy-load-list {
     overflow-y: auto; }
 

@@ -62,7 +62,7 @@ class restore_qtype_algebra_plugin extends restore_qtype_plugin {
         $newquestionid   = $this->get_new_parentid('question');
         $questioncreated = $this->get_mappingid('question_created', $oldquestionid) ? true : false;
 
-        // If the question has been created by restore, we need to create its qtype_algebra too.
+        // If the question has been created by restore, we need to create its qtype_algebra_options too.
         if ($questioncreated) {
             // Adjust some columns.
             $data->questionid = $newquestionid;
@@ -91,7 +91,7 @@ class restore_qtype_algebra_plugin extends restore_qtype_plugin {
         // If the question has been created by restore, we need to create its qtype_algebra_variables too.
         if ($questioncreated) {
             // Adjust some columns.
-            $data->question = $newquestionid;
+            $data->questionid = $newquestionid;
             // Insert record.
             $newitemid = $DB->insert_record('qtype_algebra_variables', $data);
             // Create mapping.

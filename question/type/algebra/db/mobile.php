@@ -15,40 +15,36 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Mobile plugin.
+ * algebra question type  capability definition
  *
- * @package qtype_algebra
- * @copyright 2019 Jean-Michel Vedrine
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    qtype_algebra
+ * @copyright  2019 Jean-Michel Vedrine
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 defined('MOODLE_INTERNAL') || die();
-// To enable moodle mobile test site to upload my css files.
-header('Access-Control-Allow-Origin: *');
 
-$addons = array(
-    "qtype_algebra" => array(
-        "handlers" => array( // Different places where the add-on will display content.
-            'algebra' => array( // Handler unique name (can be anything).
-                'displaydata' => array(
-                    'title' => 'Algebra',
+$addons = [
+    "qtype_algebra" => [
+        "handlers" => [ // Different places where the add-on will display content.
+            'algebra' => [ // Handler unique name (can be anything).
+                'displaydata' => [
+                    'title' => 'algebra question',
                     'icon' => '/question/type/algebra/pix/icon.gif',
-                    'class' => '', // What does this do?
-                ),
+                    'class' => '',
+                ],
                 'delegate' => 'CoreQuestionDelegate', // Delegate (where to display the link to the add-on).
-                'method' => 'algebra_view',
-                'offlinefunctions' => array(
-                    'mobile_get_algebra' => array(),
-                ), // Function needs caching for offline.
-
-               'styles' => array(
+                'method' => 'mobile_get_algebra',
+                'offlinefunctions' => [
+                    'mobile_get_algebra' => [], // Function in classes/output/mobile.php.
+                ], // Function needs caching for offline.
+                'styles' => [
                     'url' => '/question/type/algebra/mobile/styles_app.css',
                     'version' => '1.00'
-                ),
-                'lang' => array(
-                    array('pluginname', 'qtype_algebra')
-                )
-            )
-        ),
-    )
-);
+                ]
+            ]
+        ],
+        'lang' => [
+                    ['pluginname', 'qtype_algebra'], // Matching value in  lang/en/qtype_algebra.
+        ],
+    ]
+];

@@ -23,7 +23,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Multichoice question type conversion handler
+ * Algebra question type conversion handler.
  */
 class moodle1_qtype_algebra_handler extends moodle1_qtype_handler {
 

@@ -232,7 +232,29 @@
 	display: none;
 }
 
+#banner-wrapper {
+	margin-bottom: 0;
+	background-image: linear-gradient(to right, $expand-light-blue-800, $expand-dark-blue-900);
+}
+
+#coursesearch {
+	margin-top: 0 !important;
+}
+
+#category-banner-wrapper {
+	max-width: 600px;
+}
+
+#category-banner {
+	border-radius: 2.7rem;
+}
+
 /** Progress Bar */
+.block_completion_progress .progressBarCell {
+	border: 1px solid $primary-dark-blue;
+	border-radius: .25rem;
+	margin: .25rem 0 0 .25rem;
+}
 
 .block_progress .progressBarCell {
 	border: 1px solid $primary-dark-blue;
@@ -247,4 +269,11 @@
 
 .activity-navigation {
 	display: none;
+}
+
+/** Atto Editor */
+// Make the min height of editor boxes 160px.
+// In some places it's 28px and too small.
+.editor_atto_content {
+    min-height: 160px !important;
 }

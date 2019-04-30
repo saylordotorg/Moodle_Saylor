@@ -1,5 +1,5 @@
 @qtype @qtype_algebra
-Feature: Test exporting Short answer questions
+Feature: Test exporting Algebra questions
   As a teacher
   In order to be able to reuse my Algebra questions
   I need to export them
