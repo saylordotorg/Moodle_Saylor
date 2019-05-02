@@ -241,12 +241,78 @@
 	margin-top: 0 !important;
 }
 
-#category-banner-wrapper {
-	max-width: 600px;
+/** Category Page */
+.category-banner-wrapper {
+	margin: 0;
+	background-image: linear-gradient(to right, $expand-light-blue-800, $expand-dark-blue-900);
 }
 
-#category-banner {
-	border-radius: 2.7rem;
+#business-administration-banner {
+	background-image: linear-gradient(to right, $expand-pastel-green-700, $expand-pastel-green-900);
+}
+
+#political-science-banner {
+	background-image: linear-gradient(to right, $expand-pastel-green-700, $expand-pastel-green-900);
+}
+
+#communication-banner {
+	background-image: linear-gradient(to right, $expand-pastel-green-700, $expand-pastel-green-900);
+}
+
+#philosophy-banner {
+	background-image: linear-gradient(to right, $expand-teal-700, $expand-teal-900);
+}
+
+#psychology-banner {
+	background-image: linear-gradient(to right, $expand-teal-700, $expand-teal-900);
+}
+
+#sociology-banner {
+	background-image: linear-gradient(to right, $expand-teal-700, $expand-teal-900);
+}
+
+#biology-banner {
+	background-image: linear-gradient(to right, $expand-red-600, $expand-red-900);
+}
+
+#chemistry-banner {
+	background-image: linear-gradient(to right, $expand-red-600, $expand-red-900);
+}
+
+#physics-banner {
+	background-image: linear-gradient(to right, $expand-red-600, $expand-red-900);
+}
+
+#mathematics-banner {
+	background-image: linear-gradient(to right, $expand-pink-500, $expand-pink-900);
+}
+
+#computer-science-banner {
+	background-image: linear-gradient(to right, $expand-pink-500, $expand-pink-900);
+}
+
+#economics-banner {
+	background-image: linear-gradient(to right, $expand-pink-500, $expand-pink-900);
+}
+
+#english-banner {
+	background-image: linear-gradient(to right, $expand-indigo-500, $expand-indigo-900);
+}
+
+#art-history-banner {
+	background-image: linear-gradient(to right, $expand-indigo-500, $expand-indigo-900);
+}
+
+#history-banner {
+	background-image: linear-gradient(to right, $expand-indigo-500, $expand-indigo-900);
+}
+
+#professional-development-banner {
+	background-image: linear-gradient(to right, $expand-purple-500, $expand-purple-900);
+}
+
+#learning-skills-banner {
+	background-image: linear-gradient(to right, $expand-purple-500, $expand-purple-900);
 }
 
 /** Progress Bar */

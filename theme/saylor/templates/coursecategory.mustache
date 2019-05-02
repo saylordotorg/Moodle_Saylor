@@ -62,23 +62,24 @@
         <div id="page-content" class="row">
             <div id="region-main-box" class="col-12">
                 {{#hasregionmainsettingsmenu}}
-                <div id="region-main-settings-menu" class="d-print-none {{#hasblocks}}has-blocks{{/hasblocks}}">
+                <div id="region-main-settings-menu" class="d-print-none{{#hasblocks}} has-blocks{{/hasblocks}}">
                     <div> {{{ output.region_main_settings_menu }}} </div>
                 </div>
                 {{/hasregionmainsettingsmenu}}
                 <section id="region-main" class="{{#hasblocks}}has-blocks {{/hasblocks}}my-3 card">
-                    {{#hasregionmainsettingsmenu}}
-                        <div class="region_main_settings_menu_proxy"></div>
-                    {{/hasregionmainsettingsmenu}}
-                    {{{ output.course_content_header }}}
-                    <div id="banner-wrapper" class="container-fluid p-0 d-flex align-items-center rounded">
-                        <div id="banner-summary-container" class="mx-auto my-4 mdl-align text-white">
-                            <h2>{{ sitesummary }}</h2>
+
+                    <div id="{{coursecategoryclass}}-banner" class="category-banner-wrapper {{coursecategoryclass}}-banner container-fluid p-0 d-flex align-items-center rounded">
+                        <div id="category-container" class="mx-auto my-4 mdl-align text-white">
+                            <h1>{{coursecategory}}</h1>
                         </div>
                     </div>
+
+                    {{{ output.course_content_header }}}
                     {{{ output.main_content }}}
                     {{{ output.activity_navigation }}}
+                    <div class="course-content-footer">
                     {{{ output.course_content_footer }}}
+                    </div>
                 </section>
                 {{#hasblocks}}
                 <section data-region="blocks-column" class="d-print-none mt-3">

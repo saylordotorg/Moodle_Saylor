@@ -67,7 +67,7 @@
                     <div> {{{ output.region_main_settings_menu }}} </div>
                 </div>
                 {{/hasregionmainsettingsmenu}}
-                <section id="region-main" {{#hasblocks}}class="has-blocks mb-3"{{/hasblocks}}>
+                <section id="region-main" class="{{#hasblocks}}has-blocks {{/hasblocks}}my-3 card">
                     {{#hasregionmainsettingsmenu}}
                         <div class="region_main_settings_menu_proxy"></div>
                     {{/hasregionmainsettingsmenu}}
@@ -78,7 +78,7 @@
                     {{{ output.course_content_footer }}}
                 </section>
                 {{#hasblocks}}
-                <section data-region="blocks-column" class="d-print-none">
+                <section data-region="blocks-column" class="d-print-none mt-3">
                     {{{ sidepreblocks }}}
                 </section>
                 {{/hasblocks}}
