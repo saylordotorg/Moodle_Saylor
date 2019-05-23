@@ -51,7 +51,8 @@ $strchkgrades = get_string('pluginname', 'gradeexport_checklist');
 print_grade_page_head($COURSE->id, 'export', 'checklist', $strchkgrades);
 
 // Get list of appropriate checklists.
-$checklists = $DB->get_records('checklist', array('course' => $course->id));
+$modinfo = get_fast_modinfo($course);
+$checklists = $modinfo->get_instances_of('checklist');
 
 if (empty($checklists)) {
     print_error('nochecklists', 'gradeexport_checklist');
@@ -103,8 +104,10 @@ echo '<label for="choosechecklist">'.get_string('choosechecklist', 'gradeexport_
     '<select id="choosechecklist" name="choosechecklist">';
 $selected = ' selected="selected" ';
 foreach ($checklists as $checklist) {
-    echo "<option $selected value='{$checklist->id}'>{$checklist->name}</option>";
-    $selected = '';
+    if (!$checklist->deletioninprogress) {
+        echo "<option $selected value='{$checklist->instance}'>{$checklist->get_formatted_name()}</option>";
+        $selected = '';
+    }
 }
 echo '</select><br/>';
 

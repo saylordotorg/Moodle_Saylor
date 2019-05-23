@@ -57,7 +57,7 @@ class qtype_numerical extends question_type {
      * @param string $x a string
      * @return bool whether $x is a number that the numerical question type can interpret.
      */
-    public static function is_valid_number($x) {
+    public static function is_valid_number(string $x) : bool {
         $ap = new qtype_numerical_answer_processor(array());
         list($value, $unit) = $ap->apply_units($x);
         return !is_null($value) && !$unit;
@@ -553,7 +553,7 @@ class qtype_numerical_answer_processor {
     }
 
     /**
-     * @return book If the student's response contains a '.' or a ',' that
+     * @return bool If the student's response contains a '.' or a ',' that
      * matches the thousands separator in the current locale. In this case, the
      * parsing in apply_unit can give a result that the student did not expect.
      */
@@ -651,7 +651,7 @@ class qtype_numerical_answer_processor {
         if (strpos($response, '.') !== false || substr_count($response, ',') > 1) {
             $response = str_replace(',', '', $response);
         } else {
-            $response = str_replace(',', '.', $response);
+            $response = str_replace([$this->thousandssep, $this->decsep, ','], ['', '.', '.'], $response);
         }
 
         $regex = '[+-]?(?:\d+(?:\\.\d*)?|\\.\d+)(?:e[-+]?\d+)?';

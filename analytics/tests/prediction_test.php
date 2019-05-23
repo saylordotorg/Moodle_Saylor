@@ -27,6 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once(__DIR__ . '/fixtures/test_indicator_max.php');
 require_once(__DIR__ . '/fixtures/test_indicator_min.php');
+require_once(__DIR__ . '/fixtures/test_indicator_null.php');
 require_once(__DIR__ . '/fixtures/test_indicator_fullname.php');
 require_once(__DIR__ . '/fixtures/test_indicator_random.php');
 require_once(__DIR__ . '/fixtures/test_target_shortname.php');
@@ -86,18 +87,14 @@ class core_analytics_prediction_testcase extends advanced_testcase {
         // 1 range for each analysable.
         $predictedranges = $DB->get_records('analytics_predict_samples', array('modelid' => $model->get_id()));
         $this->assertCount(2, $predictedranges);
-        $this->assertEquals(1, $DB->count_records('analytics_used_files',
-            array('modelid' => $model->get_id(), 'action' => 'predicted')));
         // 2 predictions for each range.
         $this->assertEquals(2, $DB->count_records('analytics_predictions',
             array('modelid' => $model->get_id())));
 
-        // No new generated files nor records as there are no new courses available.
+        // No new generated records as there are no new courses available.
         $model->predict();
         $predictedranges = $DB->get_records('analytics_predict_samples', array('modelid' => $model->get_id()));
         $this->assertCount(2, $predictedranges);
-        $this->assertEquals(1, $DB->count_records('analytics_used_files',
-            array('modelid' => $model->get_id(), 'action' => 'predicted')));
         $this->assertEquals(2, $DB->count_records('analytics_predictions',
             array('modelid' => $model->get_id())));
     }
@@ -119,23 +116,9 @@ class core_analytics_prediction_testcase extends advanced_testcase {
         $this->setAdminuser();
         set_config('enabled_stores', 'logstore_standard', 'tool_log');
 
-        $ncourses = 10;
-
         // Generate training data.
-        $params = array(
-            'startdate' => mktime(0, 0, 0, 10, 24, 2015),
-            'enddate' => mktime(0, 0, 0, 2, 24, 2016),
-        );
-        for ($i = 0; $i < $ncourses; $i++) {
-            $name = 'a' . random_string(10);
-            $courseparams = array('shortname' => $name, 'fullname' => $name) + $params;
-            $this->getDataGenerator()->create_course($courseparams);
-        }
-        for ($i = 0; $i < $ncourses; $i++) {
-            $name = 'b' . random_string(10);
-            $courseparams = array('shortname' => $name, 'fullname' => $name) + $params;
-            $this->getDataGenerator()->create_course($courseparams);
-        }
+        $ncourses = 10;
+        $this->generate_courses($ncourses);
 
         // We repeat the test for all prediction processors.
         $predictionsprocessor = \core_analytics\manager::get_predictions_processor($predictionsprocessorclass, false);
@@ -171,6 +154,10 @@ class core_analytics_prediction_testcase extends advanced_testcase {
         $this->assertEmpty($fs->get_directory_files(\context_system::instance()->id, 'analytics',
             \core_analytics\dataset_manager::UNLABELLED_FILEAREA, $model->get_id(), '/analysable/', true, false));
 
+        $params = [
+            'startdate' => mktime(0, 0, 0, 10, 24, 2015),
+            'enddate' => mktime(0, 0, 0, 2, 24, 2016),
+        ];
         $courseparams = $params + array('shortname' => 'aaaaaa', 'fullname' => 'aaaaaa', 'visible' => 0);
         $course1 = $this->getDataGenerator()->create_course($courseparams);
         $courseparams = $params + array('shortname' => 'bbbbbb', 'fullname' => 'bbbbbb', 'visible' => 0);
@@ -281,6 +268,81 @@ class core_analytics_prediction_testcase extends advanced_testcase {
     }
 
     /**
+     * test_ml_export_import
+     *
+     * @param string $predictionsprocessorclass The class name
+     * @dataProvider provider_ml_processors
+     */
+    public function test_ml_export_import($predictionsprocessorclass) {
+
+        $this->resetAfterTest(true);
+        $this->setAdminuser();
+        set_config('enabled_stores', 'logstore_standard', 'tool_log');
+
+        // Generate training data.
+        $ncourses = 10;
+        $this->generate_courses($ncourses);
+
+        // We repeat the test for all prediction processors.
+        $predictionsprocessor = \core_analytics\manager::get_predictions_processor($predictionsprocessorclass, false);
+        if ($predictionsprocessor->is_ready() !== true) {
+            $this->markTestSkipped('Skipping ' . $predictionsprocessorclass . ' as the predictor is not ready.');
+        }
+
+        $model = $this->add_perfect_model();
+        $model->update(true, false, '\core\analytics\time_splitting\quarters', get_class($predictionsprocessor));
+
+        $model->train();
+        $this->assertTrue($model->trained_locally());
+
+        $this->generate_courses(10, ['visible' => 0]);
+
+        $originalresults = $model->predict();
+
+        $zipfilename = 'model-zip-' . microtime() . '.zip';
+        $zipfilepath = $model->export_model($zipfilename);
+
+        $modelconfig = new \core_analytics\model_config();
+        list($modelconfig, $mlbackend) = $modelconfig->extract_import_contents($zipfilepath);
+        $this->assertNotFalse($mlbackend);
+
+        $importmodel = \core_analytics\model::import_model($zipfilepath);
+        $importmodel->enable();
+
+        // Now predict using the imported model without prior training.
+        $importedmodelresults = $importmodel->predict();
+
+        foreach ($originalresults->predictions as $sampleid => $prediction) {
+            $this->assertEquals($importedmodelresults->predictions[$sampleid]->prediction, $prediction->prediction);
+        }
+
+        $this->assertFalse($importmodel->trained_locally());
+
+        $zipfilename = 'model-zip-' . microtime() . '.zip';
+        $zipfilepath = $model->export_model($zipfilename, false);
+
+        $modelconfig = new \core_analytics\model_config();
+        list($modelconfig, $mlbackend) = $modelconfig->extract_import_contents($zipfilepath);
+        $this->assertFalse($mlbackend);
+
+        set_config('enabled_stores', '', 'tool_log');
+        get_log_manager(true);
+    }
+
+    /**
+     * provider_ml_processors
+     *
+     * @return array
+     */
+    public function provider_ml_processors() {
+        $cases = [
+            'case' => [],
+        ];
+
+        // We need to test all system prediction processors.
+        return $this->add_prediction_processors($cases);
+    }
+    /**
      * Test the system classifiers returns.
      *
      * This test checks that all mlbackend plugins in the system are able to return proper status codes
@@ -374,22 +436,21 @@ class core_analytics_prediction_testcase extends advanced_testcase {
     /**
      * Basic test to check that prediction processors work as expected.
      *
-     * @dataProvider provider_ml_test_evaluation
+     * @dataProvider provider_ml_test_evaluation_configuration
      * @param string $modelquality
      * @param int $ncourses
      * @param array $expected
      * @param string $predictionsprocessorclass
      * @return void
      */
-    public function test_ml_evaluation($modelquality, $ncourses, $expected, $predictionsprocessorclass) {
+    public function test_ml_evaluation_configuration($modelquality, $ncourses, $expected, $predictionsprocessorclass) {
         $this->resetAfterTest(true);
         $this->setAdminuser();
         set_config('enabled_stores', 'logstore_standard', 'tool_log');
 
-        $sometimesplittings = '\core\analytics\time_splitting\weekly,' .
-            '\core\analytics\time_splitting\single_range,' .
+        $sometimesplittings = '\core\analytics\time_splitting\single_range,' .
             '\core\analytics\time_splitting\quarters';
-        set_config('timesplittings', $sometimesplittings, 'analytics');
+        set_config('defaulttimesplittingsevaluation', $sometimesplittings, 'analytics');
 
         if ($modelquality === 'perfect') {
             $model = $this->add_perfect_model();
@@ -400,20 +461,7 @@ class core_analytics_prediction_testcase extends advanced_testcase {
         }
 
         // Generate training data.
-        $params = array(
-            'startdate' => mktime(0, 0, 0, 10, 24, 2015),
-            'enddate' => mktime(0, 0, 0, 2, 24, 2016),
-        );
-        for ($i = 0; $i < $ncourses; $i++) {
-            $name = 'a' . random_string(10);
-            $params = array('shortname' => $name, 'fullname' => $name) + $params;
-            $this->getDataGenerator()->create_course($params);
-        }
-        for ($i = 0; $i < $ncourses; $i++) {
-            $name = 'b' . random_string(10);
-            $params = array('shortname' => $name, 'fullname' => $name) + $params;
-            $this->getDataGenerator()->create_course($params);
-        }
+        $this->generate_courses($ncourses);
 
         // We repeat the test for all prediction processors.
         $predictionsprocessor = \core_analytics\manager::get_predictions_processor($predictionsprocessorclass, false);
@@ -430,6 +478,44 @@ class core_analytics_prediction_testcase extends advanced_testcase {
             $filtered = $result->status & $expected[$timesplitting];
             $this->assertEquals($expected[$timesplitting], $filtered, $message);
         }
+
+        set_config('enabled_stores', '', 'tool_log');
+        get_log_manager(true);
+    }
+
+    /**
+     * Tests the evaluation of already trained models.
+     *
+     * @dataProvider provider_ml_processors
+     * @param  string $predictionsprocessorclass
+     * @return null
+     */
+    public function test_ml_evaluation_trained_model($predictionsprocessorclass) {
+        $this->resetAfterTest(true);
+        $this->setAdminuser();
+        set_config('enabled_stores', 'logstore_standard', 'tool_log');
+
+        $model = $this->add_perfect_model();
+
+        // Generate training data.
+        $this->generate_courses(50);
+
+        // We repeat the test for all prediction processors.
+        $predictionsprocessor = \core_analytics\manager::get_predictions_processor($predictionsprocessorclass, false);
+        if ($predictionsprocessor->is_ready() !== true) {
+            $this->markTestSkipped('Skipping ' . $predictionsprocessorclass . ' as the predictor is not ready.');
+        }
+
+        $model->update(true, false, '\\core\\analytics\\time_splitting\\quarters', get_class($predictionsprocessor));
+        $model->train();
+
+        $zipfilename = 'model-zip-' . microtime() . '.zip';
+        $zipfilepath = $model->export_model($zipfilename);
+        $importmodel = \core_analytics\model::import_model($zipfilepath);
+
+        $results = $importmodel->evaluate(['mode' => 'trainedmodel']);
+        $this->assertEquals(0, $results['\\core\\analytics\\time_splitting\\quarters']->status);
+        $this->assertEquals(1, $results['\\core\\analytics\\time_splitting\\quarters']->score);
 
         set_config('enabled_stores', '', 'tool_log');
         get_log_manager(true);
@@ -463,8 +549,7 @@ class core_analytics_prediction_testcase extends advanced_testcase {
     public function test_not_null_samples() {
         $this->resetAfterTest(true);
 
-        $classname = '\core\analytics\time_splitting\quarters';
-        $timesplitting = \core_analytics\manager::get_time_splitting($classname);
+        $timesplitting = \core_analytics\manager::get_time_splitting('\core\analytics\time_splitting\quarters');
         $timesplitting->set_analysable(new \core_analytics\site());
 
         $ranges = array(
@@ -473,35 +558,49 @@ class core_analytics_prediction_testcase extends advanced_testcase {
         );
         $samples = array(123 => 123, 321 => 321);
 
-        $indicator1 = $this->getMockBuilder('test_indicator_max')
-            ->setMethods(['calculate_sample'])
-            ->getMock();
-        $indicator1->method('calculate_sample')
-            ->willReturn(null);
+        $target = \core_analytics\manager::get_target('test_target_shortname');
+        $indicators = array('test_indicator_null', 'test_indicator_min');
+        foreach ($indicators as $key => $indicator) {
+            $indicators[$key] = \core_analytics\manager::get_indicator($indicator);
+        }
+        $model = \core_analytics\model::create($target, $indicators, '\core\analytics\time_splitting\no_splitting');
 
-        $indicator2 = \core_analytics\manager::get_indicator('test_indicator_min');
+        $analyser = $model->get_analyser();
+        $result = new \core_analytics\local\analysis\result_array($model->get_id(), false, $analyser->get_options());
+        $analysis = new \core_analytics\analysis($analyser, false, $result);
 
         // Samples with at least 1 not null value are returned.
         $params = array(
+            $timesplitting,
             $samples,
-            'whatever',
-            array($indicator1, $indicator2),
             $ranges
         );
-        $dataset = phpunit_util::call_internal_method($timesplitting, 'calculate_indicators', $params, $classname);
+        $dataset = phpunit_util::call_internal_method($analysis, 'calculate_indicators', $params,
+            '\core_analytics\analysis');
         $this->assertArrayHasKey('123-0', $dataset);
         $this->assertArrayHasKey('123-1', $dataset);
         $this->assertArrayHasKey('321-0', $dataset);
         $this->assertArrayHasKey('321-1', $dataset);
 
+
+        $indicators = array('test_indicator_null');
+        foreach ($indicators as $key => $indicator) {
+            $indicators[$key] = \core_analytics\manager::get_indicator($indicator);
+        }
+        $model = \core_analytics\model::create($target, $indicators, '\core\analytics\time_splitting\no_splitting');
+
+        $analyser = $model->get_analyser();
+        $result = new \core_analytics\local\analysis\result_array($model->get_id(), false, $analyser->get_options());
+        $analysis = new \core_analytics\analysis($analyser, false, $result);
+
         // Samples with only null values are not returned.
         $params = array(
+            $timesplitting,
             $samples,
-            'whatever',
-            array($indicator1),
             $ranges
         );
-        $dataset = phpunit_util::call_internal_method($timesplitting, 'calculate_indicators', $params, $classname);
+        $dataset = phpunit_util::call_internal_method($analysis, 'calculate_indicators', $params,
+            '\core_analytics\analysis');
         $this->assertArrayNotHasKey('123-0', $dataset);
         $this->assertArrayNotHasKey('123-1', $dataset);
         $this->assertArrayNotHasKey('321-0', $dataset);
@@ -509,19 +608,17 @@ class core_analytics_prediction_testcase extends advanced_testcase {
     }
 
     /**
-     * provider_ml_test_evaluation
+     * provider_ml_test_evaluation_configuration
      *
      * @return array
      */
-    public function provider_ml_test_evaluation() {
+    public function provider_ml_test_evaluation_configuration() {
 
         $cases = array(
             'bad' => array(
                 'modelquality' => 'random',
                 'ncourses' => 50,
                 'expectedresults' => array(
-                    // The course duration is too much to be processed by in weekly basis.
-                    '\core\analytics\time_splitting\weekly' => \core_analytics\model::NO_DATASET,
                     '\core\analytics\time_splitting\single_range' => \core_analytics\model::LOW_SCORE,
                     '\core\analytics\time_splitting\quarters' => \core_analytics\model::LOW_SCORE,
                 )
@@ -530,8 +627,6 @@ class core_analytics_prediction_testcase extends advanced_testcase {
                 'modelquality' => 'perfect',
                 'ncourses' => 50,
                 'expectedresults' => array(
-                    // The course duration is too much to be processed by in weekly basis.
-                    '\core\analytics\time_splitting\weekly' => \core_analytics\model::NO_DATASET,
                     '\core\analytics\time_splitting\single_range' => \core_analytics\model::OK,
                     '\core\analytics\time_splitting\quarters' => \core_analytics\model::OK,
                 )
@@ -577,6 +672,32 @@ class core_analytics_prediction_testcase extends advanced_testcase {
 
         // To load db defaults as well.
         return new \core_analytics\model($model->get_id());
+    }
+
+    /**
+     * Generates $ncourses courses
+     *
+     * @param  int $ncourses The number of courses to be generated.
+     * @param  array $params Course params
+     * @return null
+     */
+    protected function generate_courses($ncourses, array $params = []) {
+
+        $params = $params + [
+            'startdate' => mktime(0, 0, 0, 10, 24, 2015),
+            'enddate' => mktime(0, 0, 0, 2, 24, 2016),
+        ];
+
+        for ($i = 0; $i < $ncourses; $i++) {
+            $name = 'a' . random_string(10);
+            $courseparams = array('shortname' => $name, 'fullname' => $name) + $params;
+            $this->getDataGenerator()->create_course($courseparams);
+        }
+        for ($i = 0; $i < $ncourses; $i++) {
+            $name = 'b' . random_string(10);
+            $courseparams = array('shortname' => $name, 'fullname' => $name) + $params;
+            $this->getDataGenerator()->create_course($courseparams);
+        }
     }
 
     /**

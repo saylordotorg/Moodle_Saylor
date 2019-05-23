@@ -29,7 +29,7 @@
  *
  */
 
-$plugin->version  = 2018030700;
+$plugin->version  = 2019052100;
 $plugin->requires = 2016120500;
 $plugin->release = '0.2';
 $plugin->maturity = MATURITY_BETA;

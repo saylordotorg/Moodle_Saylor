@@ -37,9 +37,9 @@ class helper {
     /**
      * Helper function to retrieve the messages between two users
      *
-     * TODO: This function should be removed once the new group messaging UI is in place and the old messaging UI is removed.
-     * For now we are not removing/deprecating this function for backwards compatibility with messaging UI.
-     * Followup: MDL-63915
+     * TODO: This function should be removed once the related web services go through final deprecation.
+     * The related web services are data_for_messagearea_messages AND data_for_messagearea_get_most_recent_message.
+     * Followup: MDL-63261
      *
      * @param int $userid the current user
      * @param int $otheruserid the other user
@@ -58,7 +58,8 @@ class helper {
         $hash = self::get_conversation_hash([$userid, $otheruserid]);
 
         $sql = "SELECT m.id, m.useridfrom, m.subject, m.fullmessage, m.fullmessagehtml,
-                       m.fullmessageformat, m.smallmessage, m.timecreated, muaread.timecreated AS timeread
+                       m.fullmessageformat, m.fullmessagetrust, m.smallmessage, m.timecreated,
+                       mc.contextid, muaread.timecreated AS timeread
                   FROM {message_conversations} mc
             INNER JOIN {messages} m
                     ON m.conversationid = mc.id
@@ -131,7 +132,8 @@ class helper {
         global $DB;
 
         $sql = "SELECT m.id, m.useridfrom, m.subject, m.fullmessage, m.fullmessagehtml,
-                       m.fullmessageformat, m.smallmessage, m.timecreated, muaread.timecreated AS timeread
+                       m.fullmessageformat, m.fullmessagetrust, m.smallmessage, m.timecreated,
+                       mc.contextid, muaread.timecreated AS timeread
                   FROM {message_conversations} mc
             INNER JOIN {messages} m
                     ON m.conversationid = mc.id
@@ -232,9 +234,9 @@ class helper {
     /**
      * Helper function to return an array of messages.
      *
-     * TODO: This function should be removed once the new group messaging UI is in place and the old messaging UI is removed.
-     * For now we are not removing/deprecating this function for backwards compatibility with messaging UI.
-     * Followup: MDL-63915
+     * TODO: This function should be removed once the related web services go through final deprecation.
+     * The related web services are data_for_messagearea_messages AND data_for_messagearea_get_most_recent_message.
+     * Followup: MDL-63261
      *
      * @param int $userid
      * @param array $messages
@@ -436,6 +438,40 @@ class helper {
     }
 
     /**
+     * Requires the JS libraries for the message user button.
+     *
+     * @return void
+     */
+    public static function messageuser_requirejs() {
+        global $PAGE;
+
+        static $done = false;
+        if ($done) {
+            return;
+        }
+
+        $PAGE->requires->js_call_amd('core_message/message_user_button', 'send', array('#message-user-button'));
+        $done = true;
+    }
+
+    /**
+     * Returns the attributes to place on the message user button.
+     *
+     * @param int $useridto
+     * @return array
+     */
+    public static function messageuser_link_params(int $useridto) : array {
+        global $USER;
+
+        return [
+            'id' => 'message-user-button',
+            'role' => 'button',
+            'data-conversationid' => api::get_conversation_between_users([$USER->id, $useridto]),
+            'data-userid' => $useridto,
+        ];
+    }
+
+    /**
      * Returns the conversation hash between users for easy look-ups in the DB.
      *
      * @param array $userids
@@ -604,6 +640,10 @@ class helper {
     /**
      * Backwards compatibility formatter, transforming the new output of get_conversations() into the old format.
      *
+     * TODO: This function should be removed once the related web services go through final deprecation.
+     * The related web services are data_for_messagearea_conversations.
+     * Followup: MDL-63261
+     *
      * @param array $conversations the array of conversations, which must come from get_conversations().
      * @return array the array of conversations, formatted in the legacy style.
      */
@@ -637,5 +677,132 @@ class helper {
             $tmp[$data->userid] = $data;
         }
         return $tmp;
+    }
+
+    /**
+     * Renders the messaging widget.
+     *
+     * @param bool $isdrawer Are we are rendering the drawer or is this on a full page?
+     * @param int|null $sendtouser The ID of the user we want to send a message to
+     * @param int|null $conversationid The ID of the conversation we want to load
+     * @return string The HTML.
+     */
+    public static function render_messaging_widget(bool $isdrawer, int $sendtouser = null, int $conversationid = null) {
+        global $USER, $CFG, $PAGE;
+
+        // Early bail out conditions.
+        if (empty($CFG->messaging) || !isloggedin() || isguestuser() || user_not_fully_set_up($USER) ||
+            get_user_preferences('auth_forcepasswordchange') ||
+            (!$USER->policyagreed && !is_siteadmin() &&
+                ($manager = new \core_privacy\local\sitepolicy\manager()) && $manager->is_defined())) {
+            return '';
+        }
+
+        $renderer = $PAGE->get_renderer('core');
+        $requestcount = \core_message\api::get_received_contact_requests_count($USER->id);
+        $contactscount = \core_message\api::count_contacts($USER->id);
+
+        $choices = [];
+        $choices[] = [
+            'value' => \core_message\api::MESSAGE_PRIVACY_ONLYCONTACTS,
+            'text' => get_string('contactableprivacy_onlycontacts', 'message')
+        ];
+        $choices[] = [
+            'value' => \core_message\api::MESSAGE_PRIVACY_COURSEMEMBER,
+            'text' => get_string('contactableprivacy_coursemember', 'message')
+        ];
+        if (!empty($CFG->messagingallusers)) {
+            // Add the MESSAGE_PRIVACY_SITE option when site-wide messaging between users is enabled.
+            $choices[] = [
+                'value' => \core_message\api::MESSAGE_PRIVACY_SITE,
+                'text' => get_string('contactableprivacy_site', 'message')
+            ];
+        }
+
+        // Enter to send.
+        $entertosend = get_user_preferences('message_entertosend', $CFG->messagingdefaultpressenter, $USER);
+
+        $notification = '';
+        if (!get_user_preferences('core_message_migrate_data', false)) {
+            $notification = get_string('messagingdatahasnotbeenmigrated', 'message');
+        }
+
+        if ($isdrawer) {
+            $template = 'core_message/message_drawer';
+            $messageurl = new \moodle_url('/message/index.php');
+        } else {
+            $template = 'core_message/message_index';
+            $messageurl = null;
+        }
+
+        $templatecontext = [
+            'contactrequestcount' => $requestcount,
+            'loggedinuser' => [
+                'id' => $USER->id,
+                'midnight' => usergetmidnight(time())
+            ],
+            'contacts' => [
+                'sectioncontacts' => [
+                    'placeholders' => array_fill(0, $contactscount > 50 ? 50 : $contactscount, true)
+                ],
+                'sectionrequests' => [
+                    'placeholders' => array_fill(0, $requestcount > 50 ? 50 : $requestcount, true)
+                ],
+            ],
+            'settings' => [
+                'privacy' => $choices,
+                'entertosend' => $entertosend
+            ],
+            'overview' => [
+                'messageurl' => $messageurl,
+                'notification' => $notification
+            ],
+            'sendtouser' => false,
+            'conversationid' => false,
+            'isdrawer' => $isdrawer
+        ];
+
+        if ($sendtouser) {
+            $templatecontext['sendtouser'] = $sendtouser;
+        }
+
+        if ($conversationid) {
+            $templatecontext['conversationid'] = $conversationid;
+        }
+
+        return $renderer->render_from_template($template, $templatecontext);
+    }
+
+    /**
+     * Returns user details for a user, if they are visible to the current user in the message search.
+     *
+     * This method checks the visibility of a user specifically for the purpose of inclusion in the message search results.
+     * Visibility depends on the site-wide messaging setting 'messagingallusers':
+     * If enabled, visibility depends only on the core notion of visibility; a visible site or course profile.
+     * If disabled, visibility requires that the user be sharing a course with the searching user, and have a visible profile there.
+     * The current user is always returned.
+     *
+     * @param \stdClass $user
+     * @return array the array of userdetails, if visible, or an empty array otherwise.
+     */
+    public static function search_get_user_details(\stdClass $user) : array {
+        global $CFG, $USER;
+        require_once($CFG->dirroot . '/user/lib.php');
+
+        if ($CFG->messagingallusers || $user->id == $USER->id) {
+            return \user_get_user_details_courses($user) ?? []; // This checks visibility of site and course profiles.
+        } else {
+            // Messaging specific: user must share a course with the searching user AND have a visible profile there.
+            $sharedcourses = enrol_get_shared_courses($USER, $user);
+            foreach ($sharedcourses as $course) {
+                if (user_can_view_profile($user, $course)) {
+                    $userdetails = user_get_user_details($user, $course);
+                    if (!is_null($userdetails)) {
+                        return $userdetails;
+                    }
+                }
+            }
+        }
+        return [];
     }
 }

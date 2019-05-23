@@ -865,7 +865,6 @@ function enrol_get_users_courses($userid, $onlyactive = false, $fields = null, $
     }
 
     return $courses;
-
 }
 
 /**

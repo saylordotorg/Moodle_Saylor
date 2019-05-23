@@ -273,6 +273,52 @@ class theme_saylor_core_renderer extends theme_boost\output\core_renderer
     }
 
     /*
+    * This controls course property logic.
+    */
+    public function get_course_properties() {
+        global $CFG, $COURSE, $DB, $PAGE, $SITE;
+
+        $imagedomain = "https://resources.saylor.org/og/";
+
+        $courseproperties = new stdClass();
+        // Show different info in courses, such as the title and images.
+        if ($PAGE->pagelayout == 'course' || $PAGE->pagelayout == 'incourse') {
+            $title = str_replace("Course: ", "", $PAGE->title)." | ".$SITE->shortname;
+            // Filter out instances where the course name is listed twice 
+            // where a resource has the course name in it (like the final exams).
+            $title = str_replace($COURSE->shortname.": ".$COURSE->shortname.": ", $COURSE->shortname.": ", $title);
+            $image = $COURSE->shortname."-1200x1200.png";
+            $description = preg_replace('~((\{.*\})|(<.+>.*</.+>))~s', '', $COURSE->summary);
+            $canonical = "/course/".$COURSE->shortname;
+
+            $courseproperties = new stdClass();
+            $courseproperties->siteurl = str_replace("/", "\/", $CFG->wwwroot);
+            $courseproperties->url = str_replace("/", "\/", $CFG->wwwroot.$canonical);
+            $courseproperties->name = str_replace("Course: ", "", $PAGE->title);
+            $courseproperties->description = $description;
+            $courseproperties->coursecode = $COURSE->shortname;
+            $courseproperties->subject = $DB->get_record('course_categories',array('id'=>$COURSE->category))->name;
+            $courseproperties->imagename = $image;
+            $courseproperties->imageurl = $imagedomain.$image;
+            // Get the time advisory
+            if (preg_match('~.*?Time: ([0-9]{1,3}) hours.*?~', $COURSE->summary, $time)) {
+                $courseproperties->time = $time[1];
+            } else {
+                $courseproperties->time = "0";
+            }
+
+            // Check if the course has a credit option.
+            // This is done by checking for the fa-graduation-cap
+            // fontawesome icon in the course description.
+            if (strpos($COURSE->summary, 'fa-graduation-cap') !== false) {
+                $courseproperties->credit = true;
+            }
+        }
+
+        return $courseproperties;
+    }
+
+    /*
     * This code shows an enroll button in main course view to logged in user or Login/sign up link when user is not logged in.
     */
     public function saylor_custom_enroll_button() {

@@ -38,6 +38,12 @@ if ($hassiteconfig or has_any_capability($capabilities, $systemcontext)) {
         )
     );
     $ADMIN->add('courses',
+        new admin_externalpage('course_customfield', new lang_string('course_customfield', 'admin'),
+            $CFG->wwwroot . '/course/customfield.php',
+            array('moodle/course:configurecustomfields')
+        )
+    );
+    $ADMIN->add('courses',
         new admin_externalpage('addcategory', new lang_string('addcategory', 'admin'),
             new moodle_url('/course/editcategory.php', array('parent' => 0)),
             array('moodle/category:manage')
@@ -451,5 +457,29 @@ if ($hassiteconfig or has_any_capability($capabilities, $systemcontext)) {
         array(1 => get_string('yes'), 0 => get_string('no'))));
 
     $ADMIN->add('backups', $temp);
+
+    // Create a page for asynchronous backup and restore configuration and defaults.
+    if (!empty($CFG->enableasyncbackup)) {  // Only add settings if async mode is enable at site level.
+        $temp = new admin_settingpage('asyncgeneralsettings', new lang_string('asyncgeneralsettings', 'backup'));
+
+        $temp->add(new admin_setting_configcheckbox(
+                'backup/backup_async_message_users',
+                new lang_string('asyncemailenable', 'backup'),
+                new lang_string('asyncemailenabledetail', 'backup'), 0));
+
+        $temp->add(new admin_setting_configtext(
+                'backup/backup_async_message_subject',
+                new lang_string('asyncmessagesubject', 'backup'),
+                new lang_string('asyncmessagesubjectdetail', 'backup'),
+                new lang_string('asyncmessagesubjectdefault', 'backup')));
+
+        $temp->add(new admin_setting_confightmleditor(
+                'backup/backup_async_message',
+                new lang_string('asyncmessagebody', 'backup'),
+                new lang_string('asyncmessagebodydetail', 'backup'),
+                new lang_string('asyncmessagebodydefault', 'backup')));
+
+        $ADMIN->add('backups', $temp);
+    }
 
 }

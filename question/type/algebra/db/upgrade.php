@@ -41,7 +41,7 @@ function xmldb_qtype_algebra_upgrade($oldversion=0) {
         upgrade_plugin_savepoint(true, 2008061500, 'qtype', 'algebra');
     }
 
-    // Drop the answers and variables fields wich are totaly redundants.
+    // Drop the answers and variables fields wich are totally redundant.
     if ($oldversion < 2011072800) {
         $table = new xmldb_table('question_algebra');
         $field = new xmldb_field('answers');
@@ -80,6 +80,48 @@ function xmldb_qtype_algebra_upgrade($oldversion=0) {
         }
         upgrade_plugin_savepoint(true, 2012061702, 'qtype', 'algebra');
     }
+
+    if ($oldversion < 2019042705) {
+
+        // Define key question (foreign) to be dropped form qtype_algebra_variables.
+        $table = new xmldb_table('qtype_algebra_variables');
+        $key = new xmldb_key('question', XMLDB_KEY_FOREIGN, array('question'), 'question', array('id'));
+
+        // Launch drop key question.
+        $dbman->drop_key($table, $key);
+
+        // Record that qtype_algebra savepoint was reached.
+        upgrade_plugin_savepoint(true, 2019042705, 'qtype', 'algebra');
+    }
+
+    if ($oldversion < 2019042706) {
+
+        // Rename field question on table qtype_algebra_variables to questionid.
+        $table = new xmldb_table('qtype_algebra_variables');
+        $field = new xmldb_field('question', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'id');
+
+        // Launch rename field question.
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->rename_field($table, $field, 'questionid');
+        }
+
+        // Record that qtype_algebra savepoint was reached.
+        upgrade_plugin_savepoint(true, 2019042706, 'qtype', 'algebra');
+    }
+
+    if ($oldversion < 2019042900) {
+
+        // Define key questionid (foreign) to be added to qtype_algebra_variables.
+        $table = new xmldb_table('qtype_algebra_variables');
+        $key = new xmldb_key('questionid', XMLDB_KEY_FOREIGN, array('questionid'), 'question', array('id'));
+
+        // Launch add key questionid.
+        $dbman->add_key($table, $key);
+
+        // Record that qtype_algebra savepoint was reached.
+        upgrade_plugin_savepoint(true, 2019042900, 'qtype', 'algebra');
+    }
+
     return true;
 }
 

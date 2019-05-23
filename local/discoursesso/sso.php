@@ -25,7 +25,8 @@
 
 require_once('../../config.php');
 require_once('./locallib.php');
-require_once __DIR__ . '/vendor/discourse-php/src/SSOHelper.php';
+require_once(__DIR__ . '/../../cohort/lib.php');
+require_once(__DIR__ . '/vendor/discourse-php/src/SSOHelper.php');
 
 global $CFG, $DB, $USER;
 
@@ -133,6 +134,31 @@ if (get_config('local_discoursesso', 'adminsync')) {
     if (is_siteadmin()) {
         $extraparams['admin']='true';
     }
+}
+
+// Create list of user's groups.
+$cohortstosync = $DB->get_records('discoursesso_cohorts');
+if ($cohortstosync !== false) {
+    $groupstoadd = array();
+    $groupstoremove = array();
+
+
+    foreach ($cohortstosync as $cohort) {
+        // Check if user is a member of the cohort.
+        if (cohort_is_member($cohort->cohortid, $userid)) {
+            // Modify name.
+            $groupstoadd[] = clean_name($cohort->cohortname);
+        }
+        else {
+            $groupstoremove[] = clean_name($cohort->cohortname);
+        }
+    }
+
+    // Add add_groups and remove_groups params.
+    $extraparams['add_groups'] = implode(",", $groupstoadd);
+    $extraparams['remove_groups'] = implode(",", $groupstoremove);
+    //$extraparams['groups'] = implode(",", $groupstoadd).",".implode(",", $groupstoremove);
+
 }
 
 // Build query string and redirect back to the Discourse site.

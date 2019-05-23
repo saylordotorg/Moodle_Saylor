@@ -11,8 +11,8 @@ Feature: Add badges to the system
   @javascript
   Scenario: Setting badges settings
     Given I navigate to "Badges > Badges settings" in site administration
-    And I set the field "Default badge issuer name" to "Test Badge Site"
-    And I set the field "Default badge issuer contact details" to "testuser@example.com"
+    And I set the field "Badge issuer name" to "Test Badge Site"
+    And I set the field "Badge issuer email address" to "testuser@example.com"
     And I press "Save changes"
     And I follow "Badges"
     When I follow "Add a new badge"
@@ -46,7 +46,7 @@ Feature: Add badges to the system
     And I should see "Test badge with 'apostrophe' and other friends (&@#)"
     And I should see "Endorsement"
     And I should see "Related badges (0)"
-    And I should see "Competencies (0)"
+    And I should see "Alignments (0)"
     And I should not see "Create badge"
     And I follow "Manage badges"
     And I should see "Number of badges available: 1"
@@ -118,7 +118,7 @@ Feature: Add badges to the system
     Then I should see "Changes saved"
 
   @javascript @_file_upload
-  Scenario: Competencies alignment for Badge
+  Scenario: Alignments for Badge
     Given I navigate to "Badges > Add a new badge" in site administration
     And I set the following fields to these values:
       | Name | Test Badge |
@@ -133,15 +133,50 @@ Feature: Add badges to the system
     When I press "Create badge"
     Then I should see "Test Badge"
     And I should see "Endorsement"
-    And I follow "Competencies (0)"
-    And I should see "This badge does not have any competencies specified."
-    And I press "Add competency"
-    And I follow "Competency"
-    And I wait until the page is ready
-    And I follow "Competency"
+    And I follow "Alignments (0)"
+    And I should see "This badge does not have any external skills or standards specified."
+    And I press "Add external skill or standard"
     And I set the following fields to these values:
-      | Competency name | Test Badge Competencies |
-      | URL | https://competencies.example.com |
-      | Description | Test Badge Competencies description |
+      | Name | Test Badge Alignments |
+      | URL | https://alignments.example.com |
+      | Description | Test Badge Alignments description |
     When I press "Save changes"
-    And I should see "Competencies (1)"
+    And I should see "Alignments (1)"
+
+  @javascript @_file_upload
+  Scenario: Add a badge from Site badges section
+    Given I press "Customise this page"
+    # TODO MDL-57120 site "Badges" link not accessible without navigation block.
+    And I add the "Navigation" block if not present
+    When I click on "Site pages" "list_item" in the "Navigation" "block"
+    And I click on "Site badges" "link" in the "Navigation" "block"
+    Then I should see "Manage badges"
+    And I should see "Add a new badge"
+    # Add a badge.
+    When I press "Add a new badge"
+    And I set the following fields to these values:
+      | Name | Test badge with 'apostrophe' and other friends (<>&@#) 2 |
+      | Version | v1 |
+      | Language | English |
+      | Description | Test badge description |
+      | Image author | http://author.example.com |
+      | Image caption | Test caption image |
+      | issuername | Test Badge Site |
+      | issuercontact | testuser@example.com |
+    And I upload "badges/tests/behat/badge.png" file to "Image" filemanager
+    And I press "Create badge"
+    Then I should see "Edit details"
+    And I should see "Test badge with 'apostrophe' and other friends (&@#) 2"
+    And I should see "Endorsement"
+    And I should see "Related badges (0)"
+    And I should see "Alignments (0)"
+    And I should not see "Create badge"
+    And I follow "Manage badges"
+    And I should see "Number of badges available: 1"
+    And I should not see "There are no badges available."
+    # See buttons from the "Site badges" page.
+    And I am on homepage
+    When I click on "Site pages" "list_item" in the "Navigation" "block"
+    And I click on "Site badges" "link" in the "Navigation" "block"
+    Then I should see "Manage badges"
+    And I should see "Add a new badge"

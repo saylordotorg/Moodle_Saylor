@@ -1,34 +1,10 @@
-.collapsibleregioncaption {
-    display: none;
-}
-.qtype-algebra .text-input,
-.qtype-algebra .text-input-md {
-    border: 1px solid #ccc;
-    padding: 4px 6px;
+
+.qtype-algebra .answer {
+    border: 1px solid black;
+    margin-top: 1px;
+    margin-bottom: 1px;
+    background: white;
+    color: black;
     border-radius: 4px;
-    margin: 0px 0px;
-    width: calc(100% - 20px);
-    font-size: 1.4rem;
-}
-.qtype-algebra .item-input {
-    padding-left: 6px;
-    margin-top: -14px;
-}
-.qtype-algebra .question-correct:after,
-.qtype-algebra .question-incorrect:after,
-.qtype-algebra .question-partiallycorrect:after {
-    font-family: FontAwesome;
-    padding-left: 3px;
-}
-.qtype-algebra .question-correct:after {
-    content: "\f00c";
-    color: #5e8100;
-}
-.qtype-algebra .question-incorrect:after {
-    content: "\f00d";
-    color: #cb3d4d;
-}
-.qtype-algebra .question-partiallycorrect:after {
-    content: "\f046";
-    color: #f98012;
+    display: inline;
 }

@@ -30,6 +30,10 @@ body:not(.editing) #gridmiddle-column {
     line-height: 1;
 }
 
+.course-content ul.gridicons li .icon_content.content_inside {
+    box-sizing: content-box;
+}
+
 div#gridshadebox_overlay {
     z-index: 1000;
 }

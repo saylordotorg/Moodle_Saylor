@@ -26,10 +26,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-.course-content .grid_title {
-    font-size: 160%;
-    font-weight: bold;
-}
 .course-content ul.gtopics h3.sectionname {
     background: transparent;
     border: 0 none;

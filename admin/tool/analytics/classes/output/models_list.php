@@ -63,15 +63,53 @@ class models_list implements \renderable, \templatable {
 
         $data = new \stdClass();
 
+        $newmodelmenu = new \action_menu();
+        $newmodelmenu->set_menu_trigger(get_string('newmodel', 'tool_analytics'), 'btn btn-default');
+        $newmodelmenu->set_alignment(\action_menu::TL, \action_menu::BL);
+
+        $newmodelmenu->add(new \action_menu_link(
+            new \moodle_url('/admin/tool/analytics/createmodel.php'),
+            new \pix_icon('i/edit', ''),
+            get_string('createmodel', 'tool_analytics'),
+            false
+        ));
+
+        $newmodelmenu->add(new \action_menu_link(
+            new \moodle_url('/admin/tool/analytics/importmodel.php'),
+            new \pix_icon('i/import', ''),
+            get_string('importmodel', 'tool_analytics'),
+            false
+        ));
+
+        $newmodelmenu->add(new \action_menu_link(
+            new \moodle_url('/admin/tool/analytics/restoredefault.php'),
+            new \pix_icon('i/reload', ''),
+            get_string('restoredefault', 'tool_analytics'),
+            false
+        ));
+
+        $data->newmodelmenu = $newmodelmenu->export_for_template($output);
+
         $onlycli = get_config('analytics', 'onlycli');
         if ($onlycli === false) {
             // Default applied if no config found.
             $onlycli = 1;
         }
 
+        // Evaluation options.
+        $timesplittingmethods = [
+            ['id' => 'all', 'text' => get_string('alltimesplittingmethods', 'tool_analytics')],
+        ];
+        foreach (\core_analytics\manager::get_time_splitting_methods_for_evaluation(true) as $timesplitting) {
+            $timesplittingmethods[] = [
+                'id' => \tool_analytics\output\helper::class_to_option($timesplitting->get_id()),
+                'text' => $timesplitting->get_name()->out(),
+            ];
+        }
+
         $data->models = array();
         foreach ($this->models as $model) {
-            $modeldata = $model->export();
+            $modeldata = $model->export($output);
 
             // Check if there is a help icon for the target to show.
             $identifier = $modeldata->target->get_identifier();
@@ -106,6 +144,8 @@ class models_list implements \renderable, \templatable {
                 }
                 $modeldata->indicators = $indicators;
             }
+
+            $modeldata->indicatorsnum = count($modeldata->indicators);
 
             // Check if there is a help icon for the time splitting method.
             if (!empty($modeldata->timesplitting)) {
@@ -185,15 +225,30 @@ class models_list implements \renderable, \templatable {
 
             // Evaluate machine-learning-based models.
             if (!$onlycli && $model->get_indicators() && !$model->is_static()) {
+
+                // Extra is_trained call as trained_locally returns false if the model has not been trained yet.
+                $trainedonlyexternally = !$model->trained_locally() && $model->is_trained();
+
+                $actionid = 'evaluate-' . $model->get_id();
+
+                $modeltimesplittingmethods = $timesplittingmethods;
+                // Include the current time-splitting method as the default selection method the model already have one.
+                if ($model->get_model_obj()->timesplitting) {
+                    $currenttimesplitting = ['id' => 'current', 'text' => get_string('currenttimesplitting', 'tool_analytics')];
+                    array_unshift($modeltimesplittingmethods, $currenttimesplitting);
+                }
+
+                $evaluateparams = [$actionid, $trainedonlyexternally, $modeltimesplittingmethods];
+                $PAGE->requires->js_call_amd('tool_analytics/model', 'selectEvaluationOptions', $evaluateparams);
                 $urlparams['action'] = 'evaluate';
                 $url = new \moodle_url('model.php', $urlparams);
                 $icon = new \action_menu_link_secondary($url, new \pix_icon('i/calc', get_string('evaluate', 'tool_analytics')),
-                    get_string('evaluate', 'tool_analytics'));
+                    get_string('evaluate', 'tool_analytics'), ['data-action-id' => $actionid]);
                 $actionsmenu->add($icon);
             }
 
             // Machine-learning-based models evaluation log.
-            if (!$model->is_static()) {
+            if (!$model->is_static() && $model->get_logs()) {
                 $urlparams['action'] = 'log';
                 $url = new \moodle_url('model.php', $urlparams);
                 $icon = new \action_menu_link_secondary($url, new \pix_icon('i/report', get_string('viewlog', 'tool_analytics')),
@@ -202,12 +257,10 @@ class models_list implements \renderable, \templatable {
             }
 
             // Edit model.
-            if (!$model->is_static()) {
-                $urlparams['action'] = 'edit';
-                $url = new \moodle_url('model.php', $urlparams);
-                $icon = new \action_menu_link_secondary($url, new \pix_icon('t/edit', get_string('edit')), get_string('edit'));
-                $actionsmenu->add($icon);
-            }
+            $urlparams['action'] = 'edit';
+            $url = new \moodle_url('model.php', $urlparams);
+            $icon = new \action_menu_link_secondary($url, new \pix_icon('t/edit', get_string('edit')), get_string('edit'));
+            $actionsmenu->add($icon);
 
             // Enable / disable.
             if ($model->is_enabled() || !empty($modeldata->timesplitting)) {
@@ -227,13 +280,27 @@ class models_list implements \renderable, \templatable {
                 $actionsmenu->add($icon);
             }
 
-            // Export training data.
-            if (!$model->is_static() && $model->is_trained()) {
-                $urlparams['action'] = 'export';
-                $url = new \moodle_url('model.php', $urlparams);
-                $icon = new \action_menu_link_secondary($url, new \pix_icon('i/export',
-                    get_string('exporttrainingdata', 'tool_analytics')), get_string('export', 'tool_analytics'));
-                $actionsmenu->add($icon);
+            // Export.
+            if (!$model->is_static()) {
+
+                $fullysetup = $model->get_indicators() && !empty($modeldata->timesplitting);
+                $istrained = $model->is_trained();
+
+                if ($fullysetup || $istrained) {
+
+                    $url = new \moodle_url('model.php', $urlparams);
+                    // Clear the previous action param from the URL, we will set it in JS.
+                    $url->remove_params('action');
+
+                    $actionid = 'export-' . $model->get_id();
+                    $PAGE->requires->js_call_amd('tool_analytics/model', 'selectExportOptions',
+                        [$actionid, $istrained]);
+
+                    $icon = new \action_menu_link_secondary($url, new \pix_icon('i/export',
+                        get_string('export', 'tool_analytics')), get_string('export', 'tool_analytics'),
+                        ['data-action-id' => $actionid]);
+                    $actionsmenu->add($icon);
+                }
             }
 
             // Invalid analysables.
@@ -257,6 +324,16 @@ class models_list implements \renderable, \templatable {
                     ['data-action-id' => $actionid]);
                 $actionsmenu->add($icon);
             }
+
+            // Delete model.
+            $actionid = 'delete-' . $model->get_id();
+            $PAGE->requires->js_call_amd('tool_analytics/model', 'confirmAction', [$actionid, 'delete']);
+            $urlparams['action'] = 'delete';
+            $url = new \moodle_url('model.php', $urlparams);
+            $icon = new \action_menu_link_secondary($url, new \pix_icon('t/delete',
+                get_string('delete', 'tool_analytics')), get_string('delete', 'tool_analytics'),
+                ['data-action-id' => $actionid]);
+            $actionsmenu->add($icon);
 
             $modeldata->actions = $actionsmenu->export_for_template($output);
 

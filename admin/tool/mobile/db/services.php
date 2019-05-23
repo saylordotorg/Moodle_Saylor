@@ -57,15 +57,25 @@ $functions = array(
         'classname'   => 'tool_mobile\external',
         'methodname'  => 'get_autologin_key',
         'description' => 'Creates an auto-login key for the current user.
-                            Is created only in https sites and is restricted by time and ip address.',
+                            Is created only in https sites and is restricted by time, ip address and only works if the request
+                            comes from the Moodle mobile or desktop app.',
         'type'        => 'write',
         'services'    => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
     ),
+
     'tool_mobile_get_content' => array(
         'classname'   => 'tool_mobile\external',
         'methodname'  => 'get_content',
         'description' => 'Returns a piece of content to be displayed in the Mobile app.',
         'type'        => 'read',
+        'services'    => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
+    ),
+
+    'tool_mobile_call_external_functions' => array(
+        'classname'   => 'tool_mobile\external',
+        'methodname'  => 'call_external_functions',
+        'description' => 'Call multiple external functions and return all responses.',
+        'type'        => 'write',
         'services'    => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
     ),
 );

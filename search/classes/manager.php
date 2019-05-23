@@ -98,6 +98,31 @@ class manager {
     const INDEX_PRIORITY_REINDEXING = 50;
 
     /**
+     * @var string Core search area category for all results.
+     */
+    const SEARCH_AREA_CATEGORY_ALL = 'core-all';
+
+    /**
+     * @var string Core search area category for course content.
+     */
+    const SEARCH_AREA_CATEGORY_COURSE_CONTENT = 'core-course-content';
+
+    /**
+     * @var string Core search area category for courses.
+     */
+    const SEARCH_AREA_CATEGORY_COURSES = 'core-courses';
+
+    /**
+     * @var string Core search area category for users.
+     */
+    const SEARCH_AREA_CATEGORY_USERS = 'core-users';
+
+    /**
+     * @var string Core search area category for results that do not fit into any of existing categories.
+     */
+    const SEARCH_AREA_CATEGORY_OTHER = 'core-other';
+
+    /**
      * @var \core_search\base[] Enabled search areas.
      */
     protected static $enabledsearchareas = null;
@@ -106,6 +131,11 @@ class manager {
      * @var \core_search\base[] All system search areas.
      */
     protected static $allsearchareas = null;
+
+    /**
+     * @var \core_search\area_category[] A list of search area categories.
+     */
+    protected static $searchareacategories = null;
 
     /**
      * @var \core_search\manager
@@ -306,50 +336,20 @@ class manager {
 
         static::$allsearchareas = array();
         static::$enabledsearchareas = array();
+        $searchclasses = \core_component::get_component_classes_in_namespace(null, 'search');
 
-        $plugintypes = \core_component::get_plugin_types();
-        foreach ($plugintypes as $plugintype => $unused) {
-            $plugins = \core_component::get_plugin_list($plugintype);
-            foreach ($plugins as $pluginname => $pluginfullpath) {
-
-                $componentname = $plugintype . '_' . $pluginname;
-                $searchclasses = \core_component::get_component_classes_in_namespace($componentname, 'search');
-                foreach ($searchclasses as $classname => $classpath) {
-                    $areaname = substr(strrchr($classname, '\\'), 1);
-
-                    if (!static::is_search_area($classname)) {
-                        continue;
-                    }
-
-                    $areaid = static::generate_areaid($componentname, $areaname);
-                    $searchclass = new $classname();
-
-                    static::$allsearchareas[$areaid] = $searchclass;
-                    if ($searchclass->is_enabled()) {
-                        static::$enabledsearchareas[$areaid] = $searchclass;
-                    }
-                }
+        foreach ($searchclasses as $classname => $classpath) {
+            $areaname = substr(strrchr($classname, '\\'), 1);
+            $componentname = strstr($classname, '\\', 1);
+            if (!static::is_search_area($classname)) {
+                continue;
             }
-        }
 
-        $subsystems = \core_component::get_core_subsystems();
-        foreach ($subsystems as $subsystemname => $subsystempath) {
-            $componentname = 'core_' . $subsystemname;
-            $searchclasses = \core_component::get_component_classes_in_namespace($componentname, 'search');
-
-            foreach ($searchclasses as $classname => $classpath) {
-                $areaname = substr(strrchr($classname, '\\'), 1);
-
-                if (!static::is_search_area($classname)) {
-                    continue;
-                }
-
-                $areaid = static::generate_areaid($componentname, $areaname);
-                $searchclass = new $classname();
-                static::$allsearchareas[$areaid] = $searchclass;
-                if ($searchclass->is_enabled()) {
-                    static::$enabledsearchareas[$areaid] = $searchclass;
-                }
+            $areaid = static::generate_areaid($componentname, $areaname);
+            $searchclass = new $classname();
+            static::$allsearchareas[$areaid] = $searchclass;
+            if ($searchclass->is_enabled()) {
+                static::$enabledsearchareas[$areaid] = $searchclass;
             }
         }
 
@@ -357,6 +357,162 @@ class manager {
             return static::$enabledsearchareas;
         }
         return static::$allsearchareas;
+    }
+
+    /**
+     * Return search area category instance by category name.
+     *
+     * @param string $name Category name. If name is not valid will return default category.
+     *
+     * @return \core_search\area_category
+     */
+    public static function get_search_area_category_by_name($name) {
+        if (key_exists($name, self::get_search_area_categories())) {
+            return self::get_search_area_categories()[$name];
+        } else {
+            return self::get_search_area_categories()[self::get_default_area_category_name()];
+        }
+    }
+
+    /**
+     * Return a list of existing search area categories.
+     *
+     * @return \core_search\area_category[]
+     */
+    public static function get_search_area_categories() {
+        if (!isset(static::$searchareacategories)) {
+            $categories = self::get_core_search_area_categories();
+
+            // Go through all existing search areas and get categories they are assigned to.
+            $areacategories = [];
+            foreach (self::get_search_areas_list() as $searcharea) {
+                foreach ($searcharea->get_category_names() as $categoryname) {
+                    if (!key_exists($categoryname, $areacategories)) {
+                        $areacategories[$categoryname] = [];
+                    }
+
+                    $areacategories[$categoryname][] = $searcharea;
+                }
+            }
+
+            // Populate core categories by areas.
+            foreach ($areacategories as $name => $searchareas) {
+                if (key_exists($name, $categories)) {
+                    $categories[$name]->set_areas($searchareas);
+                } else {
+                    throw new \coding_exception('Unknown core search area category ' . $name);
+                }
+            }
+
+            // Get additional categories.
+            $additionalcategories = self::get_additional_search_area_categories();
+            foreach ($additionalcategories as $additionalcategory) {
+                if (!key_exists($additionalcategory->get_name(), $categories)) {
+                    $categories[$additionalcategory->get_name()] = $additionalcategory;
+                }
+            }
+
+            // Remove categories without areas.
+            foreach ($categories as $key => $category) {
+                if (empty($category->get_areas())) {
+                    unset($categories[$key]);
+                }
+            }
+
+            // Sort categories by order.
+            uasort($categories, function($category1, $category2) {
+                return $category1->get_order() > $category2->get_order();
+            });
+
+            static::$searchareacategories = $categories;
+        }
+
+        return static::$searchareacategories;
+    }
+
+    /**
+     * Get list of core search area categories.
+     *
+     * @return \core_search\area_category[]
+     */
+    protected static function get_core_search_area_categories() {
+        $categories = [];
+
+        $categories[self::SEARCH_AREA_CATEGORY_ALL] = new area_category(
+            self::SEARCH_AREA_CATEGORY_ALL,
+            get_string('core-all', 'search'),
+            0,
+            self::get_search_areas_list(true)
+        );
+
+        $categories[self::SEARCH_AREA_CATEGORY_COURSE_CONTENT] = new area_category(
+            self::SEARCH_AREA_CATEGORY_COURSE_CONTENT,
+            get_string('core-course-content', 'search'),
+            1
+        );
+
+        $categories[self::SEARCH_AREA_CATEGORY_COURSES] = new area_category(
+            self::SEARCH_AREA_CATEGORY_COURSES,
+            get_string('core-courses', 'search'),
+            2
+        );
+
+        $categories[self::SEARCH_AREA_CATEGORY_USERS] = new area_category(
+            self::SEARCH_AREA_CATEGORY_USERS,
+            get_string('core-users', 'search'),
+            3
+        );
+
+        $categories[self::SEARCH_AREA_CATEGORY_OTHER] = new area_category(
+            self::SEARCH_AREA_CATEGORY_OTHER,
+            get_string('core-other', 'search'),
+            4
+        );
+
+        return $categories;
+    }
+
+    /**
+     * Gets a list of additional search area categories.
+     *
+     * @return \core_search\area_category[]
+     */
+    protected static function get_additional_search_area_categories() {
+        $additionalcategories = [];
+
+        // Allow plugins to add custom search area categories.
+        if ($pluginsfunction = get_plugins_with_function('search_area_categories')) {
+            foreach ($pluginsfunction as $plugintype => $plugins) {
+                foreach ($plugins as $pluginfunction) {
+                    $plugincategories = $pluginfunction();
+                    // We're expecting a list of valid area categories.
+                    if (is_array($plugincategories)) {
+                        foreach ($plugincategories as $plugincategory) {
+                            if (self::is_valid_area_category($plugincategory)) {
+                                $additionalcategories[] = $plugincategory;
+                            } else {
+                                throw  new \coding_exception('Invalid search area category!');
+                            }
+                        }
+                    } else {
+                        throw  new \coding_exception($pluginfunction . ' should return a list of search area categories!');
+                    }
+                }
+            }
+        }
+
+        return $additionalcategories;
+    }
+
+    /**
+     * Check if provided instance of area category is valid.
+     *
+     * @param mixed $areacategory Area category instance. Potentially could be anything.
+     *
+     * @return bool
+     */
+    protected static function is_valid_area_category($areacategory) {
+        return $areacategory instanceof area_category;
     }
 
     /**
@@ -369,6 +525,7 @@ class manager {
         static::$enabledsearchareas = null;
         static::$allsearchareas = null;
         static::$instance = null;
+        static::$searchareacategories = null;
 
         base_block::clear_static();
         engine::clear_users_cache();
@@ -396,6 +553,33 @@ class manager {
      */
     public static function extract_areaid_parts($areaid) {
         return explode('-', $areaid);
+    }
+
+    /**
+     * Parse a search area id and get plugin name and config name prefix from it.
+     *
+     * @param string $areaid Search area id.
+     * @return array Where the first element is a plugin name and the second is config names prefix.
+     */
+    public static function parse_areaid($areaid) {
+        $parts = self::extract_areaid_parts($areaid);
+
+        if (empty($parts[1])) {
+            throw new \coding_exception('Trying to parse invalid search area id ' . $areaid);
+        }
+
+        $component = $parts[0];
+        $area = $parts[1];
+
+        if (strpos($component, 'core') === 0) {
+            $plugin = 'core_search';
+            $configprefix = str_replace('-', '_', $areaid);
+        } else {
+            $plugin = $component;
+            $configprefix = 'search_' . $area;
+        }
+
+        return [$plugin, $configprefix];
     }
 
     /**
@@ -473,54 +657,54 @@ class manager {
         }
 
         if (is_siteadmin()) {
-            // Admins have access to all courses regardless of enrolment.
-            if ($limitcourseids) {
-                list ($coursesql, $courseparams) = $DB->get_in_or_equal($limitcourseids);
-                $coursesql = 'id ' . $coursesql;
-            } else {
-                $coursesql = '';
-                $courseparams = [];
-            }
-            // Get courses using the same list of fields from enrol_get_my_courses.
-            $courses = $DB->get_records_select('course', $coursesql, $courseparams, '',
-                    'id, category, sortorder, shortname, fullname, idnumber, startdate, visible, ' .
-                    'groupmode, groupmodeforce, cacherev');
+            $allcourses = $this->get_all_courses($limitcourseids);
         } else {
-            // Get the courses where the current user has access.
-            $courses = enrol_get_my_courses(array('id', 'cacherev'), 'id', 0, [],
-                    (bool)get_config('core', 'searchallavailablecourses'));
+            $allcourses = $mycourses = $this->get_my_courses((bool)get_config('core', 'searchallavailablecourses'));
+
+            if (self::include_all_courses()) {
+                $allcourses = $this->get_all_courses($limitcourseids);
+            }
         }
 
         if (empty($limitcourseids) || in_array(SITEID, $limitcourseids)) {
-            $courses[SITEID] = get_course(SITEID);
+            $allcourses[SITEID] = get_course(SITEID);
+            if (isset($mycourses)) {
+                $mycourses[SITEID] = get_course(SITEID);
+            }
         }
 
         // Keep a list of included course context ids (needed for the block calculation below).
         $coursecontextids = [];
         $modulecms = [];
 
-        foreach ($courses as $course) {
+        foreach ($allcourses as $course) {
             if (!empty($limitcourseids) && !in_array($course->id, $limitcourseids)) {
                 // Skip non-included courses.
                 continue;
             }
 
             $coursecontext = \context_course::instance($course->id);
-            $coursecontextids[] = $coursecontext->id;
             $hasgrouprestrictions = false;
-
-            // Info about the course modules.
-            $modinfo = get_fast_modinfo($course);
 
             if (!empty($areasbylevel[CONTEXT_COURSE]) &&
                     (!$limitcontextids || in_array($coursecontext->id, $limitcontextids))) {
                 // Add the course contexts the user can view.
                 foreach ($areasbylevel[CONTEXT_COURSE] as $areaid => $searchclass) {
-                    if ($course->visible || has_capability('moodle/course:viewhiddencourses', $coursecontext)) {
+                    if (!empty($mycourses[$course->id]) || \core_course_category::can_view_course_info($course)) {
                         $areascontexts[$areaid][$coursecontext->id] = $coursecontext->id;
                     }
                 }
             }
+
+            // Skip module context if a user can't access related course.
+            if (isset($mycourses) && !key_exists($course->id, $mycourses)) {
+                continue;
+            }
+
+            $coursecontextids[] = $coursecontext->id;
+
+            // Info about the course modules.
+            $modinfo = get_fast_modinfo($course);
 
             if (!empty($areasbylevel[CONTEXT_MODULE])) {
                 // Add the module contexts the user can view (cm_info->uservisible).
@@ -671,6 +855,19 @@ class manager {
     public function paged_search(\stdClass $formdata, $pagenum) {
         $out = new \stdClass();
 
+        if (self::is_search_area_categories_enabled() && !empty($formdata->cat)) {
+            $cat = self::get_search_area_category_by_name($formdata->cat);
+            if (empty($formdata->areaids)) {
+                $formdata->areaids = array_keys($cat->get_areas());
+            } else {
+                foreach ($formdata->areaids as $key => $areaid) {
+                    if (!key_exists($areaid, $cat->get_areas())) {
+                        unset($formdata->areaids[$key]);
+                    }
+                }
+            }
+        }
+
         $perpage = static::DISPLAY_RESULTS_PER_PAGE;
 
         // Make sure we only allow request up to max page.
@@ -762,10 +959,7 @@ class manager {
             }
         }
 
-        $limitcourseids = false;
-        if (!empty($formdata->courseids)) {
-            $limitcourseids = $formdata->courseids;
-        }
+        $limitcourseids = $this->build_limitcourseids($formdata);
 
         $limitcontextids = false;
         if (!empty($formdata->contextids)) {
@@ -791,6 +985,31 @@ class manager {
         }
 
         return $docs;
+    }
+
+    /**
+     * Build a list of course ids to limit the search based on submitted form data.
+     *
+     * @param \stdClass $formdata Submitted search form data.
+     *
+     * @return array|bool
+     */
+    protected function build_limitcourseids(\stdClass $formdata) {
+        $limitcourseids = false;
+
+        if (!empty($formdata->mycoursesonly)) {
+            $limitcourseids = array_keys($this->get_my_courses(false));
+        }
+
+        if (!empty($formdata->courseids)) {
+            if (empty($limitcourseids)) {
+                $limitcourseids = $formdata->courseids;
+            } else {
+                $limitcourseids = array_intersect($limitcourseids, $formdata->courseids);
+            }
+        }
+
+        return $limitcourseids;
     }
 
     /**
@@ -1435,4 +1654,113 @@ class manager {
         }
         return microtime(true);
     }
+
+    /**
+     * Check if search area categories functionality is enabled.
+     *
+     * @return bool
+     */
+    public static function is_search_area_categories_enabled() {
+        return !empty(get_config('core', 'searchenablecategories'));
+    }
+
+    /**
+     * Check if all results category should be hidden.
+     *
+     * @return bool
+     */
+    public static function should_hide_all_results_category() {
+        return get_config('core', 'searchhideallcategory');
+    }
+
+    /**
+     * Returns default search area category name.
+     *
+     * @return string
+     */
+    public static function get_default_area_category_name() {
+        $default = get_config('core', 'searchdefaultcategory');
+
+        if (empty($default)) {
+            $default = self::SEARCH_AREA_CATEGORY_ALL;
+        }
+
+        if ($default == self::SEARCH_AREA_CATEGORY_ALL && self::should_hide_all_results_category()) {
+            $default = self::SEARCH_AREA_CATEGORY_COURSE_CONTENT;
+        }
+
+        return $default;
+    }
+
+    /**
+     * Get a list of all courses limited by ids if required.
+     *
+     * @param array|false $limitcourseids An array of course ids to limit the search to. False for no limiting.
+     * @return array
+     */
+    protected function get_all_courses($limitcourseids) {
+        global $DB;
+
+        if ($limitcourseids) {
+            list ($coursesql, $courseparams) = $DB->get_in_or_equal($limitcourseids);
+            $coursesql = 'id ' . $coursesql;
+        } else {
+            $coursesql = '';
+            $courseparams = [];
+        }
+
+        // Get courses using the same list of fields from enrol_get_my_courses.
+        return $DB->get_records_select('course', $coursesql, $courseparams, '',
+            'id, category, sortorder, shortname, fullname, idnumber, startdate, visible, ' .
+            'groupmode, groupmodeforce, cacherev');
+    }
+
+    /**
+     * Get a list of courses as user can access.
+     *
+     * @param bool $allaccessible Include courses user is not enrolled in, but can access.
+     * @return array
+     */
+    protected function get_my_courses($allaccessible) {
+        return enrol_get_my_courses(array('id', 'cacherev'), 'id', 0, [], $allaccessible);
+    }
+
+    /**
+     * Check if search all courses setting is enabled.
+     *
+     * @return bool
+     */
+    public static function include_all_courses() {
+        return !empty(get_config('core', 'searchincludeallcourses'));
+    }
+
+    /**
+     * Cleans up non existing search area.
+     *
+     * 1. Remove all configs from {config_plugins} table.
+     * 2. Delete all related indexed documents.
+     *
+     * @param string $areaid Search area id.
+     */
+    public static function clean_up_non_existing_area($areaid) {
+        global $DB;
+
+        if (!empty(self::get_search_area($areaid))) {
+            throw new \coding_exception("Area $areaid exists. Please use appropriate search area class to manipulate the data.");
+        }
+
+        $parts = self::parse_areaid($areaid);
+
+        $plugin = $parts[0];
+        $configprefix = $parts[1];
+
+        foreach (base::get_settingnames() as $settingname) {
+            $name = $configprefix. $settingname;
+            $DB->delete_records('config_plugins', ['name' => $name, 'plugin' => $plugin]);
+        }
+
+        $engine = self::instance()->get_engine();
+        $engine->delete($areaid);
+    }
+
 }

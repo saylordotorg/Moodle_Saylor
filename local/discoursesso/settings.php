@@ -33,15 +33,20 @@ if ( $hassiteconfig ){
 	// $settings will be NULL
 	$settings = new admin_settingpage( 'local_discoursesso', get_string('settingstitle', 'local_discoursesso'));
  
+
 	// Create 
-	$ADMIN->add( 'localplugins', $settings );
- 
+ 	$ADMIN->add('localplugins', new admin_category('discoursessoroot', new lang_string('pluginname', 'local_discoursesso')));
+ 	$ADMIN->add( 'discoursessoroot', $settings );
+	$settings->add(
+		new admin_setting_configtext('discoursesso_api_key', get_string('apikeylabel', 'local_discoursesso'), get_string('apikeyhelp', 'local_discoursesso'), '', PARAM_RAW)
+	);
+
 	$settings->add(
 		new admin_setting_configtext('discoursesso_secret_key', get_string('secretkeylabel', 'local_discoursesso'), get_string('secretkeyhelp', 'local_discoursesso'), '', PARAM_RAW)
 	);
 
 	$settings->add(
-		new admin_setting_configtext('discoursesso_discourse_url', get_string('discourseurllabel', 'local_discoursesso'), get_string('discourseurlhelp', 'local_discoursesso'), 'https://discourse.example', PARAM_TEXT)
+		new admin_setting_configtext('discoursesso_discourse_url', get_string('discourseurllabel', 'local_discoursesso'), get_string('discourseurlhelp', 'local_discoursesso'), 'https://discourse.example', PARAM_URL)
 	);
 
 	$name = 'local_discoursesso/locale';
@@ -55,5 +60,9 @@ if ( $hassiteconfig ){
     $help = get_string('adminsynchelp', 'local_discoursesso');
     $setting = new admin_setting_configcheckbox($name, $label, $help, 1);
     $settings->add($setting);
+
+    // Add manage affiliates page to the affiliations node.
+    $ADMIN->add('discoursessoroot', new admin_externalpage('local_discoursesso_managegroups', get_string('plugingrouppagename', 'local_discoursesso'),
+            new moodle_url('/local/discoursesso/groups.php')));
  
 }

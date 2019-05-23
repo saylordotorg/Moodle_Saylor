@@ -13,39 +13,6 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
 
     $optionalsubsystems->add(new admin_setting_configcheckbox('enablewebservices', new lang_string('enablewebservices', 'admin'), new lang_string('configenablewebservices', 'admin'), 0));
 
-    $optionalsubsystems->add(new admin_setting_configcheckbox('messaging', new lang_string('messaging', 'admin'), new lang_string('configmessaging','admin'), 1));
-
-    $optionalsubsystems->add(new admin_setting_configcheckbox('messagingallusers',
-        new lang_string('messagingallusers', 'admin'),
-        new lang_string('configmessagingallusers', 'admin'),
-        0)
-    );
-
-    $options = array(
-        DAYSECS => new lang_string('secondstotime86400'),
-        WEEKSECS => new lang_string('secondstotime604800'),
-        2620800 => new lang_string('nummonths', 'moodle', 1),
-        7862400 => new lang_string('nummonths', 'moodle', 3),
-        15724800 => new lang_string('nummonths', 'moodle', 6),
-        0 => new lang_string('never')
-    );
-    $optionalsubsystems->add(new admin_setting_configselect(
-        'messagingdeletereadnotificationsdelay',
-        new lang_string('messagingdeletereadnotificationsdelay', 'admin'),
-        new lang_string('configmessagingdeletereadnotificationsdelay', 'admin'),
-        604800,
-        $options)
-    );
-    $optionalsubsystems->add(new admin_setting_configselect(
-        'messagingdeleteallnotificationsdelay',
-        new lang_string('messagingdeleteallnotificationsdelay', 'admin'),
-        new lang_string('configmessagingdeleteallnotificationsdelay', 'admin'),
-        2620800,
-        $options)
-    );
-
-    $optionalsubsystems->add(new admin_setting_configcheckbox('messagingallowemailoverride', new lang_string('messagingallowemailoverride', 'admin'), new lang_string('configmessagingallowemailoverride','admin'), 0));
-
     $optionalsubsystems->add(new admin_setting_configcheckbox('enablestats', new lang_string('enablestats', 'admin'), new lang_string('configenablestats', 'admin'), 0));
 
     $optionalsubsystems->add(new admin_setting_configcheckbox('enablerssfeeds', new lang_string('enablerssfeeds', 'admin'), new lang_string('configenablerssfeeds', 'admin'), 0));
@@ -81,4 +48,10 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
 
     $optionalsubsystems->add(new admin_setting_configcheckbox('allowstealth', new lang_string('allowstealthmodules'),
         new lang_string('allowstealthmodules_help'), 0, 1, 0));
+
+    $optionalsubsystems->add(new admin_setting_configcheckbox('enablecoursepublishing',
+        new lang_string('enablecoursepublishing', 'hub'), new lang_string('enablecoursepublishing_help', 'hub'), 0));
+
+    $optionalsubsystems->add(new admin_setting_configcheckbox('enableasyncbackup', new lang_string('enableasyncbackup', 'backup'),
+        new lang_string('enableasyncbackup_help', 'backup'), 0, 1, 0));
 }

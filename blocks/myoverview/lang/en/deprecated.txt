@@ -13,3 +13,5 @@ sortbydates,block_myoverview
 timeline,block_myoverview
 viewcoursename,block_myoverview
 privacy:metadata:overviewlasttab,block_myoverview
+nocourses,block_myoverview
+complete,block_myoverview

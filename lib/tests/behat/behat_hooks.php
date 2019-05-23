@@ -110,6 +110,11 @@ class behat_hooks extends behat_base {
     protected static $runningsuite = '';
 
     /**
+     * @var array Array (with tag names in keys) of all tags in current scenario.
+     */
+    protected static $scenariotags;
+
+    /**
      * Hook to capture BeforeSuite event so as to give access to moodle codebase.
      * This will try and catch any exception and exists if anything fails.
      *
@@ -171,7 +176,7 @@ class behat_hooks extends behat_base {
 
         if (!behat_util::is_test_mode_enabled()) {
             throw new behat_stop_exception('Behat only can run if test mode is enabled. More info in ' .
-                behat_command::DOCS_URL . '#Running_tests');
+                behat_command::DOCS_URL);
         }
 
         // Reset all data, before checking for check_server_status.
@@ -298,7 +303,7 @@ class behat_hooks extends behat_base {
             throw new behat_stop_exception('Behat only can modify the test database and the test dataroot!');
         }
 
-        $moreinfo = 'More info in ' . behat_command::DOCS_URL . '#Running_tests';
+        $moreinfo = 'More info in ' . behat_command::DOCS_URL;
         $driverexceptionmsg = 'Selenium server is not running, you need to start it to run tests that involve Javascript. ' . $moreinfo;
         try {
             $session = $this->getSession();
@@ -376,6 +381,14 @@ class behat_hooks extends behat_base {
 
         // Run all test with medium (1024x768) screen size, to avoid responsive problems.
         $this->resize_window('medium');
+
+        // Set up the tags for current scenario.
+        self::fetch_tags_for_scenario($scope);
+
+        // If scenario requires the Moodle app to be running, set this up.
+        if ($this->has_tag('app')) {
+            $this->execute('behat_app::start_scenario');
+        }
     }
 
     /**
@@ -416,6 +429,27 @@ class behat_hooks extends behat_base {
             }
             $this->scenariorunning = true;
         }
+    }
+
+    /**
+     * Sets up the tags for the current scenario.
+     *
+     * @param \Behat\Behat\Hook\Scope\BeforeScenarioScope $scope Scope
+     */
+    protected static function fetch_tags_for_scenario(\Behat\Behat\Hook\Scope\BeforeScenarioScope $scope) {
+        self::$scenariotags = array_flip(array_merge(
+            $scope->getScenario()->getTags(),
+            $scope->getFeature()->getTags()
+        ));
+    }
+
+    /**
+     * Gets the tags for the current scenario
+     *
+     * @return array Array where key is tag name and value is an integer
+     */
+    public static function get_tags_for_scenario() : array {
+        return self::$scenariotags;
     }
 
     /**

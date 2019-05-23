@@ -426,6 +426,8 @@ class qformat_default {
                 );
 
             $question->id = $DB->insert_record('question', $question);
+            $event = \core\event\question_created::create_from_question_instance($question, $this->importcontext);
+            $event->trigger();
 
             if (isset($question->questiontextitemid)) {
                 $question->questiontext = file_save_draft_area_files($question->questiontextitemid,
@@ -613,6 +615,8 @@ class qformat_default {
                 $category->stamp = make_unique_id_code();
                 $category->id = $DB->insert_record('question_categories', $category);
                 $parent = $category->id;
+                $event = \core\event\question_category_created::create_from_question_category_instance($category, $context);
+                $event->trigger();
             }
         }
         return $category;
@@ -937,11 +941,15 @@ class qformat_default {
                 }
             }
 
-            // export the question displaying message
-            $count++;
-
+            // Add the question to result.
             if (!$checkcapabilities || question_has_capability_on($question, 'view')) {
-                $expout .= $this->writequestion($question, $contextid) . "\n";
+                $expquestion = $this->writequestion($question, $contextid);
+                // Don't add anything if witequestion returned nothing.
+                // This will permit qformat plugins to exclude some questions.
+                if ($expquestion !== null) {
+                    $expout .= $expquestion . "\n";
+                    $count++;
+                }
             }
         }
 

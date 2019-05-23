@@ -15,11 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Mobile output class for algebra question type.
+ * Mobile output class for qtype_algebra
  *
- * @package qtype_algebra
- * @copyright 2019 Jean-Michel Vedrine
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    qtype_algebra
+ * @copyright  2019 Jean-Michel Vedrine
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace qtype_algebra\output;
@@ -27,24 +27,29 @@ namespace qtype_algebra\output;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Mobile output class for question type algebra.
- * @copyright 2019 Jean-Michel Vedrine
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * Mobile output class for algebra question type
+ *
+ * @package    qtype_algebra
+ * @copyright  2019 Jean-Michel vedrine
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mobile {
+
     /**
-     * Returns the algebra question view for the mobile app.
+     * Returns the algebra question type for the quiz the mobile app.
      *
      * @return void
      */
-    public static function algebra_view() {
+    public static function mobile_get_algebra() {
         global $CFG;
         return [
-            'templates' => [[
-                'id' => 'main',
-                'html' => file_get_contents($CFG->dirroot . '/question/type/algebra/mobile/algebra.html')
-            ]],
-            'javascript' => file_get_contents($CFG->dirroot . '/question/type/algebra/mobile/algebra.js')
+            'templates' => [
+                [
+                    'id' => 'main',
+                    'html' => file_get_contents($CFG->dirroot .'/question/type/algebra/mobile/qtype-algebra.html')
+                    ]
+            ],
+            'javascript' => file_get_contents($CFG->dirroot . '/question/type/algebra/mobile/mobile.js')
         ];
     }
 }

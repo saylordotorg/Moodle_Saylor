@@ -47,6 +47,9 @@
     <meta name="twitter:image" content="{{opengraph.image}}" />
     {{/opengraph}}
     <!-- End Open Graph -->
+    {{#courseproperties.name}}
+        {{> /course_richsnippet }}
+    {{/courseproperties.name}}
     <!-- Favicons -->
     <link rel="apple-touch-icon" sizes="57x57" href="{{{ config.wwwroot }}}/theme/image.php?theme=saylor&component=theme_saylor&image=favicons%2Fapple-icon-57x57">
     <link rel="apple-touch-icon" sizes="180x180" href="{{{ config.wwwroot }}}/theme/image.php?theme=saylor&component=theme_saylor&image=favicons%2Fapple-touch-icon">

@@ -1,0 +1,62 @@
+/* Prettyify Saylor Grayscale Theme */
+
+.prettyprint {
+  color: #212121;
+  background-color: #EEEEEE;
+  margin-top: .3rem;
+  margin-bottom: .3rem;
+  border-radius: .25rem;
+  padding-top: .1rem;
+  padding-bottom: .1rem;
+  padding-left: .5rem;
+  padding-right: .5rem;
+}
+
+.prettyprint .pln {
+  color: inherit;
+}
+
+.prettyprint .str,
+.prettyprint .lit,
+.prettyprint .atv {
+  color: #2E3DAA;
+}
+
+.prettyprint .kwd {
+  color: #93097D;
+}
+
+.prettyprint .com,
+.prettyprint .dec {
+  color: #5E38BD;
+  font-style: italic;
+}
+
+.prettyprint .typ {
+  color: #294658;
+}
+
+.prettyprint .pun {
+  color: inherit;
+}
+
+.prettyprint .opn {
+  color: inherit;
+}
+
+.prettyprint .clo {
+  color: inherit;
+}
+
+.prettyprint .tag {
+  color: #2E3DAA;
+  font-weight: bold;
+}
+
+.prettyprint .atn {
+  color: inherit;
+}
+
+.que .formulation .prettyprint, .que .outcome .prettyprint, .que .comment .prettyprint {
+  text-shadow: 0 0 0;
+}

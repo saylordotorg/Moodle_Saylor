@@ -105,20 +105,11 @@ class provider implements
             return;
         }
 
-        $params = [
-            'contextid' => $context->id,
-            'contextcourse' => CONTEXT_COURSE,
-        ];
-
         $sql = "SELECT ue.userid as userid
                   FROM {user_enrolments} ue
-                  JOIN {enrol} e
-                       ON e.id = ue.enrolid
-                  JOIN {context} ctx
-                       ON ctx.instanceid = e.courseid
-                       AND ctx.contextlevel = :contextcourse
-                 WHERE ctx.id = :contextid";
-
+                  JOIN {enrol} e ON e.id = ue.enrolid
+                 WHERE e.courseid = ?";
+        $params = [$context->instanceid];
         $userlist->add_from_sql('userid', $sql, $params);
     }
 
@@ -203,12 +194,9 @@ class provider implements
         if ($context->contextlevel == CONTEXT_COURSE) {
             $sql = "SELECT ue.id
                       FROM {user_enrolments} ue
-                      JOIN {enrol} e
-                        ON e.id = ue.enrolid
-                      JOIN {context} ctx
-                        ON ctx.instanceid = e.courseid
-                     WHERE ctx.id = :contextid";
-            $params = ['contextid' => $context->id];
+                      JOIN {enrol} e ON e.id = ue.enrolid
+                     WHERE e.courseid = :courseid";
+            $params = ['courseid' => $context->instanceid];
             $enrolsids = $DB->get_fieldset_sql($sql, $params);
             if (!empty($enrolsids)) {
                 list($insql, $inparams) = $DB->get_in_or_equal($enrolsids, SQL_PARAMS_NAMED);
@@ -232,14 +220,11 @@ class provider implements
 
             $sql = "SELECT ue.id
                       FROM {user_enrolments} ue
-                      JOIN {enrol} e
-                        ON e.id = ue.enrolid
-                      JOIN {context} ctx
-                        ON ctx.instanceid = e.courseid
-                     WHERE ctx.id = :contextid
-                     AND ue.userid {$usersql}";
+                      JOIN {enrol} e ON e.id = ue.enrolid
+                     WHERE e.courseid = :courseid
+                           AND ue.userid {$usersql}";
 
-            $params = ['contextid' => $context->id] + $userparams;
+            $params = ['courseid' => $context->instanceid] + $userparams;
             $enrolsids = $DB->get_fieldset_sql($sql, $params);
 
             if (!empty($enrolsids)) {

@@ -405,6 +405,29 @@ What are the colors of the Olympic medals?
         $this->check_step_count(2);
     }
 
+    public function test_get_letter_hints() {
+        $gapfill = qtype_gapfill_test_helper::make_question2();
+        $gapfill->hints = [
+            new question_hint(1, 'This is the first hint.', FORMAT_HTML),
+            new question_hint(2, 'This is the second hint.', FORMAT_HTML),
+        ];
+        $this->start_attempt_at_question($gapfill, 'interactive', $gapfill->gapstofill);
+        $this->process_submission([ '-submit' => 1, 'p1' => 'cat', 'p2' => 'cat']);
+        $this->process_submission(array('-tryagain' => 1));
+        $qa = $this->quba->get_question_attempt($this->slot);
+        /*normally lots of things in inputattributes */
+        $inputattributes = [];
+        $rightanswer = 'cat';
+        $currentanswer = '';
+        $hint = $gapfill->get_letter_hints($qa, $inputattributes, $rightanswer, $currentanswer);
+        /*The hint is the first letter of the correct answer */
+        $this->assertEquals($hint['value'], 'c');
+        $this->process_submission([ '-submit' => 1, 'p1' => 'cat', 'p2' => 'cat']);
+        $this->process_submission(array('-tryagain' => 1));
+        $hint = $gapfill->get_letter_hints($qa, $inputattributes, $rightanswer, $currentanswer);
+        /* add another letter of the correct answer */
+        $this->assertEquals($hint['value'], 'ca');
+    }
     public function test_interactive_grade_for_blank() {
         /* this is for the scenario where you have multiple fields
          * and each field could take any value. The marking is designed

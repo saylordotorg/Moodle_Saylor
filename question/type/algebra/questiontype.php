@@ -54,10 +54,6 @@ class qtype_algebra extends question_type {
                      );
     }
 
-    public function questionid_column_name() {
-        return 'questionid';
-    }
-
     public function move_files($questionid, $oldcontextid, $newcontextid) {
         parent::move_files($questionid, $oldcontextid, $newcontextid);
         $this->move_files_in_answers($questionid, $oldcontextid, $newcontextid);
@@ -73,7 +69,7 @@ class qtype_algebra extends question_type {
     public function delete_question($questionid, $contextid) {
         global $DB;
         $DB->delete_records('qtype_algebra_options', array('questionid' => $questionid));
-        $DB->delete_records('qtype_algebra_variables', array('question' => $questionid));
+        $DB->delete_records('qtype_algebra_variables', array('questionid' => $questionid));
 
         parent::delete_question($questionid, $contextid);
     }
@@ -87,143 +83,51 @@ class qtype_algebra extends question_type {
      *
      * @param object $question  This holds the information from the editing form,
      *                          it is not a standard question object.
-     * @return array of variable object IDs
      */
     public function save_question_variables($question) {
         global $DB;
-        // Create the results class.
-        $result = new stdClass;
-        // Get all the old answers from the database as an array.
-        if (!$oldvars = $DB->get_records('qtype_algebra_variables', array('question' => $question->id), 'id ASC')) {
-            $oldvars = array();
-        }
-        // Create an array of the variable IDs for the question.
-        $variables = array();
+        // Get all the old variables from the database as an array.
+        $oldvars = $DB->get_records('qtype_algebra_variables',
+                array('questionid' => $question->id), 'id ASC');
 
-        // Loop over all the answers in the question form and write them to the database.
+        // Loop over all the variables in the question form and write them to the database.
         foreach ($question->variable as $key => $varname) {
             // Check to see that there is a variable and skip any which are empty.
             if ($varname == '') {
                 continue;
             }
 
-            // Get the old variable from the array and overwrite what is required, if there
-            // is no old variable then we skip to the 'else' clause.
-            if ($oldvar = array_shift($oldvars)) {  // Existing variable, so reuse it.
-                $var = $oldvar;
-                $var->name = trim($varname);
-                $var->min  = trim($question->varmin[$key]);
-                $var->max  = trim($question->varmax[$key]);
-                // Update the record in the database to denote this change.
-                if (!$DB->update_record('qtype_algebra_variables', $var)) {
-                    throw new Exception("Could not update algebra question variable (id=$var->id)");
-                }
-            } else {
-                // This is a completely new variable so we have to create a new record.
-                $var = new stdClass;
-                $var->name     = trim($varname);
-                $var->question = $question->id;
-                $var->min      = trim($question->varmin[$key]);
-                $var->max      = trim($question->varmax[$key]);
-                // Insert a new record into the database table.
-                if (!$var->id = $DB->insert_record('qtype_algebra_variables', $var)) {
-                    throw new Exception("Could not insert algebra question variable '$varname'!");
-                }
+            // Update an existing variable if possible.
+            $variable = array_shift($oldvars);
+            if (!$variable) {
+                $variable = new stdClass();
+                $variable->questionid = $question->id;
+                $variable->name = '';
+                $variable->min = '';
+                $variable->max = '';
+                $variable->id = $DB->insert_record('qtype_algebra_variables', $variable);
             }
-            // Add the variable ID to the array of IDs.
-            $variables[] = $var->id;
+            $variable->name = trim($varname);
+            $variable->min  = trim($question->varmin[$key]);
+            $variable->max  = trim($question->varmax[$key]);
+            $DB->update_record('qtype_algebra_variables', $variable);
         }   // End loop over variables.
 
         // Delete any left over old variables records.
         foreach ($oldvars as $oldvar) {
             $DB->delete_records('qtype_algebra_variables', array('id' => $oldvar->id));
         }
-        // Finally we are all done so return the result!
-        return $variables;
     }
 
     /**
-     * Saves the questions answers to the database
-     *
-     * This is called by {@link save_question_options()} to save the answers to the question to
-     * the database from the data in the submitted form. This method should probably be in the
-     * questin base class rather than in the algebra subclass since the code is common to multiple
-     * question types and originally comes from the shortanswer question type. The method returns
-     * a list of the answer ID written to the database or throws an exception if an error is detected.
-     *
-     * @param object $question  This holds the information from the editing form,
-     *                          it is not a standard question object.
-     * @return array of answer IDs which were written to the database
+     * Returns true is answer with the $key is empty in the question data and should not be saved in DB.
+     * @param object $questiondata This holds the information from the question editing form or import.
+     * @param int $key A key of the answer in question.
+     * @return bool True if answer shouldn't be saved in DB.
      */
-    public function save_question_answers($question) {
-        global $CFG, $DB;
-
-        $context = $question->context;
-        // Create the results class.
-        $result = new stdClass;
-
-        // Get all the old answers from the database as an array.
-        if (!$oldanswers = $DB->get_records('question_answers', array('question' => $question->id), 'id ASC')) {
-            $oldanswers = array();
-        }
-        // Create an array of the answer IDs for the question.
-        $answers = array();
-        // Set the maximum answer fraction to be -1. We will check this at the end of our
-        // loop over the questions and if it is not 100% (=1.0) then we will flag an error.
-        $maxfraction = -1;
-
-        // Loop over all the answers in the question form and write them to the database.
-        foreach ($question->answer as $key => $answerdata) {
-            // Check for, and ignore, completely blank answer from the form.
-            if (trim($answerdata) == '' && $question->fraction[$key] == 0 &&
-                    html_is_blank($question->feedback[$key]['text'])) {
-                continue;
-            }
-            // Update an existing answer if possible.
-            $answer = array_shift($oldanswers);
-            if (!$answer) {
-                $answer = new stdClass();
-                $answer->question = $question->id;
-                $answer->answer = '';
-                $answer->feedback = '';
-                $answer->feedbackformat = FORMAT_HTML;
-                if (!$answer->id = $DB->insert_record('question_answers', $answer)) {
-                    throw new Exception("Could not create new algebra question answer");
-                }
-            }
-
-            $answer->answer   = trim($answerdata);
-            $answer->fraction = $question->fraction[$key];
-            $answer->feedback = $this->import_or_save_files($question->feedback[$key],
-                    $context, 'question', 'answerfeedback', $answer->id);
-            $answer->feedbackformat = $question->feedback[$key]['format'];
-            if (!$DB->update_record('question_answers', $answer)) {
-                    throw new Exception("Could not update algebra question answer (id=$answer->id)");
-            }
-
-            $answers[] = $answer->id;
-            if ($question->fraction[$key] > $maxfraction) {
-                $maxfraction = $question->fraction[$key];
-            }
-        }     // End loop over answers.
-
-        // Perform sanity check on the maximum fractional grade which should be 100%.
-        if ($maxfraction != 1) {
-            $maxfraction = $maxfraction * 100;
-            throw new Exception(get_string('fractionsnomax', 'quiz', $maxfraction));
-        }
-
-        // Delete any left over old answer records.
-        $fs = get_file_storage();
-        foreach ($oldanswers as $oldanswer) {
-            $fs->delete_area_files($context->id, 'question', 'answerfeedback', $oldanswer->id);
-            $DB->delete_records('question_answers', array('id' => $oldanswer->id));
-        }
-
-        // Finally we are all done so return the result!
-        return $answers;
+    protected function is_answer_empty($questiondata, $key) {
+        return trim($questiondata->answer[$key]) == '';
     }
-
     /**
      * Saves question-type specific options
      *
@@ -240,7 +144,7 @@ class qtype_algebra extends question_type {
         // then add the answers and variables to the database.
         try {
             // First write out all the variables associated with the question.
-            $variables = $this->save_question_variables($question);
+            $this->save_question_variables($question);
 
             // Loop over all the answers in the question form and parse them to generate
             // a parser string. This ensures a constant formatting is stored in the database.
@@ -251,17 +155,16 @@ class qtype_algebra extends question_type {
             }
 
             // Now we need to write out all the answers to the question to the database.
-            $answers = $this->save_question_answers($question);
+            $this->save_question_answers($question);
 
         } catch (Exception $e) {
             // Error when adding answers or variables to the database so create a result class
-            // and put the error string in the error member funtion and then return the class
+            // and put the error string in the error member function and then return the class
             // This keeps us compatible with the existing save_question_options methods.
             $result = new stdClass;
             $result->error = $e->getMessage();
             return $result;
         }
-
         // Process the allowed functions field. This code just sets up the variable, it is saved
         // in the parent class' save_question_options method called at the end of this method
         // Look for the 'all' option. If we find it then set the string to an empty value.
@@ -294,23 +197,24 @@ class qtype_algebra extends question_type {
         // Get the information from the database table. If this fails then immediately bail.
         // Note unlike the save_question_options base class method this method DOES get the question's
         // answers along with any answer extensions.
-        global $DB;
+        global $DB, $OUTPUT;
         if (!parent::get_question_options($question)) {
             return false;
         }
         // Check that we have answers and if not then bail since this question type requires answers.
         if (count($question->options->answers) == 0) {
-            notify('Failed to load question answers from the table question_answers for questionid ' .
-                   $question->id);
+            echo $OUTPUT->notification('Failed to load question answers from the table ' .
+                    'qtype_algebra_answers for questionid ' . $question->id);
+
             return false;
         }
         // Now get the variables from the database as well.
-        $question->options->variables = $DB->get_records('qtype_algebra_variables', array('question' => $question->id));
+        $question->options->variables = $DB->get_records('qtype_algebra_variables', array('questionid' => $question->id));
         // Check that we have variables and if not then bail since this question type requires variables.
 
         if (count($question->options->variables) == 0) {
-            notify('Failed to load question variables from the table qtype_algebra_variables '.
-                   "for questionid $question->id");
+            echo $OUTPUT->notification('Failed to load question variables from the table ' .
+                    'qtype_algebra_variables for questionid ' . $question->id);
             return false;
         }
 

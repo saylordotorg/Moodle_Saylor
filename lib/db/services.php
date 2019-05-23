@@ -74,6 +74,33 @@ $functions = array(
         'ajax'          => true,
         'loginrequired' => false,
     ),
+    'core_backup_get_async_backup_progress' => array(
+        'classname'   => 'core_backup_external',
+        'classpath' => 'backup/externallib.php',
+        'methodname'  => 'get_async_backup_progress',
+        'description' => 'Get the progress of an Asyncronhous backup.',
+        'type'        => 'read',
+        'ajax'          => true,
+        'loginrequired' => true,
+    ),
+    'core_backup_get_async_backup_links_backup' => array(
+        'classname'   => 'core_backup_external',
+        'classpath' => 'backup/externallib.php',
+        'methodname'  => 'get_async_backup_links_backup',
+        'description' => 'Gets the data to use when updating the status table row in the UI for when an async backup completes.',
+        'type'        => 'read',
+        'ajax'          => true,
+        'loginrequired' => true,
+   ),
+   'core_backup_get_async_backup_links_restore' => array(
+        'classname'   => 'core_backup_external',
+        'classpath' => 'backup/externallib.php',
+        'methodname'  => 'get_async_backup_links_restore',
+        'description' => 'Gets the data to use when updating the status table row in the UI for when an async restore completes.',
+        'type'        => 'read',
+        'ajax'          => true,
+        'loginrequired' => true,
+    ),
     'core_badges_get_user_badges' => array(
         'classname'     => 'core_badges_external',
         'methodname'    => 'get_user_badges',
@@ -138,6 +165,7 @@ $functions = array(
         'type' => 'write',
         'capabilities' => 'moodle/calendar:manageentries, moodle/calendar:manageownentries, moodle/calendar:managegroupentries',
         'ajax' => true,
+        'services' => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
     ),
     'core_calendar_create_calendar_events' => array(
         'classname' => 'core_calendar_external',
@@ -215,6 +243,23 @@ $functions = array(
         'type' => 'write',
         'capabilities' => 'moodle/calendar:manageentries, moodle/calendar:manageownentries, moodle/calendar:managegroupentries',
         'ajax' => true,
+        'services' => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
+    ),
+    'core_calendar_get_calendar_access_information' => array(
+        'classname' => 'core_calendar_external',
+        'methodname' => 'get_calendar_access_information',
+        'description' => 'Convenience function to retrieve some permissions/access information for the given course calendar.',
+        'classpath' => 'calendar/externallib.php',
+        'type' => 'read',
+        'services' => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
+    ),
+    'core_calendar_get_allowed_event_types' => array(
+        'classname' => 'core_calendar_external',
+        'methodname' => 'get_allowed_event_types',
+        'description' => 'Get the type of events a user can create in the given course.',
+        'classpath' => 'calendar/externallib.php',
+        'type' => 'read',
+        'services' => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
     ),
     'core_cohort_add_cohort_members' => array(
         'classname' => 'core_cohort_external',
@@ -874,6 +919,24 @@ $functions = array(
         'type' => 'write',
         'capabilities' => 'moodle/course:managegroups'
     ),
+    'core_message_mute_conversations' => array(
+        'classname' => 'core_message_external',
+        'methodname' => 'mute_conversations',
+        'classpath' => 'message/externallib.php',
+        'description' => 'Mutes a list of conversations',
+        'type' => 'write',
+        'ajax' => true,
+        'services' => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
+    ),
+    'core_message_unmute_conversations' => array(
+        'classname' => 'core_message_external',
+        'methodname' => 'unmute_conversations',
+        'classpath' => 'message/externallib.php',
+        'description' => 'Unmutes a list of conversations',
+        'type' => 'write',
+        'ajax' => true,
+        'services' => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
+    ),
     'core_message_block_user' => array(
         'classname' => 'core_message_external',
         'methodname' => 'block_user',
@@ -1125,6 +1188,15 @@ $functions = array(
         'services' => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
         'ajax' => true
     ),
+    'core_message_get_self_conversation' => array(
+        'classname' => 'core_message_external',
+        'methodname' => 'get_self_conversation',
+        'classpath' => 'message/externallib.php',
+        'description' => 'Retrieve a self-conversation for a user',
+        'type' => 'read',
+        'services' => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
+        'ajax' => true
+    ),
     'core_message_get_messages' => array(
         'classname' => 'core_message_external',
         'methodname' => 'get_messages',
@@ -1335,6 +1407,16 @@ $functions = array(
         'ajax' => true,
         'services' => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
     ),
+    'core_message_delete_message_for_all_users' => array(
+        'classname' => 'core_message_external',
+        'methodname' => 'delete_message_for_all_users',
+        'classpath' => 'message/externallib.php',
+        'description' => 'Deletes a message for all users.',
+        'type' => 'write',
+        'capabilities' => 'moodle/site:deleteanymessage',
+        'ajax' => true,
+        'services' => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
+    ),
     'core_notes_create_notes' => array(
         'classname' => 'core_notes_external',
         'methodname' => 'create_notes',
@@ -1392,6 +1474,14 @@ $functions = array(
         'classname' => 'core\output\external',
         'methodname' => 'load_template',
         'description' => 'Load a template for a renderable',
+        'type' => 'read',
+        'loginrequired' => false,
+        'ajax' => true,
+    ),
+    'core_output_load_template_with_dependencies' => array(
+        'classname' => 'core\output\external',
+        'methodname' => 'load_template_with_dependencies',
+        'description' => 'Load a template and its dependencies for a renderable',
         'type' => 'read',
         'loginrequired' => false,
         'ajax' => true,
@@ -1472,6 +1562,7 @@ $functions = array(
         'description' => 'Gets tag index page for one tag and one tag area',
         'type' => 'read',
         'ajax' => true,
+        'services' => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
     ),
     'core_tag_get_tags' => array(
         'classname' => 'core_tag_external',
@@ -1486,6 +1577,34 @@ $functions = array(
         'description' => 'Updates tags',
         'type' => 'write',
         'ajax' => true,
+    ),
+    'core_tag_get_tagindex_per_area' => array(
+        'classname' => 'core_tag_external',
+        'methodname' => 'get_tagindex_per_area',
+        'description' => 'Gets tag index page per different areas.',
+        'type' => 'read',
+        'services' => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
+    ),
+    'core_tag_get_tag_areas' => array(
+        'classname' => 'core_tag_external',
+        'methodname' => 'get_tag_areas',
+        'description' => 'Retrieves existing tag areas.',
+        'type' => 'read',
+        'services' => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
+    ),
+    'core_tag_get_tag_collections' => array(
+        'classname' => 'core_tag_external',
+        'methodname' => 'get_tag_collections',
+        'description' => 'Retrieves existing tag collections.',
+        'type' => 'read',
+        'services' => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
+    ),
+    'core_tag_get_tag_cloud' => array(
+        'classname' => 'core_tag_external',
+        'methodname' => 'get_tag_cloud',
+        'description' => 'Retrieves a tag cloud for the given collection and/or query search.',
+        'type' => 'read',
+        'services' => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
     ),
     'core_update_inplace_editable' => array(
         'classname' => 'core_external',
@@ -2425,6 +2544,54 @@ $functions = array(
         'type'        => 'read',
         'services'    => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
     ),
+    'core_customfield_delete_field' => array(
+        'classname'   => 'core_customfield_external',
+        'methodname'  => 'delete_field',
+        'classpath'   => 'customfield/externallib.php',
+        'description' => 'Deletes an entry',
+        'type'        => 'write',
+        'ajax'        => 'true'
+    ),
+    'core_customfield_reload_template' => array(
+        'classname'   => 'core_customfield_external',
+        'methodname'  => 'reload_template',
+        'classpath'   => 'customfield/externallib.php',
+        'description' => 'Reloads template',
+        'type'        => 'read',
+        'ajax'        => 'true'
+    ),
+    'core_customfield_create_category' => array(
+        'classname'   => 'core_customfield_external',
+        'methodname'  => 'create_category',
+        'classpath'   => 'customfield/externallib.php',
+        'description' => 'Creates a new category',
+        'type'        => 'write',
+        'ajax'        => 'true'
+    ),
+    'core_customfield_delete_category' => array(
+        'classname'   => 'core_customfield_external',
+        'methodname'  => 'delete_category',
+        'classpath'   => 'customfield/externallib.php',
+        'description' => 'Deletes a category',
+        'type'        => 'write',
+        'ajax'        => 'true'
+    ),
+    'core_customfield_move_field'   => array(
+        'classname'   => 'core_customfield_external',
+        'methodname'  => 'move_field',
+        'classpath'   => 'customfield/externallib.php',
+        'description' => 'Drag and drop',
+        'type'        => 'write',
+        'ajax'        => 'true'
+    ),
+    'core_customfield_move_category' => array(
+        'classname'   => 'core_customfield_external',
+        'methodname'  => 'move_category',
+        'classpath'   => 'customfield/externallib.php',
+        'description' => 'Drag and drop categories',
+        'type'        => 'write',
+        'ajax'        => 'true'
+    )
 );
 
 $services = array(
