@@ -83,10 +83,10 @@ var result = {
             console.warn('Aborting because of no question received.');
             return that.CoreQuestionHelperProvider.showComponentError(that.onAbort);
         }
-        const div = document.createElement('div');
+        var div = document.createElement('div');
         div.innerHTML = this.question.html;
          // Get question questiontext.
-        const questiontext = div.querySelector('.qtext');
+        var questiontext = div.querySelector('.qtext');
 
         // Replace Moodle's correct/incorrect and feedback classes with our own.
         this.CoreQuestionHelperProvider.replaceCorrectnessClasses(div);
@@ -96,7 +96,7 @@ var result = {
         this.CoreQuestionHelperProvider.treatCorrectnessIcons(div);
 
          // Get answeroptions/draggables.
-        const answeroptions = div.querySelector('.answeroptions');
+        var answeroptions = div.querySelector('.answeroptions');
 
         if (div.querySelector('.readonly') !== null) {
             this.question.readOnly = true;
@@ -126,6 +126,8 @@ var result = {
             return this.CoreQuestionHelperProvider.showComponentError(this.onAbort);
         }
 
+        // @codingStandardsIgnoreStart
+        // see MDL-64516
         // Wait for the DOM to be rendered.
         setTimeout(()=> {
             /* Set isdragdrop to true if it is a dragdrop question. This will then be used
@@ -139,6 +141,7 @@ var result = {
             }
 
         });
+        // @codingStandardsIgnoreEnd
         return true;
     }
 };

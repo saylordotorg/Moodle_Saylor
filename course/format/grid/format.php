@@ -218,7 +218,7 @@ if ($gfsettings['sectiontitlesummarybackgroundcolour'][0] != '#') {
 echo $gfsettings['sectiontitlesummarybackgroundcolour'].';';
 echo '}';
 
-echo '.course-content ul.gridicons li .gridicon_link .image_holder .tooltip {';
+echo '.course-content ul.gridicons li .gridicon_link .tooltip.in {';
 echo 'opacity: '.$gfsettings['sectiontitlesummarybackgroundopacity'].';';
 echo '}';
 

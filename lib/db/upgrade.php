@@ -3056,5 +3056,27 @@ function xmldb_main_upgrade($oldversion) {
         upgrade_main_savepoint(true, 2018120303.05);
     }
 
+    if ($oldversion < 2018120303.16) {
+        // Delete all stale favourite records which were left behind when a course was deleted.
+        $params = ['component' => 'core_message', 'itemtype' => 'message_conversations'];
+        $sql = "SELECT fav.id as id
+                  FROM {favourite} fav
+             LEFT JOIN {context} ctx ON (ctx.id = fav.contextid)
+                 WHERE fav.component = :component
+                       AND fav.itemtype = :itemtype
+                       AND ctx.id IS NULL";
+
+        if ($records = $DB->get_fieldset_sql($sql, $params)) {
+            // Just for safety, delete by chunks.
+            $chunks = array_chunk($records, 1000);
+            foreach ($chunks as $chunk) {
+                list($insql, $inparams) = $DB->get_in_or_equal($chunk);
+                $DB->delete_records_select('favourite', "id $insql", $inparams);
+            }
+        }
+
+        upgrade_main_savepoint(true, 2018120303.16);
+    }
+
     return true;
 }

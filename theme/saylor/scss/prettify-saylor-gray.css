@@ -1,8 +1,15 @@
-/* Prettyify Solarized (Dark) Theme - Taken from: https://css-tricks.com/snippets/css/solarized-theme-for-codemirror-and-prettify/ */
+/* Prettyify Saylor Grayscale Theme */
 
 .prettyprint {
-  color: #839496;
-  background-color: #002b36;
+  color: #212121;
+  background-color: #EEEEEE;
+  margin-top: .3rem;
+  margin-bottom: .3rem;
+  border-radius: .25rem;
+  padding-top: .1rem;
+  padding-bottom: .1rem;
+  padding-left: .5rem;
+  padding-right: .5rem;
 }
 
 .prettyprint .pln {
@@ -12,21 +19,21 @@
 .prettyprint .str,
 .prettyprint .lit,
 .prettyprint .atv {
-  color: #2aa198;
+  color: #2E3DAA;
 }
 
 .prettyprint .kwd {
-  color: #268bd2;
+  color: #93097D;
 }
 
 .prettyprint .com,
 .prettyprint .dec {
-  color: #586e75;
+  color: #5E38BD;
   font-style: italic;
 }
 
 .prettyprint .typ {
-  color: #b58900;
+  color: #294658;
 }
 
 .prettyprint .pun {
@@ -42,7 +49,7 @@
 }
 
 .prettyprint .tag {
-  color: #268bd2;
+  color: #2E3DAA;
   font-weight: bold;
 }
 

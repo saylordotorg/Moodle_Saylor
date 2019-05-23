@@ -1,5 +1,5 @@
-/*!
- * jQuery UI Touch Punch Improved 0.3.1
+/*
+ * JQuery UI Touch Punch Improved 0.3.1
  *
  *
  * Copyright 2013, Chris Hutchinson <chris@brushd.com>
@@ -10,17 +10,17 @@
  * jquery.ui.widget.js
  * jquery.ui.mouse.js
  */
-(function( factory ) {
-    if ( typeof define === "function" && define.amd ) {
+(function(factory) {
+    if (typeof define === "function" && define.amd) {
 
         // AMD. Register as an anonymous module.
-        define([ "jquery", "jqueryui" ], factory );
+        define(["jquery", "jqueryui"], factory);
     } else {
 
         // Browser globals.
-        factory( window.jQuery );
+        factory(window.jQuery);
     }
-}(function ($) {
+}(function($) {
     var pointerEnabled = window.navigator.pointerEnabled
         || window.navigator.msPointerEnabled;
 
@@ -36,7 +36,11 @@
         _mouseInit = mouseProto._mouseInit,
         touchHandled;
 
-    // See http://stackoverflow.com/a/12714084/220825.
+    /**
+     *  See http://stackoverflow.com/a/12714084/220825.
+     * @param {*} touch
+     * @returns {object}
+     */
     function fixTouch(touch) {
         var winPageX = window.pageXOffset,
             winPageY = window.pageYOffset,
@@ -68,7 +72,7 @@
      * @param {Object} event A touch event
      * @param {String} simulatedType The corresponding mouse event
      */
-    function simulateMouseEvent (event, simulatedType) {
+    function simulateMouseEvent(event, simulatedType) {
         // Ignore multi-touch events.
         if ((!pointerEnabled && event.originalEvent.touches.length > 1) || (pointerEnabled && !event.isPrimary)) {
             return;
@@ -112,7 +116,7 @@
      * Handle the jQuery UI widget's touchstart events
      * @param {Object} event The widget element's touchstart event
      */
-    mouseProto._touchStart = function (event) {
+    mouseProto._touchStart = function(event) {
         var self = this;
 
         // Ignore the event if another widget is already being handled.
@@ -140,7 +144,7 @@
      * Handle the jQuery UI widget's touchmove events
      * @param {Object} event The document's touchmove event
      */
-    mouseProto._touchMove = function (event) {
+    mouseProto._touchMove = function(event) {
         // Ignore event if not handled.
         if (!touchHandled) {
             return;
@@ -157,7 +161,7 @@
      * Handle the jQuery UI widget's touchend events
      * @param {Object} event The document's touchend event
      */
-    mouseProto._touchEnd = function (event) {
+    mouseProto._touchEnd = function(event) {
         // Ignore event if not handled.
         if (!touchHandled) {
             return;
@@ -185,7 +189,7 @@
      * translate touch events to mouse events and pass them to the widget's
      * original mouse event handling methods.
      */
-    mouseProto._mouseInit = function () {
+    mouseProto._mouseInit = function() {
         var self = this;
 
         self.element.on({

@@ -28,7 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 $string['pluginname'] = 'Saylor';
 
 $string['advancedsettings'] = 'Advanced settings';
-$string['bannerdescription'] = 'Build new skills or work towards a degree at your own pace with free Saylor Academy college courses.';
+$string['bannerdescription'] = 'Build new skills or work toward a degree at your own pace with free Saylor Academy college courses.';
 $string['choosereadme'] = 'Theme Saylor is a child theme of Boost.';                
 $string['configtitle'] = 'Saylor theme settings';
 $string['generalsettings'] = 'General settings';

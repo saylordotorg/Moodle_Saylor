@@ -32,7 +32,7 @@
 namespace local_affiliations\event;
 defined('MOODLE_INTERNAL') || die();
 
-class affiliate_deleted extends base {
+class affiliate_deleted extends \core\event\base {
 
     /**
      * Init method.

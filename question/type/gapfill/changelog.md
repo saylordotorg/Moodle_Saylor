@@ -1,3 +1,8 @@
+### Version 1.976 of the Moodle Gapfill question type May 2019
+Updated icon design to include a hint of color and in svg format.
+More code compliance tweeks.
+Increased number of english language sample questions to over 450
+
 ### Version 1.975 of the Moodle Gapfill question type Jan 2019
 Added a collection of sample english language questions in 
 examples\en\english_language.xml that can be imported.

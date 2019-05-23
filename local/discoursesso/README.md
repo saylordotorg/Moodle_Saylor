@@ -49,5 +49,10 @@ Optional:
 #### Moodle Setup
 
 1. Navigate to the DiscourseSSO settings page from the administration block.
-2. Enter the previously generated secret into the "Shared SSO Secret Key" field. Make sure it matches the secret entered into Discourse!
-3. Enter your Discourse site URL into the "Discourse URL field"
+2. Enter the Discourse API key into the API key field. This can be found in your Discourse server's settings under Admin->API.
+3. Enter the previously generated secret into the "Shared SSO Secret Key" field. Make sure it matches the secret entered into Discourse!
+4. Enter your Discourse site URL into the "Discourse URL field"
+
+##### Cohorts
+
+Select Moodle cohorts can now be synced as Discourse groups. On the "Assign cohorts" page under the DiscourseSSO settings, search through your Moodle cohorts and add any that you would like to sync. This will create a new group in Discourse. Any users who are a member of that cohort will be added to the Discourse group when they log in.
