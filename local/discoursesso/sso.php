@@ -24,7 +24,7 @@
 */
 
 require_once('../../config.php');
-
+require_once('./locallib.php');
 require_once __DIR__ . '/vendor/discourse-php/src/SSOHelper.php';
 
 global $CFG, $DB, $USER;
@@ -101,9 +101,9 @@ $user = $DB->get_record('user', array('id' => $USER->id));
 $userdescription = format_text($user->description, $user->descriptionformat);
 
 $extraparams = array(
-    'username' => $USER->username,
-    'name'     => fullname($USER, true),
-    'bio'      => $userdescription
+    'username'      => $USER->username,
+    'name'          => fullname($USER, true),
+    'bio'           => $userdescription
 );
 
 // Generate user avatar url
@@ -116,6 +116,23 @@ if (($userpicture->user->picture > 0) || !empty($CFG->enablegravatar)) {
 // Add the avatar if set.
 if (isset($useravatar)) {
     $extraparams['avatar_url'] = $useravatar;
+    $extraparams['avatar_force_update'] = 'true';
+}
+
+// Get the user's locale after converting, if enabled.
+if (get_config('local_discoursesso', 'locale')) {
+    $discourselocale = get_discourse_locale($user->lang);
+
+    $extraparams['locale'] = $discourselocale;
+    $extraparams['locale_force_update'] = 'true';
+}
+
+// Sync admin status, if enabled.
+if (get_config('local_discoursesso', 'adminsync')) {
+    // Check if this user is an admin.
+    if (is_siteadmin()) {
+        $extraparams['admin']='true';
+    }
 }
 
 // Build query string and redirect back to the Discourse site.
