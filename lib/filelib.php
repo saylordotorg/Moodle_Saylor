@@ -29,6 +29,12 @@ defined('MOODLE_INTERNAL') || die();
  */
 define('BYTESERVING_BOUNDARY', 's1k2o3d4a5k6s7');
 
+
+/**
+ * Do not process file merging when working with draft area files.
+ */
+define('IGNORE_FILE_MERGE', -1);
+
 /**
  * Unlimited area size constant
  */
@@ -464,7 +470,7 @@ function file_prepare_draft_area(&$draftitemid, $contextid, $component, $fileare
  * @param   array   $options
  *          bool    $options.forcehttps Force the user of https
  *          bool    $options.reverse Reverse the behaviour of the function
- *          bool    $options.includetoken Use a token for authentication
+ *          mixed   $options.includetoken Use a token for authentication. True for current user, int value for other user id.
  *          string  The processed text.
  */
 function file_rewrite_pluginfile_urls($text, $file, $contextid, $component, $filearea, $itemid, array $options=null) {
@@ -477,7 +483,8 @@ function file_rewrite_pluginfile_urls($text, $file, $contextid, $component, $fil
 
     $baseurl = "{$CFG->wwwroot}/{$file}";
     if (!empty($options['includetoken'])) {
-        $token = get_user_key('core_files', $USER->id);
+        $userid = $options['includetoken'] === true ? $USER->id : $options['includetoken'];
+        $token = get_user_key('core_files', $userid);
         $finalfile = basename($file);
         $tokenfile = "token{$finalfile}";
         $file = substr($file, 0, strlen($file) - strlen($finalfile)) . $tokenfile;
@@ -888,6 +895,7 @@ function file_remove_editor_orphaned_files($editor) {
  *
  * @category files
  * @param int $draftitemid the id of the primary draft area.
+ *            When set to -1 (probably, by a WebService) it won't process file merging, keeping the original state of the file area.
  * @param int $usercontextid the user's context id.
  * @param string $text some html content that needs to have files copied to the correct draft area.
  * @param bool $forcehttps force https urls.
@@ -896,6 +904,11 @@ function file_remove_editor_orphaned_files($editor) {
  */
 function file_merge_draft_areas($draftitemid, $usercontextid, $text, $forcehttps = false) {
     if (is_null($text)) {
+        return null;
+    }
+
+    // Do not merge files, leave it as it was.
+    if ($draftitemid === IGNORE_FILE_MERGE) {
         return null;
     }
 
@@ -1015,6 +1028,7 @@ function file_copy_file_to_file_area($file, $filename, $itemid) {
  * @global stdClass $USER
  * @param int $draftitemid the id of the draft area to use. Normally obtained
  *      from file_get_submitted_draft_itemid('elementname') or similar.
+ *      When set to -1 (probably, by a WebService) it won't process file merging, keeping the original state of the file area.
  * @param int $contextid This parameter and the next two identify the file area to save to.
  * @param string $component
  * @param string $filearea indentifies the file area.
@@ -1027,6 +1041,11 @@ function file_copy_file_to_file_area($file, $filename, $itemid) {
  */
 function file_save_draft_area_files($draftitemid, $contextid, $component, $filearea, $itemid, array $options=null, $text=null, $forcehttps=false) {
     global $USER;
+
+    // Do not merge files, leave it as it was.
+    if ($draftitemid === IGNORE_FILE_MERGE) {
+        return null;
+    }
 
     $usercontext = context_user::instance($USER->id);
     $fs = get_file_storage();
@@ -4218,7 +4237,7 @@ function file_pluginfile($relativepath, $forcedownload, $preview = null, $offlin
 
         } else if ($filearea == GRADE_FEEDBACK_FILEAREA || $filearea == GRADE_HISTORY_FEEDBACK_FILEAREA) {
             if ($context->contextlevel != CONTEXT_MODULE) {
-                send_file_not_found;
+                send_file_not_found();
             }
 
             require_login($course, false);
@@ -4608,11 +4627,8 @@ function file_pluginfile($relativepath, $forcedownload, $preview = null, $offlin
             }
 
             // Check if user can view this category.
-            if (!has_capability('moodle/category:viewhiddencategories', $context)) {
-                $coursecatvisible = $DB->get_field('course_categories', 'visible', array('id' => $context->instanceid));
-                if (!$coursecatvisible) {
-                    send_file_not_found();
-                }
+            if (!core_course_category::get($context->instanceid, IGNORE_MISSING)) {
+                send_file_not_found();
             }
 
             $filename = array_pop($args);

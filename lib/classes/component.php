@@ -86,6 +86,8 @@ class core_component {
         'Phpml' => 'lib/mlbackend/php/phpml/src/Phpml',
         'PHPMailer\\PHPMailer' => 'lib/phpmailer/src',
         'RedeyeVentures\\GeoPattern' => 'lib/geopattern-php/GeoPattern',
+        'MongoDB' => 'cache/stores/mongodb/MongoDB',
+        'Firebase\\JWT' => 'lib/php-jwt/src',
     );
 
     /**
@@ -436,6 +438,7 @@ $cache = '.var_export($cache, true).';
             'countries'   => null,
             'course'      => $CFG->dirroot.'/course',
             'currencies'  => null,
+            'customfield' => $CFG->dirroot.'/customfield',
             'dbtransfer'  => null,
             'debug'       => null,
             'editor'      => $CFG->dirroot.'/lib/editor',
@@ -504,6 +507,7 @@ $cache = '.var_export($cache, true).';
             'mod'           => $CFG->dirroot.'/mod',
             'auth'          => $CFG->dirroot.'/auth',
             'calendartype'  => $CFG->dirroot.'/calendar/type',
+            'customfield'   => $CFG->dirroot.'/customfield/field',
             'enrol'         => $CFG->dirroot.'/enrol',
             'message'       => $CFG->dirroot.'/message/output',
             'block'         => $CFG->dirroot.'/blocks',
@@ -920,32 +924,38 @@ $cache = '.var_export($cache, true).';
      *
      * e.g. get_component_classes_in_namespace('mod_forum', 'event')
      *
-     * @param string $component A valid moodle component (frankenstyle)
-     * @param string $namespace Namespace from the component name or empty if all $component namespace classes.
-     * @return array The full class name as key and the class path as value.
+     * @param string|null $component A valid moodle component (frankenstyle) or null if searching all components
+     * @param string $namespace Namespace from the component name or empty string if all $component classes.
+     * @return array The full class name as key and the class path as value, empty array if $component is `null`
+     * and $namespace is empty.
      */
-    public static function get_component_classes_in_namespace($component, $namespace = '') {
+    public static function get_component_classes_in_namespace($component = null, $namespace = '') {
 
-        $component = self::normalize_componentname($component);
-
-        if ($namespace) {
-
-            // We will add them later.
-            $namespace = trim($namespace, '\\');
-
-            // We need add double backslashes as it is how classes are stored into self::$classmap.
-            $namespace = implode('\\\\', explode('\\', $namespace));
-            $namespace = $namespace . '\\\\';
-        }
-
-        $regex = '|^' . $component . '\\\\' . $namespace . '|';
-        $it = new RegexIterator(new ArrayIterator(self::$classmap), $regex, RegexIterator::GET_MATCH, RegexIterator::USE_KEY);
-
-        // We want to be sure that they exist.
         $classes = array();
-        foreach ($it as $classname => $classpath) {
-            if (class_exists($classname)) {
-                $classes[$classname] = $classpath;
+
+        // Only look for components if a component name is set or a namespace is set.
+        if (isset($component) || !empty($namespace)) {
+
+            // If a component parameter value is set we only want to look in that component.
+            // Otherwise we want to check all components.
+            $component = (isset($component)) ? self::normalize_componentname($component) : '\w+';
+            if ($namespace) {
+
+                // We will add them later.
+                $namespace = trim($namespace, '\\');
+
+                // We need add double backslashes as it is how classes are stored into self::$classmap.
+                $namespace = implode('\\\\', explode('\\', $namespace));
+                $namespace = $namespace . '\\\\';
+            }
+            $regex = '|^' . $component . '\\\\' . $namespace . '|';
+            $it = new RegexIterator(new ArrayIterator(self::$classmap), $regex, RegexIterator::GET_MATCH, RegexIterator::USE_KEY);
+
+            // We want to be sure that they exist.
+            foreach ($it as $classname => $classpath) {
+                if (class_exists($classname)) {
+                    $classes[$classname] = $classpath;
+                }
             }
         }
 
@@ -1139,6 +1149,17 @@ $cache = '.var_export($cache, true).';
      * @return string sha1 hash
      */
     public static function get_all_versions_hash() {
+        return sha1(serialize(self::get_all_versions()));
+    }
+
+    /**
+     * Returns hash of all versions including core and all plugins.
+     *
+     * This is relatively slow and not fully cached, use with care!
+     *
+     * @return array as (string)plugintype_pluginname => (int)version
+     */
+    public static function get_all_versions() : array {
         global $CFG;
 
         self::init();
@@ -1172,7 +1193,7 @@ $cache = '.var_export($cache, true).';
             }
         }
 
-        return sha1(serialize($versions));
+        return $versions;
     }
 
     /**

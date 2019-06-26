@@ -58,6 +58,7 @@ function(
         BLOCKED_ICON_CONTAINER: '[data-region="contact-icon-blocked"]',
         LAST_MESSAGE: '[data-region="last-message"]',
         LAST_MESSAGE_DATE: '[data-region="last-message-date"]',
+        MUTED_ICON_CONTAINER: '[data-region="muted-icon-container"]',
         UNREAD_COUNT: '[data-region="unread-count"]',
         SECTION_TOTAL_COUNT: '[data-region="section-total-count"]',
         SECTION_TOTAL_COUNT_CONTAINER: '[data-region="section-total-count-container"]',
@@ -209,19 +210,27 @@ function(
                 name: conversation.name,
                 subname: conversation.subname,
                 unreadcount: conversation.unreadcount,
+                ismuted: conversation.ismuted,
                 lastmessagedate: lastMessage ? lastMessage.timecreated : null,
                 sentfromcurrentuser: lastMessage ? lastMessage.useridfrom == userId : null,
                 lastmessage: lastMessage ? $(lastMessage.text).text() || lastMessage.text : null
             };
 
-            if (conversation.type == MessageDrawerViewConversationContants.CONVERSATION_TYPES.PRIVATE) {
-                var otherUser = conversation.members.reduce(function(carry, member) {
+            var otherUser = null;
+            if (conversation.type == MessageDrawerViewConversationContants.CONVERSATION_TYPES.SELF) {
+                // Self-conversations have only one member.
+                otherUser = conversation.members[0];
+            } else if (conversation.type == MessageDrawerViewConversationContants.CONVERSATION_TYPES.PRIVATE) {
+                // For private conversations, remove the current userId from the members to get the other user.
+                otherUser = conversation.members.reduce(function(carry, member) {
                     if (!carry && member.id != userId) {
                         carry = member;
                     }
                     return carry;
                 }, null);
+            }
 
+            if (otherUser !== null) {
                 formattedConversation.userid = otherUser.id;
                 formattedConversation.showonlinestatus = otherUser.showonlinestatus;
                 formattedConversation.isonline = otherUser.isonline;
@@ -240,25 +249,54 @@ function(
             return formattedConversation;
         });
 
+        formattedConversations.forEach(function(conversation) {
+            if (new Date().toDateString() == new Date(conversation.lastmessagedate * 1000).toDateString()) {
+                conversation.istoday = true;
+            }
+        });
+
         return Templates.render(TEMPLATES.CONVERSATIONS_LIST, {conversations: formattedConversations});
     };
 
     /**
      * Build the callback to load conversations.
      *
-     * @param  {Number} type The conversation type.
-     * @param  {Bool} includeFavourites Include/exclude favourites.
+     * @param  {Array|null} types The conversation types for this section.
+     * @param  {bool} includeFavourites Include/exclude favourites.
      * @param  {Number} offset Result offset
      * @return {Function}
      */
-    var getLoadCallback = function(type, includeFavourites, offset) {
+    var getLoadCallback = function(types, includeFavourites, offset) {
+        // Note: This function is a bit messy because we've added the concept of loading
+        // multiple conversations types (e.g. private + self) at once but haven't properly
+        // updated the web service to accept an array of types. Instead we've added a new
+        // parameter for the self type which means we can only ever load self + other type.
+        // This should be improved to make it more extensible in the future. Adding new params
+        // for each type isn't very scalable.
+        var type = null;
+        // Include self conversations in the results by default.
+        var includeSelfConversations = true;
+        if (types && types.length) {
+            // Just get the conversation types that aren't "self" for now.
+            var nonSelfConversationTypes = types.filter(function(candidate) {
+                return candidate != MessageDrawerViewConversationContants.CONVERSATION_TYPES.SELF;
+            });
+            // If we're specifically asking for a list of types that doesn't include the self
+            // conversations then we don't need to include them.
+            includeSelfConversations = types.length != nonSelfConversationTypes.length;
+            // As mentioned above the webservice is currently limited to loading one type at a
+            // time (plus self conversations) so let's hope we never change this.
+            type = nonSelfConversationTypes[0];
+        }
+
         return function(root, userId) {
             return MessageRepository.getConversations(
                     userId,
                     type,
                     LOAD_LIMIT + 1,
                     offset,
-                    includeFavourites
+                    includeFavourites,
+                    includeSelfConversations
                 )
                 .then(function(response) {
                     var conversations = response.conversations;
@@ -370,6 +408,24 @@ function(
     };
 
     /**
+     * Show the conversation is muted icon.
+     *
+     * @param  {Object} conversationElement The conversation element.
+     */
+    var muteConversation = function(conversationElement) {
+        conversationElement.find(SELECTORS.MUTED_ICON_CONTAINER).removeClass('hidden');
+    };
+
+    /**
+     * Hide the conversation is muted icon.
+     *
+     * @param  {Object} conversationElement The conversation element.
+     */
+    var unmuteConversation = function(conversationElement) {
+        conversationElement.find(SELECTORS.MUTED_ICON_CONTAINER).addClass('hidden');
+    };
+
+    /**
      * Show the contact is blocked icon.
      *
      * @param  {Object} conversationElement The conversation element.
@@ -408,6 +464,7 @@ function(
 
         // Cache the conversation.
         loadedConversationsById[conversation.id] = conversation;
+
         return render([conversation], userId)
             .then(function(html) {
                 var contentContainer = LazyLoadList.getContentContainer(root);
@@ -455,13 +512,31 @@ function(
     /**
      * Listen to, and handle events in this section.
      *
+     * @param {String} namespace Unique identifier for the Routes
      * @param {Object} root The section container element.
      * @param {Function} loadCallback The callback to load items.
-     * @param {Number} type The conversation type for this section
-     * @param {Bool} includeFavourites If this section includes favourites
+     * @param {Array|null} types The conversation types for this section
+     * @param {bool} includeFavourites If this section includes favourites
+     * @param {String} fromPanel Routing argument to send if the section is loaded in message index left panel.
      */
-    var registerEventListeners = function(root, loadCallback, type, includeFavourites) {
+    var registerEventListeners = function(namespace, root, loadCallback, types, includeFavourites, fromPanel) {
         var listRoot = LazyLoadList.getRoot(root);
+        var conversationBelongsToThisSection = function(conversation) {
+            // Make sure the type is an int so that the index of check matches correctly.
+            var conversationType = parseInt(conversation.type, 10);
+            if (
+                // If the conversation type isn't one this section cares about then we can ignore it.
+                (types && types.indexOf(conversationType) < 0) ||
+                // If this is the favourites section and the conversation isn't a favourite then ignore it.
+                (includeFavourites && !conversation.isFavourite) ||
+                // If this section doesn't include favourites and the conversation is a favourite then ignore it.
+                (!includeFavourites && conversation.isFavourite)
+            ) {
+                return false;
+            }
+
+            return true;
+        };
 
         // Set the minimum height of the section to the height of the toggle. This
         // smooths out the collapse animation.
@@ -493,17 +568,30 @@ function(
 
         PubSub.subscribe(MessageDrawerEvents.CONTACT_UNBLOCKED, function(userId) {
             var conversationElement = getConversationElementFromUserId(root, userId);
+
             if (conversationElement.length) {
                 unblockContact(conversationElement);
             }
         });
 
+        PubSub.subscribe(MessageDrawerEvents.CONVERSATION_SET_MUTED, function(conversation) {
+            var conversationId = conversation.id;
+            var conversationElement = getConversationElement(root, conversationId);
+            if (conversationElement.length) {
+                muteConversation(conversationElement);
+            }
+        });
+
+        PubSub.subscribe(MessageDrawerEvents.CONVERSATION_UNSET_MUTED, function(conversation) {
+            var conversationId = conversation.id;
+            var conversationElement = getConversationElement(root, conversationId);
+            if (conversationElement.length) {
+                unmuteConversation(conversationElement);
+            }
+        });
+
         PubSub.subscribe(MessageDrawerEvents.CONVERSATION_NEW_LAST_MESSAGE, function(conversation) {
-            if (
-                (type && conversation.type != type) ||
-                (includeFavourites && !conversation.isFavourite) ||
-                (!includeFavourites && conversation.isFavourite)
-            ) {
+            if (!conversationBelongsToThisSection(conversation)) {
                 return;
             }
 
@@ -542,7 +630,7 @@ function(
 
         PubSub.subscribe(MessageDrawerEvents.CONVERSATION_SET_FAVOURITE, function(conversation) {
             var conversationElement = null;
-            if (includeFavourites && (!type || type == conversation.type)) {
+            if (conversationBelongsToThisSection(conversation)) {
                 conversationElement = getConversationElement(root, conversation.id);
                 if (!conversationElement.length) {
                     createNewConversationFromEvent(
@@ -551,7 +639,7 @@ function(
                         conversation.loggedInUserId
                     );
                 }
-            } else if (type == conversation.type) {
+            } else {
                 conversationElement = getConversationElement(root, conversation.id);
                 if (conversationElement.length) {
                     deleteConversation(root, conversationElement);
@@ -561,12 +649,7 @@ function(
 
         PubSub.subscribe(MessageDrawerEvents.CONVERSATION_UNSET_FAVOURITE, function(conversation) {
             var conversationElement = null;
-            if (includeFavourites) {
-                conversationElement = getConversationElement(root, conversation.id);
-                if (conversationElement.length) {
-                    deleteConversation(root, conversationElement);
-                }
-            } else if (type == conversation.type) {
+            if (conversationBelongsToThisSection(conversation)) {
                 conversationElement = getConversationElement(root, conversation.id);
                 if (!conversationElement.length) {
                     createNewConversationFromEvent(
@@ -574,6 +657,11 @@ function(
                         formatConversationFromEvent(conversation),
                         conversation.loggedInUserId
                     );
+                }
+            } else {
+                conversationElement = getConversationElement(root, conversation.id);
+                if (conversationElement.length) {
+                    deleteConversation(root, conversationElement);
                 }
             }
         });
@@ -583,7 +671,7 @@ function(
             var conversationElement = $(e.target).closest(SELECTORS.CONVERSATION);
             var conversationId = conversationElement.attr('data-conversation-id');
             var conversation = loadedConversationsById[conversationId];
-            MessageDrawerRouter.go(MessageDrawerRoutes.VIEW_CONVERSATION, conversation);
+            MessageDrawerRouter.go(namespace, MessageDrawerRoutes.VIEW_CONVERSATION, conversation, fromPanel);
 
             data.originalEvent.preventDefault();
         });
@@ -592,18 +680,23 @@ function(
     /**
      * Setup the section.
      *
-     * @param {Object} root The section container element.
-     * @param {Number} type The conversation type for this section
-     * @param {Bool} includeFavourites If this section includes favourites
+     * @param {String} namespace Unique identifier for the Routes
+     * @param {Object} header The header container element.
+     * @param {Object} body The section container element.
+     * @param {Object} footer The footer container element.
+     * @param {Array} types The conversation types that show in this section
+     * @param {bool} includeFavourites If this section includes favourites
      * @param {Object} totalCountPromise Resolves wth the total conversations count
      * @param {Object} unreadCountPromise Resolves wth the unread conversations count
+     * @param {bool} fromPanel shown in message app panel.
      */
-    var show = function(root, type, includeFavourites, totalCountPromise, unreadCountPromise) {
-        root = $(root);
+    var show = function(namespace, header, body, footer, types, includeFavourites, totalCountPromise, unreadCountPromise,
+        fromPanel) {
+        var root = $(body);
 
         if (!root.attr('data-init')) {
-            var loadCallback = getLoadCallback(type, includeFavourites, 0);
-            registerEventListeners(root, loadCallback, type, includeFavourites);
+            var loadCallback = getLoadCallback(types, includeFavourites, 0);
+            registerEventListeners(namespace, root, loadCallback, types, includeFavourites, fromPanel);
 
             if (isVisible(root)) {
                 setExpanded(root);

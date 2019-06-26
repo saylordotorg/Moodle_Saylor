@@ -9,6 +9,9 @@ $bg-inverse-link-color: #fff !default;
     overflow-x: auto;
     overflow-y: visible;
     border: $card-border-width solid $card-border-color;
+    @if $enable-rounded {
+        @include border-radius($card-border-radius);
+    }
     padding: $card-spacer-x;
     background-color: $body-bg;
 }
@@ -2257,6 +2260,14 @@ $switch-transition: .2s all !default;
 
 .position-right {
     right: 0 !important; /* stylelint-disable-line declaration-no-important */
+}
+
+.overflow-hidden {
+    overflow: hidden !important; /* stylelint-disable-line declaration-no-important */
+}
+
+.text-break {
+    overflow-wrap: break-word !important; /* stylelint-disable-line declaration-no-important */
 }
 
 .z-index-1 {

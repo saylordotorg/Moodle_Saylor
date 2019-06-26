@@ -29,39 +29,49 @@
                 "fullname": "course 3",
                 "summary": "This course is about assignments",
                 "hasprogress": true,
-                "progress": 10
+                "progress": 10,
+                "coursecategory": "Miscellaneous"
             }
         ]
     }
 }}
 <div role="list">
 {{#courses}}
-    <div class="course-summaryitem m-b-1 p-2" role="listitem"
+    <div class="course-summaryitem mb-1 p-2" role="listitem"
         data-region="course-content"
         data-course-id="{{{id}}}">
         <div class="d-flex">
             <a href="{{viewurl}}" tabindex="-1">
-                <div class="summaryimage rounded-circle m-r-1" style='background-image: url("{{{courseimage}}}");'>
+                <div class="summaryimage rounded-circle mr-1" style='background-image: url("{{{courseimage}}}");'>
                     <span class="sr-only">{{#str}}aria:courseimage, core_course{{/str}}</span>
                 </div>
             </a>
 
             <div class="align-self-stretch d-flex flex-column w-100">
+                <div class="text-muted muted mb-1 d-flex flex-wrap">
+                    <span class="sr-only">
+                        {{#str}}aria:coursecategory, core_course{{/str}}
+                    </span>
+                    {{$coursecategory}}
+                    <span class="categoryname">
+                        {{{coursecategory}}}
+                    </span>
+                    {{/coursecategory}}
+                    {{#showshortname}}
+                    <div class="pl-1 pr-1">|</div>
+                    <span class="sr-only">
+                        {{#str}}aria:courseshortname, core_course{{/str}}
+                    </span>
+                    <div>{{{shortname}}}</div>
+                    {{/showshortname}}
+                </div>
                 <div class="d-flex mb-1">
                     <a href="{{viewurl}}" class="coursename">
-                        {{#showshortname}}
-                            <span class="sr-only">
-                                {{#str}}aria:courseshortname, core_course{{/str}}
-                            </span>
-                            <div class="text-muted muted mb-1">
-                                {{{shortname}}}
-                            </div>
-                        {{/showshortname}}
                         {{> core_course/favouriteicon }}
                         <span class="sr-only">
                             {{#str}}aria:coursename, core_course{{/str}}
                         </span>
-                        <h6 class="d-inline h5">{{{fullname}}}</h4>
+                        <h6 class="d-inline h5">{{{fullname}}}</h6>
                     </a>
                     {{> block_myoverview/course-action-menu }}
                 </div>

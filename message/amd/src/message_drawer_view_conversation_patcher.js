@@ -298,6 +298,7 @@ function(
                     totalmembercount: newState.totalMemberCount,
                     imageurl: newState.imageUrl,
                     isfavourite: newState.isFavourite,
+                    ismuted: newState.isMuted,
                     // Don't show favouriting if we don't have a conversation.
                     showfavourite: newState.id !== null,
                     userid: newOtherUser.id,
@@ -312,6 +313,37 @@ function(
         return null;
     };
 
+    /**
+     * Build a patch for the header of this conversation. Check if this conversation
+     * is a group conversation.
+     *
+     * @param  {Object} state The current state.
+     * @param  {Object} newState The new state.
+     * @return {Object} patch
+     */
+    var buildHeaderPatchTypeSelf = function(state, newState) {
+        var shouldRenderHeader = (state.name === null && newState.name !== null);
+
+        if (shouldRenderHeader) {
+            return {
+                type: Constants.CONVERSATION_TYPES.SELF,
+                // Don't display the controls for the self-conversations.
+                showControls: false,
+                context: {
+                    id: newState.id,
+                    name: newState.name,
+                    subname: newState.subname,
+                    imageurl: newState.imageUrl,
+                    isfavourite: newState.isFavourite,
+                    // Don't show favouriting if we don't have a conversation.
+                    showfavourite: newState.id !== null,
+                    showonlinestatus: true,
+                }
+            };
+        }
+
+        return null;
+    };
 
     /**
      * Build a patch for the header of this conversation. Check if this conversation
@@ -336,6 +368,7 @@ function(
                     totalmembercount: newState.totalMemberCount,
                     imageurl: newState.imageUrl,
                     isfavourite: newState.isFavourite,
+                    ismuted: newState.isMuted,
                     // Don't show favouriting if we don't have a conversation.
                     showfavourite: newState.id !== null
                 }
@@ -529,13 +562,22 @@ function(
      *
      * @param  {Object} state The current state.
      * @param  {Object} newState The new state.
-     * @return {Bool|Null}
+     * @return {Object|Null} The conversation type and if the user can delete  the messages for all users.
      */
     var buildConfirmDeleteSelectedMessages = function(state, newState) {
-        if (newState.pendingDeleteMessageIds.length) {
-            return true;
-        } else if (state.pendingDeleteMessageIds.length) {
-            return false;
+        var oldPendingCount = state.pendingDeleteMessageIds.length;
+        var newPendingCount = newState.pendingDeleteMessageIds.length;
+
+        if (newPendingCount && !oldPendingCount) {
+            return {
+                show: true,
+                type: newState.type,
+                canDeleteMessagesForAllUsers: newState.canDeleteMessagesForAllUsers
+            };
+        } else if (oldPendingCount && !newPendingCount) {
+            return {
+                show: false
+            };
         }
 
         return null;
@@ -546,11 +588,11 @@ function(
      *
      * @param  {Object} state The current state.
      * @param  {Object} newState The new state.
-     * @return {Bool|Null}
+     * @return {int|Null} The conversation type to be deleted.
      */
     var buildConfirmDeleteConversation = function(state, newState) {
         if (!state.pendingDeleteConversation && newState.pendingDeleteConversation) {
-            return true;
+            return newState.type;
         } else if (state.pendingDeleteConversation && !newState.pendingDeleteConversation) {
             return false;
         }
@@ -641,6 +683,39 @@ function(
             return 'show-remove';
         } else if (oldIsFavourite && !newIsFavourite) {
             return 'show-add';
+        } else {
+            return null;
+        }
+    };
+
+    /**
+     * Check if there are any changes the conversation muted state.
+     *
+     * @param  {Object} state The current state.
+     * @param  {Object} newState The new state.
+     * @return {string|null}
+     */
+    var buildIsMuted = function(state, newState) {
+        var oldIsMuted = state.isMuted;
+        var newIsMuted = newState.isMuted;
+
+        if (state.id === null && newState.id === null) {
+            // The conversation isn't yet created so don't change anything.
+            return null;
+        } else if (state.id === null && newState.id !== null) {
+            // The conversation was created so we can show the mute button.
+            return 'show-mute';
+        } else if (state.id !== null && newState.id === null) {
+            // We're changing from a created conversation to a new conversation so hide
+            // the muting functionality for now.
+            return 'hide';
+        } else if (oldIsMuted == newIsMuted) {
+            // No change.
+            return null;
+        } else if (!oldIsMuted && newIsMuted) {
+            return 'show-unmute';
+        } else if (oldIsMuted && !newIsMuted) {
+            return 'show-mute';
         } else {
             return null;
         }
@@ -913,6 +988,11 @@ function(
         var oldOtherUser = getOtherUserFromState(state);
         var newOtherUser = getOtherUserFromState(newState);
 
+        if (newState.type == Constants.CONVERSATION_TYPES.SELF) {
+            // Users always can send message themselves on self-conversations.
+            return null;
+        }
+
         if (!oldOtherUser && !newOtherUser) {
             return null;
         } else if (oldOtherUser && !newOtherUser) {
@@ -1070,6 +1150,23 @@ function(
     };
 
     /**
+     * We should show this message always, for all the self-conversations.
+     *
+     * The message should be hidden when it's not a self-conversation.
+     *
+     * @param  {Object} state The current state.
+     * @param  {Object} newState The new state.
+     * @return {bool}
+     */
+    var buildSelfConversationMessage = function(state, newState) {
+        if (state.type != newState.type) {
+            return (newState.type == Constants.CONVERSATION_TYPES.SELF);
+        }
+
+        return null;
+    };
+
+    /**
      * We should show the contact request sent message if the user just sent
      * a contact request to the other user and there are no messages in the
      * conversation.
@@ -1130,7 +1227,8 @@ function(
                 confirmDeleteSelectedMessages: buildConfirmDeleteSelectedMessages,
                 inEditMode: buildInEditMode,
                 selectedMessages: buildSelectedMessages,
-                isFavourite: buildIsFavourite
+                isFavourite: buildIsFavourite,
+                isMuted: buildIsMuted
             }
         };
         // These build functions are only applicable to private conversations.
@@ -1153,6 +1251,13 @@ function(
         config[Constants.CONVERSATION_TYPES.PUBLIC] = {
             header: buildHeaderPatchTypePublic,
             footer: buildFooterPatchTypePublic,
+        };
+        // These build functions are only applicable to self-conversations.
+        config[Constants.CONVERSATION_TYPES.SELF] = {
+            header: buildHeaderPatchTypeSelf,
+            footer: buildFooterPatchTypePublic,
+            confirmDeleteConversation: buildConfirmDeleteConversation,
+            selfConversationMessage: buildSelfConversationMessage
         };
 
         var patchConfig = $.extend({}, config.all);

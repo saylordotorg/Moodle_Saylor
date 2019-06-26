@@ -28,6 +28,13 @@ $page = optional_param('page', 0, PARAM_INT);
 $q = optional_param('q', '', PARAM_NOTAGS);
 $title = optional_param('title', '', PARAM_NOTAGS);
 $contextid = optional_param('context', 0, PARAM_INT);
+$cat = optional_param('cat', '', PARAM_NOTAGS);
+$mycoursesonly = optional_param('mycoursesonly', 0, PARAM_INT);
+
+if (\core_search\manager::is_search_area_categories_enabled()) {
+    $cat = \core_search\manager::get_search_area_category_by_name($cat);
+}
+
 // Moving areaids, courseids, timestart, and timeend further down as they might come as an array if they come from the form.
 
 $context = context_system::instance();
@@ -80,6 +87,10 @@ if ($contextid) {
 // Get available ordering options from search engine.
 $customdata['orderoptions'] = $search->get_engine()->get_supported_orders($context);
 
+if ($cat instanceof \core_search\area_category) {
+    $customdata['cat'] = $cat->get_name();
+}
+
 $mform = new \core_search\output\form\search(null, $customdata);
 
 $data = $mform->get_data();
@@ -103,6 +114,7 @@ if (!$data && $q) {
     $data->timeend = optional_param('timeend', 0, PARAM_INT);
 
     $data->context = $contextid;
+    $data->mycoursesonly = $mycoursesonly;
 
     $mform->set_data($data);
 }
@@ -125,6 +137,10 @@ if (!empty($context) && $data) {
     $data->context = $context;
 }
 
+if ($data && $cat instanceof \core_search\area_category) {
+    $data->cat = $cat->get_name();
+}
+
 // Set the page URL.
 $urlparams = array('page' => $page);
 if ($data) {
@@ -138,7 +154,13 @@ if ($data) {
     }
     $urlparams['timestart'] = $data->timestart;
     $urlparams['timeend'] = $data->timeend;
+    $urlparams['mycoursesonly'] = isset($data->mycoursesonly) ? $data->mycoursesonly : 0;
 }
+
+if ($cat instanceof \core_search\area_category) {
+    $urlparams['cat'] = $cat->get_name();
+}
+
 $url = new moodle_url('/search/index.php', $urlparams);
 $PAGE->set_url($url);
 
@@ -160,7 +182,7 @@ if ($errorstr = $search->get_engine()->get_query_error()) {
 $mform->display();
 
 if (!empty($results)) {
-    echo $searchrenderer->render_results($results->results, $results->actualpage, $results->totalcount, $url);
+    echo $searchrenderer->render_results($results->results, $results->actualpage, $results->totalcount, $url, $cat);
 
     \core_search\manager::trigger_search_results_viewed([
         'q' => $data->q,

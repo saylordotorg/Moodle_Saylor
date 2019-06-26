@@ -98,6 +98,9 @@ function local_boostnavigation_build_custom_nodes($customnodes, navigation_node 
     // Parse node settings.
     foreach ($lines as $line) {
 
+        // Remember the node which we add the custom node to individually as we might change this node afterwards.
+        $targetnode = $node;
+
         // Trim setting lines.
         $line = trim($line);
 
@@ -236,8 +239,22 @@ function local_boostnavigation_build_custom_nodes($customnodes, navigation_node 
                             // If no before node key is given, the node will be added to the end of the navigation.
                             $nodebeforenodekey = clean_param($setting, PARAM_ALPHANUM);
 
-                            break;
+                            // The nodes 'myhome' and 'coursehome' cannot be taken as "beforenode".
+                            // The former because it is the root node of the hierarchy.
+                            // The latter since it only exists in the flatnavigation which can't be accessed here.
+                            if ($nodebeforenodekey === 'myhome' || $nodebeforenodekey === 'coursehome') {
+                                $nodebeforenodekey = null;
 
+                                // Handle "beforenodes" that are known to be not direct children of $node but grand children.
+                            } else if ($nodebeforenodekey === 'calendar' || $nodebeforenodekey === 'privatefiles') {
+                                $nodebeforenode = $targetnode->find($nodebeforenodekey, global_navigation::TYPE_UNKNOWN);
+
+                                if ($nodebeforenode) {
+                                    $targetnode = $nodebeforenode->parent;
+                                }
+                            }
+
+                            break;
                     }
                 }
             }
@@ -311,7 +328,7 @@ function local_boostnavigation_build_custom_nodes($customnodes, navigation_node 
                 }
 
                 // Add the custom node to the given navigation_node.
-                $node->add_node($customnode, $nodebeforenodekey);
+                $targetnode->add_node($customnode, $nodebeforenodekey);
 
                 // Remember the node as a potential parent node for the next node.
                 $lastparentnode = $customnode;
@@ -382,7 +399,7 @@ function local_boostnavigation_build_custom_nodes($customnodes, navigation_node 
                 // For some crazy reason, if we add the child node directly to the parent node, it is not shown in the
                 // course navigation section.
                 // Thus, add the custom node to the given navigation_node.
-                $node->add_node($customnode, $nodebeforenodekey);
+                $targetnode->add_node($customnode, $nodebeforenodekey);
                 // And change the parent node directly afterwards.
                 $customnode->set_parent($lastparentnode);
 
@@ -464,19 +481,24 @@ function local_boostnavigation_cohort_is_member($userid, $setting) {
 function local_boostnavigation_build_node_url($url) {
     global $USER, $COURSE, $PAGE;
 
-    // Define placeholders which should be replaced later.
-    $placeholders = array('courseid' => (isset($COURSE->id) ? $COURSE->id : ''),
-            'courseshortname' => (isset($COURSE->shortname) ? $COURSE->shortname : ''),
-            'editingtoggle' => ($PAGE->user_is_editing() ? 'off' : 'on'),
-            'userid' => (isset($USER->id) ? $USER->id : ''),
-            'userusername' => (isset($USER->username) ? $USER->username : ''),
-            'pagecontextid' => (is_object($PAGE->context) ? $PAGE->context->id : ''),
-            'pagepath' => (is_object($PAGE->url) ? $PAGE->url->out_as_local_url() : ''),
-            'sesskey' => sesskey());
+    // Variable to hold the placeholders as soon as needed.
+    static $placeholders = null;
 
     // Check if there is any placeholder in the url.
     if (strpos($url, '{') !== false) {
-        // If yes, replace the placeholders in the url.
+        // If yes, create the placeholders array to be replaced later.
+        if ($placeholders == null) {
+            $placeholders = array('courseid' => (isset($COURSE->id) ? $COURSE->id : ''),
+                                  'courseshortname' => (isset($COURSE->shortname) ? $COURSE->shortname : ''),
+                                  'editingtoggle' => ($PAGE->user_is_editing() ? 'off' : 'on'),
+                                  'userid' => (isset($USER->id) ? $USER->id : ''),
+                                  'userusername' => (isset($USER->username) ? $USER->username : ''),
+                                  'pagecontextid' => (is_object($PAGE->context) ? $PAGE->context->id : ''),
+                                  'pagepath' => (is_object($PAGE->url) ? $PAGE->url->out_as_local_url() : ''),
+                                  'sesskey' => sesskey());
+        }
+
+        // And replace the placeholders in the url.
         foreach ($placeholders as $search => $replace) {
             $url = str_replace('{' . $search . '}', $replace, $url);
         }
@@ -494,16 +516,22 @@ function local_boostnavigation_build_node_url($url) {
 function local_boostnavigation_build_node_title($title) {
     global $USER, $COURSE, $PAGE;
 
-    // Define placeholders which should be replaced later.
-    $placeholders = array('coursefullname' => (isset($COURSE->fullname) ? format_string($COURSE->fullname) : ''),
-            'courseshortname' => (isset($COURSE->shortname) ? $COURSE->shortname : ''),
-            'editingtoggle' => ($PAGE->user_is_editing() ? get_string('turneditingoff') : get_string('turneditingon')),
-            'userfullname' => fullname($USER),
-            'userusername' => (isset($USER->username) ? $USER->username : ''));
+    // Variable to hold the placeholders as soon as needed.
+    static $placeholders = null;
 
     // Check if there is any placeholder in the title.
     if (strpos($title, '{') !== false) {
-        // If yes, replace the placeholders in the title.
+        // If yes, create the placeholders array to be replaced later.
+        if ($placeholders == null) {
+            $placeholders = array('coursefullname'  => (isset($COURSE->fullname) ? format_string($COURSE->fullname) : ''),
+                                  'courseshortname' => (isset($COURSE->shortname) ? $COURSE->shortname : ''),
+                                  'editingtoggle'   => ($PAGE->user_is_editing() ?
+                                          get_string('turneditingoff') : get_string('turneditingon')),
+                                  'userfullname'    => fullname($USER),
+                                  'userusername'    => (isset($USER->username) ? $USER->username : ''));
+        }
+
+        // And replace the placeholders in the title.
         foreach ($placeholders as $search => $replace) {
             $title = str_replace('{' . $search . '}', $replace, $title);
         }
@@ -623,4 +651,184 @@ function local_boostnavigation_user_has_role_on_system($userid, $setting) {
 
     // Check if the user has at least one of the required roles.
     return count(array_intersect($rolesinsystemshortnames, $showforroles)) > 0;
+}
+
+
+/**
+ * Helper function to generate the description for the custom nodes for users settings which is needed three times.
+ * It's not nice, but it serves its purpose.
+ *
+ * @return string
+ */
+function local_boostnavigation_customnodesusageusers() {
+
+    $html = get_string('setting_customnodesusageusersintro', 'local_boostnavigation', null, true).'<br />'.
+            '<hr />'.
+            get_string('setting_customnodesusageexamples', 'local_boostnavigation', null, true).'<br />'.
+            '<code>'.get_string('setting_customnodesusageusersexample', 'local_boostnavigation', null, true).'</code><br />'.
+            '<hr />'.
+            get_string('setting_customnodesusageparameters', 'local_boostnavigation', null, true).'<br />'.
+            '<dl>'.
+            '<dt>'.get_string('setting_customnodesusageparametertitledt', 'local_boostnavigation', null, true).'</dt>'.
+            '<dd>'.get_string('setting_customnodesusageparametertitledd', 'local_boostnavigation', null, true).'</dd>'.
+            '<dt>'.get_string('setting_customnodesusageparameterlinkdt', 'local_boostnavigation', null, true).'</dt>'.
+            '<dd>'.get_string('setting_customnodesusageparameterlinkdd', 'local_boostnavigation', null, true).'</dd>'.
+            '<dt>'.get_string('setting_customnodesusageparameterlanguagedt', 'local_boostnavigation', null, true).'</dt>'.
+            '<dd>'.get_string('setting_customnodesusageparameterlanguagedd', 'local_boostnavigation', null, true).'</dd>'.
+            '<dt>'.get_string('setting_customnodesusageparametercohortdt', 'local_boostnavigation', null, true).'</dt>'.
+            '<dd>'.get_string('setting_customnodesusageparametercohortdd', 'local_boostnavigation', null, true).'</dd>'.
+            '<dt>'.get_string('setting_customnodesusageparameterroledt', 'local_boostnavigation', null, true).'</dt>'.
+            '<dd>'.get_string('setting_customnodesusageparameterroledd', 'local_boostnavigation', null, true).'</dd>'.
+            '<dt>'.get_string('setting_customnodesusageparametersystemroledt', 'local_boostnavigation', null, true).'</dt>'.
+            '<dd>'.get_string('setting_customnodesusageparametersystemroledd', 'local_boostnavigation', null, true).'</dd>'.
+            '<dt>'.get_string('setting_customnodesusageparameterlogicaldt', 'local_boostnavigation', null, true).'</dt>'.
+            '<dd>'.get_string('setting_customnodesusageparameterlogicaldd', 'local_boostnavigation', null, true).'</dd>'.
+            '<dt>'.get_string('setting_customnodesusageparametericondt', 'local_boostnavigation', null, true).'</dt>'.
+            '<dd>'.get_string('setting_customnodesusageparametericondd', 'local_boostnavigation', null, true).'</dd>'.
+            '<dt>'.get_string('setting_customnodesusageparameteriddt', 'local_boostnavigation', null, true).'</dt>'.
+            '<dd>'.get_string('setting_customnodesusageparameteriddd', 'local_boostnavigation', null, true).'</dd>'.
+            '<dt>'.get_string('setting_customnodesusageparameterbeforenodedt', 'local_boostnavigation', null, true).'</dt>'.
+            '<dd>'.get_string('setting_customnodesusageparameterbeforenodedd', 'local_boostnavigation', null, true).'</dd>'.
+            '</dl>'.
+            '<hr />'.
+            get_string('setting_customnodesusagepleasenote', 'local_boostnavigation', null, true).
+            '<ul>'.
+            '<li>'.get_string('setting_customnodesusagepleasenotepipes', 'local_boostnavigation', null, true).'</li>'.
+            '<li>'.get_string('setting_customnodesusagepleasenotetitle', 'local_boostnavigation', null, true).'<br />'.
+            get_string('setting_customnodesusagepleasenotephexplanation', 'local_boostnavigation', null, true).''.
+            get_string('setting_customnodesusagepleasenotephavailable', 'local_boostnavigation', null, true).
+            '<dl>'.
+            '<dt>'.get_string('setting_customnodesusagepleasenotephcoursefullnamedt', 'local_boostnavigation', null, true).'</dt>'.
+            '<dd>'.get_string('setting_customnodesusagepleasenotephcoursefullnamedd', 'local_boostnavigation', null, true).'</dd>'.
+            '<dt>'.get_string('setting_customnodesusagepleasenotephcourseshortnamedt', 'local_boostnavigation', null, true).'</dt>'.
+            '<dd>'.get_string('setting_customnodesusagepleasenotephcourseshortnamedd', 'local_boostnavigation', null, true).'</dd>'.
+            '<dt>'.get_string('setting_customnodesusagepleasenotepheditingtitledt', 'local_boostnavigation', null, true).'</dt>'.
+            '<dd>'.get_string('setting_customnodesusagepleasenotepheditingtitledd', 'local_boostnavigation', null, true).'</dd>'.
+            '<dt>'.get_string('setting_customnodesusagepleasenotephuserfullnamedt', 'local_boostnavigation', null, true).'</dt>'.
+            '<dd>'.get_string('setting_customnodesusagepleasenotephuserfullnamedd', 'local_boostnavigation', null, true).'</dd>'.
+            '<dt>'.get_string('setting_customnodesusagepleasenotephuserusernamedt', 'local_boostnavigation', null, true).'</dt>'.
+            '<dd>'.get_string('setting_customnodesusagepleasenotephuserusernamedd', 'local_boostnavigation', null, true).'</dd>'.
+            '</dl>'.
+            '</li>'.
+            '<li>'.get_string('setting_customnodesusagepleasenotelink', 'local_boostnavigation', null, true).' '.
+            get_string('setting_customnodesusagepleasenotephexplanation', 'local_boostnavigation', null, true).'<br />'.
+            get_string('setting_customnodesusagepleasenotephavailable', 'local_boostnavigation', null, true).
+            '<dl>'.
+            '<dt>'.get_string('setting_customnodesusagepleasenotephcourseiddt', 'local_boostnavigation', null, true).'</dt>'.
+            '<dd>'.get_string('setting_customnodesusagepleasenotephcourseiddd', 'local_boostnavigation', null, true).'</dd>'.
+            '<dt>'.get_string('setting_customnodesusagepleasenotephcourseshortnamedt', 'local_boostnavigation', null, true).'</dt>'.
+            '<dd>'.get_string('setting_customnodesusagepleasenotephcourseshortnamedd', 'local_boostnavigation', null, true).'</dd>'.
+            '<dt>'.get_string('setting_customnodesusagepleasenotepheditinglinkdt', 'local_boostnavigation', null, true).'</dt>'.
+            '<dd>'.get_string('setting_customnodesusagepleasenotepheditinglinkdd', 'local_boostnavigation', null, true).'</dd>'.
+            '<dt>'.get_string('setting_customnodesusagepleasenotephuseriddt', 'local_boostnavigation', null, true).'</dt>'.
+            '<dd>'.get_string('setting_customnodesusagepleasenotephuseriddd', 'local_boostnavigation', null, true).'</dd>'.
+            '<dt>'.get_string('setting_customnodesusagepleasenotephuserusernamedt', 'local_boostnavigation', null, true).'</dt>'.
+            '<dd>'.get_string('setting_customnodesusagepleasenotephuserusernamedd', 'local_boostnavigation', null, true).'</dd>'.
+            '<dt>'.get_string('setting_customnodesusagepleasenotephpagecontextiddt', 'local_boostnavigation', null, true).'</dt>'.
+            '<dd>'.get_string('setting_customnodesusagepleasenotephpagecontextiddd', 'local_boostnavigation', null, true).'</dd>'.
+            '<dt>'.get_string('setting_customnodesusagepleasenotephpagepathdt', 'local_boostnavigation', null, true).'</dt>'.
+            '<dd>'.get_string('setting_customnodesusagepleasenotephpagepathdd', 'local_boostnavigation', null, true).'</dd>'.
+            '<dt>'.get_string('setting_customnodesusagepleasenotephsesskeydt', 'local_boostnavigation', null, true).'</dt>'.
+            '<dd>'.get_string('setting_customnodesusagepleasenotephsesskeydd', 'local_boostnavigation', null, true).'</dd>'.
+            '</dl>'.
+            '</li>'.
+            '<li>'.get_string('setting_customnodesusagepleasenotecheck', 'local_boostnavigation', null, true).'</li>'.
+            '<li>'.get_string('setting_customnodesusagepleasenotecss', 'local_boostnavigation', null, true).'</li>'.
+            '</ul>'.
+            '<hr />'.
+            get_string('setting_customnodesusagechildnodes', 'local_boostnavigation', null, true).'<br />'.
+            '<br />'.
+            get_string('setting_customnodesusageexamples', 'local_boostnavigation', null, true).'<br />'.
+            '<code>'.get_string('setting_customnodesusagechildnodesexample', 'local_boostnavigation', null, true).'</code><br />'.
+            '<br />'.
+            get_string('setting_customnodesusagepleasenote', 'local_boostnavigation', null, true).
+            '<ul>'.
+            '<li>'.get_string('setting_customnodesusagechildnodespleasenoteurl', 'local_boostnavigation', null, true).'</li>'.
+            '<li>'.get_string('setting_customnodesusagechildnodespleasenoterecursive', 'local_boostnavigation', null, true).'</li>'.
+            '</ul>';
+
+    return $html;
+}
+
+
+/**
+ * Helper function to generate the description for the custom nodes for admins settings which is needed three times.
+ * It's not nice, but it serves its purpose.
+ *
+ * @return string
+ */
+function local_boostnavigation_customnodesusageadmins() {
+
+    $html = get_string('setting_customnodesusageadminsintro', 'local_boostnavigation', null, true).'<br />'.
+            '<hr />'.
+            get_string('setting_customnodesusageexamples', 'local_boostnavigation', null, true).'<br />'.
+            '<code>'.get_string('setting_customnodesusageadminsexample', 'local_boostnavigation', null, true).'</code><br />'.
+            '<hr />'.
+            get_string('setting_customnodesusageparameters', 'local_boostnavigation', null, true).'<br />'.
+            '<dl>'.
+            '<dt>'.get_string('setting_customnodesusageparametertitledt', 'local_boostnavigation', null, true).'</dt>'.
+            '<dd>'.get_string('setting_customnodesusageparametertitledd', 'local_boostnavigation', null, true).'</dd>'.
+            '<dt>'.get_string('setting_customnodesusageparameterlinkdt', 'local_boostnavigation', null, true).'</dt>'.
+            '<dd>'.get_string('setting_customnodesusageparameterlinkdd', 'local_boostnavigation', null, true).'</dd>'.
+            '<dt>'.get_string('setting_customnodesusageparameterlanguagedt', 'local_boostnavigation', null, true).'</dt>'.
+            '<dd>'.get_string('setting_customnodesusageparameterlanguagedd', 'local_boostnavigation', null, true).'</dd>'.
+            '</dl>'.
+            '<hr />'.
+            get_string('setting_customnodesusagepleasenote', 'local_boostnavigation', null, true).
+            '<ul>'.
+            '<li>'.get_string('setting_customnodesusageadminsparameternote', 'local_boostnavigation', null, true).'</li>'.
+            '<li>'.get_string('setting_customnodesusagepleasenotetitle', 'local_boostnavigation', null, true).' '.
+            get_string('setting_customnodesusagepleasenotephexplanation', 'local_boostnavigation', null, true).'<br />'.
+            get_string('setting_customnodesusagepleasenotephavailable', 'local_boostnavigation', null, true).
+            '<dl>'.
+            '<dt>'.get_string('setting_customnodesusagepleasenotephcoursefullnamedt', 'local_boostnavigation', null, true).'</dt>'.
+            '<dd>'.get_string('setting_customnodesusagepleasenotephcoursefullnamedd', 'local_boostnavigation', null, true).'</dd>'.
+            '<dt>'.get_string('setting_customnodesusagepleasenotephcourseshortnamedt', 'local_boostnavigation', null, true).'</dt>'.
+            '<dd>'.get_string('setting_customnodesusagepleasenotephcourseshortnamedd', 'local_boostnavigation', null, true).'</dd>'.
+            '<dt>'.get_string('setting_customnodesusagepleasenotepheditingtitledt', 'local_boostnavigation', null, true).'</dt>'.
+            '<dd>'.get_string('setting_customnodesusagepleasenotepheditingtitledd', 'local_boostnavigation', null, true).'</dd>'.
+            '<dt>'.get_string('setting_customnodesusagepleasenotephuserfullnamedt', 'local_boostnavigation', null, true).'</dt>'.
+            '<dd>'.get_string('setting_customnodesusagepleasenotephuserfullnamedd', 'local_boostnavigation', null, true).'</dd>'.
+            '<dt>'.get_string('setting_customnodesusagepleasenotephuserusernamedt', 'local_boostnavigation', null, true).'</dt>'.
+            '<dd>'.get_string('setting_customnodesusagepleasenotephuserusernamedd', 'local_boostnavigation', null, true).'</dd>'.
+            '</dl>'.
+            '</li>'.
+            '<li>'.get_string('setting_customnodesusagepleasenotelink', 'local_boostnavigation', null, true).' '.
+            get_string('setting_customnodesusagepleasenotephexplanation', 'local_boostnavigation', null, true).'<br />'.
+            get_string('setting_customnodesusagepleasenotephavailable', 'local_boostnavigation', null, true).
+            '<dl>'.
+            '<dt>'.get_string('setting_customnodesusagepleasenotephcourseiddt', 'local_boostnavigation', null, true).'</dt>'.
+            '<dd>'.get_string('setting_customnodesusagepleasenotephcourseiddd', 'local_boostnavigation', null, true).'</dd>'.
+            '<dt>'.get_string('setting_customnodesusagepleasenotephcourseshortnamedt', 'local_boostnavigation', null, true).'</dt>'.
+            '<dd>'.get_string('setting_customnodesusagepleasenotephcourseshortnamedd', 'local_boostnavigation', null, true).'</dd>'.
+            '<dt>'.get_string('setting_customnodesusagepleasenotepheditinglinkdt', 'local_boostnavigation', null, true).'</dt>'.
+            '<dd>'.get_string('setting_customnodesusagepleasenotepheditinglinkdd', 'local_boostnavigation', null, true).'</dd>'.
+            '<dt>'.get_string('setting_customnodesusagepleasenotephuseriddt', 'local_boostnavigation', null, true).'</dt>'.
+            '<dd>'.get_string('setting_customnodesusagepleasenotephuseriddd', 'local_boostnavigation', null, true).'</dd>'.
+            '<dt>'.get_string('setting_customnodesusagepleasenotephuserusernamedt', 'local_boostnavigation', null, true).'</dt>'.
+            '<dd>'.get_string('setting_customnodesusagepleasenotephuserusernamedd', 'local_boostnavigation', null, true).'</dd>'.
+            '<dt>'.get_string('setting_customnodesusagepleasenotephpagecontextiddt', 'local_boostnavigation', null, true).'</dt>'.
+            '<dd>'.get_string('setting_customnodesusagepleasenotephpagecontextiddd', 'local_boostnavigation', null, true).'</dd>'.
+            '<dt>'.get_string('setting_customnodesusagepleasenotephpagepathdt', 'local_boostnavigation', null, true).'</dt>'.
+            '<dd>'.get_string('setting_customnodesusagepleasenotephpagepathdd', 'local_boostnavigation', null, true).'</dd>'.
+            '<dt>'.get_string('setting_customnodesusagepleasenotephsesskeydt', 'local_boostnavigation', null, true).'</dt>'.
+            '<dd>'.get_string('setting_customnodesusagepleasenotephsesskeydd', 'local_boostnavigation', null, true).'</dd>'.
+            '</dl>'.
+            '</li>'.
+            '<li>'.get_string('setting_customnodesusagepleasenotecheck', 'local_boostnavigation', null, true).'</li>'.
+            '<li>'.get_string('setting_customnodesusagepleasenotecss', 'local_boostnavigation', null, true).'</li>'.
+            '</ul>'.
+            '<hr />'.
+            get_string('setting_customnodesusagechildnodes', 'local_boostnavigation', null, true).'<br />'.
+            '<br />'.
+            get_string('setting_customnodesusageexamples', 'local_boostnavigation', null, true).'<br />'.
+            '<code>'.get_string('setting_customnodesusagechildnodesexample', 'local_boostnavigation', null, true).'</code><br />'.
+            '<br />'.
+            get_string('setting_customnodesusagepleasenote', 'local_boostnavigation', null, true).
+            '<ul>'.
+            '<li>'.get_string('setting_customnodesusagechildnodespleasenoteurl', 'local_boostnavigation', null, true).'</li>'.
+            '<li>'.get_string('setting_customnodesusagechildnodespleasenoterecursive', 'local_boostnavigation', null, true).'</li>'.
+            '</ul>';
+
+    return $html;
 }

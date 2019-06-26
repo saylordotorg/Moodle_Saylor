@@ -64,7 +64,7 @@ function(
         COURSES_CARDS: 'block_myoverview/view-cards',
         COURSES_LIST: 'block_myoverview/view-list',
         COURSES_SUMMARY: 'block_myoverview/view-summary',
-        NOCOURSES: 'block_myoverview/no-courses'
+        NOCOURSES: 'core_course/no-courses'
     };
 
     var NUMCOURSES_PERPAGE = [12, 24, 48];
@@ -90,7 +90,8 @@ function(
         return {
             display: courseRegion.attr('data-display'),
             grouping: courseRegion.attr('data-grouping'),
-            sort: courseRegion.attr('data-sort')
+            sort: courseRegion.attr('data-sort'),
+            displaycategories: courseRegion.attr('data-displaycategories'),
         };
     };
 
@@ -217,7 +218,7 @@ function(
 
         setCourseFavouriteState(courseId, true).then(function(success) {
             if (success) {
-                PubSub.publish(CourseEvents.favourited);
+                PubSub.publish(CourseEvents.favourited, courseId);
                 removeAction.removeClass('hidden');
                 addAction.addClass('hidden');
                 showFavouriteIcon(root, courseId);
@@ -240,7 +241,7 @@ function(
 
         setCourseFavouriteState(courseId, false).then(function(success) {
             if (success) {
-                PubSub.publish(CourseEvents.unfavorited);
+                PubSub.publish(CourseEvents.unfavorited, courseId);
                 removeAction.addClass('hidden');
                 addAction.removeClass('hidden');
                 hideFavouriteIcon(root, courseId);
@@ -370,9 +371,17 @@ function(
             currentTemplate = TEMPLATES.COURSES_SUMMARY;
         }
 
+        // Delete the course category if it is not to be displayed
+        if (filters.displaycategories != 'on') {
+            coursesData.courses = coursesData.courses.map(function(course) {
+                delete course.coursecategory;
+                return course;
+            });
+        }
+
         if (coursesData.courses.length) {
             return Templates.render(currentTemplate, {
-                courses: coursesData.courses
+                courses: coursesData.courses,
             });
         } else {
             var nocoursesimg = root.find(Selectors.courseView.region).attr('data-nocoursesimg');

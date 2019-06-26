@@ -84,13 +84,16 @@ class manager {
         // Get user records for all members of the conversation.
         // We must fetch distinct users, because it's possible for a user to message themselves via bulk user actions.
         // In such cases, there will be 2 records referring to the same user.
-        $sql = "SELECT u.*
+        $sql = "SELECT u.*, mca.id as ismuted
                   FROM {user} u
+             LEFT JOIN {message_conversation_actions} mca
+                    ON mca.userid = u.id AND mca.conversationid = ? AND mca.action = ?
                  WHERE u.id IN (
                           SELECT mcm.userid FROM {message_conversation_members} mcm
-                           WHERE mcm.conversationid = :convid
+                           WHERE mcm.conversationid = ?
                  )";
-        $members = $DB->get_records_sql($sql, ['convid' => $eventdata->convid]);
+        $members = $DB->get_records_sql($sql, [$eventdata->convid, \core_message\api::CONVERSATION_ACTION_MUTED,
+            $eventdata->convid]);
         if (empty($members)) {
             throw new \moodle_exception("Conversation has no members or does not exist.");
         }
@@ -105,6 +108,13 @@ class manager {
 
         // Get conversation type and name. We'll use this to determine which message subject to generate, depending on type.
         $conv = $DB->get_record('message_conversations', ['id' => $eventdata->convid], 'id, type, name');
+
+        // For now Self conversations are not processed because users are aware of the messages sent by themselves, so we
+        // can return early.
+        if ($conv->type == \core_message\api::MESSAGE_CONVERSATION_TYPE_SELF) {
+            return $savemessage->id;
+        }
+        $localisedeventdata->conversationtype = $conv->type;
 
         // We treat individual conversations the same as any direct message with 'userfrom' and 'userto' specified.
         // We know the other user, so set the 'userto' field so that the event code will get access to this field.
@@ -138,7 +148,10 @@ class manager {
         foreach ($otherusers as $recipient) {
             // If this message was a legacy (1:1) message, then we use the userto.
             if ($legacymessage) {
+                $ismuted = $recipient->ismuted;
+
                 $recipient = $eventdata->userto;
+                $recipient->ismuted = $ismuted;
             }
 
             $usertoisrealuser = (\core_user::is_real_user($recipient->id) != false);
@@ -156,6 +169,14 @@ class manager {
 
             // Spoof the userto based on the current member id.
             $localisedeventdata->userto = $recipient;
+            // Check if the notification is including images that will need a user token to be displayed outside Moodle.
+            if (!empty($localisedeventdata->customdata)) {
+                $customdata = json_decode($localisedeventdata->customdata);
+                if (is_object($customdata) && !empty($customdata->notificationiconurl)) {
+                    $customdata->tokenpluginfile = get_user_key('core_files', $localisedeventdata->userto->id);
+                    $localisedeventdata->customdata = $customdata; // Message class will JSON encode again.
+                }
+            }
 
             $s = new \stdClass();
             $s->sitename = format_string($SITE->shortname, true, array('context' => \context_course::instance(SITEID)));
@@ -194,9 +215,9 @@ class manager {
             }
 
             // Fill in the array of processors to be used based on default and user preferences.
-            // This applies only to individual conversations. Messages to group conversations ignore processors.
+            // Do not process muted conversations.
             $processorlist = [];
-            if ($conv->type == \core_message\api::MESSAGE_CONVERSATION_TYPE_INDIVIDUAL) {
+            if (!$recipient->ismuted) {
                 foreach ($processors as $processor) {
                     // Skip adding processors for internal user, if processor doesn't support sending message to internal user.
                     if (!$usertoisrealuser && !$processor->object->can_send_to_any_users()) {
@@ -466,9 +487,21 @@ class manager {
      * @param array $processorlist the list of processors for a single user.
      */
     protected static function call_processors(message $eventdata, array $processorlist) {
+        // Allow plugins to change the message/notification data before sending it.
+        $pluginsfunction = get_plugins_with_function('pre_processor_message_send');
+
         foreach ($processorlist as $procname) {
             // Let new messaging class add custom content based on the processor.
             $proceventdata = ($eventdata instanceof message) ? $eventdata->get_eventobject_for_processor($procname) : $eventdata;
+
+            if ($pluginsfunction) {
+                foreach ($pluginsfunction as $plugintype => $plugins) {
+                    foreach ($plugins as $pluginfunction) {
+                        $pluginfunction($procname, $proceventdata);
+                    }
+                }
+            }
+
             $stdproc = new \stdClass();
             $stdproc->name = $procname;
             $processor = \core_message\api::get_processed_processor_object($stdproc);

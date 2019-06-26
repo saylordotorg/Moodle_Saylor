@@ -456,22 +456,6 @@ class qtype_multianswer_edit_form extends question_edit_form {
         parent::set_data($question);
     }
 
-    /**
-     * Validate that a string is a nubmer formatted correctly for the current locale.
-     * @param string $x a string
-     * @return bool whether $x is a number that the numerical question type can interpret.
-     */
-    protected function is_valid_number($x) {
-        if (is_null($this->ap)) {
-            $this->ap = new qtype_numerical_answer_processor(array());
-        }
-
-        list($value, $unit) = $this->ap->apply_units($x);
-
-        return !is_null($value) && !$unit;
-    }
-
-
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 

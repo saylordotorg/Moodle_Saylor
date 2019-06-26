@@ -32,9 +32,6 @@ defined('MOODLE_INTERNAL') || die();
 function xmldb_auth_manual_upgrade($oldversion) {
     global $CFG;
 
-    // Automatically generated Moodle v3.2.0 release upgrade line.
-    // Put any upgrade step following this.
-
     if ($oldversion < 2017020700) {
         // Convert info in config plugins from auth/manual to auth_manual.
         upgrade_fix_config_auth_plugin_names('manual');
@@ -52,6 +49,9 @@ function xmldb_auth_manual_upgrade($oldversion) {
     // Put any upgrade step following this.
 
     // Automatically generated Moodle v3.6.0 release upgrade line.
+    // Put any upgrade step following this.
+
+    // Automatically generated Moodle v3.7.0 release upgrade line.
     // Put any upgrade step following this.
 
     return true;

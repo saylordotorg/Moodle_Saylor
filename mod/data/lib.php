@@ -608,7 +608,7 @@ function data_generate_default_template(&$data, $template, $recordid=0, $form=fa
     if ($fields = $DB->get_records('data_fields', array('dataid'=>$data->id), 'id')) {
 
         $table = new html_table();
-        $table->attributes['class'] = 'mod-data-default-template ##approvalstatus##';
+        $table->attributes['class'] = 'mod-data-default-template ##approvalstatusclass##';
         $table->colclasses = array('template-field', 'template-token');
         $table->data = array();
         foreach ($fields as $field) {
@@ -1507,12 +1507,16 @@ function data_print_template($template, $records, $data, $search='', $page=0, $r
         }
 
         $patterns[] = '##approvalstatus##';
+        $patterns[] = '##approvalstatusclass##';
         if (!$data->approval) {
+            $replacement[] = '';
             $replacement[] = '';
         } else if ($record->approved) {
             $replacement[] = get_string('approved', 'data');
+            $replacement[] = 'approved';
         } else {
             $replacement[] = get_string('notapproved', 'data');
+            $replacement[] = 'notapproved';
         }
 
         $patterns[]='##comments##';
@@ -1811,7 +1815,7 @@ function data_print_preference_form($data, $perpage, $search, $sort='', $order='
          'class="form-control" size="16" name="search" id= "pref_search" value="' . s($search) . '" /></div>';
     echo '&nbsp;&nbsp;&nbsp;<label for="pref_sortby">'.get_string('sortby').'</label> ';
     // foreach field, print the option
-    echo '<select name="sort" id="pref_sortby" class="custom-select m-r-1">';
+    echo '<select name="sort" id="pref_sortby" class="custom-select mr-1">';
     if ($fields = $DB->get_records('data_fields', array('dataid'=>$data->id), 'name')) {
         echo '<optgroup label="'.get_string('fields', 'data').'">';
         foreach ($fields as $field) {
@@ -1842,7 +1846,7 @@ function data_print_preference_form($data, $perpage, $search, $sort='', $order='
     echo '</optgroup>';
     echo '</select>';
     echo '<label for="pref_order" class="accesshide">'.get_string('order').'</label>';
-    echo '<select id="pref_order" name="order" class="custom-select m-r-1">';
+    echo '<select id="pref_order" name="order" class="custom-select mr-1">';
     if ($order == 'ASC') {
         echo '<option value="ASC" selected="selected">'.get_string('ascending','data').'</option>';
     } else {
@@ -1865,7 +1869,7 @@ function data_print_preference_form($data, $perpage, $search, $sort='', $order='
     echo '&nbsp;<input type="hidden" name="advanced" value="0" />';
     echo '&nbsp;<input type="hidden" name="filter" value="1" />';
     echo '&nbsp;<input type="checkbox" id="advancedcheckbox" name="advanced" value="1" ' . $checked . ' ' .
-         'onchange="showHideAdvSearch(this.checked);" class="m-x-1" />' .
+         'onchange="showHideAdvSearch(this.checked);" class="mx-1" />' .
          '<label for="advancedcheckbox">' . get_string('advancedsearch', 'data') . '</label>';
     echo '&nbsp;<input type="submit" class="btn btn-secondary" value="' . get_string('savesettings', 'data') . '" />';
 
@@ -1940,7 +1944,7 @@ function data_print_preference_form($data, $perpage, $search, $sort='', $order='
     echo '</td></tr>';
 
     echo '<tr><td colspan="4"><br/>' .
-         '<input type="submit" class="btn btn-primary m-r-1" value="' . get_string('savesettings', 'data') . '" />' .
+         '<input type="submit" class="btn btn-primary mr-1" value="' . get_string('savesettings', 'data') . '" />' .
          '<input type="submit" class="btn btn-secondary" name="resetadv" value="' . get_string('resetsettings', 'data') . '" />' .
          '</td></tr>';
     echo '</table>';

@@ -344,13 +344,13 @@ class core_course_renderer extends plugin_renderer_base {
     }
 
     /**
-     * Renders html to display a course search form
+     * Renders html to display a course search form.
      *
      * @param string $value default value to populate the search field
      * @param string $format display format - 'plain' (default), 'short' or 'navbar'
      * @return string
      */
-    function course_search_form($value = '', $format = 'plain') {
+    public function course_search_form($value = '', $format = 'plain') {
         static $count = 0;
         $formid = 'coursesearch';
         if ((++$count) > 1) {
@@ -372,23 +372,19 @@ class core_course_renderer extends plugin_renderer_base {
                 $inputsize = 30;
         }
 
-        $strsearchcourses= get_string("searchcourses");
-        $searchurl = new moodle_url('/course/search.php');
-
-        $output = html_writer::start_tag('form', array('id' => $formid, 'action' => $searchurl, 'method' => 'get'));
-        $output .= html_writer::start_tag('fieldset', array('class' => 'coursesearchbox invisiblefieldset'));
-        $output .= html_writer::tag('label', $strsearchcourses.': ', array('for' => $inputid));
-        $output .= html_writer::empty_tag('input', array('type' => 'text', 'id' => $inputid,
-            'size' => $inputsize, 'name' => 'search', 'value' => s($value)));
-        $output .= html_writer::empty_tag('input', array('type' => 'submit',
-            'value' => get_string('go')));
-        $output .= html_writer::end_tag('fieldset');
+        $data = (object) [
+                'searchurl' => (new moodle_url('/course/search.php'))->out(false),
+                'id' => $formid,
+                'inputid' => $inputid,
+                'inputsize' => $inputsize,
+                'value' => $value
+        ];
         if ($format != 'navbar') {
-            $output .= $this->output->help_icon("coursesearch", "core");
+            $helpicon = new \help_icon('coursesearch', 'core');
+            $data->helpicon = $helpicon->export_for_template($this);
         }
-        $output .= html_writer::end_tag('form');
 
-        return $output;
+        return $this->render_from_template('core_course/course_search_form', $data);
     }
 
     /**
@@ -407,8 +403,12 @@ class core_course_renderer extends plugin_renderer_base {
      * @return string
      */
     public function course_section_cm_completion($course, &$completioninfo, cm_info $mod, $displayoptions = array()) {
-        global $CFG, $DB;
+        global $CFG, $DB, $USER;
         $output = '';
+
+        $istrackeduser = $completioninfo->is_tracked_user($USER->id);
+        $isediting = $this->page->user_is_editing();
+
         if (!empty($displayoptions['hidecompletion']) || !isloggedin() || isguestuser() || !$mod->uservisible) {
             return $output;
         }
@@ -416,49 +416,52 @@ class core_course_renderer extends plugin_renderer_base {
             $completioninfo = new completion_info($course);
         }
         $completion = $completioninfo->is_enabled($mod);
+
         if ($completion == COMPLETION_TRACKING_NONE) {
-            if ($this->page->user_is_editing()) {
+            if ($isediting) {
                 $output .= html_writer::span('&nbsp;', 'filler');
             }
             return $output;
         }
 
-        $completiondata = $completioninfo->get_data($mod, true);
         $completionicon = '';
 
-        if ($this->page->user_is_editing()) {
+        if ($isediting || !$istrackeduser) {
             switch ($completion) {
                 case COMPLETION_TRACKING_MANUAL :
                     $completionicon = 'manual-enabled'; break;
                 case COMPLETION_TRACKING_AUTOMATIC :
                     $completionicon = 'auto-enabled'; break;
             }
-        } else if ($completion == COMPLETION_TRACKING_MANUAL) {
-            switch($completiondata->completionstate) {
-                case COMPLETION_INCOMPLETE:
-                    $completionicon = 'manual-n' . ($completiondata->overrideby ? '-override' : '');
-                    break;
-                case COMPLETION_COMPLETE:
-                    $completionicon = 'manual-y' . ($completiondata->overrideby ? '-override' : '');
-                    break;
-            }
-        } else { // Automatic
-            switch($completiondata->completionstate) {
-                case COMPLETION_INCOMPLETE:
-                    $completionicon = 'auto-n' . ($completiondata->overrideby ? '-override' : '');
-                    break;
-                case COMPLETION_COMPLETE:
-                    $completionicon = 'auto-y' . ($completiondata->overrideby ? '-override' : '');
-                    break;
-                case COMPLETION_COMPLETE_PASS:
-                    $completionicon = 'auto-pass'; break;
-                case COMPLETION_COMPLETE_FAIL:
-                    $completionicon = 'auto-fail'; break;
+        } else {
+            $completiondata = $completioninfo->get_data($mod, true);
+            if ($completion == COMPLETION_TRACKING_MANUAL) {
+                switch($completiondata->completionstate) {
+                    case COMPLETION_INCOMPLETE:
+                        $completionicon = 'manual-n' . ($completiondata->overrideby ? '-override' : '');
+                        break;
+                    case COMPLETION_COMPLETE:
+                        $completionicon = 'manual-y' . ($completiondata->overrideby ? '-override' : '');
+                        break;
+                }
+            } else { // Automatic
+                switch($completiondata->completionstate) {
+                    case COMPLETION_INCOMPLETE:
+                        $completionicon = 'auto-n' . ($completiondata->overrideby ? '-override' : '');
+                        break;
+                    case COMPLETION_COMPLETE:
+                        $completionicon = 'auto-y' . ($completiondata->overrideby ? '-override' : '');
+                        break;
+                    case COMPLETION_COMPLETE_PASS:
+                        $completionicon = 'auto-pass'; break;
+                    case COMPLETION_COMPLETE_FAIL:
+                        $completionicon = 'auto-fail'; break;
+                }
             }
         }
         if ($completionicon) {
             $formattedname = html_entity_decode($mod->get_formatted_name(), ENT_QUOTES, 'UTF-8');
-            if ($completiondata->overrideby) {
+            if (!$isediting && $istrackeduser && $completiondata->overrideby) {
                 $args = new stdClass();
                 $args->modname = $formattedname;
                 $overridebyuser = \core_user::get_user($completiondata->overrideby, '*', MUST_EXIST);
@@ -468,7 +471,7 @@ class core_course_renderer extends plugin_renderer_base {
                 $imgalt = get_string('completion-alt-' . $completionicon, 'completion', $formattedname);
             }
 
-            if ($this->page->user_is_editing() || !has_capability('moodle/course:togglecompletion', $mod->context)) {
+            if ($isediting || !$istrackeduser || !has_capability('moodle/course:togglecompletion', $mod->context)) {
                 // When editing, the icon is just an image.
                 $completionpixicon = new pix_icon('i/completion-'.$completionicon, $imgalt, '',
                         array('title' => $imgalt, 'class' => 'iconsmall'));
@@ -1116,7 +1119,8 @@ class core_course_renderer extends plugin_renderer_base {
         // If we display course in collapsed form but the course has summary or course contacts, display the link to the info page.
         $content .= html_writer::start_tag('div', array('class' => 'moreinfo'));
         if ($chelper->get_show_courses() < self::COURSECAT_SHOW_COURSES_EXPANDED) {
-            if ($course->has_summary() || $course->has_course_contacts() || $course->has_course_overviewfiles()) {
+            if ($course->has_summary() || $course->has_course_contacts() || $course->has_course_overviewfiles()
+                    || $course->has_custom_fields()) {
                 $url = new moodle_url('/course/info.php', array('id' => $course->id));
                 $image = $this->output->pix_icon('i/info', $this->strings->summary);
                 $content .= html_writer::link($url, $image, array('title' => $this->strings->summary));
@@ -1219,6 +1223,13 @@ class core_course_renderer extends plugin_renderer_base {
                                 $cat->get_formatted_name(), array('class' => $cat->visible ? '' : 'dimmed'));
                 $content .= html_writer::end_tag('div'); // .coursecat
             }
+        }
+
+        // Display custom fields.
+        if ($course->has_custom_fields()) {
+            $handler = core_course\customfield\course_handler::create();
+            $customfields = $handler->display_custom_fields_data($course->get_custom_fields());
+            $content .= \html_writer::tag('div', $customfields, ['class' => 'customfields-container']);
         }
 
         return $content;
@@ -1578,35 +1589,38 @@ class core_course_renderer extends plugin_renderer_base {
      */
     public function course_category($category) {
         global $CFG;
-        $coursecat = core_course_category::get(is_object($category) ? $category->id : $category);
+        $usertop = core_course_category::user_top();
+        if (empty($category)) {
+            $coursecat = $usertop;
+        } else if (is_object($category) && $category instanceof core_course_category) {
+            $coursecat = $category;
+        } else {
+            $coursecat = core_course_category::get(is_object($category) ? $category->id : $category);
+        }
         $site = get_site();
         $output = '';
 
-        if (can_edit_in_category($coursecat->id)) {
+        if ($coursecat->can_create_course() || $coursecat->has_manage_capability()) {
             // Add 'Manage' button if user has permissions to edit this category.
             $managebutton = $this->single_button(new moodle_url('/course/management.php',
                 array('categoryid' => $coursecat->id)), get_string('managecourses'), 'get');
             $this->page->set_button($managebutton);
         }
-        if (!$coursecat->id) {
-            if (core_course_category::count_all() == 1) {
-                // There exists only one category in the system, do not display link to it
-                $coursecat = core_course_category::get_default();
-                $strfulllistofcourses = get_string('fulllistofcourses');
-                $this->page->set_title("$site->shortname: $strfulllistofcourses");
-            } else {
-                $strcategories = get_string('categories');
-                $this->page->set_title("$site->shortname: $strcategories");
-            }
+
+        if (core_course_category::is_simple_site()) {
+            // There is only one category in the system, do not display link to it.
+            $strfulllistofcourses = get_string('fulllistofcourses');
+            $this->page->set_title("$site->shortname: $strfulllistofcourses");
+        } else if (!$coursecat->id || !$coursecat->is_uservisible()) {
+            $strcategories = get_string('categories');
+            $this->page->set_title("$site->shortname: $strcategories");
         } else {
-            $title = $site->shortname;
-            if (core_course_category::count_all() > 1) {
-                $title .= ": ". $coursecat->get_formatted_name();
-            }
-            $this->page->set_title($title);
+            $strfulllistofcourses = get_string('fulllistofcourses');
+            $this->page->set_title("$site->shortname: $strfulllistofcourses");
 
             // Print the category selector
-            if (core_course_category::count_all() > 1) {
+            $categorieslist = core_course_category::make_categories_list();
+            if (count($categorieslist) > 1) {
                 $output .= html_writer::start_tag('div', array('class' => 'categorypicker'));
                 $select = new single_select(new moodle_url('/course/index.php'), 'categoryid',
                         core_course_category::make_categories_list(), $coursecat->id, null, 'switchcategory');
@@ -1640,13 +1654,13 @@ class core_course_renderer extends plugin_renderer_base {
         }
         $coursedisplayoptions['limit'] = $perpage;
         $catdisplayoptions['limit'] = $perpage;
-        if ($browse === 'courses' || !$coursecat->has_children()) {
+        if ($browse === 'courses' || !$coursecat->get_children_count()) {
             $coursedisplayoptions['offset'] = $page * $perpage;
             $coursedisplayoptions['paginationurl'] = new moodle_url($baseurl, array('browse' => 'courses'));
             $catdisplayoptions['nodisplay'] = true;
             $catdisplayoptions['viewmoreurl'] = new moodle_url($baseurl, array('browse' => 'categories'));
             $catdisplayoptions['viewmoretext'] = new lang_string('viewallsubcategories');
-        } else if ($browse === 'categories' || !$coursecat->has_courses()) {
+        } else if ($browse === 'categories' || !$coursecat->get_courses_count()) {
             $coursedisplayoptions['nodisplay'] = true;
             $catdisplayoptions['offset'] = $page * $perpage;
             $catdisplayoptions['paginationurl'] = new moodle_url($baseurl, array('browse' => 'categories'));
@@ -1666,24 +1680,23 @@ class core_course_renderer extends plugin_renderer_base {
 
         // Add action buttons
         $output .= $this->container_start('buttons');
-        $context = get_category_or_system_context($coursecat->id);
-        if (has_capability('moodle/course:create', $context)) {
-            // Print link to create a new course, for the 1st available category.
-            if ($coursecat->id) {
-                $url = new moodle_url('/course/edit.php', array('category' => $coursecat->id, 'returnto' => 'category'));
-            } else {
-                $url = new moodle_url('/course/edit.php', array('category' => $CFG->defaultrequestcategory, 'returnto' => 'topcat'));
+        if ($coursecat->is_uservisible()) {
+            $context = get_category_or_system_context($coursecat->id);
+            if (has_capability('moodle/course:create', $context)) {
+                // Print link to create a new course, for the 1st available category.
+                if ($coursecat->id) {
+                    $url = new moodle_url('/course/edit.php', array('category' => $coursecat->id, 'returnto' => 'category'));
+                } else {
+                    $url = new moodle_url('/course/edit.php',
+                        array('category' => $CFG->defaultrequestcategory, 'returnto' => 'topcat'));
+                }
+                $output .= $this->single_button($url, get_string('addnewcourse'), 'get');
             }
-            $output .= $this->single_button($url, get_string('addnewcourse'), 'get');
-        }
-        ob_start();
-        if (core_course_category::count_all() == 1) {
-            print_course_request_buttons(context_system::instance());
-        } else {
+            ob_start();
             print_course_request_buttons($context);
+            $output .= ob_get_contents();
+            ob_end_clean();
         }
-        $output .= ob_get_contents();
-        ob_end_clean();
         $output .= $this->container_end();
 
         return $output;
@@ -1824,7 +1837,7 @@ class core_course_renderer extends plugin_renderer_base {
         if (empty($displayoptions)) {
             $displayoptions = array();
         }
-        $showcategories = core_course_category::count_all() > 1;
+        $showcategories = !core_course_category::is_simple_site();
         $displayoptions += array('limit' => $CFG->coursesperpage, 'offset' => 0);
         $chelper = new coursecat_helper();
         $searchcriteria = array('tagid' => $tagid, 'ctx' => $ctx, 'rec' => $rec);
@@ -1946,15 +1959,15 @@ class core_course_renderer extends plugin_renderer_base {
         if (!empty($courses) || !empty($rcourses) || !empty($rhosts)) {
 
             $chelper = new coursecat_helper();
+            $totalcount = count($courses);
             if (count($courses) > $CFG->frontpagecourselimit) {
                 // There are more enrolled courses than we can display, display link to 'My courses'.
-                $totalcount = count($courses);
                 $courses = array_slice($courses, 0, $CFG->frontpagecourselimit, true);
                 $chelper->set_courses_display_options(array(
                         'viewmoreurl' => new moodle_url('/my/'),
                         'viewmoretext' => new lang_string('mycourses')
                     ));
-            } else {
+            } else if (core_course_category::top()->is_uservisible()) {
                 // All enrolled courses are displayed, display link to 'All courses' if there are more courses in system.
                 $chelper->set_courses_display_options(array(
                         'viewmoreurl' => new moodle_url('/course/index.php'),
@@ -2003,8 +2016,8 @@ class core_course_renderer extends plugin_renderer_base {
                     'viewmoretext' => new lang_string('fulllistofcourses')));
 
         $chelper->set_attributes(array('class' => 'frontpage-course-list-all'));
-        $courses = core_course_category::get(0)->get_courses($chelper->get_courses_display_options());
-        $totalcount = core_course_category::get(0)->get_courses_count($chelper->get_courses_display_options());
+        $courses = core_course_category::top()->get_courses($chelper->get_courses_display_options());
+        $totalcount = core_course_category::top()->get_courses_count($chelper->get_courses_display_options());
         if (!$totalcount && !$this->page->user_is_editing() && has_capability('moodle/course:create', context_system::instance())) {
             // Print link to create a new course, for the 1st available category.
             return $this->add_new_course_button();
@@ -2034,6 +2047,11 @@ class core_course_renderer extends plugin_renderer_base {
      */
     public function frontpage_combo_list() {
         global $CFG;
+        // TODO MDL-10965 improve.
+        $tree = core_course_category::top();
+        if (!$tree->get_children_count()) {
+            return '';
+        }
         $chelper = new coursecat_helper();
         $chelper->set_subcat_depth($CFG->maxcategorydepth)->
             set_categories_display_options(array(
@@ -2047,7 +2065,7 @@ class core_course_renderer extends plugin_renderer_base {
                         array('browse' => 'courses', 'page' => 1))
             ))->
             set_attributes(array('class' => 'frontpage-category-combo'));
-        return $this->coursecat_tree($chelper, core_course_category::get(0));
+        return $this->coursecat_tree($chelper, $tree);
     }
 
     /**
@@ -2057,6 +2075,11 @@ class core_course_renderer extends plugin_renderer_base {
      */
     public function frontpage_categories_list() {
         global $CFG;
+        // TODO MDL-10965 improve.
+        $tree = core_course_category::top();
+        if (!$tree->get_children_count()) {
+            return '';
+        }
         $chelper = new coursecat_helper();
         $chelper->set_subcat_depth($CFG->maxcategorydepth)->
                 set_show_courses(self::COURSECAT_SHOW_COURSES_COUNT)->
@@ -2066,7 +2089,7 @@ class core_course_renderer extends plugin_renderer_base {
                             array('browse' => 'categories', 'page' => 1))
                 ))->
                 set_attributes(array('class' => 'frontpage-category-names'));
-        return $this->coursecat_tree($chelper, core_course_category::get(0));
+        return $this->coursecat_tree($chelper, $tree);
     }
 
     /**
@@ -2330,10 +2353,10 @@ class core_course_renderer extends plugin_renderer_base {
     /**
      * Output news for the frontpage (extract from site-wide news forum)
      *
-     * @param stdClass $newsforum record from db table 'forum' that represents the site news forum
+     * @param stdClass $forum record from db table 'forum' that represents the site news forum
      * @return string
      */
-    protected function frontpage_news($newsforum) {
+    protected function frontpage_news($forum) {
         global $CFG, $SITE, $SESSION, $USER;
         require_once($CFG->dirroot .'/mod/forum/lib.php');
 
@@ -2342,23 +2365,27 @@ class core_course_renderer extends plugin_renderer_base {
         if (isloggedin()) {
             $SESSION->fromdiscussion = $CFG->wwwroot;
             $subtext = '';
-            if (\mod_forum\subscriptions::is_subscribed($USER->id, $newsforum)) {
-                if (!\mod_forum\subscriptions::is_forcesubscribed($newsforum)) {
+            if (\mod_forum\subscriptions::is_subscribed($USER->id, $forum)) {
+                if (!\mod_forum\subscriptions::is_forcesubscribed($forum)) {
                     $subtext = get_string('unsubscribe', 'forum');
                 }
             } else {
                 $subtext = get_string('subscribe', 'forum');
             }
-            $suburl = new moodle_url('/mod/forum/subscribe.php', array('id' => $newsforum->id, 'sesskey' => sesskey()));
+            $suburl = new moodle_url('/mod/forum/subscribe.php', array('id' => $forum->id, 'sesskey' => sesskey()));
             $output .= html_writer::tag('div', html_writer::link($suburl, $subtext), array('class' => 'subscribelink'));
         }
 
-        ob_start();
-        forum_print_latest_discussions($SITE, $newsforum, $SITE->newsitems, 'plain', 'p.modified DESC');
-        $output .= ob_get_contents();
-        ob_end_clean();
+        $coursemodule = get_coursemodule_from_instance('forum', $forum->id);
+        $context = context_module::instance($coursemodule->id);
 
-        return $output;
+        $entityfactory = mod_forum\local\container::get_entity_factory();
+        $forumentity = $entityfactory->get_forum_from_stdclass($forum, $context, $coursemodule, $SITE);
+
+        $rendererfactory = mod_forum\local\container::get_renderer_factory();
+        $discussionsrenderer = $rendererfactory->get_frontpage_news_discussion_list_renderer($forumentity);
+        $cm = \cm_info::create($coursemodule);
+        return $output . $discussionsrenderer->render($USER, $cm, null, null, 0, $SITE->newsitems);
     }
 
     /**
@@ -2371,6 +2398,9 @@ class core_course_renderer extends plugin_renderer_base {
      * @return string
      */
     protected function frontpage_part($skipdivid, $contentsdivid, $header, $contents) {
+        if (strval($contents) === '') {
+            return '';
+        }
         $output = html_writer::link('#' . $skipdivid,
             get_string('skipa', 'access', core_text::strtolower(strip_tags($header))),
             array('class' => 'skip-block skip'));
@@ -2404,8 +2434,7 @@ class core_course_renderer extends plugin_renderer_base {
             $frontpagelayout = $CFG->frontpage;
         }
 
-        $frontpageoptions = explode(',', $frontpagelayout);
-        foreach ($frontpageoptions as $v) {
+        foreach (explode(',', $frontpagelayout) as $v) {
             switch ($v) {
                 // Display the main part of the front page.
                 case FRONTPAGENEWS:
@@ -2426,22 +2455,13 @@ class core_course_renderer extends plugin_renderer_base {
                     if (!empty($mycourseshtml)) {
                         $output .= $this->frontpage_part('skipmycourses', 'frontpage-course-list',
                             get_string('mycourses'), $mycourseshtml);
-                        break;
-                    } else {
-                        // Temp fix/fallback in order to display available courses when enrolled courses should be shown,
-                        // but user is not enrolled in any course.
-                        if (array_search(FRONTPAGEALLCOURSELIST, $frontpageoptions)) {
-                            break;
-                        }
                     }
-                    // No "break" here. If there are no enrolled courses - continue to 'Available courses'.
+                    break;
 
                 case FRONTPAGEALLCOURSELIST:
                     $availablecourseshtml = $this->frontpage_available_courses();
-                    if (!empty($availablecourseshtml)) {
-                        $output .= $this->frontpage_part('skipavailablecourses', 'frontpage-available-course-list',
-                            get_string('availablecourses'), $availablecourseshtml);
-                    }
+                    $output .= $this->frontpage_part('skipavailablecourses', 'frontpage-available-course-list',
+                        get_string('availablecourses'), $availablecourseshtml);
                     break;
 
                 case FRONTPAGECATEGORYNAMES:
@@ -2461,6 +2481,7 @@ class core_course_renderer extends plugin_renderer_base {
             }
             $output .= '<br />';
         }
+
         return $output;
     }
 }
@@ -2504,6 +2525,7 @@ class coursecat_helper {
         // and core_course_category::search_courses().
         $this->coursesdisplayoptions['summary'] = $showcourses >= core_course_renderer::COURSECAT_SHOW_COURSES_AUTO;
         $this->coursesdisplayoptions['coursecontacts'] = $showcourses >= core_course_renderer::COURSECAT_SHOW_COURSES_EXPANDED;
+        $this->coursesdisplayoptions['customfields'] = $showcourses >= core_course_renderer::COURSECAT_SHOW_COURSES_COLLAPSED;
         return $this;
     }
 
@@ -2550,6 +2572,7 @@ class coursecat_helper {
      *      this may be a huge list!
      *    - summary - preloads fields 'summary' and 'summaryformat'
      *    - coursecontacts - preloads course contacts
+     *    - customfields - preloads custom fields data
      *    - isenrolled - preloads indication whether this user is enrolled in the course
      *    - sort - list of fields to sort. Example
      *             array('idnumber' => 1, 'shortname' => 1, 'id' => -1)
@@ -2702,7 +2725,7 @@ class coursecat_helper {
      * @return string|null
      */
     public function get_category_formatted_description($coursecat, $options = null) {
-        if ($coursecat->id && !empty($coursecat->description)) {
+        if ($coursecat->id && $coursecat->is_uservisible() && !empty($coursecat->description)) {
             if (!isset($coursecat->descriptionformat)) {
                 $descriptionformat = FORMAT_MOODLE;
             } else {

@@ -23,9 +23,11 @@
  */
 
 $string['all'] = 'All';
+$string['allexcepthidden'] = 'All (except hidden)';
 $string['addtofavourites'] = 'Star this course';
 $string['aria:addtofavourites'] = 'Star for';
 $string['aria:allcourses'] = 'All courses';
+$string['aria:allcoursesexcepthidden'] = 'All courses except hidden courses';
 $string['aria:card'] = 'Switch to card view';
 $string['aria:controls'] = 'Course overview controls';
 $string['aria:courseactions'] = 'Actions for current course';
@@ -46,15 +48,15 @@ $string['aria:sortingdropdown'] = 'Sorting drop-down menu';
 $string['card'] = 'Card';
 $string['cards'] = 'Cards';
 $string['courseprogress'] = 'Course progress:';
-$string['complete'] = 'complete';
+$string['completepercent'] = '{$a}% complete';
+$string['displaycategories'] = 'Display categories';
+$string['displaycategories_help'] = 'Display the course category on dashboard course items including cards, list items and summary items.';
 $string['favourites'] = 'Starred';
 $string['future'] = 'Future';
 $string['inprogress'] = 'In progress';
 $string['lastaccessed'] = 'Last accessed';
 $string['list'] = 'List';
-$string['myoverview:addinstance'] = 'Add a new course overview block';
 $string['myoverview:myaddinstance'] = 'Add a new course overview block to Dashboard';
-$string['nocourses'] = 'No courses';
 $string['past'] = 'Past';
 $string['pluginname'] = 'Course overview';
 $string['privacy:metadata:overviewsortpreference'] = 'The Course overview block sort preference.';
@@ -90,3 +92,7 @@ $string['timeline'] = 'Timeline';
 $string['viewcoursename'] = 'View course {$a}';
 $string['privacy:metadata:overviewlasttab'] = 'This stores the last tab selected by the user on the overview block.';
 $string['viewcourse'] = 'View course';
+
+// Deprecated since Moodle 3.7.
+$string['complete'] = 'complete';
+$string['nocourses'] = 'No courses';

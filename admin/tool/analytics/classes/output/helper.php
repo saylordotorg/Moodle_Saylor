@@ -45,7 +45,7 @@ class helper {
         // Form field is PARAM_ALPHANUMEXT and we are sending fully qualified class names
         // as option names, but replacing the backslash for a string that is really unlikely
         // to ever be part of a class name.
-        return str_replace('\\', '2015102400ouuu', $class);
+        return str_replace('\\', '__', $class);
     }
 
     /**
@@ -56,6 +56,53 @@ class helper {
      */
     public static function option_to_class($option) {
         // Really unlikely but yeah, I'm a bad booyyy.
-        return str_replace('2015102400ouuu', '\\', $option);
+        return str_replace('__', '\\', $option);
+    }
+
+    /**
+     * Sets an analytics > analytics models > $title breadcrumb.
+     *
+     * @param string $title
+     * @param \moodle_url $url
+     * @param \context|null $context Defaults to context_system
+     * @return null
+     */
+    public static function set_navbar(string $title, \moodle_url $url, ?\context $context = null) {
+        global $PAGE;
+
+        if (!$context) {
+            $context = \context_system::instance();
+        }
+
+        $PAGE->set_context($context);
+        $PAGE->set_url($url);
+
+        if ($siteadmin = $PAGE->settingsnav->find('root', \navigation_node::TYPE_SITE_ADMIN)) {
+            $PAGE->navbar->add($siteadmin->get_content(), $siteadmin->action());
+        }
+        if ($analytics = $PAGE->settingsnav->find('analytics', \navigation_node::TYPE_SETTING)) {
+            $PAGE->navbar->add($analytics->get_content(), $analytics->action());
+        }
+        if ($analyticmodels = $PAGE->settingsnav->find('analyticmodels', \navigation_node::TYPE_SETTING)) {
+            $PAGE->navbar->add($analyticmodels->get_content(), $analyticmodels->action());
+        }
+        $PAGE->navbar->add($title);
+
+        $PAGE->set_pagelayout('report');
+        $PAGE->set_title($title);
+        $PAGE->set_heading($title);
+    }
+
+    /**
+     * Resets the current page.
+     *
+     * Note that this function can only be used by analytics pages that work at the system context.
+     *
+     * @return null
+     */
+    public static function reset_page() {
+        global $PAGE;
+        $PAGE->reset_theme_and_output();
+        $PAGE->set_context(\context_system::instance());
     }
 }

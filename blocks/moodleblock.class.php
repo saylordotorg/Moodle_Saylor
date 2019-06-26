@@ -462,11 +462,10 @@ class block_base {
      * Allows the block to load any JS it requires into the page.
      *
      * By default this function simply permits the user to dock the block if it is dockable.
+     *
+     * Left null as of MDL-64506.
      */
     function get_required_javascript() {
-        if ($this->instance_can_be_docked() && !$this->hide_header()) {
-            user_preference_allow_ajax_update('docked_block_instance_'.$this->instance->id, PARAM_INT);
-        }
     }
 
     /**
@@ -578,16 +577,14 @@ class block_base {
      * @return boolean
      */
     function user_can_addto($page) {
-        global $USER;
+        // List of formats this block supports.
+        $formats = $this->applicable_formats();
 
         // The blocks in My Moodle are a special case and use a different capability.
-        if (!empty($USER->id)
-            && $page->context->contextlevel == CONTEXT_USER // Page belongs to a user
-            && $page->context->instanceid == $USER->id // Page belongs to this user
-            && $page->pagetype == 'my-index') { // Ensure we are on the My Moodle page
+        $mypagetypes = my_page_type_list($page->pagetype); // Get list of possible my page types.
 
+        if (array_key_exists($page->pagetype, $mypagetypes)) { // Ensure we are on a page with a my page type.
             // If the block cannot be displayed on /my it is ok if the myaddinstance capability is not defined.
-            $formats = $this->applicable_formats();
             // Is 'my' explicitly forbidden?
             // If 'all' has not been allowed, has 'my' been explicitly allowed?
             if ((isset($formats['my']) && $formats['my'] == false)
@@ -600,6 +597,12 @@ class block_base {
                 return $this->has_add_block_capability($page, $capability)
                        && has_capability('moodle/my:manageblocks', $page->context);
             }
+        }
+        // Check if this is a block only used on /my.
+        unset($formats['my']);
+        if (empty($formats)) {
+            // Block can only be added to /my - return false.
+            return false;
         }
 
         $capability = 'block/' . $this->name() . ':addinstance';
@@ -643,10 +646,11 @@ class block_base {
      * Can be overridden by the block to prevent the block from being dockable.
      *
      * @return bool
+     *
+     * Return false as per MDL-64506
      */
     public function instance_can_be_docked() {
-        global $CFG;
-        return (!empty($CFG->allowblockstodock) && $this->page->theme->enable_dock);
+        return false;
     }
 
     /**

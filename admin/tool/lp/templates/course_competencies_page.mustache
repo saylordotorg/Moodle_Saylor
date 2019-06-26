@@ -15,13 +15,17 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
+    @template tool_lp/course_competencies_page
+
     Course competencies template.
 
     For a full list of the context for this template see the course_competencies_page renderable.
+
+    This template includes ajax functionality, so it cannot be shown in the template library.
 }}
 <div data-region="coursecompetenciespage">
     <div data-region="actions" class="clearfix">
-        <div class="pull-xs-left">
+        <div class="float-sm-left">
             {{#canmanagecoursecompetencies}}
                 <button class="btn btn-secondary" disabled>{{#str}}addcoursecompetencies, tool_lp{{/str}}</button>
             {{/canmanagecoursecompetencies}}
@@ -57,8 +61,8 @@
     <tr class="drag-samenode" data-id="{{competency.id}}">
     <td>
         {{#canmanagecoursecompetencies}}
-        <span class="drag-handlecontainer pull-xs-left"></span>
-        <div class="pull-xs-right">
+        <span class="drag-handlecontainer float-sm-left"></span>
+        <div class="float-sm-right">
             <a href="#" data-action="delete-competency-link" data-id="{{competency.id}}">
                 {{#pix}}t/delete, core, {{#str}}delete{{/str}}{{/pix}}
             </a>
@@ -74,11 +78,11 @@
             <p>{{{competency.description}}}</p>
         {{/competency}}
         {{#comppath}}
-            <span class="pull-xs-left">{{#str}}path, tool_lp{{/str}}&nbsp;</span>{{> tool_lp/competency_path }}
+            <span class="float-sm-left">{{#str}}path, tool_lp{{/str}}&nbsp;</span>{{> tool_lp/competency_path }}
         {{/comppath}}
         {{#usercompetencycourse}}
             {{#grade}}
-            <span class="label {{^proficiency}}label-important{{/proficiency}}">{{gradename}}</span>
+            <span class="badge {{^proficiency}}badge-danger{{/proficiency}}">{{gradename}}</span>
             {{/grade}}
         {{/usercompetencycourse}}
         {{#canmanagecoursecompetencies}}
@@ -95,13 +99,27 @@
         {{/canmanagecoursecompetencies}}
         <div data-region="coursecompetencyactivities">
         <p>
-        <ul class="inline list-inline">
+        <strong>{{#str}}activities{{/str}}</strong>
+        <ul class="inline list-inline p-2">
         {{#coursemodules}}
             <li class="list-inline-item"><a href="{{url}}"><img src="{{iconurl}}"> {{name}} </a></li>
         {{/coursemodules}}
         {{^coursemodules}}
-            <li class="list-inline-item"><span class="alert">{{#str}}noactivities, tool_lp{{/str}}</span></li>
+            <li class="list-inline-item">{{#str}}noactivities, tool_lp{{/str}}</li>
         {{/coursemodules}}
+        </ul>
+        </p>
+        </div>
+        <div data-region="learningplans">
+        <p>
+        <strong>{{#str}}userplans, core_competency{{/str}}</strong>
+        <ul class="inline list-inline p-2">
+        {{#plans}}
+            <li class="list-inline-item"><a href="{{pluginbaseurl}}/plan.php?id={{id}}">{{{name}}}</a></li>
+        {{/plans}}
+        {{^plans}}
+            <li class="list-inline-item">{{#str}}nouserplanswithcompetency, core_competency{{/str}}</li>
+        {{/plans}}
         </ul>
         </p>
         </div>
@@ -112,7 +130,12 @@
 </table>
 {{^competencies}}
 <p class="alert alert-info">
-    {{#str}}nocompetenciesincourse, tool_lp{{/str}}
+    {{#moduleid}}
+        {{#str}}nocompetenciesinactivity, tool_lp{{/str}}
+    {{/moduleid}}
+    {{^moduleid}}
+        {{#str}}nocompetenciesincourse, tool_lp{{/str}}
+    {{/moduleid}}
 </p>
 {{/competencies}}
 </div>

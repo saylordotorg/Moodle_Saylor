@@ -24,11 +24,13 @@ Feature: Message send messages
       | student1 | G1 |
       | student2 | G1 |
     And the following config values are set as admin:
-      | messaging | 1 |
+      | messaging        | 1 |
+      | messagingminpoll | 1 |
 
   Scenario: Send a message to a group conversation
     Given I log in as "student1"
     And I open messaging
+    And I open the "Group" conversations list
     And "Group 1" "group_message" should exist
     And I select "Group 1" conversation in messaging
     When I send "Hi!" message in the message area
@@ -44,6 +46,7 @@ Feature: Message send messages
   Scenario: Send a message to a starred conversation
     Given I log in as "student1"
     When I open messaging
+    And I open the "Group" conversations list
     Then "Group 1" "group_message" should exist
     And I select "Group 1" conversation in the "group-messages" conversations list
     And I open contact menu

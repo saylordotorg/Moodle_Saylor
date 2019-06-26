@@ -277,7 +277,8 @@ class core_course_external extends external_api {
                             $module['completiondata'] = array(
                                 'state'         => $completiondata->completionstate,
                                 'timecompleted' => $completiondata->timemodified,
-                                'overrideby'    => $completiondata->overrideby
+                                'overrideby'    => $completiondata->overrideby,
+                                'valueused'     => core_availability\info::completion_value_used($course, $cm->id)
                             );
                         }
 
@@ -317,7 +318,33 @@ class core_course_external extends external_api {
                             require_once($CFG->dirroot . '/mod/' . $cm->modname . '/lib.php');
                             $getcontentfunction = $cm->modname.'_export_contents';
                             if (function_exists($getcontentfunction)) {
-                                if (empty($filters['excludecontents']) and $contents = $getcontentfunction($cm, $baseurl)) {
+                                $contents = $getcontentfunction($cm, $baseurl);
+                                $module['contentsinfo'] = array(
+                                    'filescount' => count($contents),
+                                    'filessize' => 0,
+                                    'lastmodified' => 0,
+                                    'mimetypes' => array(),
+                                );
+                                foreach ($contents as $content) {
+                                    // Check repository file (only main file).
+                                    if (!isset($module['contentsinfo']['repositorytype'])) {
+                                        $module['contentsinfo']['repositorytype'] =
+                                            isset($content['repositorytype']) ? $content['repositorytype'] : '';
+                                    }
+                                    if (isset($content['filesize'])) {
+                                        $module['contentsinfo']['filessize'] += $content['filesize'];
+                                    }
+                                    if (isset($content['timemodified']) &&
+                                            ($content['timemodified'] > $module['contentsinfo']['lastmodified'])) {
+
+                                        $module['contentsinfo']['lastmodified'] = $content['timemodified'];
+                                    }
+                                    if (isset($content['mimetype'])) {
+                                        $module['contentsinfo']['mimetypes'][$content['mimetype']] = $content['mimetype'];
+                                    }
+                                }
+
+                                if (empty($filters['excludecontents']) and !empty($contents)) {
                                     $module['contents'] = $contents;
                                 } else {
                                     $module['contents'] = array();
@@ -440,6 +467,8 @@ class core_course_external extends external_api {
                                             'timecompleted' => new external_value(PARAM_INT, 'Timestamp for completion status.'),
                                             'overrideby' => new external_value(PARAM_INT, 'The user id who has overriden the
                                                 status.'),
+                                            'valueused' => new external_value(PARAM_BOOL, 'Whether the completion status affects
+                                                the availability of another activity.', VALUE_OPTIONAL),
                                         ), 'Module completion data.', VALUE_OPTIONAL
                                     ),
                                     'contents' => new external_multiple_structure(
@@ -465,9 +494,26 @@ class core_course_external extends external_api {
                                                   'userid' => new external_value(PARAM_INT, 'User who added this content to moodle'),
                                                   'author' => new external_value(PARAM_TEXT, 'Content owner'),
                                                   'license' => new external_value(PARAM_TEXT, 'Content license'),
+                                                  'tags' => new external_multiple_structure(
+                                                       \core_tag\external\tag_item_exporter::get_read_structure(), 'Tags',
+                                                            VALUE_OPTIONAL
+                                                   ),
                                               )
                                           ), VALUE_DEFAULT, array()
-                                      )
+                                      ),
+                                    'contentsinfo' => new external_single_structure(
+                                        array(
+                                            'filescount' => new external_value(PARAM_INT, 'Total number of files.'),
+                                            'filessize' => new external_value(PARAM_INT, 'Total files size.'),
+                                            'lastmodified' => new external_value(PARAM_INT, 'Last time files were modified.'),
+                                            'mimetypes' => new external_multiple_structure(
+                                                new external_value(PARAM_RAW, 'File mime type.'),
+                                                'Files mime types.'
+                                            ),
+                                            'repositorytype' => new external_value(PARAM_PLUGIN, 'The repository type for
+                                                the main file.', VALUE_OPTIONAL),
+                                        ), 'Contents summary information.', VALUE_OPTIONAL
+                                    ),
                                 )
                             ), 'list of module'
                     )
@@ -551,6 +597,19 @@ class core_course_external extends external_api {
             if (array_key_exists('numsections', $courseformatoptions)) {
                 // For backward-compartibility
                 $courseinfo['numsections'] = $courseformatoptions['numsections'];
+            }
+
+            $handler = core_course\customfield\course_handler::create();
+            if ($customfields = $handler->export_instance_data($course->id)) {
+                $courseinfo['customfields'] = [];
+                foreach ($customfields as $data) {
+                    $courseinfo['customfields'][] = [
+                        'type' => $data->get_type(),
+                        'value' => $data->get_value(),
+                        'name' => $data->get_name(),
+                        'shortname' => $data->get_shortname()
+                    ];
+                }
             }
 
             //some field should be returned only if the user has update permission
@@ -663,9 +722,16 @@ class core_course_external extends external_api {
                                 new external_single_structure(
                                     array('name' => new external_value(PARAM_ALPHANUMEXT, 'course format option name'),
                                         'value' => new external_value(PARAM_RAW, 'course format option value')
-                                )),
-                                    'additional options for particular course format', VALUE_OPTIONAL
+                                )), 'additional options for particular course format', VALUE_OPTIONAL
                              ),
+                            'customfields' => new external_multiple_structure(
+                                new external_single_structure(
+                                    ['name' => new external_value(PARAM_TEXT, 'The name of the custom field'),
+                                     'shortname' => new external_value(PARAM_ALPHANUMEXT, 'The shortname of the custom field'),
+                                     'type'  => new external_value(PARAM_COMPONENT,
+                                         'The type of the custom field - text, checkbox...'),
+                                     'value' => new external_value(PARAM_RAW, 'The value of the custom field')]
+                                ), 'Custom fields and associated values', VALUE_OPTIONAL),
                         ), 'course'
                 )
         );
@@ -739,8 +805,14 @@ class core_course_external extends external_api {
                                         'value' => new external_value(PARAM_RAW, 'course format option value')
                                 )),
                                     'additional options for particular course format', VALUE_OPTIONAL),
-                        )
-                    ), 'courses to create'
+                            'customfields' => new external_multiple_structure(
+                                new external_single_structure(
+                                    array(
+                                        'shortname'  => new external_value(PARAM_ALPHANUMEXT, 'The shortname of the custom field'),
+                                        'value' => new external_value(PARAM_RAW, 'The value of the custom field'),
+                                )), 'custom fields for the course', VALUE_OPTIONAL
+                            )
+                    )), 'courses to create'
                 )
             )
         );
@@ -828,6 +900,13 @@ class core_course_external extends external_api {
                 }
             }
 
+            // Custom fields.
+            if (!empty($course['customfields'])) {
+                foreach ($course['customfields'] as $field) {
+                    $course['customfield_'.$field['shortname']] = $field['value'];
+                }
+            }
+
             //Note: create_course() core function check shortname, idnumber, category
             $course['id'] = create_course((object) $course)->id;
 
@@ -909,8 +988,14 @@ class core_course_external extends external_api {
                                 new external_single_structure(
                                     array('name' => new external_value(PARAM_ALPHANUMEXT, 'course format option name'),
                                         'value' => new external_value(PARAM_RAW, 'course format option value')
-                                )),
-                                    'additional options for particular course format', VALUE_OPTIONAL),
+                                )), 'additional options for particular course format', VALUE_OPTIONAL),
+                            'customfields' => new external_multiple_structure(
+                                new external_single_structure(
+                                    [
+                                        'shortname'  => new external_value(PARAM_ALPHANUMEXT, 'The shortname of the custom field'),
+                                        'value' => new external_value(PARAM_RAW, 'The value of the custom field')
+                                    ]
+                                ), 'Custom fields', VALUE_OPTIONAL),
                         )
                     ), 'courses to update'
                 )
@@ -1021,6 +1106,13 @@ class core_course_external extends external_api {
                         if (isset($option['name']) && isset($option['value'])) {
                             $course[$option['name']] = $option['value'];
                         }
+                    }
+                }
+
+                // Prepare list of custom fields.
+                if (isset($course['customfields'])) {
+                    foreach ($course['customfields'] as $field) {
+                        $course['customfield_' . $field['shortname']] = $field['value'];
                     }
                 }
 
@@ -1782,7 +1874,7 @@ class core_course_external extends external_api {
             if (!isset($excludedcats[$category->id])) {
 
                 // Final check to see if the category is visible to the user.
-                if ($category->visible or has_capability('moodle/category:viewhiddencategories', $context)) {
+                if (core_course_category::can_view_category($category)) {
 
                     $categoryinfo = array();
                     $categoryinfo['id'] = $category->id;
@@ -2285,6 +2377,8 @@ class core_course_external extends external_api {
                     'Optional list of required capabilities (used to filter the list)', VALUE_DEFAULT, array()
                 ),
                 'limittoenrolled' => new external_value(PARAM_BOOL, 'limit to enrolled courses', VALUE_DEFAULT, 0),
+                'onlywithcompletion' => new external_value(PARAM_BOOL, 'limit to courses where completion is enabled',
+                    VALUE_DEFAULT, 0),
             )
         );
     }
@@ -2369,6 +2463,20 @@ class core_course_external extends external_api {
         $coursereturns['contacts']          = $coursecontacts;
         $coursereturns['enrollmentmethods'] = $enroltypes;
         $coursereturns['sortorder']         = $course->sortorder;
+
+        $handler = core_course\customfield\course_handler::create();
+        if ($customfields = $handler->export_instance_data($course->id)) {
+            $coursereturns['customfields'] = [];
+            foreach ($customfields as $data) {
+                $coursereturns['customfields'][] = [
+                    'type' => $data->get_type(),
+                    'value' => $data->get_value(),
+                    'name' => $data->get_name(),
+                    'shortname' => $data->get_shortname()
+                ];
+            }
+        }
+
         return $coursereturns;
     }
 
@@ -2381,6 +2489,7 @@ class core_course_external extends external_api {
      * @param int $perpage          Items per page
      * @param array $requiredcapabilities Optional list of required capabilities (used to filter the list).
      * @param int $limittoenrolled  Limit to only enrolled courses
+     * @param int onlywithcompletion Limit to only courses where completion is enabled
      * @return array of course objects and warnings
      * @since Moodle 3.0
      * @throws moodle_exception
@@ -2390,7 +2499,8 @@ class core_course_external extends external_api {
                                           $page=0,
                                           $perpage=0,
                                           $requiredcapabilities=array(),
-                                          $limittoenrolled=0) {
+                                          $limittoenrolled=0,
+                                          $onlywithcompletion=0) {
         global $CFG;
 
         $warnings = array();
@@ -2400,7 +2510,9 @@ class core_course_external extends external_api {
             'criteriavalue' => $criteriavalue,
             'page'          => $page,
             'perpage'       => $perpage,
-            'requiredcapabilities' => $requiredcapabilities
+            'requiredcapabilities' => $requiredcapabilities,
+            'limittoenrolled' => $limittoenrolled,
+            'onlywithcompletion' => $onlywithcompletion
         );
         $params = self::validate_parameters(self::search_courses_parameters(), $parameters);
         self::validate_context(context_system::instance());
@@ -2426,6 +2538,9 @@ class core_course_external extends external_api {
         // Prepare the search API options.
         $searchcriteria = array();
         $searchcriteria[$params['criterianame']] = $params['criteriavalue'];
+        if ($params['onlywithcompletion']) {
+            $searchcriteria['onlywithcompletion'] = true;
+        }
 
         $options = array();
         if ($params['perpage'] != 0) {
@@ -2499,6 +2614,17 @@ class core_course_external extends external_api {
                 new external_value(PARAM_PLUGIN, 'enrollment method'),
                 'enrollment methods list'
             ),
+            'customfields' => new external_multiple_structure(
+                new external_single_structure(
+                    array(
+                        'name' => new external_value(PARAM_RAW, 'The name of the custom field'),
+                        'shortname' => new external_value(PARAM_RAW,
+                            'The shortname of the custom field - to be able to build the field class in the code'),
+                        'type'  => new external_value(PARAM_ALPHANUMEXT,
+                            'The type of the custom field - text field, checkbox...'),
+                        'value' => new external_value(PARAM_RAW, 'The value of the custom field'),
+                    )
+                ), 'Custom fields', VALUE_OPTIONAL),
         );
 
         if (!$onlypublicdata) {
@@ -3136,14 +3262,18 @@ class core_course_external extends external_api {
             }
             // Get the public course information, even if we are not enrolled.
             $courseinlist = new core_course_list_element($course);
-            $coursesdata[$course->id] = self::get_course_public_information($courseinlist, $context);
 
             // Now, check if we have access to the course.
             try {
                 self::validate_context($context);
             } catch (Exception $e) {
+                // User can not access the course, check if they can see the public information about the course and return it.
+                if (core_course_category::can_view_course_info($course)) {
+                    $coursesdata[$course->id] = self::get_course_public_information($courseinlist, $context);
+                }
                 continue;
             }
+            $coursesdata[$course->id] = self::get_course_public_information($courseinlist, $context);
             // Return information for any user that can access the course.
             $coursefields = array('format', 'showgrades', 'newsitems', 'startdate', 'enddate', 'maxbytes', 'showreports', 'visible',
                 'groupmode', 'groupmodeforce', 'defaultgroupingid', 'enablecompletion', 'completionnotify', 'lang', 'theme',

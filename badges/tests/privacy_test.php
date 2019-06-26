@@ -669,7 +669,6 @@ class core_badges_privacy_testcase extends provider_testcase {
      * Align a badge.
      *
      * @param array $params Parameters.
-     * @param string $suffix Option to append to strings.
      * @return object
      */
     protected function align_badge(array $params = [], $suffix = '') {
@@ -680,9 +679,9 @@ class core_badges_privacy_testcase extends provider_testcase {
             'targeturl' => "http://issuer-url.domain.co.nz",
             'targetdescription' => "Description" . $suffix,
             'targetframework' => "Framework" . $suffix,
-            'targetcode' => "Code" . $suffix
+            'targetcode' => "Code . $suffix"
         ], $params);
-        $record->id = $DB->insert_record('badge_competencies', $record);
+        $record->id = $DB->insert_record('badge_alignment', $record);
 
         return $record;
     }
@@ -694,8 +693,9 @@ class core_badges_privacy_testcase extends provider_testcase {
      * @return object
      */
     protected function endorse_badge(array $params = []) {
-        global $DB, $USER;
+        global $DB;
         $record = (object) array_merge([
+            'badgeid' => null,
             'issuername' => "External issuer name",
             'issuerurl' => "http://issuer-url.domain.co.nz",
             'issueremail' => "issuer@example.com",

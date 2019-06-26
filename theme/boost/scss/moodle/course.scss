@@ -42,6 +42,13 @@
     margin: 0;
 }
 
+body:not(.editing)  .sitetopic ul.section {
+    padding-left: 0;
+    .label .mod-indent-outer {
+        padding-left: 0;
+    }
+}
+
 .course-content ul.section {
     margin: $spacer;
 }
@@ -618,14 +625,16 @@ span.editinstructions {
 .coursebox > .info > .coursename,
 .coursebox .content .teachers,
 .coursebox .content .courseimage,
-.coursebox .content .coursefile {
+.coursebox .content .coursefile,
+.coursebox .content .customfields-container {
     float: left;
     clear: left;
 }
 
 .coursebox .content .teachers,
 .coursebox .content .courseimage,
-.coursebox .content .coursefile {
+.coursebox .content .coursefile,
+.coursebox .content .customfields-container {
     width: 40%;
 }
 
@@ -683,7 +692,8 @@ span.editinstructions {
 .coursebox .content .courseimage,
 .coursebox .content .coursefile,
 .coursebox .content .teachers,
-.coursebox.remotecoursebox .remotecourseinfo {
+.coursebox.remotecoursebox .remotecourseinfo,
+.coursebox .content .customfields-container {
     margin: 15px 5px 5px;
     padding: 0;
 }

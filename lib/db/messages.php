@@ -72,12 +72,18 @@ $messageproviders = array (
 
     // Course request approval notification
     'courserequestapproved' => array (
-         'capability'  => 'moodle/course:request'
+         'capability'  => 'moodle/course:request',
+         'defaults' => array(
+            'airnotifier' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN + MESSAGE_DEFAULT_LOGGEDOFF,
+        ),
     ),
 
     // Course request rejection notification
     'courserequestrejected' => array (
-        'capability'  => 'moodle/course:request'
+        'capability'  => 'moodle/course:request',
+        'defaults' => array(
+            'airnotifier' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN + MESSAGE_DEFAULT_LOGGEDOFF,
+        ),
     ),
 
     // Badge award notification to a badge recipient.
@@ -85,6 +91,7 @@ $messageproviders = array (
         'defaults' => array(
             'popup' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN + MESSAGE_DEFAULT_LOGGEDOFF,
             'email' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDOFF,
+            'airnotifier' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN + MESSAGE_DEFAULT_LOGGEDOFF,
         ),
         'capability'  => 'moodle/badges:earnbadge'
     ),
@@ -104,7 +111,11 @@ $messageproviders = array (
 
     // User insights.
     'insights' => array (
-         'capability'  => 'moodle/analytics:listinsights'
+        'defaults' => [
+            'popup' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN + MESSAGE_DEFAULT_LOGGEDOFF,
+            'email' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDOFF,
+            'airnotifier' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN + MESSAGE_DEFAULT_LOGGEDOFF,
+        ]
     ),
 
     // Message contact requests.
@@ -112,6 +123,15 @@ $messageproviders = array (
         'defaults' => [
             'popup' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN + MESSAGE_DEFAULT_LOGGEDOFF,
             'email' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDOFF,
+            'airnotifier' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN + MESSAGE_DEFAULT_LOGGEDOFF,
         ]
     ],
+
+    // Asyncronhous backup/restore notifications.
+    'asyncbackupnotification' => array(
+        'defaults' => array(
+            'popup' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN + MESSAGE_DEFAULT_LOGGEDOFF,
+            'email' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDOFF,
+        )
+    ),
 );

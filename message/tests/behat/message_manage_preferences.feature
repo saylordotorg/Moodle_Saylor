@@ -33,8 +33,9 @@ Feature: Manage preferences
       | user     | contact |
       | student1 | student2 |
     And the following config values are set as admin:
-      | messaging | 1 |
+      | messaging         | 1 |
       | messagingallusers | 1 |
+      | messagingminpoll  | 1 |
 
   # Recipient has 'My contacts only' set.
   Scenario: Allow sending a message when you are a contact
@@ -95,3 +96,24 @@ Feature: Manage preferences
     And I open messaging
     And I search for "Student 1" in messaging
     And I should see "No results"
+
+  Scenario: Sending a message when 'User enter to send' is enabled
+    Given I log in as "student1"
+    And I open messaging
+    And I select "Student 2" user in messaging
+    And I set the field with xpath "//textarea[@data-region='send-message-txt']" to "Hi!"
+    And I press key "13" in "//textarea[@data-region='send-message-txt']" "xpath_element"
+    Then I should see "Hi!" in the "//*[@data-region='message-drawer']//div[@data-region='content-message-container']" "xpath_element"
+
+  Scenario: Sending a message after 'Use enter to send' is disabled
+    Given I log in as "student1"
+    And I open messaging
+    And I open messaging settings preferences
+    When I click on "//label[text()[contains(.,'Use enter to send')]]" "xpath_element"
+    And I go back in "view-settings" message drawer
+    Then I select "Student 2" user in messaging
+    And I set the field with xpath "//textarea[@data-region='send-message-txt']" to "Hi!"
+    And I press key "13" in "//textarea[@data-region='send-message-txt']" "xpath_element"
+    And I should not see "Hi!" in the "//*[@data-region='message-drawer']//div[@data-region='content-message-container']" "xpath_element"
+    And I press "Send message"
+    And I should see "Hi!" in the "//*[@data-region='message-drawer']//div[@data-region='content-message-container']" "xpath_element"

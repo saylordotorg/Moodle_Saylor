@@ -182,8 +182,8 @@ class mod_checklist_renderer extends plugin_renderer_base {
                     continue;
                 }
 
-                if ($status->is_checkgroupings() && $item->grouping) {
-                    if (!in_array($item->grouping, $groupings)) {
+                if ($status->is_checkgroupings() && $item->groupingid) {
+                    if (!in_array($item->groupingid, $groupings)) {
                         continue; // Current user is not a member of this item's grouping, so skip.
                     }
                 }
@@ -229,11 +229,11 @@ class mod_checklist_renderer extends plugin_renderer_base {
 
                 $checkclass = '';
                 if ($item->is_heading()) {
-                    $optional = ' class="itemheading '.$itemcolour.'" ';
+                    $optional = ' class="itemheading '.$itemcolour.' ml-1" ';
                 } else if ($item->is_required()) {
-                    $optional = ' class="'.$itemcolour.'" ';
+                    $optional = ' class="'.$itemcolour.' ml-1" ';
                 } else {
-                    $optional = ' class="itemoptional '.$itemcolour.'" ';
+                    $optional = ' class="itemoptional '.$itemcolour.' ml-1" ';
                     $checkclass = ' itemoptional';
                 }
 
@@ -916,9 +916,9 @@ ENDSCRIPT;
 
         $out .= '<br>';
         $out .= html_writer::label(get_string('grouping', 'mod_checklist'), 'id_grouping').' ';
-        $selected = $item ? $item->grouping : null;
+        $selected = $item ? $item->groupingid : null;
         $groupings = checklist_class::get_course_groupings($status->get_courseid());
-        $out .= html_writer::select($groupings, 'grouping', $selected, [0 => get_string('anygrouping', 'mod_checklist')],
+        $out .= html_writer::select($groupings, 'groupingid', $selected, [0 => get_string('anygrouping', 'mod_checklist')],
                                     ['id' => 'id_grouping']);
 
         return $out;

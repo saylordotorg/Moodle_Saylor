@@ -24,11 +24,13 @@ Feature: Unread messages
       | student1 | NG |
       | student2 | NG |
     And the following config values are set as admin:
-      | messaging | 1 |
+      | messaging        | 1 |
+      | messagingminpoll | 1 |
 
   Scenario: Unread messages for group conversation
     Given I log in as "student1"
     When I open messaging
+    And I open the "Group" conversations list
     Then "New group" "group_message" should exist
     And I select "New group" conversation in messaging
     And I send "Hi!" message in the message area

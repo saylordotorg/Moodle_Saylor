@@ -57,8 +57,6 @@ class behat_deprecated extends behat_base {
     /**
      * Click link in navigation tree that matches the text in parentnode/s (seperated using greater-than character if more than one)
      *
-     * @Given /^I navigate to "(?P<nodetext_string>(?:[^"]|\\")*)" node in "(?P<parentnodes_string>(?:[^"]|\\")*)"$/
-     *
      * @throws ExpectationException
      * @param string $nodetext navigation node to click.
      * @param string $parentnodes comma seperated list of parent nodes.
@@ -78,7 +76,55 @@ class behat_deprecated extends behat_base {
         $this->deprecated_message($alternative);
 
         $parentnodes = array_map('trim', explode('>', $parentnodes));
-        $this->execute('behat_navigation::select_node_in_navigation', array($nodetext, $parentnodes));
+        $nodelist = array_merge($parentnodes, [$nodetext]);
+        $firstnode = array_shift($nodelist);
+
+        if ($firstnode === get_string('administrationsite')) {
+            $this->execute('behat_theme_boost_behat_navigation::i_select_from_flat_navigation_drawer',
+                    array(get_string('administrationsite')));
+            $this->execute('behat_theme_boost_behat_navigation::select_on_administration_page', array($nodelist));
+            return;
+        }
+
+        if ($firstnode === get_string('sitepages')) {
+            if ($nodetext === get_string('calendar', 'calendar')) {
+                $this->execute('behat_theme_boost_behat_navigation::i_select_from_flat_navigation_drawer',
+                        array(($nodetext)));
+            } else {
+                // TODO MDL-57120 other links under "Site pages" are not accessible without navigation block.
+                $this->execute('behat_theme_boost_behat_navigation::select_node_in_navigation',
+                        array($nodetext, $parentnodes));
+            }
+            return;
+        }
+
+        if ($firstnode === get_string('courseadministration')) {
+            // Administration menu is available only on the main course page where settings in Administration
+            // block (original purpose of the step) are available on every course page.
+            $this->execute('behat_theme_boost_behat_navigation::go_to_main_course_page', array());
+        }
+
+        $this->execute('behat_theme_boost_behat_navigation::select_from_administration_menu', array($nodelist));
+    }
+
+    /**
+     * Docks a block. Editing mode should be previously enabled.
+     * @throws ExpectationException
+     * @param string $blockname
+     * @return void
+     * @deprecated since Moodle 3.7 MDL-64506 - please do not use this definition step any more.
+     * @todo MDL-65215 This will be deleted in Moodle 4.1.
+     */
+    public function i_dock_block($blockname) {
+
+        $message = "Block docking is no longer used as of MDL-64506. Please update your tests.";
+        $this->deprecated_message($message);
+
+        // Looking for both title and alt.
+        $xpath = "//input[@type='image'][@title='" . get_string('dockblock', 'block', $blockname) . "' or @alt='" . get_string('addtodock', 'block') . "']";
+        $this->execute('behat_general::i_click_on_in_the',
+                array($xpath, "xpath_element", $this->escape($blockname), "block")
+        );
     }
 
     /**

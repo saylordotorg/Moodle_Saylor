@@ -140,7 +140,7 @@ $string['importgroups_help'] = 'Groups may be imported via text file. The format
 * Each record is a series of data separated by commas
 * The first record contains a list of fieldnames defining the format of the rest of the file
 * Required fieldname is groupname
-* Optional fieldnames are groupidnumber, description, enrolmentkey, groupingname';
+* Optional fieldnames are groupidnumber, description, enrolmentkey, groupingname, enablemessaging';
 $string['importgroups_link'] = 'group/import';
 $string['includeonlyactiveenrol'] = 'Include only active enrolments';
 $string['includeonlyactiveenrol_help'] = 'If enabled, suspended users will not be included in groups.';
@@ -196,3 +196,4 @@ $string['toomanygroups'] = 'Insufficient users to populate this number of groups
 $string['usercount'] = 'User count';
 $string['usercounttotal'] = 'User count ({$a})';
 $string['usergroupmembership'] = 'Selected user\'s membership:';
+$string['memberofgroup'] = 'Group member of: {$a}';

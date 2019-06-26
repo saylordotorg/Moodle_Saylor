@@ -41,9 +41,6 @@ function xmldb_feedback_upgrade($oldversion) {
 
     $dbman = $DB->get_manager(); // Loads ddl manager and xmldb classes.
 
-    // Automatically generated Moodle v3.2.0 release upgrade line.
-    // Put any upgrade step following this.
-
     if ($oldversion < 2017032800) {
 
         // Delete duplicated records in feedback_completed. We just keep the last record of completion.
@@ -82,6 +79,9 @@ function xmldb_feedback_upgrade($oldversion) {
     // Put any upgrade step following this.
 
     // Automatically generated Moodle v3.6.0 release upgrade line.
+    // Put any upgrade step following this.
+
+    // Automatically generated Moodle v3.7.0 release upgrade line.
     // Put any upgrade step following this.
 
     return true;

@@ -773,7 +773,9 @@ class moodle_url {
      * @param string $pathname
      * @param string $filename
      * @param bool $forcedownload
-     * @param boolean $includetoken Whether to use a user token when displaying this group image.
+     * @param mixed $includetoken Whether to use a user token when displaying this group image.
+     *                True indicates to generate a token for current user, and integer value indicates to generate a token for the
+     *                user whose id is the value indicated.
      *                If the group picture is included in an e-mail or some other location where the audience is a specific
      *                user who will not be logged in when viewing, then we use a token to authenticate the user.
      * @return moodle_url
@@ -786,7 +788,8 @@ class moodle_url {
 
         if ($includetoken) {
             $urlbase = "$CFG->wwwroot/tokenpluginfile.php";
-            $token = get_user_key('core_files', $USER->id);
+            $userid = $includetoken === true ? $USER->id : $includetoken;
+            $token = get_user_key('core_files', $userid);
             if ($CFG->slasharguments) {
                 $path[] = $token;
             }
@@ -1104,13 +1107,10 @@ function page_get_doc_link_path(moodle_page $page) {
  * @return boolean
  */
 function validate_email($address) {
+    global $CFG;
+    require_once($CFG->libdir.'/phpmailer/moodle_phpmailer.php');
 
-    return (bool)preg_match('#^[-!\#$%&\'*+\\/0-9=?A-Z^_`a-z{|}~]+'.
-                 '(\.[-!\#$%&\'*+\\/0-9=?A-Z^_`a-z{|}~]+)*'.
-                  '@'.
-                  '[-!\#$%&\'*+\\/0-9=?A-Z^_`a-z{|}~]+\.'.
-                  '[-!\#$%&\'*+\\./0-9=?A-Z^_`a-z{|}~]+$#',
-                  $address);
+    return moodle_phpmailer::validateAddress($address);
 }
 
 /**
@@ -2281,7 +2281,8 @@ function send_headers($contenttype, $cacheable = true) {
     }
     @header('Accept-Ranges: none');
 
-    if (empty($CFG->allowframembedding)) {
+    // The Moodle app must be allowed to embed content always.
+    if (empty($CFG->allowframembedding) && !core_useragent::is_moodle_app()) {
         @header('X-Frame-Options: sameorigin');
     }
 }
@@ -2493,6 +2494,8 @@ function print_collapsible_region_end($return = false) {
  * @param boolean $return If false print picture, otherwise return the output as string
  * @param boolean $link Enclose image in a link to view specified course?
  * @param boolean $includetoken Whether to use a user token when displaying this group image.
+ *                True indicates to generate a token for current user, and integer value indicates to generate a token for the
+ *                user whose id is the value indicated.
  *                If the group picture is included in an e-mail or some other location where the audience is a specific
  *                user who will not be logged in when viewing, then we use a token to authenticate the user.
  * @return string|void Depending on the setting of $return
@@ -2547,6 +2550,8 @@ function print_group_picture($group, $courseid, $large = false, $return = false,
  * @param  int $courseid The course ID for the group.
  * @param  bool $large A large or small group picture? Default is small.
  * @param  boolean $includetoken Whether to use a user token when displaying this group image.
+ *                 True indicates to generate a token for current user, and integer value indicates to generate a token for the
+ *                 user whose id is the value indicated.
  *                 If the group picture is included in an e-mail or some other location where the audience is a specific
  *                 user who will not be logged in when viewing, then we use a token to authenticate the user.
  * @return moodle_url Returns the url for the group picture.

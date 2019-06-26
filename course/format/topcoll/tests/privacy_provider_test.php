@@ -17,8 +17,7 @@
 /**
  * Unit tests for the implementation of the privacy API.
  *
- * @package    course/format
- * @subpackage topcoll
+ * @package    format_topcoll
  * @version    See the value of '$plugin->version' in version.php.
  * @copyright  &copy; 2018-onwards G J Barnard based upon code originally written by Andrew Nicols.
  * @author     G J Barnard - {@link http://moodle.org/user/profile.php?id=442195}
@@ -75,7 +74,7 @@ class format_topcoll_privacy_testcase extends \core_privacy\tests\provider_testc
     protected function set_up() {
         $this->resetAfterTest(true);
 
-        set_config('theme', 'clean');
+        set_config('theme', 'boost');
         global $PAGE;
         $this->outputus = $PAGE->get_renderer('format_topcoll');
         // Ref: https://docs.moodle.org/dev/Writing_PHPUnit_tests.

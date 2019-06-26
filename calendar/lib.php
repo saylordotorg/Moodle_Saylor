@@ -2347,8 +2347,11 @@ function calendar_get_default_courses($courseid = null, $fields = '*', $canmanag
         $fieldlist = explode(',', $fields);
 
         $prefixedfields = array_map(function($value) {
-            return 'c.' . trim($value);
+            return 'c.' . trim(strtolower($value));
         }, $fieldlist);
+        if (!in_array('c.visible', $prefixedfields) && !in_array('c.*', $prefixedfields)) {
+            $prefixedfields[] = 'c.visible';
+        }
         $courses = get_courses('all', 'c.shortname', implode(',', $prefixedfields));
     } else {
         $courses = enrol_get_users_courses($userid, true, $fields);
@@ -3234,10 +3237,12 @@ function core_calendar_user_preferences() {
  *                              or events in progress/already started selected as well
  * @param boolean $ignorehidden whether to select only visible events or all events
  * @param array $categories array of category ids and/or objects.
+ * @param int $limitnum Number of events to fetch or zero to fetch all.
+ *
  * @return array $events of selected events or an empty array if there aren't any (or there was an error)
  */
 function calendar_get_legacy_events($tstart, $tend, $users, $groups, $courses,
-        $withduration = true, $ignorehidden = true, $categories = []) {
+        $withduration = true, $ignorehidden = true, $categories = [], $limitnum = 0) {
     // Normalise the users, groups and courses parameters so that they are compliant with \core_calendar\local\api::get_events().
     // Existing functions that were using the old calendar_get_events() were passing a mixture of array, int, boolean for these
     // parameters, but with the new API method, only null and arrays are accepted.
@@ -3274,7 +3279,7 @@ function calendar_get_legacy_events($tstart, $tend, $users, $groups, $courses,
         null,
         null,
         null,
-        40,
+        $limitnum,
         null,
         $userparam,
         $groupparam,
@@ -3297,9 +3302,11 @@ function calendar_get_legacy_events($tstart, $tend, $users, $groups, $courses,
  * @param   string  $view The type of calendar to have displayed
  * @param   bool    $includenavigation Whether to include navigation
  * @param   bool    $skipevents Whether to load the events or not
+ * @param   int     $lookahead Overwrites site and users's lookahead setting.
  * @return  array[array, string]
  */
-function calendar_get_view(\calendar_information $calendar, $view, $includenavigation = true, bool $skipevents = false) {
+function calendar_get_view(\calendar_information $calendar, $view, $includenavigation = true, bool $skipevents = false,
+        ?int $lookahead = null) {
     global $PAGE, $CFG;
 
     $renderer = $PAGE->get_renderer('core_calendar');
@@ -3309,7 +3316,7 @@ function calendar_get_view(\calendar_information $calendar, $view, $includenavig
     $calendardate = $type->timestamp_to_date_array($calendar->time);
 
     $date = new \DateTime('now', core_date::get_user_timezone_object(99));
-    $eventlimit = 200;
+    $eventlimit = 0;
 
     if ($view === 'day') {
         $tstart = $type->convert_to_timestamp($calendardate['year'], $calendardate['mon'], $calendardate['mday']);
@@ -3317,12 +3324,14 @@ function calendar_get_view(\calendar_information $calendar, $view, $includenavig
         $date->modify('+1 day');
     } else if ($view === 'upcoming' || $view === 'upcoming_mini') {
         // Number of days in the future that will be used to fetch events.
-        if (isset($CFG->calendar_lookahead)) {
-            $defaultlookahead = intval($CFG->calendar_lookahead);
-        } else {
-            $defaultlookahead = CALENDAR_DEFAULT_UPCOMING_LOOKAHEAD;
+        if (!$lookahead) {
+            if (isset($CFG->calendar_lookahead)) {
+                $defaultlookahead = intval($CFG->calendar_lookahead);
+            } else {
+                $defaultlookahead = CALENDAR_DEFAULT_UPCOMING_LOOKAHEAD;
+            }
+            $lookahead = get_user_preferences('calendar_lookahead', $defaultlookahead);
         }
-        $lookahead = get_user_preferences('calendar_lookahead', $defaultlookahead);
 
         // Maximum number of events to be displayed on upcoming view.
         $defaultmaxevents = CALENDAR_DEFAULT_UPCOMING_MAXEVENTS;

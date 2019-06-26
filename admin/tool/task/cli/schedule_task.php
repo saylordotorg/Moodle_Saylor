@@ -50,7 +50,7 @@ Options:
 -h, --help            Print out this help
 
 Example:
-\$sudo -u www-data /usr/bin/php admin/tool/task/cli/scheduled_task.php --execute=\\\\core\\\\task\\\\session_cleanup_task
+\$sudo -u www-data /usr/bin/php admin/tool/task/cli/schedule_task.php --execute=\\\\core\\\\task\\\\session_cleanup_task
 
 ";
 
@@ -129,6 +129,7 @@ if ($execute = $options['execute']) {
     $predbqueries = $DB->perf_get_queries();
     $pretime = microtime(true);
 
+    \core\task\logmanager::start_logging($task);
     $fullname = $task->get_name() . ' (' . get_class($task) . ')';
     mtrace('Execute scheduled task: ' . $fullname);
     // NOTE: it would be tricky to move this code to \core\task\manager class,

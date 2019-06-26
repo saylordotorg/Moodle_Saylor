@@ -739,8 +739,8 @@ class theme_config {
         $this->name     = $config->name;
         $this->dir      = $config->dir;
 
-        if ($this->name != 'bootstrapbase') {
-            $baseconfig = theme_config::find_theme_config('bootstrapbase', $this->settings);
+        if ($this->name != self::DEFAULT_THEME) {
+            $baseconfig = self::find_theme_config(self::DEFAULT_THEME, $this->settings);
         } else {
             $baseconfig = $config;
         }
@@ -748,7 +748,7 @@ class theme_config {
         $configurable = array(
             'parents', 'sheets', 'parents_exclude_sheets', 'plugins_exclude_sheets', 'usefallback',
             'javascripts', 'javascripts_footer', 'parents_exclude_javascripts',
-            'layouts', 'enable_dock', 'enablecourseajax', 'requiredblocks',
+            'layouts', 'enablecourseajax', 'requiredblocks',
             'rendererfactory', 'csspostprocess', 'editor_sheets', 'editor_scss', 'rarrow', 'larrow', 'uarrow', 'darrow',
             'hidefromselector', 'doctype', 'yuicssmodules', 'blockrtlmanipulations',
             'lessfile', 'extralesscallback', 'lessvariablescallback', 'blockrendermethod',
@@ -1547,7 +1547,7 @@ class theme_config {
      * @return string Return compiled css.
      */
     public function get_precompiled_css_content() {
-        $configs = [$this] + $this->parent_configs;
+        $configs = array_reverse($this->parent_configs) + [$this];
         $css = '';
 
         foreach ($configs as $config) {
@@ -2558,8 +2558,8 @@ class theme_config {
             }
         }
 
-        // Last resort, try the bootstrapbase theme for names
-        return get_string('region-' . $region, 'theme_bootstrapbase');
+        // Last resort, try the boost theme for names
+        return get_string('region-' . $region, 'theme_boost');
     }
 
     /**

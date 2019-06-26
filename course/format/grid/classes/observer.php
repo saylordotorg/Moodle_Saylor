@@ -17,8 +17,7 @@
 /**
  * Grid Format - A topics based format that uses a grid of user selectable images to popup a light box of the section.
  *
- * @package    course/format
- * @subpackage grid
+ * @package    format_grid
  * @category   event
  * @version    See the value of '$plugin->version' in version.php.
  * @copyright  &copy; 2017-onwards G J Barnard based upon work done by Marina Glancy.
@@ -45,16 +44,33 @@ class format_grid_observer {
     public static function course_content_deleted(\core\event\course_content_deleted $event) {
         if (class_exists('format_grid', false)) {
             // If class format_grid was never loaded, this is definitely not a course in 'Grid' format.
-            global $DB;
-            /* Delete any images associated with the course.
-               Done this way so will work if the course has
-               been a grid format course in the past even if
-               it is not now. */
-            $courseformat = format_grid::get_instance($event->objectid);
-            $courseformat->delete_images();
-            unset($courseformat);  // Destruct.
-
-            $DB->delete_records("format_grid_summary", array("courseid" => $event->objectid));
+            self::delete_images_and_summary($event->objectid);
         }
+    }
+
+    /**
+     * Observer for the event course_restored.
+     *
+     * Deletes the settings entry for the given course upon course deletion.
+     *
+     * @param \core\event\course_restored $event
+     */
+    public static function course_restored(\core\event\course_restored $event) {
+        global $DB;
+        $format = $DB->get_field('course', 'format', array('id' => $event->objectid));
+        if ($format != 'grid') {
+            // Then delete the images and any summary.
+            self::delete_images_and_summary($event->objectid);
+        }
+    }
+
+    protected static function delete_images_and_summary($courseid) {
+        global $DB;
+        // Delete any images associated with the course.
+        $courseformat = format_grid::get_instance($courseid);
+        $courseformat->delete_images();
+        unset($courseformat);  // Destruct.
+
+        $DB->delete_records("format_grid_summary", array("courseid" => $courseid));
     }
 }

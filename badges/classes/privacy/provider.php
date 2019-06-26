@@ -92,7 +92,7 @@ class provider implements
         $collection->add_database_table('badge_backpack', [
             'userid' => 'privacy:metadata:backpack:userid',
             'email' => 'privacy:metadata:backpack:email',
-            'backpackurl' => 'privacy:metadata:backpack:backpackurl',
+            'externalbackpackid' => 'privacy:metadata:backpack:externalbackpackid',
             'backpackuid' => 'privacy:metadata:backpack:backpackuid',
             // The columns autosync and password are not used.
         ], 'privacy:metadata:backpack');
@@ -197,20 +197,21 @@ class provider implements
 
         if ($context->contextlevel == CONTEXT_COURSE || $context->contextlevel == CONTEXT_SYSTEM) {
             // Find the modifications we made on badges (course & system).
-            $params = [
-                'courselevel' => CONTEXT_COURSE,
-                'syscontextid' => SYSCONTEXTID,
-                'typecourse' => BADGE_TYPE_COURSE,
-                'typesite' => BADGE_TYPE_SITE,
-                'contextid' => $context->id,
-            ];
+            if ($context->contextlevel == CONTEXT_COURSE) {
+                $extrawhere = 'AND b.courseid = :courseid';
+                $params = [
+                    'badgetype' => BADGE_TYPE_COURSE,
+                    'courseid'  => $context->instanceid
+                ];
+            } else {
+                $extrawhere = '';
+                $params = ['badgetype' => BADGE_TYPE_SITE];
+            }
 
             $sql = "SELECT b.usermodified, b.usercreated
                       FROM {badge} b
-                      JOIN {context} ctx
-                           ON (b.type = :typecourse AND b.courseid = ctx.instanceid AND ctx.contextlevel = :courselevel)
-                           OR (b.type = :typesite AND ctx.id = :syscontextid)
-                     WHERE ctx.id = :contextid";
+                     WHERE b.type = :badgetype
+                           $extrawhere";
 
             $userlist->add_from_sql('usermodified', $sql, $params);
             $userlist->add_from_sql('usercreated', $sql, $params);
@@ -404,9 +405,9 @@ class provider implements
              LEFT JOIN {badge_issued} bi
                     ON bi.badgeid = b.id
                    AND bi.userid = :userid1
-             LEFT JOIN {badge_related} brb
+            LEFT JOIN {badge_related} brb
                     ON ( b.id = brb.badgeid OR b.id = brb.relatedbadgeid )
-             LEFT JOIN {badge_competencies} ba
+             LEFT JOIN {badge_alignment} ba
                     ON ( b.id = ba.badgeid )
              LEFT JOIN {badge_endorsement} be
                     ON be.badgeid = b.id
@@ -459,6 +460,7 @@ class provider implements
                         context_helper::preload_from_record($record);
                         $carry['course'] = format_string($record->coursename, true, ['context' => $badge->get_context()]);
                     }
+
                     if (!empty($record->beid)) {
                         $carry['endorsement'] = [
                             'issuername' => $record->beissuername,
@@ -573,7 +575,7 @@ class provider implements
             foreach ($recordset as $record) {
                 $data[] = [
                     'email' => $record->email,
-                    'url' => $record->backpackurl,
+                    'externalbackpackid' => $record->externalbackpackid,
                     'uid' => $record->backpackuid
                 ];
             }

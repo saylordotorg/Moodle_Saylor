@@ -39,7 +39,7 @@ class backup_forum_activity_structure_step extends backup_activity_structure_ste
         // Define each element separated
 
         $forum = new backup_nested_element('forum', array('id'), array(
-            'type', 'name', 'intro', 'introformat',
+            'type', 'name', 'intro', 'introformat', 'duedate', 'cutoffdate',
             'assessed', 'assesstimestart', 'assesstimefinish', 'scale',
             'maxbytes', 'maxattachments', 'forcesubscribe', 'trackingtype',
             'rsstype', 'rssarticles', 'timemodified', 'warnafter',
@@ -51,14 +51,14 @@ class backup_forum_activity_structure_step extends backup_activity_structure_ste
         $discussion = new backup_nested_element('discussion', array('id'), array(
             'name', 'firstpost', 'userid', 'groupid',
             'assessed', 'timemodified', 'usermodified', 'timestart',
-            'timeend', 'pinned'));
+            'timeend', 'pinned', 'timelocked'));
 
         $posts = new backup_nested_element('posts');
 
         $post = new backup_nested_element('post', array('id'), array(
             'parent', 'userid', 'created', 'modified',
             'mailed', 'subject', 'message', 'messageformat',
-            'messagetrust', 'attachment', 'totalscore', 'mailnow'));
+            'messagetrust', 'attachment', 'totalscore', 'mailnow', 'privatereplyto'));
 
         $tags = new backup_nested_element('poststags');
         $tag = new backup_nested_element('tag', array('id'), array('itemid', 'rawname'));

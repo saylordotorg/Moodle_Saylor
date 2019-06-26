@@ -56,7 +56,13 @@ define('UU_PWRESET_ALL', 2);
  */
 class uu_progress_tracker {
     private $_row;
-    public $columns = array('status', 'line', 'id', 'username', 'firstname', 'lastname', 'email', 'password', 'auth', 'enrolments', 'suspended', 'deleted');
+
+    /**
+     * The columns shown on the table.
+     * @var array
+     */
+    public $columns = array('status', 'line', 'id', 'username', 'firstname', 'lastname', 'email',
+                            'password', 'auth', 'enrolments', 'suspended', 'theme', 'deleted');
 
     /**
      * Print table header.
@@ -77,6 +83,7 @@ class uu_progress_tracker {
         echo '<th class="header c'.$ci++.'" scope="col">'.get_string('authentication').'</th>';
         echo '<th class="header c'.$ci++.'" scope="col">'.get_string('enrolments', 'enrol').'</th>';
         echo '<th class="header c'.$ci++.'" scope="col">'.get_string('suspended', 'auth').'</th>';
+        echo '<th class="header c'.$ci++.'" scope="col">'.get_string('theme').'</th>';
         echo '<th class="header c'.$ci++.'" scope="col">'.get_string('delete').'</th>';
         echo '</tr>';
         $this->_row = null;
@@ -353,6 +360,7 @@ function uu_allowed_roles() {
  */
 function uu_allowed_roles_cache() {
     $allowedroles = get_assignable_roles(context_course::instance(SITEID), ROLENAME_SHORT);
+    $rolecache = [];
     foreach ($allowedroles as $rid=>$rname) {
         $rolecache[$rid] = new stdClass();
         $rolecache[$rid]->id   = $rid;
@@ -372,6 +380,7 @@ function uu_allowed_roles_cache() {
  */
 function uu_allowed_sysroles_cache() {
     $allowedroles = get_assignable_roles(context_system::instance(), ROLENAME_SHORT);
+    $rolecache = [];
     foreach ($allowedroles as $rid => $rname) {
         $rolecache[$rid] = new stdClass();
         $rolecache[$rid]->id   = $rid;

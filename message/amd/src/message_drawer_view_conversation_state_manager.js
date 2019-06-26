@@ -40,18 +40,11 @@ define(['jquery'], function($) {
      * @return {Object} newstate A copy of the state to clone.
      */
     var cloneState = function(state) {
-        var newState = $.extend({}, state);
-        newState.messages = state.messages.map(function(message) {
-            return $.extend({}, message);
-        });
-        newState.members = Object.keys(state.members).reduce(function(carry, id) {
-            carry[id] = $.extend({}, state.members[id]);
-            carry[id].contactrequests = state.members[id].contactrequests.map(function(request) {
-                return $.extend({}, request);
-            });
-            return carry;
-        }, {});
-        return newState;
+        // Do a deep extend to make sure we recursively copy objects and
+        // arrays so that the new state doesn't contain any references to
+        // the old state, e.g. adding a value to an array in the new state
+        // shouldn't also add it to the old state.
+        return $.extend(true, {}, state);
     };
 
     /**
@@ -108,19 +101,35 @@ define(['jquery'], function($) {
      * @param  {Number} midnight Midnight time.
      * @param  {Number} loggedInUserId The logged in user id.
      * @param  {Number} id The conversation id.
+     * @param  {Number} messagePollMin The message poll start timeout in seconds.
+     * @param  {Number} messagePollMax The message poll max timeout limit in seconds.
+     * @param  {Number} messagePollAfterMax The message poll frequency in seconds to reset to after max limit is reached.
      * @return {Object} Initial state.
      */
-    var buildInitialState = function(midnight, loggedInUserId, id) {
+    var buildInitialState = function(
+        midnight,
+        loggedInUserId,
+        id,
+        messagePollMin,
+        messagePollMax,
+        messagePollAfterMax
+    ) {
         return {
             midnight: midnight,
             loggedInUserId: loggedInUserId,
             id: id,
+            messagePollMin: messagePollMin,
+            messagePollMax: messagePollMax,
+            messagePollAfterMax: messagePollAfterMax,
             name: null,
             subname: null,
             type: null,
             totalMemberCount: null,
             imageUrl: null,
             isFavourite: null,
+            isMuted: null,
+            canDeleteMessagesForAllUsers: false,
+            deleteMessagesForAllUsers: false,
             members: {},
             messages: [],
             hasTriedToLoadMessages: false,
@@ -344,6 +353,19 @@ define(['jquery'], function($) {
     var setIsFavourite = function(state, isFavourite) {
         var newState = cloneState(state);
         newState.isFavourite = isFavourite;
+        return newState;
+    };
+
+    /**
+     * Set whether the conversation is a muted conversation.
+     *
+     * @param  {Object} state Current state.
+     * @param  {bool} isMuted If it's muted.
+     * @return {Object} New state.
+     */
+    var setIsMuted = function(state, isMuted) {
+        var newState = cloneState(state);
+        newState.isMuted = isMuted;
         return newState;
     };
 
@@ -644,6 +666,32 @@ define(['jquery'], function($) {
         return newState;
     };
 
+    /**
+     * Set wheter the message of the conversation can delete for all users.
+     *
+     * @param  {Object} state Current state.
+     * @param  {Bool} value If it can delete for all users.
+     * @return {Object} New state.
+     */
+    var setCanDeleteMessagesForAllUsers = function(state, value) {
+        var newState = cloneState(state);
+        newState.canDeleteMessagesForAllUsers = value;
+        return newState;
+    };
+
+    /**
+     * Set wheter the messages of the conversation delete for all users.
+     *
+     * @param  {Object} state Current state.
+     * @param  {Bool} value Delete messages for all users.
+     * @return {Object} New state.
+     */
+    var setDeleteMessagesForAllUsers = function(state, value) {
+        var newState = cloneState(state);
+        newState.deleteMessagesForAllUsers = value;
+        return newState;
+    };
+
     return {
         buildInitialState: buildInitialState,
         addMessages: addMessages,
@@ -659,6 +707,9 @@ define(['jquery'], function($) {
         setSubname: setSubname,
         setType: setType,
         setIsFavourite: setIsFavourite,
+        setIsMuted: setIsMuted,
+        setCanDeleteMessagesForAllUsers: setCanDeleteMessagesForAllUsers,
+        setDeleteMessagesForAllUsers: setDeleteMessagesForAllUsers,
         setTotalMemberCount: setTotalMemberCount,
         setImageUrl: setImageUrl,
         setLoadingConfirmAction: setLoadingConfirmAction,

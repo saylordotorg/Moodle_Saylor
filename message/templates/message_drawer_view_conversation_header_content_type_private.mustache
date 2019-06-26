@@ -36,11 +36,13 @@
 }}
 
 <div class="d-flex align-items-center">
-    <div class="align-self-stretch" >
-        <a class="h-100 mr-2 d-flex align-items-center" href="#" data-route-back role="button">
-            {{> core_message/message_drawer_icon_back }}
-        </a>
-    </div>
+    {{#showrouteback}}
+        <div class="align-self-stretch" >
+            <a class="h-100 mr-2 d-flex align-items-center" href="#" data-route-back role="button">
+                {{> core_message/message_drawer_icon_back }}
+            </a>
+        </div>
+    {{/showrouteback}}
     <div class="d-flex text-truncate">
         <a class="d-flex text-truncate text-decoration-none" href="#" data-action="view-contact" role="button">
             {{#imageurl}}
@@ -61,6 +63,10 @@
                     aria-label="{{#str}} favourites, core {{/str}}">
                         {{#pix}} i/star-rating, core {{/pix}}
                     </span>
+                    <span class="{{^ismuted}}hidden{{/ismuted}} ml-1 text-primary" data-region="muted-icon-container"
+                    aria-label="{{#str}} mutedconversation, core_message {{/str}}">
+                        {{#pix}} i/muted, core {{/pix}}
+                    </span>
                 </div>
                 {{#showonlinestatus}}
                     <p class="m-0 font-weight-light text-truncate">
@@ -73,22 +79,22 @@
     </div>
     <div class="ml-auto dropdown">
         <button id="conversation-actions-menu-button" class="btn btn-link btn-icon icon-size-3" type="button"
-            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-            aria-label="{{#str}} conversationactions, core_message {{/str}}" aria-controls="conversation-actions-menu">
-                {{#pix}} i/moremenu, core {{/pix}}
+        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+        aria-label="{{#str}} conversationactions, core_message {{/str}}" aria-controls="conversation-actions-menu">
+            {{#pix}} i/moremenu, core {{/pix}}
         </button>
-        <div id="conversation-actions-menu" class="dropdown-menu pull-right" role="menu"
-            aria-labelledby="conversation-actions-menu-button">
+        <div id="conversation-actions-menu" class="dropdown-menu float-right" role="menu"
+        aria-labelledby="conversation-actions-menu-button">
             <a class="dropdown-item" href="#" data-action="view-contact" role="menuitem">
                 {{#str}} info, core_message {{/str}}
             </a>
             <a class="dropdown-item {{#isfavourite}}hidden{{/isfavourite}} {{^showfavourite}}hidden{{/showfavourite}}" href="#"
-                data-action="confirm-favourite" role="menuitem">
-                    {{#str}} addtofavourites, core_message {{/str}}
+            data-action="confirm-favourite" role="menuitem">
+                {{#str}} addtofavourites, core_message {{/str}}
             </a>
             <a class="dropdown-item {{^isfavourite}}hidden{{/isfavourite}} {{^showfavourite}}hidden{{/showfavourite}}" href="#"
-                data-action="confirm-unfavourite" role="menuitem">
-                    {{#str}} removefromfavourites, core_message {{/str}}
+            data-action="confirm-unfavourite" role="menuitem">
+                {{#str}} removefromfavourites, core_message {{/str}}
             </a>
             <a class="dropdown-item {{#isblocked}}hidden{{/isblocked}}" href="#" data-action="request-block" role="menuitem">
                 {{#str}} blockuser, core_message {{/str}}
@@ -96,15 +102,21 @@
             <a class="dropdown-item {{^isblocked}}hidden{{/isblocked}}" href="#" data-action="request-unblock" role="menuitem">
                 {{#str}} unblockuser, core_message {{/str}}
             </a>
+            <a class="dropdown-item {{#ismuted}}hidden{{/ismuted}}" href="#" data-action="confirm-mute" role="menuitem">
+                {{#str}} muteconversation, core_message {{/str}}
+            </a>
+            <a class="dropdown-item {{^ismuted}}hidden{{/ismuted}}" href="#" data-action="confirm-unmute" role="menuitem">
+                {{#str}} unmuteconversation, core_message {{/str}}
+            </a>
+            <a class="dropdown-item" href="#" data-action="request-delete-conversation" role="menuitem">
+                {{#str}} deleteconversation, core_message {{/str}}
+            </a>
             <a class="dropdown-item {{#iscontact}}hidden{{/iscontact}}" href="#" data-action="request-add-contact" role="menuitem">
                 {{#str}} addtoyourcontacts, core_message {{/str}}
             </a>
             <a class="dropdown-item {{^iscontact}}hidden{{/iscontact}}" href="#" data-action="request-remove-contact"
-                role="menuitem">
-                    {{#str}} removefromyourcontacts, core_message {{/str}}
-            </a>
-            <a class="dropdown-item" href="#" data-action="request-delete-conversation" role="menuitem">
-                {{#str}} deleteconversation, core_message {{/str}}
+            role="menuitem">
+                {{#str}} removefromyourcontacts, core_message {{/str}}
             </a>
         </div>
     </div>

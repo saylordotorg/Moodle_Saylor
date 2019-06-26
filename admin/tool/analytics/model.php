@@ -23,24 +23,24 @@
  */
 
 require_once(__DIR__ . '/../../../config.php');
+require_once($CFG->libdir . '/filelib.php');
 
 $id = required_param('id', PARAM_INT);
 $action = required_param('action', PARAM_ALPHANUMEXT);
-
-$context = context_system::instance();
 
 require_login();
 
 $model = new \core_analytics\model($id);
 \core_analytics\manager::check_can_manage_models();
 
+$returnurl = new \moodle_url('/admin/tool/analytics/index.php');
 $params = array('id' => $id, 'action' => $action);
 $url = new \moodle_url('/admin/tool/analytics/model.php', $params);
 
 switch ($action) {
 
     case 'edit':
-        $title = get_string('editmodel', 'tool_analytics', $model->get_target()->get_name());
+        $title = get_string('editmodel', 'tool_analytics', $model->get_name());
         break;
     case 'evaluate':
         $title = get_string('evaluatemodel', 'tool_analytics');
@@ -57,8 +57,14 @@ switch ($action) {
     case 'disable':
         $title = get_string('disable');
         break;
-    case 'export':
-        $title = get_string('export', 'tool_analytics');
+    case 'delete':
+        $title = get_string('delete');
+        break;
+    case 'exportdata':
+        $title = get_string('exporttrainingdata', 'tool_analytics');
+        break;
+    case 'exportmodel':
+        $title = get_string('exportmodel', 'tool_analytics');
         break;
     case 'clear':
         $title = get_string('clearpredictions', 'tool_analytics');
@@ -70,11 +76,7 @@ switch ($action) {
         throw new moodle_exception('errorunknownaction', 'analytics');
 }
 
-$PAGE->set_context($context);
-$PAGE->set_url($url);
-$PAGE->set_pagelayout('report');
-$PAGE->set_title($title);
-$PAGE->set_heading($title);
+\tool_analytics\output\helper::set_navbar($title, $url);
 
 $onlycli = get_config('analytics', 'onlycli');
 if ($onlycli === false) {
@@ -88,48 +90,59 @@ switch ($action) {
         confirm_sesskey();
 
         $model->enable();
-        redirect(new \moodle_url('/admin/tool/analytics/index.php'));
+        redirect($returnurl);
         break;
 
     case 'disable':
         confirm_sesskey();
 
         $model->update(0, false, false);
-        redirect(new \moodle_url('/admin/tool/analytics/index.php'));
+        redirect($returnurl);
+        break;
+
+    case 'delete':
+        confirm_sesskey();
+
+        $model->delete();
+        redirect($returnurl);
         break;
 
     case 'edit':
         confirm_sesskey();
 
-        if ($model->is_static()) {
-            echo $OUTPUT->header();
-            throw new moodle_exception('errornostaticedit', 'tool_analytics');
-        }
-
         $customdata = array(
             'id' => $model->get_id(),
-            'model' => $model,
+            'trainedmodel' => $model->is_trained(),
+            'staticmodel' => $model->is_static(),
             'indicators' => $model->get_potential_indicators(),
-            'timesplittings' => \core_analytics\manager::get_enabled_time_splitting_methods(),
+            'timesplittings' => \core_analytics\manager::get_all_time_splittings(),
             'predictionprocessors' => \core_analytics\manager::get_all_prediction_processors()
         );
         $mform = new \tool_analytics\output\form\edit_model(null, $customdata);
 
         if ($mform->is_cancelled()) {
-            redirect(new \moodle_url('/admin/tool/analytics/index.php'));
+            redirect($returnurl);
 
         } else if ($data = $mform->get_data()) {
 
-            // Converting option names to class names.
-            $indicators = array();
-            foreach ($data->indicators as $indicator) {
-                $indicatorclass = \tool_analytics\output\helper::option_to_class($indicator);
-                $indicators[] = \core_analytics\manager::get_indicator($indicatorclass);
-            }
             $timesplitting = \tool_analytics\output\helper::option_to_class($data->timesplitting);
-            $predictionsprocessor = \tool_analytics\output\helper::option_to_class($data->predictionsprocessor);
+
+            if (!$model->is_static()) {
+                // Converting option names to class names.
+                $indicators = array();
+                foreach ($data->indicators as $indicator) {
+                    $indicatorclass = \tool_analytics\output\helper::option_to_class($indicator);
+                    $indicators[] = \core_analytics\manager::get_indicator($indicatorclass);
+                }
+                $predictionsprocessor = \tool_analytics\output\helper::option_to_class($data->predictionsprocessor);
+            } else {
+                // These fields can not be modified.
+                $indicators = false;
+                $predictionsprocessor = false;
+            }
+
             $model->update($data->enabled, $indicators, $timesplitting, $predictionsprocessor);
-            redirect(new \moodle_url('/admin/tool/analytics/index.php'));
+            redirect($returnurl);
         }
 
         echo $OUTPUT->header();
@@ -147,8 +160,6 @@ switch ($action) {
     case 'evaluate':
         confirm_sesskey();
 
-        echo $OUTPUT->header();
-
         if ($model->is_static()) {
             throw new moodle_exception('errornostaticevaluate', 'tool_analytics');
         }
@@ -160,15 +171,37 @@ switch ($action) {
         // Web interface is used by people who can not use CLI nor code stuff, always use
         // cached stuff as they will change the model through the web interface as well
         // which invalidates the previously analysed stuff.
-        $results = $model->evaluate(array('reuseprevanalysed' => true));
+        $options = ['reuseprevanalysed' => true];
+
+        $mode = optional_param('mode', false, PARAM_ALPHANUM);
+        if ($mode == 'trainedmodel') {
+            $options['mode'] = 'trainedmodel';
+        } else {
+
+            // All is the default in core_analytics\model::evaluate() as well.
+            $timesplitting = optional_param('timesplitting', 'all', PARAM_ALPHANUMEXT);
+            if ($timesplitting === 'current') {
+                $options['timesplitting'] = \core_analytics\manager::get_time_splitting($model->get_model_obj()->timesplitting);
+            } else if ($timesplitting !== 'all') {
+                $options['timesplitting'] = \core_analytics\manager::get_time_splitting(
+                    \tool_analytics\output\helper::option_to_class($timesplitting)
+                );
+            }
+        }
+
+        $results = $model->evaluate($options);
+
+        // We reset the theme and the output as some indicators may be using external functions
+        // which reset $PAGE.
+        \tool_analytics\output\helper::reset_page();
+        echo $OUTPUT->header();
+
         $renderer = $PAGE->get_renderer('tool_analytics');
         echo $renderer->render_evaluate_results($results, $model->get_analyser()->get_logs());
         break;
 
     case 'getpredictions':
         confirm_sesskey();
-
-        echo $OUTPUT->header();
 
         if ($onlycli) {
             throw new moodle_exception('erroronlycli', 'tool_analytics');
@@ -187,6 +220,11 @@ switch ($action) {
             $predictlogs = array();
         }
 
+        // We reset the theme and the output as some indicators may be using external functions
+        // which reset $PAGE.
+        \tool_analytics\output\helper::reset_page();
+        echo $OUTPUT->header();
+
         $renderer = $PAGE->get_renderer('tool_analytics');
         echo $renderer->render_get_predictions_results($trainresults, $trainlogs, $predictresults, $predictlogs);
         break;
@@ -203,7 +241,7 @@ switch ($action) {
         echo $renderer->render_table($modellogstable);
         break;
 
-    case 'export':
+    case 'exportdata':
 
         if ($model->is_static() || !$model->is_trained()) {
             throw new moodle_exception('errornoexport', 'tool_analytics');
@@ -211,7 +249,7 @@ switch ($action) {
 
         $file = $model->get_training_data();
         if (!$file) {
-            redirect(new \moodle_url('/admin/tool/analytics/index.php'), get_string('errortrainingdataexport', 'tool_analytics'),
+            redirect($returnurl, get_string('errortrainingdataexport', 'tool_analytics'),
                 null, \core\output\notification::NOTIFY_ERROR);
         }
 
@@ -219,11 +257,20 @@ switch ($action) {
         send_file($file, $filename, null, 0, false, true);
         break;
 
+    case 'exportmodel':
+
+        $includeweights = optional_param('includeweights', 1, PARAM_INT);
+
+        $zipfilename = 'model-' . $model->get_unique_id() . '-' . microtime(false) . '.zip';
+        $zipfilepath = $model->export_model($zipfilename, $includeweights);
+        send_temp_file($zipfilepath, $zipfilename);
+        break;
+
     case 'clear':
         confirm_sesskey();
 
         $model->clear();
-        redirect(new \moodle_url('/admin/tool/analytics/index.php'));
+        redirect($returnurl);
         break;
 
     case 'invalidanalysables':

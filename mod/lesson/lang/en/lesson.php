@@ -59,6 +59,9 @@ $string['additionalattemptsremaining'] = 'Completed, You can re-attempt this les
 $string['addpage'] = 'Add a page';
 $string['addshortanswer'] = 'Create a Short answer question page';
 $string['addtruefalse'] = 'Create a True/false question page';
+$string['allotheranswers'] = 'All other answers';
+$string['allotheranswersjump'] = 'All other answers jump';
+$string['allotheranswersscore'] = 'All other answers score';
 $string['allowofflineattempts'] = 'Allow lesson to be attempted offline using the mobile app';
 $string['allowofflineattempts_help'] = 'If enabled, a mobile app user can download the lesson and attempt it offline.
 All the possible answers and correct responses will be downloaded as well.
@@ -162,7 +165,7 @@ $string['displayleftmenu'] = 'Display menu';
 $string['displayleftmenu_help'] = 'If enabled, a menu allowing users to navigate through the list of pages is displayed.';
 $string['displayofgrade'] = 'Display of grade (for students only)';
 $string['displayreview'] = 'Provide option to try a question again';
-$string['displayreview_help'] = 'If enabled, when a question is answered incorrectly, the student is given the option to try it again for no point credit, or continue with the lesson.';
+$string['displayreview_help'] = 'If enabled, when a question is answered incorrectly, the student is given the option to try it again for no point credit, or continue with the lesson. If the student clicks to move on to another question then the selected (wrong) answer will be followed. By default wrong answer jumps are set to "this page" and have a score of 0, so it is recommended that you set the wrong answer jump to a different page to avoid confusion with your students.';
 $string['displayscorewithessays'] = '<p>You earned {$a->score} out of {$a->tempmaxgrade} for the automatically graded questions.</p>
 <p>Your {$a->essayquestions} essay question(s) will be graded and added into your final score at a later date.</p>
 <p>Your current grade without the essay question(s) is {$a->score} out of {$a->grade}.</p>';
@@ -201,6 +204,7 @@ $string['eolstudentoutoftime'] = 'Attention:  You ran out of time for this lesso
 $string['eolstudentoutoftimenoanswers'] = 'You did not answer any questions.  You have received a 0 for this lesson.';
 $string['essay'] = 'Essay';
 $string['essayemailmessage2'] = '<p>Essay prompt: {$a->question}</p><p>Your response: <em>{$a->response}</em></p><p>Grader\'s comments: <em>{$a->comment}</em></p><p>You have received {$a->earned} out of {$a->outof} for this essay question.</p><p>Your grade for the {$a->lesson} lesson has been changed to {$a->newgrade}&#37;.</p>';
+$string['essayemailmessagesmall'] = '<p>You have received {$a->earned} out of {$a->outof} for this essay question.</p><p>Your grade for the {$a->lesson} lesson has been changed to {$a->newgrade}&#37;.</p>';
 $string['essayemailsubject'] = 'Grade available for lesson question';
 $string['essaynotgradedyet'] = 'This essay has not been graded yet';
 $string['essayresponses'] = 'Essay responses';
@@ -475,6 +479,7 @@ $string['privacy:metadata:overrides:password'] = 'The password to access the les
 $string['privacy:metadata:overrides'] = 'A record of overrides per lesson';
 $string['privacy:metadata:userpref:lessonview'] = 'The preferred display mode when editing lessons';
 $string['privacy:path:essayresponses'] = 'Essay responses';
+$string['privacy:path:essayanswers'] = 'Essay answers';
 $string['privacy:path:pages'] = 'Pages';
 $string['processerror'] = 'Error occurred during processing!';
 $string['progressbar'] = 'Progress bar';

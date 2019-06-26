@@ -178,7 +178,7 @@ class edit_renderer extends \plugin_renderer_base {
                 'name' => 'maxgrade', 'size' => ($structure->get_decimal_places_for_grades() + 2),
                 'value' => $structure->formatted_quiz_grade(),
                 'class' => 'form-control'));
-        $output .= html_writer::empty_tag('input', array('type' => 'submit', 'class' => 'btn btn-secondary m-l-1',
+        $output .= html_writer::empty_tag('input', array('type' => 'submit', 'class' => 'btn btn-secondary ml-1',
                 'name' => 'savechanges', 'value' => get_string('save', 'quiz')));
         $output .= html_writer::end_tag('fieldset');
         $output .= html_writer::end_tag('form');
@@ -193,7 +193,6 @@ class edit_renderer extends \plugin_renderer_base {
      * @return string HTML to output.
      */
     protected function repaginate_button(structure $structure, \moodle_url $pageurl) {
-
         $header = html_writer::tag('span', get_string('repaginatecommand', 'quiz'), array('class' => 'repaginatecommand'));
         $form = $this->repaginate_form($structure, $pageurl);
 
@@ -202,14 +201,14 @@ class edit_renderer extends \plugin_renderer_base {
             'name'  => 'repaginate',
             'id'    => 'repaginatecommand',
             'value' => get_string('repaginatecommand', 'quiz'),
-            'class' => 'btn btn-secondary m-b-1',
+            'class' => 'btn btn-secondary mb-1',
             'data-header' => $header,
             'data-form'   => $form,
         );
         if (!$structure->can_be_repaginated()) {
             $buttonoptions['disabled'] = 'disabled';
         } else {
-            $this->page->requires->yui_module('moodle-mod_quiz-repaginate', 'M.mod_quiz.repaginate.init');
+            $this->page->requires->js_call_amd('mod_quiz/repaginate', 'init');
         }
 
         return html_writer::empty_tag('input', $buttonoptions);
@@ -227,7 +226,7 @@ class edit_renderer extends \plugin_renderer_base {
             'name'  => 'selectmultiple',
             'id'    => 'selectmultiplecommand',
             'value' => get_string('selectmultipleitems', 'quiz'),
-            'class' => 'btn btn-secondary m-b-1'
+            'class' => 'btn btn-secondary mb-1'
         );
         if (!$structure->can_be_edited()) {
             $buttonoptions['disabled'] = 'disabled';
@@ -320,7 +319,7 @@ class edit_renderer extends \plugin_renderer_base {
             'type' => 'submit',
             'name' => 'repaginate',
             'value' => get_string('go'),
-            'class' => 'btn btn-secondary m-l-1'
+            'class' => 'btn btn-secondary ml-1'
         );
 
         $formcontent = html_writer::tag('form', html_writer::div(

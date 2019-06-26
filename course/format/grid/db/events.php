@@ -17,8 +17,7 @@
 /**
  * Grid Format - A topics based format that uses a grid of user selectable images to popup a light box of the section.
  *
- * @package    course/format
- * @subpackage grid
+ * @package    format_grid
  * @category   event
  * @version    See the value of '$plugin->version' in version.php.
  * @copyright  &copy; 2017-onwards G J Barnard based upon work done by Marina Glancy.
@@ -37,5 +36,8 @@ $observers = array(
         'eventname'   => '\core\event\course_content_deleted',
         'callback'    => 'format_grid_observer::course_content_deleted',
     ),
-
+    array(
+        'eventname'   => '\core\event\course_restored',
+        'callback'    => 'format_grid_observer::course_restored',
+    )
 );

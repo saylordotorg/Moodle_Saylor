@@ -92,6 +92,16 @@ class behat_data_generators extends behat_base {
             'required' => array('user', 'course', 'role'),
             'switchids' => array('user' => 'userid', 'course' => 'courseid', 'role' => 'roleid')
         ),
+        'custom field categories' => array(
+            'datagenerator' => 'custom_field_category',
+            'required' => array('name', 'component', 'area', 'itemid'),
+            'switchids' => array()
+        ),
+        'custom fields' => array(
+            'datagenerator' => 'custom_field',
+            'required' => array('name', 'category', 'type', 'shortname'),
+            'switchids' => array()
+        ),
         'permission overrides' => array(
             'datagenerator' => 'permission_override',
             'required' => array('capability', 'permission', 'role', 'contextlevel', 'reference'),
@@ -197,6 +207,25 @@ class behat_data_generators extends behat_base {
             'datagenerator' => 'favourite_conversations',
             'required' => array('user', 'contact'),
             'switchids' => array('user' => 'userid', 'contact' => 'contactid')
+        ),
+        'group messages' => array(
+            'datagenerator' => 'group_messages',
+            'required' => array('user', 'group', 'message'),
+            'switchids' => array('user' => 'userid', 'group' => 'groupid')
+        ),
+        'muted group conversations' => array(
+            'datagenerator' => 'mute_group_conversations',
+            'required' => array('user', 'group', 'course'),
+            'switchids' => array('user' => 'userid', 'group' => 'groupid', 'course' => 'courseid')
+        ),
+        'muted private conversations' => array(
+            'datagenerator' => 'mute_private_conversations',
+            'required' => array('user', 'contact'),
+            'switchids' => array('user' => 'userid', 'contact' => 'contactid')
+        ),
+        'language customisations' => array(
+            'datagenerator' => 'customlang',
+            'required' => array('component', 'stringid', 'value'),
         ),
     );
 
@@ -403,6 +432,61 @@ class behat_data_generators extends behat_base {
         // cause problems since the relevant key names are different.
         // $options is not used in most blocks I have seen, but where it is, it is necessary.
         $this->datagenerator->create_block($data['blockname'], $data, $data);
+    }
+
+    /**
+     * Creates language customisation.
+     *
+     * @throws Exception
+     * @throws dml_exception
+     * @param array $data
+     * @return void
+     */
+    protected function process_customlang($data) {
+        global $CFG, $DB, $USER;
+
+        require_once($CFG->dirroot . '/' . $CFG->admin . '/tool/customlang/locallib.php');
+        require_once($CFG->libdir . '/adminlib.php');
+
+        if (empty($data['component'])) {
+            throw new Exception('\'customlang\' requires the field \'component\' type to be specified');
+        }
+
+        if (empty($data['stringid'])) {
+            throw new Exception('\'customlang\' requires the field \'stringid\' to be specified');
+        }
+
+        if (!isset($data['value'])) {
+            throw new Exception('\'customlang\' requires the field \'value\' to be specified');
+        }
+
+        $now = time();
+
+        tool_customlang_utils::checkout($USER->lang);
+
+        $record = $DB->get_record_sql("SELECT s.*
+                                         FROM {tool_customlang} s
+                                         JOIN {tool_customlang_components} c ON s.componentid = c.id
+                                        WHERE c.name = ? AND s.lang = ? AND s.stringid = ?",
+                array($data['component'], $USER->lang, $data['stringid']));
+
+        if (empty($data['value']) && !is_null($record->local)) {
+            $record->local = null;
+            $record->modified = 1;
+            $record->outdated = 0;
+            $record->timecustomized = null;
+            $DB->update_record('tool_customlang', $record);
+            tool_customlang_utils::checkin($USER->lang);
+        }
+
+        if (!empty($data['value']) && $data['value'] != $record->local) {
+            $record->local = $data['value'];
+            $record->modified = 1;
+            $record->outdated = 0;
+            $record->timecustomized = $now;
+            $DB->update_record('tool_customlang', $record);
+            tool_customlang_utils::checkin($USER->lang);
+        }
     }
 
     /**
@@ -887,6 +971,10 @@ class behat_data_generators extends behat_base {
      * @return void
      */
     protected function process_private_messages(array $data) {
+        if (empty($data['format'])) {
+            $data['format'] = 'FORMAT_PLAIN';
+        }
+
         if (!$conversationid = \core_message\api::get_conversation_between_users([$data['userid'], $data['contactid']])) {
             $conversation = \core_message\api::create_conversation(
                 \core_message\api::MESSAGE_CONVERSATION_TYPE_INDIVIDUAL,
@@ -894,7 +982,48 @@ class behat_data_generators extends behat_base {
             );
             $conversationid = $conversation->id;
         }
-        \core_message\api::send_message_to_conversation($data['userid'], $conversationid, $data['message'], FORMAT_PLAIN);
+        \core_message\api::send_message_to_conversation(
+            $data['userid'],
+            $conversationid,
+            $data['message'],
+            constant($data['format'])
+        );
+    }
+
+    /**
+     * Send a new message from user to a group conversation
+     *
+     * @param array $data
+     * @return void
+     */
+    protected function process_group_messages(array $data) {
+        global $DB;
+
+        if (empty($data['format'])) {
+            $data['format'] = 'FORMAT_PLAIN';
+        }
+
+        $group = $DB->get_record('groups', ['id' => $data['groupid']]);
+        $coursecontext = context_course::instance($group->courseid);
+        if (!$conversation = \core_message\api::get_conversation_by_area('core_group', 'groups', $data['groupid'],
+            $coursecontext->id)) {
+            $members = $DB->get_records_menu('groups_members', ['groupid' => $data['groupid']], '', 'userid, id');
+            $conversation = \core_message\api::create_conversation(
+                \core_message\api::MESSAGE_CONVERSATION_TYPE_GROUP,
+                array_keys($members),
+                $group->name,
+                \core_message\api::MESSAGE_CONVERSATION_ENABLED,
+                'core_group',
+                'groups',
+                $group->id,
+                $coursecontext->id);
+        }
+        \core_message\api::send_message_to_conversation(
+            $data['userid'],
+            $conversation->id,
+            $data['message'],
+            constant($data['format'])
+        );
     }
 
     /**
@@ -912,5 +1041,43 @@ class behat_data_generators extends behat_base {
             $conversationid = $conversation->id;
         }
         \core_message\api::set_favourite_conversation($conversationid, $data['userid']);
+    }
+
+    /**
+     * Mute an existing group conversation for user
+     *
+     * @param array $data
+     * @return void
+     */
+    protected function process_mute_group_conversations(array $data) {
+        if (groups_is_member($data['groupid'], $data['userid'])) {
+            $context = context_course::instance($data['courseid']);
+            $conversation = \core_message\api::get_conversation_by_area(
+                'core_group',
+                'groups',
+                $data['groupid'],
+                $context->id
+            );
+            if ($conversation) {
+                \core_message\api::mute_conversation($data['userid'], $conversation->id);
+            }
+        }
+    }
+
+    /**
+     * Mute a private conversation for user
+     *
+     * @param array $data
+     * @return void
+     */
+    protected function process_mute_private_conversations(array $data) {
+        if (!$conversationid = \core_message\api::get_conversation_between_users([$data['userid'], $data['contactid']])) {
+            $conversation = \core_message\api::create_conversation(
+                \core_message\api::MESSAGE_CONVERSATION_TYPE_INDIVIDUAL,
+                [$data['userid'], $data['contactid']]
+            );
+            $conversationid = $conversation->id;
+        }
+        \core_message\api::mute_conversation($data['userid'], $conversationid);
     }
 }

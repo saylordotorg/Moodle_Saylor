@@ -610,25 +610,25 @@ function get_exception_info($ex) {
 }
 
 /**
- * Generate a uuid.
+ * Generate a V4 UUID.
  *
- * Unique is hard. Very hard. Attempt to use the PECL UUID functions if available, and if not then revert to
+ * Unique is hard. Very hard. Attempt to use the PECL UUID function if available, and if not then revert to
  * constructing the uuid using mt_rand.
  *
  * It is important that this token is not solely based on time as this could lead
  * to duplicates in a clustered environment (especially on VMs due to poor time precision).
+ *
+ * @see https://tools.ietf.org/html/rfc4122
  *
  * @return string The uuid.
  */
 function generate_uuid() {
     $uuid = '';
 
-    if (function_exists("uuid_create")) {
-        $context = null;
-        uuid_create($context);
-
-        uuid_make($context, UUID_MAKE_V4);
-        uuid_export($context, UUID_FMT_STR, $uuid);
+    // Check if PECL UUID extension is available.
+    if (function_exists('uuid_time')) {
+        // Create a V4 UUID.
+        $uuid = uuid_create(UUID_TYPE_RANDOM);
     } else {
         // Fallback uuid generation based on:
         // "http://www.php.net/manual/en/function.uniqid.php#94959".
@@ -1407,7 +1407,7 @@ function disable_output_buffering() {
  */
 function is_major_upgrade_required() {
     global $CFG;
-    $lastmajordbchanges = 2018111301.00;
+    $lastmajordbchanges = 2019050100.01;
 
     $required = empty($CFG->version);
     $required = $required || (float)$CFG->version < $lastmajordbchanges;
@@ -1633,15 +1633,22 @@ function make_upload_directory($directory, $exceptiononerror = true) {
  *
  * The directory is automatically cleaned up during the shutdown handler.
  *
- * @param bool $exceptiononerror throw exception if error encountered
- * @return string|false Returns full path to directory if successful, false if not; may throw exception
+ * @param   bool    $exceptiononerror throw exception if error encountered
+ * @param   bool    $forcecreate Force creation of a new parent directory
+ * @return  string  Returns full path to directory if successful, false if not; may throw exception
  */
-function get_request_storage_directory($exceptiononerror = true) {
+function get_request_storage_directory($exceptiononerror = true, bool $forcecreate = false) {
     global $CFG;
 
     static $requestdir = null;
 
-    if (!$requestdir || !file_exists($requestdir) || !is_dir($requestdir) || !is_writable($requestdir)) {
+    $writabledirectoryexists = (null !== $requestdir);
+    $writabledirectoryexists = $writabledirectoryexists && file_exists($requestdir);
+    $writabledirectoryexists = $writabledirectoryexists && is_dir($requestdir);
+    $writabledirectoryexists = $writabledirectoryexists && is_writable($requestdir);
+    $createnewdirectory = $forcecreate || !$writabledirectoryexists;
+
+    if ($createnewdirectory) {
         if ($CFG->localcachedir !== "$CFG->dataroot/localcache") {
             check_dir_exists($CFG->localcachedir, true, true);
             protect_directory($CFG->localcachedir);
@@ -1649,10 +1656,12 @@ function get_request_storage_directory($exceptiononerror = true) {
             protect_directory($CFG->dataroot);
         }
 
-        if ($requestdir = make_unique_writable_directory($CFG->localcachedir, $exceptiononerror)) {
+        if ($dir = make_unique_writable_directory($CFG->localcachedir, $exceptiononerror)) {
             // Register a shutdown handler to remove the directory.
-            \core_shutdown_manager::register_function('remove_dir', array($requestdir));
+            \core_shutdown_manager::register_function('remove_dir', [$dir]);
         }
+
+        $requestdir = $dir;
     }
 
     return $requestdir;
@@ -1663,13 +1672,18 @@ function get_request_storage_directory($exceptiononerror = true) {
  * This can only be used during the current request and will be tidied away
  * automatically afterwards.
  *
- * A new, unique directory is always created within the current request directory.
+ * A new, unique directory is always created within a shared base request directory.
  *
- * @param bool $exceptiononerror throw exception if error encountered
- * @return string full path to directory if successful, false if not; may throw exception
+ * In some exceptional cases an alternative base directory may be required. This can be accomplished using the
+ * $forcecreate parameter. Typically this will only be requried where the file may be required during a shutdown handler
+ * which may or may not be registered after a previous request directory has been created.
+ *
+ * @param   bool    $exceptiononerror throw exception if error encountered
+ * @param   bool    $forcecreate Force creation of a new parent directory
+ * @return  string  The full path to directory if successful, false if not; may throw exception
  */
-function make_request_directory($exceptiononerror = true) {
-    $basedir = get_request_storage_directory($exceptiononerror);
+function make_request_directory($exceptiononerror = true, bool $forcecreate = false) {
+    $basedir = get_request_storage_directory($exceptiononerror, $forcecreate);
     return make_unique_writable_directory($basedir, $exceptiononerror);
 }
 

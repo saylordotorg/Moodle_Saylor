@@ -17,8 +17,7 @@
 /**
  * Grid Format - A topics based format that uses a grid of user selectable images to popup a light box of the section.
  *
- * @package    course/format
- * @subpackage grid
+ * @package    format_grid
  * @version    See the value of '$plugin->version' in version.php.
  * @copyright  &copy; 2012 G J Barnard in respect to modifications of standard topics format.
  * @author     G J Barnard - {@link http://about.me/gjbarnard} and
@@ -77,10 +76,17 @@ $string['newsectionname'] = 'New name for section {$a}';
 $string['numbersections'] = 'Number of sections';
 
 // Exception messages.
-$string['imagecannotbeused'] = 'Image cannot be used, must be a PNG, JPG or GIF and the GD PHP extension must be installed.';
 $string['cannotfinduploadedimage'] = 'Cannot find the uploaded original image.  Please report error details and the information contained in the php.log file to developer.  Refresh the page and upload a fresh copy of the image.';
 $string['cannotconvertuploadedimagetodisplayedimage'] = 'Cannot convert uploaded image to displayed image.  Please report error details and the information contained in the php.log file to developer.';
 $string['cannotgetimagesforcourse'] = 'Cannot get images for course.  Please report error details to developer.';
+$string['formatnotsupported'] = 'Format is not supported at this server, please fix the system configuration to have the GD PHP extension installed - {$a}.';
+$string['functionfailed'] = 'Function failed on image - {$a}.';
+$string['imagecannotbeused'] = 'Image cannot be used, must be a PNG, JPG or GIF and the GD PHP extension must be installed.';
+$string['mimetypenotsupported'] = 'Mime type is not supported as an image format in the Grid format - {$a}.';
+$string['originalheightempty'] = 'Original height is empty - {$a}.';
+$string['originalwidthempty'] = 'Original width is empty - {$a}.';
+$string['noimageinformation'] = 'Image information is empty - {$a}.';
+$string['reporterror'] = 'Please report error details and the information contained in the php.log file to developer';
 
 // CONTRIB-4099 Image container size change improvement.
 $string['off'] = 'Off';

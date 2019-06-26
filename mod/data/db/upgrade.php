@@ -26,24 +26,6 @@ function xmldb_data_upgrade($oldversion) {
 
     $dbman = $DB->get_manager();
 
-    if ($oldversion < 2016090600) {
-
-        // Define field config to be added to data.
-        $table = new xmldb_table('data');
-        $field = new xmldb_field('config', XMLDB_TYPE_TEXT, null, null, null, null, null, 'timemodified');
-
-        // Conditionally launch add field config.
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
-
-        // Data savepoint reached.
-        upgrade_mod_savepoint(true, 2016090600, 'data');
-    }
-
-    // Automatically generated Moodle v3.2.0 release upgrade line.
-    // Put any upgrade step following this.
-
     if ($oldversion < 2017032800) {
 
         // Define field completionentries to be added to data. Require a number of entries to be considered complete.
@@ -71,5 +53,25 @@ function xmldb_data_upgrade($oldversion) {
     // Automatically generated Moodle v3.6.0 release upgrade line.
     // Put any upgrade step following this.
 
+    // Automatically generated Moodle v3.7.0 release upgrade line.
+    // Put any upgrade step following this.
+
+    if ($oldversion < 2019052001) {
+
+        $columns = $DB->get_columns('data');
+
+        $oldclass = "mod-data-default-template ##approvalstatus##";
+        $newclass = "mod-data-default-template ##approvalstatusclass##";
+
+        // Update existing classes.
+        $DB->replace_all_text('data', $columns['singletemplate'], $oldclass, $newclass);
+        $DB->replace_all_text('data', $columns['listtemplate'], $oldclass, $newclass);
+        $DB->replace_all_text('data', $columns['addtemplate'], $oldclass, $newclass);
+        $DB->replace_all_text('data', $columns['rsstemplate'], $oldclass, $newclass);
+        $DB->replace_all_text('data', $columns['asearchtemplate'], $oldclass, $newclass);
+
+        // Data savepoint reached.
+        upgrade_mod_savepoint(true, 2019052001, 'data');
+    }
     return true;
 }

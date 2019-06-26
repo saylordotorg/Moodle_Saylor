@@ -1,11 +1,23 @@
 ﻿Version Information
 ===================
+Version 3.7.0.2
+  1. Add missing Moodle define.
+
+Version 3.7.0.1
+  1. Beta version for Moodle 3.7 based on 3.6.0.3.
+
 Version 3.6.0.3
   1. Apply MDL-64819 - #61.
   2. Fix phpunit tests for MDL-64492 - thanks to Rossco Hellmans for the patch - #59.
   3. Added SVG version of one section icon - thanks to Luca Bösch for the patch - #60.
   4. New: Accordion/Collapsed Topic aria attributes improvements - thanks to John Y for the patch - #62 and #63.
   5. Fix position of activity / resource editing menu.
+  6. Change position of the window when clicking on a section anchor such that a navbar would not be in the way.
+     Thanks for the information in the Adaptable theme referencing: https://github.com/twbs/bootstrap/issues/1768.
+  7. Added the course and admin settings to enable or disable the toggle all functionality.  Reset in the 'layout'
+     area with associated capability for non-admins.
+  8. Added the course and admin settings to enable or disable the view single section functionality.  Reset in the
+     'layout' area with associated capability for non-admins.
 
 Version 3.6.0.2
   1. Fix invalid HTML in case of zero section elements - thanks to Mario Wehr for raising this - #47.
