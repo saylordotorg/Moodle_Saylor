@@ -50,8 +50,8 @@ $templatecontext = [
     'currentyear' => date('Y'),
     'opengraph' => $OUTPUT->get_open_graph_properties(),
     'courseproperties' => $OUTPUT->get_course_properties(),
-    'coursecategory' => str_replace($SITE->shortname.": ", "", $PAGE->title),
-    'coursecategoryclass' => preg_replace("/[\s-]+/", "-", strtolower(str_replace($SITE->shortname.": ", "", $PAGE->title)))
+    'coursecategory' => str_replace($SITE->shortname.": ", "", $PAGE->heading),
+    'coursecategoryclass' => preg_replace("/[\s-]+/", "-", strtolower(str_replace($SITE->shortname.": ", "", $PAGE->heading)))
 ];
 
 $templatecontext['flatnavigation'] = $PAGE->flatnav;
