@@ -28,6 +28,7 @@ $templatecontext = [
     'sitename' => format_string($SITE->shortname, true, ['context' => context_course::instance(SITEID), "escape" => false]),
     'output' => $OUTPUT,
     'bodyattributes' => $bodyattributes,
+    'opengraph' => $OUTPUT->get_open_graph_properties(),
     'currentyear' => date('Y')
 ];
 
