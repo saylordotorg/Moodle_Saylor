@@ -28,7 +28,8 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/question/type/pmatch/pmatch/matcher.php');
 
 define('PMATCH_SPECIAL_CHARACTER', '[\(\)\\\\\|\?\*_\[\]]');
-define('PMATCH_CHARACTER', '[\pL\pM\pN!"#£$%&\'/\-+<=>@\^`{}\~\.]'); // Ignore codechecker warning.
+// All characters in many Unicode classes, but not the special ones.
+define('PMATCH_CHARACTER', '(?:(?!' . PMATCH_SPECIAL_CHARACTER . ')[\pL\pM\pN\pP\pS])');
 
 define('PMATCH_LNUM', '[0-9]+');
 define('PMATCH_DNUM', PMATCH_LNUM.'[\.]'.PMATCH_LNUM);
@@ -344,10 +345,6 @@ class pmatch_interpreter_whole_expression extends pmatch_interpreter_item_with_s
     protected $limitsubcontents = 1;
 
     public function interpret($string, $start = 0) {
-        if (preg_match('/[^0-9]\.|\.[^0-9]/', $string)) {
-            $this->set_error_message('nofullstop', null);
-            return array('', 0);
-        }
         return parent::interpret($string, $start);
     }
 

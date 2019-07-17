@@ -25,6 +25,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+use qtype_pmatch\local\spell\qtype_pmatch_spell_checker;
+
 
 /**
  * Generates the output for pattern-match questions.
@@ -70,6 +72,12 @@ class qtype_pmatch_renderer extends qtype_renderer {
                 $htmlresponse = false;
             }
         }
+
+        // Distinguish between answer input with or without supsub editor (used for mobileApp).
+        if ($htmlresponse) {
+            $attributes['class'] .= " answer-supsub";
+        }
+
         $questiontext = $question->format_questiontext($qa);
         $rows = 2;
         $cols = 50;
@@ -146,6 +154,13 @@ class qtype_pmatch_renderer extends qtype_renderer {
                     array('class' => 'validationerror'));
         }
 
+        // Show the error if the question is using a language that does not available on the server.
+        if ($question->user_can_see_missing_dict_warning() && $question->is_spell_check_laguage_available()) {
+            $missinglangname = qtype_pmatch_spell_checker::get_display_name_for_language_code($question->applydictionarycheck);
+            $result .= html_writer::nonempty_tag('div',
+                    get_string('apply_spellchecker_missing_language_attempt', 'qtype_pmatch', $missinglangname),
+                    ['class' => 'validationerror']);
+        }
         return $result;
     }
 
@@ -171,7 +186,7 @@ class qtype_pmatch_renderer extends qtype_renderer {
      * @param question_display_options $options
      * @return string HTML fragment.
      */
-    protected function question_tests_link(qtype_pmatch_question $question, question_display_options $options) {
+    public function question_tests_link(qtype_pmatch_question $question, question_display_options $options) {
         if (!empty($options->suppressruntestslink)) {
             return '';
         }

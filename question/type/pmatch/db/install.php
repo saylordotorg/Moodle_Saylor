@@ -24,11 +24,13 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+use qtype_pmatch\local\spell\qtype_pmatch_spell_checker;
+
 function xmldb_qtype_pmatch_install() {
     global $CFG;
 
-    require_once($CFG->dirroot . '/question/type/pmatch/spellinglib.php');
     $backends = qtype_pmatch_spell_checker::get_installed_backends();
     end($backends);
     set_config('spellchecker', key($backends), 'qtype_pmatch');
+    set_config('spellcheck_languages', 'en', 'qtype_pmatch');
 }

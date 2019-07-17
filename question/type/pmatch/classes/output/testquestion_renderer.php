@@ -35,8 +35,11 @@ class qtype_pmatch_testquestion_renderer extends plugin_renderer_base {
     }
 
     public function get_uploadresponses_link($question) {
-        return html_writer::tag('p', html_writer::link(new moodle_url('/question/type/pmatch/uploadresponses.php',
-                        array('id' => $question->id)), 'Upload responses'));
+        $link = new moodle_url('/question/type/pmatch/uploadresponses.php', ['id' => $question->id]);
+
+        return html_writer::tag('button',
+                get_string('testquestionuploadresponses', 'qtype_pmatch'),
+                ['type' => 'button', "onclick" => "window.location.href = '" . $link->out(false) . "'"]);
     }
 
     public function get_responses_heading($question) {
@@ -44,8 +47,11 @@ class qtype_pmatch_testquestion_renderer extends plugin_renderer_base {
     }
 
     /**
-     * This looks like (Pos=12/12 Neg=1/1 Unm=180 Acc=100%).
+     * Get the grade summary
+     *
      * @param object $question
+     * @return string the html grade summary
+     * @throws coding_exception\
      */
     public function get_grade_summary($question) {
         $counts = \qtype_pmatch\testquestion_responses::get_question_grade_summary_counts($question);
@@ -61,18 +67,19 @@ class qtype_pmatch_testquestion_renderer extends plugin_renderer_base {
         $html = '';
         if (question_has_capability_on($question, 'edit')) {
             $html .= html_writer::start_div('', array('id' => 'commands'));
-            $html = \html_writer::start_tag('p');
-            $html .= \html_writer::tag('button',
+            $html = \html_writer::start_tag('p', ['id' => 'wrapperactionresponse']);
+            $html .= html_writer::tag('button',
                     get_string('testquestionformnewresponsebutton', 'qtype_pmatch'),
-                    ['id' => 'newresponsebutton']);
+                    ['id' => 'newresponsebutton', 'class' => 'btn btn-secondary']);
+            $html .= $this->get_uploadresponses_link($question);
             $html .= \html_writer::end_tag('p');
             $html .= html_writer::tag('strong', get_string('withselected', 'question') . ':');
             $html .= html_writer::empty_tag('br');
             // Delete responses.
-            $html .= '<input type="submit" id="deleteresponsesbutton" name="delete" value="' .
+            $html .= '<input type="submit" id="deleteresponsesbutton" class="btn btn-secondary" name="delete" value="' .
                 get_string('testquestionformdeletesubmit', 'qtype_pmatch') . '"/> ';
             // Test responses.
-            $html .= '<input type="submit" id="testresponsesbutton" name="test" value="' .
+            $html .= '<input type="submit" id="testresponsesbutton" class="btn btn-secondary" name="test" value="' .
                     get_string('testquestionformtestsubmit', 'qtype_pmatch') . '"/> ';
             $this->page->requires->event_handler('#deleteresponsesbutton', 'click', 'M.util.show_confirm_dialog',
                     array('message' => get_string('testquestionformdeletecheck', 'qtype_pmatch')));
@@ -82,8 +89,9 @@ class qtype_pmatch_testquestion_renderer extends plugin_renderer_base {
             // Add ajax create response.
             $this->page->requires->js_call_amd('qtype_pmatch/creator', 'init');
 
-            $this->page->requires->strings_for_js(['selectall', 'deselectall'], 'moodle');
-            $this->page->requires->strings_for_js(['testquestionresultssummary', 'testquestionformsaveresponsebutton',
+            $this->page->requires->strings_for_js(['ok', 'selectall', 'deselectall'], 'moodle');
+            $this->page->requires->strings_for_js(['error:title', 'testquestionresultssummary',
+                    'testquestionformsaveresponsebutton',
                     'testquestionformcancelresponsebutton'], 'qtype_pmatch');
         }
         return $html;
