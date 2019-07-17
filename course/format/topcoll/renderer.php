@@ -22,8 +22,7 @@
  * Toggles are persistent on a per browser session per course basis but can be made to persist longer by a small
  * code change. Full installation instructions, code adaptions and credits are included in the 'Readme.txt' file.
  *
- * @package    course/format
- * @subpackage topcoll
+ * @package    format_topcoll
  * @version    See the value of '$plugin->version' in version.php.
  * @copyright  &copy; 2012-onwards G J Barnard in respect to modifications of standard topics format.
  * @author     G J Barnard - {@link http://moodle.org/user/profile.php?id=442195}
@@ -182,21 +181,23 @@ class format_topcoll_renderer extends format_section_renderer_base {
                 } else {
                     $topictext = get_string('setlayoutstructureday', 'format_topcoll');
                 }
-                $title = get_string('viewonly', 'format_topcoll', array('sectionname' => $topictext.' '.$section->section));
-                switch ($this->tcsettings['layoutelement']) { // Toggle section x.
-                    case 1:
-                    case 3:
-                    case 5:
-                    case 8:
-                        $o .= html_writer::link($url,
-                            $topictext.html_writer::empty_tag('br').
-                            $section->section, array('title' => $title, 'class' => 'cps_centre'));
-                        break;
-                    default:
-                        $o .= html_writer::link($url,
-                            $this->output->pix_icon('one_section', $title, 'format_topcoll'),
-                            array('title' => $title, 'class' => 'cps_centre'));
-                        break;
+                if ($this->tcsettings['viewsinglesectionenabled'] == 2) {
+                    $title = get_string('viewonly', 'format_topcoll', array('sectionname' => $topictext.' '.$section->section));
+                    switch ($this->tcsettings['layoutelement']) { // Toggle section x.
+                        case 1:
+                        case 3:
+                        case 5:
+                        case 8:
+                            $o .= html_writer::link($url,
+                                $topictext.html_writer::empty_tag('br').
+                                $section->section, array('title' => $title, 'class' => 'cps_centre'));
+                            break;
+                        default:
+                            $o .= html_writer::link($url,
+                                $this->output->pix_icon('one_section', $title, 'format_topcoll'),
+                                array('title' => $title, 'class' => 'cps_centre'));
+                            break;
+                    }
                 }
             }
         }
@@ -780,9 +781,11 @@ class format_topcoll_renderer extends format_section_renderer_base {
         if ($coursenumsections > 0) {
             $sectiondisplayarray = array();
             if ($coursenumsections > 1) {
-                if (($this->userisediting) || ($this->tcsettings['onesection'] == 1)) {
-                    // Collapsed Topics all toggles.
-                    echo $this->toggle_all();
+                if ($this->tcsettings['toggleallenabled'] == 2) {
+                    if (($this->userisediting) || ($this->tcsettings['onesection'] == 1)) {
+                        // Collapsed Topics all toggles.
+                        echo $this->toggle_all();
+                    }
                 }
                 if ($this->tcsettings['displayinstructions'] == 2) {
                     // Collapsed Topics instructions.

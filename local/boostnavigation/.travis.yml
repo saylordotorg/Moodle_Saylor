@@ -1,20 +1,16 @@
 language: php
 
-# Workaround for fixing that Selenium server is not running and therefore Behat tests not working
-sudo: required
-# ORIGINAL:
-# sudo: false
+sudo: true
+
+services:
+  - mysql
 
 addons:
   firefox: "47.0.1"
   postgresql: "9.4"
   apt:
     packages:
-# Workaround for fixing that Java could not be downloaded from Oracle website.
       - openjdk-8-jre-headless
-# ORIGINAL:
-#     - oracle-java8-installer
-#     - oracle-java8-set-default
 
 cache:
   directories:
@@ -22,12 +18,13 @@ cache:
     - $HOME/.npm
 
 php:
- - 7.0
  - 7.1
+ - 7.2
+ - 7.3
 
 env:
  global:
-  - MOODLE_BRANCH=MOODLE_36_STABLE
+  - MOODLE_BRANCH=MOODLE_37_STABLE
  matrix:
   - DB=pgsql
   - DB=mysqli
@@ -45,12 +42,13 @@ install:
 
 script:
   - moodle-plugin-ci phplint
-  - moodle-plugin-ci phpcpd
+  - moodle-plugin-ci phpcpd || true # Output warnings but do not fail the build because of duplicated but well working code
   - moodle-plugin-ci phpmd
   - moodle-plugin-ci codechecker
   - moodle-plugin-ci validate
   - moodle-plugin-ci savepoints
   - moodle-plugin-ci mustache
   - moodle-plugin-ci grunt
+  - moodle-plugin-ci phpdoc
   - moodle-plugin-ci phpunit
   - moodle-plugin-ci behat --dump

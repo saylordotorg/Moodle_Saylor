@@ -99,9 +99,6 @@ module.exports = function(grunt) { // jshint ignore:line
             files: ['**/amd/src/*.js']
         },
         uglify: {
-            options: {
-                preserveComments: 'some'
-            },
             dynamic_mappings: {
                 files: grunt.file.expandMapping(
                     ['**/src/*.js', '!**/node_modules/**'],

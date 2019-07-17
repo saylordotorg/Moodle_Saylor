@@ -23,6 +23,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use qtype_pmatch\local\spell\qtype_pmatch_spell_checker;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/question/type/pmatch/pmatchlib.php');
@@ -45,6 +47,7 @@ class qtype_combined_combinable_type_pmatch extends qtype_combined_combinable_ty
                      'usecase' => null,
                      'applydictionarycheck' => null,
                      'extenddictionary' => '',
+                     'sentencedividers' => '.?!',
                      'converttospace' => ',;:',
                      'synonymsdata' => array());
     }
@@ -75,15 +78,26 @@ class qtype_combined_combinable_pmatch extends qtype_combined_combinable_text_en
         $casedictels = array();
         $casedictels[] = $mform->createElement('select', $this->form_field_name('usecase'),
                                                get_string('casesensitive', 'qtype_pmatch'), $menu);
-        $casedictels[] = $mform->createElement('selectyesno', $this->form_field_name('applydictionarycheck'),
-                                                                            get_string('applydictionarycheck', 'qtype_pmatch'));
+        list ($options, $disable) = qtype_pmatch_spell_checker::get_spell_checker_language_options($this->questionrec);
+        if ($disable) {
+            $casedictels[] = $mform->createElement('select', $this->form_field_name('applydictionarycheck'),
+                    get_string('applydictionarycheck', 'qtype_pmatch'), $options, ['disabled' => 'disabled']);
+        } else {
+            $casedictels[] = $mform->createElement('select', $this->form_field_name('applydictionarycheck'),
+                    get_string('applydictionarycheck', 'qtype_pmatch'), $options);
+            $mform->setDefault('applydictionarycheck', get_string('iso6391', 'langconfig'));
+        }
         $mform->addGroup($casedictels, $this->form_field_name('casedictels'),
                                                                         get_string('casesensitive', 'qtype_pmatch'), '', false);
-        $mform->setDefault($this->form_field_name('applydictionarycheck'), 1);
 
         $mform->addElement('textarea', $this->form_field_name('extenddictionary'), get_string('extenddictionary', 'qtype_pmatch'),
             array('rows' => '3', 'cols' => '57'));
+        $mform->disabledIf($this->form_field_name('extenddictionary'),
+                $this->form_field_name('applydictionarycheck'),
+                'eq', qtype_pmatch_spell_checker::DO_NOT_CHECK_OPTION);
 
+        $mform->addElement('text', $this->form_field_name('sentencedividers'), get_string('sentencedividers', 'qtype_pmatch'));
+        $mform->setDefault($this->form_field_name('sentencedividers'), '.?!');
         $mform->addElement('text', $this->form_field_name('converttospace'), get_string('converttospace', 'qtype_pmatch'));
         $mform->setDefault($this->form_field_name('converttospace'), ',;:');
         \qtype_pmatch\form_utils::add_synonyms($combinedform, $mform, $this->questionrec, false,
@@ -92,6 +106,7 @@ class qtype_combined_combinable_pmatch extends qtype_combined_combinable_text_en
         $mform->addElement('textarea', $this->form_field_name('answer[0]'), get_string('answer', 'question'),
                                                              array('rows' => '6', 'cols' => '57', 'class' => 'textareamonospace'));
         $mform->setType($this->form_field_name('answer'), PARAM_RAW_TRIMMED);
+        $mform->setType($this->form_field_name('sentencedividers'), PARAM_RAW_TRIMMED);
         $mform->setType($this->form_field_name('converttospace'), PARAM_RAW_TRIMMED);
         $mform->setType($this->form_field_name('synonymsdata'), PARAM_RAW_TRIMMED);
     }

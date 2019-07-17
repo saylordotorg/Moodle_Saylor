@@ -28,7 +28,12 @@ defined('MOODLE_INTERNAL') || die();
 use context;
 use context_module;
 use core_privacy\local\metadata\collection;
-use core_privacy\local\request\{writer, transform, helper, contextlist, approved_contextlist};
+use core_privacy\local\request\approved_contextlist;
+use core_privacy\local\request\approved_userlist;
+use core_privacy\local\request\contextlist;
+use core_privacy\local\request\transform;
+use core_privacy\local\request\userlist;
+use core_privacy\local\request\writer;
 use stdClass;
 
 /**
@@ -37,9 +42,10 @@ use stdClass;
  * @copyright 2018 Catalyst IT
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class provider implements
-    \core_privacy\local\request\plugin\provider,
-    \core_privacy\local\metadata\provider
+class provider implements
+    \core_privacy\local\metadata\provider,
+    \core_privacy\local\request\core_userlist_provider,
+    \core_privacy\local\request\plugin\provider
 {
 
     /**
@@ -220,5 +226,66 @@ final class provider implements
             'emailsent' => $dbrow->emailsent,
             'completed' => $dbrow->completed
         ];
+    }
+
+    /**
+     * Get the list of users who have data within a context.
+     *
+     * @param   userlist    $userlist   The userlist containing the list of users who have data in this context/plugin combination.
+     */
+    public static function get_users_in_context(userlist $userlist) {
+        $context = $userlist->get_context();
+
+        if (!is_a($context, \context_module::class)) {
+            return;
+        }
+        $sql = "SELECT r.userid
+                  FROM {reengagement_inprogress} r
+                  JOIN {modules} m
+                    ON m.name = 'reengagement'
+                  JOIN {course_modules} cm
+                    ON cm.instance = r.reengagement
+                   AND cm.module = m.id
+                  JOIN {context} ctx ON cm.id = ctx.instanceid AND ctx.contextlevel = :contextlevel
+                 WHERE ctx.id = :contextid";
+
+        $params = [
+            'contextlevel' => CONTEXT_MODULE,
+            'contextid'    => $context->id,
+        ];
+
+        $userlist->add_from_sql('userid', $sql, $params);
+    }
+
+    /**
+     * Delete multiple users within a single context.
+     *
+     * @param   approved_userlist       $userlist The approved context and user information to delete information for.
+     */
+    public static function delete_data_for_users(approved_userlist $userlist) {
+        global $DB;
+        $context = $userlist->get_context();
+
+        if (!is_a($context, \context_module::class)) {
+            return;
+        }
+        // Prepare SQL to gather all completed IDs.
+        $userids = $userlist->get_userids();
+        list($insql, $inparams) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
+
+        $sql = "(SELECT r.id
+                  FROM {reengagement_inprogress} r
+                  JOIN {modules} m
+                    ON m.name = 'reengagement'
+                  JOIN {course_modules} cm
+                    ON cm.instance = r.reengagement
+                   AND cm.module = m.id
+                  JOIN {context} ctx
+                    ON ctx.instanceid = cm.id
+                 WHERE ctx.id = :contextid
+                   AND r.userid $insql)";
+        $params = array_merge($inparams, ['contextid' => $context->id]);
+
+        $DB->delete_records_select('reengagement_inprogress', "id $sql", $params);
     }
 }

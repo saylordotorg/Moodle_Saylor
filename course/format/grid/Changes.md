@@ -1,5 +1,19 @@
 History
 =============
+Version 3.7.0.3
+  1. Reduced size of Tooltip JS - #94.
+
+Version 3.7.0.2
+  1. Remove old redundant tests.
+  2. Add missing Moodle defined.
+  3. Styles tidy up.
+  4. Removed old convert_legacy_image.php script as was only needed for conversion from M1.9 grid courses - #93.
+  5. Fix cannot change image tiles when importing a grid format course - #66.
+  6. Fix 2-3 image ratio.
+
+Version 3.7.0.1
+  1. Beta version for Moodle 3.7 based on 3.6.0.5.
+
 Version 3.6.0.5
   1. Apply MDL-64819 - #91.
   2. Fix "Editing section summary and changing summary text breaks grid image" - #92.

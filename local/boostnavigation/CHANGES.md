@@ -4,6 +4,35 @@ moodle-local_boostnavigation
 Changes
 -------
 
+### v3.7-r2
+
+* 2019-06-16 - Fix flaws in the english language pack.
+
+### v3.7-r1
+
+* 2019-06-15 - Improvement: Make multiple usages of placeholders in custom nodes slightly more efficient.
+* 2019-06-15 - Refactor, modularize and parametrize the language pack.
+               This was done to ease future additions and translations and to get rid of the existing duplicated substrings.
+               Unfortunately, this refactoring means that existing translations have to be done mostly by copy & paste in AMOS.
+               Thanks in advance to all translators for your support and understanding.
+* 2019-06-14 - Improvement: Split the mix of core and custom nodes settings onto separate settings pages.
+* 2019-06-14 - Improvement: Leverage the possibility to hide admin settings based on other admin settings' values from Moodle 3.7 on.
+* 2019-06-14 - Prepare compatibility for Moodle 3.7.
+
+### v3.6-r7
+
+* 2019-06-15 - Bugfix: Two more strings in language pack didn't work for Moodle installed in subdirectories - Credits to Tim Schroeder.
+
+### v3.6-r6
+
+* 2019-06-14 - Bugfix: Using calendar and privatefiles as beforenode key broke subsequent lines using beforenode keys.
+
+### v3.6-r5
+
+* 2019-06-13 - Improvement: Enable custom nodes positioning for some more beforenodes - Credits to Jean-Roch.
+* 2019-06-13 - Bugfix: The competencies node which is added to the cog menu didn't have an icon - Credits to Sarah Cotton.
+* 2019-06-13 - Bugfix: String in language pack didn't work for Moodle installed in subdirectories - Credits to Tim Schroeder.
+
 ### v3.6-r4
 
 * 2019-04-30 - Bugfix: If you added an ID attribute to the first bottom node, the bottom nodes did not get a margin-top anymore - Credits to Jean-Roch. 

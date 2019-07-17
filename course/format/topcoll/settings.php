@@ -22,9 +22,8 @@
  * Toggles are persistent on a per browser session per course basis but can be made to persist longer by a small
  * code change. Full installation instructions, code adaptions and credits are included in the 'Readme.txt' file.
  *
- * @package    course/format
- * @subpackage topcoll
- * @version    See the value of '$plugin->version' in below.
+ * @package    format_topcoll
+ * @version    See the value of '$plugin->version' in version.php.
  * @copyright  &copy; 2012-onwards G J Barnard in respect to modifications of standard topics format.
  * @author     G J Barnard - {@link http://moodle.org/user/profile.php?id=442195}
  * @link       http://docs.moodle.org/en/Collapsed_Topics_course_format
@@ -123,6 +122,28 @@ if ($ADMIN->fulltree) {
     );
     $settings->add(new admin_setting_configselect($name, $title, $description, $default, $choices));
 
+    /* Toggle all enabled - 1 = no, 2 = yes. */
+    $name = 'format_topcoll/defaulttoggleallenabled';
+    $title = get_string('defaulttoggleallenabled', 'format_topcoll');
+    $description = get_string('defaulttoggleallenabled_desc', 'format_topcoll');
+    $default = 2;
+    $choices = array(
+        1 => new lang_string('no'), // No.
+        2 => new lang_string('yes') // Yes.
+    );
+    $settings->add(new admin_setting_configselect($name, $title, $description, $default, $choices));
+
+    /* View single section enabled - 1 = no, 2 = yes. */
+    $name = 'format_topcoll/defaultviewsinglesectionenabled';
+    $title = get_string('defaultviewsinglesectionenabled', 'format_topcoll');
+    $description = get_string('defaultviewsinglesectionenabled_desc', 'format_topcoll');
+    $default = 2;
+    $choices = array(
+        1 => new lang_string('no'), // No.
+        2 => new lang_string('yes') // Yes.
+    );
+    $settings->add(new admin_setting_configselect($name, $title, $description, $default, $choices));
+
     // Toggle text alignment.
     // 1 = left, 2 = center and 3 = right - done this way to avoid typos.
     $name = 'format_topcoll/defaulttogglealignment';
@@ -192,7 +213,7 @@ if ($ADMIN->fulltree) {
     $default = 1;
     $choices = array(
         1 => new lang_string('no'), // No.
-        2 => new lang_string('yes')   // Yes.
+        2 => new lang_string('yes') // Yes.
     );
     $settings->add(new admin_setting_configselect($name, $title, $description, $default, $choices));
 

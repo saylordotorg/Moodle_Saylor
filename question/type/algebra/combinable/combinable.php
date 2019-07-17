@@ -138,6 +138,7 @@ class qtype_combined_combinable_algebra extends qtype_combined_combinable_text_e
 
     public function data_to_form($context, $fileoptions) {
         $answers = array('answer' => array());
+        $variables = array('variable' => array(), 'varmin' => array(), 'varmax' => array());
         if ($this->questionrec !== null) {
             foreach ($this->questionrec->options->answers as $answer) {
                 $answers['answer'][] = $answer->answer;

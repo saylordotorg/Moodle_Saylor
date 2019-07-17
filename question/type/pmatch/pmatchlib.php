@@ -26,7 +26,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/question/type/pmatch/pmatch/interpreter.php');
-require_once($CFG->dirroot . '/question/type/pmatch/spellinglib.php');
+
+use qtype_pmatch\local\spell\qtype_pmatch_spell_checker;
 
 // The following is required because the xdebug library defaults to throwing a fatal error if
 // there is more than 100 nested function calls.
@@ -76,6 +77,28 @@ class pmatch_options {
     /** @var array of words from synonyms that are exempt from spell check. */
     public $nospellcheckwords = array();
 
+    /**
+     * Static factory to make an options object with various values set.
+     *
+     * @param array $settings field name => value to set.
+     * @return pmatch_options new options object.
+     */
+    public static function make(array $settings): pmatch_options {
+        $options = new pmatch_options();
+        foreach ($settings as $name => $value) {
+            if ($name === 'synonyms') {
+                foreach ($value as $word => $synonyms) {
+                    $options->set_synonyms([(object) ['word' => $word, 'synonyms' => $synonyms]]);
+                }
+            } else if (!property_exists($options, $name)) {
+                throw new coding_exception("pmatch_options does not have a $name field");
+            } else {
+                $options->$name = $value;
+            }
+        }
+        return $options;
+    }
+
     public function set_synonyms($synonyms) {
         $toreplace = array();
         $replacewith = array();
@@ -86,7 +109,7 @@ class pmatch_options {
             $toreplaceitem = preg_replace('~\\\\\*~u',
                         '('.$this->character_in_word_pattern().')*', $toreplaceitem);
             // The ?<= and ?= ensures that the adjacent characters are not replaced also.
-            $toreplaceitem = '~(?<=^|\PL)'.$toreplaceitem.'(?=\PL|$)~';
+            $toreplaceitem = '~(?<=^|\PL)'.$toreplaceitem.'(?=\PL|$)~u';
             if ($this->ignorecase) {
                 $toreplaceitem .= 'i';
             }
@@ -106,7 +129,6 @@ class pmatch_options {
     }
 
     public function unicode_normalisation($unicodestring) {
-        global $COURSE;
         static $errorlogged = false;
         if (class_exists('Normalizer')) {
             return Normalizer::normalize($unicodestring);
@@ -144,7 +166,8 @@ class pmatch_options {
     }
 
     /**
-     * @return string fragment of preg_match pattern to match sentence separator.
+     * @param string $word fragment of preg_match pattern to match sentence separator.
+     * @return bool wether $words ends in one of the sentence divider characters.
      */
     public function word_has_sentence_divider_suffix($word) {
         $sd = $this->sentence_divider_pattern();
@@ -158,7 +181,6 @@ class pmatch_options {
      * @return string with sentence divider stripped off.
      */
     public function strip_sentence_divider($string) {
-        $sd = $this->sentence_divider_pattern();
         if ($this->word_has_sentence_divider_suffix($string)) {
             $string = core_text::substr($string, 0, -1);
         }
@@ -193,6 +215,11 @@ class pmatch_options {
                 // Full stop should only match if it is not a decimal point (followed by a digit).
                 $pattern .= '(?![0-9])';
             }
+        }
+        // If there is no pattern, then we should never match anything.
+        // Make a pattern that does that, to avoid bugs.
+        if ($pattern === '') {
+            $pattern = '(?!X)X';
         }
         return $pattern;
     }
@@ -229,7 +256,6 @@ class pmatch_parsed_string {
         }
 
         $this->words = array();
-        $wordno = 0;
         $cursor = 0;
         $string = trim($string); // Trim off any extra whitespace.
         $string = $this->options->unicode_normalisation($string);
@@ -250,7 +276,7 @@ class pmatch_parsed_string {
                 }
             }
             if (!count($matches)) {
-                if (!preg_match("~(.+?)$endofword~A$po", $toprocess, $matches)) {
+                if (!preg_match("~(.+?)$endofword~Au$po", $toprocess, $matches)) {
                     // Ignore the rest of the string.
                     break;
                 }
@@ -259,8 +285,7 @@ class pmatch_parsed_string {
             if (isset($matches['sd'])) {
                 $word .= $matches['sd'];
             }
-            $this->words[$wordno] = $word;
-            $wordno++;
+            $this->words[] = $word;
             $cursor = $cursor + core_text::strlen($matches[0]);
 
             if ('' === $this->options->strip_sentence_divider($word)) {
@@ -274,10 +299,10 @@ class pmatch_parsed_string {
     }
 
     /**
-     * @return boolean returns false if any word is misspelt.
+     * @return boolean returns false if any word is misspelled.
      */
-    public function is_spelt_correctly() {
-        $this->misspelledwords = $this->spell_check($this->words);
+    public function is_spelled_correctly() {
+        $this->misspelledwords = $this->spell_check();
         return (count($this->misspelledwords) == 0);
     }
 
@@ -294,33 +319,80 @@ class pmatch_parsed_string {
     }
 
     protected function spell_check() {
-        global $COURSE;
-
-        $spellchecker = qtype_pmatch_spell_checker::make($this->options->lang);
-
-        $endofpattern = '(' . $this->options->sentence_divider_pattern() . ')?$~A';
-        if ($this->options->ignorecase) {
-            $endofpattern .= 'i';
-        }
-        $words = array_unique($this->words);
-        foreach ($this->options->words_to_ignore_patterns() as $wordstoignorepattern) {
-            $words = (preg_grep('~'.$wordstoignorepattern.$endofpattern, $words, PREG_GREP_INVERT));
-        }
-        $misspelledwords = array();
-        foreach ($words as $word) {
-            $originalword = $word;
+        $misspelledwords = [];
+        foreach (array_unique($this->words) as $word) {
             $word = core_text::strtolower($word);
-            $word = $this->options->strip_sentence_divider($word);
-
-            if (!$spellchecker->is_in_dictionary($word)) {
-                $misspelledwords[] = $originalword;
+            $wrongword = $this->is_word_misspelled($word);
+            if ($wrongword !== null) {
+                $misspelledwords[] = $wrongword;
             }
         }
         return $misspelledwords;
     }
 
     /**
-     * @return array all the distinct misspelt words.
+     * Test a 'word' to see if it is in the dictonary. If not, return
+     *
+     * The reason we need this is that 'words' in a parsed string contain
+     * any surrounding punctuation. For example in '"Hello!" shouted Fred.'
+     * the first word is "Hello!", and if that was not in the dictionary,
+     * then eventually 'Hello' would be returned, however, in this case,
+     * it is correct, so null will be returned.
+     *
+     * This may seem a bit complicated, but you need to remember that
+     * 'e.g.', 'co-operate', and 'AC/DC' are all words found in dictionaries.
+     *
+     * @param qtype_pmatch_spell_checker $spellchecker
+     * @param string $word
+     * @return string|null
+     */
+    protected function is_word_misspelled(string $word): ? string {
+        if (trim($word) === '') {
+            return null;
+        }
+        $endofpattern = '(' . $this->options->sentence_divider_pattern() . ')?$~Au';
+        if ($this->options->ignorecase) {
+            $endofpattern .= 'i';
+        }
+        foreach ($this->options->words_to_ignore_patterns() as $wordstoignorepattern) {
+            if (preg_match('~'.$wordstoignorepattern.$endofpattern, $word)) {
+                // Is a number, extra dictionary word or synonym.
+                return null;
+            }
+        }
+
+        $spellchecker = qtype_pmatch_spell_checker::make($this->options->lang);
+        if ($spellchecker->is_in_dictionary($word)) {
+            return null;
+        }
+
+        // Try trimming one non-letter character from the end or start, if present.
+        if (preg_match('~[^\pL]$~u', $word)) {
+            return $this->is_word_misspelled(core_text::substr($word, 0, -1));
+        } else if (preg_match('~^[^\pL]~u', $word)) {
+            return $this->is_word_misspelled(core_text::substr($word, 1));
+        }
+
+        // Finally, if what is left after all puncution is removed contains -s,
+        // then the word is spelled right if all the bits are, so test that.
+        if (core_text::strpos($word, '-') === false) {
+            // No hyphens, so Word is misspelled.
+            return $word;
+        }
+
+        foreach (explode('-', $word) as $fragment) {
+            if (!$spellchecker->is_in_dictionary($fragment)) {
+                // A fragment is misspelled, so reject the whole thing.
+                return $word;
+            }
+        }
+
+        // All fragments are OK, so fine.
+        return null;
+    }
+
+    /**
+     * @return array all the distinct misspelled words.
      */
     public function get_spelling_errors() {
         return $this->misspelledwords;

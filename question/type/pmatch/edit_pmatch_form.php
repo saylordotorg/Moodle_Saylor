@@ -26,6 +26,8 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/question/type/pmatch/pmatchlib.php');
 
+use qtype_pmatch\local\spell\qtype_pmatch_spell_checker;
+
 /**
  * Short answer question editing form definition.
  *
@@ -88,7 +90,9 @@ class qtype_pmatch_edit_form extends question_edit_form {
 
         if (\qtype_pmatch\testquestion_responses::has_responses($this->question)) {
             $counts = \qtype_pmatch\testquestion_responses::get_question_grade_summary_counts($this->question);
-            $results = html_writer::tag('p', get_string('testquestionresultssummary', 'qtype_pmatch', $counts));
+            $results = html_writer::tag('p',
+                    get_string('testquestionresultssummary', 'qtype_pmatch', $counts),
+                    ["id" => 'testquestion_gradesummary']);
         }
         $answersinstruct = $mform->createElement('static', 'answersinstruct',
                                                 get_string('correctanswers', 'qtype_pmatch'),
@@ -130,6 +134,7 @@ class qtype_pmatch_edit_form extends question_edit_form {
             return;
         }
         $count = 0;
+        $responsestmp = $responses;
         foreach ($rules as $aid => $rule) {
             // Avoid adding anything to the 'Any other answer' section.
             if (!$mform->elementExists('fraction[' . $count . ']')) {
@@ -137,15 +142,17 @@ class qtype_pmatch_edit_form extends question_edit_form {
             }
 
             // Add the Rule accuracy section.
-            $accuracy = \qtype_pmatch\testquestion_responses::get_rule_accuracy_counts($responses, $rule->id, $matches);
-            $labelhtml = html_writer::div(get_string('ruleaccuracylabel', 'qtype_pmatch'), 'fitemtitle');
+            $accuracy = \qtype_pmatch\testquestion_responses::get_rule_accuracy_counts($responsestmp, $rule, $matches);
+            $labelhtml = html_writer::div(
+                    html_writer::label(get_string('ruleaccuracylabel', 'qtype_pmatch'), 'fitem_accuracy_' . $count),
+                    'fitemtitle');
             $elementhtml = html_writer::div(get_string('ruleaccuracy', 'qtype_pmatch', $accuracy),
                     'felement fselect', array('id' => 'fitem_accuracy_' . $count));
             $html = html_writer::div($labelhtml. $elementhtml, 'fitem fitem_accuracy');
             $answersaccuracy = $mform->createElement('html', $html);
             $cloneanswersaccuracy = clone $answersaccuracy;
-            $mform->insertElementBefore($cloneanswersaccuracy, 'answer[' . $count . ']');
-
+            $mform->insertElementBefore($cloneanswersaccuracy, 'accuracyborder[' . $count . ']');
+            unset($cloneanswersaccuracy);
             // Add the Show coverage section - for rules that have been marked.
             if (array_key_exists($rule->id, $matches['ruleidstoresponseids'])) {
                 $items = array();
@@ -177,9 +184,7 @@ class qtype_pmatch_edit_form extends question_edit_form {
                 $reponseslist .= html_writer::alist($items);
                 $reponseslist .= print_collapsible_region_end(true);
                 $html = html_writer::div($reponseslist, 'fitem fitem_matchedresponses');
-                $matchedresponses = $mform->createElement('html', $html);
-                $clonematchedresponses = clone ($matchedresponses);
-                $mform->insertElementBefore($clonematchedresponses, 'fraction[' . $count . ']');
+                $mform->insertElementBefore($mform->createElement('html', $html), 'fraction[' . $count . ']');
             }
             $count++;
         }
@@ -231,16 +236,28 @@ class qtype_pmatch_edit_form extends question_edit_form {
         $mform->addElement('select', 'forcelength',
                                                 get_string('forcelength', 'qtype_pmatch'), $menu);
         $mform->setDefault('forcelength', 1);
-        $mform->addElement('selectyesno', 'applydictionarycheck',
-                                            get_string('applydictionarycheck', 'qtype_pmatch'));
-        $mform->setDefault('applydictionarycheck', 1);
+        list ($options, $disable) = qtype_pmatch_spell_checker::get_spell_checker_language_options($this->question);
+        if ($disable) {
+            $mform->addElement('select', 'applydictionarycheck',
+                    get_string('applydictionarycheck', 'qtype_pmatch'), $options, ['disabled' => 'disabled']);
+        } else {
+            $mform->addElement('select', 'applydictionarycheck',
+                    get_string('applydictionarycheck', 'qtype_pmatch'), $options);
+            $mform->setDefault('applydictionarycheck', get_string('iso6391', 'langconfig'));
+        }
         $mform->addElement('textarea', 'extenddictionary',
                         get_string('extenddictionary', 'qtype_pmatch'),
                         array('rows' => '5', 'cols' => '80'));
-        $mform->disabledIf('extenddictionary', 'applydictionarycheck', 'eq', 0);
+        $mform->disabledIf('extenddictionary', 'applydictionarycheck', 'eq', qtype_pmatch_spell_checker::DO_NOT_CHECK_OPTION);
+        $mform->addElement('text', 'sentencedividers',
+            get_string('sentencedividers', 'qtype_pmatch'), array('size' => 20));
+        $mform->addHelpButton('sentencedividers', 'sentencedividers', 'qtype_pmatch');
+        $mform->setDefault('sentencedividers', '.?!');
+        $mform->setType('sentencedividers', PARAM_RAW_TRIMMED);
         $mform->addElement('text', 'converttospace',
                         get_string('converttospace', 'qtype_pmatch'),
                         array('size' => 60));
+        $mform->addHelpButton('converttospace', 'converttospace', 'qtype_pmatch');
         $mform->setDefault('converttospace', ',;:');
         $mform->setType('converttospace', PARAM_RAW_TRIMMED);
 
@@ -263,11 +280,12 @@ class qtype_pmatch_edit_form extends question_edit_form {
         // It would be nice to add a class to this element for styling, but it does not work.
         $repeated[] = $mform->createElement('static', 'topborder', '', ' ');
         $repeated[] = $mform->createElement('textarea', 'answer', $label,
-                            array('rows' => '8', 'cols' => '60', 'class' => 'textareamonospace'));
+                ['rows' => '8', 'cols' => '60', 'class' => 'answer-rule textareamonospace']);
         if ($this->question->qtype == 'pmatch') {
             $title = $this->get_rc_title();
             $content = $this->get_rc_content();
             $repeated[] = $mform->createElement('static', 'rule-creator-wrapper', $title, $content);
+            $repeated[] = $mform->createElement('static', 'accuracyborder', '', ' ');
             if ($html = $this->get_try_button()) {
                 $repeated[] = $mform->createElement('html', $html);
             }
@@ -443,6 +461,7 @@ EOT;
             $question->forcelength = $question->options->forcelength;
             $question->applydictionarycheck = $question->options->applydictionarycheck;
             $question->extenddictionary = $question->options->extenddictionary;
+            $question->sentencedividers = $question->options->sentencedividers;
             $question->converttospace = $question->options->converttospace;
         }
         if (isset($question->options->synonyms)) {

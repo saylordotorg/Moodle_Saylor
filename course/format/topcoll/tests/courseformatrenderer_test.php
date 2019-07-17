@@ -17,8 +17,7 @@
 /**
  * Collapsed Topics course format.
  *
- * @package    course/format
- * @subpackage topcoll
+ * @package    format_topcoll
  * @version    See the value of '$plugin->version' in version.php.
  * @copyright  &copy; 2015-onwards G J Barnard in respect to modifications of standard topics format.
  * @author     G J Barnard - {@link http://moodle.org/user/profile.php?id=442195}
@@ -83,7 +82,7 @@ class format_topcoll_courseformatrenderer_testcase extends advanced_testcase {
         return $property;
     }
 
-    protected function init($numsections = 1, $layoutcolumnorientation = 2) {
+    protected function init($numsections = 1, $layoutcolumnorientation = 2, $toggleallenabled = 2, $viewsinglesectionenabled = 2) {
         $this->resetAfterTest(true);
 
         set_config('theme', 'boost');
@@ -114,6 +113,8 @@ class format_topcoll_courseformatrenderer_testcase extends advanced_testcase {
         self::set_property($this->outputus, 'output', $ouroutput);
         $tcsettings = $this->courseformat->get_settings();
         $tcsettings['layoutcolumnorientation'] = $layoutcolumnorientation;
+        $tcsettings['toggleallenabled'] = $toggleallenabled;
+        $tcsettings['viewsinglesectionenabled'] = $viewsinglesectionenabled;
         self::set_property($this->outputus, 'tcsettings', $tcsettings);
     }
 

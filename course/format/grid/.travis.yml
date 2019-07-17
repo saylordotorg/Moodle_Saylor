@@ -10,21 +10,21 @@ matrix:
  allow_failures:
  fast_finish: true
  include:
- - php: 7.0
+ - php: 7.1
    env: DB=mysqli
- - php: 7.0
+ - php: 7.1
    env: DB=pgsql
    addons:
       postgresql: 9.4
- - php: 7.1
+ - php: 7.2
    env: DB=mysqli
- - php: 7.1
+ - php: 7.2
    env: DB=pgsql
    addons:
       postgresql: 9.4
 env:
  global:
-  - MOODLE_BRANCH=MOODLE_36_STABLE
+  - MOODLE_BRANCH=MOODLE_37_STABLE
   - IGNORE_PATHS=amd/src/tooltip.js,test/test_image.php,upgrade/convert_legacy_image.php,yui/src/gridkeys/js/event-nav-keys-debug.js,yui/src/gridkeys/js/event-nav-keys.js,yui/src/gridkeys/scripts/backport.js,yui/gridkeys/gridkeys.js
   - IGNORE_NAMES=gf_colourpopup.php,gf_colourpopup.js
 

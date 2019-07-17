@@ -17,8 +17,7 @@
 /**
  * Grid Information
  *
- * @package    course/format
- * @subpackage Grid
+ * @package    format_grid
  * @version    See the value of '$plugin->version' in below.
  * @copyright  &copy; 2012 G J Barnard in respect to modifications of standard topics format.
  * @author     G J Barnard - {@link http://about.me/gjbarnard} and
