@@ -28,6 +28,16 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/mod/journal/lib.php');
 
+function get_dynamic_parent_entry() {
+    global $CFG;
+    if (class_exists('\core_search\area\base_mod')) {
+        return '\core_search\area\base_mod';
+    } else {
+        return '\core_search\base_mod';
+    }
+}
+class_alias(get_dynamic_parent_entry(), '\mod_journal\search\DynamicParentEntry');
+
 /**
  * Journal entries search.
  *
@@ -35,7 +45,7 @@ require_once($CFG->dirroot . '/mod/journal/lib.php');
  * @copyright  2016 David Monllao {@link http://www.davidmonllao.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class entry extends \core_search\base_mod {
+class entry extends \mod_journal\search\DynamicParentEntry {
 
     /**
      * Returns recordset containing required data for indexing journal entries.
@@ -47,7 +57,7 @@ class entry extends \core_search\base_mod {
         global $DB;
 
         $sql = "SELECT je.*, j.course FROM {journal_entries} je
-                  JOIN {journal} j ON j.id = je.journal
+                JOIN {journal} j ON j.id = je.journal
                 WHERE je.modified >= ? ORDER BY je.modified ASC";
         return $DB->get_recordset_sql($sql, array($modifiedfrom));
     }
@@ -175,7 +185,7 @@ class entry extends \core_search\base_mod {
         global $DB;
 
         return $DB->get_record_sql("SELECT je.*, j.course FROM {journal_entries} je
-                                      JOIN {journal} j ON j.id = je.journal
+                                    JOIN {journal} j ON j.id = je.journal
                                     WHERE je.id = ?", array('id' => $entryid), MUST_EXIST);
     }
 }

@@ -26,6 +26,7 @@
 // Include required files.
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once($CFG->dirroot.'/blocks/completion_progress/lib.php');
+require_once($CFG->dirroot.'/notes/lib.php');
 require_once($CFG->libdir.'/tablelib.php');
 
 const USER_SMALL_CLASS = 20;   // Below this is considered small.
@@ -130,15 +131,17 @@ if (has_capability('moodle/site:accessallgroups', $context)) {
     $groupuserid = 0;
 }
 $groupids = array();
+$groupidnums = array();
 $groupingids = array();
 $groups = groups_get_all_groups($course->id, $groupuserid);
-$groupings = groups_get_all_groupings($course->id);
+$groupings = ($groupuserid == 0 ? groups_get_all_groupings($course->id) : []);
 if (!empty($groups) || !empty($groupings)) {
-    $groupstodisplay = array(0 => get_string('allparticipants'));
+    $groupstodisplay = ($groupuserid == 0 ? array(0 => get_string('allparticipants')) : []);
     foreach ($groups as $groupidnum => $groupobject) {
         $groupid = 'group-'.$groupidnum;
         $groupstodisplay[$groupid] = format_string($groupobject->name);
         $groupids[] = $groupid;
+        $groupidnums[] = $groupidnum;
     }
     foreach ($groupings as $groupingidnum => $groupingobject) {
         $groupingid = 'grouping-'.$groupingidnum;
@@ -179,8 +182,8 @@ if ((substr($group, 0, 6) == 'group-') && ($groupid = intval(substr($group, 6)))
                  '(g.groupid IN (SELECT DISTINCT groupid FROM {groupings_groups} WHERE groupingid = :groupingselected) '.
                  'AND g.userid = u.id)';
     $params['groupingselected'] = $groupingid;
-} else if ($groupuserid != 0 && !empty($groupids)) {
-    $groupjoin = 'JOIN {groups_members} g ON (g.groupid IN ('.implode(',', $groupids).') AND g.userid = u.id)';
+} else if ($groupuserid != 0 && !empty($groupidnums)) {
+    $groupjoin = 'JOIN {groups_members} g ON (g.groupid IN ('.implode(',', $groupidnums).') AND g.userid = u.id)';
 }
 
 

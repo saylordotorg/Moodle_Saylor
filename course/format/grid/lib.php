@@ -1985,25 +1985,30 @@ class format_grid extends format_base {
             return false;
         }
 
-        if (!$sectionimage = $DB->get_record('format_grid_icon', array('sectionid' => $sectionid))) {
+        // Only allow this code to be executed once at the same time for the given section id (the id is unique).
+        $lockfactory = \core\lock\lock_config::get_lock_factory('format_grid');
+        if ($lock = $lockfactory->get_lock('sectionid'.$sectionid, 5)) {
+            if (!$sectionimage = $DB->get_record('format_grid_icon', array('sectionid' => $sectionid))) {
+                $newimagecontainer = new stdClass();
+                $newimagecontainer->sectionid = $sectionid;
+                $newimagecontainer->courseid = $courseid;
+                $newimagecontainer->displayedimageindex = 0;
 
-            $newimagecontainer = new stdClass();
-            $newimagecontainer->sectionid = $sectionid;
-            $newimagecontainer->courseid = $courseid;
-            $newimagecontainer->displayedimageindex = 0;
-
-            if (!$newimagecontainer->id = $DB->insert_record('format_grid_icon', $newimagecontainer, true)) {
-                throw new moodle_exception('invalidrecordid', 'format_grid', '',
-                'Could not create image container.  Grid format database is not ready.' .
-                '  An admin must visit the notifications section.');
+                if (!$newimagecontainer->id = $DB->insert_record('format_grid_icon', $newimagecontainer, true)) {
+                    $lock->release();
+                    throw new moodle_exception('invalidiconrecordid', 'format_grid', '', get_string('invalidiconrecordid', 'format_grid'));
+                }
+                $sectionimage = $newimagecontainer;
+            } else if ($sectionimage->courseid == 1) { // 1 is the default and is the 'site' course so cannot be the Grid format.
+                // Note: Using a double equals in the test and not a triple as the latter does not work for some reason.
+                /* Course id is the default and needs to be set correctly.  This can happen with data created by versions prior to
+                13/7/2012. */
+                $DB->set_field('format_grid_icon', 'courseid', $courseid, array('sectionid' => $sectionid));
+                $sectionimage->courseid = $courseid;
             }
-            $sectionimage = $newimagecontainer;
-        } else if ($sectionimage->courseid == 1) { // 1 is the default and is the 'site' course so cannot be the Grid format.
-            // Note: Using a double equals in the test and not a triple as the latter does not work for some reason.
-            /* Course id is the default and needs to be set correctly.  This can happen with data created by versions prior to
-              13/7/2012. */
-            $DB->set_field('format_grid_icon', 'courseid', $courseid, array('sectionid' => $sectionid));
-            $sectionimage->courseid = $courseid;
+            $lock->release();
+        } else {
+            throw new moodle_exception('cannotgetimagelock', 'format_grid', '', get_string('cannotgetimagelock', 'format_grid'));
         }
         return $sectionimage;
     }
@@ -2017,24 +2022,31 @@ class format_grid extends format_base {
      */
     public function get_summary_visibility($courseid) {
         global $DB;
-        if (!$summarystatus = $DB->get_record('format_grid_summary', array('courseid' => $courseid))) {
-            $newstatus = new stdClass();
-            $newstatus->courseid = $courseid;
-            $newstatus->showsummary = 1;
+        // Only allow this code to be executed once at the same time for the given course id (the id is unique).
+        $lockfactory = \core\lock\lock_config::get_lock_factory('format_grid');
+        if ($lock = $lockfactory->get_lock('courseid'.$courseid, 5)) {
+            if (!$summarystatus = $DB->get_record('format_grid_summary', array('courseid' => $courseid))) {
+                $newstatus = new stdClass();
+                $newstatus->courseid = $courseid;
+                $newstatus->showsummary = 1;
 
-            if (!$newstatus->id = $DB->insert_record('format_grid_summary', $newstatus)) {
-                throw new moodle_exception('invalidrecordid', 'format_grid', '',
-                'Could not set summary status. Grid format database is not ready. An admin must visit the notifications section.');
+                if (!$newstatus->id = $DB->insert_record('format_grid_summary', $newstatus)) {
+                    $lock->release();
+                    throw new moodle_exception('invalidsummaryrecordid', 'format_grid', '', get_string('invalidsummaryrecordid', 'format_grid'));
+                }
+                $summarystatus = $newstatus;
+
+                /* Technically this only happens once when the course is created, so we can use it to set the
+                 * course format options for the first time.  This so that the defaults are set upon creation
+                 * and therefore do not have to detect when they change in the global site settings.  Which
+                 * cannot be detected and therefore the icons would look odd.  So here they are set and set once
+                 * until course settings are reset or changed.
+                 */
+                $this->update_course_format_options($this->get_settings());
             }
-            $summarystatus = $newstatus;
-
-            /* Technically this only happens once when the course is created, so we can use it to set the
-             * course format options for the first time.  This so that the defaults are set upon creation
-             * and therefore do not have to detect when they change in the global site settings.  Which
-             * cannot be detected and therefore the icons would look odd.  So here they are set and set once
-             * until course settings are reset or changed.
-             */
-            $this->update_course_format_options($this->get_settings());
+            $lock->release();
+        } else {
+            throw new moodle_exception('cannotgetsummarylock', 'format_grid', '', get_string('cannotgetsummarylock', 'format_grid'));
         }
         return $summarystatus;
     }

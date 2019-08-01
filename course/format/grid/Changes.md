@@ -2,6 +2,7 @@ History
 =============
 Version 3.7.0.3
   1. Reduced size of Tooltip JS - #94.
+  2. Attempted fix for "found more than one record" for format_grid_summary table - #97.
 
 Version 3.7.0.2
   1. Remove old redundant tests.

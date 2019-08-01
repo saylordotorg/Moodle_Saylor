@@ -14,19 +14,21 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-
 /**
- * Completion Progress block version details
+ * This is a placeholder file for a legacy implementation.
  *
- * @package    block_completion_progress
- * @copyright  2018 Michael de Raadt
+ * @package    core
+ * @copyright  2019 Ryan Wyllie <ryan@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die;
+// Disable moodle specific debug messages since we're just redirecting.
+define('NO_DEBUG_DISPLAY', true);
+require('../config.php');
 
-$plugin->version   = 2019072700;
-$plugin->requires  = 2014111100; // Moodle 2.8.
-$plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = 'Version for Moodle 2.8 onwards';
-$plugin->component = 'block_completion_progress';
+require_login(null, false);
+
+// We have a bunch of old notifications (both internal and external, e.g. email) that
+// reference this URL which means we can't remove it so let's just redirect.
+redirect("{$CFG->wwwroot}/message/index.php?view=contactrequests");
+
