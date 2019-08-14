@@ -15,18 +15,17 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Instance settings form
+ * Completion overview report.
  *
- * @package   block_checklist
- * @copyright 2010 Davo Smith
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    report_completionoverview
+ * @copyright  2017 Jim Harris <jim.harris@twoscope.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+defined('MOODLE_INTERNAL') || die;
 
-$plugin->version = 2019080700;
-$plugin->requires = 2017111300; // Moodle 3.4+.
-$plugin->release = '3.4+ (Build: 2018040200)';
-$plugin->component = 'block_checklist';
-$plugin->maturity = MATURITY_STABLE;
-$plugin->dependencies = ['mod_checklist' => 2019061900]; // Must have checklist activity module installed.
+$plugin->version   = 2017111702;        // The current plugin version (Date: YYYYMMDDXX).
+$plugin->requires  = 2017051500;        // Requires this Moodle version - THIS IS 3.3.
+$plugin->component = 'report_completionoverview'; // Full name of the plugin (used for diagnostics).
+$plugin->release = '2';
+$plugin->maturity  = MATURITY_STABLE;

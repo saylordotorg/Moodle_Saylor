@@ -1,0 +1,33 @@
+#page-admin-report-completionoverview-index table#completion-progress {
+    margin-top: 20px;
+    margin-bottom: 30px;
+}
+
+#page-admin-report-completionoverview-index .criterianame,
+#page-admin-report-completionoverview-index .criteriaicon,
+#page-admin-report-completionoverview-index .completion-progresscell {
+    text-align: center; vertical-align: bottom;
+}
+
+/* Custom CSS for rotated header.. */
+#page-admin-report-completionoverview-index .rotated-text-container {
+    display: inline-block;
+    width: 16px;
+}
+
+/*rtl:begin:ignore.*/
+#page-admin-report-completionoverview-index .rotated-text {
+    display: inline-block;
+    white-space: nowrap;
+
+    transform: translate(0, 100%) rotate(-90deg);
+    transform-origin: 0 0;
+    vertical-align: middle;
+}
+
+#page-admin-report-completionoverview-index .rotated-text:after {
+    content: "";
+    float: left;
+    margin-top: 100%;
+}
+/*rtl:end:ignore.*/
