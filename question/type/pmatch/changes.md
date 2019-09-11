@@ -1,6 +1,11 @@
 # Change log for the pattern-match question type
 
 
+## Changes in 2.6
+
+* Fix a bug where upgrading from the previous version got stuck on the upgradesettings.php screen.
+
+
 ## Changes in 2.5
 
 * Partial support for this question type in the Moodle mobile app. (Questions work if they don't use the superscript/subscript editor.)

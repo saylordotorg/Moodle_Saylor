@@ -181,14 +181,7 @@ function accredible_check_if_cert_earned($record, $course, $user) {
 
     // check for the existence of an activity instance and an auto-issue rule
     if( $record and ($record->finalquiz or $record->completionactivities) ) {
-
-        // Check if we have a groupid or achievementid. Logic is same for both
-        if($record->groupid) {
-            $groupid = $record->groupid;
-        }
-        elseif($record->achievementid) {
-            $groupid = $record->achievementid;
-        }
+        $groupid = $record->groupid;
 
         if($record->finalquiz) {
             $quiz = $DB->get_record('quiz', array('id'=> $record->finalquiz), '*', MUST_EXIST);
@@ -275,41 +268,6 @@ function create_credential($user, $group_id, $event = null, $issued_on = null){
 }
 
 /**
- * Create a credential given a user and an existing group
- * @param stdObject $user 
- * @param int $group_id 
- * @return stdObject
- */
-function create_credential_legacy($user, $achievement_name, $course_name, $course_description, $course_link, $issued_on, $event = null){
-	global $CFG;
-
-	$api = new Api($CFG->accredible_api_key);
-
-	try {
-		$credential = $api->create_credential_legacy(fullname($user), $user->email, $achievement_name, $issued_on, null, $course_name, $course_description, $course_link);
-
-		// log an event now we've created the credential if possible
-		if($event != null){
-			$certificate_event = \mod_accredible\event\certificate_created::create(array(
-								  'objectid' => $credential->credential->id,
-								  'context' => context_module::instance($event->contextinstanceid),
-								  'relateduserid' => $event->relateduserid
-								));
-			$certificate_event->trigger();
-		}
-		
-		return $credential->credential;
-
-	} catch (ClientException $e) {
-	    // throw API exception
-	  	// include the achievement id that triggered the error
-	  	// direct the user to accredible's support
-	  	// dump the achievement id to debug_info
-	  	throw new moodle_exception('credentialcreateerror', 'accredible', 'https://help.accredible.com/hc/en-us', $user->email, $group_id);
-	}
-}
-
-/**
  * Get the groups for the issuer
  * @return type
  */
@@ -337,10 +295,34 @@ function accredible_get_groups() {
 }
 
 /**
+ * Get a specific group by name
+ * @param String name
+ * @return type
+ */
+function accredible_get_group_by_name($name) {
+	global $CFG;
+
+	$api = new Api($CFG->accredible_api_key);
+
+	try {
+		$response = $api->get_groups(1, 1, $name);
+
+		return $response->groups[0];
+
+	} catch (ClientException $e) {
+	    // throw API exception
+	  	// include the achievement id that triggered the error
+	  	// direct the user to accredible's support
+	  	// dump the achievement id to debug_info
+	  	throw new moodle_exception('getgroupserror', 'accredible', 'https://help.accredible.com/hc/en-us');
+	}
+}
+
+/**
  * Get the SSO link for a recipient
  * @return type
  */
-function accredible_get_recipient_sso_linik($group_id, $email) {
+function accredible_get_recipient_sso_link($group_id, $email) {
 	global $CFG;
 
 	$api = new Api($CFG->accredible_api_key);
@@ -383,48 +365,6 @@ function accredible_get_templates() {
 }
 
 /*
- * accredible_issue_default_certificate
- * 
- */
-function accredible_issue_default_certificate($user_id, $certificate_id, $name, $email, $grade, $quiz_name, $completed_timestamp = null) {
-	global $DB, $CFG;
-
-    if (!isset($completed_timestamp)) {
-        $completed_timestamp = time();
-    }
-    $issued_on = date('Y-m-d', (int) $completed_timestamp);
-
-	// Issue certs
-	$accredible_certificate = $DB->get_record('accredible', array('id'=>$certificate_id));
-
-
-  	$course_url = new moodle_url('/course/view.php', array('id' => $accredible_certificate->course));
-  	$course_link = $course_url->__toString();
-
-  	$api = new Api($CFG->accredible_api_key);
-	$credential = $api->create_credential_legacy($name, $email, $accredible_certificate->achievementid, $issued_on, null, $accredible_certificate->certificatename, $accredible_certificate->description, $course_link);
-
-	// evidence item posts
-	$credential_id = $credential->credential->id;
-	if($grade) {
-		if($grade < 50) {
-		    $hidden = true;
-		} else {
-			$hidden = false;
-		}
-
-		$response = $api->create_evidence_item_grade($grade, $quiz_name, $credential_id, $hidden);
-	}
-  	if($transcript = accredible_get_transcript($accredible_certificate->course, $user_id, $accredible_certificate->finalquiz)) {
-	  accredible_post_evidence($credential_id, $transcript, false);
-	}
-	accredible_post_essay_answers($user_id, $accredible_certificate->course, $credential_id);
-	accredible_course_duration_evidence($user_id, $accredible_certificate->course, $credential_id, $completed_timestamp);
-
-	return json_decode($result);
-}
-
-/*
  * accredible_log_creation
  */
 function accredible_log_creation($certificate_id, $user_id, $course_id, $cm_id) {
@@ -464,155 +404,69 @@ function accredible_quiz_submission_handler($event) {
 		foreach ($accredible_certificate_records as $record) {
 			// check for the existence of an activity instance and an auto-issue rule
 			if( $record and ($record->finalquiz or $record->completionactivities) ) {
+				// check which quiz is used as the deciding factor in this course
+				if($quiz->id == $record->finalquiz) {
+					// check for an existing certificate
+					$existing_certificate = accredible_check_for_existing_credential($record->groupid, $user->email);
+					
+					// create that credential if it doesn't exist
+					if(!$existing_certificate) {
+						$users_grade = min( ( quiz_get_best_grade($quiz, $user->id) / $quiz->grade ) * 100, 100);
+						$grade_is_high_enough = ($users_grade >= $record->passinggrade);
 
-				// Check if we have a group mapping - if not use the old logic
-				if($record->groupid){
-					// check which quiz is used as the deciding factor in this course
-					if($quiz->id == $record->finalquiz) {
-						// check for an existing certificate
-						$existing_certificate = accredible_check_for_existing_credential($record->groupid, $user->email);
-						
-						// create that credential if it doesn't exist
-						if(!$existing_certificate) {
-							$users_grade = min( ( quiz_get_best_grade($quiz, $user->id) / $quiz->grade ) * 100, 100);
-							$grade_is_high_enough = ($users_grade >= $record->passinggrade);
-
-							// check for pass
-							if($grade_is_high_enough) {
-								// issue a ceritificate
-								create_credential($user, $record->groupid);
-							}
-						} 
-						// check the existing grade to see if this one is higher and update the credential if so
-						else {
-							foreach ($existing_certificate->evidence_items as $evidence_item) {
-								if($evidence_item->type == "grade") {
-									$highest_grade = min( ( quiz_get_best_grade($quiz, $user->id) / $quiz->grade ) * 100, 100);
-									// only update if higher
-									if($evidence_item->string_object->grade < $highest_grade) {
-										accredible_update_certificate_grade($existing_certificate->id, $evidence_item->id, $highest_grade);
-									}
+						// check for pass
+						if($grade_is_high_enough) {
+							// issue a ceritificate
+							create_credential($user, $record->groupid);
+						}
+					} 
+					// check the existing grade to see if this one is higher and update the credential if so
+					else {
+						foreach ($existing_certificate->evidence_items as $evidence_item) {
+							if($evidence_item->type == "grade") {
+								$highest_grade = min( ( quiz_get_best_grade($quiz, $user->id) / $quiz->grade ) * 100, 100);
+								// only update if higher
+								if($evidence_item->string_object->grade < $highest_grade) {
+									accredible_update_certificate_grade($existing_certificate->id, $evidence_item->id, $highest_grade);
 								}
-							}
-						}
-					}
-
-					$completion_activities = unserialize_completion_array($record->completionactivities);
-					// if this quiz is in the completion activities
-					if( isset($completion_activities[$quiz->id]) ) {
-						$completion_activities[$quiz->id] = true;
-						$quiz_attempts = $DB->get_records('quiz_attempts', array('userid' => $user->id, 'state' => 'finished'));
-						foreach($quiz_attempts as $quiz_attempt) {
-							// if this quiz was already attempted, then we shouldn't be issuing a certificate
-							if( $quiz_attempt->quiz == $quiz->id && $quiz_attempt->attempt > 1 ) {
-								return null;
-							}
-							// otherwise, set this quiz as completed
-							if( isset($completion_activities[$quiz_attempt->quiz]) ) {
-								$completion_activities[$quiz_attempt->quiz] = true;
-							}
-						}
-
-						// but was this the last required activity that was completed?
-						$course_complete = true;
-						foreach($completion_activities as $is_complete) {
-							if(!$is_complete) {
-								$course_complete = false;
-							}
-						}
-						// if it was the final activity
-						if($course_complete) {
-							$existing_certificate = accredible_check_for_existing_credential($record->groupid, $user->email);
-							// make sure there isn't already a certificate
-							if(!$existing_certificate) {
-								// issue a ceritificate
-								create_credential($user, $record->groupid);
-							}
-						}
-					}
-
-
-				} else {
-					// check which quiz is used as the deciding factor in this course
-					if($quiz->id == $record->finalquiz) {
-						$existing_certificate = accredible_check_for_existing_certificate (
-							$record->achievementid, $user
-						);
-
-						// check for an existing certificate
-						if(!$existing_certificate) {
-							$users_grade = min( ( quiz_get_best_grade($quiz, $user->id) / $quiz->grade ) * 100, 100);
-							$grade_is_high_enough = ($users_grade >= $record->passinggrade);
-
-							// check for pass
-							if($grade_is_high_enough) {
-								// issue a ceritificate
-								$api_response = accredible_issue_default_certificate( $user->id, $record->id, fullname($user), $user->email, $users_grade, $quiz->name);
-								$certificate_event = \mod_accredible\event\certificate_created::create(array(
-								  'objectid' => $api_response->credential->id,
-								  'context' => context_module::instance($event->contextinstanceid),
-								  'relateduserid' => $event->relateduserid
-								));
-								$certificate_event->trigger();
-							}
-						} 
-						// check the existing grade to see if this one is higher
-						else {
-							foreach ($existing_certificate->evidence_items as $evidence_item) {
-								if($evidence_item->type == "grade") {
-									$highest_grade = min( ( quiz_get_best_grade($quiz, $user->id) / $quiz->grade ) * 100, 100);
-									// only update if higher
-									if($evidence_item->string_object->grade < $highest_grade) {
-										accredible_update_certificate_grade($existing_certificate->id, $evidence_item->id, $highest_grade);
-									}
-								}
-							}
-						}
-					}
-
-					$completion_activities = unserialize_completion_array($record->completionactivities);
-					// if this quiz is in the completion activities
-					if( isset($completion_activities[$quiz->id]) ) {
-						$completion_activities[$quiz->id] = true;
-						$quiz_attempts = $DB->get_records('quiz_attempts', array('userid' => $user->id, 'state' => 'finished'));
-						foreach($quiz_attempts as $quiz_attempt) {
-							// if this quiz was already attempted, then we shouldn't be issuing a certificate
-							if( $quiz_attempt->quiz == $quiz->id && $quiz_attempt->attempt > 1 ) {
-								return null;
-							}
-							// otherwise, set this quiz as completed
-							if( isset($completion_activities[$quiz_attempt->quiz]) ) {
-								$completion_activities[$quiz_attempt->quiz] = true;
-							}
-						}
-
-						// but was this the last required activity that was completed?
-						$course_complete = true;
-						foreach($completion_activities as $is_complete) {
-							if(!$is_complete) {
-								$course_complete = false;
-							}
-						}
-						// if it was the final activity
-						if($course_complete) {
-							$existing_certificate = accredible_check_for_existing_certificate (
-								$record->achievementid, $user
-							);
-							// make sure there isn't already a certificate
-							if(!$existing_certificate) {
-								// and issue a ceritificate
-								$api_response = accredible_issue_default_certificate( $user->id, $record->id, fullname($user), $user->email, null, null);
-								$certificate_event = \mod_accredible\event\certificate_created::create(array(
-								  'objectid' => $api_response->credential->id,
-								  'context' => context_module::instance($event->contextinstanceid),
-								  'relateduserid' => $event->relateduserid
-								));
-								$certificate_event->trigger();
 							}
 						}
 					}
 				}
 
+				$completion_activities = unserialize_completion_array($record->completionactivities);
+				// if this quiz is in the completion activities
+				if( isset($completion_activities[$quiz->id]) ) {
+					$completion_activities[$quiz->id] = true;
+					$quiz_attempts = $DB->get_records('quiz_attempts', array('userid' => $user->id, 'state' => 'finished'));
+					foreach($quiz_attempts as $quiz_attempt) {
+						// if this quiz was already attempted, then we shouldn't be issuing a certificate
+						if( $quiz_attempt->quiz == $quiz->id && $quiz_attempt->attempt > 1 ) {
+							return null;
+						}
+						// otherwise, set this quiz as completed
+						if( isset($completion_activities[$quiz_attempt->quiz]) ) {
+							$completion_activities[$quiz_attempt->quiz] = true;
+						}
+					}
+
+					// but was this the last required activity that was completed?
+					$course_complete = true;
+					foreach($completion_activities as $is_complete) {
+						if(!$is_complete) {
+							$course_complete = false;
+						}
+					}
+					// if it was the final activity
+					if($course_complete) {
+						$existing_certificate = accredible_check_for_existing_credential($record->groupid, $user->email);
+						// make sure there isn't already a certificate
+						if(!$existing_certificate) {
+							// issue a ceritificate
+							create_credential($user, $record->groupid);
+						}
+					}
+				}
 			}
 		}
 	}
@@ -635,23 +489,8 @@ function accredible_course_completed_handler($event) {
 		foreach ($accredible_certificate_records as $record) {
 			// check for the existence of an activity instance and an auto-issue rule
 			if( $record and ($record->completionactivities && $record->completionactivities != 0) ) {
-
-				// Check if we have a group mapping - if not use the old logic
-				if($record->groupid){
-					
-					// create the credential
-					create_credential($user, $record->groupid);
-
-				} else {
-					$api_response = accredible_issue_default_certificate( $user->id, $record->id, fullname($user), $user->email, null, null);
-					$certificate_event = \mod_accredible\event\certificate_created::create(array(
-					  'objectid' => $api_response->credential->id,
-					  'context' => context_module::instance($event->contextinstanceid),
-					  'relateduserid' => $event->relateduserid
-					));
-					$certificate_event->trigger();
-				}
-
+				// Create the credential
+				create_credential($user, $record->groupid);
 			}
 		}
 	}
@@ -754,7 +593,7 @@ function unserialize_completion_array($completion_object) {
 }
 
 function accredible_post_essay_answers($user_id, $course_id, $credential_id) {
-	global $DB;
+	global $CFG, $DB;
 
 	// grab the course quizes
 	if($quizes = $DB->get_records_select('quiz', 'course = :course_id', array('course_id' => $course_id)) ) {

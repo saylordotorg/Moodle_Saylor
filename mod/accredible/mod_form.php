@@ -104,40 +104,10 @@ class mod_accredible_mod_form extends moodleform_mod {
             $mform->setDefault('groupid', $accredible_certificate->groupid);
         }
 
-        if($updatingcert && $accredible_certificate->achievementid){
-            // Grab the list of templates available
-            $templates = accredible_get_templates();
-            $mform->addElement('static', 'usestemplatesdescription', '', get_string('usestemplatesdescription', 'accredible'));
-            $mform->addElement('select', 'achievementid', get_string('groupselect', 'accredible'), $templates);
-            $mform->addRule('achievementid', null, 'required', null, 'client');
-            $mform->setDefault('achievementid', $course->shortname);
-
-            if($alreadyexists) {
-                $mform->addElement('static', 'additionalactivitiesthree', '', get_string('additionalactivitiesthree', 'accredible'));
-            }
-            $mform->addElement('text', 'certificatename', get_string('certificatename', 'accredible'), array('style'=>'width: 399px'));
-            $mform->addRule('certificatename', null, 'required', null, 'client');
-            $mform->setType('certificatename', PARAM_TEXT);
-            $mform->setDefault('certificatename', $course->fullname);
-
-            $mform->addElement('textarea', 'description', get_string('description', 'accredible'), array('cols'=>'64', 'rows'=>'10', 'wrap'=>'virtual', 'maxlength' => '1000'));
-            $mform->addRule('description', null, 'required', null, 'client');
-            $mform->setType('description', PARAM_RAW);
-            $mform->setDefault('description', $description);
-            if($updatingcert) {
-                $mform->addElement('static', 'dashboardlink', get_string('dashboardlink', 'accredible'), get_string('dashboardlinktext', 'accredible'));
-            }
-        }
-
         // Get certificates if updating
         if ($updatingcert) {
             // Grab existing certificates and cross-reference emails
-            if ($accredible_certificate->achievementid) {
-                $certificates = accredible_get_credentials($accredible_certificate->achievementid);
-            }
-            elseif ($accredible_certificate->groupid) {
-                $certificates = accredible_get_credentials($accredible_certificate->groupid);
-            }
+            $certificates = accredible_get_credentials($accredible_certificate->groupid);
         }
 
         // Generate list of users who have earned a certificate, if updating
@@ -155,6 +125,11 @@ class mod_accredible_mod_form extends moodleform_mod {
             $unissued_header = false;
             foreach ($users_earned_certificate as $user) {
                 $existing_certificate = false;
+
+                // If this user is suspended, do not add them to the list.
+                if ($user->suspended == 1) {
+                    break;
+                }
 
                 foreach ($certificates as $certificate) {
                     // Search through the certificates to see if this user has one existing
@@ -188,11 +163,7 @@ class mod_accredible_mod_form extends moodleform_mod {
         if($updatingcert) {
 
             // Grab existing credentials and cross-reference emails
-            if($accredible_certificate->achievementid){
-                $certificates = accredible_get_credentials($accredible_certificate->achievementid);
-            } else {
-                $certificates = accredible_get_credentials($accredible_certificate->groupid);
-            }
+            $certificates = accredible_get_credentials($accredible_certificate->groupid);
             
             foreach ($users as $user) {
                 $cert_id = null;

@@ -31,6 +31,37 @@ function xmldb_accredible_upgrade($oldversion=0) {
 
     $result = true;
 
+    if ($oldversion < 2019081900) {
+        require_once($CFG->dirroot . '/mod/accredible/locallib.php');
+        // Get items in accredible table.
+        if ($records = $DB->get_records('accredible', null, $sort='', $fields='*', $limitfrom=0, $limitnum=0)) {
+            foreach ($records as $record) {
+                // Check if the record does not have a group id.
+                if (!isset($record->groupid)) {
+                    $achievementid = $record->achievementid;
+
+                    // Get the group info from it's achievementid/name.
+                    $group = accredible_get_group_by_name($achievementid);
+
+                    // Grab the groupid
+                    $groupid = $group->id;
+
+                    // Update groupid for the record.
+                    $record->groupid = $groupid;
+                    $DB->update_record('accredible', $record); 
+                }
+            }
+        }
+
+        // Remove the achievementid field from the table.
+        $table = new xmldb_table('accredible');
+        $field = new xmldb_field('achievementid');
+        $dbman->drop_field($table, $field);
+
+        // Accredible savepoint reached.
+        upgrade_mod_savepoint(true, 2019081900, 'accredible');
+    }
+
     if ($oldversion < 2014111800) {
 
         // Changing type of field description on table accredible to text.

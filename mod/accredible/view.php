@@ -49,11 +49,7 @@ $PAGE->set_heading(format_string($course->fullname));
 if(has_capability('mod/accredible:manage', $context)) {
 
 	// Get array of certificates
-	if($accredible_certificate->achievementid){ // legacy achievment ID
-		$certificates = accredible_get_credentials($accredible_certificate->achievementid);
-	} else { // group id
-		$certificates = accredible_get_credentials($accredible_certificate->groupid);
-	}
+	$certificates = accredible_get_credentials($accredible_certificate->groupid);
 
 	$table = new html_table();
 	$table->head  = array (get_string('id', 'accredible'), get_string('recipient', 'accredible'), get_string('certificateurl', 'accredible'), get_string('datecreated', 'accredible'));
@@ -78,8 +74,6 @@ if(has_capability('mod/accredible:manage', $context)) {
 	echo html_writer::tag( 'h3', get_string('viewheader', 'accredible', $accredible_certificate->name) );
 	if($accredible_certificate->groupid){
 		echo html_writer::tag( 'h5', get_string('viewsubheader', 'accredible', $accredible_certificate->groupid) );
-	} else {
-		echo html_writer::tag( 'h5', get_string('viewsubheaderold', 'accredible', $accredible_certificate->achievementid) );
 	}
 
 	echo html_writer::tag( 'p', get_string('gotodashboard', 'accredible') );
@@ -92,14 +86,10 @@ else {
 	// Regular user, Check for this user's certificate
 	$users_certificate_link = null;
 
-	if($accredible_certificate->achievementid){ // legacy achievment ID
-		$certificates = accredible_get_credentials($accredible_certificate->achievementid, $USER->email);
-	} else { // group id
-		$certificates = accredible_get_credentials($accredible_certificate->groupid, $USER->email);
-	}
+	$certificates = accredible_get_credentials($accredible_certificate->groupid, $USER->email);
 
 	if($accredible_certificate->groupid){
-		$users_certificate_link = accredible_get_recipient_sso_linik($accredible_certificate->groupid, $USER->email);
+		$users_certificate_link = accredible_get_recipient_sso_link($accredible_certificate->groupid, $USER->email);
 	// legacy achievment ID
 	} else {
 		foreach ($certificates as $certificate) {
