@@ -25,6 +25,9 @@
 namespace qtype_pmatch;
 defined('MOODLE_INTERNAL') || die();
 
+require_once(__DIR__ . '/../question.php');
+
+
 /**
  * Pattern match form utils.
  *
@@ -85,6 +88,57 @@ class form_utils {
         }
 
         return $errors;
+    }
+
+    /**
+     * Check whether any char of the first string appear in the second string.
+     *
+     * @param string $fiststring
+     * @param string $secondstring
+     * @return string
+     */
+    public static function find_char_in_both_strings($firststring, $secondstring) {
+        if (empty($firststring)) {
+            return null;
+        }
+        $firstchars = str_split($firststring);
+        $secondchars = str_split($secondstring);
+        foreach ($firstchars as $char) {
+            if (in_array($char, $secondchars)) {
+                return $char;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Check validity of the modelanswer if it is given and return the string, otherwise retun null
+     *
+     * @param $answers
+     * @param $grades
+     * @param $modelanswer
+     * @return bool
+     */
+    public static function validate_modelanswer($answers, $grades, $modelanswer) {
+        // If there is no modelanswer there is no need for validation.
+        if ($modelanswer === '') {
+            return true;
+        }
+        foreach ($answers as $key => $answer) {
+            $trimmedanswer = trim($answer);
+            if ($trimmedanswer === '') {
+                // Not an answer, just part of the form that was left blank.
+                continue;
+            }
+            $expression = new \pmatch_expression($trimmedanswer);
+            if (\qtype_pmatch_question::compare_string_with_pmatch_expression(
+                    $modelanswer, $trimmedanswer, $expression->get_options())) {
+                // This answer matches. Is the grade right?
+                return $grades[$key] == 1.0;
+            }
+        }
+        // No matching answers.
+        return false;
     }
 
     /**

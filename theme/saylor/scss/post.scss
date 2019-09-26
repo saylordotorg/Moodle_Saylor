@@ -324,6 +324,10 @@
 	background-image: linear-gradient(to right, $expand-purple-500, $expand-purple-900);
 }
 
+#geography-banner {
+	background-image: linear-gradient(to right, $expand-indigo-500, $expand-indigo-900);
+}
+
 /** Progress Bar */
 .block_completion_progress .progressBarCell {
 	border: 1px solid $primary-dark-blue;

@@ -60,7 +60,7 @@ question editing form
     margin-top: 1px;
     padding: 1px;
     display: inline-block;
-    height:inherit;
+    height: inherit;
 }
 
 /* glow a little around the border */
@@ -158,6 +158,9 @@ incorrec answer was entered */
     background-color: #afa;
 }
 
+.que.gapfill select.incorrect {
+    background-color: #faa;
+}
 .que.gapfill input.incorrect {
     background-color: #faa;
 }

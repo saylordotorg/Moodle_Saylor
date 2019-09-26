@@ -200,6 +200,7 @@ class qtype_gapfill_renderer extends qtype_with_combined_feedback_renderer {
         if ($question->answerdisplay == "dropdown") {
             $inputattributes['class'] = $inputclass;
             $inputattributes['type'] = "select";
+            $inputattribues['selected'] = $currentanswer;
             /* if the size attribute is left in android chrome
              *  doesn't show the down arrows in select
              */
@@ -370,7 +371,7 @@ class qtype_gapfill_renderer extends qtype_with_combined_feedback_renderer {
     public function get_dropdown_list() {
         /* convert things like &gt; to > etc */
         foreach ($this->allanswers as $key => $value) {
-            $this->allanswers[$key] = htmlspecialchars_decode($value);
+            $this->allanswers[$key] = htmlspecialchars_decode(trim($value));
         }
         // Make the key and value the same in the array.
         $selectoptions = array_combine($this->allanswers, $this->allanswers);
