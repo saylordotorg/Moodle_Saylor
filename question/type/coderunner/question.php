@@ -82,25 +82,13 @@ class qtype_coderunner_question extends question_graded_automatically {
     public function apply_attempt_state(question_attempt_step $step) {
         parent::apply_attempt_state($step);
         $this->student = unserialize($step->get_qt_var('_STUDENT'));
-
-        // Short-lived legacy code, for use at U of C only
-        $templateparams = $step->get_qt_var('_templateparamsinstance');
-        if ($templateparams !== null) {
-
-            $this->templateparams = $templateparams;
-            if ($step->get_qt_var('_twigall')) {
-                $this->twigall = true;
-            }
-        } else {
-            // Non-legacy code lands here
-            $seed = $step->get_qt_var('_mtrandseed');
-            if ($seed === null) {
-                // Rendering a question that was begun before randomisation
-                // was introduced into the code
-               $seed = mt_rand();
-            }
-            $this->setup_template_params($seed);
+        $seed = $step->get_qt_var('_mtrandseed');
+        if ($seed === null) {
+            // Rendering a question that was begun before randomisation
+            // was introduced into the code
+           $seed = mt_rand();
         }
+        $this->setup_template_params($seed);
 
         if ($this->twigall) {
             $this->twig_all();
@@ -199,8 +187,8 @@ class qtype_coderunner_question extends question_graded_automatically {
         if (!empty($regex) && preg_match('`^' . $this->filenamesregex . '$`', $filename) !== 1) {
             return false;  // Filename doesn't match given regex
         }
-        foreach ($supportfiles as $supportfile) {
-            if ($supportfile->get_filename() == $filename) {
+        foreach (array_keys($supportfiles) as $supportfilename) {
+            if ($supportfilename == $filename) {
                 return false;  // Filename collides with a support file name
             }
         }
@@ -360,7 +348,7 @@ class qtype_coderunner_question extends question_graded_automatically {
     //in the given response.
     private function get_attached_files($response) {
         $attachments = array();
-        if (array_key_exists('attachments', $response)) {
+        if (array_key_exists('attachments', $response) && $response['attachments']) {
             $files = $response['attachments']->get_files();
             foreach ($files as $file) {
                 $attachments[$file->get_filename()] = $file->get_content();
@@ -607,6 +595,7 @@ class qtype_coderunner_question extends question_graded_automatically {
     // Return the support files for this question, namely all the files
     // uploaded with this question itself plus all the files uploaded with the
     // prototype. This does not include files attached to the answer.
+    // Returns an associative array mapping filenames to filecontents.
     public function get_files() {
         if ($this->prototypetype != 0) { // Is this a prototype question?
             $files = array(); // Don't load the files twice.
@@ -615,7 +604,7 @@ class qtype_coderunner_question extends question_graded_automatically {
             $this->get_prototype();
             $files = self::get_support_files($this->prototype, $this->prototype->questionid);
         }
-        $files += self::get_support_files($this, $this->id);  // Add in files for this question.
+        $files = array_merge($files, self::get_support_files($this, $this->id));  // Add in files for this question.
         return $files;
     }
 

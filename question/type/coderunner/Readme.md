@@ -1,6 +1,6 @@
 # CODE RUNNER
 
-Version: 3.6.0 January 2019
+Version: 3.6.1 July 2019
 
 Authors: Richard Lobb, University of Canterbury, New Zealand.
          Tim Hunt, The Open University, UK
@@ -1114,6 +1114,7 @@ following.
  * `QUESTION.questionid` The unique internal ID of this question.
  * `QUESTION.questiontext` The question text itself
  * `QUESTION.answer` The supplied sample answer (null if not explicitly set).
+ * `QUESTION.answerpreload` The string that is preloaded into the answer box.
  * `QUESTION.language` The language being used to run the question in the sandbox,
 e.g. "Python3".
  * `QUESTION.useace` '1'/'0' if the ace editor is/is not in use.
@@ -1798,11 +1799,7 @@ CTRL-ALT-M keypress, alternately exposing and hiding the underlying textarea ele
 
 ### The Table UI
 
-*Warning:* This UI plug-in is still experimental, and may change in the future.
-It was written only to support the new python3\_program\_testing question type,
-which is itself only experimental.
-
-The plug-in replaces the usual textarea answer element with an HTML table,
+The table UI plug-in replaces the usual textarea answer element with an HTML table,
 into which the student must enter text data. All cells in the table are
 HTML *textarea* elements. The question author can enable *Add row* and
 *Delete row* buttons that allow the student to add or delete rows. The configuration
@@ -1818,6 +1815,18 @@ of the table is set by the following template parameters:
  o `table_dynamic_rows` should be set `true` to enable the addition of *Add row*
    and *Delete row* buttons through which the student can alter the number of
    rows. The number of rows can never be less than the initial `table_num_rows` value.
+ o `table_locked_cells` is an array of 2-element [row, column] cell specifiers.
+   The specified cells are rendered to HTML with the *disabled* attribute, so
+   cannot be changed by the user. For example
+
+        "table_locked_cells": [[0, 0], [1, 0]]
+
+   to lock the leftmost column of rows 0 and 1.
+   This is primarily for use in conjunction with
+   an answer preload in which some cells are defined by the question author.
+   The preload answer must be defined before the table_locked_cells template
+   parameter is defined, or the question author will not be able to define
+   the required values in the first place.
 
 For example, the `python3\_program\_testing` question type uses the following
 template parameter setting:
@@ -2032,8 +2041,8 @@ would be the default. If no default is specified the
 initial state of the drop-down is empty and the student must choose a language.
 Multilanguage questions require a special template that uses the {{ANSWER\_LANGUAGE}}
 template variable to control how to execute the student code.
-The {{ANSWER\_LANGUAGE}} variable is defined
-<i>only</i> for multilanguage questions.
+The {{ANSWER\_LANGUAGE}} variable is meaningfully defined only for multilanguage questions;
+it is the empty string, otherwise.
 
 The template for a multilanguage question is a generalisation of the template
 shown in the previous section. It is essentially a single large case statement

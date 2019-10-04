@@ -50,7 +50,6 @@ question editing form
     color: darkslategray;
 }
 
-
 /* the gap where answers are dropped/keyed in */
 .que.gapfill input[type=text] {
     background: white;
@@ -60,8 +59,9 @@ question editing form
     margin-bottom: 1px;
     margin-top: 1px;
     padding: 1px;
+    display: inline-block;
+    height: inherit;
 }
-
 
 /* glow a little around the border */
 
@@ -158,6 +158,9 @@ incorrec answer was entered */
     background-color: #afa;
 }
 
+.que.gapfill select.incorrect {
+    background-color: #faa;
+}
 .que.gapfill input.incorrect {
     background-color: #faa;
 }

@@ -235,7 +235,7 @@ if ($hassiteconfig) {
                         get_string('setting_removerootnodestechnicalhint', 'local_boostnavigation', null, true).
                         '<br /><br />'.
                         get_string('setting_removemycoursesnodeperformancehint', 'local_boostnavigation',
-                                array('url' => $CFG->wwwroot.'/admin/search.php?query=linkcoursesections'),
+                                array('url' => $CFG->wwwroot.'/admin/search.php?query=navshowmycoursecategories'),
                                 true),
                 0));
 
@@ -260,7 +260,7 @@ if ($hassiteconfig) {
                         get_string('setting_collapsenodestechnicalhint', 'local_boostnavigation', null, true).
                         '<br /><br />'.
                         get_string('setting_collapsemycoursesnodeperformancehint', 'local_boostnavigation',
-                                array('url' => $CFG->wwwroot.'/admin/search.php?query=linkcoursesections'),
+                                array('url' => $CFG->wwwroot.'/admin/search.php?query=navshowmycoursecategories'),
                                 true),
                 0));
 
@@ -577,7 +577,7 @@ if ($hassiteconfig) {
                               'which' => get_string('sections', 'moodle')),
                         true).
                         '<br />'.
-                        get_string('setting_insertcoursesectionscoursenodeexplanation', 'local_boostnavigation', null, true),
+                        get_string('setting_insertcoursesectionscoursenodeexplanation', 'local_boostnavigation', null, true).
                         '<br /><br />'.
                         get_string('setting_insertcoursesectionscoursenodecorehint', 'local_boostnavigation',
                                 array('url' => $CFG->wwwroot.'/admin/search.php?query=linkcoursesections'),
@@ -597,7 +597,7 @@ if ($hassiteconfig) {
                               'which' => get_string('activities', 'moodle')),
                         true).
                         '<br />'.
-                        get_string('setting_insertactivitiescoursenodeexplanation', 'local_boostnavigation', null, true),
+                        get_string('setting_insertactivitiescoursenodeexplanation', 'local_boostnavigation', null, true).
                         '<br /><br />'.
                         get_string('setting_insertnodescollapsehint', 'local_boostnavigation', null, true),
                 0));
@@ -614,7 +614,6 @@ if ($hassiteconfig) {
                         true).
                         '<br />'.
                         get_string('setting_insertresourcescoursenodeexplanation', 'local_boostnavigation', null, true),
-
                 0));
 
         // Add collapse course nodes heading.

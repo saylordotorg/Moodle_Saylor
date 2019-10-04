@@ -96,6 +96,15 @@ abstract class base extends \core_analytics\calculable {
     }
 
     /**
+     * Should the insights of this model be linked from reports?
+     *
+     * @return bool
+     */
+    public function link_insights_report(): bool {
+        return true;
+    }
+
+    /**
      * Based on facts (processed by machine learning backends) by default.
      *
      * @return bool
@@ -137,7 +146,7 @@ abstract class base extends \core_analytics\calculable {
 
         $actions = array();
 
-        if ($includedetailsaction) {
+        if ($this->link_insights_report() && $includedetailsaction) {
 
             $predictionurl = new \moodle_url('/report/insights/prediction.php', array('id' => $predictionid));
             $detailstext = $this->get_view_details_text();
@@ -229,7 +238,12 @@ abstract class base extends \core_analytics\calculable {
      */
     public function get_insights_users(\context $context) {
         if ($context->contextlevel === CONTEXT_USER) {
-            $users = [$context->instanceid => \core_user::get_user($context->instanceid)];
+            if (!has_capability('moodle/analytics:listowninsights', $context, $context->instanceid)) {
+                $users = [];
+            } else {
+                $users = [$context->instanceid => \core_user::get_user($context->instanceid)];
+            }
+
         } else if ($context->contextlevel >= CONTEXT_COURSE) {
             // At course level or below only enrolled users although this is not ideal for
             // teachers assigned at category level.

@@ -1,5 +1,15 @@
 # Change log for the pattern-match question type
 
+## Changes in 2.7
+
+* Ability for the question author to input a 'Model answer' for the question.
+* Fixes to the punctuation handling.
+
+
+## Changes in 2.6
+
+* Fix a bug where upgrading from the previous version got stuck on the upgradesettings.php screen.
+
 
 ## Changes in 2.5
 

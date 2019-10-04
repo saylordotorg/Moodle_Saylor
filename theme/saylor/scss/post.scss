@@ -241,6 +241,11 @@
 	margin-top: 0 !important;
 }
 
+.coursesearchbox {
+	margin-left: auto;
+	margin-right: auto;
+}
+
 /** Category Page */
 .category-banner-wrapper {
 	margin: 0;
@@ -317,6 +322,10 @@
 
 #learning-skills-banner {
 	background-image: linear-gradient(to right, $expand-purple-500, $expand-purple-900);
+}
+
+#geography-banner {
+	background-image: linear-gradient(to right, $expand-indigo-500, $expand-indigo-900);
 }
 
 /** Progress Bar */

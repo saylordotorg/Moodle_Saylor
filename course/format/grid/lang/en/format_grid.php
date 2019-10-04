@@ -78,10 +78,14 @@ $string['numbersections'] = 'Number of sections';
 // Exception messages.
 $string['cannotfinduploadedimage'] = 'Cannot find the uploaded original image.  Please report error details and the information contained in the php.log file to developer.  Refresh the page and upload a fresh copy of the image.';
 $string['cannotconvertuploadedimagetodisplayedimage'] = 'Cannot convert uploaded image to displayed image.  Please report error details and the information contained in the php.log file to developer.';
+$string['cannotgetimagelock'] = 'Cannot get image lock.  Please report error details to developer.';
 $string['cannotgetimagesforcourse'] = 'Cannot get images for course.  Please report error details to developer.';
+$string['cannotgetsummarylock'] = 'Cannot get summary lock.  Please report error details to developer.';
 $string['formatnotsupported'] = 'Format is not supported at this server, please fix the system configuration to have the GD PHP extension installed - {$a}.';
 $string['functionfailed'] = 'Function failed on image - {$a}.';
 $string['imagecannotbeused'] = 'Image cannot be used, must be a PNG, JPG or GIF and the GD PHP extension must be installed.';
+$string['invalidiconrecordid'] = 'Could not create image container.  Grid format database is not ready.  An admin must visit the notifications section.';
+$string['invalidsummaryrecordid'] = 'Could not set summary status.  Grid format database is not ready.  An admin must visit the notifications section.';
 $string['mimetypenotsupported'] = 'Mime type is not supported as an image format in the Grid format - {$a}.';
 $string['originalheightempty'] = 'Original height is empty - {$a}.';
 $string['originalwidthempty'] = 'Original width is empty - {$a}.';

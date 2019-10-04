@@ -5,6 +5,7 @@ http://moodle.org/plugins/view.php?plugin=mod_checklist
 
 ==Changes==
 
+* 2019-08-07 - make compatible with latest version of mod_checklist (after MySQL 8 enforced rename of grouping => groupingid)
 * 2018-04-02 - declare plugin stores no user data (for GDPR), this version only compatible with M3.4+
 * 2015-12-23 - hide block from guests / users without 'updateown' capability (and no 'viewreports' capability)
 * 2015-01-01 - Display overview of all courses, when added to My home or Front page (thanks to Richard Wallace for this)

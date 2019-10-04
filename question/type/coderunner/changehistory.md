@@ -1,5 +1,29 @@
 # CHANGE HISTORY
 
+### 28 July 2019. 3.6.1+
+
+ * Add table_locked_cells template parameter to Table UI
+ * Bug fix: student file attachments don't work in conjunction with
+   author-supplied support files.
+ * Bug fix: attaching files after submitting a question without attachments gave
+   a runtime error
+
+### 22 July 2019. 3.6.1
+
+ * Bug fix: if a prototype and a derived question had support files with
+   the same name, the prototype file was being used instead of the override
+   file in the child.
+ * Add "locknodes" and "lockedges" template parameters to GraphUI to allow
+   question authors to preload answerbox with a particular graph and prevent
+   students altering the topology.
+ * Add behat test for TableUI
+
+### 21 June 2019. 3.6.0+
+
+ * Fix wrong default for useace in upgrade.php (thanks Mahmoud Kassaei).
+ * Fix snip method when displaying overly-long output containing multibyte strings
+   (thanks Ivan Marichev).
+
 ### 26 February 2019. 3.6.0+
 
  * Bug fix: the Reset Answer button was not working correctly with TableUI
@@ -9,6 +33,7 @@
  * Prevent annoying flashing of GraphUI help screen.
  * Document linkargs in C program question type language string.
  * Add youtube video links to Readme.md
+ * Styling improvements for input areas (thanks Tim Hunt).
 
 ### 30 January 2018. 3.6.0
 

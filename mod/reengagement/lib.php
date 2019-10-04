@@ -574,6 +574,10 @@ function reengagement_send_notification($userto, $subject, $messageplain, $messa
  * @return array - the content of the fields after templating.
  */
 function reengagement_template_variables($reengagement, $inprogress, $user) {
+    global $CFG, $DB;
+
+    require_once($CFG->dirroot.'/user/profile/lib.php');
+
     $templatevars = array(
         '/%courseshortname%/' => $reengagement->courseshortname,
         '/%coursefullname%/' => $reengagement->coursefullname,
@@ -585,6 +589,43 @@ function reengagement_template_variables($reengagement, $inprogress, $user) {
         '/%userinstitution%/' => $user->institution,
         '/%userdepartment%/' => $user->department,
     );
+    // Add the users course groups as a template item.
+    $groups = $DB->get_records_sql_menu("SELECT g.id, g.name
+                                   FROM {groups_members} gm
+                                   JOIN {groups} g
+                                    ON g.id = gm.groupid
+                                  WHERE gm.userid = ? AND g.courseid = ?
+                                   ORDER BY name ASC", array($user->id, $reengagement->courseid));
+
+    if (!empty($groups)) {
+        $templatevars['/%usergroups%/'] = implode(', ', $groups);
+    } else {
+        $templatevars['/%usergroups%/'] = '';
+    }
+
+    // Now do custom user fields;
+    $fields = profile_get_custom_fields();
+    if (!empty($fields)) {
+        $userfielddata = $DB->get_records('user_info_data', array('userid' => $user->id), '', 'fieldid, data, dataformat');
+        foreach ($fields as $field) {
+            if (!empty($userfielddata[$field->id])) {
+                if ($field->datatype == 'datetime') {
+                    if (!empty($field->param3)) {
+                        $format = get_string('strftimedaydatetime', 'langconfig');
+                    } else {
+                        $format = get_string('strftimedate', 'langconfig');
+                    }
+
+                    $templatevars['/%profilefield_'.$field->shortname.'%/'] = userdate($userfielddata[$field->id]->data, $format);
+                } else {
+                    $templatevars['/%profilefield_'.$field->shortname.'%/'] = format_text($userfielddata[$field->id]->data, $userfielddata[$field->id]->dataformat);
+                }
+
+            } else {
+                $templatevars['/%profilefield_'.$field->shortname.'%/'] = '';
+            }
+        }
+    }
     $patterns = array_keys($templatevars); // The placeholders which are to be replaced.
     $replacements = array_values($templatevars); // The values which are to be templated in for the placeholders.
 
@@ -785,34 +826,34 @@ function reengagement_supports($feature) {
 }
 
 /**
- * Process an arbitary number of seconds, and prepare to display it as X minutes, or Y hours or Z weeks.
+ * Process an arbitary number of seconds, and prepare to display it as 'W seconds', 'X minutes', or Y hours or Z weeks.
  *
  * @param int $duration FEATURE_xx constant for requested feature
  * @param boolean $periodstring - return period as string.
  * @return array
  */
 function reengagement_get_readable_duration($duration, $periodstring = false) {
-    if ($duration < 300) {
-        $period = 60;
-        $periodcount = 5;
-    } else {
-        $periods = array(604800, 86400, 3600, 60);
-        foreach ($periods as $period) {
-            if ((($duration % $period) == 0) || ($period == 60)) {
-                // Duration divides exactly into periods, or have reached the min. sensible period.
-                $periodcount = floor((int)$duration / (int)$period);
-                break;
-            }
+    $period = 1; // Default to dealing in seconds.
+    $periodcount = $duration; // Default to dealing in seconds.
+    $periods = array(WEEKSECS, DAYSECS, HOURSECS, MINSECS);
+    foreach ($periods as $period) {
+        if (($duration % $period) == 0) {
+            // Duration divides exactly into periods.
+            $periodcount = floor((int)$duration / (int)$period);
+            break;
         }
     }
     if ($periodstring) {
-        if ($period == 60) {
+        // Caller wants function to return in the format (30, 'minutes'), not (30, 60).
+        if ($period == MINSECS) {
             $period = get_string('minutes', 'reengagement');
-        } else if ($period == 3600) {
+        } else if ($period == HOURSECS) {
             $period = get_string('hours', 'reengagement');
-        } else if ($period == 86400) {
+        } else if ($period == DAYSECS) {
             $period = get_string('days', 'reengagement');
-        } else if ($period == 604800) {
+        } else if ($period == WEEKSECS) {
+            $period = get_string('weeks', 'reengagement');
+        } else {
             $period = get_string('weeks', 'reengagement');
         }
     }

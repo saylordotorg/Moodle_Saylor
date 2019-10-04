@@ -3378,5 +3378,55 @@ function xmldb_main_upgrade($oldversion) {
     // Automatically generated Moodle v3.7.0 release upgrade line.
     // Put any upgrade step following this.
 
+    if ($oldversion < 2019052001.04) {
+        // Update the empty tag instructions to null.
+        $instructions = get_config('core', 'auth_instructions');
+
+        if (trim(html_to_text($instructions)) === '') {
+            set_config('auth_instructions', '');
+        }
+
+        // Main savepoint reached.
+        upgrade_main_savepoint(true, 2019052001.04);
+    }
+
+    if ($oldversion < 2019052001.12) {
+        // Remove unused config.
+        unset_config('enablecoursepublishing');
+        upgrade_main_savepoint(true, 2019052001.12);
+    }
+
+    if ($oldversion < 2019052001.13) {
+        // Delete "orphaned" subscriptions.
+        $sql = "SELECT DISTINCT es.userid
+                  FROM {event_subscriptions} es
+             LEFT JOIN {user} u ON u.id = es.userid
+                 WHERE u.deleted = 1 OR u.id IS NULL";
+        $deletedusers = $DB->get_field_sql($sql);
+        if ($deletedusers) {
+            list($sql, $params) = $DB->get_in_or_equal($deletedusers);
+
+            // Delete orphaned subscriptions.
+            $DB->execute("DELETE FROM {event_subscriptions} WHERE userid " . $sql, $params);
+        }
+
+        upgrade_main_savepoint(true, 2019052001.13);
+    }
+
+    if ($oldversion < 2019052002.01) {
+
+        // Define index analysableid (not unique) to be added to analytics_used_analysables.
+        $table = new xmldb_table('analytics_used_analysables');
+        $index = new xmldb_index('analysableid', XMLDB_INDEX_NOTUNIQUE, ['analysableid']);
+
+        // Conditionally launch add index analysableid.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Main savepoint reached.
+        upgrade_main_savepoint(true, 2019052002.01);
+    }
+
     return true;
 }

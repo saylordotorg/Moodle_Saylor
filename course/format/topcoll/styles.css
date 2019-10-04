@@ -50,6 +50,11 @@
     margin: 4px 1px 1px 1px;
     padding: 0;
 }
+.course-content ul.ctopics li.section.main,
+.course-content ul.ctopics li.tcsection,
+.format-topcoll .course-content .single-section .section-navigation {
+    position: relative;
+}
 
 .course-content ul.ctopics.bsnewgrid li.section.main,
 .course-content ul.ctopics.bsnewgrid li.tcsection {
@@ -512,7 +517,27 @@ body#page-course-edit.lang-en_ar select#id_toggleiconset option {
 
 .course-content ul.ctopics li.section .right,
 .course-content ul.ctopics li.tcsection .right {
-    float:right;
+    clear: none;
+    float: none;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+.format-topcoll .course-content .single-section .section-navigation .mdl-left,
+.format-topcoll .course-content .single-section .section-navigation .mdl-right {
+    float: none;
+    position: absolute;
+    top: 50%;
+    transform: translate(0, -50%);
+}
+
+.format-topcoll .course-content .single-section .section-navigation .mdl-left {
+    left: 0;
+}
+
+.format-topcoll .course-content .single-section .section-navigation .mdl-right {
+    right: 0;
 }
 
 .course-content ul.ctopics li.section .right {
@@ -574,17 +599,6 @@ body.format-topcoll .course-content ul.ctopics li.section .summary.summaryalways
     padding-top: 10px;
 }
 
-body.format-topcoll.editing ul.ctopics .section .activity .contentwithoutlink,
-body.format-topcoll.editing ul.ctopics .section .activity .activityinstance {
-    display: inline;
-    padding-right: 0;
-}
-
-body.format-topcoll.editing.dir-rtl ul.ctopics .section .activity .contentwithoutlink,
-body.format-topcoll.editing.dir-rtl ul.ctopics .section .activity .activityinstance {
-    padding-left: 0;
-}
-
 body.format-topcoll.editing #region-main ul.ctopics .moodle-actionmenu ul.menubar {
     display: none;
 }
@@ -595,7 +609,7 @@ body.format-topcoll.editing.jsenabled #region-main ul.ctopics .moodle-actionmenu
 
 /* -- The section name in a Toggle and hidden section -- */
 .course-content ul.ctopics li.section .content .toggle,
-.course-content ul.ctopics li.section .content.sectionhidden  {
+.course-content ul.ctopics li.section .content.sectionhidden {
     display: block;
     padding: 0;
     text-align: left;
@@ -608,7 +622,7 @@ body.format-topcoll.editing.jsenabled #region-main ul.ctopics .moodle-actionmenu
 }
 
 /* -- The padding of a hidden section -- */
-.course-content ul.ctopics li.section .content.sectionhidden  {
+.course-content ul.ctopics li.section .content.sectionhidden {
     padding: 6px 0 6px 0;
 }
 

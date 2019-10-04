@@ -239,7 +239,7 @@ class block_checklist extends block_list {
         // Get all the items for all the checklists.
         list($csql, $params) = $DB->get_in_or_equal(array_keys($checklists), SQL_PARAMS_NAMED);
         $select = "checklist $csql AND userid = 0 AND itemoptional = ".CHECKLIST_OPTIONAL_NO." AND hidden = ".CHECKLIST_HIDDEN_NO;
-        $items = $DB->get_records_select('checklist_item', $select, $params, 'checklist', 'id, checklist, grouping');
+        $items = $DB->get_records_select('checklist_item', $select, $params, 'checklist', 'id, checklist, groupingid');
         if (!$items) {
             return $checklists;
         }
@@ -269,7 +269,7 @@ class block_checklist extends block_list {
             $checklist = $checklists[$item->checklist];
             if ($groupings && $checklist->autopopulate) {
                 // If the item has a grouping, check against the grouping memberships for this user.
-                if ($item->grouping && !in_array($item->grouping, $groupingids, false)) {
+                if ($item->groupingid && !in_array($item->groupingid, $groupingids, false)) {
                     continue;
                 }
             }
@@ -348,7 +348,7 @@ class block_checklist extends block_list {
 
         $output = '<div class="checklist_progress_outer" style="width: '.$width.';" >';
         $output .= '<div class="checklist_progress_inner" style="width:'.
-            $percent.'%; background-image: url('.$OUTPUT->pix_url('progress', 'checklist').');" >&nbsp;</div>';
+            $percent.'%; background-image: url('.$OUTPUT->image_url('progress', 'checklist').');" >&nbsp;</div>';
         $output .= '</div>';
         $output .= '<br style="clear:both;" />';
 

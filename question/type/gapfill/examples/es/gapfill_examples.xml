@@ -11,7 +11,7 @@
 <!-- question: 19  -->
   <question type="gapfill">
     <name>
-      <text>Images in tables (fruit)</text>
+      <text>Imágenes en tabla (fruta)</text>
     </name>
     <questiontext format="html">
       <text><![CDATA[<table class="gapfilltable" border="2" rules="rows"><colgroup> <col class="gapfillcol"> <col class="gapfillcol"> </colgroup>
@@ -78,17 +78,17 @@
       <text></text>
     </correctfeedback>
     <partiallycorrectfeedback format="html">
-      <text><![CDATA[<p>Your answer is partially correct.</p>]]></text>
+      <text><![CDATA[<p>Su respuesta es parcialmente correcta.</p>]]></text>
     </partiallycorrectfeedback>
     <incorrectfeedback format="html">
-      <text><![CDATA[<p>Your answer is incorrect.</p>]]></text>
+      <text><![CDATA[<p>Su respuesta es incorrecta.</p>]]></text>
     </incorrectfeedback>
   </question>
 
 <!-- question: 31  -->
   <question type="gapfill">
     <name>
-      <text>Spanish CatMat</text>
+      <text>Spanish CatMat (3 tristes tigres)</text>
     </name>
     <questiontext format="html">
       <text><![CDATA[<p>Tres tristes tigres [tragan] trigo en el trigal.<br></p>]]></text>
@@ -163,10 +163,10 @@
       <text></text>
     </correctfeedback>
     <partiallycorrectfeedback format="html">
-      <text>Your answer is partially correct.</text>
+      <text>Su respuesta es parcialmente correcta.</text>
     </partiallycorrectfeedback>
     <incorrectfeedback format="html">
-      <text>Your answer is incorrect.</text>
+      <text>Su respuesta es incorrecta.</text>
     </incorrectfeedback>
   </question>
 

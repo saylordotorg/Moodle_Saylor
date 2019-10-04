@@ -732,7 +732,6 @@ Y.extend(ANNOTATION, Y.Base, {
 
             drawingregion.append(deletelink);
             deletelink.setData('annotation', this);
-            deletelink.setStyle('zIndex', '200');
 
             deletelink.on('click', this.remove, this);
             deletelink.on('key', this.remove, 'space,enter', this);
@@ -1570,24 +1569,24 @@ Y.extend(ANNOTATIONSTAMP, M.assignfeedback_editpdf.annotation, {
      */
     draw: function() {
         var drawable = new M.assignfeedback_editpdf.drawable(this.editor),
-            drawingregion = this.editor.get_dialogue_element(SELECTOR.DRAWINGREGION),
+            drawingcanvas = this.editor.get_dialogue_element(SELECTOR.DRAWINGCANVAS),
             node,
             position;
 
         position = this.editor.get_window_coordinates(new M.assignfeedback_editpdf.point(this.x, this.y));
         node = Y.Node.create('<div/>');
-        // If these are absolutely positioned, they escape their scroll container.
+        node.addClass('annotation');
+        node.addClass('stamp');
         node.setStyles({
-            'position': 'relative',
+            'position': 'absolute',
             'display': 'inline-block',
             'backgroundImage': 'url(' + this.editor.get_stamp_image_url(this.path) + ')',
             'width': (this.endx - this.x),
             'height': (this.endy - this.y),
-            'backgroundSize': '100% 100%',
-            'zIndex': 50
+            'backgroundSize': '100% 100%'
         });
 
-        drawingregion.append(node);
+        drawingcanvas.append(node);
         node.setX(position.x);
         node.setY(position.y);
         drawable.store_position(node, position.x, position.y);
@@ -1624,14 +1623,15 @@ Y.extend(ANNOTATIONSTAMP, M.assignfeedback_editpdf.annotation, {
         position = this.editor.get_window_coordinates(new M.assignfeedback_editpdf.point(bounds.x, bounds.y));
 
         node = Y.Node.create('<div/>');
+        node.addClass('annotation');
+        node.addClass('stamp');
         node.setStyles({
             'position': 'absolute',
             'display': 'inline-block',
             'backgroundImage': 'url(' + this.editor.get_stamp_image_url(edit.stamp) + ')',
             'width': bounds.width,
             'height': bounds.height,
-            'backgroundSize': '100% 100%',
-            'zIndex': 50
+            'backgroundSize': '100% 100%'
         });
 
         drawingregion.append(node);
@@ -2544,7 +2544,7 @@ var COMMENT = function(editor, gradeid, pageno, x, y, width, colour, rawtext) {
     this.draw = function(focus) {
         var drawable = new M.assignfeedback_editpdf.drawable(this.editor),
             node,
-            drawingregion = this.editor.get_dialogue_element(SELECTOR.DRAWINGREGION),
+            drawingcanvas = this.editor.get_dialogue_element(SELECTOR.DRAWINGCANVAS),
             container,
             label,
             marker,
@@ -2587,8 +2587,8 @@ var COMMENT = function(editor, gradeid, pageno, x, y, width, colour, rawtext) {
             color: COMMENTTEXTCOLOUR
         });
 
-        drawingregion.append(container);
-        container.setStyle('position', 'relative');
+        drawingcanvas.append(container);
+        container.setStyle('position', 'absolute');
         container.setX(position.x);
         container.setY(position.y);
         drawable.store_position(container, position.x, position.y);
@@ -3664,7 +3664,7 @@ EDITOR.prototype = {
      * @method open_in_panel
      */
     open_in_panel: function(panel) {
-        var drawingcanvas, drawingregion;
+        var drawingcanvas;
 
         this.panel = panel;
         panel.append(this.get('body'));
@@ -3674,9 +3674,6 @@ EDITOR.prototype = {
 
         drawingcanvas = this.get_dialogue_element(SELECTOR.DRAWINGCANVAS);
         this.graphic = new Y.Graphic({render: drawingcanvas});
-
-        drawingregion = this.get_dialogue_element(SELECTOR.DRAWINGREGION);
-        drawingregion.on('scroll', this.move_canvas, this);
 
         if (!this.get('readonly')) {
             drawingcanvas.on('gesturemovestart', this.edit_start, null, this);
@@ -3694,7 +3691,7 @@ EDITOR.prototype = {
      * @method link_handler
      */
     link_handler: function(e) {
-        var drawingcanvas, drawingregion;
+        var drawingcanvas;
         var resize = true;
         e.preventDefault();
 
@@ -3716,9 +3713,6 @@ EDITOR.prototype = {
 
             drawingcanvas = this.get_dialogue_element(SELECTOR.DRAWINGCANVAS);
             this.graphic = new Y.Graphic({render: drawingcanvas});
-
-            drawingregion = this.get_dialogue_element(SELECTOR.DRAWINGREGION);
-            drawingregion.on('scroll', this.move_canvas, this);
 
             if (!this.get('readonly')) {
                 drawingcanvas.on('gesturemovestart', this.edit_start, null, this);
