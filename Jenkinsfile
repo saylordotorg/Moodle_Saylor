@@ -259,6 +259,12 @@ def plugins = [
         "url" : 'https://github.com/saylordotorg/moodle-mod_hvp.git',
         "branch" : 'master',
         "dest" : 'mod/hvp'
+    ],
+    [
+        "name" : 'block_quickmail',
+        "url" : 'https://github.com/lsuits/lsu-block_quickmail.git',
+        "branch" : 'master',
+        "dest" : 'blocks/quickmail'
     ]
 ]
 
