@@ -293,12 +293,19 @@ h1 { font-family: $font-family-header;
     @extend .border;
 }
 
+// Small cap course titles
+.course-title
+{
+    font-variant: small-caps;
+    text-transform: lowercase;
+}
+
 // Rounded user pictures
 .userpicture {
     border-radius: 50%;
 }
 
-// Increase font size for user log in/sign up top-right header. */
+// Increase font size for user log in/sign up top-right header.
 .usermenu {
     font-size: 1.2em;
 }
@@ -329,4 +336,10 @@ h1 { font-family: $font-family-header;
 /** Page Backgrounds */
 #page-wrapper {
     background-color: $light;
+}
+
+/** Progress Bar */
+// Increase progress bar height
+.block .block-cards .progress {
+    height: .75rem;
 }

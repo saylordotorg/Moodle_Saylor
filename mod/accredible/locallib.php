@@ -305,9 +305,15 @@ function accredible_get_group_by_name($name) {
 	$api = new Api($CFG->accredible_api_key);
 
 	try {
-		$response = $api->get_groups(1, 1, $name);
+		$response = $api->get_groups(100, 1, $name);
 
-		return $response->groups[0];
+		foreach ($response->groups as $group) {
+			if ($group->name === $name) {
+				return $group;
+			}
+		}
+
+		throw new ClientException();
 
 	} catch (ClientException $e) {
 	    // throw API exception

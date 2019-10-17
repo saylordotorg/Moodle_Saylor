@@ -38,7 +38,7 @@ if (is_siteadmin()) {
         get_string('disableregexset_text', 'qtype_gapfill'), 0));
     $settingspage->add(new admin_setting_configcheckbox('qtype_gapfill/fixedgapsize',
         get_string('fixedgapsize', 'qtype_gapfill'),
-        get_string('fixedgapsizeset_text', 'qtype_gapfill') , 0));
+        get_string('fixedgapsizeset_text', 'qtype_gapfill') , 1));
     $settingspage->add(new admin_setting_configcheckbox('qtype_gapfill/casesensitive',
         get_string('casesensitive', 'qtype_gapfill'),
         get_string('casesensitive_help', 'qtype_gapfill') , 0));
