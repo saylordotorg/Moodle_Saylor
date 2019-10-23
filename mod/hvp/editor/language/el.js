@@ -7,6 +7,7 @@ H5PEditor.language.core = {
   notImageOrDimensionsField: 'Το ":path" δεν είναι εικόνα ή πεδίο διαστάσεων.',
   requiredProperty: 'Η ιδιότητα :property απαιτείται, και πρέπει να έχει μια τιμή.',
   onlyNumbers: 'Η τιμή της ιδιότητας :property μπορεί να περιέχει μόνο αριθμούς.',
+  illegalDecimalNumber: ':property can only contain numbers with max :decimals decimals.',
   exceedsMax: 'Η τιμή της ιδιότητας :property υπερβαίνει το μέγιστο :max.',
   listExceedsMax: 'Ο κατάλογος υπερβαίνει το μέγιστο των :max στοιχείων.',
   belowMin: 'Η τιμή της ιδιότητας :property είναι μικρότερη από το ελάχιστο :min.',
@@ -207,5 +208,9 @@ H5PEditor.language.core = {
   changeLanguage: 'Change language to :language?',
   thisWillPotentially: "This will potentially reset all the text and translations. You can't undo this. The content itself will not be changed. Do you want to proceed?",
   notAllTextsChanged: 'Not all texts were changed, there is only partial coverage for :language.',
-  contributeTranslations: 'If you want to complete the translation for :language you can learn about <a href=":url" target="_new">contributing translations to H5P</a>'
+  contributeTranslations: 'If you want to complete the translation for :language you can learn about <a href=":url" target="_new">contributing translations to H5P</a>',
+  unknownLibrary: 'Unfortunately, the selected content type \'%lib\' isn\'t installed on this system.',
+  proceedButtonLabel: 'Proceed to save',
+  enterFullscreenButtonLabel: 'Enter fullscreen',
+  exitFullscreenButtonLabel: 'Exit fullscreen'
 };
