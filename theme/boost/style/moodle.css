@@ -14275,6 +14275,9 @@ body.path-question-type {
 .questionbankwindow .module {
   width: auto; }
 
+.questionbankwindow .form-autocomplete-selection {
+  margin-left: 0; }
+
 #page-mod-quiz-edit div.editq div.question div.content {
   background-color: #fff;
   border: 1px solid #ddd;
@@ -14832,7 +14835,7 @@ fieldset.coursesearchbox label {
   margin: 0.25rem;
   min-height: 2.375rem; }
 
-.form-autocomplete-multiple [role=listitem] {
+.form-autocomplete-selection [role=listitem] {
   cursor: pointer;
   white-space: inherit;
   word-break: break-word;

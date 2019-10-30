@@ -3,3 +3,7 @@
 /* 3.5 styles */
 
 @import url("https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css");
+
+.standoutbox.blue {
+	background-color: #e3f5fa;
+}
