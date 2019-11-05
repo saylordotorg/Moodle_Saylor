@@ -48,9 +48,25 @@ class qtype_coderunner_renderer extends qtype_renderer {
      */
     public function formulation_and_controls(question_attempt $qa, question_display_options $options) {
         global $CFG, $PAGE;
+        global $USER;
 
         $question = $qa->get_question();
+        $qid = $question->id;
+	if (empty($USER->coderunnerquestionids)) {
+            $USER->coderunnerquestionids = array($qid);  // Record in case of AJAX request
+	} else {
+	    array_push($USER->coderunnerquestionids, $qid); // Array of active qids
+	}
+        $divid = "qtype_coderunner_problemspec$qid";
+        $params = json_decode($question->templateparams);
         $qtext = $question->format_questiontext($qa);
+        if (isset($params->programming_contest_problem) && $params->programming_contest_problem) {
+            // Special case hack for programming contest problems
+            $qtext .= "<div id='$divid'></div>";
+            $probspecfilename = isset($params->problem_spec_filename) ? $params->problem_spec_filename : '';
+            $PAGE->requires->js_call_amd('qtype_coderunner/ajaxquestionloader',
+                    'loadQuestionText', array($qid, $divid, $probspecfilename));
+        }
         $examples = $question->example_testcases();
         if (count($examples) > 0) {
             $forexample = get_string('forexample', 'qtype_coderunner');
@@ -123,7 +139,7 @@ class qtype_coderunner_renderer extends qtype_renderer {
         $qtext .= html_writer::end_tag('div');
 
         $preload = isset($question->answerpreload) ? $question->answerpreload : '';
-        if ($preload) {  // Add a reset button if preloaded text is non-empty
+        if ($preload) {  // Add a reset button if preloaded text is non-empty.
             $qtext .= self::reset_button($qa, $responsefieldid, $preload);
         }
 
@@ -135,7 +151,9 @@ class qtype_coderunner_renderer extends qtype_renderer {
                 'spellcheck' => 'false',
                 'rows'      => $rows,
                 'data-params' => $question->templateparams,
-                'data-lang' => ucwords($currentlanguage)
+                'data-globalextra' => $question->globalextra,
+                'data-lang' => ucwords($currentlanguage),
+                'data-test0' => $question->testcases ? json_encode($question->testcases[0]) : ''
         );
 
         if ($options->readonly) {
@@ -160,7 +178,7 @@ class qtype_coderunner_renderer extends qtype_renderer {
                     array('class' => 'validationerror'));
         }
 
-        // Add file upload controls if attachments are allowed
+        // Add file upload controls if attachments are allowed.
         $files = '';
         if ($question->attachments) {
             if (empty($options->readonly)) {
@@ -171,7 +189,7 @@ class qtype_coderunner_renderer extends qtype_renderer {
             }
             $qtext .= html_writer::tag('div', $files,
                     array('class' => 'form-filemanager', 'data-fieldtype' => 'filemanager'));
-            // class and data-fieldtype are so behat can find the filemanager in both boost and clean themes.
+            // Class and data-fieldtype are so behat can find the filemanager in both boost and clean themes.
         }
 
         // Initialise any JavaScript UI. Default is Ace unless uiplugin is explicitly
@@ -437,7 +455,7 @@ class qtype_coderunner_renderer extends qtype_renderer {
     protected function make_source_code_div($outcome) {
         $html = '';
         $sourcecodelist = $outcome->get_sourcecode_list();
-        if (count($sourcecodelist) > 0) {
+        if ($sourcecodelist && count($sourcecodelist) > 0) {
             $heading = get_string('sourcecodeallruns', 'qtype_coderunner');
             $html = html_writer::start_tag('div', array('class' => 'debugging'));
             $html .= html_writer::tag('h3', $heading);
@@ -513,7 +531,7 @@ class qtype_coderunner_renderer extends qtype_renderer {
         $pickeroptions->maxbytes = intval($question->maxfilesize);
         $pickeroptions->context = $options->context;
         $pickeroptions->return_types = FILE_INTERNAL | FILE_CONTROLLED_LINK;
-        $pickeroptions->accepted_types = '*';  // Accept anything - names checked on upload
+        $pickeroptions->accepted_types = '*';  // Accept anything - names checked on upload.
         $pickeroptions->itemid = $qa->prepare_response_files_draft_itemid(
                 'attachments', $options->context->id);
 
@@ -528,12 +546,12 @@ class qtype_coderunner_renderer extends qtype_renderer {
                     . ': ' . $question->filenamesregex);
         }
 
-        # In order to prevent a spurious warning message when checking or saving
-        # the question after modifying the uploaded files, we need to explicitly
-        # initialise the form change checker, to ensure the onsubmit action for
-        # the form calls the set_form_submitted function in the module.
-        # This is only needed during Preview as it's apparently done anyway
-        # in normal quiz display mode, but we do it here regardless.
+        // In order to prevent a spurious warning message when checking or saving
+        // the question after modifying the uploaded files, we need to explicitly
+        // initialise the form change checker, to ensure the onsubmit action for
+        // the form calls the set_form_submitted function in the module.
+        // This is only needed during Preview as it's apparently done anyway
+        // in normal quiz display mode, but we do it here regardless.
         $PAGE->requires->yui_module('moodle-core-formchangechecker',
                 'M.core_formchangechecker.init',
                 array(array('formid' => 'responseform'))

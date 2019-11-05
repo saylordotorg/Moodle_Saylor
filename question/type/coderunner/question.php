@@ -85,8 +85,8 @@ class qtype_coderunner_question extends question_graded_automatically {
         $seed = $step->get_qt_var('_mtrandseed');
         if ($seed === null) {
             // Rendering a question that was begun before randomisation
-            // was introduced into the code
-           $seed = mt_rand();
+            // was introduced into the code.
+            $seed = mt_rand();
         }
         $this->setup_template_params($seed);
 
@@ -133,7 +133,7 @@ class qtype_coderunner_question extends question_graded_automatically {
         // Check the response and return a validation error message if it's
         // faulty or an empty string otherwise.
 
-        // First check the attachments
+        // First check the attachments.
         $hasattachments = array_key_exists('attachments', $response)
             && $response['attachments'] instanceof question_response_files;
         if ($hasattachments) {
@@ -162,7 +162,7 @@ class qtype_coderunner_question extends question_graded_automatically {
             return get_string('insufficientattachments', 'qtype_coderunner', $this->attachmentsrequired);
         }
 
-        if ($attachcount == 0) { // If no attachments, require an answer
+        if ($attachcount == 0) { // If no attachments, require an answer.
             $hasanswer = array_key_exists('answer', $response);
             if (!$hasanswer || strlen($response['answer']) == 0) {
                 return get_string('answerrequired', 'qtype_coderunner');
@@ -170,7 +170,7 @@ class qtype_coderunner_question extends question_graded_automatically {
                 return get_string('answertooshort', 'qtype_coderunner', constants::FUNC_MIN_LENGTH);
             }
         }
-        return '';  // All good
+        return '';  // All good.
     }
 
     // Return true iff the given filename is valid, meaning it matches the
@@ -179,17 +179,17 @@ class qtype_coderunner_question extends question_graded_automatically {
     // start with double underscore..
     private function is_valid_filename($filename, $regex, $supportfiles) {
         if (strpos($filename, '__') === 0) {
-            return false;  // Dunder names are reserved for runtime task
+            return false;  // Dunder names are reserved for runtime task.
         }
         if (!ctype_alnum(str_replace(array('-', '_', '.'), '', $filename))) {
-            return false;  // Filenames must be alphanumeric plus '.', '-', or '_'
+            return false;  // Filenames must be alphanumeric plus '.', '-', or '_'.
         }
-        if (!empty($regex) && preg_match('`^' . $this->filenamesregex . '$`', $filename) !== 1) {
-            return false;  // Filename doesn't match given regex
+        if (!empty($regex) && preg_match('=^' . $this->filenamesregex . '$=', $filename) !== 1) {
+            return false;  // Filename doesn't match given regex.
         }
         foreach (array_keys($supportfiles) as $supportfilename) {
             if ($supportfilename == $filename) {
-                return false;  // Filename collides with a support file name
+                return false;  // Filename collides with a support file name.
             }
         }
         return true;
@@ -213,7 +213,7 @@ class qtype_coderunner_question extends question_graded_automatically {
      * @return string the message.
      */
     public function get_validation_error(array $response) {
-        $error =  $this->validate_response($response);
+        $error = $this->validate_response($response);
         if ($error) {
             return $error;
         } else {
@@ -253,7 +253,12 @@ class qtype_coderunner_question extends question_graded_automatically {
         } else {
             $answer = array('answer' => $this->answer);
             // For multilanguage questions we also need to specify the language.
-            if (!empty($this->acelang) && strpos($this->acelang, ',') !== false) {
+            // Use the answer_language template parameter value if given, otherwise
+            // run with the default.
+            $params = json_decode($this->templateparams);
+            if (!empty($params->answer_language)) {
+                $answer['language'] = $params->answer_language;
+            } else if (!empty($this->acelang) && strpos($this->acelang, ',') !== false) {
                 list($langs, $defaultlang) = qtype_coderunner_util::extract_languages($this->acelang);
                 $default = empty($defaultlang) ? $langs[0] : $defaultlang;
                 $answer['language'] = $default;
@@ -280,7 +285,7 @@ class qtype_coderunner_question extends question_graded_automatically {
      * @return bool FEEDBACK_USE_QUIZ, FEEDBACK_SHOW or FEEDBACK_HIDE from constants class.
      */
     public function display_feedback() {
-        return isset($this->displayfeedback) ? intval($this->displayfeedback): constants::FEEDBACK_USE_QUIZ;
+        return isset($this->displayfeedback) ? intval($this->displayfeedback) : constants::FEEDBACK_USE_QUIZ;
     }
 
 
@@ -345,7 +350,7 @@ class qtype_coderunner_question extends question_graded_automatically {
 
 
     // Return a map from filename to file contents for all the attached files
-    //in the given response.
+    // in the given response.
     private function get_attached_files($response) {
         $attachments = array();
         if (array_key_exists('attachments', $response) && $response['attachments']) {
@@ -401,14 +406,12 @@ class qtype_coderunner_question extends question_graded_automatically {
         }
 
         // Twig expand everything in a context that includes the template
-        // parameters and the STUDENT and QUESTION objects. The only thing
-        // guaranteed about the QUESTION object is the parameters field - use
-        // other fields at your peril (since the order in which they are
-        // expanded might vary in the future).
+        // parameters and the STUDENT and QUESTION objects.
         $this->questiontext = $this->twig_expand($this->questiontext);
         $this->generalfeedback = $this->twig_expand($this->generalfeedback);
         $this->answer = $this->twig_expand($this->answer);
         $this->answerpreload = $this->twig_expand($this->answerpreload);
+        $this->globalextra = $this->twig_expand($this->globalextra);
         foreach ($this->testcases as $key => $test) {
             foreach (['testcode', 'stdin', 'expected', 'extra'] as $field) {
                 $text = $this->testcases[$key]->$field;
@@ -426,15 +429,17 @@ class qtype_coderunner_question extends question_graded_automatically {
      * @param associative array $twigparams Extra twig environment parameters
      */
     public function twig_expand($text, $twigparams=array()) {
-        $twig = qtype_coderunner_twig::get_twig_environment();
-        $twigparams['QUESTION'] = $this;
-        if ($this->hoisttemplateparams) {
-            foreach ($this->parameters as $key => $value) {
-                $twigparams[$key] = $value;
+        if (empty(trim($text))) {
+            return $text;
+        } else {
+            $twigparams['QUESTION'] = $this;
+            if ($this->hoisttemplateparams) {
+                foreach ($this->parameters as $key => $value) {
+                    $twigparams[$key] = $value;
+                }
             }
+            return qtype_coderunner_twig::render($text, $twigparams);
         }
-        $twigparams['STUDENT'] = new qtype_coderunner_student($this->student);
-        return $twig->render($text, $twigparams);
     }
 
     /**
@@ -444,12 +449,13 @@ class qtype_coderunner_question extends question_graded_automatically {
      * @param type $seed The random number seed to set for Twig randomisation
      */
     private function setup_template_params($seed) {
-        $twig = qtype_coderunner_twig::get_twig_environment();
-        $twigparams = array('STUDENT' => new qtype_coderunner_student($this->student));
         mt_srand($seed);
-        $ournewtemplateparams = $twig->render($this->templateparams, $twigparams);
+        if (!isset($this->templateparams)) {
+            $this->templateparams = '';
+        }
+        $ournewtemplateparams = qtype_coderunner_twig::render($this->templateparams);
         if (isset($this->prototypetemplateparams)) {
-            $prototypenewtemplateparams = $twig->render($this->prototypetemplateparams, $twigparams);
+            $prototypenewtemplateparams = qtype_coderunner_twig::render($this->prototypetemplateparams);
             $this->templateparams = qtype_coderunner_util::merge_json($prototypenewtemplateparams, $ournewtemplateparams);
         } else {
             // Missing prototype?
