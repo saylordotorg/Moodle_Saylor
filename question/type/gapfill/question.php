@@ -581,11 +581,6 @@ class qtype_gapfill_question extends question_graded_automatically_with_countbac
         $answergiven = htmlspecialchars_decode($answergiven);
 
         if ($disableregex == true) {
-             /* strcmp is case sensitive. If case sensitive is off, both string and
-             * pattern will come into function already converted to lower case with
-             * core_text::strtolower
-             */
-
             /* use the | operator without regular expressions. Useful for
              * programming languages or math related questions which use
              * special characters such as ()and slashes. Introduced with
@@ -595,6 +590,11 @@ class qtype_gapfill_question extends question_graded_automatically_with_countbac
             $answerparts = explode("|", $answer);
 
             foreach ($answerparts as $answer) {
+                // TODO Find why it was not checked earlier, plus strcasecmp would be more concise.
+                if (!$this->casesensitive == 1) {
+                    $answergiven = core_text::strtolower($answergiven, 'UTF-8');
+                    $answer = core_text::strtolower($answer, 'UTF-8');
+                }
                 if (strcmp(trim($answergiven), trim($answer)) == 0) {
                     $correctness = true;
                 } else if (preg_match($this->blankregex, $answer) && $answergiven == "") {

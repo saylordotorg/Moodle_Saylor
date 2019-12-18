@@ -57,13 +57,14 @@ class qtype_coderunner_question extends question_graded_automatically {
      *      1 and {@link get_num_variants()} inclusive.
      */
     public function start_attempt(question_attempt_step $step=null, $variant=null) {
-        global $USER;
-
-        $user = $USER;
-        $this->student = $user;
+        global $DB, $USER;
         if ($step !== null) {
             parent::start_attempt($step, $variant);
-            $step->set_qt_var('_STUDENT', serialize($user));
+            $userid = $step->get_user_id();
+            $this->student = $DB->get_record('user', array('id' => $userid));
+            $step->set_qt_var('_STUDENT', serialize($this->student));
+        } else {  // Validation, so just use the global $USER as student.
+            $this->student = $USER;
         }
 
         $seed = mt_rand();
@@ -438,7 +439,7 @@ class qtype_coderunner_question extends question_graded_automatically {
                     $twigparams[$key] = $value;
                 }
             }
-            return qtype_coderunner_twig::render($text, $twigparams);
+            return $this->twig_render($text, $twigparams);
         }
     }
 
@@ -453,14 +454,21 @@ class qtype_coderunner_question extends question_graded_automatically {
         if (!isset($this->templateparams)) {
             $this->templateparams = '';
         }
-        $ournewtemplateparams = qtype_coderunner_twig::render($this->templateparams);
+        $ournewtemplateparams = $this->twig_render($this->templateparams);
         if (isset($this->prototypetemplateparams)) {
-            $prototypenewtemplateparams = qtype_coderunner_twig::render($this->prototypetemplateparams);
+            $prototypenewtemplateparams = $this->twig_render($this->prototypetemplateparams);
             $this->templateparams = qtype_coderunner_util::merge_json($prototypenewtemplateparams, $ournewtemplateparams);
         } else {
             // Missing prototype?
             $this->templateparams = $ournewtemplateparams;
         }
+    }
+
+
+    // Render the given twig text using the given parameters and the
+    // current $this->student as user variable (for mapping to STUDENT twig param).
+    private function twig_render($text, $params=array()) {
+        return qtype_coderunner_twig::render($text, $this->student, $params);
     }
 
 

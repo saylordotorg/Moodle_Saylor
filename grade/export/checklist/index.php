@@ -55,7 +55,9 @@ $modinfo = get_fast_modinfo($course);
 $checklists = $modinfo->get_instances_of('checklist');
 
 if (empty($checklists)) {
-    print_error('nochecklists', 'gradeexport_checklist');
+    echo '<div class="alert alert-info">'.get_string('nochecklists', 'gradeexport_checklist').'</div>';
+    echo $OUTPUT->footer();
+    die();
 }
 
 // Get list of districts.

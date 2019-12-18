@@ -27,6 +27,8 @@ global $CFG;
 
 require_once($CFG->dirroot . '/question/type/questionbase.php');
 require_once($CFG->dirroot . '/question/engine/tests/helpers.php');
+require_once($CFG->dirroot . '/question/type/gapfill/tests/helper.php');
+
 
 require_once($CFG->dirroot . '/question/type/gapfill/question.php');
 
@@ -91,18 +93,30 @@ class qtype_gapfill_question_test extends advanced_testcase {
         This was compared with how the ddwtos question marked */
         $this->assertEquals($fraction, .5);
     }
+    /**
+     * When noduplicates is true,
+     * discard any duplicate responses when
+     * calculating how many responses were correct
+     * Normally used with questions like
+     * What are the olympic medals?
+     * [gold|silve|bronze] [gold|silve|bronze] [gold|silve|bronze]
+     * So students cannot get marks for [gold] [gold] [gold]
+     */
     public function test_discard_duplicates() {
         $options = [
             "noduplicates" => 1,
             'disableregex' => 0,
             'delimitchars' => '[]'
         ];
-        $questiontext = 'The [cat] sat on the [mat]';
+        $questiontext = 'The [cat] sat on the [cat]';
         $question = qtype_gapfill_test_helper::make_question2($questiontext, false, $options);
+        // Give the same answer for each gap.
         $response = array('p1' => 'cat', 'p2' => 'cat');
+        // Discard duplicates by putting hash in duplicate gaps.
         $ddresponse = $question->discard_duplicates($response);
         $numpartsright = $question->get_num_parts_right($ddresponse);
-        $this->assertEquals($numpartsright[0], 1);
+        // 0 element is numright element 1 is gapcount.
+        $this->assertEquals($numpartsright[0], 1, 'Expected 1 response to be discarded so 1 right');
     }
 
 
