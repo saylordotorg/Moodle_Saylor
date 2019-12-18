@@ -264,7 +264,7 @@ def plugins = [
         "name" : 'block_accredibledashboard',
         "url" : 'https://github.com/saylordotorg/moodle-block_accredibledashboard',
         "branch" : 'master',
-        "dest" : 'blocks_accredibledashboard'
+        "dest" : 'blocks/accredibledashboard'
     ]
 ]
 
