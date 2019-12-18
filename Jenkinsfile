@@ -259,6 +259,12 @@ def plugins = [
         "url" : 'https://github.com/Twoscope/moodle-report_completionoverview',
         "branch" : 'master',
         "dest" : 'report/completionoverview'
+    ],
+    [
+        "name" : 'block_accredibledashboard',
+        "url" : 'https://github.com/saylordotorg/moodle-block_accredibledashboard',
+        "branch" : 'master',
+        "dest" : 'blocks_accredibledashboard'
     ]
 ]
 
