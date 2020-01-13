@@ -265,6 +265,12 @@ def plugins = [
         "url" : 'https://github.com/saylordotorg/moodle-block_accredibledashboard',
         "branch" : 'master',
         "dest" : 'blocks/accredibledashboard'
+    ],
+    [
+        "name" : 'block_quickmail',
+        "url" : 'https://github.com/lsuits/lsu-block_quickmail.git',
+        "branch" : 'master',
+        "dest" : 'blocks/quickmail'
     ]
 ]
 
