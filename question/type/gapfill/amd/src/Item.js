@@ -28,8 +28,7 @@ define(["jquery"], function($) {
    */
   return function Item(text, delimitchars) {
     this.questionid = $("input[name=id]").val();
-    debugger;
-    this.settings = get_settings();
+    this.settings = getSettings();
     this.gaptext = text;
     this.delimitchars = delimitchars;
     /* The l and r is for left and right */
@@ -52,7 +51,11 @@ define(["jquery"], function($) {
       var regex = /(<([^>]+)>)/gi;
       return gaptext.replace(regex, "");
     };
-    function get_settings() {
+    /**
+     * Pull data from hidden settings field on form
+     * @returns {object} settings
+     */
+    function getSettings() {
       var settings = [];
       var settingsdata = $("[name='itemsettings']").val();
       if (settingsdata > "") {

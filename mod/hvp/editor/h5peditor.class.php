@@ -21,6 +21,7 @@ class H5peditor {
     'scripts/h5peditor-semantic-structure.js',
     'scripts/h5peditor-editor.js',
     'scripts/h5peditor-library-selector.js',
+    'scripts/h5peditor-fullscreen-bar.js',
     'scripts/h5peditor-form.js',
     'scripts/h5peditor-text.js',
     'scripts/h5peditor-html.js',
@@ -375,9 +376,12 @@ class H5peditor {
   public function getLibraryData($machineName, $majorVersion, $minorVersion, $languageCode, $prefix = '', $fileDir = '', $defaultLanguage) {
     $libraryData = new stdClass();
 
+    $library = $this->h5p->loadLibrary($machineName, $majorVersion, $minorVersion);
+
     // Include name and version in data object for convenience
     $libraryData->name = $machineName;
     $libraryData->version = (object) array('major' => $majorVersion, 'minor' => $minorVersion);
+    $libraryData->title = $library['title'];
 
     $libraryData->upgradesScript = $this->h5p->fs->getUpgradeScript($machineName, $majorVersion, $minorVersion);
     if ($libraryData->upgradesScript !== NULL) {
@@ -400,8 +404,7 @@ class H5peditor {
     // Get list of JS and CSS files that belongs to the dependencies
     $files = $this->h5p->getDependenciesFiles($libraries, $prefix);
     $libraryName = H5PCore::libraryToString(compact('machineName', 'majorVersion', 'minorVersion'), true);
-    if( $this->hasPresave($libraryName) === true ){
-      $library = $this->h5p->loadLibrary($machineName, $majorVersion, $minorVersion);
+    if ($this->hasPresave($libraryName) === true) {
       $this->addPresaveFile($files, $library, $prefix);
     }
     $this->storage->alterLibraryFiles($files, $libraries);

@@ -491,11 +491,10 @@ define('HOMEPAGE_USER', 2);
  */
 define('HUB_HUBDIRECTORYURL', "https://hubdirectory.moodle.org");
 
-
 /**
- * Moodle.net url (should be moodle.net)
+ * URL of the Moodle sites registration portal.
  */
-define('HUB_MOODLEORGHUBURL', "https://moodle.net");
+defined('HUB_MOODLEORGHUBURL') || define('HUB_MOODLEORGHUBURL', 'https://stats.moodle.org');
 define('HUB_OLDMOODLEORGHUBURL', "http://hub.moodle.org");
 
 /**
@@ -1411,6 +1410,14 @@ function set_config($name, $value, $plugin=null) {
                 $config->name  = $name;
                 $config->value = $value;
                 $DB->insert_record('config', $config, false);
+            }
+            // When setting config during a Behat test (in the CLI script, not in the web browser
+            // requests), remember which ones are set so that we can clear them later.
+            if (defined('BEHAT_TEST')) {
+                if (!property_exists($CFG, 'behat_cli_added_config')) {
+                    $CFG->behat_cli_added_config = [];
+                }
+                $CFG->behat_cli_added_config[$name] = true;
             }
         }
         if ($name === 'siteidentifier') {
@@ -3222,6 +3229,8 @@ function require_user_key_login($script, $instance = null, $keyvalue = null) {
     if (!$user = $DB->get_record('user', array('id' => $key->userid))) {
         print_error('invaliduserid');
     }
+
+    core_user::require_active_user($user, true, true);
 
     // Emulate normal session.
     enrol_check_plugins($user);
@@ -7035,19 +7044,10 @@ function current_language() {
  */
 function get_parent_language($lang=null) {
 
-    // Let's hack around the current language.
-    if (!empty($lang)) {
-        $oldforcelang = force_current_language($lang);
-    }
+    $parentlang = get_string_manager()->get_string('parentlanguage', 'langconfig', null, $lang);
 
-    $parentlang = get_string('parentlanguage', 'langconfig');
     if ($parentlang === 'en') {
         $parentlang = '';
-    }
-
-    // Let's hack around the current language.
-    if (!empty($lang)) {
-        force_current_language($oldforcelang);
     }
 
     return $parentlang;
@@ -8601,9 +8601,10 @@ function generate_password($maxlen=10) {
  * then it will display '5.4' instead of '5.400' or '5' instead of '5.000'.
  *
  * @param float $float The float to print
- * @param int $decimalpoints The number of decimal places to print.
+ * @param int $decimalpoints The number of decimal places to print. -1 is a special value for auto detect (full precision).
  * @param bool $localized use localized decimal separator
- * @param bool $stripzeros If true, removes final zeros after decimal point
+ * @param bool $stripzeros If true, removes final zeros after decimal point. It will be ignored and the trailing zeros after
+ *                         the decimal point are always striped if $decimalpoints is -1.
  * @return string locale float
  */
 function format_float($float, $decimalpoints=1, $localized=true, $stripzeros=false) {
@@ -8615,6 +8616,13 @@ function format_float($float, $decimalpoints=1, $localized=true, $stripzeros=fal
     } else {
         $separator = '.';
     }
+    if ($decimalpoints == -1) {
+        // The following counts the number of decimals.
+        // It is safe as both floatval() and round() functions have same behaviour when non-numeric values are provided.
+        $floatval = floatval($float);
+        for ($decimalpoints = 0; $floatval != round($float, $decimalpoints); $decimalpoints++);
+    }
+
     $result = number_format($float, $decimalpoints, $separator, '');
     if ($stripzeros) {
         // Remove zeros and final dot if not needed.

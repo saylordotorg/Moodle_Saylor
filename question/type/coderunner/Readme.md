@@ -1,6 +1,6 @@
 # CODE RUNNER
 
-Version: 3.6.1 July 2019
+Version: 3.7.4+ November 2019
 
 Authors: Richard Lobb, University of Canterbury, New Zealand.
          Tim Hunt, The Open University, UK
@@ -12,62 +12,64 @@ can post CodeRunner questions, such as
 requests for help if things go wrong, or are looking for ideas on how to write some
 unusual question type.
 
-<!--ts-->
-   * [CODE RUNNER](#code-runner)
-      * [Introduction](#introduction)
-      * [Installation](#installation)
-         * [Upgrading from a CodeRunner version earlier than 2.4.0](#upgrading-from-a-coderunner-version-earlier-than-240)
-         * [Upgrading from CodeRunner versions between 2.4 and 3.0](#upgrading-from-coderunner-versions-between-24-and-30)
-            * [Note for enthusiasts only.](#note-for-enthusiasts-only)
-         * [Installing CodeRunner from scratch](#installing-coderunner-from-scratch)
-         * [Preliminary testing of the CodeRunner question type](#preliminary-testing-of-the-coderunner-question-type)
-         * [Sandbox Configuration](#sandbox-configuration)
-         * [Running the unit tests](#running-the-unit-tests)
-      * [The Architecture of CodeRunner](#the-architecture-of-coderunner)
-      * [Question types](#question-types)
-         * [An example question type](#an-example-question-type)
-         * [Built-in question types](#built-in-question-types)
-         * [Some more-specialised question types](#some-more-specialised-question-types)
-      * [Templates](#templates)
-         * [Per-test templates](#per-test-templates)
-         * [Combinator templates](#combinator-templates)
-         * [Customising templates](#customising-templates)
-      * [Using the template as a script for more advanced questions](#using-the-template-as-a-script-for-more-advanced-questions)
-         * [Twig Escapers](#twig-escapers)
-      * [Template parameters](#template-parameters)
-         * [The Twig QUESTION variable](#the-twig-question-variable)
-         * [The Twig STUDENT variable](#the-twig-student-variable)
-      * [Randomising questions](#randomising-questions)
-         * [How it works](#how-it-works)
-         * [Randomising per-student rather than per-question-attempt](#randomising-per-student-rather-than-per-question-attempt)
-         * [An important warning about editing template parameters](#a-important-warning-about-editing-template-parameters)
-         * [Hoisting the template parameters](#hoisting-the-template-parameters)
-         * [Miscellaneous tips](#miscellaneous-tips)
-      * [Grading with templates](#grading-with-templates)
-         * [Per-test-case template grading](#per-test-case-template-grading)
-         * [Combinator-template grading](#combinator-template-grading)
-      * [Template grader examples](#template-grader-examples)
-         * [A simple grading-template example](#a-simple-grading-template-example)
-         * [A more advanced grading-template example](#a-more-advanced-grading-template-example)
-      * [Customising the result table](#customising-the-result-table)
-         * [Column specifiers](#column-specifiers)
-         * [HTML formatted columns](#html-formatted-columns)
-         * [Extended column specifier syntax (<em>obsolescent</em>)](#extended-column-specifier-syntax-obsolescent)
-         * [Default result columns](#default-result-columns)
-      * [User-interface selection](#user-interface-selection)
-         * [The Graph UI](#the-graph-ui)
-         * [The Table UI](#the-table-ui)
-         * [Other UI plugins](#other-ui-plugins)
-      * [User-defined question types](#user-defined-question-types)
-      * [Supporting or implementing new languages](#supporting-or-implementing-new-languages)
-      * [Multilanguage questions](#multilanguage-questions)
-      * [Administrator scripts](#administrator-scripts)
-      * [A note on accessibility](#a-note-on-accessibility)
-      * [APPENDIX: How programming quizzes should work](#appendix-how-programming-quizzes-should-work)
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-<!-- Added by: rjl83, at: 2018-04-28T18:05+12:00 -->
+- [CODE RUNNER](#code-runner)
+  - [Introduction](#introduction)
+  - [Installation](#installation)
+    - [Upgrading from a CodeRunner version earlier than 2.4.0](#upgrading-from-a-coderunner-version-earlier-than-240)
+    - [Upgrading from CodeRunner versions between 2.4 and 3.0](#upgrading-from-coderunner-versions-between-24-and-30)
+      - [Note for enthusiasts only.](#note-for-enthusiasts-only)
+    - [Installing CodeRunner from scratch](#installing-coderunner-from-scratch)
+    - [Preliminary testing of the CodeRunner question type](#preliminary-testing-of-the-coderunner-question-type)
+    - [Setting the quiz review options](#setting-the-quiz-review-options)
+    - [Sandbox Configuration](#sandbox-configuration)
+    - [Running the unit tests](#running-the-unit-tests)
+  - [The Architecture of CodeRunner](#the-architecture-of-coderunner)
+  - [Question types](#question-types)
+    - [An example question type](#an-example-question-type)
+    - [Built-in question types](#built-in-question-types)
+    - [Some more-specialised question types](#some-more-specialised-question-types)
+  - [Templates](#templates)
+    - [Per-test templates](#per-test-templates)
+    - [Combinator templates](#combinator-templates)
+    - [Customising templates](#customising-templates)
+  - [Using the template as a script for more advanced questions](#using-the-template-as-a-script-for-more-advanced-questions)
+    - [Twig Escapers](#twig-escapers)
+  - [Template parameters](#template-parameters)
+    - [The Twig QUESTION variable](#the-twig-question-variable)
+    - [The Twig STUDENT variable](#the-twig-student-variable)
+  - [Randomising questions](#randomising-questions)
+    - [How it works](#how-it-works)
+    - [Randomising per-student rather than per-question-attempt](#randomising-per-student-rather-than-per-question-attempt)
+    - [An important warning about editing template parameters](#an-important-warning-about-editing-template-parameters)
+    - [Hoisting the template parameters](#hoisting-the-template-parameters)
+    - [Miscellaneous tips](#miscellaneous-tips)
+  - [Grading with templates](#grading-with-templates)
+    - [Per-test-case template grading](#per-test-case-template-grading)
+    - [Combinator-template grading](#combinator-template-grading)
+  - [Template grader examples](#template-grader-examples)
+    - [A simple grading-template example](#a-simple-grading-template-example)
+    - [A more advanced grading-template example](#a-more-advanced-grading-template-example)
+  - [Customising the result table](#customising-the-result-table)
+    - [Column specifiers](#column-specifiers)
+    - [HTML formatted columns](#html-formatted-columns)
+    - [Extended column specifier syntax (*obsolescent*)](#extended-column-specifier-syntax-obsolescent)
+    - [Default result columns](#default-result-columns)
+  - [User-interface selection](#user-interface-selection)
+    - [The Graph UI](#the-graph-ui)
+    - [The Table UI](#the-table-ui)
+    - [Other UI plugins](#other-ui-plugins)
+  - [User-defined question types](#user-defined-question-types)
+  - [Supporting or implementing new languages](#supporting-or-implementing-new-languages)
+  - [Multilanguage questions](#multilanguage-questions)
+  - [Administrator scripts](#administrator-scripts)
+  - [A note on accessibility](#a-note-on-accessibility)
+  - [APPENDIX: How programming quizzes should work](#appendix-how-programming-quizzes-should-work)
 
-<!--te-->
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Introduction
 
@@ -1058,16 +1060,30 @@ be defined by the question author in the "Template params" field of the question
 editing form. This field must be set to a JSON-encoded record containing
 definitions of variables that can be used by the template engine to perform
 local per-question customisation of the template. The template parameters
-are passed to the template engine as the object `QUESTION.parameters`.
+are passed to the template engine as the object `QUESTION.parameters`. In
+addition, if the *Hoist template parameters* checkbox is checked (which
+is now the default behaviour) the `QUESTION.parameters` prefix can be dropped.
 
-A more advanced version of the *python3\_pylint* question type, which allows
-customisation of the pylint options via template parameters and also allows
-for an optional insertion of a module docstring for "write a function"
-questions is then:
+For example, suppose we wanted a more advanced version of the *python3\_pylint*
+question type that allows customisation of the pylint options via template parameters.
+We might also wish to insert a module docstring for "write a function"
+questions. Lastly we might want the ability to configure the error message if
+pylint errors are found.
+
+The template parameters might be:
+
+    {
+        "isfunction": false,
+        "pylintoptions": ["--disable=missing-final-newline", "--enable=C0236"],
+        "errormessage": "Pylint is not happy with your program"
+    }
+
+The template for such a question type might then be:
 
     import subprocess
     import os
     import sys
+    import re
 
     def code_ok(prog_to_test):
     {% if QUESTION.parameters.isfunction %}
@@ -1089,10 +1105,12 @@ questions is then:
         except Exception as e:
             result = e.output
 
-        if result.strip():
-            print("pylint doesn't approve of your program", file=sys.stderr)
+        # Have to remove pylint's annoying config file output message before
+        # checking for a clean run. [--quiet option in pylint 2.0 fixes this].
+        result = re.sub('Using config file.*', '', result).strip()
+        if result:
+            print("{{QUESTION.parameters.errormessage | e('py')}}", file=sys.stderr)
             print(result, file=sys.stderr)
-            print("Submission rejected", file=sys.stderr)
             return False
         else:
             return True
@@ -1103,6 +1121,8 @@ questions is then:
         __student_answer__ += '\n' + """{{ TEST.testcode | e('py') }}"""
         exec(__student_answer__)
 
+If *Hoist template parameters* is checked, all `QUESTION.parameters.` prefixes
+can be dropped.
 
 ### The Twig QUESTION variable
 
@@ -1117,6 +1137,7 @@ following.
  * `QUESTION.answerpreload` The string that is preloaded into the answer box.
  * `QUESTION.language` The language being used to run the question in the sandbox,
 e.g. "Python3".
+ * `QUESTION.globalextra` Extra data for use by template authors, global to all tests.
  * `QUESTION.useace` '1'/'0' if the ace editor is/is not in use.
  * `QUESTION.sandbox` The sandbox being used, e.g. "jobesandbox".
  * `QUESTION.grader` The PHP grader class being used, e.g. "EqualityGrader".
@@ -1150,6 +1171,60 @@ PHP user object. The fields/attributes of STUDENT are:
  * `STUDENT.lastname` The last name of the current user.
  * `STUDENT.email` The email address of the current user.
 
+### Twig macros
+
+Twig has a [macro capability](https://twig.symfony.com/doc/1.x/tags/macro.html)
+that provides something akin to functions in normal programming languages.
+Macros can be stored in one Twig template and imported from there into another.
+
+In the CodeRunner context there is only a single template available
+at any time - usually the question's so-called *template* field,
+although other question fields are
+expanded if *TwigAll* is set. CodeRunner does not provide access to
+an associated file system from which
+templates of macros can be loaded or created by question authors.
+However, CodeRunner does
+provide a few macros in a support (pseudo) template named "html". These
+macros are primarily intended for use with the Html UI (q.v.); each one inserts
+a named HTML element into the template that is being expanded. As an
+example, if the question author includes the following in a question field
+
+    {% from html import input %}
+
+    ...
+
+    {{ input('fieldname', 15) }}
+
+and that question is subject to Twig expansion, the invocation of the *input*
+macro will generate the HTML code
+
+    <input name="somename" class="coderunner-ui-element" width="15">
+
+All macros name take a mandatory name parameter and additional parameters as follows.
+Optional parameters and their default values are indicated with an equals sign.
+
+  1. `input(name, width=10)` generates an input element as in the above example.
+  2. `textarea(name, rows=2, cols=60)` to generate an HTML *textarea* element.
+  3. `select(name, options)` generates an HTML select element with a sequence
+of embedded `option` elements as defined by the second parameter, which must be
+an array with elements that are either strings or 2-element string arrays.
+If a single string is provided as the array elements,
+it is used as both the value attribute of the option element and its inner
+HTML. If a 2-element array is provided, the first string is used as the value
+and the second as the inner HTML.
+  4. `radio(name, items)` generates a vertically-aligned sequence of
+mutually exclusive radio buttons, one for each of the elements of the `items`
+parameter, which must be
+an array with elements that are either strings or 2-element string arrays. As with
+*select* options, if an element is a single string it is used as both the radio
+button label and its value. But if a 2-element array is provided, the first
+element is the value attribute of the `input` element (the radio button) and
+the second is the label.
+  5. `checkbox(name, label, ischecked=false)` generates a checkbox with the given name,
+and label, which is checked only if ischecked is true.
+
+To reduce the risk that the UI element names conflict with existing UI element
+names in the Moodle page, all names are prefixed by `crui_`.
 
 ## Randomising questions
 
@@ -1803,19 +1878,23 @@ The table UI plug-in replaces the usual textarea answer element with an HTML tab
 into which the student must enter text data. All cells in the table are
 HTML *textarea* elements. The question author can enable *Add row* and
 *Delete row* buttons that allow the student to add or delete rows. The configuration
-of the table is set by the following template parameters:
+of the table is set by the following template parameters, where the first two
+are required and the rest are optional.
 
- o `table_num_rows` sets the (initial) number of table rows, excluding the header
- o `table_num_columns` set the number of table columns
- o `table_column_headers` is a list of strings used for column headers
- o `table_column_width_percents` is a list of numeric percentage widths of the different
+ o `table_num_rows` (required): sets the (initial) number of table rows, excluding the header.
+ o `table_num_columns` (required): sets the number of table columns.
+ o `table_column_headers` (optional): a list of strings used for column headers. By default
+   no column headers are used.
+ o `table_row_labels` (optional): a list of strings used for row labels. By
+   default no row labels are used.
+ o `table_column_width_percents` (optional): a list of numeric percentage widths of the different
    columns. For example, if there are two columns, and the first one is to
    occupy one-quarter of the available width, the list should be \[25, 75\].
-   This parameter is optional; by default all columns have the same width.
- o `table_dynamic_rows` should be set `true` to enable the addition of *Add row*
+   By default all columns have the same width.
+ o `table_dynamic_rows` (optional): set `true` to enable the addition of *Add row*
    and *Delete row* buttons through which the student can alter the number of
    rows. The number of rows can never be less than the initial `table_num_rows` value.
- o `table_locked_cells` is an array of 2-element [row, column] cell specifiers.
+ o `table_locked_cells` (optional): an array of 2-element [row, column] cell specifiers.
    The specified cells are rendered to HTML with the *disabled* attribute, so
    cannot be changed by the user. For example
 
@@ -1847,6 +1926,142 @@ itself the empty string.
 
 An example of the use of this UI type can be seen in the
 *python3_program_testing* prototype in the *samples* folder.
+
+### The Gap Filler UI (new, experimental)
+
+This plugin replaces the usual textarea answer box with a div
+consisting of pre-formatted text supplied by the question author in either the
+"globalextra" field or the testcode field of the first test case, according
+to the template parameter gapfiller_ui_source (default: globalextra).  HTML
+entry or textarea elements are then inserted at
+specified points. It is intended primarily for use with coding questions
+where the answerbox presents the students with code that has smallish bits
+missing.
+
+The locations within the globalextra text at which the input elements are
+to be inserted are denoted by "tags" of the form
+
+    {[ size ]}
+
+for an HTML input element
+
+or
+
+    {[ rows, columns ]}
+
+for a textarea element
+
+where size, rows and column are integer literals. These respectively
+inject an HTML input element or a textarea element of the
+specified size.
+
+The serialisation of the answer box contents, i.e. the text that
+copied back into the textarea for submissions
+as the answer, is simply a list of all the field values (strings), in order.
+
+As a special case of the serialisation, if the value list is empty, the
+serialisation itself is the empty string.
+
+The delimiters for the input element insertion tags are by default '{[' and
+']}', but can be changed by an optional template parameter gap_filler_delimiters,
+which must be a 2-element array of strings. For example:
+
+    {"gap_filler_delimiters": ["{{", "}}"]}
+
+Note that the double-brace delimiters in that example are the same as those
+used by Twig, so using them instead of the default would prevent you from
+ever adding Twig expansion (e.g. for randomisation) to the question. This is
+not recommended.
+
+
+### The Html UI (unsupported and experimental)
+
+The HTML UI plug-in replaces the answer box with custom HTML provided by the
+question author. The HTML will usually include data entry fields such as
+html input and text area elements and it is the values that the user enters
+into these fields that constitutes the student answer. The HTML can
+also include JavaScript in `<script>` elements. Although
+very powerful, the mechanism is complex and there are several pitfalls. Caveat
+emptor!
+
+When the answer is submitted by the student, the UI extracts the values of all
+UI elements within the HTML that have the class 'coderunner-ui-element'.
+Each such element
+is expected to have a 'name' attribute as well and (name, value) pairs of all
+such elements are used to construct a single JSON object which is copied into
+the underlying textarea answerbox and returned as the answer. Since multiple
+UI elements can have the same name, the values in the JSON represention of
+the answer are always lists.  Each list contains all the values, in
+document order, of the results of calling the jquery val() method in turn
+on each of the UI elements with that name.
+This means that at least input, select and textarea
+elements are supported. Twig macros
+are provided to simplify entry of those elements; see [this section](#twig-macros).
+
+The author is responsible for checking the
+compatibility of any other elements entered using raw HTML with jquery's val() method.
+
+The HTML to use in the answer area must be provided as the contents of
+the `globalextra` field in the question authoring form.
+
+Care must be taken when using the HTML UI to avoid using field names that conflict
+with any other named HTML elements in the page. It is recommended that a prefix
+of some sort, such as `crui_`, be used with all names.
+
+When authoring a question that uses the html UI, the answer and answer preload
+fields are *not* controlled by the UI, but are displayed as raw text.
+sections of the authoring form. If data is to be entered into these fields,
+it must be of the form
+
+    {"<fieldName>": "<fieldValueList>",...}
+
+where fieldValueList is a list of all the values to be assigned to the fields
+with the given name, in document order. For complex UIs it is easiest to turn
+off validate on save, save the question, preview it, enter the right answers into
+all fields, type CTRL-ALT-M to switch off the UI and expose the serialisation,
+then copy that serialisation back into the author form.
+
+It is possible that the question author might want a dynamic answer box in
+which the student can add extra fields. A simple example of this is the Table UI,
+which is a special case of the Html UI. The Table UI provides
+an optional *Add rows* button, plus associated JavaScript, which allows
+students to add rows to the table. The serialisation then contains more
+data than can be accommodated in the fields of the original HTML. In the case of
+the Table UI, where the same name is used for all cells in a table column,
+the list of values for each name in the serialisation is longer than the number of
+rows. In other dynamic HTML contexts, new elements with entirely new names may
+have been added.
+
+When the serialisation is reloaded back into the HTML all such leftover values
+from the serialisation are assigned to the `data['leftovers']`
+attribute of the outer html div, as a sub-object of the original object.
+This outer div can be located as the 'closest' (in a jQuery sense)
+`div.qtype-coderunner-html-outer-div`. The author-supplied HTML must include
+JavaScript to make use of the 'leftovers'.
+
+As a special case of the serialisation, if all values in the serialisation
+are either empty strings or a list of empty strings, the serialisation is
+itself the empty string.
+
+In programming questions, the HTML UI can be used to define a "fill-in-the-gaps"
+programming question. Here the `globalextra` should be set to the full
+program code, wrapped in a `<pre>` element. Since this is a raw text field which
+will necessarily contain some genuine HTML, it
+is necessary to manually perform html-escaping operations on the non-html code, such as replacing
+'<' characters with '&lt;'.
+
+Then, bits of the code can be cut out and replaced with HTML input
+elements either explicitly or by use of Twig macros like
+
+    {{ input('crui_expr1', 20) }}
+
+The question's template will receive the values of all input fields in JSON like
+
+    {"crui_expr1": ["*sp++"]}
+
+and, with sufficient ingenuity, can re-insert those field values into the original
+code, which can then be run with all the tests in the usual way. An example of
+this type of question is supplied as **TBS**.
 
 ### Other UI plugins
 

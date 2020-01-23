@@ -91,6 +91,7 @@ class qtype_coderunner extends question_type {
             'answerboxlines',
             'answerboxcolumns',  // Defunct.
             'answerpreload',
+            'globalextra',
             'useace',
             'resultcolumns',
             'template',
@@ -135,6 +136,7 @@ class qtype_coderunner extends question_type {
             'answerboxlines',
             'answerboxcolumns',
             'answerpreload',
+            'globalextra',
             'answer',
             'validateonsave',
             'templateparams',
@@ -273,23 +275,13 @@ class qtype_coderunner extends question_type {
             $DB->delete_records($testcasetable, array('id' => $otc->id));
         }
 
-        // If this is a prototype, clear the caching of any child questions.
-        if ($question->prototypetype != 0) {
-            $typename = $question->coderunnertype;
-            $children = $DB->get_records('question_coderunner_options',
-                    array('prototypetype' => 0,
-                          'coderunnertype' => $typename)
-            );
-            foreach ($children as $child) {
-                question_bank::notify_question_edited($child->questionid);
-            }
-        }
+        $this->notify_prototype_children_if_any($question);
 
         // Lastly, save any datafiles (support files + sample answer files).
         if ($USER->id) {
             // The id check is a hack to deal with phpunit initialisation, when no user exists.
-            foreach (array('datafiles'=>'datafile', 'sampleanswerattachments'=>'samplefile')
-                    as $fileset=>$filearea) {
+            foreach (array('datafiles' => 'datafile',
+                'sampleanswerattachments' => 'samplefile') as $fileset => $filearea) {
                 if (isset($question->$fileset)) {
                     file_save_draft_area_files($question->$fileset, $question->context->id,
                         'qtype_coderunner', $filearea, (int) $question->id, $this->fileoptions);
@@ -357,12 +349,12 @@ class qtype_coderunner extends question_type {
         }
 
         // Convert penalty regime string to generic form without '%'s and with
-        // ', ' as a separator
+        // ', ' as a separator.
         $penaltyregime = str_replace('%', '', $question->penaltyregime);
         $penaltyregime = str_replace(',', ', ', $penaltyregime);
         $question->penaltyregime = preg_replace('/ *,? +/', ', ', $penaltyregime);
 
-        // Copy and clean testcases
+        // Copy and clean testcases.
         if (!isset($question->testcases)) {
             $this->copy_testcases_from_form($question, $isvalidation);
         }
@@ -407,7 +399,7 @@ class qtype_coderunner extends question_type {
             $context = $this->question_context($question);
             $prototype = $this->get_prototype($qtype, $context);
             $this->set_inherited_fields($options, $prototype);
-            if ($prototype !== null) {
+            if ($prototype !== null && trim($prototype->templateparams) !== '') {
                 $options->mergedtemplateparams = qtype_coderunner_util::merge_json(
                     $prototype->templateparams, $options->templateparams);
             } else { // Missing prototype!
@@ -416,8 +408,10 @@ class qtype_coderunner extends question_type {
         }
 
         // Add in any testcases.
-        if (!$options->testcases = $DB->get_records('question_coderunner_tests',
+        if ($testcases = $DB->get_records('question_coderunner_tests',
                 array('questionid' => $question->id), 'id ASC')) {
+            $options->testcases = array_values($testcases); // Reindex tests from zero
+        } else {
             $options->testcases = array();
         }
 
@@ -521,7 +515,7 @@ class qtype_coderunner extends question_type {
 
         $validprotos = $DB->get_records_sql($sql, $params);
         if (count($validprotos) !== 1) {
-            return null;  // Exactly one prototype should be found
+            return null;  // Exactly one prototype should be found.
         } else {
             $prototype = reset($validprotos);
             self::update_question_text_maybe($prototype);
@@ -575,7 +569,7 @@ class qtype_coderunner extends question_type {
     // in-line help in the question authoring form) with the appropriate
     // language string.
     protected static function update_question_text_maybe($prototype) {
-        if ($prototype->prototypetype == 1) { // Built-in prototype
+        if ($prototype->prototypetype == 1) { // Built-in prototype.
             $stringname = 'qtype_' . $prototype->coderunnertype;
             $prototype->questiontext = get_string($stringname, 'qtype_coderunner');
         }
@@ -599,22 +593,25 @@ class qtype_coderunner extends question_type {
     }
 
 
-    // Override required here so we can check if this is a prototype
-    // with children (in which case deletion is disallowed). If not,
-    // deletion is allowed but must delete the testcases too.
+    // Override default question deletion code to delete all the question's
+    // testcases.
+    // Includes a check if the question being deleted is a prototype. Currently
+    // I don't have a good way to check if the prototype being deleted has
+    // "children" in the current context. It's over to question authors to make
+    // sure they don't delete in-use prototypes.
+    // All I do when a prototype is deleted is invalidate cached child questions
+    // so that at least their subsequent behaviour is consistent with the
+    // missing prototype. This can occasionally be helpful, e.g. if a duplicate
+    // prototype has somehow been created, and is then deleted again, the
+    // child question will now function correctly.
     public function delete_question($questionid, $contextid) {
         global $DB;
 
-        // TODO: find a solution to the problem of deleting in-use
-        // prototypes. The code below isn't isn't correct (it doesn't
-        // check the context of the question) so the entire block has
-        // been commented out. Currently it's over to
-        // to user to make sure they don't delete in-use prototypes.
-        /*$question = $DB->get_record(
+        $question = $DB->get_record(
                 'question_coderunner_options',
                 array('questionid' => $questionid));
 
-
+        /*
         if ($question->prototypetype != 0) {
             $typeName = $question->coderunnertype;
             $nUses = $DB->count_records('question_coderunner_options',
@@ -633,9 +630,27 @@ class qtype_coderunner extends question_type {
 
         */
 
+        $this->notify_prototype_children_if_any($question);
         $success = $DB->delete_records("question_coderunner_tests",
                 array('questionid' => $questionid));
         return $success && parent::delete_question($questionid, $contextid);
+    }
+
+
+    // Function to notify any children of a given question (if it is a
+    // prototype) that the parent has been edited (or perhaps deleted).
+    private function notify_prototype_children_if_any($question) {
+        global $DB;
+        if ($question->prototypetype != 0) {
+            $typename = $question->coderunnertype;
+            $children = $DB->get_records('question_coderunner_options',
+                    array('prototypetype' => 0,
+                          'coderunnertype' => $typename)
+            );
+            foreach ($children as $child) {
+                question_bank::notify_question_edited($child->questionid);
+            }
+        }
     }
 
     /******************** EDIT FORM OPTIONS ************************/
@@ -716,8 +731,9 @@ class qtype_coderunner extends question_type {
             'precheck' => 0,
             'answerboxlines' => 15,
             'answerboxcolumns' => 90,
-            'validateonsave' => 0,
+            'validateonsave' => 1,
             'answerpreload' => '',
+            'globalextra' => '',
             'useace' => 1,
             'iscombinatortemplate' => null,  // Probably unnecessary?
             'template' => null,  // Probably unnecessary?
@@ -790,14 +806,14 @@ class qtype_coderunner extends question_type {
             }
         }
 
-        // Import any support files
+        // Import any support files.
         $datafiles = $format->getpath($data,
                 array('#', 'testcases', 0, '#', 'file'), array());
         if (is_array($datafiles)) { // Seems like a non-array does occur in some versions of PHP!
             $qo->datafiles = $format->import_files_as_draft($datafiles);
         }
 
-        // Import any sample answer attachments
+        // Import any sample answer attachments.
         if (isset($data['#']['answerfiles'])) {
             $samplefiles = $format->getpath($data, array('#', 'answerfiles', 0, '#', 'file'), array());
             if (is_array($samplefiles)) {
@@ -885,7 +901,6 @@ class qtype_coderunner extends question_type {
             $expout .= $format->write_files($sampleanswerfiles);
             $expout .= "    </answerfiles>\n";
         }
-
 
         return $expout;
     }

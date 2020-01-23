@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die;
 
 $plugin->component = 'theme_saylor';
-$plugin->version   = 2019050100;
+$plugin->version   = 2019101700;
 $plugin->maturity = MATURITY_STABLE;
 $plugin->requires  = 2018120301.00; // Moodle 3.6.1 (Build: 20181205).
 $plugin->dependencies = ['theme_boost' => '2018051300'];

@@ -72,7 +72,7 @@ class qtype_gapfill_edit_form extends question_edit_form {
 
         $mform->removeelement('questiontext');
         /*for storing the json containing the settings data */
-        $mform->addElement('text', 'itemsettings', '', array('size' => '80'));
+        $mform->addElement('hidden', 'itemsettings', '', array('size' => '80'));
         $mform->setType('itemsettings', PARAM_RAW);
 
         /* popup for entering feedback for individual words */

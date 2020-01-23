@@ -513,17 +513,19 @@ class format_grid_renderer extends format_section_renderer_base {
             $sectionredirect = $this->courseformat->get_view_url(null)->out(true);
         }
 
-        // Initialise the shade box functionality:...
-        $PAGE->requires->js_init_call('M.format_grid.init', array(
-            $PAGE->user_is_editing(),
-            $sectionredirect,
-            $shownsections,
-            $this->initialsection,
-            json_encode($this->shadeboxshownarray)));
-        if (!$PAGE->user_is_editing()) {
-            // Initialise the key control functionality...
-            $PAGE->requires->yui_module('moodle-format_grid-gridkeys', 'M.format_grid.gridkeys.init',
-                array(array('rtl' => $rtl)), null, true);
+        if ($shownsections) {
+            // Initialise the shade box functionality:...
+            $PAGE->requires->js_init_call('M.format_grid.init', array(
+                $PAGE->user_is_editing(),
+                $sectionredirect,
+                count($this->shadeboxshownarray),
+                $this->initialsection,
+                json_encode($this->shadeboxshownarray)));
+            if (!$PAGE->user_is_editing()) {
+                // Initialise the key control functionality...
+                $PAGE->requires->yui_module('moodle-format_grid-gridkeys', 'M.format_grid.gridkeys.init',
+                    array(array('rtl' => $rtl)), null, true);
+            }
         }
     }
 

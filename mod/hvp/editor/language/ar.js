@@ -7,6 +7,7 @@ H5PEditor.language.core = {
   notImageOrDimensionsField: '":path" ليست صورة أو أبعاد حقل',
   requiredProperty: 'ال :property مطلوب ويجب أن يكون له قيمة.',
   onlyNumbers: ' :property القيمة يمكن أن تحوي على أرقام فقط.',
+  illegalDecimalNumber: ':property can only contain numbers with max :decimals decimals.',
   exceedsMax: ' :property القيمة تتجاوز الحد الأعظمي لـ :max.',
   listExceedsMax: 'تتجاوز القائمة الحد الأقصى لـ :max items.',
   belowMin: ' :property القيمة تحت الحد الأدنى من  :min.',
@@ -207,5 +208,9 @@ H5PEditor.language.core = {
   changeLanguage: 'Change language to :language?',
   thisWillPotentially: "This will potentially reset all the text and translations. You can't undo this. The content itself will not be changed. Do you want to proceed?",
   notAllTextsChanged: 'Not all texts were changed, there is only partial coverage for :language.',
-  contributeTranslations: 'If you want to complete the translation for :language you can learn about <a href=":url" target="_new">contributing translations to H5P</a>'
+  contributeTranslations: 'If you want to complete the translation for :language you can learn about <a href=":url" target="_new">contributing translations to H5P</a>',
+  unknownLibrary: 'Unfortunately, the selected content type \'%lib\' isn\'t installed on this system.',
+  proceedButtonLabel: 'Proceed to save',
+  enterFullscreenButtonLabel: 'Enter fullscreen',
+  exitFullscreenButtonLabel: 'Exit fullscreen'
 };

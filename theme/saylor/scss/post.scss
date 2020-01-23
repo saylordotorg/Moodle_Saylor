@@ -356,3 +356,10 @@
 .editor_atto_content {
     min-height: 160px !important;
 }
+
+/** Standoutbox */
+// For a gray standoutbox, use the bootstrap class bg-light.
+// Blue standoutbox
+.standoutbox.blue {
+	background-color: $expand-light-blue-50;
+}

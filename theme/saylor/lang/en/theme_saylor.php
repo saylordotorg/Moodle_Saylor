@@ -31,6 +31,7 @@ $string['advancedsettings'] = 'Advanced settings';
 $string['bannerdescription'] = 'Build new skills or work toward a degree at your own pace with free Saylor Academy college courses.';
 $string['choosereadme'] = 'Theme Saylor is a child theme of Boost.';                
 $string['configtitle'] = 'Saylor theme settings';
+$string['completed'] = 'Completed';
 $string['generalsettings'] = 'General settings';
 $string['loginorsignupmessage'] = '<a href="{$a}"> Log in or Sign up</a> to track your course progress, gain access to final exams, and get a free certificate of completion!';
 $string['presetfiles'] = 'Additional theme preset files';

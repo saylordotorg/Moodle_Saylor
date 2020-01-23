@@ -368,7 +368,23 @@ function checklist_update_grades($checklist, $userid = 0) {
                         $content = get_string('emailoncompletebody', 'checklist', $details);
                         $content .= new moodle_url('/mod/checklist/view.php', array('id' => $cm->id));
 
-                        if ($recipients = get_users_by_capability($context, 'mod/checklist:emailoncomplete', 'u.*')) {
+                        $groups = groups_get_all_groups($course->id, $grade->userid, $cm->groupingid);
+
+                        $groupmode = groups_get_activity_groupmode($cm, $course);
+
+                        if (is_array($groups) && count($groups) > 0 && $groupmode != NOGROUPS) {
+                            $groups = array_keys($groups);
+                        } else if ($groupmode != NOGROUPS) {
+                            // If the user is not in a group, and the checklist is set to group mode,
+                            // then set $groups to a non-existant id so that only users with
+                            // 'moodle/site:accessallgroups' get notified.
+                            $groups = -1;
+                        } else {
+                            $groups = '';
+                        }
+
+                        if ($recipients = get_users_by_capability($context, 'mod/checklist:emailoncomplete',
+                                                                  'u.*', '', '', '', $groups)) {
                             foreach ($recipients as $recipient) {
                                 email_to_user($recipient, $grade, $subj, $content, '', '', '', false);
                             }

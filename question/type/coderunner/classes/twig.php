@@ -20,35 +20,40 @@
 
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
-require_once($CFG->dirroot . '/question/type/coderunner/Twig/Autoloader.php');
-require_once($CFG->dirroot . '/question/type/coderunner/Twig/ExtensionInterface.php');
-require_once($CFG->dirroot . '/question/type/coderunner/Twig/Extension.php');
+require_once $CFG->dirroot . '/question/type/coderunner/vendor/autoload.php';
+require_once $CFG->dirroot . '/question/type/coderunner/classes/twigmacros.php';
 
 
 // Class that provides a singleton instance of the twig environment.
 class qtype_coderunner_twig {
-    private static $twigenvironment = null;
+    private static $twigenvironments = array(true => null, false => null);
 
     // Set up a twig loader and the twig environment. Return the
-    // singleton twig loader. If $twigoptions is empty returns a standard
-    // twig environment that will be reused by other calls (a singleton).
-    // Otherwise set up and returns a custom version.
-    public static function get_twig_environment($twigoptions=array()) {
-        if (self::$twigenvironment && empty($twigoptions)) {
-            $twig = self::$twigenvironment;
-        } else {
-            Twig_Autoloader::register();
-            $twigloader = new Twig_Loader_String();
-            if (!isset($twigoptions['optimizations'])) {
-                $twigoptions['optimizations'] = 0;
-            }
-            if (!isset($twigoptions['autoescape'])) {
-                $twigoptions['autoescape'] = false;
-            }
-            $twig = new Twig_Environment($twigloader, $twigoptions);
-            if (isset($twigoptions['debug']) && $twigoptions['debug']) {
+    // singleton twig loader. There are two different environments:
+    // one with strict_variables true and one with it false.
+    private static function get_twig_environment($isstrict=false, $isdebug=false) {
+        if (self::$twigenvironments[$isstrict] === null) {
+            // On the first call, build the required environment.
+            $macros = qtype_coderunner_twigmacros::macros();
+            $twigloader = new \Twig\Loader\ArrayLoader($macros);
+            $twigoptions = array(
+                'cache' => false,
+                'optimisations' => 0,
+                'autoescape' => false,
+                'strict_variables' => $isstrict,
+                'debug' => $isdebug);
+            $twig = new \Twig\Environment($twigloader, $twigoptions);
+            if ($isdebug) {
                 $twig->addExtension(new Twig_Extension_Debug());
             }
+            $newrandom = new \Twig\TwigFunction('random', 'qtype_coderunner_random',
+                array('needs_environment' => true));
+            $setrandomseed = new \Twig\TwigFunction('set_random_seed', 'qtype_coderunner_set_random_seed',
+                array('needs_environment' => true));
+            $twig->addFunction($newrandom);
+            $twig->addFunction($setrandomseed);
+
+            self::$twigenvironments[$isstrict] = $twig;
 
             $twigcore = $twig->getExtension('core');
             $twigcore->setEscaper('py', 'qtype_coderunner_escapers::python');
@@ -57,36 +62,23 @@ class qtype_coderunner_twig {
             $twigcore->setEscaper('java', 'qtype_coderunner_escapers::java');
             $twigcore->setEscaper('ml', 'qtype_coderunner_escapers::matlab');
             $twigcore->setEscaper('matlab', 'qtype_coderunner_escapers::matlab');
-
-            $twig->addExtension(new qtype_coderunner_RandomExtension);
-
-            if (empty($twigoptions)) {
-                self::$twigenvironment = $twig;
-            }
         }
-        return $twig;
+        return self::$twigenvironments[$isstrict];
+    }
+
+
+    // Render the given Twigged string with the given set of parameters, to
+    // which is added the STUDENT parameter.
+    // Return the Twig-expanded string.
+    // Any Twig exceptions raised must be caught higher up.
+    public static function render($s, $student, $parameters=array(), $isstrict=false) {
+        $twig = qtype_coderunner_twig::get_twig_environment($isstrict);
+        $parameters['STUDENT'] = new qtype_coderunner_student($student);
+        $template = $twig->createTemplate($s);
+        $renderedstring = $template->render($parameters);
+        return $renderedstring;
     }
 }
-
-/** Define a Twig extension that overrides the built-in random function
- *  with one that uses mt_rand everywhere. The built-in version mostly
- *  uses mt_rand but switches to PHP's array_rand function when selecting
- *  from an array. array_rand does not allow setting of a seed, which is
- *  required by CodeRunner.
- */
-
-class qtype_coderunner_RandomExtension extends Twig_Extension
-{
-    public function getFunctions() {
-        return array(
-            new Twig_SimpleFunction('random', 'qtype_coderunner_random',
-                array('needs_environment' => true)),
-            new Twig_SimpleFunction('set_random_seed', 'qtype_coderunner_set_random_seed',
-                array('needs_environment' => true))
-            );
-    }
-};
-
 
 /**
  * HACKED VERSION OF THE BUILT-IN RANDOM (see above).

@@ -64,6 +64,7 @@ define(['jquery', 'qtype_coderunner/userinterfacewrapper'], function($, ui) {
     function initEditForm(strings) {
         var typeCombo = $('#id_coderunnertype'),
             template = $('#id_template'),
+            globalextra = $('#id_globalextra'),
             useace = $('#id_useace'),
             language = $('#id_language'),
             acelang = $('#id_acelang'),
@@ -98,6 +99,10 @@ define(['jquery', 'qtype_coderunner/userinterfacewrapper'], function($, ui) {
                 params = {},
                 uiWrapper;
 
+            // Set data attributes in the text area for UI components that need
+            // global extra or testcase data (e.g. gapfiller UI).
+            ta.attr('data-globalextra', globalextra.val());
+            ta.attr('data-test0', $('#id_testcode_0').val());
             try {
                 params = JSON.parse(paramsJson);
             } catch(err) {}
@@ -134,10 +139,12 @@ define(['jquery', 'qtype_coderunner/userinterfacewrapper'], function($, ui) {
         }
 
         // Set the correct Ui controller on both the sample answer and the answer preload.
+        // As a special case, we don't turn on the Ui controller in the answer
+        // and answer preload fields when using Html-Ui
         function setUis() {
             var uiname = uiplugin.val();
 
-            if (uiname) {
+            if (uiname && uiname !== 'html') {
                 setUi('id_answer', uiname);
                 setUi('id_answerpreload', uiname);
             }
@@ -294,7 +301,7 @@ define(['jquery', 'qtype_coderunner/userinterfacewrapper'], function($, ui) {
         }
 
         // If the missingPrototype hidden element is not empty, insert the
-        // given message as an error at the top of the question
+        // given message as an error at the top of the question.
         function checkForMissingPrototype() {
             var missingPrototypeMessage = missingPrototype.prop('value'),
                 messagePara = null;

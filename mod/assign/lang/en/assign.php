@@ -291,7 +291,9 @@ $string['groupoverrides'] = 'Group overrides';
 $string['groupoverridesdeleted'] = 'Group overrides deleted';
 $string['groupsnone'] = 'No groups you can access.';
 $string['hidegrader'] = 'Hide grader identity from students';
-$string['hidegrader_help'] = 'Hides the identity of any user who grades an assignment submission, so students can\'t see who marked their work.';
+$string['hidegrader_help'] = 'If enabled, the identity of any user who grades an assignment submission is not shown, so students can\'t see who marked their work.
+
+Note that this setting has no effect on the comments box on the grading page.';
 $string['hideshow'] = 'Hide/Show';
 $string['hiddenuser'] = 'Participant ';
 $string['inactiveoverridehelp'] = '* Student does not have the correct group or role to attempt the assignment';
@@ -595,6 +597,7 @@ $string['userextensiondate'] = 'Extension granted until: {$a}';
 $string['useridlistnotcached'] = 'The grade changes were NOT saved, as it was not possible to determine which submission they were for.';
 $string['useroverrides'] = 'User overrides';
 $string['useroverridesdeleted'] = 'User overrides deleted';
+$string['usersubmissioncannotberemoved'] = 'The submission of {$a} cannot be removed.';
 $string['usersnone'] = 'No students have access to this assignment.';
 $string['userswhoneedtosubmit'] = 'Users who need to submit: {$a}';
 $string['usergrade'] = 'User grade';

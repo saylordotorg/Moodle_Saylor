@@ -37,6 +37,8 @@ defined('MOODLE_INTERNAL') || die;
  * @param global_navigation $navigation The navigation node to extend
  */
 function report_myfeedback_extend_navigation(global_navigation $navigation) {
+    // TODO: Segun Babalola. Where does $course come from?
+    // TODO: Check that pix_icon is not deprecated.
     $url = new moodle_url('/report/myfeedback/index.php', array('course' => $course->id));
     $navigation->add(get_string('pluginname', 'report_myfeedback'), $url, null, null, null, new pix_icon('i/report', ''));
 }
@@ -352,7 +354,7 @@ class report_myfeedback {
                 }
                 if ($pfeed) {
                     $feedback .= strip_tags($feedback) ? '<br/>' : '';
-                    $feedback .= '<b>' . get_string('peerfeedback', 'report_myfeedback') . '</b>';
+                    $feedback .= '<strong>' . get_string('peerfeedback', 'report_myfeedback') . '</strong>';
                 }
                 foreach ($asse as $as) {
                     if ($as->feedbackauthor && $as->reviewerid != $userid) {
@@ -366,7 +368,7 @@ class report_myfeedback {
                 }
                 if ($self) {
                     $feedback .= strip_tags($feedback) ? '<br/>' : '';
-                    $feedback .= '<b>' . get_string('selfassessment', 'report_myfeedback') . '</b>';
+                    $feedback .= '<strong>' . get_string('selfassessment', 'report_myfeedback') . '</strong>';
                 }
                 foreach ($asse as $as1) {
                     if ($as1->feedbackauthor && $as1->reviewerid == $userid) {
@@ -394,11 +396,11 @@ class report_myfeedback {
             }
             if ($c) {
                 $feedback .= strip_tags($feedback) ? '<br/>' : '';
-                $feedback .= "<br/><b>" . get_string('comments', 'report_myfeedback') . "</b>";
+                $feedback .= "<br/><strong>" . get_string('comments', 'report_myfeedback') . "</strong>";
             }
             foreach ($commentscheck as $ts) {
                 $feedback .= strip_tags($ts->description) ? "<br/><b>" . $ts->description : '';
-                $feedback .= strip_tags($ts->description) ? "<br/><b>" . get_string('comment', 'report_myfeedback') . "</b>: " . strip_tags($ts->peercomment) . "<br/>" : '';
+                $feedback .= strip_tags($ts->description) ? "<br/><strong>" . get_string('comment', 'report_myfeedback') . "</strong>: " . strip_tags($ts->peercomment) . "<br/>" : '';
             }
         }
 
@@ -2019,12 +2021,12 @@ class report_myfeedback {
             $item = $a['icon'];
             if ($item && $item != 'manual') {
                 $assessmenticon = '<img src="' .
-                        $OUTPUT->pix_url('icon', $item) . '" ' .
+                        $OUTPUT->image_url('icon', $item) . '" ' .
                         'class="icon" alt="' . $item . '" title="' . $item . '" rel="tooltip">';
             }
             if ($item && $item == 'manual') {
                 $assessmenticon = '<img src="' .
-                        $OUTPUT->pix_url('i/manual_item') . '" ' .
+                        $OUTPUT->image_url('i/manual_item') . '" ' .
                         'class="icon" alt="' . $item . '" title="' . $item . '" rel="tooltip">';
             }
 
@@ -2295,7 +2297,13 @@ class report_myfeedback {
 		//add all the roleid code into the where query
 		$params[] = $roleids[0];
 		$i = 1; //start at 1, because the first role is already in the query
-		while($roleids[$i] != null){
+
+        // Segun Babalola, 2019-07-18.
+        // The following line of code is causing warnings in the UI because $i exceeds array size.
+        // This is unrelated to the issue I'm trying to fix (i.e. https://tracker.moodle.org/browse/CONTRIB-6841),
+        // however I will guard execution with an existence check for now. Hopefully the root cause of
+        // the issue will be addressed in future.
+		while(isset($roleids[$i]) && $roleids[$i] != null){
 			$sql .= '  OR roleid = ?';
 			$params[] = $roleids[$i];
 			$i++;
@@ -3738,7 +3746,10 @@ class report_myfeedback {
                 $user = $remotedb->get_record('user', array('id' => $u->id, 'deleted' => 0));
                 $year = null;
                 profile_load_data($user);
-                if (!$year = $user->profile_field_courseyear) {
+                // Segun Babalola, July 11, 2019
+                // Adding check for field existence to avoid errors being thrown in UI.
+                // The body of the if statement is empty, so not sure whst the purpose is, but leaving in place.
+                if (isset($user->profile_field_courseyear) && !$year = $user->profile_field_courseyear) {
                     
                 }
                 $myusers[$u->id][0] = "<div><div style=\"float:left;margin-right:5px;\">" .
@@ -4446,14 +4457,18 @@ class report_myfeedback {
      */
     public function get_prog_admin_dept_prog($dept_prog, $frommod = null) {
         global $CFG;
-        require_once($CFG->libdir . '/coursecatlib.php');
+        // Segun Babalola, July 10, 2019.
+        // Commenting out require statement for coursecatlib.php, to avoid deprecation messages.
+        // require_once($CFG->libdir . '/coursecatlib.php');
         $cat = array();
         $prog = array();
         $tomod = array('dept' => '', 'prog' => '');
         foreach ($dept_prog as $dp) {
             $catid = ($dp->category ? $dp->category : 0);
             if ($catid) {
-                $cat = coursecat::get($catid, $strictness = MUST_EXIST, $alwaysreturnhidden = true); //Use strictness so even hidden category names are shown without error
+                // Segun Babalola, July 10, 2019.
+                // Replacing coursecat::get with core_course_category::get to avoid deprecation messages.
+                $cat = core_course_category::get($catid, $strictness = MUST_EXIST, $alwaysreturnhidden = true); //Use strictness so even hidden category names are shown without error
                 if ($cat) {
                     $path = explode("/", $cat->path);
                     $parent = ($cat->parent ? coursecat::get($cat->parent, $strictness = MUST_EXIST, $alwaysreturnhidden = true) : $cat);
@@ -4952,6 +4967,7 @@ class report_myfeedback {
      */
     public function get_content($tab = NULL, $ptutor = NULL, $padmin = NULL, $arch = NULL) {
         global $CFG, $OUTPUT, $USER;
+
         $userid = optional_param('userid', 0, PARAM_INT); // User id.
         if (empty($userid)) {
             $userid = $USER->id;
@@ -5251,7 +5267,7 @@ class report_myfeedback {
                                     if ($onlinepdffeedback) {
                                         $feedbackfile = get_string('hasfeedbackfile', 'report_myfeedback');
                                         $feedbackfileicon = ' <img src="' .
-                                                $OUTPUT->pix_url('i/report') . '" ' .
+                                                $OUTPUT->image_url('i/report') . '" ' .
                                                 'class="icon" alt="' . $feedbackfile . '" title="' . $feedbackfile . '" rel="tooltip">';
                                     }
                                 }
@@ -5367,7 +5383,7 @@ class report_myfeedback {
                                 if ($workshopfeedbackfile) {
                                     $feedbackfile = get_string('hasfeedbackfile', 'report_myfeedback');
                                     $feedbackfileicon = ' <img src="' .
-                                            $OUTPUT->pix_url('i/report') . '" ' .
+                                            $OUTPUT->image_url('i/report') . '" ' .
                                             'class="icon" alt="' . $feedbackfile . '" title="' . $feedbackfile . '" rel="tooltip">';
                                 }
 
@@ -5524,7 +5540,7 @@ class report_myfeedback {
                         if ($itemtype === "manual") {
                             $assessmenttype = get_string('manual_gradeitem', 'report_myfeedback');
                             $assessmenticon = '<img src="' .
-                                    $OUTPUT->pix_url('i/manual_item') . '" ' .
+                                    $OUTPUT->image_url('i/manual_item') . '" ' .
                                     'class="icon" alt="' . $itemtype . '" title="' . $itemtype . '" rel="tooltip">';
                             // Bring the student to their user report in the gradebook.
                             $assignmentname = "<a href=\"" . $CFG->wwwroot . "/grade/report/user/index.php?id=" . $record->courseid .
@@ -5560,7 +5576,7 @@ class report_myfeedback {
                     //Add the assessment icon.
                     if ($assessmenticon == "") {
                         $assessmenticon = '<img src="' .
-                                $OUTPUT->pix_url('icon', $record->assessmenttype) . '" ' .
+                                $OUTPUT->image_url('icon', $record->assessmenttype) . '" ' .
                                 'class="icon" alt="' . $assessmenttype . '" title="' . $assessmenttype . '"  rel="tooltip" />';
                     }
                     //Set the sortable date before converting to d-M-y format 
@@ -5594,10 +5610,10 @@ class report_myfeedback {
                                     $a->late = format_time($submittedtime - $record->duedate);
                                     $submissionmsg .= get_string('waslate', 'report_myfeedback', $a);
                                     if ($record->assessmenttype == "assign") {
-                                        $alerticon = ($record->status == 'submitted' ? '<img class="smallicon" src="' . $OUTPUT->pix_url('i/warning', 'core') . '" ' . 'class="icon" alt="-" title="' .
+                                        $alerticon = ($record->status == 'submitted' ? '<img class="smallicon" src="' . $OUTPUT->image_url('i/warning', 'core') . '" ' . 'class="icon" alt="-" title="' .
                                                         $submissionmsg . '" rel="tooltip"/>' : '');
                                     } else {
-                                        $alerticon = '<img class="smallicon" src="' . $OUTPUT->pix_url('i/warning', 'core') . '" ' . 'class="icon" alt="-" title="' .
+                                        $alerticon = '<img class="smallicon" src="' . $OUTPUT->image_url('i/warning', 'core') . '" ' . 'class="icon" alt="-" title="' .
                                                 $submissionmsg . '" rel="tooltip"/>';
                                     }
                                 }
@@ -5915,7 +5931,7 @@ class report_myfeedback {
                             $exceltable[$x]['Viewed'] = $viewexport;
                             ++$x;
 
-                            $fileicon = ' <img src="' . $OUTPUT->pix_url('i/edit', 'core') . '" ' . 'class="icon" alt="edit">';
+                            $fileicon = ' <img src="' . $OUTPUT->image_url('i/edit', 'core') . '" ' . 'class="icon" alt="edit">';
                             //The reflective notes and turnitin feedback
                             $tdid = $record->gradeitemid;
                             if (!$instn = $record->subpart) {

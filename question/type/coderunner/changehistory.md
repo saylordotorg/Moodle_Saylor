@@ -1,5 +1,56 @@
 # CHANGE HISTORY
 
+### 19 November 2019. 3.7.4+
+
+ * Change default for validateonsave from false to true.
+ * Re-order Support files and Attachment options sections in question editing form.
+ * Bug fix: Questions using gapfiller_ui did not allow editing of sample
+   answer when the html code source was the first test case rather
+   than globalextra.
+ * Bug fix: bulk tester was not correctly testing multilanguage questions
+   in which the sample answer was not the default i.e. was not recognising
+   the answer_language template parameter.
+
+### 7 November 2019. 3.7.3
+
+ * Regression fix: questions using the Twig STUDENT variable were not able
+   to be correctly reviewed by a teacher after submission by student.
+
+### 1 November 2019. 3.7.2
+
+ * Regression: upgraded Twig barfs on questions with null (as opposed to
+   empty string) template parameters.
+
+### 30 September 2019. 3.7.1
+
+ * Add a new experimental Ajax service that allows a question to display the
+   question specification from a pdf file within a .zip support file, such as
+   a standard ICPC exported programming contest question. Alpha version,
+   still undocumented.
+ * Update Twig to the latest version of the 1.n branch.
+ * Allow specification of https protocol for communication to Jobe, say if
+   it's behind a reverse proxy to terminate the SSL connection (thanks Eric
+   Villard).
+ * Fix missing MoodleQuickForm::hideIf method for Moodle versions < 3.4 (thanks
+   Eric Villard)
+ * Add new experimental user interface (ui_gapfiller) to support "fill in the
+   gaps" questions.
+ * Fix broken nodejs prototype.
+ * Various tweaks to documentation.
+ * Lots of minor edits to reduce style-checker warnings
+
+### 14 August 2019. 3.7.0
+
+ * Addition of a globalextra field to all questions for use by question authors
+   as a parameter global to all tests.
+ * Various enhancements and refactoring of TableUI including addition of a
+   table-row-labels template parameter.
+ * Modify the still experimental and undocumented HtmlUI to get the raw HTML
+   from the new globalextra field rather than via a template parameter.
+ * Bug fix: UI plugins that depend on template parameters, notable TableUI,
+   broke if Twig code was used within the template parameters, e.g. for
+   randomisation.
+
 ### 28 July 2019. 3.6.1+
 
  * Add table_locked_cells template parameter to Table UI
