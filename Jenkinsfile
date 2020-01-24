@@ -82,7 +82,7 @@ def plugins = [
     ],
     [
         "name" : 'mod_accredible',
-        "url" : 'https://github.com/accredible/moodle-mod_accredible.git',
+        "url" : 'https://github.com/saylordotorg/moodle-mod_accredible.git',
         "branch" : 'master',
         "dest" : 'mod/accredible'
     ],
@@ -259,6 +259,12 @@ def plugins = [
         "url" : 'https://github.com/saylordotorg/moodle-mod_hvp.git',
         "branch" : 'master',
         "dest" : 'mod/hvp'
+    ],
+    [
+        "name" : 'block_accredibledashboard',
+        "url" : 'https://github.com/saylordotorg/moodle-block_accredibledashboard',
+        "branch" : 'master',
+        "dest" : 'blocks/accredibledashboard'
     ],
     [
         "name" : 'block_quickmail',
