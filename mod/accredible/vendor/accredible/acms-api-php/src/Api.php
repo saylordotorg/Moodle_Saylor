@@ -280,12 +280,13 @@ class Api {
 	 * Get all Groups
 	 * @param String $page_size
 	 * @param String $page
+	 * @param String $name
 	 * @return stdObject
 	 */
-	public function get_groups($page_size = nil, $page = 1){
+	public function get_groups($page_size = null, $page = 1, $name = null){
 		$client = new \GuzzleHttp\Client();
 
-		$response = $client->get($this->api_endpoint.'issuer/all_groups?page_size=' . $page_size . '&page=' . $page, array('headers' =>  array('Authorization' => 'Token token="'.$this->getAPIKey().'"')));
+		$response = $client->get($this->api_endpoint.'issuer/all_groups?page_size=' . $page_size . '&page=' . $page . '&name=' . $name, array('headers' =>  array('Authorization' => 'Token token="'.$this->getAPIKey().'"')));
 
 		$result = json_decode($response->getBody());
 		return $result;
