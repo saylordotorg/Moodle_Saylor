@@ -45,12 +45,6 @@ def plugins = [
         "dest" : 'mod/hotpot'
     ],
     [
-        "name" : 'block_progress',
-        "url" : 'https://github.com/deraadt/moodle-block_progress.git',
-        "branch" : 'master',
-        "dest" : 'blocks/progress'
-    ],
-    [
         "name" : 'mod_checklist',
         "url" : 'https://github.com/davosmith/moodle-checklist.git',
         "branch" : 'master',
@@ -261,6 +255,12 @@ def plugins = [
         "dest" : 'mod/hvp'
     ],
     [
+        "name" : 'report_completionoverview',
+        "url" : 'https://github.com/Twoscope/moodle-report_completionoverview',
+        "branch" : 'master',
+        "dest" : 'report/completionoverview'
+    ],
+    [
         "name" : 'block_accredibledashboard',
         "url" : 'https://github.com/saylordotorg/moodle-block_accredibledashboard',
         "branch" : 'master',
@@ -355,7 +355,7 @@ def NotifyOnFail(err) {
     def message = "Build failed: ${env.JOB_NAME} ${env.BUILD_NUMBER} on ${env.BRANCH_NAME} -> ${err}"
 
     // List of people to @ in Slack since this is important.
-    def slack_recipients = '@ja @sharmi'
+    def slack_recipients = '@ja'
 
     //Slack
     slackSend color: 'danger', message: "${slack_recipients} ${message}"
