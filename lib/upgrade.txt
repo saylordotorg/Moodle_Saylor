@@ -1,10 +1,97 @@
 This files describes API changes in core libraries and APIs,
 information provided here is intended especially for developers.
 
-=== 3.7.4 ===
-format_float() now accepts a special value (-1) as the $decimalpoints parameter which means auto-detecting number of decimal points.
+=== 3.8.2 ===
+* grade_item::update_final_grade() can now take an optional parameter to set the grade->timemodified. If not present the current time will carry on being used.
+
+=== 3.8.1 ===
+* behat_data_generators::the_following_exist() has been removed, please use
+  behat_data_generators::the_following_entities_exist() instead. See MDL-67691 for more info.
+* format_float() now accepts a special value (-1) as the $decimalpoints parameter which means auto-detecting number of decimal points.
+
+=== 3.8 ===
+* The rotate_image function has been added to the stored_file class (MDL-63349)
+* The yui checknet module is removed. Call \core\session\manager::keepalive instead.
+* The generate_uuid() function has been deprecated. Please use \core\uuid::generate() instead.
+* Remove lib/pear/auth/RADIUS.php (MDL-65746)
+* Core components are now defined in /lib/components.json instead of coded into /lib/classes/component.php
+* Subplugins should now be defined using /db/subplugins.json instead of /db/subplugins.php
+* The following functions have been finally deprecated and can not be used anymore:
+    * allow_override()
+    * allow_assign()
+    * allow_switch()
+    * https_required()
+    * verify_https_required()
+* Remove duplicate font-awesome SCSS, Please see /theme/boost/scss/fontawesome for usage (MDL-65936)
+* Remove lib/pear/Crypt/CHAP.php (MDL-65747)
+* New output component available: \core\output\checkbox_toggleall
+  - This allows developers to easily output groups of checkboxes that can be toggled by master controls in the form of a checkbox or
+    a button. Action elements which perform actions on the selected checkboxes can also be enabled/disabled depending on whether
+    at least a single checkbox item is selected or not.
+* Final deprecation (removal) of the core/modal_confirm dialogue.
+* Upgrade scssphp to v1.0.2, This involves renaming classes from Leafo => ScssPhp as the repo has changed.
+* Implement supports_xsendfile() method and allow support for xsendfile in alternative_file_system_class
+  independently of local files (MDL-66304).
+* The methods get_local_path_from_storedfile and get_remote_path_from_storedfile in lib/filestore/file_system.php
+  are now public. If you are overriding these then you will need to change your methods to public in your class.
+* It is now possible to use sub-directories for AMD modules.
+  The standard rules for Level 2 namespaces also apply to AMD modules.
+  The sub-directory used must be either an valid component, or placed inside a 'local' directory to ensure that it does not conflict with other components.
+
+    The following are all valid module names and locations in your plugin:
+      mod_forum/view: mod/forum/amd/src/view.js
+      mod_forum/local/views/post: mod/forum/amd/src/local/views/post
+      mod_forum/form/checkbox-toggle: mod/forum/amd/src/form/checkbox-toggle.js
+
+    The following are all invalid module names and locations in your plugin:
+      mod_forum/views/post: mod/forum/amd/src/views/post
+* The 'xxxx_check_password_policy' method now has an extra parameter: $user. It contains the user object to perform password
+validation against and defaults to null (so, no user needed) if not provided.
+* It is now possible to use sub-directories when creating mustache templates.
+  The standard rules for Level 2 namespaces also apply to templates.
+  The sub-directory used must be either an valid component, or placed inside a 'local' directory to ensure that it does not conflict with other components.
+
+    The following are all valid template names and locations in your plugin:
+      mod_forum/forum_post: mod/forum/templates/forum_post.mustache
+      mod_forum/local/post/user: mod/forum/templates/local/post/user.mustache
+      mod_forum/form/checkbox_toggle: mod/forum/templates/form/checkbox_toggle.mustache
+
+    The following are _invalid_ template names and locations:
+      mod_forum/post/user: mod/forum/templates/local/post/user.mustache
+* Following behat steps have been removed from core:
+    - I go to "<gradepath_string>" in the course gradebook
+* A new admin setting widget 'core_admin\local\settings\filesize' is added.
+* Core capabilities 'moodle/community:add' and 'moodle/community:download' have been removed from core as part of Moodle.net sunsetting.
+* As part of Moodle.net sunsetting process the following hub api functions have been deprecated:
+    - get_courses
+    - unregister_courses
+    - register_course
+    - add_screenshot
+    - download_course_backup
+    - upload_course_backup
+* A new setting 'Cache templates' was added (see MDL-66367). This setting determines if templates are cached or not.
+  This setting can be set via the UI or by defining $CFG->cachetemplates in your config.php file. It is a boolean
+  and should be set to either false or true. Developers will probably want to set this to false.
+* The core_enrol_edit_user_enrolment webservice has been deprecated. Please use core_enrol_submit_user_enrolment_form instead.
+* \single_button constructor has a new attributes param to add attributes to the button HTML tag.
+* Improved url matching behaviour for profiled urls and excluded urls
+* Attempting to use xsendfile via the 3rd param of readstring_accel() is now ignored.
+* New H5P libraries have been added to Moodle core in /lib/h5p.
+* New H5P core subsystem have been added.
+* Introduced new callback for plugin developers '<component>_get_path_from_pluginfile($filearea, $args)': This will return
+the itemid and filepath for the filearea and path defined in $args. It has been added in order to get the correct itemid and
+filepath because some components, such as mod_page or mod_resource, add the revision to the URL where the itemid should be placed
+(to prevent caching problems), but then they don't store it in database.
+* New utility function \core_form\util::form_download_complete should be called if your code sends
+  a file with Content-Disposition: Attachment in response to a Moodle form submit button (to ensure
+  that disabled submit buttons get re-enabled in that case). It is automatically called by the
+  filelib.php send_xx functions.
+* If you have a form which sends a file in response to a Moodle form submit button, but you cannot
+  call the above function because the file is sent by a third party library, then you should add
+  the attribute data-double-submit-protection="off" to your form.
 
 === 3.7 ===
+
 * Nodes in the navigation api can have labels for each group. See set/get_collectionlabel().
 * The method core_user::is_real_user() now returns false for userid = 0 parameter
 * 'mform1' dependencies (in themes, js...) will stop working because a randomly generated string has been added to the id

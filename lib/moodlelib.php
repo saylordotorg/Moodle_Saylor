@@ -487,15 +487,9 @@ define('HOMEPAGE_MY', 1);
 define('HOMEPAGE_USER', 2);
 
 /**
- * Hub directory url (should be moodle.org)
- */
-define('HUB_HUBDIRECTORYURL', "https://hubdirectory.moodle.org");
-
-/**
  * URL of the Moodle sites registration portal.
  */
 defined('HUB_MOODLEORGHUBURL') || define('HUB_MOODLEORGHUBURL', 'https://stats.moodle.org');
-define('HUB_OLDMOODLEORGHUBURL', "http://hub.moodle.org");
 
 /**
  * Moodle mobile app service name
@@ -1655,7 +1649,7 @@ function purge_all_caches() {
  *        'other'  Purge all other caches?
  */
 function purge_caches($options = []) {
-    $defaults = array_fill_keys(['muc', 'theme', 'lang', 'js', 'filter', 'other'], false);
+    $defaults = array_fill_keys(['muc', 'theme', 'lang', 'js', 'template', 'filter', 'other'], false);
     if (empty(array_filter($options))) {
         $options = array_fill_keys(array_keys($defaults), true); // Set all options to true.
     } else {
@@ -1672,6 +1666,9 @@ function purge_caches($options = []) {
     }
     if ($options['js']) {
         js_reset_all_caches();
+    }
+    if ($options['template']) {
+        template_reset_all_caches();
     }
     if ($options['filter']) {
         reset_text_filters_cache();
@@ -2382,6 +2379,29 @@ function usertime($date, $timezone=99) {
 }
 
 /**
+ * Get a formatted string representation of an interval between two unix timestamps.
+ *
+ * E.g.
+ * $intervalstring = get_time_interval_string(12345600, 12345660);
+ * Will produce the string:
+ * '0d 0h 1m'
+ *
+ * @param int $time1 unix timestamp
+ * @param int $time2 unix timestamp
+ * @param string $format string (can be lang string) containing format chars: https://www.php.net/manual/en/dateinterval.format.php.
+ * @return string the formatted string describing the time difference, e.g. '10d 11h 45m'.
+ */
+function get_time_interval_string(int $time1, int $time2, string $format = ''): string {
+    $dtdate = new DateTime();
+    $dtdate->setTimeStamp($time1);
+    $dtdate2 = new DateTime();
+    $dtdate2->setTimeStamp($time2);
+    $interval = $dtdate2->diff($dtdate);
+    $format = empty($format) ? get_string('dateintervaldayshoursmins', 'langconfig') : $format;
+    return $interval->format($format);
+}
+
+/**
  * Given a time, return the GMT timestamp of the most recent midnight
  * for the current user.
  *
@@ -3035,6 +3055,14 @@ function require_login($courseorid = null, $autologinguest = true, $cm = null, $
     }
 }
 
+/**
+ * A convenience function for where we must be logged in as admin
+ * @return void
+ */
+function require_admin() {
+    require_login(null, false);
+    require_capability('moodle/site:config', context_system::instance());
+}
 
 /**
  * This function just makes sure a user is logged out.
@@ -4220,6 +4248,9 @@ function delete_user(stdClass $user) {
     // This might be slow but it is really needed - modules might do some extra cleanup!
     role_unassign_all(array('userid' => $user->id));
 
+    // Notify the competency subsystem.
+    \core_competency\api::hook_user_deleted($user->id);
+
     // Now do a brute force cleanup.
 
     // Delete all user events and subscription events.
@@ -4292,6 +4323,9 @@ function delete_user(stdClass $user) {
 
     // Delete all content associated with the user context, but not the context itself.
     $usercontext->delete_content();
+
+    // Delete any search data.
+    \core_search\manager::context_deleted($usercontext);
 
     // Any plugin that needs to cleanup should register this event.
     // Trigger event.
@@ -4946,9 +4980,10 @@ function get_complete_user_data($field, $value, $mnethostid = null, $throwexcept
  *
  * @param string $password the password to be checked against the password policy
  * @param string $errmsg the error message to display when the password doesn't comply with the policy.
+ * @param stdClass $user the user object to perform password validation against. Defaults to null if not provided
  * @return bool true if the password is valid according to the policy. false otherwise.
  */
-function check_password_policy($password, &$errmsg) {
+function check_password_policy($password, &$errmsg, $user = null) {
     global $CFG;
 
     if (!empty($CFG->passwordpolicy)) {
@@ -4978,7 +5013,7 @@ function check_password_policy($password, &$errmsg) {
     $pluginsfunction = get_plugins_with_function('check_password_policy');
     foreach ($pluginsfunction as $plugintype => $plugins) {
         foreach ($plugins as $pluginfunction) {
-            $pluginerr = $pluginfunction($password);
+            $pluginerr = $pluginfunction($password, $user);
             if ($pluginerr) {
                 $errmsg .= '<div>'. $pluginerr .'</div>';
             }
@@ -5044,6 +5079,10 @@ function delete_course($courseorid, $showfeedback = true) {
         }
     }
 
+    // Tell the search manager we are about to delete a course. This prevents us sending updates
+    // for each individual context being deleted.
+    \core_search\manager::course_deleting_start($courseid);
+
     $handler = core_course\customfield\course_handler::create();
     $handler->delete_instance($courseid);
 
@@ -5060,6 +5099,9 @@ function delete_course($courseorid, $showfeedback = true) {
     if (class_exists('format_base', false)) {
         format_base::reset_course_cache($courseid);
     }
+
+    // Tell search that we have deleted the course so it can delete course data from the index.
+    \core_search\manager::course_deleting_finish($courseid);
 
     // Trigger a course deleted event.
     $event = \core\event\course_deleted::create(array(
@@ -5700,7 +5742,7 @@ function moodle_process_email($modargs, $body) {
     global $DB;
 
     // The first char should be an unencoded letter. We'll take this as an action.
-    switch ($modargs{0}) {
+    switch ($modargs[0]) {
         case 'B': { // Bounce.
             list(, $userid) = unpack('V', base64_decode(substr($modargs, 1, 8)));
             if ($user = $DB->get_record("user", array('id' => $userid), "id,email")) {
@@ -6133,24 +6175,16 @@ function email_to_user($user, $from, $subject, $messagetext, $messagehtml = '', 
     if (!empty($user->mailformat) && $user->mailformat == 1) {
         // Only process html templates if the user preferences allow html email.
 
-        if ($messagehtml) {
-            // If html has been given then pass it through the template.
-            $context['body'] = $messagehtml;
-            $messagehtml = $renderer->render_from_template('core/email_html', $context);
-
-        } else {
+        if (!$messagehtml) {
             // If no html has been given, BUT there is an html wrapping template then
             // auto convert the text to html and then wrap it.
-            $autohtml = trim(text_to_html($messagetext));
-            $context['body'] = $autohtml;
-            $temphtml = $renderer->render_from_template('core/email_html', $context);
-            if ($autohtml != $temphtml) {
-                $messagehtml = $temphtml;
-            }
+            $messagehtml = trim(text_to_html($messagetext));
         }
+        $context['body'] = $messagehtml;
+        $messagehtml = $renderer->render_from_template('core/email_html', $context);
     }
 
-    $context['body'] = $messagetext;
+    $context['body'] = html_to_text(nl2br($messagetext));
     $mail->Subject = $renderer->render_from_template('core/email_subject', $context);
     $mail->FromName = $renderer->render_from_template('core/email_fromname', $context);
     $messagetext = $renderer->render_from_template('core/email_text', $context);
@@ -6436,8 +6470,6 @@ function send_confirmation_email($user, $confirmationurl = null) {
 
     $message     = get_string('emailconfirmation', '', $data);
     $messagehtml = text_to_html(get_string('emailconfirmation', '', $data), false, false, true);
-
-    $user->mailformat = 1;  // Always send HTML version as well.
 
     // Directly email rather than using the messaging system to ensure its not routed to a popup or jabber.
     return email_to_user($user, $supportuser, $subject, $message, $messagehtml);
@@ -9066,11 +9098,11 @@ function mtrace($string, $eol="\n", $sleep=0) {
         $fn($string, $eol);
         return;
     } else if (defined('STDOUT') && !PHPUNIT_TEST && !defined('BEHAT_TEST')) {
-        fwrite(STDOUT, $string.$eol);
-
         // We must explicitly call the add_line function here.
         // Uses of fwrite to STDOUT are not picked up by ob_start.
-        \core\task\logmanager::add_line("{$string}{$eol}");
+        if ($output = \core\task\logmanager::add_line("{$string}{$eol}")) {
+            fwrite(STDOUT, $output);
+        }
     } else {
         echo $string . $eol;
     }
@@ -9101,24 +9133,13 @@ function cleardoubleslashes ($path) {
  * @return bool
  */
 function remoteip_in_list($list) {
-    $inlist = false;
     $clientip = getremoteaddr(null);
 
     if (!$clientip) {
         // Ensure access on cli.
         return true;
     }
-
-    $list = explode("\n", $list);
-    foreach ($list as $line) {
-        $tokens = explode('#', $line);
-        $subnet = trim($tokens[0]);
-        if (address_in_subnet($clientip, $subnet)) {
-            $inlist = true;
-            break;
-        }
-    }
-    return $inlist;
+    return \core\ip_utils::is_ip_in_subnet_list($clientip, $list);
 }
 
 /**
@@ -9146,7 +9167,15 @@ function getremoteaddr($default='0.0.0.0') {
     if (!($variablestoskip & GETREMOTEADDR_SKIP_HTTP_X_FORWARDED_FOR)) {
         if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
             $forwardedaddresses = explode(",", $_SERVER['HTTP_X_FORWARDED_FOR']);
-            $address = $forwardedaddresses[0];
+
+            $forwardedaddresses = array_filter($forwardedaddresses, function($ip) {
+                global $CFG;
+                return !\core\ip_utils::is_ip_in_subnet_list($ip, $CFG->reverseproxyignore, ',');
+            });
+
+            // Multiple proxies can append values to this header including an
+            // untrusted original request header so we must only trust the last ip.
+            $address = end($forwardedaddresses);
 
             if (substr_count($address, ":") > 1) {
                 // Remove port and brackets from IPv6.

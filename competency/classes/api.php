@@ -1204,6 +1204,31 @@ class api {
     }
 
     /**
+     * Count the competencies associated to a course module.
+     *
+     * @param mixed $cmorid The course module, or its ID.
+     * @return int
+     */
+    public static function count_course_module_competencies($cmorid) {
+        static::require_enabled();
+        $cm = $cmorid;
+        if (!is_object($cmorid)) {
+            $cm = get_coursemodule_from_id('', $cmorid, 0, true, MUST_EXIST);
+        }
+
+        // Check the user have access to the course module.
+        self::validate_course_module($cm);
+        $context = context_module::instance($cm->id);
+
+        $capabilities = array('moodle/competency:coursecompetencyview', 'moodle/competency:coursecompetencymanage');
+        if (!has_any_capability($capabilities, $context)) {
+            throw new required_capability_exception($context, 'moodle/competency:coursecompetencyview', 'nopermissions', '');
+        }
+
+        return course_module_competency::count_competencies($cm->id);
+    }
+
+    /**
      * List the competencies associated to a course module.
      *
      * @param mixed $cmorid The course module, or its ID.
@@ -3814,7 +3839,7 @@ class api {
         if (!$userevidence->can_manage()) {
             throw new required_capability_exception($context, 'moodle/competency:userevidencemanage', 'nopermissions', '');
 
-        } else if (array_key_exists('userid', $data) && $data->userid != $userevidence->get('userid')) {
+        } else if (property_exists($data, 'userid') && $data->userid != $userevidence->get('userid')) {
             throw new coding_exception('Can not change the userid of a user evidence.');
         }
 
@@ -4775,6 +4800,40 @@ class api {
     public static function hook_cohort_deleted(\stdClass $cohort) {
         global $DB;
         $DB->delete_records(template_cohort::TABLE, array('cohortid' => $cohort->id));
+    }
+
+    /**
+     * Action to perform when a user is deleted.
+     *
+     * @param int $userid The user id.
+     */
+    public static function hook_user_deleted($userid) {
+        global $DB;
+
+        $usercompetencies = $DB->get_records(user_competency::TABLE, ['userid' => $userid], '', 'id');
+        foreach ($usercompetencies as $usercomp) {
+            $DB->delete_records(evidence::TABLE, ['usercompetencyid' => $usercomp->id]);
+        }
+
+        $DB->delete_records(user_competency::TABLE, ['userid' => $userid]);
+        $DB->delete_records(user_competency_course::TABLE, ['userid' => $userid]);
+        $DB->delete_records(user_competency_plan::TABLE, ['userid' => $userid]);
+
+        // Delete any associated files.
+        $fs = get_file_storage();
+        $context = context_user::instance($userid);
+        $userevidences = $DB->get_records(user_evidence::TABLE, ['userid' => $userid], '', 'id');
+        foreach ($userevidences as $userevidence) {
+            $DB->delete_records(user_evidence_competency::TABLE, ['userevidenceid' => $userevidence->id]);
+            $DB->delete_records(user_evidence::TABLE, ['id' => $userevidence->id]);
+            $fs->delete_area_files($context->id, 'core_competency', 'userevidence', $userevidence->id);
+        }
+
+        $userplans = $DB->get_records(plan::TABLE, ['userid' => $userid], '', 'id');
+        foreach ($userplans as $userplan) {
+            $DB->delete_records(plan_competency::TABLE, ['planid' => $userplan->id]);
+            $DB->delete_records(plan::TABLE, ['id' => $userplan->id]);
+        }
     }
 
     /**

@@ -34,17 +34,22 @@ Feature: Test all the basic functionality of this Gapfill question type
       | id_hintshownumcorrect_1             | 1                                      |
     Then I should see "Gapfill-001"
 
-    When I click on "Edit" "link" in the "Gapfill-001" "table_row"
-    And I press "Gap settings"
-    And I click on "//span[@id='id1_0']" "xpath_element"
+    #When I click on "Edit" "link" in the "" "table_row"
+    #When I choose "Edit question" action for "Gapfill-001" in the question bank
 
-    And I set the field with xpath "//div[@id='id_correcteditable']" to "a correct response feedback"
-    And I set the field with xpath "//div[@id='id_incorrecteditable']" to "An incorrect response"
-    And I press "OK"
-    And I click on "#id_submitbutton" "css_element"
+    #And I press "Gap settings"
+    #And I click on "//span[@id='id1_0']" "xpath_element"
+
+    #And I set the field with xpath "//div[@id='id_correcteditable']" to "a correct response feedback"
+    #And I set the field with xpath "//div[@id='id_incorrecteditable']" to "An incorrect response"
+
+    #And I press "OK"
+    #And I click on "#id_submitbutton" "css_element"
 
     # Preview it.
-    When I click on "Preview" "link" in the "Gapfill-001" "table_row"
+    #When I click on "Preview" "link" in the "Gapfill-001" "table_row"
+    When I choose "Preview" action for "Gapfill-001" in the question bank
+
     And I switch to "questionpreview" window
 
  ##################################################

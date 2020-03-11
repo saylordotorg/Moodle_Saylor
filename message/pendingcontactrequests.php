@@ -31,4 +31,3 @@ require_login(null, false);
 // We have a bunch of old notifications (both internal and external, e.g. email) that
 // reference this URL which means we can't remove it so let's just redirect.
 redirect("{$CFG->wwwroot}/message/index.php?view=contactrequests");
-

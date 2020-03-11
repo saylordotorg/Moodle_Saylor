@@ -78,6 +78,7 @@ class mod_forum_entities_forum_testcase extends advanced_testcase {
         $assesstimestart = 0;
         $assesstimefinish = 0;
         $scale = 0;
+        $gradeforum = 0;
         $maxbytes = 200;
         $maxattachments = 5;
         $forcesubscribe = 0;
@@ -95,7 +96,7 @@ class mod_forum_entities_forum_testcase extends advanced_testcase {
         $lockdiscussionafter = 0;
         $duedate = 0;
         $cutoffdate = 0;
-
+        $sendnotification = false;
         $forum = new forum_entity(
             $context,
             $coursemodule,
@@ -111,6 +112,8 @@ class mod_forum_entities_forum_testcase extends advanced_testcase {
             $assesstimestart,
             $assesstimefinish,
             $scale,
+            $gradeforum,
+            $sendnotification,
             $maxbytes,
             $maxattachments,
             $forcesubscribe,
@@ -147,6 +150,7 @@ class mod_forum_entities_forum_testcase extends advanced_testcase {
         $this->assertEquals($assesstimestart, $forum->get_assess_time_start());
         $this->assertEquals($assesstimefinish, $forum->get_assess_time_finish());
         $this->assertEquals($scale, $forum->get_scale());
+        $this->assertEquals($gradeforum, $forum->get_grade_for_forum());
         $this->assertEquals($maxbytes, $forum->get_max_bytes());
         $this->assertEquals($maxattachments, $forum->get_max_attachments());
         $this->assertEquals($forcesubscribe, $forum->get_subscription_mode());

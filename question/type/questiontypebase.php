@@ -234,6 +234,27 @@ class question_type {
     }
 
     /**
+     * Get extra actions for a question of this type to add to the question bank edit menu.
+     *
+     * This method is called if the {@link edit_menu_column} is being used in the
+     * question bank, which it is by default since Moodle 3.8. If applicable for
+     * your question type, you can return arn array of {@link action_menu_link}s.
+     * These will be added at the end of the Edit menu for this question.
+     *
+     * The $question object passed in will have a hard-to-predict set of fields,
+     * because the fields present depend on which columns are included in the
+     * question bank view. However, you can rely on 'id', 'createdby',
+     * 'contextid', 'hidden' and 'category' (id) being present, and so you
+     * can call question_has_capability_on without causing performance problems.
+     *
+     * @param stdClass $question the available information about the particular question the action is for.
+     * @return action_menu_link[] any actions you want to add to the Edit menu for this question.
+     */
+    public function get_extra_question_bank_actions(stdClass $question): array {
+        return [];
+    }
+
+    /**
      * This method should be overriden if you want to include a special heading or some other
      * html on a question editing page besides the question editing form.
      *
@@ -304,6 +325,9 @@ class question_type {
     public function save_question($question, $form) {
         global $USER, $DB, $OUTPUT;
 
+        // The actuall update/insert done with multiple DB access, so we do it in a transaction.
+        $transaction = $DB->start_delegated_transaction ();
+
         list($question->category) = explode(',', $form->category);
         $context = $this->get_context_by_category_id($question->category);
 
@@ -350,16 +374,22 @@ class question_type {
             $question->defaultmark = $form->defaultmark;
         }
 
-        if (isset($form->idnumber) && ((string) $form->idnumber !== '')) {
-            // While this check already exists in the form validation, this is a backstop preventing unnecessary errors.
-            if (strpos($form->category, ',') !== false) {
-                list($category, $categorycontextid) = explode(',', $form->category);
+        if (isset($form->idnumber)) {
+            if ((string) $form->idnumber === '') {
+                $question->idnumber = null;
             } else {
-                $category = $form->category;
-            }
-            if (!$DB->record_exists('question',
-                    ['idnumber' => $form->idnumber, 'category' => $category])) {
-                $question->idnumber = $form->idnumber;
+                // While this check already exists in the form validation,
+                // this is a backstop preventing unnecessary errors.
+                // Only set the idnumber if it has changed and will not cause a unique index violation.
+                if (strpos($form->category, ',') !== false) {
+                    list($category, $categorycontextid) = explode(',', $form->category);
+                } else {
+                    $category = $form->category;
+                }
+                if (!$DB->record_exists('question',
+                        ['idnumber' => $form->idnumber, 'category' => $category])) {
+                    $question->idnumber = $form->idnumber;
+                }
             }
         }
 
@@ -393,16 +423,6 @@ class question_type {
         }
         $DB->update_record('question', $question);
 
-        if ($newquestion) {
-            // Log the creation of this question.
-            $event = \core\event\question_created::create_from_question_instance($question, $context);
-            $event->trigger();
-        } else {
-            // Log the update of this question.
-            $event = \core\event\question_updated::create_from_question_instance($question, $context);
-            $event->trigger();
-        }
-
         // Now to save all the answers and type-specific options.
         $form->id = $question->id;
         $form->qtype = $question->qtype;
@@ -430,6 +450,18 @@ class question_type {
         // Give the question a unique version stamp determined by question_hash().
         $DB->set_field('question', 'version', question_hash($question),
                 array('id' => $question->id));
+
+        if ($newquestion) {
+            // Log the creation of this question.
+            $event = \core\event\question_created::create_from_question_instance($question, $context);
+            $event->trigger();
+        } else {
+            // Log the update of this question.
+            $event = \core\event\question_updated::create_from_question_instance($question, $context);
+            $event->trigger();
+        }
+
+        $transaction->allow_commit ();
 
         return $question;
     }

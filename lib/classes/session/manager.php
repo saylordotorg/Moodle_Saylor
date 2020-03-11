@@ -292,7 +292,27 @@ class manager {
 
         // Set configuration.
         session_name($sessionname);
-        session_set_cookie_params(0, $CFG->sessioncookiepath, $CFG->sessioncookiedomain, $cookiesecure, $CFG->cookiehttponly);
+
+        if (version_compare(PHP_VERSION, '7.3.0', '>=')) {
+            $sessionoptions = [
+                'lifetime' => 0,
+                'path' => $CFG->sessioncookiepath,
+                'domain' => $CFG->sessioncookiedomain,
+                'secure' => $cookiesecure,
+                'httponly' => $CFG->cookiehttponly,
+            ];
+
+            if (self::should_use_samesite_none()) {
+                // If $samesite is empty, we don't want there to be any SameSite attribute.
+                $sessionoptions['samesite'] = 'None';
+            }
+
+            session_set_cookie_params($sessionoptions);
+        } else {
+            // Once PHP 7.3 becomes our minimum, drop this in favour of the alternative call to session_set_cookie_params above,
+            // as that does not require a hack to work with same site settings on cookies.
+            session_set_cookie_params(0, $CFG->sessioncookiepath, $CFG->sessioncookiedomain, $cookiesecure, $CFG->cookiehttponly);
+        }
         ini_set('session.use_trans_sid', '0');
         ini_set('session.use_only_cookies', '1');
         ini_set('session.hash_function', '0');        // For now MD5 - we do not have room for sha-1 in sessions table.
@@ -364,6 +384,9 @@ class manager {
             }
 
             if ($timeout) {
+                if (defined('NO_SESSION_UPDATE') && NO_SESSION_UPDATE) {
+                    return;
+                }
                 session_regenerate_id(true);
                 $_SESSION = array();
                 $DB->delete_records('sessions', array('id'=>$record->id));
@@ -398,7 +421,7 @@ class manager {
                     $updated = true;
                 }
 
-                if ($updated) {
+                if ($updated && (!defined('NO_SESSION_UPDATE') || !NO_SESSION_UPDATE)) {
                     $update->id = $record->id;
                     $DB->update_record('sessions', $update);
                 }
@@ -425,7 +448,7 @@ class manager {
 
         $user = null;
 
-        if (!empty($CFG->opentogoogle)) {
+        if (!empty($CFG->opentowebcrawlers)) {
             if (\core_useragent::is_web_crawler()) {
                 $user = guest_user();
             }
@@ -452,6 +475,8 @@ class manager {
         if ($timedout) {
             $_SESSION['SESSION']->has_timed_out = true;
         }
+
+        self::append_samesite_cookie_attribute();
     }
 
     /**
@@ -519,6 +544,61 @@ class manager {
 
         // Setup $USER object.
         self::set_user($user);
+        self::append_samesite_cookie_attribute();
+    }
+
+    /**
+     * Returns a valid setting for the SameSite cookie attribute.
+     *
+     * @return string The desired setting for the SameSite attribute on the cookie. Empty string indicates the SameSite attribute
+     * should not be set at all.
+     */
+    private static function should_use_samesite_none(): bool {
+        // We only want None or no attribute at this point. When we have cookie handling compatible with Lax,
+        // we can look at checking a setting.
+
+        // Browser support for none is not consistent yet. There are known issues with Safari, and IE11.
+        // Things are stablising, however as they're not stable yet we will deal specifically with the version of chrome
+        // that introduces a default of lax, setting it to none for the current version of chrome (2 releases before the change).
+        // We also check you are using secure cookies and HTTPS because if you are not running over HTTPS
+        // then setting SameSite=None will cause your session cookie to be rejected.
+        if (\core_useragent::is_chrome() && \core_useragent::check_chrome_version('78') && is_moodle_cookie_secure()) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Conditionally append the SameSite attribute to the session cookie if necessary.
+     *
+     * Contains a hack for versions of PHP lower than 7.3 as there is no API built into PHP cookie API
+     * for adding the SameSite setting.
+     *
+     * This won't change the Set-Cookie headers if:
+     *  - PHP 7.3 or higher is being used. That already adds the SameSite attribute without any hacks.
+     *  - If the samesite setting is empty.
+     *  - If the samesite setting is None but the browser is not compatible with that setting.
+     */
+    private static function append_samesite_cookie_attribute() {
+        if (version_compare(PHP_VERSION, '7.3.0', '>=')) {
+            // This hack is only necessary if we weren't able to set the samesite flag via the session_set_cookie_params API.
+            return;
+        }
+
+        if (!self::should_use_samesite_none()) {
+            return;
+        }
+
+        $cookies = headers_list();
+        header_remove('Set-Cookie');
+        $setcookiesession = 'Set-Cookie: ' . session_name() . '=';
+
+        foreach ($cookies as $cookie) {
+            if (strpos($cookie, $setcookiesession) === 0) {
+                $cookie .= '; SameSite=None';
+            }
+            header($cookie, false);
+        }
     }
 
     /**
@@ -555,6 +635,8 @@ class manager {
         self::add_session_record($_SESSION['USER']->id); // Do not use $USER here because it may not be set up yet.
         session_write_close();
         self::$sessionactive = false;
+
+        self::append_samesite_cookie_attribute();
     }
 
     /**
@@ -630,6 +712,31 @@ class manager {
         // There is no need the existence of handler storage in public API.
         self::load_handler();
         return self::$handler->session_exists($sid);
+    }
+
+    /**
+     * Return the number of seconds remaining in the current session.
+     * @param string $sid
+     */
+    public static function time_remaining($sid) {
+        global $DB, $CFG;
+
+        if (empty($CFG->version)) {
+            // Not installed yet, do not try to access database.
+            return ['userid' => 0, 'timeremaining' => $CFG->sessiontimeout];
+        }
+
+        // Note: add sessions->state checking here if it gets implemented.
+        if (!$record = $DB->get_record('sessions', array('sid' => $sid), 'id, userid, timemodified')) {
+            return ['userid' => 0, 'timeremaining' => $CFG->sessiontimeout];
+        }
+
+        if (empty($record->userid) or isguestuser($record->userid)) {
+            // Ignore guest and not-logged-in timeouts, there is very little risk here.
+            return ['userid' => 0, 'timeremaining' => $CFG->sessiontimeout];
+        } else {
+            return ['userid' => $record->userid, 'timeremaining' => $CFG->sessiontimeout - (time() - $record->timemodified)];
+        }
     }
 
     /**
@@ -955,9 +1062,10 @@ class manager {
      * @param string $identifier The string identifier for the message to show on failure.
      * @param string $component The string component for the message to show on failure.
      * @param int $frequency The update frequency in seconds.
+     * @param int $timeout The timeout of each request in seconds.
      * @throws coding_exception IF the frequency is longer than the session lifetime.
      */
-    public static function keepalive($identifier = 'sessionerroruser', $component = 'error', $frequency = null) {
+    public static function keepalive($identifier = 'sessionerroruser', $component = 'error', $frequency = null, $timeout = 0) {
         global $CFG, $PAGE;
 
         if ($frequency) {
@@ -966,19 +1074,15 @@ class manager {
                 throw new \coding_exception('Keepalive frequency is longer than the session lifespan.');
             }
         } else {
-            // A frequency of sessiontimeout / 3 allows for one missed request whilst still preserving the session.
-            $frequency = $CFG->sessiontimeout / 3;
+            // A frequency of sessiontimeout / 10 matches the timeouts in core/network amd module.
+            $frequency = $CFG->sessiontimeout / 10;
         }
 
-        // Add the session keepalive script to the list of page output requirements.
-        $sessionkeepaliveurl = new \moodle_url('/lib/sessionkeepalive_ajax.php');
-        $PAGE->requires->string_for_js($identifier, $component);
-        $PAGE->requires->yui_module('moodle-core-checknet', 'M.core.checknet.init', array(array(
-            // The JS config takes this is milliseconds rather than seconds.
-            'frequency' => $frequency * 1000,
-            'message' => array($identifier, $component),
-            'uri' => $sessionkeepaliveurl->out(),
-        )));
+        $PAGE->requires->js_call_amd('core/network', 'keepalive', array(
+                $frequency,
+                $timeout,
+                get_string($identifier, $component)
+            ));
     }
 
     /**

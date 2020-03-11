@@ -179,6 +179,34 @@ class behat_general extends behat_base {
     }
 
     /**
+     * Switches to the iframe containing specified class.
+     *
+     * @Given /^I switch to "(?P<iframe_name_string>(?:[^"]|\\")*)" class iframe$/
+     * @param string $classname
+     */
+    public function switch_to_class_iframe($classname) {
+        // We spin to give time to the iframe to be loaded.
+        // Using extended timeout as we don't know about which
+        // kind of iframe will be loaded.
+        $this->spin(
+            function($context, $classname) {
+                $iframe = $this->find('iframe', $classname);
+                if (!empty($iframe->getAttribute('id'))) {
+                    $iframename = $iframe->getAttribute('id');
+                } else {
+                    $iframename = $iframe->getAttribute('name');
+                }
+                $context->getSession()->switchToIFrame($iframename);
+
+                // If no exception we are done.
+                return true;
+            },
+            $classname,
+            behat_base::get_extended_timeout()
+        );
+    }
+
+    /**
      * Switches to the main Moodle frame.
      *
      * @Given /^I switch to the main frame$/
@@ -1832,5 +1860,42 @@ EOF;
         // Gets the node based on the requested selector type and locator.
         $node = $this->get_selected_node($selectortype, $element);
         $this->js_trigger_click($node);
+    }
+
+    /**
+     * Checks, that the specified element contains the specified text a certain amount of times.
+     * When running Javascript tests it also considers that texts may be hidden.
+     *
+     * @Then /^I should see "(?P<elementscount_number>\d+)" occurrences of "(?P<text_string>(?:[^"]|\\")*)" in the "(?P<element_string>(?:[^"]|\\")*)" "(?P<text_selector_string>[^"]*)"$/
+     * @throws ElementNotFoundException
+     * @throws ExpectationException
+     * @param int    $elementscount How many occurrences of the element we look for.
+     * @param string $text
+     * @param string $element Element we look in.
+     * @param string $selectortype The type of element where we are looking in.
+     */
+    public function i_should_see_occurrences_of_in_element($elementscount, $text, $element, $selectortype) {
+
+        // Getting the container where the text should be found.
+        $container = $this->get_selected_node($selectortype, $element);
+
+        // Looking for all the matching nodes without any other descendant matching the
+        // same xpath (we are using contains(., ....).
+        $xpathliteral = behat_context_helper::escape($text);
+        $xpath = "/descendant-or-self::*[contains(., $xpathliteral)]" .
+                "[count(descendant::*[contains(., $xpathliteral)]) = 0]";
+
+        $nodes = $this->find_all('xpath', $xpath, false, $container);
+
+        if ($this->running_javascript()) {
+            $nodes = array_filter($nodes, function($node) {
+                return $node->isVisible();
+            });
+        }
+
+        if ($elementscount != count($nodes)) {
+            throw new ExpectationException('Found '.count($nodes).' elements in column. Expected '.$elementscount,
+                    $this->getSession());
+        }
     }
 }

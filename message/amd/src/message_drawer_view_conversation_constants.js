@@ -25,6 +25,7 @@ define([], function() {
     var SELECTORS = {
         ACTION_ACCEPT_CONTACT_REQUEST: '[data-action="accept-contact-request"]',
         ACTION_CANCEL_CONFIRM: '[data-action="cancel-confirm"]',
+        ACTION_OKAY_CONFIRM: '[data-action="okay-confirm"]',
         ACTION_CANCEL_EDIT_MODE: '[data-action="cancel-edit-mode"]',
         ACTION_CONFIRM_ADD_CONTACT: '[data-action="confirm-add-contact"]',
         ACTION_CONFIRM_BLOCK: '[data-action="confirm-block"]',
@@ -46,10 +47,12 @@ define([], function() {
         ACTION_VIEW_CONTACT: '[data-action="view-contact"]',
         ACTION_VIEW_GROUP_INFO: '[data-action="view-group-info"]',
         CAN_RECEIVE_FOCUS: 'input:not([type="hidden"]), a[href], button, textarea, select, [tabindex]',
+        CONFIRM_DIALOGUE: '[data-region="confirm-dialogue"]',
         CONFIRM_DIALOGUE_BUTTON_TEXT: '[data-region="dialogue-button-text"]',
         CONFIRM_DIALOGUE_CANCEL_BUTTON: '[data-action="cancel-confirm"]',
         CONFIRM_DIALOGUE_CONTAINER: '[data-region="confirm-dialogue-container"]',
         CONFIRM_DIALOGUE_HEADER: '[data-region="dialogue-header"]',
+        CONFIRM_DIALOGUE_OKAY_BUTTON: '[data-action="okay-confirm"]',
         CONFIRM_DIALOGUE_TEXT: '[data-region="dialogue-text"]',
         CONTACT_REQUEST_SENT_MESSAGE_CONTAINER: '[data-region="contact-request-sent-message-container"]',
         CONTENT_PLACEHOLDER_CONTAINER: '[data-region="content-placeholder"]',
@@ -63,6 +66,12 @@ define([], function() {
         DAY_MESSAGES_CONTAINER: '[data-region="day-messages-container"]',
         DELETE_MESSAGES_FOR_ALL_USERS_TOGGLE: '[data-region="delete-messages-for-all-users-toggle"]',
         DELETE_MESSAGES_FOR_ALL_USERS_TOGGLE_CONTAINER: '[data-region="delete-messages-for-all-users-toggle-container"]',
+        EMOJI_AUTO_COMPLETE_CONTAINER: '[data-region="emoji-auto-complete-container"]',
+        EMOJI_PICKER_CONTAINER: '[data-region="emoji-picker-container"]',
+        EMOJI_PICKER: '[data-region="emoji-picker"]',
+        EMOJI_PICKER_SEARCH_INPUT: '[data-region="search-input"]',
+        ERROR_MESSAGE_CONTAINER: '[data-region="error-message-container"]',
+        ERROR_MESSAGE: '[data-region="error-message"]',
         FAVOURITE_ICON_CONTAINER: '[data-region="favourite-icon-container"]',
         FOOTER_CONTAINER: '[data-region="content-messages-footer-container"]',
         HEADER: '[data-region="header-content"]',
@@ -80,11 +89,15 @@ define([], function() {
         MORE_MESSAGES_LOADING_ICON_CONTAINER: '[data-region="more-messages-loading-icon-container"]',
         MUTED_ICON_CONTAINER: '[data-region="muted-icon-container"]',
         PLACEHOLDER_CONTAINER: '[data-region="placeholder-container"]',
+        RETRY_SEND: '[data-region="retry-send"]',
         SELF_CONVERSATION_MESSAGE_CONTAINER: '[data-region="self-conversation-message-container"]',
         SEND_MESSAGE_BUTTON: '[data-action="send-message"]',
         SEND_MESSAGE_ICON_CONTAINER: '[data-region="send-icon-container"]',
         TEXT: '[data-region="text"]',
-        TITLE: '[data-region="title"]'
+        TEXT_CONTAINER: '[data-region="text-container"]',
+        TIME_CREATED: '[data-region="time-created"]',
+        TITLE: '[data-region="title"]',
+        TOGGLE_EMOJI_PICKER_BUTTON: '[data-action="toggle-emoji-picker"]'
     };
 
     var TEMPLATES = {

@@ -1379,6 +1379,18 @@ function assign_capability($capability, $permission, $roleid, $contextid, $overw
         }
     }
 
+    // Trigger capability_assigned event.
+    \core\event\capability_assigned::create([
+        'userid' => $cap->modifierid,
+        'context' => $context,
+        'objectid' => $roleid,
+        'other' => [
+            'capability' => $capability,
+            'oldpermission' => $existing->permission ?? CAP_INHERIT,
+            'permission' => $permission
+        ]
+    ])->trigger();
+
     // Reset any cache of this role, including MUC.
     accesslib_clear_role_cache($roleid);
 
@@ -1394,7 +1406,7 @@ function assign_capability($capability, $permission, $roleid, $contextid, $overw
  * @return boolean true or exception
  */
 function unassign_capability($capability, $roleid, $contextid = null) {
-    global $DB;
+    global $DB, $USER;
 
     // Capability must exist.
     if (!$capinfo = get_capability_info($capability)) {
@@ -1412,6 +1424,16 @@ function unassign_capability($capability, $roleid, $contextid = null) {
     } else {
         $DB->delete_records('role_capabilities', array('capability'=>$capability, 'roleid'=>$roleid));
     }
+
+    // Trigger capability_assigned event.
+    \core\event\capability_unassigned::create([
+        'userid' => $USER->id,
+        'context' => $context ?? context_system::instance(),
+        'objectid' => $roleid,
+        'other' => [
+            'capability' => $capability,
+        ]
+    ])->trigger();
 
     // Reset any cache of this role, including MUC.
     accesslib_clear_role_cache($roleid);
@@ -5368,6 +5390,9 @@ abstract class context extends stdClass implements IteratorAggregate {
         $DB->delete_records('context', array('id'=>$this->_id));
         // purge static context cache if entry present
         context::cache_remove($this);
+
+        // Inform search engine to delete data related to this context.
+        \core_search\manager::context_deleted($this);
     }
 
     // ====== context level related methods ======
@@ -7019,20 +7044,27 @@ class context_module extends context {
         $module = $DB->get_record('modules', array('id'=>$cm->module));
 
         $subcaps = array();
-        $subpluginsfile = "$CFG->dirroot/mod/$module->name/db/subplugins.php";
-        if (file_exists($subpluginsfile)) {
+
+        $modulepath = "{$CFG->dirroot}/mod/{$module->name}";
+        if (file_exists("{$modulepath}/db/subplugins.json")) {
+            $subplugins = (array) json_decode(file_get_contents("{$modulepath}/db/subplugins.json"))->plugintypes;
+        } else if (file_exists("{$modulepath}/db/subplugins.php")) {
+            debugging('Use of subplugins.php has been deprecated. ' .
+                    'Please update your plugin to provide a subplugins.json file instead.',
+                    DEBUG_DEVELOPER);
             $subplugins = array();  // should be redefined in the file
-            include($subpluginsfile);
-            if (!empty($subplugins)) {
-                foreach (array_keys($subplugins) as $subplugintype) {
-                    foreach (array_keys(core_component::get_plugin_list($subplugintype)) as $subpluginname) {
-                        $subcaps = array_merge($subcaps, array_keys(load_capability_def($subplugintype.'_'.$subpluginname)));
-                    }
+            include("{$modulepath}/db/subplugins.php");
+        }
+
+        if (!empty($subplugins)) {
+            foreach (array_keys($subplugins) as $subplugintype) {
+                foreach (array_keys(core_component::get_plugin_list($subplugintype)) as $subpluginname) {
+                    $subcaps = array_merge($subcaps, array_keys(load_capability_def($subplugintype.'_'.$subpluginname)));
                 }
             }
         }
 
-        $modfile = "$CFG->dirroot/mod/$module->name/lib.php";
+        $modfile = "{$modulepath}/lib.php";
         $extracaps = array();
         if (file_exists($modfile)) {
             include_once($modfile);

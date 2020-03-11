@@ -177,6 +177,10 @@ class api {
             'langmenu' => $CFG->langmenu,
             'langlist' => $CFG->langlist,
             'locale' => $CFG->locale,
+            'tool_mobile_minimumversion' => get_config('tool_mobile', 'minimumversion'),
+            'tool_mobile_iosappid' => get_config('tool_mobile', 'iosappid'),
+            'tool_mobile_androidappid' => get_config('tool_mobile', 'androidappid'),
+            'tool_mobile_setuplink' => clean_param(get_config('tool_mobile', 'setuplink'), PARAM_URL),
         );
 
         $typeoflogin = get_config('tool_mobile', 'typeoflogin');
@@ -295,6 +299,13 @@ class api {
             $settings->calendar_maxevents = $CFG->calendar_maxevents;
         }
 
+        if (empty($section) or $section == 'coursecolors') {
+            $colornumbers = range(1, 10);
+            foreach ($colornumbers as $number) {
+                $settings->{'core_admin_coursecolor' . $number} = get_config('core_admin', 'coursecolor' . $number);
+            }
+        }
+
         return $settings;
     }
 
@@ -346,6 +357,7 @@ class api {
      */
     public static function get_features_list() {
         global $CFG;
+        require_once($CFG->libdir . '/authlib.php');
 
         $general = new lang_string('general');
         $mainmenu = new lang_string('mainmenu', 'tool_mobile');
@@ -355,6 +367,7 @@ class api {
         $user = new lang_string('user');
         $files = new lang_string('files');
         $remoteaddons = new lang_string('remoteaddons', 'tool_mobile');
+        $identityproviders = new lang_string('oauth2identityproviders', 'tool_mobile');
 
         $availablemods = core_plugin_manager::instance()->get_plugins_of_type('mod');
         $coursemodules = array();
@@ -420,7 +433,10 @@ class api {
                 'NoDelegate_CoreRating' => new lang_string('ratings', 'rating'),
                 'NoDelegate_CoreTag' => new lang_string('tags'),
                 '$mmLoginEmailSignup' => new lang_string('startsignup'),
+                'NoDelegate_ForgottenPassword' => new lang_string('forgotten'),
                 'NoDelegate_ResponsiveMainMenuItems' => new lang_string('responsivemainmenuitems', 'tool_mobile'),
+                'NoDelegate_H5POffline' => new lang_string('h5poffline', 'tool_mobile'),
+                'NoDelegate_DarkMode' => new lang_string('darkmode', 'tool_mobile'),
             ),
             "$mainmenu" => array(
                 '$mmSideMenuDelegate_mmaFrontpage' => new lang_string('sitehome'),
@@ -471,6 +487,31 @@ class api {
 
         if (!empty($remoteaddonslist)) {
             $features["$remoteaddons"] = $remoteaddonslist;
+        }
+
+        // Display OAuth 2 identity providers.
+        if (is_enabled_auth('oauth2')) {
+            $identityproviderslist = array();
+            $idps = \auth_plugin_base::get_identity_providers(['oauth2']);
+
+            foreach ($idps as $idp) {
+                // Only add identity providers that have an ID.
+                $id = isset($idp['url']) ? $idp['url']->get_param('id') : null;
+                if ($id != null) {
+                    $identityproviderslist['NoDelegate_IdentityProvider_' . $id] = $idp['name'];
+                }
+            }
+
+            if (!empty($identityproviderslist)) {
+                $features["$identityproviders"] = array();
+
+                if (count($identityproviderslist) > 1) {
+                    // Include an option to disable them all.
+                    $features["$identityproviders"]['NoDelegate_IdentityProviders'] = new lang_string('all');
+                }
+
+                $features["$identityproviders"] = array_merge($features["$identityproviders"], $identityproviderslist);
+            }
         }
 
         return $features;

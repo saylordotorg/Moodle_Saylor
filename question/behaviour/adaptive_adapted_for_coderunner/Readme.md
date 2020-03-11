@@ -19,6 +19,7 @@ For full install instructions, see the
 [CodeRunner install instructions](https://github.com/trampgeek/moodle-qtype_coderunner/blob/master/Readme.md).
 
 ## CHANGE HISTORY
+11/02/20: V1.3.7. Set css class for correct styling of Precheck button.
 25/01/19: V1.3.6. Fix bug in privacy provider (not working with pre-version7 PHP).
 03/8/18: V1.3.5 Implement Moodle Privacy API (null provider).
 

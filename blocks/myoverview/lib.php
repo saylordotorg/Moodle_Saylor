@@ -27,12 +27,19 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Constants for the user preferences grouping options
  */
+define('BLOCK_MYOVERVIEW_GROUPING_ALLINCLUDINGHIDDEN', 'allincludinghidden');
 define('BLOCK_MYOVERVIEW_GROUPING_ALL', 'all');
 define('BLOCK_MYOVERVIEW_GROUPING_INPROGRESS', 'inprogress');
 define('BLOCK_MYOVERVIEW_GROUPING_FUTURE', 'future');
 define('BLOCK_MYOVERVIEW_GROUPING_PAST', 'past');
 define('BLOCK_MYOVERVIEW_GROUPING_FAVOURITES', 'favourites');
 define('BLOCK_MYOVERVIEW_GROUPING_HIDDEN', 'hidden');
+define('BLOCK_MYOVERVIEW_GROUPING_CUSTOMFIELD', 'customfield');
+
+/**
+ * Allows selection of all courses without a value for the custom field.
+ */
+define('BLOCK_MYOVERVIEW_CUSTOMFIELD_EMPTY', -1);
 
 /**
  * Constants for the user preferences sorting options
@@ -44,7 +51,7 @@ define('BLOCK_MYOVERVIEW_SORTING_LASTACCESSED', 'lastaccessed');
 /**
  * Constants for the user preferences view options
  */
-define('BLOCK_MYOVERVIEW_VIEW_CARD', 'cards');
+define('BLOCK_MYOVERVIEW_VIEW_CARD', 'card');
 define('BLOCK_MYOVERVIEW_VIEW_LIST', 'list');
 define('BLOCK_MYOVERVIEW_VIEW_SUMMARY', 'summary');
 
@@ -54,6 +61,8 @@ define('BLOCK_MYOVERVIEW_VIEW_SUMMARY', 'summary');
 define('BLOCK_MYOVERVIEW_PAGING_12', 12);
 define('BLOCK_MYOVERVIEW_PAGING_24', 24);
 define('BLOCK_MYOVERVIEW_PAGING_48', 48);
+define('BLOCK_MYOVERVIEW_PAGING_96', 96);
+define('BLOCK_MYOVERVIEW_PAGING_ALL', 0);
 
 /**
  * Constants for the admin category display setting
@@ -72,14 +81,23 @@ function block_myoverview_user_preferences() {
         'default' => BLOCK_MYOVERVIEW_GROUPING_ALL,
         'type' => PARAM_ALPHA,
         'choices' => array(
+            BLOCK_MYOVERVIEW_GROUPING_ALLINCLUDINGHIDDEN,
             BLOCK_MYOVERVIEW_GROUPING_ALL,
             BLOCK_MYOVERVIEW_GROUPING_INPROGRESS,
             BLOCK_MYOVERVIEW_GROUPING_FUTURE,
             BLOCK_MYOVERVIEW_GROUPING_PAST,
             BLOCK_MYOVERVIEW_GROUPING_FAVOURITES,
-            BLOCK_MYOVERVIEW_GROUPING_HIDDEN
+            BLOCK_MYOVERVIEW_GROUPING_HIDDEN,
+            BLOCK_MYOVERVIEW_GROUPING_CUSTOMFIELD,
         )
     );
+
+    $preferences['block_myoverview_user_grouping_customfieldvalue_preference'] = [
+        'null' => NULL_ALLOWED,
+        'default' => null,
+        'type' => PARAM_RAW,
+    ];
+
     $preferences['block_myoverview_user_sort_preference'] = array(
         'null' => NULL_NOT_ALLOWED,
         'default' => BLOCK_MYOVERVIEW_SORTING_TITLE,
@@ -115,7 +133,9 @@ function block_myoverview_user_preferences() {
         'choices' => array(
             BLOCK_MYOVERVIEW_PAGING_12,
             BLOCK_MYOVERVIEW_PAGING_24,
-            BLOCK_MYOVERVIEW_PAGING_48
+            BLOCK_MYOVERVIEW_PAGING_48,
+            BLOCK_MYOVERVIEW_PAGING_96,
+            BLOCK_MYOVERVIEW_PAGING_ALL
         )
     );
 

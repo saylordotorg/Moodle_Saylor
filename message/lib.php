@@ -353,6 +353,7 @@ function message_post_message($userfrom, $userto, $message, $format) {
     $eventdata->notification    = 0;
     // User image.
     $userpicture = new user_picture($userfrom);
+    $userpicture->size = 1; // Use f1 size.
     $userpicture->includetoken = $userto->id; // Generate an out-of-session token for the user receiving the message.
     $eventdata->customdata = [
         'notificationiconurl' => $userpicture->get_url($PAGE)->out(false),
@@ -487,15 +488,15 @@ function get_message_output_default_preferences() {
 function translate_message_default_setting($plugindefault, $processorname) {
     // Preset translation arrays
     $permittedvalues = array(
-        0x04 => 'disallowed',
-        0x08 => 'permitted',
-        0x0c => 'forced',
+        MESSAGE_DISALLOWED => 'disallowed',
+        MESSAGE_PERMITTED  => 'permitted',
+        MESSAGE_FORCED     => 'forced',
     );
 
     $loggedinstatusvalues = array(
         0x00 => null, // use null if loggedin/loggedoff is not defined
-        0x01 => 'loggedin',
-        0x02 => 'loggedoff',
+        MESSAGE_DEFAULT_LOGGEDIN  => 'loggedin',
+        MESSAGE_DEFAULT_LOGGEDOFF => 'loggedoff',
     );
 
     // define the default setting
@@ -781,39 +782,6 @@ function core_message_user_preferences() {
             return $parts ? join(',', $parts) : 'none';
         });
     return $preferences;
-}
-
-/**
- * Renders the popup.
- *
- * @param renderer_base $renderer
- * @return string The HTML
- */
-function core_message_render_navbar_output(\renderer_base $renderer) {
-    global $USER, $CFG;
-
-    // Early bail out conditions.
-    if (!isloggedin() || isguestuser() || user_not_fully_set_up($USER) ||
-        get_user_preferences('auth_forcepasswordchange') ||
-        (!$USER->policyagreed && !is_siteadmin() &&
-            ($manager = new \core_privacy\local\sitepolicy\manager()) && $manager->is_defined())) {
-        return '';
-    }
-
-    $output = '';
-
-    // Add the messages popover.
-    if (!empty($CFG->messaging)) {
-        $unreadcount = \core_message\api::count_unread_conversations($USER);
-        $requestcount = \core_message\api::get_received_contact_requests_count($USER->id);
-        $context = [
-            'userid' => $USER->id,
-            'unreadcount' => $unreadcount + $requestcount
-        ];
-        $output .= $renderer->render_from_template('core_message/message_popover', $context);
-    }
-
-    return $output;
 }
 
 /**

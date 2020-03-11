@@ -35,7 +35,7 @@ Feature: Adding random questions to a quiz based on category and tags
       | Tags | foo |
     And I press "id_submitbutton"
     And I choose "Manage tags" action for "question 2 name" in the question bank
-    And I set the following fields to these values:
+    And I set the following fields in the "Question tags" "dialogue" to these values:
       | Tags | bar |
     And I press "Save changes"
     And I am on the "Quiz 1" "mod_quiz > Edit" page

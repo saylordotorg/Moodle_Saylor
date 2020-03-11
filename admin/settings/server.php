@@ -97,7 +97,10 @@ $options = array(
     GETREMOTEADDR_SKIP_HTTP_CLIENT_IP => 'HTTP_X_FORWARDED_FOR, REMOTE_ADDR',
     GETREMOTEADDR_SKIP_HTTP_X_FORWARDED_FOR => 'HTTP_CLIENT, REMOTE_ADDR',
     GETREMOTEADDR_SKIP_HTTP_X_FORWARDED_FOR|GETREMOTEADDR_SKIP_HTTP_CLIENT_IP => 'REMOTE_ADDR');
-$temp->add(new admin_setting_configselect('getremoteaddrconf', new lang_string('getremoteaddrconf', 'admin'), new lang_string('configgetremoteaddrconf', 'admin'), 0, $options));
+$temp->add(new admin_setting_configselect('getremoteaddrconf', new lang_string('getremoteaddrconf', 'admin'),
+    new lang_string('configgetremoteaddrconf', 'admin'),
+    GETREMOTEADDR_SKIP_HTTP_X_FORWARDED_FOR|GETREMOTEADDR_SKIP_HTTP_CLIENT_IP, $options));
+$temp->add(new admin_setting_configtext('reverseproxyignore', new lang_string('reverseproxyignore', 'admin'), new lang_string('configreverseproxyignore', 'admin'), ''));
 
 $temp->add(new admin_setting_heading('webproxy', new lang_string('webproxy', 'admin'), new lang_string('webproxyinfo', 'admin')));
 $temp->add(new admin_setting_configtext('proxyhost', new lang_string('proxyhost', 'admin'), new lang_string('configproxyhost', 'admin'), '', PARAM_HOST));
@@ -172,7 +175,10 @@ $temp->add(new admin_setting_configselect('tempdatafoldercleanup', new lang_stri
 
 $ADMIN->add('server', $temp);
 
-
+    $temp->add(new admin_setting_configduration('filescleanupperiod',
+        new lang_string('filescleanupperiod', 'admin'),
+        new lang_string('filescleanupperiod_help', 'admin'),
+        86400));
 
 $ADMIN->add('server', new admin_externalpage('environment', new lang_string('environment','admin'), "$CFG->wwwroot/$CFG->admin/environment.php"));
 $ADMIN->add('server', new admin_externalpage('phpinfo', new lang_string('phpinfo'), "$CFG->wwwroot/$CFG->admin/phpinfo.php"));
@@ -266,6 +272,14 @@ $temp->add(
             \core\task\logmanager::MODE_FAILONLY => new lang_string('task_logmode_failonly', 'admin'),
             \core\task\logmanager::MODE_NONE => new lang_string('task_logmode_none', 'admin'),
         ]
+    )
+);
+$temp->add(
+    new admin_setting_configcheckbox(
+        'task_logtostdout',
+        new lang_string('task_logtostdout', 'admin'),
+        new lang_string('task_logtostdout_desc', 'admin'),
+        1
     )
 );
 

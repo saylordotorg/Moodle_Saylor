@@ -52,16 +52,30 @@ require_once($CFG->dirroot.'/calendar/lib.php');
 $categoryid = optional_param('category', null, PARAM_INT);
 $courseid = optional_param('course', SITEID, PARAM_INT);
 $view = optional_param('view', 'upcoming', PARAM_ALPHA);
+$day = optional_param('cal_d', 0, PARAM_INT);
+$mon = optional_param('cal_m', 0, PARAM_INT);
+$year = optional_param('cal_y', 0, PARAM_INT);
 $time = optional_param('time', 0, PARAM_INT);
 $lookahead = optional_param('lookahead', null, PARAM_INT);
 
 $url = new moodle_url('/calendar/view.php');
 
+// If a day, month and year were passed then convert it to a timestamp. If these were passed
+// then we can assume the day, month and year are passed as Gregorian, as no where in core
+// should we be passing these values rather than the time. This is done for BC.
+if (!empty($day) && !empty($mon) && !empty($year)) {
+    if (checkdate($mon, $day, $year)) {
+        $time = make_timestamp($year, $mon, $day);
+    }
+}
+
 if (empty($time)) {
     $time = time();
 }
 
-if ($courseid != SITEID) {
+$iscoursecalendar = $courseid != SITEID;
+
+if ($iscoursecalendar) {
     $url->param('course', $courseid);
 }
 
@@ -80,7 +94,7 @@ $PAGE->set_url($url);
 
 $course = get_course($courseid);
 
-if ($courseid != SITEID && !empty($courseid)) {
+if ($iscoursecalendar && !empty($courseid)) {
     navigation_node::override_active_url(new moodle_url('/course/view.php', array('id' => $course->id)));
 } else if (!empty($categoryid)) {
     core_course_category::get($categoryid); // Check that category exists and can be accessed.
@@ -115,7 +129,10 @@ switch($view) {
 // Print title and header
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title("$course->shortname: $strcalendar: $pagetitle");
-$PAGE->set_heading($COURSE->fullname);
+
+$headingstr = ($iscoursecalendar) ? get_string('coursecalendar', 'core_calendar', $COURSE->shortname) :
+        get_string('calendar', 'core_calendar');
+$PAGE->set_heading($headingstr);
 
 $renderer = $PAGE->get_renderer('core_calendar');
 $calendar->add_sidecalendar_blocks($renderer, true, $view);
@@ -123,7 +140,7 @@ $calendar->add_sidecalendar_blocks($renderer, true, $view);
 echo $OUTPUT->header();
 echo $renderer->start_layout();
 echo html_writer::start_tag('div', array('class'=>'heightcontainer'));
-echo $OUTPUT->heading(get_string('calendar', 'calendar'));
+
 
 
 list($data, $template) = calendar_get_view($calendar, $view, true, false, $lookahead);

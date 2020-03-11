@@ -57,7 +57,7 @@ class qbehaviour_adaptive_adapted_for_coderunner_renderer extends qbehaviour_ada
             'id' => $qa->get_behaviour_field_name('precheck'),
             'name' => $qa->get_behaviour_field_name('precheck'),
             'value' => get_string('precheck', 'qbehaviour_adaptive_adapted_for_coderunner'),
-            'class' => 'submit btn',
+            'class' => 'submit btn btn-secondary',
         );
         if ($options->readonly) {
             $attributes['disabled'] = 'disabled';

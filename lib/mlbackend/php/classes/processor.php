@@ -30,6 +30,8 @@ use Phpml\Preprocessing\Normalizer;
 use Phpml\CrossValidation\RandomSplit;
 use Phpml\Dataset\ArrayDataset;
 use Phpml\ModelManager;
+use Phpml\Classification\Linear\LogisticRegression;
+use Phpml\Metric\ClassificationReport;
 
 /**
  * PHP predictions processor.
@@ -87,9 +89,10 @@ class processor implements \core_analytics\classifier, \core_analytics\regressor
      * Delete the output directory.
      *
      * @param string $modeloutputdir
+     * @param string $uniqueid
      * @return null
      */
-    public function delete_output_dir($modeloutputdir) {
+    public function delete_output_dir($modeloutputdir, $uniqueid) {
         remove_dir($modeloutputdir);
     }
 
@@ -110,7 +113,7 @@ class processor implements \core_analytics\classifier, \core_analytics\regressor
         if (file_exists($modelfilepath)) {
             $classifier = $modelmanager->restoreFromFile($modelfilepath);
         } else {
-            $classifier = new \Phpml\Classification\Linear\LogisticRegression(self::TRAIN_ITERATIONS, Normalizer::NORM_L2);
+            $classifier = $this->instantiate_algorithm();
         }
 
         $fh = $dataset->get_content_file_handle();
@@ -131,8 +134,7 @@ class processor implements \core_analytics\classifier, \core_analytics\regressor
             $nsamples = count($samples);
             if ($nsamples === self::BATCH_SIZE) {
                 // Training it batches to avoid running out of memory.
-
-                $classifier->partialTrain($samples, $targets, array(0, 1));
+                $classifier->partialTrain($samples, $targets, json_decode($metadata['targetclasses']));
                 $samples = array();
                 $targets = array();
             }
@@ -151,7 +153,7 @@ class processor implements \core_analytics\classifier, \core_analytics\regressor
 
         // Train the remaining samples.
         if ($samples) {
-            $classifier->partialTrain($samples, $targets, array(0, 1));
+            $classifier->partialTrain($samples, $targets, json_decode($metadata['targetclasses']));
         }
 
         $resultobj = new \stdClass();
@@ -308,52 +310,56 @@ class processor implements \core_analytics\classifier, \core_analytics\regressor
             return $resultobj;
         }
 
-        $phis = array();
+        $scores = array();
 
         // Evaluate the model multiple times to confirm the results are not significantly random due to a short amount of data.
         for ($i = 0; $i < $niterations; $i++) {
 
             if (!$trainedmodeldir) {
-                $classifier = new \Phpml\Classification\Linear\LogisticRegression(self::TRAIN_ITERATIONS, Normalizer::NORM_L2);
+                $classifier = $this->instantiate_algorithm();
 
                 // Split up the dataset in classifier and testing.
                 $data = new RandomSplit(new ArrayDataset($samples, $targets), 0.2);
 
                 $classifier->train($data->getTrainSamples(), $data->getTrainLabels());
                 $predictedlabels = $classifier->predict($data->getTestSamples());
-                $phis[] = $this->get_phi($data->getTestLabels(), $predictedlabels);
+                $report = new ClassificationReport($data->getTestLabels(), $predictedlabels,
+                    ClassificationReport::WEIGHTED_AVERAGE);
             } else {
                 $predictedlabels = $classifier->predict($samples);
-                $phis[] = $this->get_phi($targets, $predictedlabels);
+                $report = new ClassificationReport($targets, $predictedlabels,
+                    ClassificationReport::WEIGHTED_AVERAGE);
             }
+            $averages = $report->getAverage();
+            $scores[] = $averages['f1score'];
         }
 
         // Let's fill the results changing the returned status code depending on the phi-related calculated metrics.
-        return $this->get_evaluation_result_object($dataset, $phis, $maxdeviation);
+        return $this->get_evaluation_result_object($dataset, $scores, $maxdeviation);
     }
 
     /**
      * Returns the results objects from all evaluations.
      *
      * @param \stored_file $dataset
-     * @param array $phis
+     * @param array $scores
      * @param float $maxdeviation
      * @return \stdClass
      */
-    protected function get_evaluation_result_object(\stored_file $dataset, $phis, $maxdeviation) {
+    protected function get_evaluation_result_object(\stored_file $dataset, $scores, $maxdeviation) {
 
-        // Average phi of all evaluations as final score.
-        if (count($phis) === 1) {
-            $avgphi = reset($phis);
+        // Average f1 score of all evaluations as final score.
+        if (count($scores) === 1) {
+            $avgscore = reset($scores);
         } else {
-            $avgphi = \Phpml\Math\Statistic\Mean::arithmetic($phis);
+            $avgscore = \Phpml\Math\Statistic\Mean::arithmetic($scores);
         }
 
         // Standard deviation should ideally be calculated against the area under the curve.
-        if (count($phis) === 1) {
+        if (count($scores) === 1) {
             $modeldev = 0;
         } else {
-            $modeldev = \Phpml\Math\Statistic\StandardDeviation::population($phis);
+            $modeldev = \Phpml\Math\Statistic\StandardDeviation::population($scores);
         }
 
         // Let's fill the results object.
@@ -362,9 +368,7 @@ class processor implements \core_analytics\classifier, \core_analytics\regressor
         // Zero is ok, now we add other bits if something is not right.
         $resultobj->status = \core_analytics\model::OK;
         $resultobj->info = array();
-
-        // Convert phi to a standard score (from -1 to 1 to a value between 0 and 1).
-        $resultobj->score = ($avgphi + 1) / 2;
+        $resultobj->score = $avgscore;
 
         // If each iteration results varied too much we need more data to confirm that this is a valid model.
         if ($modeldev > $maxdeviation) {
@@ -523,33 +527,6 @@ class processor implements \core_analytics\classifier, \core_analytics\regressor
     }
 
     /**
-     * Returns the Phi correlation coefficient.
-     *
-     * @param array $testlabels
-     * @param array $predictedlabels
-     * @return float
-     */
-    protected function get_phi($testlabels, $predictedlabels) {
-
-        // Binary here only as well.
-        $matrix = \Phpml\Metric\ConfusionMatrix::compute($testlabels, $predictedlabels, array(0, 1));
-
-        $tptn = $matrix[0][0] * $matrix[1][1];
-        $fpfn = $matrix[1][0] * $matrix[0][1];
-        $tpfp = $matrix[0][0] + $matrix[1][0];
-        $tpfn = $matrix[0][0] + $matrix[0][1];
-        $tnfp = $matrix[1][1] + $matrix[1][0];
-        $tnfn = $matrix[1][1] + $matrix[0][1];
-        if ($tpfp === 0 || $tpfn === 0 || $tnfp === 0 || $tnfn === 0) {
-            $phi = 0;
-        } else {
-            $phi = ( $tptn - $fpfn ) / sqrt( $tpfp * $tpfn * $tnfp * $tnfn);
-        }
-
-        return $phi;
-    }
-
-    /**
      * Extracts metadata from the dataset file.
      *
      * The file poiter should be located at the top of the file.
@@ -560,5 +537,15 @@ class processor implements \core_analytics\classifier, \core_analytics\regressor
     protected function extract_metadata($fh) {
         $metadata = fgetcsv($fh);
         return array_combine($metadata, fgetcsv($fh));
+    }
+
+    /**
+     * Instantiates the ML algorithm.
+     *
+     * @return \Phpml\Classification\Linear\LogisticRegression
+     */
+    protected function instantiate_algorithm(): \Phpml\Classification\Linear\LogisticRegression {
+        return new LogisticRegression(self::TRAIN_ITERATIONS, true,
+            LogisticRegression::CONJUGATE_GRAD_TRAINING, 'log');
     }
 }

@@ -366,6 +366,7 @@ select[size="1"] {
 
 textarea[data-auto-rows] {
     overflow-x: hidden;
+    resize: none;
 }
 
 /** Display elements under labels in vertical forms regardless of the screen size. */
@@ -470,6 +471,33 @@ textarea[data-auto-rows] {
                 label {
                     justify-content: initial;
                 }
+            }
+        }
+    }
+}
+
+// Form inset on the left/right.
+// Used to display an icon/button within the form control.
+.input-group {
+    &.form-inset {
+        .form-inset-item {
+            @extend .position-absolute;
+            padding-top: calc(#{$input-padding-y} + #{$input-border-width});
+            z-index: 3;
+        }
+
+        &.form-inset-left {
+            .form-control {
+                @extend .pl-4;
+            }
+        }
+
+        &.form-inset-right {
+            .form-control {
+                @extend .pr-4;
+            }
+            .form-inset-item {
+                right: 0;
             }
         }
     }

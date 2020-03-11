@@ -4,8 +4,15 @@ moodle-local_boostnavigation
 Changes
 -------
 
-### Unreleased
+### v3.7-r5
 
+* 2020-02-12 - Added Behat tests to cover the individual features of the plugin.
+* 2020-02-10 - Improvement: The ID attribute for custom nodes is in fact a data-key attribute. This is now fixed in the language pack.
+
+### v3.7-r4
+
+* 2020-02-04 - Improvement: Support multilang strings in custom node titles - Thanks to Jean-Roch.
+* 2020-02-04 - Bugfix: A fatal error could have appeared during login as sessions - Credits to Adrian Perez.
 * 2019-09-04 - Fix flaws in the settings page regarding a link to other settings.
 
 ### v3.7-r3

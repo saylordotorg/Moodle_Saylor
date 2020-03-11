@@ -75,7 +75,7 @@ M.format_grid.init = function(Y, the_editing_on, the_section_redirect, the_num_s
     if (this.num_sections > 0) {
         if (the_initial_section > -1) {
             M.format_grid.tab(the_initial_section);
-        } else {
+        } else if (!the_editing_on) {
             this.set_selected_section(this.num_sections, true, true);  // Section 0 can be in the grid.
         }
     } else {

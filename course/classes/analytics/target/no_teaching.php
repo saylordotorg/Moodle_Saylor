@@ -45,6 +45,16 @@ class no_teaching extends \core_analytics\local\target\binary {
     }
 
     /**
+     * It requires a specific time-splitting method.
+     *
+     * @param  \core_analytics\local\time_splitting\base $timesplitting
+     * @return bool
+     */
+    public function can_use_timesplitting(\core_analytics\local\time_splitting\base $timesplitting): bool {
+        return (get_class($timesplitting) === \core\analytics\time_splitting\single_range::class);
+    }
+
+    /**
      * Returns the name.
      *
      * If there is a corresponding '_help' string this will be shown as well.
@@ -64,6 +74,27 @@ class no_teaching extends \core_analytics\local\target\binary {
      */
     public function get_insight_subject(int $modelid, \context $context) {
         return get_string('noteachingupcomingcourses');
+    }
+
+    /**
+     * Returns the body message for the insight.
+     *
+     * @param  \context     $context
+     * @param  string       $contextname
+     * @param  \stdClass    $user
+     * @param  \moodle_url  $insighturl
+     * @return string[]                     The plain text message and the HTML message
+     */
+    public function get_insight_body(\context $context, string $contextname, \stdClass $user, \moodle_url $insighturl): array {
+        global $OUTPUT;
+
+        $a = (object)['userfirstname' => $user->firstname];
+        $fullmessage = get_string('noteachinginfomessage', 'course', $a) . PHP_EOL . PHP_EOL . $insighturl->out(false);
+        $fullmessagehtml = $OUTPUT->render_from_template('core_analytics/insight_info_message',
+            ['url' => $insighturl->out(false), 'insightinfomessage' => get_string('noteachinginfomessage', 'course', $a)]
+        );
+
+        return [$fullmessage, $fullmessagehtml];
     }
 
     /**
@@ -97,9 +128,7 @@ class no_teaching extends \core_analytics\local\target\binary {
                 $url, $pix, get_string('participants'));
         }
 
-        $parentactions = parent::prediction_actions($prediction, $includedetailsaction);
-        // No need to show details as there is only 1 indicator.
-        unset($parentactions[\core_analytics\prediction::ACTION_PREDICTION_DETAILS]);
+        $parentactions = parent::prediction_actions($prediction, $includedetailsaction, $isinsightuser);
 
         return array_merge($actions, $parentactions);
     }

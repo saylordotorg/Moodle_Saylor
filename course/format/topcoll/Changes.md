@@ -1,9 +1,13 @@
 ﻿Version Information
 ===================
-Version 3.7.1.1 - 17/11/2019
+Version 3.8.1.0 - TBD
+  1. Fix 'Section edit link is moved on top of previous sections edit link when deleting a section' - CONTRIB-7957.
+
+Version 3.8.0.1
   1. Fix Collapsed topics format zoom issue - CONTRIB-7893.
   2. Adjust position of 'view only' icon.
   3. More accessible open all / close all - #67.
+  4. Moodle 3.8 version based on V3.7.1.1.
 
 Version 3.7.1.0
   1. Add missing Moodle define.

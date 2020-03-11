@@ -321,6 +321,7 @@ class page_requirements_manager {
             $this->M_cfg = array(
                 'wwwroot'             => $CFG->wwwroot,
                 'sesskey'             => sesskey(),
+                'sessiontimeout'      => $CFG->sessiontimeout,
                 'themerev'            => theme_get_revision(),
                 'slasharguments'      => (int)(!empty($CFG->slasharguments)),
                 'theme'               => $page->theme->name,
@@ -330,6 +331,8 @@ class page_requirements_manager {
                 'svgicons'            => $page->theme->use_svg_icons(),
                 'usertimezone'        => usertimezone(),
                 'contextid'           => $contextid,
+                'langrev'             => get_string_manager()->get_revision(),
+                'templaterev'         => $this->get_templaterev()
             );
             if ($CFG->debugdeveloper) {
                 $this->M_cfg['developerdebug'] = true;
@@ -409,6 +412,25 @@ class page_requirements_manager {
         }
 
         return $jsrev;
+    }
+
+    /**
+     * Determine the correct Template revision to use for this load.
+     *
+     * @return int the templaterev to use.
+     */
+    protected function get_templaterev() {
+        global $CFG;
+
+        if (empty($CFG->cachetemplates)) {
+            $templaterev = -1;
+        } else if (empty($CFG->templaterev)) {
+            $templaterev = 1;
+        } else {
+            $templaterev = $CFG->templaterev;
+        }
+
+        return $templaterev;
     }
 
     /**
@@ -1573,8 +1595,21 @@ class page_requirements_manager {
      * @return string the HTML code to go at the start of the <body> tag.
      */
     public function get_top_of_body_code(renderer_base $renderer) {
+        global $CFG;
+
         // First the skip links.
         $output = $renderer->render_skip_links($this->skiplinks);
+
+        // The polyfill needs to load before the other JavaScript in order to make sure
+        // that we have access to the functions it provides.
+        if (empty($CFG->cachejs)) {
+            $output .= html_writer::script('', $this->js_fix_url('/lib/babel-polyfill/polyfill.js'));
+        } else {
+            $output .= html_writer::script('', $this->js_fix_url('/lib/babel-polyfill/polyfill.min.js'));
+        }
+
+        // Include the MDN Polyfill.
+        $output .= html_writer::script('', $this->js_fix_url('/lib/mdn-polyfills/polyfill.js'));
 
         // YUI3 JS needs to be loaded early in the body. It should be cached well by the browser.
         $output .= $this->get_yui3lib_headcode();
@@ -1644,7 +1679,16 @@ class page_requirements_manager {
             'areyousure',
             'closebuttontitle',
             'unknownerror',
+            'error',
+            'file',
+            'url',
         ), 'moodle');
+        $this->strings_for_js(array(
+            'debuginfo',
+            'line',
+            'stacktrace',
+        ), 'debug');
+        $this->string_for_js('labelsep', 'langconfig');
         if (!empty($this->stringsforjs)) {
             $strings = array();
             foreach ($this->stringsforjs as $component=>$v) {
@@ -2087,6 +2131,23 @@ class YUI_config {
             }
         }
     }
+}
+
+/**
+ * Invalidate all server and client side template caches.
+ */
+function template_reset_all_caches() {
+    global $CFG;
+
+    $next = time();
+    if (isset($CFG->templaterev) and $next <= $CFG->templaterev and $CFG->templaterev - $next < 60 * 60) {
+        // This resolves problems when reset is requested repeatedly within 1s,
+        // the < 1h condition prevents accidental switching to future dates
+        // because we might not recover from it.
+        $next = $CFG->templaterev + 1;
+    }
+
+    set_config('templaterev', $next);
 }
 
 /**

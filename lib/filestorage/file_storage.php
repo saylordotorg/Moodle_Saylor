@@ -1834,6 +1834,15 @@ class file_storage {
     }
 
     /**
+     * Returns true if filesystem is configured to support xsendfile.
+     *
+     * @return bool
+     */
+    public function supports_xsendfile() {
+        return $this->filesystem->supports_xsendfile();
+    }
+
+    /**
      * Content exists
      *
      * @param string $contenthash
@@ -2241,7 +2250,8 @@ class file_storage {
 
         // remove trash pool files once a day
         // if you want to disable purging of trash put $CFG->fileslastcleanup=time(); into config.php
-        if (empty($CFG->fileslastcleanup) or $CFG->fileslastcleanup < time() - 60*60*24) {
+        $filescleanupperiod = empty($CFG->filescleanupperiod) ? 86400 : $CFG->filescleanupperiod;
+        if (empty($CFG->fileslastcleanup) || ($CFG->fileslastcleanup < time() - $filescleanupperiod)) {
             require_once($CFG->libdir.'/filelib.php');
             // Delete files that are associated with a context that no longer exists.
             mtrace('Cleaning up files from deleted contexts... ', '');

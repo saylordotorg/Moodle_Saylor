@@ -119,34 +119,32 @@ function question_save_qtype_order($neworder, $config = null) {
  * @return boolean whether any of these questions are being used by any part of Moodle.
  */
 function questions_in_use($questionids) {
-    global $CFG;
 
+    // Are they used by the core question system?
     if (question_engine::questions_in_use($questionids)) {
         return true;
     }
 
-    foreach (core_component::get_plugin_list('mod') as $module => $path) {
-        $lib = $path . '/lib.php';
-        if (is_readable($lib)) {
-            include_once($lib);
+    // Check if any plugins are using these questions.
+    $callbacksbytype = get_plugins_with_function('questions_in_use');
+    foreach ($callbacksbytype as $callbacks) {
+        foreach ($callbacks as $function) {
+            if ($function($questionids)) {
+                return true;
+            }
+        }
+    }
 
-            $fn = $module . '_questions_in_use';
-            if (function_exists($fn)) {
-                if ($fn($questionids)) {
-                    return true;
-                }
-            } else {
+    // Finally check legacy callback.
+    $legacycallbacks = get_plugin_list_with_function('mod', 'question_list_instances');
+    foreach ($legacycallbacks as $plugin => $function) {
+        if (isset($callbacksbytype['mod'][substr($plugin, 4)])) {
+            continue; // Already done.
+        }
 
-                // Fallback for legacy modules.
-                $fn = $module . '_question_list_instances';
-                if (function_exists($fn)) {
-                    foreach ($questionids as $questionid) {
-                        $instances = $fn($questionid);
-                        if (!empty($instances)) {
-                            return true;
-                        }
-                    }
-                }
+        foreach ($questionids as $questionid) {
+            if (!empty($function($questionid))) {
+                return true;
             }
         }
     }
@@ -511,7 +509,8 @@ function question_save_from_deletion($questionids, $newcontextid, $oldplace,
         $newcategory = new stdClass();
         $newcategory->parent = question_get_top_category($newcontextid, true)->id;
         $newcategory->contextid = $newcontextid;
-        $newcategory->name = get_string('questionsrescuedfrom', 'question', $oldplace);
+        // Max length of column name in question_categories is 255.
+        $newcategory->name = shorten_text(get_string('questionsrescuedfrom', 'question', $oldplace), 255);
         $newcategory->info = get_string('questionsrescuedfrominfo', 'question', $oldplace);
         $newcategory->sortorder = 999;
         $newcategory->stamp = make_unique_id_code();
@@ -1259,7 +1258,14 @@ function question_category_select_menu($contexts, $top = false, $currentcat = 0,
         $options[] = array($group => $opts);
     }
     echo html_writer::label(get_string('questioncategory', 'core_question'), 'id_movetocategory', false, array('class' => 'accesshide'));
-    $attrs = array('id' => 'id_movetocategory', 'class' => 'custom-select');
+    $attrs = array(
+        'id' => 'id_movetocategory',
+        'class' => 'custom-select',
+        'data-action' => 'toggle',
+        'data-togglegroup' => 'qbank',
+        'data-toggle' => 'action',
+        'disabled' => true,
+    );
     echo html_writer::select($options, 'category', $selected, $choose, $attrs);
 }
 
@@ -1349,7 +1355,8 @@ function question_make_default_categories($contexts) {
             // Otherwise, we need to make one
             $category = new stdClass();
             $contextname = $context->get_context_name(false, true);
-            $category->name = get_string('defaultfor', 'question', $contextname);
+            // Max length of name field is 255.
+            $category->name = shorten_text(get_string('defaultfor', 'question', $contextname), 255);
             $category->info = get_string('defaultinfofor', 'question', $contextname);
             $category->contextid = $context->id;
             $category->parent = $topcategory->id;
@@ -1413,7 +1420,7 @@ function question_category_options($contexts, $top = false, $currentcat = 0,
     foreach ($contexts as $context) {
         $pcontexts[] = $context->id;
     }
-    $contextslist = join($pcontexts, ', ');
+    $contextslist = join(', ', $pcontexts);
 
     $categories = get_categories_for_contexts($contextslist, 'parent, sortorder, name ASC', $top);
 
@@ -1433,11 +1440,25 @@ function question_category_options($contexts, $top = false, $currentcat = 0,
             if ($category->contextid == $contextid) {
                 $cid = $category->id;
                 if ($currentcat != $cid || $currentcat == 0) {
-                    $countstring = !empty($category->questioncount) ?
-                            " ($category->questioncount)" : '';
-                    $categoriesarray[$contextstring][$cid] =
-                            format_string($category->indentedname, true,
-                                array('context' => $context)) . $countstring;
+                    $a = new stdClass;
+                    $a->name = format_string($category->indentedname, true,
+                            array('context' => $context));
+                    if ($category->idnumber !== null && $category->idnumber !== '') {
+                        $a->idnumber = s($category->idnumber);
+                    }
+                    if (!empty($category->questioncount)) {
+                        $a->questioncount = $category->questioncount;
+                    }
+                    if (isset($a->idnumber) && isset($a->questioncount)) {
+                        $formattedname = get_string('categorynamewithidnumberandcount', 'question', $a);
+                    } else if (isset($a->idnumber)) {
+                        $formattedname = get_string('categorynamewithidnumber', 'question', $a);
+                    } else if (isset($a->questioncount)) {
+                        $formattedname = get_string('categorynamewithcount', 'question', $a);
+                    } else {
+                        $formattedname = $a->name;
+                    }
+                    $categoriesarray[$contextstring][$cid] = $formattedname;
                 }
             }
         }
@@ -1659,7 +1680,8 @@ class context_to_string_translator{
 /**
  * Check capability on category
  *
- * @param int|stdClass $questionorid object or id. If an object is passed, it should include ->contextid and ->createdby.
+ * @param int|stdClass|question_definition $questionorid object or id.
+ *      If an object is passed, it should include ->contextid and ->createdby.
  * @param string $cap 'add', 'edit', 'view', 'use', 'move' or 'tag'.
  * @param int $notused no longer used.
  * @return bool this user has the capability $cap for this question $question?
@@ -1868,14 +1890,14 @@ class question_edit_contexts {
     }
 
     /**
-     * @return array all parent contexts
+     * @return context[] all parent contexts
      */
     public function all() {
         return $this->allcontexts;
     }
 
     /**
-     * @return object lowest context which must be either the module or course context
+     * @return context lowest context which must be either the module or course context
      */
     public function lowest() {
         return $this->allcontexts[0];
@@ -1883,7 +1905,7 @@ class question_edit_contexts {
 
     /**
      * @param string $cap capability
-     * @return array parent contexts having capability, zero based index
+     * @return context[] parent contexts having capability, zero based index
      */
     public function having_cap($cap) {
         $contextswithcap = array();
@@ -1897,7 +1919,7 @@ class question_edit_contexts {
 
     /**
      * @param array $caps capabilities
-     * @return array parent contexts having at least one of $caps, zero based index
+     * @return context[] parent contexts having at least one of $caps, zero based index
      */
     public function having_one_cap($caps) {
         $contextswithacap = array();
@@ -1914,14 +1936,14 @@ class question_edit_contexts {
 
     /**
      * @param string $tabname edit tab name
-     * @return array parent contexts having at least one of $caps, zero based index
+     * @return context[] parent contexts having at least one of $caps, zero based index
      */
     public function having_one_edit_tab_cap($tabname) {
         return $this->having_one_cap(self::$caps[$tabname]);
     }
 
     /**
-     * @return those contexts where a user can add a question and then use it.
+     * @return context[] those contexts where a user can add a question and then use it.
      */
     public function having_add_and_use() {
         $contextswithcap = array();
@@ -1986,11 +2008,11 @@ class question_edit_contexts {
     /**
      * Throw error if at least one parent context hasn't got one of the caps $caps
      *
-     * @param array $cap capabilities
+     * @param array $caps capabilities
      */
     public function require_one_cap($caps) {
         if (!$this->have_one_cap($caps)) {
-            $capsstring = join($caps, ', ');
+            $capsstring = join(', ', $caps);
             print_error('nopermissions', '', '', $capsstring);
         }
     }
