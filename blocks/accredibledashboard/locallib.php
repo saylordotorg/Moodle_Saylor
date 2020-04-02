@@ -77,7 +77,7 @@ function accredibledashboard_get_credentials($group_id, $email= null, $limit = 5
 
         // Limit the number of returned credentials.
         if ($limit < count($allcredentials)) {
-            $credentials = array_slice($allcredentials, 0, $limit);
+            $credentials = array_slice($allcredentials, 0, $limit, true);
         } else {
             $credentials = $allcredentials;
         }
