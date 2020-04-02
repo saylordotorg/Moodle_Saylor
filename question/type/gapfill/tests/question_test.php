@@ -109,7 +109,7 @@ class qtype_gapfill_question_test extends advanced_testcase {
             'delimitchars' => '[]'
         ];
         $questiontext = 'The [cat] sat on the [cat]';
-        $question = qtype_gapfill_test_helper::make_question2($questiontext, false, $options);
+        $question = qtype_gapfill_test_helper::make_question2($questiontext, $options);
         // Give the same answer for each gap.
         $response = array('p1' => 'cat', 'p2' => 'cat');
         // Discard duplicates by putting hash in duplicate gaps.

@@ -1,8 +1,13 @@
 This files describes API changes in core libraries and APIs,
 information provided here is intended especially for developers.
 
+=== 3.7.5 ===
+* grade_item::update_final_grade() can now take an optional parameter to set the grade->timemodified. If not present the current time will carry on being used.
+
 === 3.7.4 ===
-format_float() now accepts a special value (-1) as the $decimalpoints parameter which means auto-detecting number of decimal points.
+* behat_data_generators::the_following_exist() has been removed, please use
+  behat_data_generators::the_following_entities_exist() instead. See MDL-67691 for more info.
+* format_float() now accepts a special value (-1) as the $decimalpoints parameter which means auto-detecting number of decimal points.
 
 === 3.7 ===
 * Nodes in the navigation api can have labels for each group. See set/get_collectionlabel().

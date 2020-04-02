@@ -80,7 +80,11 @@ if ($data = data_submitted()) {
         if (strpos($key, 'r') === 0 || strpos($key, 'c') === 0) {
             $type = substr($key, 0, 1);
             $num  = substr($key, 1);
-            $feedback[$num][$type] = $val;
+            if (strpos($key, 'r') === 0 && $val === '') {
+                $feedback[$num][$type] = -1;
+            } else {
+                $feedback[$num][$type] = $val;
+            }
         }
     }
 

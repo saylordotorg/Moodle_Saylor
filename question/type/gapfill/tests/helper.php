@@ -49,7 +49,7 @@ class qtype_gapfill_test_helper extends question_test_helper {
      * @param array $poptions
      * @return qtype_gapfill
      */
-    public static function make_question2($questiontext = 'The [cat] sat on the [mat]', $casesensitive = false,
+    public static function make_question2($questiontext = 'The [cat] sat on the [mat]',
         $poptions=array("noduplicates" => 0,
         'disableregex' => 0, 'delimitchars' => '[])')) {
         $type = 'gapfill';

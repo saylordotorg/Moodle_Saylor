@@ -9881,7 +9881,9 @@ body#page-lib-editor-tinymce-plugins-moodlemedia-preview {
 .choosercontainer #chooseform .moduletypetitle {
   text-transform: uppercase;
   padding-top: 1.2em;
-  padding-bottom: 0.4em; }
+  padding-bottom: 0.4em;
+  margin-bottom: 0.5rem;
+  font-size: 100%; }
 
 .choosercontainer #chooseform .option .typename,
 .choosercontainer #chooseform .nonoption .typename {
@@ -12103,7 +12105,7 @@ span.editinstructions {
 
 #coursesearch {
   margin-top: 1em;
-  text-align: center; }
+  text-align: left; }
 
 #page-course-pending .pendingcourserequests {
   margin-bottom: 1em; }
@@ -12579,6 +12581,9 @@ span.editinstructions {
 
 #nav-drawer.closed {
   left: -305px; }
+
+#nav-drawer[aria-hidden=true] .list-group-item {
+  display: none; }
 
 /* Use a variable for the drawer background colors. */
 [data-region="drawer"] {
@@ -13988,11 +13993,7 @@ a.ygtvspacer:hover {
 
 body.path-question-type {
   /* Hacks to display the labels within a form group. */ }
-  body.path-question-type .fitem_fgroup .accesshide {
-    font: inherit;
-    position: static;
-    padding-right: .3em; }
-  body.path-question-type .form-group .sr-only, body.path-question-type .form-buttons .sr-only, body.path-question-type .path-admin .buttons .sr-only, .path-admin body.path-question-type .buttons .sr-only, body.path-question-type .fp-content-center form + div .sr-only, .fp-content-center body.path-question-type form + div .sr-only, body.path-question-type div.backup-section + form .sr-only {
+  body.path-question-type .form-group .sr-only:not(legend), body.path-question-type .form-buttons .sr-only:not(legend), body.path-question-type .path-admin .buttons .sr-only:not(legend), .path-admin body.path-question-type .buttons .sr-only:not(legend), body.path-question-type .fp-content-center form + div .sr-only:not(legend), .fp-content-center body.path-question-type form + div .sr-only:not(legend), body.path-question-type div.backup-section + form .sr-only:not(legend) {
     position: static;
     width: auto;
     height: auto;
@@ -14115,7 +14116,10 @@ body.path-question-type {
 .que .questioncorrectnessicon {
   vertical-align: text-bottom; }
 
-.que input.questionflagimage {
+body.jsenabled .questionflag input[type=checkbox] {
+  display: none; }
+
+.que .questionflagimage {
   padding-right: 3px;
   height: 16px;
   width: 16px; }
@@ -16262,7 +16266,6 @@ body {
     flex-shrink: 0; }
 
 .popover-region {
-  float: right;
   position: relative; }
   .popover-region.collapsed .popover-region-toggle:before, .popover-region.collapsed .popover-region-toggle:after {
     display: none; }
@@ -16377,7 +16380,7 @@ body {
     display: none; }
 
 .navbar .popover-region {
-  float: right;
+  float: left;
   margin-right: 10px; }
   .navbar .popover-region.collapsed .popover-region-container {
     opacity: 0;

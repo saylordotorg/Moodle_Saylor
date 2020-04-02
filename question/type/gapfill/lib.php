@@ -38,7 +38,7 @@ defined('MOODLE_INTERNAL') || die();
  *
  */
 function qtype_gapfill_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options = array()) {
-    global $DB, $CFG;
+    global $CFG;
     require_once($CFG->libdir . '/questionlib.php');
     question_pluginfile($course, $context, 'qtype_gapfill', $filearea, $args, $forcedownload, $options);
 }

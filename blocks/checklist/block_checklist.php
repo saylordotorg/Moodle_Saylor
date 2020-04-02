@@ -343,7 +343,7 @@ class block_checklist extends block_list {
             return '';
         }
 
-        $percent = $checklist->checked * 100 / $checklist->totalitems;
+        $percent = $checklist->checked * 100.0 / $checklist->totalitems;
         $width = '150px';
 
         $output = '<div class="checklist_progress_outer" style="width: '.$width.';" >';

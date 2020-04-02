@@ -31,3 +31,4 @@ $string['configlinenumber'] = "Number of certificates to show.";
 $string['heading'] = "My Certificates";
 $string['nocertificates'] = "You don't have any certificates yet!";
 $string['viewmore'] = "View more";
+$string['viewall'] = "View all";

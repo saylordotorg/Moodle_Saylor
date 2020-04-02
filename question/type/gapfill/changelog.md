@@ -1,6 +1,13 @@
 ### Version 1.978 of the Moodle Gapfill question type Dec 2019
 Fixed issue with case sensitivity when using | operator and ignore duplicates
-Thanks to Jason Rogers of the South Carolina Dept of Education and Dipak Kumar of Blackboard for reporting this and helping test the solution
+Thanks to Jason Rogers of the South Carolina Dept of Education and Dipak Kumar of Blackboard for reporting this and helping test the solution.
+
+Fix for when force clean is on, which is planned to be a default, see
+https://tracker.moodle.org/browse/MDL-62352
+Thanks to  Hubong Nguen for the UK OU who contributed a patch for wordselect without which
+I would not have known about this.
+
+
 
 ### Version 1.977 of the Moodle Gapfill question type Oct 2019
 

@@ -44,6 +44,7 @@ class qtype_gapfill_question extends question_graded_automatically_with_countbac
      */
     public $answerdisplay;
 
+
     /**
      * The only place this appears to be used is in the tests, can it be deleted?
      * @var array
@@ -190,7 +191,6 @@ class qtype_gapfill_question extends question_graded_automatically_with_countbac
          * that will be draggable when answering. It then discards any subsequent
          * fields with an | in it.
          */
-        $done = false;
         $temp = array();
         /* array_unique is for when you have multiple identical answers separated
          * by |, i.e. olympic medals as [gold|silve|bronze]
@@ -235,7 +235,7 @@ class qtype_gapfill_question extends question_graded_automatically_with_countbac
      * @return array
      */
     public function get_expected_data() {
-        $data = array();
+        $data = [];
         foreach ($this->places as $key => $value) {
             $data['p' . $key] = PARAM_RAW_TRIMMED;
         }
@@ -251,7 +251,7 @@ class qtype_gapfill_question extends question_graded_automatically_with_countbac
      */
     public function summarise_response(array $response) {
         $summary = "";
-        foreach ($response as $key => $value) {
+        foreach ($response as $value) {
             $summary .= " " . $value . " ";
         }
         return $summary;
@@ -265,7 +265,7 @@ class qtype_gapfill_question extends question_graded_automatically_with_countbac
     public function is_complete_response(array $response) {
         $gapsfilled = 0;
         $iscomplete = true;
-        foreach ($this->answers as $key => $rightanswer) {
+        foreach ($this->answers as $rightanswer) {
             $answergiven = array_shift($response);
             if ((!($answergiven == "")) || (preg_match($this->blankregex, $rightanswer->answer))) {
                 $gapsfilled++;
@@ -330,7 +330,7 @@ class qtype_gapfill_question extends question_graded_automatically_with_countbac
      * @return boolean
      */
     public function is_gradable_response(array $response) {
-        foreach ($response as $key => $answergiven) {
+        foreach ($response as $answergiven) {
             if (($answergiven !== "")) {
                 return true;
             }
@@ -351,15 +351,6 @@ class qtype_gapfill_question extends question_graded_automatically_with_countbac
         return $response;
     }
 
-    /**
-     * TODO
-     * I am not convinced this is actually used anywhere
-     */
-    public function  get_instances() {
-        foreach ($this->places as $place => $answer) {
-            $response[$this->field($place)] = $answer;
-        }
-    }
     /**
      * Incrementally fill the gap with the letters from the correct answer when in
      * interactive with multiple tries mode

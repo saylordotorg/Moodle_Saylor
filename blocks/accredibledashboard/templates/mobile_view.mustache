@@ -44,12 +44,19 @@
 
         <%#credentials%>
 
-        <button ion-item core-link onclick="window.location.href='<%url%>'">
+        <button ion-item core-link onclick="window.location.href='<%sso_url%>'">
             <ion-label>
                 <img float-left class="cert-icon" style="height: 32px; width: 32px; margin-right: 8px;" slot="start" src="<%image%>"><div style="padding-top: 5px;"><%name%></div>
             </ion-label>
         </button>
 
         <%/credentials%>
+
+        <button ion-item core-link onclick="window.location.href='<%wallet.url%>'">
+            <ion-label>
+                <div style="padding-top: 5px; padding-left: 40px;"><%wallet.label%></div>
+            </ion-label>
+        </button>
+
     </ion-list>
 </ion-card>

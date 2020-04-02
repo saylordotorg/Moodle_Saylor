@@ -491,6 +491,7 @@ class mod_checklist_renderer extends plugin_renderer_base {
     protected function checklist_item_link(checklist_item $item) {
         $out = '';
         if ($url = $item->get_link_url()) {
+            $attrs = [];
             $out .= '&nbsp;';
             switch ($item->get_link_type()) {
                 case checklist_item::LINK_MODULE:
@@ -501,9 +502,12 @@ class mod_checklist_renderer extends plugin_renderer_base {
                     break;
                 case checklist_item::LINK_URL:
                     $icon = $this->output->pix_icon('follow_link', get_string('linktourl', 'checklist'), 'mod_checklist');
+                    if ($item->openlinkinnewwindow) {
+                        $attrs['target'] = '_blank';
+                    }
                     break;
             }
-            $out .= html_writer::link($url, $icon);
+            $out .= html_writer::link($url, $icon, $attrs);
         }
         return $out;
     }
@@ -870,7 +874,7 @@ class mod_checklist_renderer extends plugin_renderer_base {
 </script>
 ENDSCRIPT;
 
-        return $out;
+        return html_writer::span($out, 'checklistformitem');
     }
 
     /**
@@ -901,7 +905,20 @@ ENDSCRIPT;
         ];
         $out .= html_writer::empty_tag('input', $attr);
 
-        return $out;
+        $attr = [
+            'type' => 'checkbox',
+            'class' => 'form-control',
+            'id' => 'id_openlinkinnewwindow',
+        ];
+        $out .= html_writer::checkbox(
+            'openlinkinnewwindow',
+            1,
+            false,
+            get_string('openlinkinnewwindow', 'mod_checklist'),
+            $attr
+        );
+
+        return html_writer::span($out, 'checklistformitem');
     }
 
     /**
@@ -921,7 +938,7 @@ ENDSCRIPT;
         $out .= html_writer::select($groupings, 'groupingid', $selected, [0 => get_string('anygrouping', 'mod_checklist')],
                                     ['id' => 'id_grouping']);
 
-        return $out;
+        return html_writer::span($out, 'checklistformitem');
     }
 
     /**

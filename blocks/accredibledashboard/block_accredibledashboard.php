@@ -27,8 +27,6 @@ class block_accredibledashboard extends block_list {
     public function init() {
         $this->title = get_string('heading', 'block_accredibledashboard');
     }
-    // The PHP tag and the curly bracket for the class definition 
-    // will only be closed after there is another function added in the next section.
 
 	public function get_content() {
 		global $USER;
@@ -36,13 +34,6 @@ class block_accredibledashboard extends block_list {
 		if ($this->content !== null) {
 		return $this->content;
 		}
-
-		//$walletbaseurl = 'https://wwww.credential.net';
-
-		//Permissions check. What should we be checking?
-		//if (!isloggedin()) {
-		//	return "";
-		//}
 
 		// Get the user's credentials.
 		$credentials = accredibledashboard_get_credentials(null, $USER->email);
@@ -55,16 +46,12 @@ class block_accredibledashboard extends block_list {
 			// Until a link to the wallet can be generated, list all the credentials.
 			// TODO: Add a limit and only show the top credentials - as many as in the config.
 			foreach ($credentials as $credential) {
-				$this->content->items[] = '<div class="d-flex flex-row align-items-center py-1">'.html_writer::empty_tag('img', array('src' => "/blocks/accredibledashboard/assets/icon/certificate_seal.png", 'class' => 'icon float-left')).html_writer::tag('a', $credential->name, array('href' => $credential->url, 'target' => '_blank')).'</div>';
+				$this->content->items[] = '<div class="d-flex flex-row align-items-center py-1">'.html_writer::empty_tag('img', array('src' => "/blocks/accredibledashboard/assets/icon/certificate_seal.png", 'class' => 'icon float-left')).html_writer::tag('a', $credential->name, array('href' => $credential->sso_url, 'target' => '_blank')).'</div>';
 				//$this->content->icons[] = html_writer::empty_tag('img', array('src' => $credential->certificate->image->preview, 'class' => 'icon float-left'));
 			}
-
-
-			// Add footer button to credential wallet if there are more credentials than those listed.
-			// Until we can generate a link to the wallet, ignore.
-			//if (count($credentials) > $this->config->configlinenumber) {
-			//	$this->content->footer = html_writer::tag('a', get_string('viewmore', 'block_accredibledashboard'), array('href' => $accredible), 'class' => 'btn btn-primary');;
-			//}
+			// Add footer button to credential wallet.
+			$this->content->items[] = '<div class="d-flex flex-row align-items-center py-1">'.html_writer::tag('a', get_string('viewall', 'block_accredibledashboard'), array('class' => 'btn btn-primary text-white mx-auto', 'href' => $credentials[array_key_first($credentials)]->wallet_url, 'target' => '_blank')).'</div>';
+		
 
 			return $this->content;
 		}

@@ -6,7 +6,7 @@ dist: trusty
 
 addons:
   firefox: "47.0.1"
-  postgresql: "9.4"
+  postgresql: "9.5"
   apt:
     packages:
       - openjdk-8-jre-headless
@@ -141,9 +141,19 @@ matrix:
     - php: 7.1
       env: 
         DB=pgsql
-        MOODLE_BRANCH=master
+        MOODLE_BRANCH=MOODLE_38_STABLE
         MOODLE_CI_VERSION=2
     - php: 7.1
+      env: 
+        DB=mysqli
+        MOODLE_BRANCH=MOODLE_38_STABLE
+        MOODLE_CI_VERSION=2
+    - php: 7.2
+      env: 
+        DB=pgsql
+        MOODLE_BRANCH=master
+        MOODLE_CI_VERSION=2
+    - php: 7.2
       env: 
         DB=mysqli
         MOODLE_BRANCH=master

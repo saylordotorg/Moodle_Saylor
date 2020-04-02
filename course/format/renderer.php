@@ -514,7 +514,7 @@ abstract class format_section_renderer_base extends plugin_renderer_base {
 
         // Output section activities summary:
         $o = '';
-        $o.= html_writer::start_tag('div', array('class' => 'section-summary-activities mdl-right'));
+        $o.= html_writer::start_tag('div', array('class' => 'section-summary-activities pr-2 mdl-right'));
         foreach ($sectionmods as $mod) {
             $o.= html_writer::start_tag('span', array('class' => 'activity-count'));
             $o.= $mod['name'].': '.$mod['count'];
@@ -528,7 +528,7 @@ abstract class format_section_renderer_base extends plugin_renderer_base {
             $a->complete = $complete;
             $a->total = $total;
 
-            $o.= html_writer::start_tag('div', array('class' => 'section-summary-activities mdl-right'));
+            $o.= html_writer::start_tag('div', array('class' => 'section-summary-activities pr-2 mdl-right'));
             $o.= html_writer::tag('span', get_string('progresstotal', 'completion', $a), array('class' => 'activity-count'));
             $o.= html_writer::end_tag('div');
         }
@@ -1006,7 +1006,7 @@ abstract class format_section_renderer_base extends plugin_renderer_base {
             $icon = $this->output->pix_icon('t/add', '');
             $newsections = $maxsections - $lastsection;
             echo html_writer::link($url, $icon . $straddsections,
-                array('class' => 'add-sections', 'data-add-sections' => $straddsections, 'new-sections' => $newsections));
+                array('class' => 'add-sections', 'data-add-sections' => $straddsections, 'data-new-sections' => $newsections));
             echo html_writer::end_tag('div');
         }
     }

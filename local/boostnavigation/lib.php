@@ -252,7 +252,7 @@ function local_boostnavigation_extend_navigation(global_navigation $navigation) 
     if (isset($config->insertcoursesectionscoursenode) && $config->insertcoursesectionscoursenode == true &&
            $CFG->linkcoursesections == true) {
         // Only proceed if we are inside a course and we are _not_ on the frontpage.
-        if ($PAGE->context->get_course_context(false) == true && $COURSE->id != SITEID) {
+        if ($PAGE->context->get_course_context(false) == true && $COURSE->id != SITEID && $coursehomenode) {
             // Fetch all section nodes from navigation tree.
             $allsectionnodes = $coursehomenode->children->type(navigation_node::TYPE_SECTION);
 
@@ -425,6 +425,12 @@ function local_boostnavigation_extend_navigation(global_navigation $navigation) 
 
                 // Create an activity course node for each activity type.
                 foreach ($modfullnames as $modname => $modfullname) {
+                    // If, for any reason, $modfullname is empty, skip this activity type as it would
+                    // crash navigation_node::create() otherwise.
+                    if (empty($modfullname)) {
+                        continue;
+                    }
+
                     // Process "Resources" activity type.
                     if ($modname === 'resources') {
                         // Do only if the admin does not want a dedicated resources node.
@@ -547,7 +553,7 @@ function local_boostnavigation_extend_navigation(global_navigation $navigation) 
     // Check if admin wants us to insert custom course nodes for users in Boost's nav drawer.
     if (isset($config->insertcustomcoursenodesusers) && !empty($config->insertcustomcoursenodesusers)) {
         // Only proceed if we are inside a course and we are _not_ on the frontpage.
-        if ($PAGE->context->get_course_context(false) == true && $COURSE->id != SITEID) {
+        if ($PAGE->context->get_course_context(false) == true && $COURSE->id != SITEID && $coursehomenode) {
             // If yes, do it.
             $customnodesret = local_boostnavigation_build_custom_nodes($config->insertcustomcoursenodesusers, $coursehomenode,
                     'localboostnavigationcustomcourseusers', false, $config->collapsecustomcoursenodesusers,
