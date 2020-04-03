@@ -50,7 +50,9 @@ class block_accredibledashboard extends block_list {
 				//$this->content->icons[] = html_writer::empty_tag('img', array('src' => $credential->certificate->image->preview, 'class' => 'icon float-left'));
 			}
 			// Add footer button to credential wallet.
-			$this->content->items[] = '<div class="d-flex flex-row align-items-center py-1">'.html_writer::tag('a', get_string('viewall', 'block_accredibledashboard'), array('class' => 'btn btn-primary text-white mx-auto', 'href' => $credentials[array_key_first($credentials)]->wallet_url, 'target' => '_blank')).'</div>';
+			reset($credentials);
+			$credential = current($credentials);
+			$this->content->items[] = '<div class="d-flex flex-row align-items-center py-1">'.html_writer::tag('a', get_string('viewall', 'block_accredibledashboard'), array('class' => 'btn btn-primary text-white mx-auto', 'href' => $credential->wallet_url, 'target' => '_blank')).'</div>';
 		
 
 			return $this->content;

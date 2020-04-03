@@ -50,14 +50,16 @@ class mobile {
                 $credentials[] = $credential;
             }
         }
+        reset($credentials);
+        $credential = current($credentials);
 
         $wallet = new \stdClass();
         $wallet->label = get_string('viewall', 'block_accredibledashboard');
-        $wallet->url = $credentials[array_key_first($credentials)]->wallet_url;
+        $wallet->url = $credential->wallet_url;
 
         $data = array(
             'credentials' => $credentials,
-            'wallet' => $wallet;
+            'wallet' => $wallet
         );
 
         $html = '';

@@ -5,3 +5,7 @@
 .standoutbox.blue {
 	background-color: #e3f5fa;
 }
+
+div.core-course-thumb.core-course-color-img {
+	padding-top: 50% !important;
+} 
