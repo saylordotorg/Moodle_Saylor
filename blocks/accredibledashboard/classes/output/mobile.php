@@ -45,25 +45,28 @@ class mobile {
                 $credential->sso_url = $returnedcredential->sso_url;
                 $credential->name = $returnedcredential->name;
                 $credential->image = $sealurl;
+                $credential->wallet_url = $returnedcredential->wallet_url;
 
 
                 $credentials[] = $credential;
             }
         }
-        reset($credentials);
-        $credential = current($credentials);
-
-        $wallet = new \stdClass();
-        $wallet->label = get_string('viewall', 'block_accredibledashboard');
-        $wallet->url = $credential->wallet_url;
-
-        $data = array(
-            'credentials' => $credentials,
-            'wallet' => $wallet
-        );
 
         $html = '';
         if (isset($credentials)) {
+
+            reset($credentials);
+            $credential = current($credentials);
+
+            $wallet = new \stdClass();
+            $wallet->label = get_string('viewall', 'block_accredibledashboard');
+            $wallet->url = $credential->wallet_url;
+
+            $data = array(
+                'credentials' => $credentials,
+                'wallet' => $wallet
+            );
+
             $html = $OUTPUT->render_from_template('block_accredibledashboard/mobile_view', $data);
         }
  

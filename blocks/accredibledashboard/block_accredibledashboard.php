@@ -43,16 +43,13 @@ class block_accredibledashboard extends block_list {
 			$this->content->items  = array();
 			$this->content->icons  = array();
 
-			// Until a link to the wallet can be generated, list all the credentials.
-			// TODO: Add a limit and only show the top credentials - as many as in the config.
 			foreach ($credentials as $credential) {
-				$this->content->items[] = '<div class="d-flex flex-row align-items-center py-1">'.html_writer::empty_tag('img', array('src' => "/blocks/accredibledashboard/assets/icon/certificate_seal.png", 'class' => 'icon float-left')).html_writer::tag('a', $credential->name, array('href' => $credential->sso_url, 'target' => '_blank')).'</div>';
-				//$this->content->icons[] = html_writer::empty_tag('img', array('src' => $credential->certificate->image->preview, 'class' => 'icon float-left'));
+				$this->content->items[] = '<div class="d-flex flex-row align-items-center py-1">'.html_writer::empty_tag('img', array('src' => "/blocks/accredibledashboard/assets/icon/certificate_seal.png", 'class' => 'icon float-left')).html_writer::tag('a', $credential->name, array('href' => $credential->sso_url, 'target' => '_blank', 'rel' => 'noopener noreferrer')).'</div>';
 			}
 			// Add footer button to credential wallet.
 			reset($credentials);
 			$credential = current($credentials);
-			$this->content->items[] = '<div class="d-flex flex-row align-items-center py-1">'.html_writer::tag('a', get_string('viewall', 'block_accredibledashboard'), array('class' => 'btn btn-primary text-white mx-auto', 'href' => $credential->wallet_url, 'target' => '_blank')).'</div>';
+			$this->content->items[] = '<div class="d-flex flex-row align-items-center py-1">'.html_writer::tag('a', get_string('viewall', 'block_accredibledashboard'), array('class' => 'btn btn-primary text-white mx-auto', 'href' => $credential->wallet_url, 'target' => '_blank', 'rel' => 'noopener noreferrer')).'</div>';
 		
 
 			return $this->content;
