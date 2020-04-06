@@ -276,7 +276,7 @@ def plugins = [
         "name" : 'auth_nsdc',
         "url" : 'https://github.com/saylordotorg/moodle-auth_nsdc.git',
         "branch" : 'master',
-        "dest" : 'auth_nsdc'
+        "dest" : 'auth/nsdc'
     ]
 ]
 
