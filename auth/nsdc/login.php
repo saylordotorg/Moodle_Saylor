@@ -66,10 +66,8 @@ if (!$hasaccount) {
 // Get the userdata from Moodle.
 $user = \auth_nsdc\get_user($data);
 
-// Complete the user login.
-\auth_nsdc\complete_login($user);
-
 // Check course enrollment and enroll.
+// Do this before logging in or new users won't be enrolled.
 $coursecontext = context_course::instance($data->kp_course_id);
 if (!is_enrolled($coursecontext, $user->id)) {
     // This user is not enrolled in the course; enroll.
@@ -78,6 +76,10 @@ if (!is_enrolled($coursecontext, $user->id)) {
 
 // Get course and progress info; send to NSDC.
 \auth_nsdc\course_status_update($data, $user, $production);
+
+// Complete the user login.
+// If a new user or missing required profile fields, they'll be redirected to /user/edit.php.
+\auth_nsdc\complete_login($user);
 
 // Redirect to course.
 $redirecturl = new moodle_url('/course/view.php?id='.$data->kp_course_id);
