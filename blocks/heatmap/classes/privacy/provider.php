@@ -15,17 +15,33 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Simple clock block version identification
+ * Privacy main class.
  *
  * @package    block_heatmap
  * @copyright  2016 Michael de Raadt
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace block_heatmap\privacy;
+
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2020042100;
-$plugin->requires  = 2014051200; // Moodle 2.7.
-$plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = 'Version for Moodle 2.7 onwards';
-$plugin->component = 'block_heatmap';
+/**
+ * Privacy main class.
+ *
+ * @package    block_heatmap
+ * @copyright  2016 Michael de Raadt
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class provider implements \core_privacy\local\metadata\null_provider {
+
+    /**
+     * Get the language string identifier with the component's language
+     * file to explain why this plugin stores no data.
+     *
+     * @return  string
+     */
+    public static function get_reason() : string {
+        return 'privacy:metadata';
+    }
+}

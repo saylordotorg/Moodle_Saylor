@@ -39,6 +39,13 @@ require_once($CFG->dirroot . '/question/engine/lib.php');
 class qtype_gapfill extends question_type {
 
     /**
+     * @return bool whether the quiz statistics report can analyse
+     * all the student responses. See questiontypebase for more
+     */
+    public function can_analyse_responses() {
+          return false;
+    }
+    /**
      * data used by export_to_xml (among other things possibly
      * @return array
      */

@@ -15,17 +15,27 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Simple clock block version identification
+ * File containing tests for privacy_test.
  *
  * @package    block_heatmap
  * @copyright  2016 Michael de Raadt
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2020042100;
-$plugin->requires  = 2014051200; // Moodle 2.7.
-$plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = 'Version for Moodle 2.7 onwards';
-$plugin->component = 'block_heatmap';
+/**
+ * The privacy_test test class.
+ *
+ * @package    block_heatmap
+ * @copyright  2016 Michael de Raadt
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later */
+class block_heatmap_privacy_test_testcase extends advanced_testcase {
+
+    /**
+     * Test privacy.
+     */
+    public function test_privacy() {
+        $privacy = new block_heatmap\privacy\provider();
+        $this->assertEquals('privacy:metadata', $privacy->get_reason());
+    }
+}

@@ -257,6 +257,11 @@ class qtype_coderunner_renderer extends qtype_renderer {
             $outcome->set_status(qtype_coderunner_testing_outcome::STATUS_UNSERIALIZE_FAILED);
         }
         $resultsclass = $this->results_class($outcome, $q->allornothing);
+
+        $isoutputonly = $outcome->is_output_only();
+        if ($isoutputonly) {
+            $resultsclass .= ' outputonly';
+        }
         $isprecheck = $outcome->is_precheck($qa);
         if ($isprecheck) {
             $resultsclass .= ' precheck';
@@ -300,8 +305,11 @@ class qtype_coderunner_renderer extends qtype_renderer {
         }
 
         // Summarise the status of the response in a paragraph at the end.
-        // Suppress when previous errors have already said enough.
-        if (!$outcome->has_syntax_error() && !$isprecheck &&
+        // Suppress when previous errors have already said enough or it's
+        // an output only question.
+        if (!$outcome->has_syntax_error() &&
+             !$isprecheck &&
+             !$isoutputonly &&
              !$outcome->is_ungradable() &&
              !$outcome->run_failed()) {
 
@@ -386,10 +394,12 @@ class qtype_coderunner_renderer extends qtype_renderer {
         // Issue a bright yellow warning if using jobe2, except when running behat.
         $jobeserver = get_config('qtype_coderunner', 'jobe_host');
         $apikey = get_config('qtype_coderunner', 'jobe_apikey');
-        if ($jobeserver == constants::JOBE_HOST_DEFAULT &&
-                $apikey == constants::JOBE_HOST_DEFAULT_API_KEY &&
-                $CFG->prefix !== 'b_') {
-            $fb .= get_string('jobe_warning_html', 'qtype_coderunner');
+        if ($jobeserver == constants::JOBE_HOST_DEFAULT && $CFG->prefix !== 'b_') {
+            if ($apikey == constants::JOBE_HOST_DEFAULT_API_KEY) {
+                $fb .= get_string('jobe_warning_html', 'qtype_coderunner');
+            } else {
+                $fb .= get_string('jobe_canterbury_html', 'qtype_coderunner');
+            }
         }
 
         return $fb;

@@ -5,50 +5,50 @@
 
 .block_heatmap_view_count {
     text-align: left;
-    padding-left: 40px !important;
+    padding-left: 40px !important; /* stylelint-disable-line declaration-no-important */
     font-size: x-small;
 }
 
 .block_heatmap_views,
 .block_heatmap_users {
     border-radius: 20%;
-    color: #ffffff;
+    color: #fff;
     min-width: 20px;
-    border: 1px solid #ffffff;
+    border: 1px solid #fff;
     text-align: center;
     display: inline-block;
 }
 
 .block_heatmap_heat_0 {
-    background-color: #F5ECCE;
+    background-color: #f5ecce;
 }
 .block_heatmap_heat_1 {
-    background-color: #F5D0A9;
+    background-color: #f5d0a9;
 }
 .block_heatmap_heat_2 {
-    background-color: #F5BCA9;
+    background-color: #f5bca9;
 }
 .block_heatmap_heat_3 {
-    background-color: #F5A9A9;
+    background-color: #f5a9a9;
 }
 .block_heatmap_heat_4 {
-    background-color: #F78181;
+    background-color: #f78181;
 }
 
 .block_heatmap_icon_0 {
-    background-color: #F5DA81;
-    color: #FA5858;
+    background-color: #f5da81;
+    color: #fa5858;
 }
 .block_heatmap_icon_1 {
-    background-color: #F79F81;
-    color: #FE2E2E;
+    background-color: #f79f81;
+    color: #fe2e2e;
 }
 .block_heatmap_icon_2 {
-    background-color: #F78181;
+    background-color: #f78181;
 }
 .block_heatmap_icon_3 {
-    background-color: #FA5858;
+    background-color: #fa5858;
 }
 .block_heatmap_icon_4 {
-    background-color: #FE2E2E;
+    background-color: #fe2e2e;
 }

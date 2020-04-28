@@ -1,6 +1,6 @@
 # CODE RUNNER
 
-Version: 3.7.5 January 2020
+Version: 3.7.6 April 2020
 
 Authors: Richard Lobb, University of Canterbury, New Zealand.
          Tim Hunt, The Open University, UK
@@ -1558,7 +1558,7 @@ template grader", i.e. a TemplateGrader with the `Is combinator` checkbox checke
 In this mode, the JSON string output by the template grader
 should again contain a 'fraction' field, this time for the total mark,
 and may contain zero or more of 'prologuehtml', 'testresults', 'epiloguehtml'
-and 'showdifferences'
+'showoutputonly' and 'showdifferences'
 attributes.
 The 'prologuehtml' and 'epiloguehtml' fields are html
 that is displayed respectively before and after the (optional) result table. The
@@ -1570,6 +1570,16 @@ crosses for 1 or 0 row values respectively. The 'ishidden' column isn't
 actually displayed but 0 or 1 values in the column can be used to turn on and
 off row visibility. Students do not see hidden rows but markers and other
 staff do.
+
+The 'showoutputonly' attribute, if set true, results in the prologuehtml and
+epiloguehtml fields being displayed against a neutral background with the
+usual outcome message (e.g. "Passed all tests") suppressed. The mode is intended
+for use in pseudo-questions that can be used by students to experiment with a
+given bit of code. If this attribute is true the 'fraction' attribute is not
+required and is ignored if given. Since a mark is still required by the framework
+when a question is checked, full marks are awarded regardless of the result of
+the run but questions of this sort would normally not contribute marks towards
+a student's grade.
 
 The 'showdifferences' attribute can be added to the JSON outcome to render
 the standard 'Show differences' button after the result table; it is displayed
@@ -1863,7 +1873,7 @@ form.
 
 ### The Graph UI
 
-The Graph UI plugin, which should be regarded as experimental at this point,
+The Graph UI plugin
 provides simple graph-drawing capabilities to support
 questions where the student is asked to draw or edit a graph. By default the
 Graph UI, which was developed for Finite State Machines, draws directed graphs,
@@ -1880,12 +1890,49 @@ via template parameters as follows:
 
   1. isdirected - defaults to true. Set it to false for a non-directed graph.
 
-  1. isfsm - defaults to true. Set it to false to prevent edges that enter the
-graph from space, i.e., without a start node.
+  1. isfsm - defaults to false. Set it to true to allow edges to enter the
+graph from space, i.e., without a start node. It also allows nodes to be marked
+as accept states by double clicking.
 
   1. noderadius - defaults to 26. The radius of nodes, in pixels.
 
   1. fontsize - defaults to 20. The size of the Arial font, in px.
+
+  1. textoffset. An offset in pixels used when positioning link label text.
+      Default 4.
+
+  1. locknodes. True to prevent the user from moving nodes. Useful when the
+answer box is preloaded with a graph that the student has to annotate by
+changing node or edge labels or by adding/removing edges. Note, though that
+nodes can still be added and deleted.
+
+  1. lockedges. True to prevent the user from dragging edges to change
+their curvature. Possibly useful if the
+answer box is preloaded with a graph that the student has to annotate by
+changing node or edge labels or by adding/removing edges. Also ensures that
+edges added by a student are straight, e.g. to draw a polygon on a set of
+given points. Note, though that edges can still be added and deleted.
+
+  1. helpmenutext - text to replace the default help menu text. Must be a
+     single JSON string written on line using "\n" to separate lines in the menu.
+     For example:
+
+        {"helpmenutext": "Line1\nLine2\nLine3"}
+
+    The default value, written here in multiple lines for readability, is:
+
+        - Double click at a blank space to create a new node/state.
+        - Double click an existing node to "mark" it e.g. as an accept state for Finite State Machines
+          (FSMs). Double click again to unmark it.
+        - Click and drag to move a node.
+        - Alt click (or Ctrl alt click) and drag on a node to move a (sub)graph.
+        - Shift click inside one node and drag to another to create a link.
+        - Shift click on a blank space, drag to a node to create a start link (FSMs only).
+        - Click and drag a link to alter its curve.
+        - Click on a link/node to edit its text.
+        - Typing _ followed by a digit makes that digit a subscript.
+        - Typing \\epsilon creates an epsilon character (and similarly for \\alpha, \\beta etc).
+        - Click on a link/node then press the Delete key to remove it (or function-delete on a Mac).
 
 For example, for a non-directed non-fsm graph set the template parameters field to
 
@@ -1894,7 +1941,7 @@ For example, for a non-directed non-fsm graph set the template parameters field 
 or merge those values into any other template parameters required by the
 question.
 
-Other template parameters may be added as required.
+Other template parameters may be added as required by specific questions.
 
 Many thanks to Emily Price for the original implementation of the Graph UI.
 
@@ -2446,7 +2493,131 @@ text area inputs now have two modes:
 * Esc always switches to non-capturing mode.
 
 
-## APPENDIX: How programming quizzes should work
+## APPENDIX 1: How questions get marked
+
+CodeRunner is a rather complex system and, being web based, is driven by
+user-events. In this Appendix we attempt to describe the effective
+behaviour using pseudocode algorithms.
+
+An understanding of the Twig template engine is assumed in what follows.
+See [the Twig documentation](https://twig.symfony.com/) if you are not
+familiar with Twig. CodeRunner uses standard Twig, except for the addition
+of a [set_random_seed](https://github.com/trampgeek/moodle-qtype_coderunner#randomising-per-student-rather-than-per-question-attempt]
+function and some [extra escapers](https://github.com/trampgeek/moodle-qtype_coderunner#twig-escapers).
+
+### When a question is first instantiated.
+
+When a student starts a quiz, an instance of each question in the quiz has
+be be created. It's at the point that any environmental context, such as
+the student's name, plus any randomisation, gets established. To ensure that
+any randomisation done by the template remains locked in to all subsequent
+views and attempts of the question within this quiz by the current student, a
+new random number seed is generated and stored in the question at this stage.
+That seed
+is used for all subsequent randomisation except that the question
+author can explicitly call the *set_random_seed* function to use a different
+seed, such as the student's ID number.
+
+That initialisation process can be described as follows:
+<pre>
+    <b>procedure</b> create_question_instance(question):
+        question.student = get_current_moodle_user_info()
+        question.prototype = locate_prototype_question(question.prototype_name)
+        question.random_seed = make_new_random_seed()
+        set_twig_environment(question.random_seed, question.student)
+        question.template_params = twig_expand(question.template_params)
+        <b>if</b> question.prototype has template parameters:
+            prototype_params = twig_expand(question.prototype.template_params)
+            question.template_params = merge_json(prototype_params, question.template_params)
+        <b>if</b> question.twigall:
+            # Twig expand question text, sample answer, answer preload,
+            # all test case fields and global extra. The just-computed
+            # template parameters provide (most of) the twig environment.
+            set_twig_environment(question.random_seed,
+                question.student, question.template_params)
+            <b>for each</b> twiggable attribute of question:
+                question.attribute = twig_expand(question.attribute)
+        save question instance
+</pre>
+
+### Grading a submission
+
+When the user clicks the *Check* button (or *Precheck* if turned on), the
+current answer is graded. The "current answer" comprises:
+
+1. The code in the answer box or, more generally, the serialised text returned
+   by the selected UI (user interface) plug-in. For coding questions, the
+   UI is usually the Ace code-editor so the serialised text is just the raw
+   code without syntax colouring. Other UIs (e.g. GraphUI, TableUI, GapFillerUI)
+   have their own unique serialisations; see the UI plug-in documentation for
+   details.
+
+1. The set of student-supplied attached files, if attachments are enabled.
+
+The grading process involves expanding the question template, executing the
+code and grading the result. However, the process is complicated by the
+choice of sandbox, whether the question uses a so-called "combinator" or not (i.e.
+whether it attempts to combine all test-cases into a single run), whether the
+question requires that different standard input be set for each test case,
+whether it's a precheck or a full check and
+what grading method has been selected (Exact Match, Near Exact Match,
+Regular Expression, or Template Grader).
+
+Another complication relates to the environment in which the question's template
+gets expanded by Twig, i.e. the set of "template parameters". In legacy code
+the template refers to the question's template parameters using a notation like
+
+    {{ QUESTION.parameters.sometemplateparam }}
+
+but there is now a checkbox called 'Hoist template parameters', defaulting to true,
+which adds the template parameters directly to the Twig environment, allowing
+the question author to refer directly to
+
+    {{ sometemplateparam }}
+
+In the following pseudocode, we assume Hoist template parameters is true.
+
+Although CodeRunner is set up to use a variety of different sandboxes, in
+recent years only the Jobe sandbox has been supported, so we will generally disregard
+all other sandboxes. However, it sometimes helps to remember that CodeRunner
+could in principle use different sandboxes, and that not all sandboxes might
+provide the same functionality as Jobe e.g., setting of maximum
+memory or maximum runtime.
+
+<pre>
+    <b>function</b> grade_response(question, attachments, is_precheck):
+        # Grade the current submission and return a table of test results
+        if question.answer plus current set of attachments has already been graded:
+            return cached results
+        test_cases = select_subset_of_tests(question.testcases, is_precheck)
+        run_results = None
+        <b>if</b> question.is_combinator and (template grader is being used or
+            question.allow_multiple_stdins or all stdins are empty strings):
+            # Try running the combinator. If something breaks, e.g. a
+            # testcase times out, the result will be None.
+            Set up the Twig environment (templateParams) to consist of all
+                the variables in question.templateParams plus STUDENT_ANSWER,
+                IS_PRECHECK, ANSWER_LANGUAGE, and ATTACHMENTS. Additionally
+                the entire question is made available as the parameter QUESTION.
+            run_results = run_combinator(question, testcases, templateParams)
+        <b>if</b> run_result is not None:
+            run_results = []
+            <b>for</b> each test in test_cases:
+                run_results.append(run_single_testcase(question, test, templateParams)
+        <b>return</b> run_results
+</pre>
+
+<p>The algorithms used in `run_combinator` and `run_single_testcase` are
+
+<pre>
+    <b>function</b> run_combinator(question, testcases, templateParams)
+
+    *** TBS ***
+</pre>
+### Lots more to come when I get a round TUIT
+
+
+## APPENDIX 2: How programming quizzes should work
 
 Historical notes and a diatribe on the use of Adaptive Mode questions ...
 

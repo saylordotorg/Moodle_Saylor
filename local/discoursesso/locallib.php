@@ -36,7 +36,7 @@ function local_discoursesso_cohort_deleted_handler($event) {
         // First, delete the group from Discourse.
         if (empty($CFG->discoursesso_api_key)) {
             // No API key was found.
-            echo $OUTPUT->notification(get_string('errornoapikey', 'local_discoursesso'), NOTIFY_WARNING);
+            echo $OUTPUT->notification(get_string('errornoapikey', 'local_discoursesso'), \core\output\notification::NOTIFY_WARNING);
             return false;
         }
 
@@ -90,10 +90,9 @@ function get_discourse_locale($moodleuserlang) {
     return $discourselocale;
 }
 
-function clean_name($string) {
-    $cleaned = str_replace ("'", "", strtolower($string));
-    $cleaned = str_replace (" ", "_", $cleaned);
-    $cleaned = preg_replace('/[^\p{L}\p{N}]/u', '_', $cleaned);
+function clean_name($name) {
+    $cleaned = preg_replace('/[^\p{L}\p{N}]/u', '_', $name);
+    $cleaned = rtrim($cleaned, '_');
 
     return $cleaned;
 }
@@ -114,7 +113,7 @@ function discoursesso_add_group($cohortid) {
     // Make sure that there is an API key set.
     if (empty($CFG->discoursesso_api_key)) {
         // No API key was found.
-        echo $OUTPUT->notification(get_string('errornoapikey', 'local_discoursesso'), NOTIFY_WARNING);
+        echo $OUTPUT->notification(get_string('errornoapikey', 'local_discoursesso'), \core\output\notification::NOTIFY_WARNING);
         return false;
     }
 
@@ -130,12 +129,12 @@ function discoursesso_add_group($cohortid) {
     $r = $api->createGroup(clean_name($ssocohort->cohortname));
 
     if ($r->http_code != 200) {
-        echo $OUTPUT->notification(get_string('errorcreategroupdiscourse', 'local_discoursesso', clean_name($ssocohort->cohortname)), NOTIFY_WARNING);
+        echo $OUTPUT->notification(get_string('errorcreategroupdiscourse', 'local_discoursesso', clean_name($ssocohort->cohortname))."<br>Response: [".$r->http_code."] ".$r->apiresult->errors[0], \core\output\notification::NOTIFY_WARNING);
         return false;
     }
 
     if (!($DB->insert_record('discoursesso_cohorts', $ssocohort, false))) {
-        echo $OUTPUT->notification(get_string('errorcreaterecorddb', 'local_discoursesso'), NOTIFY_WARNING);
+        echo $OUTPUT->notification(get_string('errorcreaterecorddb', 'local_discoursesso'), \core\output\notification::NOTIFY_WARNING);
         return false;
     }
 
@@ -153,7 +152,7 @@ function discoursesso_add_group($cohortid) {
     // First, delete the group from Discourse.
     if (empty($CFG->discoursesso_api_key)) {
         // No API key was found.
-        echo $OUTPUT->notification(get_string('errornoapikey', 'local_discoursesso'), NOTIFY_WARNING);
+        echo $OUTPUT->notification(get_string('errornoapikey', 'local_discoursesso'), \core\output\notification::NOTIFY_WARNING);
         return false;
     }
     $api = new DiscourseAPI(preg_replace("(^https?://)", "", $CFG->discoursesso_discourse_url), $CFG->discoursesso_api_key, preg_replace("(://.+)", "", $CFG->discoursesso_discourse_url));
@@ -162,7 +161,7 @@ function discoursesso_add_group($cohortid) {
     $r = $api->deleteGroup(clean_name($cohort->name));
 
     if (!($DB->delete_records('discoursesso_cohorts', array('cohortid' => $cohortid)))) {
-        echo $OUTPUT->notification(get_string('errordeleterecorddb', 'local_discoursesso'), NOTIFY_WARNING);
+        echo $OUTPUT->notification(get_string('errordeleterecorddb', 'local_discoursesso'), \core\output\notification::NOTIFY_WARNING);
         return false;
     }
 
