@@ -5,7 +5,7 @@
 def mysql_source_dbname = 'moodle'
 def mysql_dest_dbname = 'moodle_test'
 
-def moodle_version = 'MOODLE_37_STABLE'
+def moodle_version = 'MOODLE_38_STABLE'
 
 def plugins = [
     [
@@ -29,13 +29,13 @@ def plugins = [
     [
         "name" : 'format_grid',
         "url" : 'https://github.com/gjb2048/moodle-format_grid.git',
-        "branch" : 'MOODLE_37',
+        "branch" : 'mater',
         "dest" : 'course/format/grid'
     ],
     [
         "name" : 'format_topcoll',
         "url" : 'https://github.com/gjb2048/moodle-format_topcoll.git',
-        "branch" : 'MOODLE_37',
+        "branch" : 'master',
         "dest" : 'course/format/topcoll'
     ],
     [
