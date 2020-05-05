@@ -221,6 +221,21 @@ class behat_core_generator extends behat_generator_base {
     }
 
     /**
+     * Remove any empty custom fields, to avoid errors when creating the course.
+     *
+     * @param array $data
+     * @return array
+     */
+    protected function preprocess_course($data) {
+        foreach ($data as $fieldname => $value) {
+            if ($value === '' && strpos($fieldname, 'customfield_') === 0) {
+                unset($data[$fieldname]);
+            }
+        }
+        return $data;
+    }
+
+    /**
      * If password is not set it uses the username.
      *
      * @param array $data
@@ -769,6 +784,27 @@ class behat_core_generator extends behat_generator_base {
             $conversationid = $conversation->id;
         }
         \core_message\api::mute_conversation($data['userid'], $conversationid);
+    }
+
+    /**
+     * Transform indicators string into array.
+     *
+     * @param array $data
+     * @return array
+     */
+    protected function preprocess_analytics_model($data) {
+        $data['indicators'] = explode(',', $data['indicators']);
+        return $data;
+    }
+
+    /**
+     * Creates an analytics model
+     *
+     * @param target $data
+     * @return void
+     */
+    protected function process_analytics_model($data) {
+        \core_analytics\manager::create_declared_model($data);
     }
 
     /**

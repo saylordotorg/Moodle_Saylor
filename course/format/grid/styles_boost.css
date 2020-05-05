@@ -54,3 +54,6 @@ div#gridshadebox_overlay {
     z-index: 1000;
 }
 
+body.format-grid.editing #region-main {
+    overflow-x: visible;
+}

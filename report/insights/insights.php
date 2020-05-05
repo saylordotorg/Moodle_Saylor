@@ -41,6 +41,12 @@ if ($context->contextlevel < CONTEXT_COURSE) {
     $PAGE->set_context($context);
 }
 
+if (!\core_analytics\manager::is_analytics_enabled()) {
+    $renderer = $PAGE->get_renderer('report_insights');
+    echo $renderer->render_analytics_disabled();
+    exit(0);
+}
+
 \core_analytics\manager::check_can_list_insights($context);
 
 // Get all models that are enabled, trained and have predictions at this context.
@@ -82,7 +88,7 @@ $PAGE->set_url($url);
 $PAGE->set_pagelayout('report');
 
 if ($context->contextlevel === CONTEXT_SYSTEM) {
-    admin_externalpage_setup('reportinsights', '', null, '', array('pagelayout' => 'report'));
+    admin_externalpage_setup('reportinsights', '', $url->params(), $url->out(false), array('pagelayout' => 'report'));
 } else if ($context->contextlevel === CONTEXT_USER) {
     $user = \core_user::get_user($context->instanceid, '*', MUST_EXIST);
     $PAGE->navigation->extend_for_user($user);

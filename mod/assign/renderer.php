@@ -290,8 +290,10 @@ class mod_assign_renderer extends plugin_renderer_base {
 
         // Status.
         if ($summary->teamsubmission) {
-            if ($summary->warnofungroupedusers) {
+            if ($summary->warnofungroupedusers === assign_grading_summary::WARN_GROUPS_REQUIRED) {
                 $o .= $this->output->notification(get_string('ungroupedusers', 'assign'));
+            } else if ($summary->warnofungroupedusers === assign_grading_summary::WARN_GROUPS_OPTIONAL) {
+                $o .= $this->output->notification(get_string('ungroupedusersoptional', 'assign'));
             }
             $cell1content = get_string('numberofteams', 'assign');
         } else {
@@ -324,31 +326,48 @@ class mod_assign_renderer extends plugin_renderer_base {
         $time = time();
         if ($summary->duedate) {
             // Due date.
-            $duedate = $summary->duedate;
             $cell1content = get_string('duedate', 'assign');
-            $cell2content = userdate($duedate);
+            $duedate = $summary->duedate;
+            if ($summary->courserelativedatesmode) {
+                // Returns a formatted string, in the format '10d 10h 45m'.
+                $diffstr = get_time_interval_string($duedate, $summary->coursestartdate);
+                if ($duedate >= $summary->coursestartdate) {
+                    $cell2content = get_string('relativedatessubmissionduedateafter', 'mod_assign',
+                        ['datediffstr' => $diffstr]);
+                } else {
+                    $cell2content = get_string('relativedatessubmissionduedatebefore', 'mod_assign',
+                        ['datediffstr' => $diffstr]);
+                }
+            } else {
+                $cell2content = userdate($duedate);
+            }
+
             $this->add_table_row_tuple($t, $cell1content, $cell2content);
 
             // Time remaining.
             $cell1content = get_string('timeremaining', 'assign');
-            if ($duedate - $time <= 0) {
-                $cell2content = get_string('assignmentisdue', 'assign');
+            if ($summary->courserelativedatesmode) {
+                $cell2content = get_string('relativedatessubmissiontimeleft', 'mod_assign');
             } else {
-                $cell2content = format_time($duedate - $time);
+                if ($duedate - $time <= 0) {
+                    $cell2content = get_string('assignmentisdue', 'assign');
+                } else {
+                    $cell2content = format_time($duedate - $time);
+                }
             }
 
             $this->add_table_row_tuple($t, $cell1content, $cell2content);
 
             if ($duedate < $time) {
+                $cell1content = get_string('latesubmissions', 'assign');
                 $cutoffdate = $summary->cutoffdate;
                 if ($cutoffdate) {
-                    $cell1content = get_string('latesubmissions', 'assign');
                     if ($cutoffdate > $time) {
-                        $cell2content = get_string('latesubmissionsaccepted', 'assign',
-                            userdate($cutoffdate));
+                        $cell2content = get_string('latesubmissionsaccepted', 'assign', userdate($summary->cutoffdate));
                     } else {
                         $cell2content = get_string('nomoresubmissionsaccepted', 'assign');
                     }
+
                     $this->add_table_row_tuple($t, $cell1content, $cell2content);
                 }
             }

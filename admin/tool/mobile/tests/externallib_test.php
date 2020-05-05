@@ -71,7 +71,7 @@ class tool_mobile_external_testcase extends externallib_advanced_testcase {
 
         $expected = array(
             'wwwroot' => $CFG->wwwroot,
-            'httpswwwroot' => $CFG->httpswwwroot,
+            'httpswwwroot' => $CFG->wwwroot,
             'sitename' => external_format_string($SITE->fullname, $context->id, true),
             'guestlogin' => $CFG->guestloginbutton,
             'rememberusername' => $CFG->rememberusername,
@@ -95,6 +95,10 @@ class tool_mobile_external_testcase extends externallib_advanced_testcase {
             'langmenu' => $CFG->langmenu,
             'langlist' => $CFG->langlist,
             'locale' => $CFG->locale,
+            'tool_mobile_minimumversion' => '',
+            'tool_mobile_iosappid' => get_config('tool_mobile', 'iosappid'),
+            'tool_mobile_androidappid' => get_config('tool_mobile', 'androidappid'),
+            'tool_mobile_setuplink' => get_config('tool_mobile', 'setuplink'),
             'warnings' => array()
         );
         $this->assertEquals($expected, $result);
@@ -112,6 +116,7 @@ class tool_mobile_external_testcase extends externallib_advanced_testcase {
         set_config('autolang', 1);
         set_config('lang', 'a_b');  // Set invalid lang.
         set_config('disabledfeatures', 'myoverview', 'tool_mobile');
+        set_config('minimumversion', '3.8.0', 'tool_mobile');
 
         // Enable couple of issuers.
         $issuer = \core\oauth2\api::create_standard_issuer('google');
@@ -136,6 +141,7 @@ class tool_mobile_external_testcase extends externallib_advanced_testcase {
         $expected['autolang'] = '1';
         $expected['lang'] = ''; // Expect empty because it was set to an invalid lang.
         $expected['tool_mobile_disabledfeatures'] = 'myoverview';
+        $expected['tool_mobile_minimumversion'] = '3.8.0';
 
         if ($logourl = $OUTPUT->get_logo_url()) {
             $expected['logourl'] = $logourl->out(false);
@@ -216,6 +222,13 @@ class tool_mobile_external_testcase extends externallib_advanced_testcase {
             array('name' => 'calendar_lookahead', 'value' => $CFG->calendar_lookahead),
             array('name' => 'calendar_maxevents', 'value' => $CFG->calendar_maxevents),
         );
+        $colornumbers = range(1, 10);
+        foreach ($colornumbers as $number) {
+            $expected[] = [
+                'name' => 'core_admin_coursecolor' . $number,
+                'value' => get_config('core_admin', 'coursecolor' . $number)
+            ];
+        }
         $this->assertCount(0, $result['warnings']);
         $this->assertEquals($expected, $result['settings']);
 
@@ -403,6 +416,19 @@ class tool_mobile_external_testcase extends externallib_advanced_testcase {
         $this->assertEquals(array(1, 2), $result['restrict']['users']);
         $this->assertEquals(array(3, 4), $result['restrict']['courses']);
         $this->assertEmpty($result['files']);
+        $this->assertFalse($result['disabled']);
+    }
+
+    /**
+     * Test get_content disabled.
+     */
+    public function test_get_content_disabled() {
+
+        $paramval = 16;
+        $result = external::get_content('tool_mobile', 'test_view_disabled',
+            array(array('name' => 'param1', 'value' => $paramval)));
+        $result = external_api::clean_returnvalue(external::get_content_returns(), $result);
+        $this->assertTrue($result['disabled']);
     }
 
     /**

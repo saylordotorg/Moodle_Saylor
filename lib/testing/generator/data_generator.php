@@ -253,7 +253,10 @@ EOD;
         }
 
         $record['timemodified'] = $record['timecreated'];
-        $record['lastip'] = '0.0.0.0';
+
+        if (!isset($record['lastip'])) {
+            $record['lastip'] = '0.0.0.0';
+        }
 
         if ($record['deleted']) {
             $delname = $record['email'].'.'.time();
@@ -1142,7 +1145,6 @@ EOD;
         require_once($CFG->dirroot . '/calendar/lib.php');
         $record = new \stdClass();
         $record->name = 'event name';
-        $record->eventtype = 'global';
         $record->repeat = 0;
         $record->repeats = 0;
         $record->timestart = time();
@@ -1173,7 +1175,7 @@ EOD;
                 unset($record->courseid);
                 unset($record->groupid);
                 break;
-            case 'global':
+            case 'site':
                 unset($record->categoryid);
                 unset($record->courseid);
                 unset($record->groupid);

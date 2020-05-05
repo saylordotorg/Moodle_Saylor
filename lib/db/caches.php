@@ -400,4 +400,19 @@ $definitions = array(
         'simplekeys' => true,
         'staticacceleration' => true
     ],
+
+    // Cache the user dates for courses set to relative dates mode.
+    'course_user_dates' => [
+        'mode' => cache_store::MODE_REQUEST,
+        'simplekeys' => true,
+        'simpledata' => true,
+        'staticacceleration' => true
+    ],
+
+    // Information generated during the calculation of indicators.
+    'calculablesinfo' => [
+        'mode' => cache_store::MODE_REQUEST,
+        'simplekeys' => false,
+        'simpledata' => false,
+    ],
 );

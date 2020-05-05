@@ -2512,8 +2512,10 @@ class mod_assign_external extends external_api {
                         'submissionsenabled' => new external_value(PARAM_BOOL, 'Whether submissions are enabled or not.'),
                         'submissionssubmittedcount' => new external_value(PARAM_INT, 'Number of submissions in submitted status.'),
                         'submissionsneedgradingcount' => new external_value(PARAM_INT, 'Number of submissions that need grading.'),
-                        'warnofungroupedusers' => new external_value(PARAM_BOOL, 'Whether we need to warn people that there
-                                                                        are users without groups.'),
+                        'warnofungroupedusers' => new external_value(PARAM_ALPHA, 'Whether we need to warn people that there
+                                                                        are users without groups (\'warningrequired\'), warn
+                                                                        people there are users who will submit in the default
+                                                                        group (\'warningoptional\') or no warning (\'\').'),
                     ), 'Grading information.', VALUE_OPTIONAL
                 ),
                 'lastattempt' => new external_single_structure(
@@ -2822,10 +2824,10 @@ class mod_assign_external extends external_api {
             'requiregrading' => $participant->requiregrading,
             'grantedextension' => $participant->grantedextension,
             'blindmarking' => $assign->is_blind_marking(),
-            'allowsubmissionsfromdate' => $assign->get_instance()->allowsubmissionsfromdate,
-            'duedate' => $assign->get_instance()->duedate,
-            'cutoffdate' => $assign->get_instance()->cutoffdate,
-            'duedatestr' => userdate($assign->get_instance()->duedate, get_string('strftimedatetime', 'langconfig')),
+            'allowsubmissionsfromdate' => $assign->get_instance($userid)->allowsubmissionsfromdate,
+            'duedate' => $assign->get_instance($userid)->duedate,
+            'cutoffdate' => $assign->get_instance($userid)->cutoffdate,
+            'duedatestr' => userdate($assign->get_instance($userid)->duedate, get_string('strftimedatetime', 'langconfig')),
         );
 
         if (!empty($participant->groupid)) {

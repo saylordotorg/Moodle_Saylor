@@ -534,8 +534,7 @@ global $FULLSCRIPT;
  */
 global $SCRIPT;
 
-// Set httpswwwroot to $CFG->wwwroot for backwards compatibility
-// The loginhttps option is deprecated, so httpswwwroot is no longer necessary. See MDL-42834.
+// The httpswwwroot has been deprecated, we keep it as an alias for backwards compatibility with plugins only.
 $CFG->httpswwwroot = $CFG->wwwroot;
 
 require_once($CFG->libdir .'/setuplib.php');        // Functions that MUST be loaded first
@@ -1040,4 +1039,16 @@ if (false) {
     $DB = new moodle_database();
     $OUTPUT = new core_renderer(null, null);
     $PAGE = new moodle_page();
+}
+
+// Allow plugins to callback as soon possible after setup.php is loaded.
+$pluginswithfunction = get_plugins_with_function('after_config', 'lib.php');
+foreach ($pluginswithfunction as $plugins) {
+    foreach ($plugins as $function) {
+        try {
+            $function();
+        } catch (Throwable $e) {
+            debugging("Exception calling '$function'", DEBUG_DEVELOPER, $e->getTrace());
+        }
+    }
 }

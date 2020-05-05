@@ -167,7 +167,24 @@ class assign_grading_table extends table_sql implements renderable {
                          ON u.id = uf.userid
                         AND uf.assignment = :assignmentid3 ';
 
+        if ($this->assignment->get_course()->relativedatesmode) {
+            $params['courseid1'] = $this->assignment->get_course()->id;
+            $from .= ' LEFT JOIN (
+            SELECT ue1.userid as enroluserid,
+              CASE WHEN MIN(ue1.timestart - c2.startdate) < 0 THEN 0 ELSE MIN(ue1.timestart - c2.startdate) END as enrolstartoffset
+              FROM {enrol} e1
+              JOIN {user_enrolments} ue1
+                ON (ue1.enrolid = e1.id AND ue1.status = 0)
+              JOIN {course} c2
+                ON c2.id = e1.courseid
+             WHERE e1.courseid = :courseid1 AND e1.status = 0
+             GROUP BY ue1.userid
+            ) enroloffset
+            ON (enroloffset.enroluserid = u.id) ';
+        }
+
         $hasoverrides = $this->assignment->has_overrides();
+        $inrelativedatesmode = $this->assignment->get_course()->relativedatesmode;
 
         if ($hasoverrides) {
             $params['assignmentid5'] = (int)$this->assignment->get_instance()->id;
@@ -176,15 +193,33 @@ class assign_grading_table extends table_sql implements renderable {
             $params['assignmentid8'] = (int)$this->assignment->get_instance()->id;
             $params['assignmentid9'] = (int)$this->assignment->get_instance()->id;
 
+            list($userwhere1, $userparams1) = $DB->get_in_or_equal($users, SQL_PARAMS_NAMED, 'priorityuser');
+            list($userwhere2, $userparams2) = $DB->get_in_or_equal($users, SQL_PARAMS_NAMED, 'effectiveuser');
+
+            $userwhere1 = "WHERE u.id {$userwhere1}";
+            $userwhere2 = "WHERE u.id {$userwhere2}";
+            $params = array_merge($params, $userparams1);
+            $params = array_merge($params, $userparams2);
+
             $fields .= ', priority.priority, ';
             $fields .= 'effective.allowsubmissionsfromdate, ';
-            $fields .= 'effective.duedate, ';
+
+            if ($inrelativedatesmode) {
+                // If the priority is less than the 9999999 constant value it means it's an override
+                // and we should use that value directly. Otherwise we need to apply the uesr's course
+                // start date offset.
+                $fields .= 'CASE WHEN priority.priority < 9999999 THEN effective.duedate ELSE' .
+                           ' effective.duedate + enroloffset.enrolstartoffset END as duedate, ';
+            } else {
+                $fields .= 'effective.duedate, ';
+            }
+
             $fields .= 'effective.cutoffdate ';
 
             $from .= ' LEFT JOIN (
                SELECT merged.userid, min(merged.priority) priority FROM (
                   ( SELECT u.id as userid, 9999999 AS priority
-                      FROM {user} u
+                      FROM {user} u '.$userwhere1.'
                   )
                   UNION
                   ( SELECT uo.userid, 0 AS priority
@@ -210,6 +245,7 @@ class assign_grading_table extends table_sql implements renderable {
                       a.cutoffdate
                  FROM {user} u
                  JOIN {assign} a ON a.id = :assignmentid7
+                 '.$userwhere2.'
               )
               UNION
               (SELECT 0 AS priority,
@@ -233,6 +269,14 @@ class assign_grading_table extends table_sql implements renderable {
               )
 
             ) effective ON effective.priority = priority.priority AND effective.userid = priority.userid ';
+        } else if ($inrelativedatesmode) {
+            // In relative dates mode and when we don't have overrides, include the
+            // duedate, cutoffdate and allowsubmissionsfrom date anyway as this information is useful and can vary.
+            $params['assignmentid5'] = (int)$this->assignment->get_instance()->id;
+            $fields .= ', a.duedate + enroloffset.enrolstartoffset as duedate, ';
+            $fields .= 'a.allowsubmissionsfromdate, ';
+            $fields .= 'a.cutoffdate ';
+            $from .= 'JOIN {assign} a ON a.id = :assignmentid5 ';
         }
 
         if (!empty($this->assignment->get_instance()->blindmarking)) {
@@ -243,12 +287,12 @@ class assign_grading_table extends table_sql implements renderable {
             $fields .= ', um.id as recordid ';
         }
 
-        $userparams = array();
+        $userparams3 = array();
         $userindex = 0;
 
-        list($userwhere, $userparams) = $DB->get_in_or_equal($users, SQL_PARAMS_NAMED, 'user');
-        $where = 'u.id ' . $userwhere;
-        $params = array_merge($params, $userparams);
+        list($userwhere3, $userparams3) = $DB->get_in_or_equal($users, SQL_PARAMS_NAMED, 'user');
+        $where = 'u.id ' . $userwhere3;
+        $params = array_merge($params, $userparams3);
 
         // The filters do not make sense when there are no submissions, so do not apply them.
         if ($this->assignment->is_any_submission_plugin_enabled()) {
@@ -368,7 +412,7 @@ class assign_grading_table extends table_sql implements renderable {
         $columns[] = 'status';
         $headers[] = get_string('status', 'assign');
 
-        if ($hasoverrides) {
+        if ($hasoverrides || $inrelativedatesmode) {
             // Allowsubmissionsfromdate.
             $columns[] = 'allowsubmissionsfromdate';
             $headers[] = get_string('allowsubmissionsfromdate', 'assign');
@@ -1025,7 +1069,7 @@ class assign_grading_table extends table_sql implements renderable {
     public function col_status(stdClass $row) {
         $o = '';
 
-        $instance = $this->assignment->get_instance();
+        $instance = $this->assignment->get_instance($row->userid);
 
         $due = $instance->duedate;
         if ($row->extensionduedate) {

@@ -69,6 +69,10 @@ class forum {
     private $assesstimefinish;
     /** @var int $scale The rating scale */
     private $scale;
+    /** @var int $gradeforum The grade for the forum when grading holistically */
+    private $gradeforum;
+    /** @var bool $gradeforumnotify Whether to notify students when the forum is graded holistically */
+    private $gradeforumnotify;
     /** @var int $maxbytes Maximum attachment size */
     private $maxbytes;
     /** @var int $maxattachments Maximum number of attachments */
@@ -121,6 +125,8 @@ class forum {
      * @param int $assesstimestart Timestamp to begin assessment
      * @param int $assesstimefinish Timestamp to end assessment
      * @param int $scale The rating scale
+     * @param int $gradeforum The holistic grade
+     * @param bool $gradeforumnotify Default for whether to notify students when grade holistically
      * @param int $maxbytes Maximum attachment size
      * @param int $maxattachments Maximum number of attachments
      * @param int $forcesubscribe Does the forum force users to subscribe?
@@ -154,6 +160,8 @@ class forum {
         int $assesstimestart,
         int $assesstimefinish,
         int $scale,
+        int $gradeforum,
+        bool $gradeforumnotify,
         int $maxbytes,
         int $maxattachments,
         int $forcesubscribe,
@@ -186,6 +194,8 @@ class forum {
         $this->assesstimestart = $assesstimestart;
         $this->assesstimefinish = $assesstimefinish;
         $this->scale = $scale;
+        $this->gradeforum = $gradeforum;
+        $this->gradeforumnotify = $gradeforumnotify;
         $this->maxbytes = $maxbytes;
         $this->maxattachments = $maxattachments;
         $this->forcesubscribe = $forcesubscribe;
@@ -347,6 +357,33 @@ class forum {
      */
     public function get_scale() : int {
         return $this->scale;
+    }
+
+    /**
+     * Get the grade for the forum when grading holistically.
+     *
+     * @return int
+     */
+    public function get_grade_for_forum() : int {
+        return $this->gradeforum;
+    }
+
+    /**
+     * Whether grading is enabled for this item.
+     *
+     * @return bool
+     */
+    public function is_grading_enabled(): bool {
+        return $this->get_grade_for_forum() !== 0;
+    }
+
+    /**
+     * Get the default for whether the students should be notified when grading holistically.
+     *
+     * @return bool
+     */
+    public function should_notify_students_default_when_grade_for_forum(): bool {
+        return $this->gradeforumnotify;
     }
 
     /**

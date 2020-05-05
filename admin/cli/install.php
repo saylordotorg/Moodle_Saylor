@@ -391,7 +391,6 @@ if ($interactive) {
 $CFG->wwwroot       = $wwwroot;
 $CFG->httpswwwroot  = $CFG->wwwroot;
 
-
 //We need dataroot before lang download
 $CFG->dataroot = $options['dataroot'];
 if ($interactive) {

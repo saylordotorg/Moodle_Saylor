@@ -287,7 +287,7 @@ define(['core/templates',
             }).fail(Notification.exception);
         };
 
-         /**
+        /**
          * Private method
          *
          * @method submitUnenrolFormAjax

@@ -40,9 +40,6 @@ $strheading = get_string('tasklogs', 'tool_task');
 $PAGE->set_title($strheading);
 $PAGE->set_heading($strheading);
 
-require_login();
-
-require_capability('moodle/site:config', context_system::instance());
 admin_externalpage_setup('tasklogs');
 
 $logid = optional_param('logid', null, PARAM_INT);
@@ -58,7 +55,7 @@ if (null !== $logid) {
         header("Content-Disposition: attachment; filename=\"{$filename}\"");
     }
 
-    readstring_accel($log->output, 'text/plain', false);
+    readstring_accel($log->output, 'text/plain');
     exit;
 }
 

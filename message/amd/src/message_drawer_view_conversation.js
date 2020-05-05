@@ -70,6 +70,8 @@ define(
     'core_message/message_drawer_view_conversation_state_manager',
     'core_message/message_drawer_router',
     'core_message/message_drawer_routes',
+    'core/emoji/auto_complete',
+    'core/emoji/picker'
 ],
 function(
     $,
@@ -87,7 +89,9 @@ function(
     Renderer,
     StateManager,
     MessageDrawerRouter,
-    MessageDrawerRoutes
+    MessageDrawerRoutes,
+    initialiseEmojiAutoComplete,
+    initialiseEmojiPicker
 ) {
 
     // Contains a cache of all view states that have been loaded so far
@@ -107,6 +111,8 @@ function(
     var isSendingMessage = false;
     // If the UI is currently deleting a conversation.
     var isDeletingConversationContent = false;
+    // A buffer of messages to send.
+    var sendMessageBuffer = [];
     // These functions which will be generated when this module is
     // first called. See generateRenderFunction for details.
     var render = null;
@@ -184,7 +190,8 @@ function(
             isblocked: null,
             iscontact: null,
             isdeleted: null,
-            canmessage:  null,
+            canmessage: null,
+            canmessageevenifblocked: null,
             requirescontact: null,
             contactrequests: []
         };
@@ -553,8 +560,9 @@ function(
         return function() {
             var messages = viewState.messages;
             var mostRecentMessage = messages.length ? messages[messages.length - 1] : null;
+            var lastTimeCreated = mostRecentMessage ? mostRecentMessage.timeCreated : null;
 
-            if (mostRecentMessage && !isResetting && !isSendingMessage && !isDeletingConversationContent) {
+            if (lastTimeCreated && !isResetting && !isSendingMessage && !isDeletingConversationContent) {
                 // There may be multiple messages with the same time created value since
                 // the accuracy is only down to the second. The server will include these
                 // messages in the result (since it does a >= comparison on time from) so
@@ -563,7 +571,7 @@ function(
                 var ignoreMessageIds = [];
                 for (var i = messages.length - 1; i >= 0; i--) {
                     var message = messages[i];
-                    if (message.timeCreated === mostRecentMessage.timeCreated) {
+                    if (message.timeCreated === lastTimeCreated) {
                         ignoreMessageIds.push(message.id);
                     } else {
                         // Since the messages are ordered in ascending order of time created
@@ -579,7 +587,7 @@ function(
                         0,
                         newestFirst,
                         ignoreMessageIds,
-                        mostRecentMessage.timeCreated
+                        lastTimeCreated
                     )
                     .then(function(result) {
                         if (result.messages.length) {
@@ -915,16 +923,29 @@ function(
     var deleteSelectedMessages = function() {
         var pendingPromise = new Pending('core_message/message_drawer_view_conversation:deleteSelectedMessages');
         var messageIds = viewState.pendingDeleteMessageIds;
+        var sentMessages = viewState.messages.filter(function(message) {
+            // If a message sendState is null then it means it was loaded from the server or if it's
+            // set to sent then it means the user has successfully sent it in this page load.
+            return messageIds.indexOf(message.id) >= 0 && (message.sendState == 'sent' || message.sendState === null);
+        });
         var newState = StateManager.setLoadingConfirmAction(viewState, true);
 
         render(newState);
 
-        var deleteMessagesPromise = null;
+        var deleteMessagesPromise = $.Deferred().resolve().promise();
 
-        if (newState.deleteMessagesForAllUsers) {
-            deleteMessagesPromise = Repository.deleteMessagesForAllUsers(viewState.loggedInUserId, messageIds);
-        } else {
-            deleteMessagesPromise = Repository.deleteMessages(viewState.loggedInUserId, messageIds);
+
+        if (sentMessages.length) {
+            // We only need to send a request to the server if we're trying to delete messages that
+            // have successfully been sent.
+            var sentMessageIds = sentMessages.map(function(message) {
+                return message.id;
+            });
+            if (newState.deleteMessagesForAllUsers) {
+                deleteMessagesPromise = Repository.deleteMessagesForAllUsers(viewState.loggedInUserId, sentMessageIds);
+            } else {
+                deleteMessagesPromise = Repository.deleteMessages(viewState.loggedInUserId, sentMessageIds);
+            }
         }
 
         // Mark that we are deleting content from the  conversation to prevent updates of it.
@@ -1106,41 +1127,91 @@ function(
     };
 
     /**
-     * Send a message to the repository, update the statemanager publish a message send event
-     * and call the renderer.
+     * Send all of the messages in the buffer to the server to be created. Update the
+     * UI with the newly created message information.
      *
-     * @param  {Number} conversationId The conversation to send to.
-     * @param  {String} text Text to send.
+     * This function will recursively call itself in order to make sure the buffer is
+     * always being processed.
      */
-    var sendMessage = function(conversationId, text) {
-        var pendingPromise = new Pending('core_message/message_drawer_view_conversation:sendMessage');
+    var processSendMessageBuffer = function() {
+        if (isSendingMessage) {
+            // We're already sending messages so nothing to do.
+            return;
+        }
+        if (!sendMessageBuffer.length) {
+            // No messages waiting to send. Nothing to do.
+            return;
+        }
+
+        var pendingPromise = new Pending('core_message/message_drawer_view_conversation:processSendMessageBuffer');
 
         // Flag that we're processing the queue.
         isSendingMessage = true;
-        var newState = StateManager.setSendingMessage(viewState, true);
+        // Grab all of the messages in the buffer.
+        var messagesToSend = sendMessageBuffer.slice();
+        // Empty the buffer since we're processing it.
+        sendMessageBuffer = [];
+        var conversationId = viewState.id;
         var newConversationId = null;
-
-        render(newState);
-
+        var messagesText = messagesToSend.map(function(message) {
+            return message.text;
+        });
+        var messageIds = messagesToSend.map(function(message) {
+            return message.id;
+        });
         var sendMessagePromise = null;
         var newCanDeleteMessagesForAllUsers = null;
         if (!conversationId && (viewState.type != CONVERSATION_TYPES.PUBLIC)) {
             // If it's a new private conversation then we need to use the old
             // web service function to create the conversation.
             var otherUserId = getOtherUserId();
-            sendMessagePromise = Repository.sendMessageToUser(otherUserId, text)
-                .then(function(message) {
-                    newConversationId = parseInt(message.conversationid, 10);
-                    newCanDeleteMessagesForAllUsers = message.candeletemessagesforallusers;
-                    return message;
+            sendMessagePromise = Repository.sendMessagesToUser(otherUserId, messagesText)
+                .then(function(messages) {
+                    if (messages.length) {
+                        newConversationId = parseInt(messages[0].conversationid, 10);
+                        newCanDeleteMessagesForAllUsers = messages[0].candeletemessagesforallusers;
+                    }
+                    return messages;
                 });
         } else {
-            sendMessagePromise = Repository.sendMessageToConversation(conversationId, text);
+            sendMessagePromise = Repository.sendMessagesToConversation(conversationId, messagesText);
         }
 
-        sendMessagePromise.then(function(message) {
-                var newState = StateManager.addMessages(viewState, [message]);
-                newState = StateManager.setSendingMessage(newState, false);
+        sendMessagePromise
+            .then(function(messages) {
+                var newMessageIds = messages.map(function(message) {
+                    return message.id;
+                });
+                var data = [];
+                var selectedToRemove = [];
+                var selectedToAdd = [];
+
+                messagesToSend.forEach(function(oldMessage, index) {
+                    var newMessage = messages[index];
+                    // Update messages expects and array of arrays where the first value
+                    // is the old message to update and the second value is the new values
+                    // to set.
+                    data.push([oldMessage, newMessage]);
+
+                    if (viewState.selectedMessageIds.indexOf(oldMessage.id) >= 0) {
+                        // If the message was added to the "selected messages" list while it was still
+                        // being sent then we should update it's id in that list now to make sure future
+                        // actions work.
+                        selectedToRemove.push(oldMessage.id);
+                        selectedToAdd.push(newMessage.id);
+                    }
+                });
+                var newState = StateManager.updateMessages(viewState, data);
+                newState = StateManager.setMessagesSendSuccessById(newState, newMessageIds);
+
+                if (selectedToRemove.length) {
+                    newState = StateManager.removeSelectedMessagesById(newState, selectedToRemove);
+                }
+
+                if (selectedToAdd.length) {
+                    newState = StateManager.addSelectedMessagesById(newState, selectedToAdd);
+                }
+
                 var conversation = formatConversationForEvent(newState);
 
                 if (!newState.id) {
@@ -1153,8 +1224,11 @@ function(
                     newState = StateManager.setCanDeleteMessagesForAllUsers(newState, newCanDeleteMessagesForAllUsers);
                 }
 
+                // Update the UI with the new message values from the server.
                 render(newState);
+                // Recurse just in case there has been more messages added to the buffer.
                 isSendingMessage = false;
+                processSendMessageBuffer();
                 PubSub.publish(MessageDrawerEvents.CONVERSATION_NEW_LAST_MESSAGE, conversation);
                 return;
             })
@@ -1163,12 +1237,71 @@ function(
 
                 return result;
             })
-            .catch(function(error) {
-                isSendingMessage = false;
-                var newState = StateManager.setSendingMessage(viewState, false);
-                render(newState);
-                Notification.exception(error);
+            .catch(function(e) {
+                var errorMessage;
+                if (e.message) {
+                    errorMessage = $.Deferred().resolve(e.message).promise();
+                } else {
+                    errorMessage = Str.get_string('unknownerror', 'core');
+                }
+
+                var handleFailedMessages = function(errorMessage) {
+                    // We failed to create messages so remove the old messages from the pending queue
+                    // and update the UI to indicate that the message failed.
+                    var newState = StateManager.setMessagesSendFailById(viewState, messageIds, errorMessage);
+                    render(newState);
+                    isSendingMessage = false;
+                    processSendMessageBuffer();
+                };
+
+                errorMessage.then(handleFailedMessages)
+                    .then(function(result) {
+                        pendingPromise.resolve();
+
+                        return result;
+                    })
+                    .catch(function(e) {
+                        // Hrmm, we can't even load the error messages string! We'll have to
+                        // hard code something in English here if we still haven't got a message
+                        // to show.
+                        var finalError = e.message || 'Something went wrong!';
+                        handleFailedMessages(finalError);
+                    });
             });
+    };
+
+    /**
+     * Buffers messages to be sent to the server. We use a buffer here to allow the
+     * user to freely input messages without blocking the interface for them.
+     *
+     * Instead we just queue all of their messages up and send them as fast as we can.
+     *
+     * @param {String} text Text to send.
+     */
+    var sendMessage = function(text) {
+        var id = 'temp' + Date.now();
+        var message = {
+            id: id,
+            useridfrom: viewState.loggedInUserId,
+            text: text,
+            timecreated: null
+        };
+        var newState = StateManager.addMessages(viewState, [message]);
+        render(newState);
+        sendMessageBuffer.push(message);
+        processSendMessageBuffer();
+    };
+
+    /**
+     * Retry sending a message that failed.
+     *
+     * @param {Object} message The message to send.
+     */
+    var retrySendMessage = function(message) {
+        var newState = StateManager.setMessagesSendPendingById(viewState, [message.id]);
+        render(newState);
+        sendMessageBuffer.push(message);
+        processSendMessageBuffer();
     };
 
     /**
@@ -1328,7 +1461,9 @@ function(
         var text = textArea.val().trim();
 
         if (text !== '') {
-            sendMessage(viewState.id, text);
+            sendMessage(text);
+            textArea.val('');
+            textArea.focus();
         }
 
         data.originalEvent.preventDefault();
@@ -1355,11 +1490,35 @@ function(
         }
 
         var element = target.closest(SELECTORS.MESSAGE);
-        var messageId = parseInt(element.attr('data-message-id'), 10);
+        var messageId = element.attr('data-message-id');
 
         toggleSelectMessage(messageId);
 
         data.originalEvent.preventDefault();
+    };
+
+    /**
+     * Handle retry sending of message.
+     *
+     * @param {Object} e Element this event handler is called on.
+     * @param {Object} data Data for this event.
+     */
+    var handleRetrySendMessage = function(e, data) {
+        var target = $(e.target);
+        var element = target.closest(SELECTORS.MESSAGE);
+        var messageId = element.attr('data-message-id');
+        var messages = viewState.messages.filter(function(message) {
+            return message.id == messageId;
+        });
+        var message = messages.length ? messages[0] : null;
+
+        if (message) {
+            retrySendMessage(message);
+        }
+
+        data.originalEvent.preventDefault();
+        data.originalEvent.stopPropagation();
+        e.stopPropagation();
     };
 
     /**
@@ -1470,6 +1629,36 @@ function(
     };
 
     /**
+     * Handle clicking on the emoji toggle button.
+     *
+     * @param {Object} e The event
+     * @param {Object} data The custom interaction event data
+     */
+    var handleToggleEmojiPicker = function(e, data) {
+        var newState = StateManager.setShowEmojiPicker(viewState, !viewState.showEmojiPicker);
+        render(newState);
+        data.originalEvent.preventDefault();
+    };
+
+    /**
+     * Handle clicking outside the emoji picker to close it.
+     *
+     * @param {Object} e The event
+     */
+    var handleCloseEmojiPicker = function(e) {
+        var target = $(e.target);
+
+        if (
+            viewState.showEmojiPicker &&
+            !target.closest(SELECTORS.EMOJI_PICKER_CONTAINER).length &&
+            !target.closest(SELECTORS.TOGGLE_EMOJI_PICKER_BUTTON).length
+        ) {
+            var newState = StateManager.setShowEmojiPicker(viewState, false);
+            render(newState);
+        }
+    };
+
+    /**
      * Listen to, and handle events for conversations.
      *
      * @param {string} namespace The route namespace.
@@ -1480,6 +1669,9 @@ function(
     var registerEventListeners = function(namespace, header, body, footer) {
         var isLoadingMoreMessages = false;
         var messagesContainer = getMessagesContainer(body);
+        var emojiPickerElement = footer.find(SELECTORS.EMOJI_PICKER);
+        var emojiAutoCompleteContainer = footer.find(SELECTORS.EMOJI_AUTO_COMPLETE_CONTAINER);
+        var messageTextArea = footer.find(SELECTORS.MESSAGE_TEXT_AREA);
         var headerActivateHandlers = [
             [SELECTORS.ACTION_REQUEST_BLOCK, generateConfirmActionHandler(requestBlockUser)],
             [SELECTORS.ACTION_REQUEST_UNBLOCK, generateConfirmActionHandler(requestUnblockUser)],
@@ -1502,20 +1694,67 @@ function(
             [SELECTORS.ACTION_CONFIRM_REMOVE_CONTACT, generateConfirmActionHandler(removeContact)],
             [SELECTORS.ACTION_CONFIRM_DELETE_SELECTED_MESSAGES, generateConfirmActionHandler(deleteSelectedMessages)],
             [SELECTORS.ACTION_CONFIRM_DELETE_CONVERSATION, generateConfirmActionHandler(deleteConversation)],
+            [SELECTORS.ACTION_OKAY_CONFIRM, generateConfirmActionHandler(cancelRequest)],
             [SELECTORS.ACTION_REQUEST_ADD_CONTACT, generateConfirmActionHandler(requestAddContact)],
             [SELECTORS.ACTION_ACCEPT_CONTACT_REQUEST, generateConfirmActionHandler(acceptContactRequest)],
             [SELECTORS.ACTION_DECLINE_CONTACT_REQUEST, generateConfirmActionHandler(declineContactRequest)],
             [SELECTORS.MESSAGE, handleSelectMessage],
-            [SELECTORS.DELETE_MESSAGES_FOR_ALL_USERS_TOGGLE, handleDeleteMessagesForAllUsersToggle]
+            [SELECTORS.DELETE_MESSAGES_FOR_ALL_USERS_TOGGLE, handleDeleteMessagesForAllUsersToggle],
+            [SELECTORS.RETRY_SEND, handleRetrySendMessage]
         ];
         var footerActivateHandlers = [
             [SELECTORS.SEND_MESSAGE_BUTTON, handleSendMessage],
+            [SELECTORS.TOGGLE_EMOJI_PICKER_BUTTON, handleToggleEmojiPicker],
             [SELECTORS.ACTION_REQUEST_DELETE_SELECTED_MESSAGES, generateConfirmActionHandler(requestDeleteSelectedMessages)],
             [SELECTORS.ACTION_REQUEST_ADD_CONTACT, generateConfirmActionHandler(requestAddContact)],
             [SELECTORS.ACTION_REQUEST_UNBLOCK, generateConfirmActionHandler(requestUnblockUser)],
         ];
 
         AutoRows.init(footer);
+
+        if (emojiAutoCompleteContainer.length) {
+            initialiseEmojiAutoComplete(
+                emojiAutoCompleteContainer[0],
+                messageTextArea[0],
+                function(hasSuggestions) {
+                    var newState = StateManager.setShowEmojiAutoComplete(viewState, hasSuggestions);
+                    render(newState);
+                },
+                function(emoji) {
+                    var newState = StateManager.setShowEmojiAutoComplete(viewState, false);
+                    render(newState);
+
+                    messageTextArea.focus();
+                    var cursorPos = messageTextArea.prop('selectionStart');
+                    var currentText = messageTextArea.val();
+                    var textBefore = currentText.substring(0, cursorPos).replace(/\S*$/, '');
+                    var textAfter = currentText.substring(cursorPos).replace(/^\S*/, '');
+
+                    messageTextArea.val(textBefore + emoji + textAfter);
+                    // Set the cursor position to after the inserted emoji.
+                    messageTextArea.prop('selectionStart', textBefore.length + emoji.length);
+                    messageTextArea.prop('selectionEnd', textBefore.length + emoji.length);
+                }
+            );
+        }
+
+        if (emojiPickerElement.length) {
+            initialiseEmojiPicker(emojiPickerElement[0], function(emoji) {
+                var newState = StateManager.setShowEmojiPicker(viewState, !viewState.showEmojiPicker);
+                render(newState);
+
+                messageTextArea.focus();
+                var cursorPos = messageTextArea.prop('selectionStart');
+                var currentText = messageTextArea.val();
+                var textBefore = currentText.substring(0, cursorPos);
+                var textAfter = currentText.substring(cursorPos, currentText.length);
+
+                messageTextArea.val(textBefore + emoji + textAfter);
+                // Set the cursor position to after the inserted emoji.
+                messageTextArea.prop('selectionStart', cursorPos + emoji.length);
+                messageTextArea.prop('selectionEnd', cursorPos + emoji.length);
+            });
+        }
 
         CustomEvents.define(header, [
             CustomEvents.events.activate
@@ -1525,7 +1764,8 @@ function(
         ]);
         CustomEvents.define(footer, [
             CustomEvents.events.activate,
-            CustomEvents.events.enter
+            CustomEvents.events.enter,
+            CustomEvents.events.escape
         ]);
         CustomEvents.define(messagesContainer, [
             CustomEvents.events.scrollTop,
@@ -1580,6 +1820,9 @@ function(
             }
         });
 
+        footer.on(CustomEvents.events.escape, SELECTORS.EMOJI_PICKER_CONTAINER, handleToggleEmojiPicker);
+        $(document.body).on('click', handleCloseEmojiPicker);
+
         PubSub.subscribe(MessageDrawerEvents.ROUTE_CHANGED, function(newRouteData) {
             if (newMessagesPollTimer) {
                 if (newRouteData.route != MessageDrawerRoutes.VIEW_CONVERSATION) {
@@ -1622,11 +1865,15 @@ function(
     var resetState = function(body, conversationId, loggedInUserProfile) {
         // Reset all of the states back to the beginning if we're loading a new
         // conversation.
-        isResetting = true;
+        loadedAllMessages = false;
+        messagesOffset = 0;
+        newMessagesPollTimer = null;
         isRendering = false;
         renderBuffer = [];
+        isResetting = true;
         isSendingMessage = false;
         isDeletingConversationContent = false;
+        sendMessageBuffer = [];
 
         var loggedInUserId = loggedInUserProfile.id;
         var midnight = parseInt(body.attr('data-midnight'), 10);
@@ -1848,6 +2095,7 @@ function(
         if (isNewConversation) {
             var renderPromise = null;
             var loggedInUserProfile = getLoggedInUserProfile(body);
+
             if (conversation) {
                 renderPromise = resetByConversation(body, conversation, loggedInUserProfile, otherUserId);
             } else if (conversationId) {

@@ -218,8 +218,14 @@ LTI icon, an icon which conveys the type of activity may be specified.';
 $string['id'] = 'ID';
 $string['indicator:cognitivedepth'] = 'LTI cognitive';
 $string['indicator:cognitivedepth_help'] = 'This indicator is based on the cognitive depth reached by the student in an LTI activity.';
+$string['indicator:cognitivedepthdef'] = 'LTI cognitive';
+$string['indicator:cognitivedepthdef_help'] = 'The participant has reached this percentage of the cognitive engagement offered by the LTI activities during this analysis interval (Levels = No view, View, Submit, View feedback)';
+$string['indicator:cognitivedepthdef_link'] = 'Learning_analytics_indicators#Cognitive_depth';
 $string['indicator:socialbreadth'] = 'LTI social';
 $string['indicator:socialbreadth_help'] = 'This indicator is based on the social breadth reached by the student in an LTI activity.';
+$string['indicator:socialbreadthdef'] = 'LTI social';
+$string['indicator:socialbreadthdef_help'] = 'The participant has reached this percentage of the social engagement offered by the LTI activities during this analysis interval (Levels = No participation, Participant alone, Participant with others)';
+$string['indicator:socialbreadthdef_link'] = 'Learning_analytics_indicators#Social_breadth';
 $string['initiatelogin'] = 'Initiate login URL';
 $string['initiatelogin_help'] = 'The tool URL to which requests for initiating a login are to be sent.  This URL is required before a message can be successfully sent to the tool.';
 $string['invalidid'] = 'LTI ID was incorrect';
@@ -320,13 +326,13 @@ $string['notypes'] = 'There are currently no LTI tools set up in Moodle. Click t
 $string['noviewusers'] = 'No users were found with permissions to use this tool';
 $string['oauthsecurity'] = 'LTI 1.0/1.1';
 $string['optionalsettings'] = 'Optional settings';
-$string['organization'] = 'Organization details';
-$string['organizationdescr'] = 'Organization description';
-$string['organizationid'] = 'Organization ID';
-$string['organizationid_help'] = 'A unique identifier for this Moodle instance. Typically, the DNS name of the organization is used.
+$string['organization'] = 'Organisation details';
+$string['organizationdescr'] = 'Organisation description';
+$string['organizationid'] = 'Organisation ID';
+$string['organizationid_help'] = 'A unique identifier for this Moodle instance. Typically, the DNS name of the organisation is used.
 
 If this field is left blank, the host name of this Moodle site will be used as the default value.';
-$string['organizationurl'] = 'Organization URL';
+$string['organizationurl'] = 'Organisation URL';
 $string['organizationurl_help'] = 'The base URL of this Moodle instance.
 
 If this field is left blank, a default value will be used based on the site configuration.';

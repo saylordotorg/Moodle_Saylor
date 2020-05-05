@@ -166,14 +166,15 @@ class custom_view extends \core_question\bank\view {
 
             // Add selected questions to the quiz.
             $params = array(
-                    'type' => 'submit',
-                    'name' => 'add',
-                    'class' => 'btn btn-primary',
-                    'value' => get_string('addselectedquestionstoquiz', 'quiz'),
+                'type' => 'submit',
+                'name' => 'add',
+                'class' => 'btn btn-primary',
+                'value' => get_string('addselectedquestionstoquiz', 'quiz'),
+                'data-action' => 'toggle',
+                'data-togglegroup' => 'qbank',
+                'data-toggle' => 'action',
+                'disabled' => true,
             );
-            if ($cmoptions->hasattempts) {
-                $params['disabled'] = 'disabled';
-            }
             echo \html_writer::empty_tag('input', $params);
         }
         echo "</div>\n";
@@ -206,7 +207,7 @@ class custom_view extends \core_question\bank\view {
     }
 
     protected function print_category_info($category) {
-        $formatoptions = new stdClass();
+        $formatoptions = new \stdClass();
         $formatoptions->noclean = true;
         $strcategory = get_string('category', 'quiz');
         echo '<div class="categoryinfo"><div class="categorynamefieldcontainer">' .

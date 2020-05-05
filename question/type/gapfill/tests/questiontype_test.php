@@ -91,7 +91,7 @@ class qtype_gapfill_test extends advanced_testcase {
     }
 
     public function test_can_analyse_responses() {
-        $this->assertTrue($this->qtype->can_analyse_responses());
+        $this->assertFalse($this->qtype->can_analyse_responses());
     }
 
     public function test_squestionid_column_name() {

@@ -280,16 +280,7 @@ if ($bulkoperations) {
         $label = get_string('selectalluserswithcount', 'moodle', $participanttable->totalrows);
         echo html_writer::empty_tag('input', array('type' => 'button', 'id' => 'checkall', 'class' => 'btn btn-secondary',
                 'value' => $label, 'data-showallink' => $showalllink));
-        // Select all users, mark all users on page as selected.
-        echo html_writer::tag('input', "", array('type' => 'button', 'id' => 'checkallonpage', 'class' => 'btn btn-secondary',
-        'value' => get_string('selectallusersonpage')));
-    } else {
-        echo html_writer::tag('input', "", array('type' => 'button', 'id' => 'checkallonpage', 'class' => 'btn btn-secondary',
-        'value' => get_string('selectall')));
     }
-
-    echo html_writer::tag('input', "", array('type' => 'button', 'id' => 'checknone', 'class' => 'btn btn-secondary',
-        'value' => get_string('deselectall')));
     echo html_writer::end_tag('div');
     $displaylist = array();
     if (!empty($CFG->messaging)) {
@@ -339,10 +330,18 @@ if ($bulkoperations) {
         }
     }
 
+    $selectactionparams = array(
+        'id' => 'formactionid',
+        'class' => 'ml-2',
+        'data-action' => 'toggle',
+        'data-togglegroup' => 'participants-table',
+        'data-toggle' => 'action',
+        'disabled' => empty($selectall)
+    );
     $label = html_writer::tag('label', get_string("withselectedusers"),
             ['for' => 'formactionid', 'class' => 'col-form-label d-inline']);
-    $select = html_writer::select($displaylist, 'formaction', '', ['' => 'choosedots'], ['id' => 'formactionid']);
-    echo html_writer::tag('div', $label . $select, ['class' => 'ml-2']);
+    $select = html_writer::select($displaylist, 'formaction', '', ['' => 'choosedots'], $selectactionparams);
+    echo html_writer::tag('div', $label . $select);
 
     echo '<input type="hidden" name="id" value="' . $course->id . '" />';
     echo '</div></div></div>';

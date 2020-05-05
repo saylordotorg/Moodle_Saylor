@@ -33,12 +33,12 @@ defined('MOODLE_INTERNAL') || die();
 function xmldb_tool_cohortroles_upgrade($oldversion) {
     global $DB;
 
-    if ($oldversion < 2019052001) {
+    if ($oldversion < 2019111801) {
         // Delete any tool_cohortroles mappings for roles which no longer exist.
         $DB->delete_records_select('tool_cohortroles', 'roleid NOT IN (SELECT id FROM {role})');
 
         // Cohortroles savepoint reached.
-        upgrade_plugin_savepoint(true, 2019052001, 'tool', 'cohortroles');
+        upgrade_plugin_savepoint(true, 2019111801, 'tool', 'cohortroles');
     }
 
     return true;

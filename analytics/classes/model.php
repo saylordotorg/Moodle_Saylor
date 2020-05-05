@@ -121,6 +121,11 @@ class model {
     protected $indicators = null;
 
     /**
+     * @var \context[]
+     */
+    protected $contexts = null;
+
+    /**
      * Unique Model id created from site info and last model modification.
      *
      * @var string
@@ -238,7 +243,7 @@ class model {
         $indicators = \core_analytics\manager::get_all_indicators();
 
         if (empty($this->analyser)) {
-            $this->init_analyser(array('evaluation' => true));
+            $this->init_analyser(array('notimesplitting' => true));
         }
 
         foreach ($indicators as $classname => $indicator) {
@@ -281,15 +286,24 @@ class model {
             throw new \moodle_exception('errornotarget', 'analytics');
         }
 
+        $potentialtimesplittings = $this->get_potential_timesplittings();
+
         $timesplittings = array();
         if (empty($options['notimesplitting'])) {
             if (!empty($options['evaluation'])) {
                 // The evaluation process will run using all available time splitting methods unless one is specified.
                 if (!empty($options['timesplitting'])) {
                     $timesplitting = \core_analytics\manager::get_time_splitting($options['timesplitting']);
+
+                    if (empty($potentialtimesplittings[$timesplitting->get_id()])) {
+                        throw new \moodle_exception('errorcannotusetimesplitting', 'analytics');
+                    }
                     $timesplittings = array($timesplitting->get_id() => $timesplitting);
                 } else {
-                    $timesplittings = \core_analytics\manager::get_time_splitting_methods_for_evaluation();
+                    $timesplittingsforevaluation = \core_analytics\manager::get_time_splitting_methods_for_evaluation();
+
+                    // They both have the same objects, using $potentialtimesplittings as its items are sorted.
+                    $timesplittings = array_intersect_key($potentialtimesplittings, $timesplittingsforevaluation);
                 }
             } else {
 
@@ -325,6 +339,27 @@ class model {
             return false;
         }
         return \core_analytics\manager::get_time_splitting($this->model->timesplitting);
+    }
+
+    /**
+     * Returns the time-splitting methods that can be used by this model.
+     *
+     * @return \core_analytics\local\time_splitting\base[]
+     */
+    public function get_potential_timesplittings() {
+
+        $timesplittings = \core_analytics\manager::get_all_time_splittings();
+        uasort($timesplittings, function($a, $b) {
+            return strcasecmp($a->get_name(), $b->get_name());
+        });
+
+        foreach ($timesplittings as $key => $timesplitting) {
+            if (!$this->get_target()->can_use_timesplitting($timesplitting)) {
+                unset($timesplittings[$key]);
+                continue;
+            }
+        }
+        return $timesplittings;
     }
 
     /**
@@ -429,9 +464,11 @@ class model {
      * @param \core_analytics\local\indicator\base[]|false $indicators False to respect current indicators
      * @param string|false $timesplittingid False to respect current time splitting method
      * @param string|false $predictionsprocessor False to respect current predictors processor value
+     * @param int[]|false $contextids List of context ids for this model. False to respect the current list of contexts.
      * @return void
      */
-    public function update($enabled, $indicators = false, $timesplittingid = '', $predictionsprocessor = false) {
+    public function update($enabled, $indicators = false, $timesplittingid = '', $predictionsprocessor = false,
+            $contextids = false) {
         global $USER, $DB;
 
         \core_analytics\manager::check_can_manage_models();
@@ -454,6 +491,17 @@ class model {
         if ($predictionsprocessor === false) {
             // Respect current value.
             $predictionsprocessor = $this->model->predictionsprocessor;
+        }
+
+        if ($contextids === false) {
+            $contextsstr = $this->model->contextids;
+        } else if (!$contextids) {
+            $contextsstr = null;
+        } else {
+            $contextsstr = json_encode($contextids);
+
+            // Reset the internal cache.
+            $this->contexts = null;
         }
 
         if ($this->model->timesplitting !== $timesplittingid ||
@@ -484,6 +532,7 @@ class model {
         $this->model->indicators = $indicatorsstr;
         $this->model->timesplitting = $timesplittingid;
         $this->model->predictionsprocessor = $predictionsprocessor;
+        $this->model->contextids = $contextsstr;
         $this->model->timemodified = $now;
         $this->model->usermodified = $USER->id;
 
@@ -509,7 +558,7 @@ class model {
             debugging('Prediction processor ' . $predictorname . ' is not ready to be used. Model ' .
                 $this->model->id . ' could not be deleted.');
         } else {
-            $predictor->delete_output_dir($this->get_output_dir(array(), true));
+            $predictor->delete_output_dir($this->get_output_dir(array(), true), $this->get_unique_id());
         }
 
         $DB->delete_records('analytics_models', array('id' => $this->model->id));
@@ -573,7 +622,7 @@ class model {
         // Before get_labelled_data call so we get an early exception if it is not ready.
         $predictor = $this->get_predictions_processor();
 
-        $datasets = $this->get_analyser()->get_labelled_data();
+        $datasets = $this->get_analyser()->get_labelled_data($this->get_contexts());
 
         // No datasets generated.
         if (empty($datasets)) {
@@ -665,7 +714,7 @@ class model {
         // Before get_labelled_data call so we get an early exception if it is not ready.
         $predictor = $this->get_predictions_processor();
 
-        $datasets = $this->get_analyser()->get_labelled_data();
+        $datasets = $this->get_analyser()->get_labelled_data($this->get_contexts());
 
         // No training if no files have been provided.
         if (empty($datasets) || empty($datasets[$this->model->timesplitting])) {
@@ -736,7 +785,7 @@ class model {
             // Before get_unlabelled_data call so we get an early exception if it is not ready.
             $predictor = $this->get_predictions_processor();
 
-            $samplesdata = $this->get_analyser()->get_unlabelled_data();
+            $samplesdata = $this->get_analyser()->get_unlabelled_data($this->get_contexts());
 
             // Get the prediction samples file.
             if (empty($samplesdata) || empty($samplesdata[$this->model->timesplitting])) {
@@ -772,7 +821,7 @@ class model {
         } else {
             // Predictions based on assumptions.
 
-            $indicatorcalculations = $this->get_analyser()->get_static_data();
+            $indicatorcalculations = $this->get_analyser()->get_static_data($this->get_contexts());
             // Get the prediction samples file.
             if (empty($indicatorcalculations) || empty($indicatorcalculations[$this->model->timesplitting])) {
 
@@ -920,11 +969,11 @@ class model {
             // the database, and we need to do it using one single database query (for performance reasons as well).
             $predictionrecords = $this->add_prediction_ids($predictionrecords);
 
-            // Get \core_analytics\prediction objects also fetching the samplesdata. This costs us
-            // 1 db read, but we have to pay it if we want that our insights include links to the
-            // suggested actions.
-            $predictions = array_map(function($predictionobj) {
-                $prediction = new \core_analytics\prediction($predictionobj, $this->prediction_sample_data($predictionobj));
+            $samplesdata = $this->predictions_sample_data($predictionrecords);
+            $samplesdata = $this->append_calculations_info($predictionrecords, $samplesdata);
+
+            $predictions = array_map(function($predictionobj) use ($samplesdata) {
+                $prediction = new \core_analytics\prediction($predictionobj, $samplesdata[$predictionobj->sampleid]);
                 return $prediction;
             }, $predictionrecords);
         } else {
@@ -1206,11 +1255,17 @@ class model {
             $sql .= " AND NOT EXISTS (
               SELECT 1
                 FROM {analytics_prediction_actions} apa
-               WHERE apa.predictionid = ap.id AND apa.userid = :userid AND (apa.actionname = :fixed OR apa.actionname = :notuseful)
+               WHERE apa.predictionid = ap.id AND apa.userid = :userid AND
+                     (apa.actionname = :fixed OR apa.actionname = :notuseful OR
+                     apa.actionname = :useful OR apa.actionname = :notapplicable OR
+                     apa.actionname = :incorrectlyflagged)
             )";
             $params['userid'] = $USER->id;
             $params['fixed'] = \core_analytics\prediction::ACTION_FIXED;
             $params['notuseful'] = \core_analytics\prediction::ACTION_NOT_USEFUL;
+            $params['useful'] = \core_analytics\prediction::ACTION_USEFUL;
+            $params['notapplicable'] = \core_analytics\prediction::ACTION_NOT_APPLICABLE;
+            $params['incorrectlyflagged'] = \core_analytics\prediction::ACTION_INCORRECTLY_FLAGGED;
         }
 
         return $DB->get_records_sql($sql, $params);
@@ -1289,11 +1344,17 @@ class model {
             $sql .= " AND NOT EXISTS (
               SELECT 1
                 FROM {analytics_prediction_actions} apa
-               WHERE apa.predictionid = ap.id AND apa.userid = :userid AND (apa.actionname = :fixed OR apa.actionname = :notuseful)
+               WHERE apa.predictionid = ap.id AND apa.userid = :userid AND
+                     (apa.actionname = :fixed OR apa.actionname = :notuseful OR
+                     apa.actionname = :useful OR apa.actionname = :notapplicable OR
+                     apa.actionname = :incorrectlyflagged)
             )";
             $params['userid'] = $USER->id;
             $params['fixed'] = \core_analytics\prediction::ACTION_FIXED;
             $params['notuseful'] = \core_analytics\prediction::ACTION_NOT_USEFUL;
+            $params['useful'] = \core_analytics\prediction::ACTION_USEFUL;
+            $params['notapplicable'] = \core_analytics\prediction::ACTION_NOT_APPLICABLE;
+            $params['incorrectlyflagged'] = \core_analytics\prediction::ACTION_INCORRECTLY_FLAGGED;
         }
 
         $sql .= " ORDER BY ap.timecreated DESC";
@@ -1337,7 +1398,35 @@ class model {
             $current++;
         }
 
+        if (empty($predictions)) {
+            return array();
+        }
+
         return [$current, $predictions];
+    }
+
+    /**
+     * Returns the actions executed by users on the predictions.
+     *
+     * @param  \context|null $context
+     * @return \moodle_recordset
+     */
+    public function get_prediction_actions(?\context $context): \moodle_recordset {
+        global $DB;
+
+        $sql = "SELECT apa.id, apa.predictionid, apa.userid, apa.actionname, apa.timecreated,
+                       ap.contextid, ap.sampleid, ap.rangeindex, ap.prediction, ap.predictionscore
+                  FROM {analytics_prediction_actions} apa
+                  JOIN {analytics_predictions} ap ON ap.id = apa.predictionid
+                 WHERE ap.modelid = :modelid";
+        $params = ['modelid' => $this->model->id];
+
+        if ($context) {
+            $sql .= " AND ap.contextid = :contextid";
+            $params['contextid'] = $context->id;
+        }
+
+        return $DB->get_recordset_sql($sql, $params);
     }
 
     /**
@@ -1355,6 +1444,41 @@ class model {
         }
 
         return $samplesdata[$predictionobj->sampleid];
+    }
+
+    /**
+     * Returns the samples data of the provided predictions.
+     *
+     * @param \stdClass[] $predictionrecords
+     * @return array
+     */
+    public function predictions_sample_data(array $predictionrecords): array {
+
+        $sampleids = [];
+        foreach ($predictionrecords as $predictionobj) {
+            $sampleids[] = $predictionobj->sampleid;
+        }
+        list($sampleids, $samplesdata) = $this->get_analyser()->get_samples($sampleids);
+
+        return $samplesdata;
+    }
+
+    /**
+     * Appends the calculation info to the samples data.
+     *
+     * @param   \stdClass[] $predictionrecords
+     * @param   array $samplesdata
+     * @return  array
+     */
+    public function append_calculations_info(array $predictionrecords, array $samplesdata): array {
+
+        if ($extrainfo = calculation_info::pull_info($predictionrecords)) {
+            foreach ($samplesdata as $sampleid => $data) {
+                // The extra info come prefixed by extra: so we will not have overwrites here.
+                $samplesdata[$sampleid] = $samplesdata[$sampleid] + $extrainfo[$sampleid];
+            }
+        }
+        return $samplesdata;
     }
 
     /**
@@ -1734,6 +1858,26 @@ class model {
     }
 
     /**
+     * Returns true if the time-splitting method used by this model is invalid for this model.
+     * @return  bool
+     */
+    public function invalid_timesplitting_selected(): bool {
+        $currenttimesplitting = $this->model->timesplitting;
+        if (empty($currenttimesplitting)) {
+            // Not set is different from invalid. This function is used to identify invalid
+            // time-splittings.
+            return false;
+        }
+
+        $potentialtimesplittings = $this->get_potential_timesplittings();
+        if ($currenttimesplitting && empty($potentialtimesplittings[$currenttimesplitting])) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Adds the id from {analytics_predictions} db table to the prediction \stdClass objects.
      *
      * @param  \stdClass[] $predictionrecords
@@ -1833,6 +1977,30 @@ class model {
             }
         }
         return [$allsampleids, $allsamplesdata];
+    }
+
+    /**
+     * Contexts where this model should be active.
+     *
+     * @return \context[] Empty array if there are no context restrictions.
+     */
+    public function get_contexts() {
+        if ($this->contexts !== null) {
+            return $this->contexts;
+        }
+
+        if (!$this->model->contextids) {
+            $this->contexts = [];
+            return $this->contexts;
+        }
+        $contextids = json_decode($this->model->contextids);
+
+        // We don't expect this list to be massive as contexts need to be selected manually using the edit model form.
+        $this->contexts = array_map(function($contextid) {
+            return \context::instance_by_id($contextid, IGNORE_MISSING);
+        }, $contextids);
+
+        return $this->contexts;
     }
 
     /**

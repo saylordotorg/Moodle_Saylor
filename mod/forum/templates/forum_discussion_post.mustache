@@ -39,7 +39,7 @@
     aria-labelledby="post-header-{{id}}-{{uniqid}}"
     aria-describedby="post-content-{{id}}"
 >
-    <!-- The firstpost and starter classes below aren't used for anything other than to identify the first post in behat -->
+    {{! The firstpost and starter classes below aren't used for anything other than to identify the first post in behat. }}
     <div
         class="d-flex border p-2 mb-2 forumpost focus-target {{#unread}}unread{{/unread}} {{#firstpost}}firstpost starter{{/firstpost}}"
         aria-label='{{#str}} postbyuser, mod_forum, {"post": "{{subject}}", "user": "{{author.fullname}}"} {{/str}}'
@@ -181,12 +181,12 @@
                             {{/isimage}}
                         {{/attachments}}
 
-                        <div class="d-flex flex-wrap">
-                            {{#html.rating}}
-                                <div class="mt-2">{{{.}}}</div>
-                            {{/html.rating}}
-                            {{$actions}}
-                                {{^readonly}}
+                        {{^readonly}}
+                            <div class="d-flex flex-wrap">
+                                {{#html.rating}}
+                                    <div class="mt-2">{{{.}}}</div>
+                                {{/html.rating}}
+                                {{$actions}}
                                     <div
                                         class="post-actions d-flex align-self-end justify-content-end flex-wrap ml-auto"
                                         data-region="post-actions-container"
@@ -315,9 +315,9 @@
                                             {{/export}}
                                         {{/capabilities}}
                                     </div>
-                                {{/readonly}}
-                            {{/actions}}
-                        </div>
+                                {{/actions}}
+                            </div>
+                        {{/readonly}}
 
                         {{$footer}}{{/footer}}
                     {{/isdeleted}}
@@ -326,15 +326,13 @@
         </div>
     </div>
 
-    <div data-region="replies-container">
     {{$replies}}
-        <div>
-        {{#hasreplies}}
-            {{#replies}}
-                {{> mod_forum/forum_discussion_post }}
-            {{/replies}}
-        {{/hasreplies}}
+        <div data-region="replies-container">
+            {{#hasreplies}}
+                {{#replies}}
+                    {{> mod_forum/forum_discussion_post }}
+                {{/replies}}
+            {{/hasreplies}}
         </div>
     {{/replies}}
-    </div>
 </article>

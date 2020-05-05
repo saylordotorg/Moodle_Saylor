@@ -234,6 +234,27 @@ class question_type {
     }
 
     /**
+     * Get extra actions for a question of this type to add to the question bank edit menu.
+     *
+     * This method is called if the {@link edit_menu_column} is being used in the
+     * question bank, which it is by default since Moodle 3.8. If applicable for
+     * your question type, you can return arn array of {@link action_menu_link}s.
+     * These will be added at the end of the Edit menu for this question.
+     *
+     * The $question object passed in will have a hard-to-predict set of fields,
+     * because the fields present depend on which columns are included in the
+     * question bank view. However, you can rely on 'id', 'createdby',
+     * 'contextid', 'hidden' and 'category' (id) being present, and so you
+     * can call question_has_capability_on without causing performance problems.
+     *
+     * @param stdClass $question the available information about the particular question the action is for.
+     * @return action_menu_link[] any actions you want to add to the Edit menu for this question.
+     */
+    public function get_extra_question_bank_actions(stdClass $question): array {
+        return [];
+    }
+
+    /**
      * This method should be overriden if you want to include a special heading or some other
      * html on a question editing page besides the question editing form.
      *
@@ -1034,9 +1055,27 @@ class question_type {
     }
 
     /**
-     * @param object $question
+     * Calculate the score a monkey would get on a question by clicking randomly.
+     *
+     * Some question types have significant non-zero average expected score
+     * of the response is just selected randomly. For example 50% for a
+     * true-false question. It is useful to know what this is. For example
+     * it gets shown in the quiz statistics report.
+     *
+     * For almost any open-ended question type (E.g. shortanswer or numerical)
+     * this should be 0.
+     *
+     * For selective response question types (e.g. multiple choice), you can probably compute this.
+     *
+     * For particularly complicated question types the may be impossible or very
+     * difficult to compute. In this case return null. (Or, if the expected score
+     * is very tiny even though the exact value is unknown, it may appropriate
+     * to return 0.)
+     *
+     * @param stdClass $questiondata data defining a question, as returned by
+     *      question_bank::load_question_data().
      * @return number|null either a fraction estimating what the student would
-     * score by guessing, or null, if it is not possible to estimate.
+     *      score by guessing, or null, if it is not possible to estimate.
      */
     public function get_random_guess_score($questiondata) {
         return 0;

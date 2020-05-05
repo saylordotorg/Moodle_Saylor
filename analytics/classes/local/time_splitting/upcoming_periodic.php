@@ -33,18 +33,21 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright 2019 David Monllao {@link http://www.davidmonllao.com}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-abstract class upcoming_periodic extends periodic {
+abstract class upcoming_periodic extends periodic implements after_now {
 
     /**
-     * The next range indicator calculations should be based on upcoming dates.
+     * Gets the next range with start on the provided time.
      *
-     * @param  \DateTimeImmutable $next
+     * The next range is based on the upcoming period so we add this
+     * range's periodicity to $time.
+     *
+     * @param  \DateTimeImmutable $time
      * @return array
      */
-    protected function get_next_range(\DateTimeImmutable $next) {
+    protected function get_next_range(\DateTimeImmutable $time) {
 
-        $start = $next->getTimestamp();
-        $end = $next->add($this->periodicity())->getTimestamp();
+        $start = $time->getTimestamp();
+        $end = $time->add($this->periodicity())->getTimestamp();
         return [
             'start' => $start,
             'end' => $end,
@@ -87,7 +90,7 @@ abstract class upcoming_periodic extends periodic {
             return $firstanalysis;
         }
 
-        // This analysable has not yet been analysed, the start is therefore now (-1 so ready_to_predict can be executed).
-        return time() - 1;
+        // This analysable has not yet been analysed, the start is therefore now.
+        return time();
     }
 }

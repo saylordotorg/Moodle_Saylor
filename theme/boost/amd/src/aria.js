@@ -186,9 +186,9 @@ define(['jquery', 'core/pending'], function($, Pending) {
             });
 
             // After page load, focus on any element with special autofocus attribute.
-            window.addEventListener("load", function() {
-                var alerts = document.querySelectorAll('[data-aria-autofocus="true"][role="alert"]');
-                Array.prototype.forEach.call(alerts, function(autofocusElement) {
+            window.addEventListener("load", () => {
+                const alerts = document.querySelectorAll('[data-aria-autofocus="true"][role="alert"]');
+                Array.prototype.forEach.call(alerts, autofocusElement => {
                     // According to the specification an role="alert" region is only read out on change to the content
                     // of that region.
                     autofocusElement.innerHTML += ' ';

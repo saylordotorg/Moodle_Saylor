@@ -36,6 +36,7 @@ define(
     'core_message/message_drawer_routes',
     'core_message/message_drawer_events',
     'core/pending',
+    'core/drawer',
 ],
 function(
     $,
@@ -51,10 +52,13 @@ function(
     Router,
     Routes,
     Events,
-    Pending
+    Pending,
+    Drawer
 ) {
 
     var SELECTORS = {
+        DRAWER: '[data-region="right-hand-drawer"]',
+        JUMPTO: '.popover-region [data-region="jumpto"]',
         PANEL_BODY_CONTAINER: '[data-region="panel-body-container"]',
         PANEL_HEADER_CONTAINER: '[data-region="panel-header-container"]',
         VIEW_CONTACT: '[data-region="view-contact"]',
@@ -134,9 +138,10 @@ function(
             root.attr('data-shown', true);
         }
 
-        root.removeClass('hidden');
-        root.attr('aria-expanded', true);
-        root.attr('aria-hidden', false);
+        var drawerRoot = Drawer.getDrawerRoot(root);
+        if (drawerRoot.length) {
+            Drawer.show(drawerRoot);
+        }
     };
 
     /**
@@ -145,19 +150,33 @@ function(
      * @param {Object} root The message drawer container.
      */
     var hide = function(root) {
-        root.addClass('hidden');
-        root.attr('aria-expanded', false);
-        root.attr('aria-hidden', true);
+        var drawerRoot = Drawer.getDrawerRoot(root);
+        if (drawerRoot.length) {
+            Drawer.hide(drawerRoot);
+        }
     };
 
     /**
      * Check if the drawer is visible.
      *
      * @param {Object} root The message drawer container.
-     * @return {bool}
+     * @return {boolean}
      */
     var isVisible = function(root) {
-        return !root.hasClass('hidden');
+        var drawerRoot = Drawer.getDrawerRoot(root);
+        if (drawerRoot.length) {
+            return Drawer.isVisible(drawerRoot);
+        }
+        return true;
+    };
+
+    /**
+     * Set Jump from button
+     *
+     * @param {String} buttonid The originating button id
+     */
+    var setJumpFrom = function(buttonid) {
+        $(SELECTORS.DRAWER).attr('data-origin', buttonid);
     };
 
     /**
@@ -233,6 +252,22 @@ function(
             });
         });
 
+        $(SELECTORS.JUMPTO).focus(function() {
+            var firstInput = $(SELECTORS.HEADER_CONTAINER).find('input:visible');
+            if (firstInput.length) {
+                firstInput.focus();
+            } else {
+                $(SELECTORS.HEADER_CONTAINER).find(SELECTORS.ROUTES_BACK).focus();
+            }
+        });
+
+        $(SELECTORS.DRAWER).focus(function() {
+            var button = $(this).attr('data-origin');
+            if (button) {
+                $('#' + button).focus();
+            }
+        });
+
         if (!alwaysVisible) {
             PubSub.subscribe(Events.SHOW, function() {
                 show(namespace, root);
@@ -242,23 +277,28 @@ function(
                 hide(root);
             });
 
-            PubSub.subscribe(Events.TOGGLE_VISIBILITY, function() {
+            PubSub.subscribe(Events.TOGGLE_VISIBILITY, function(buttonid) {
                 if (isVisible(root)) {
                     hide(root);
+                    $(SELECTORS.JUMPTO).attr('tabindex', -1);
                 } else {
                     show(namespace, root);
+                    setJumpFrom(buttonid);
+                    $(SELECTORS.JUMPTO).attr('tabindex', 0);
                 }
             });
         }
 
-        PubSub.subscribe(Events.SHOW_CONVERSATION, function(conversationId) {
+        PubSub.subscribe(Events.SHOW_CONVERSATION, function(args) {
+            setJumpFrom(args.buttonid);
             show(namespace, root);
-            Router.go(namespace, Routes.VIEW_CONVERSATION, conversationId);
+            Router.go(namespace, Routes.VIEW_CONVERSATION, args.conversationid);
         });
 
-        PubSub.subscribe(Events.CREATE_CONVERSATION_WITH_USER, function(userId) {
+        PubSub.subscribe(Events.CREATE_CONVERSATION_WITH_USER, function(args) {
+            setJumpFrom(args.buttonid);
             show(namespace, root);
-            Router.go(namespace, Routes.VIEW_CONVERSATION, null, 'create', userId);
+            Router.go(namespace, Routes.VIEW_CONVERSATION, null, 'create', args.userid);
         });
 
         PubSub.subscribe(Events.SHOW_SETTINGS, function() {

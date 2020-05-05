@@ -23,12 +23,13 @@
  */
 
 namespace assignfeedback_editpdf;
+use setasign\Fpdi\TcpdfFpdi;
 
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->libdir.'/pdflib.php');
-require_once($CFG->dirroot.'/mod/assign/feedback/editpdf/fpdi/fpdi.php');
+require_once($CFG->dirroot.'/mod/assign/feedback/editpdf/fpdi/autoload.php');
 
 /**
  * Library code for manipulating PDFs
@@ -37,7 +38,7 @@ require_once($CFG->dirroot.'/mod/assign/feedback/editpdf/fpdi/fpdi.php');
  * @copyright 2012 Davo Smith
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class pdf extends \FPDI {
+class pdf extends TcpdfFpdi {
 
     /** @var int the number of the current page in the PDF being processed */
     protected $currentpage = 0;
@@ -209,14 +210,11 @@ class pdf extends \FPDI {
         // Get the size (and deduce the orientation) of the next page.
         $template = $this->importPage($pageno);
         $size = $this->getTemplateSize($template);
-        $orientation = 'P';
-        if ($size['w'] > $size['h']) {
-            $orientation = 'L';
-        }
+
         // Create a page of the required size / orientation.
-        $this->AddPage($orientation, array($size['w'], $size['h']));
+        $this->AddPage($size['orientation'], array($size['width'], $size['height']));
         // Prevent new page creation when comments are at the bottom of a page.
-        $this->setPageOrientation($orientation, false, 0);
+        $this->setPageOrientation($size['orientation'], false, 0);
         // Fill in the page with the original contents from the student.
         $this->useTemplate($template);
     }
@@ -783,22 +781,19 @@ class pdf extends \FPDI {
         $size = $this->getTemplateSize($template);
 
         if ($imageinfo["width"] > $imageinfo["height"]) {
-            if ($size['w'] < $size['h']) {
-                $temp = $size['w'];
-                $size['w'] = $size['h'];
-                $size['h'] = $temp;
+            if ($size['width'] < $size['height']) {
+                $temp = $size['width'];
+                $size['width'] = $size['height'];
+                $size['height'] = $temp;
             }
-            $orientation = 'L';
         } else if ($imageinfo["width"] < $imageinfo["height"]) {
-            if ($size['w'] > $size['h']) {
-                $temp = $size['w'];
-                $size['w'] = $size['h'];
-                $size['h'] = $temp;
+            if ($size['width'] > $size['height']) {
+                $temp = $size['width'];
+                $size['width'] = $size['height'];
+                $size['height'] = $temp;
             }
-            $orientation = 'P';
-        } else {
-            $orientation = 'P';
         }
+        $orientation = $size['orientation'];
         $this->SetHeaderMargin(0);
         $this->SetFooterMargin(0);
         $this->SetMargins(0, 0, 0, true);

@@ -56,13 +56,17 @@ define('FIRSTUSEDEXCELROW', 3);
 define('MOD_CLASS_ACTIVITY', 0);
 define('MOD_CLASS_RESOURCE', 1);
 
+define('COURSE_TIMELINE_ALLINCLUDINGHIDDEN', 'allincludinghidden');
 define('COURSE_TIMELINE_ALL', 'all');
 define('COURSE_TIMELINE_PAST', 'past');
 define('COURSE_TIMELINE_INPROGRESS', 'inprogress');
 define('COURSE_TIMELINE_FUTURE', 'future');
 define('COURSE_FAVOURITES', 'favourites');
 define('COURSE_TIMELINE_HIDDEN', 'hidden');
+define('COURSE_CUSTOMFIELD', 'customfield');
 define('COURSE_DB_QUERY_LIMIT', 1000);
+/** Searching for all courses that have no value for the specified custom field. */
+define('COURSE_CUSTOMFIELD_EMPTY', -1);
 
 function make_log_url($module, $url) {
     switch ($module) {
@@ -558,12 +562,10 @@ function get_module_types_names($plural = false) {
         if ($allmods = $DB->get_records("modules")) {
             foreach ($allmods as $mod) {
                 if (file_exists("$CFG->dirroot/mod/$mod->name/lib.php") && $mod->visible) {
-                    $modnames[0][$mod->name] = get_string("modulename", "$mod->name");
-                    $modnames[1][$mod->name] = get_string("modulenameplural", "$mod->name");
+                    $modnames[0][$mod->name] = get_string("modulename", "$mod->name", null, true);
+                    $modnames[1][$mod->name] = get_string("modulenameplural", "$mod->name", null, true);
                 }
             }
-            core_collator::asort($modnames[0]);
-            core_collator::asort($modnames[1]);
         }
     }
     return $modnames[(int)$plural];
@@ -750,16 +752,21 @@ function make_categories_options() {
 /**
  * Print the buttons relating to course requests.
  *
- * @param object $context current page context.
+ * @param context $context current page context.
  */
 function print_course_request_buttons($context) {
     global $CFG, $DB, $OUTPUT;
     if (empty($CFG->enablecourserequests)) {
         return;
     }
-    if (!has_capability('moodle/course:create', $context) && has_capability('moodle/course:request', $context)) {
-    /// Print a button to request a new course
-        echo $OUTPUT->single_button(new moodle_url('/course/request.php'), get_string('requestcourse'), 'get');
+    if (course_request::can_request($context)) {
+        // Print a button to request a new course.
+        $params = [];
+        if ($context instanceof context_coursecat) {
+            $params['category'] = $context->instanceid;
+        }
+        echo $OUTPUT->single_button(new moodle_url('/course/request.php', $params),
+            get_string('requestcourse'), 'get');
     }
     /// Print a button to manage pending requests
     if (has_capability('moodle/site:approvecourse', $context)) {
@@ -1294,7 +1301,7 @@ function course_module_flag_for_async_deletion($cmid) {
  * @param bool $onlygradable whether to check only gradable modules or all modules.
  * @return bool true if the course contains any modules pending deletion, false otherwise.
  */
-function course_modules_pending_deletion($courseid, bool $onlygradable = false) : bool {
+function course_modules_pending_deletion(int $courseid, bool $onlygradable = false) : bool {
     if (empty($courseid)) {
         return false;
     }
@@ -2224,7 +2231,8 @@ function move_courses($courseids, $categoryid) {
             'objectid' => $course->id,
             'context' => context_course::instance($course->id),
             'other' => array('shortname' => $dbcourse->shortname,
-                             'fullname' => $dbcourse->fullname)
+                             'fullname' => $dbcourse->fullname,
+                             'updatedfields' => array('category' => $category->id))
         ));
         $event->set_legacy_logdata(array($course->id, 'course', 'move', 'edit.php?id=' . $course->id, $course->id));
         $event->trigger();
@@ -2432,6 +2440,11 @@ function create_course($data, $editoroptions = NULL) {
         }
     }
 
+    if (empty($CFG->enablecourserelativedates)) {
+        // Make sure we're not setting the relative dates mode when the setting is disabled.
+        unset($data->relativedatesmode);
+    }
+
     if ($errorcode = course_validate_dates((array)$data)) {
         throw new moodle_exception($errorcode);
     }
@@ -2536,8 +2549,6 @@ function create_course($data, $editoroptions = NULL) {
 function update_course($data, $editoroptions = NULL) {
     global $DB, $CFG;
 
-    $data->timemodified = time();
-
     // Prevent changes on front page course.
     if ($data->id == SITEID) {
         throw new moodle_exception('invalidcourse', 'error');
@@ -2545,6 +2556,31 @@ function update_course($data, $editoroptions = NULL) {
 
     $oldcourse = course_get_format($data->id)->get_course();
     $context   = context_course::instance($oldcourse->id);
+
+    // Make sure we're not changing whatever the course's relativedatesmode setting is.
+    unset($data->relativedatesmode);
+
+    // Capture the updated fields for the log data.
+    $updatedfields = [];
+    foreach (get_object_vars($oldcourse) as $field => $value) {
+        if ($field == 'summary_editor') {
+            if (($data->$field)['text'] !== $value['text']) {
+                // The summary might be very long, we don't wan't to fill up the log record with the full text.
+                $updatedfields[$field] = '(updated)';
+            }
+        } else if ($field == 'tags' && !empty($CFG->usetags)) {
+            // Tags might not have the same array keys, just check the values.
+            if (array_values($data->$field) !== array_values($value)) {
+                $updatedfields[$field] = $data->$field;
+            }
+        } else {
+            if (isset($data->$field) && $data->$field != $value) {
+                $updatedfields[$field] = $data->$field;
+            }
+        }
+    }
+
+    $data->timemodified = time();
 
     if ($editoroptions) {
         $data = file_postupdate_standard_editor($data, 'summary', $editoroptions, $context, 'course', 'summary', 0);
@@ -2652,7 +2688,8 @@ function update_course($data, $editoroptions = NULL) {
         'objectid' => $course->id,
         'context' => context_course::instance($course->id),
         'other' => array('shortname' => $course->shortname,
-                         'fullname' => $course->fullname)
+                         'fullname' => $course->fullname,
+                         'updatedfields' => $updatedfields)
     ));
 
     $event->set_legacy_logdata(array($course->id, 'course', 'update', 'edit.php?id=' . $course->id, $course->id));
@@ -2804,7 +2841,7 @@ class course_request {
         $data->requester = $USER->id;
 
         // Setting the default category if none set.
-        if (empty($data->category) || empty($CFG->requestcategoryselection)) {
+        if (empty($data->category) || !empty($CFG->lockrequestcategory)) {
             $data->category = $CFG->defaultrequestcategory;
         }
 
@@ -2944,6 +2981,31 @@ class course_request {
     }
 
     /**
+     * Checks user capability to approve a requested course
+     *
+     * If course was requested without category for some reason (might happen if $CFG->defaultrequestcategory is
+     * misconfigured), we check capabilities 'moodle/site:approvecourse' and 'moodle/course:changecategory'.
+     *
+     * @return bool
+     */
+    public function can_approve() {
+        global $CFG;
+        $category = null;
+        if ($this->properties->category) {
+            $category = core_course_category::get($this->properties->category, IGNORE_MISSING);
+        } else if ($CFG->defaultrequestcategory) {
+            $category = core_course_category::get($CFG->defaultrequestcategory, IGNORE_MISSING);
+        }
+        if ($category) {
+            return has_capability('moodle/site:approvecourse', $category->get_context());
+        }
+
+        // We can not determine the context where the course should be created. The approver should have
+        // both capabilities to approve courses and change course category in the system context.
+        return has_all_capabilities(['moodle/site:approvecourse', 'moodle/course:changecategory'], context_system::instance());
+    }
+
+    /**
      * Returns the category where this course request should be created
      *
      * Note that we don't check here that user has a capability to view
@@ -2954,17 +3016,14 @@ class course_request {
      */
     public function get_category() {
         global $CFG;
-        // If the category is not set, if the current user does not have the rights to change the category, or if the
-        // category does not exist, we set the default category to the course to be approved.
-        // The system level is used because the capability moodle/site:approvecourse is based on a system level.
-        if (empty($this->properties->category) || !has_capability('moodle/course:changecategory', context_system::instance()) ||
-                (!$category = core_course_category::get($this->properties->category, IGNORE_MISSING, true))) {
-            $category = core_course_category::get($CFG->defaultrequestcategory, IGNORE_MISSING, true);
+        if ($this->properties->category && ($category = core_course_category::get($this->properties->category, IGNORE_MISSING))) {
+            return $category;
+        } else if ($CFG->defaultrequestcategory &&
+                ($category = core_course_category::get($CFG->defaultrequestcategory, IGNORE_MISSING))) {
+            return $category;
+        } else {
+            return core_course_category::get_default();
         }
-        if (!$category) {
-            $category = core_course_category::get_default();
-        }
-        return $category;
     }
 
     /**
@@ -3089,6 +3148,33 @@ class course_request {
         $eventdata->smallmessage      = '';
         $eventdata->notification      = 1;
         message_send($eventdata);
+    }
+
+    /**
+     * Checks if current user can request a course in this context
+     *
+     * @param context $context
+     * @return bool
+     */
+    public static function can_request(context $context) {
+        global $CFG;
+        if (empty($CFG->enablecourserequests)) {
+            return false;
+        }
+        if (has_capability('moodle/course:create', $context)) {
+            return false;
+        }
+
+        if ($context instanceof context_system) {
+            $defaultcontext = context_coursecat::instance($CFG->defaultrequestcategory, IGNORE_MISSING);
+            return $defaultcontext &&
+                has_capability('moodle/course:request', $defaultcontext);
+        } else if ($context instanceof context_coursecat) {
+            if (!$CFG->lockrequestcategory || $CFG->defaultrequestcategory == $context->instanceid) {
+                return has_capability('moodle/course:request', $context);
+            }
+        }
+        return false;
     }
 }
 
@@ -4292,9 +4378,9 @@ function course_filter_courses_by_timeline_classification(
 ) : array {
 
     if (!in_array($classification,
-            [COURSE_TIMELINE_ALL, COURSE_TIMELINE_PAST, COURSE_TIMELINE_INPROGRESS,
+            [COURSE_TIMELINE_ALLINCLUDINGHIDDEN, COURSE_TIMELINE_ALL, COURSE_TIMELINE_PAST, COURSE_TIMELINE_INPROGRESS,
                 COURSE_TIMELINE_FUTURE, COURSE_TIMELINE_HIDDEN])) {
-        $message = 'Classification must be one of COURSE_TIMELINE_ALL, COURSE_TIMELINE_PAST, '
+        $message = 'Classification must be one of COURSE_TIMELINE_ALLINCLUDINGHIDDEN, COURSE_TIMELINE_ALL, COURSE_TIMELINE_PAST, '
             . 'COURSE_TIMELINE_INPROGRESS or COURSE_TIMELINE_FUTURE';
         throw new moodle_exception($message);
     }
@@ -4308,7 +4394,7 @@ function course_filter_courses_by_timeline_classification(
         $pref = get_user_preferences('block_myoverview_hidden_course_' . $course->id, 0);
 
         // Added as of MDL-63457 toggle viewability for each user.
-        if (($classification == COURSE_TIMELINE_HIDDEN && $pref) ||
+        if ($classification == COURSE_TIMELINE_ALLINCLUDINGHIDDEN || ($classification == COURSE_TIMELINE_HIDDEN && $pref) ||
             (($classification == COURSE_TIMELINE_ALL || $classification == course_classify_for_timeline($course)) && !$pref)) {
             $filteredcourses[] = $course;
             $filtermatches++;
@@ -4355,6 +4441,103 @@ function course_filter_courses_by_favourites(
         $numberofcoursesprocessed++;
 
         if (in_array($course->id, $favouritecourseids)) {
+            $filteredcourses[] = $course;
+            $filtermatches++;
+        }
+
+        if ($limit && $filtermatches >= $limit) {
+            // We've found the number of requested courses. No need to continue searching.
+            break;
+        }
+    }
+
+    // Return the number of filtered courses as well as the number of courses that were searched
+    // in order to find the matching courses. This allows the calling code to do some kind of
+    // pagination.
+    return [$filteredcourses, $numberofcoursesprocessed];
+}
+
+/**
+ * Search the given $courses for any that have a $customfieldname value that matches the given
+ * $customfieldvalue, up to the specified $limit.
+ *
+ * This function will return the subset of courses that matches the value as well as the
+ * number of courses it had to process to build that subset.
+ *
+ * It is recommended that for larger sets of courses this function is given a Generator that loads
+ * the courses from the database in chunks.
+ *
+ * @param array|Traversable $courses List of courses to process
+ * @param string $customfieldname the shortname of the custom field to match against
+ * @param string $customfieldvalue the value this custom field needs to match
+ * @param int $limit Limit the number of results to this amount
+ * @return array First value is the filtered courses, second value is the number of courses processed
+ */
+function course_filter_courses_by_customfield(
+    $courses,
+    $customfieldname,
+    $customfieldvalue,
+    int $limit = 0
+) : array {
+    global $DB;
+
+    if (!$courses) {
+        return [[], 0];
+    }
+
+    // Prepare the list of courses to search through.
+    $coursesbyid = [];
+    foreach ($courses as $course) {
+        $coursesbyid[$course->id] = $course;
+    }
+    if (!$coursesbyid) {
+        return [[], 0];
+    }
+    list($csql, $params) = $DB->get_in_or_equal(array_keys($coursesbyid), SQL_PARAMS_NAMED);
+
+    // Get the id of the custom field.
+    $sql = "
+       SELECT f.id
+         FROM {customfield_field} f
+         JOIN {customfield_category} cat ON cat.id = f.categoryid
+        WHERE f.shortname = ?
+          AND cat.component = 'core_course'
+          AND cat.area = 'course'
+    ";
+    $fieldid = $DB->get_field_sql($sql, [$customfieldname]);
+    if (!$fieldid) {
+        return [[], 0];
+    }
+
+    // Get a list of courseids that match that custom field value.
+    if ($customfieldvalue == COURSE_CUSTOMFIELD_EMPTY) {
+        $comparevalue = $DB->sql_compare_text('cd.value');
+        $sql = "
+           SELECT c.id
+             FROM {course} c
+        LEFT JOIN {customfield_data} cd ON cd.instanceid = c.id AND cd.fieldid = :fieldid
+            WHERE c.id $csql
+              AND (cd.value IS NULL OR $comparevalue = '' OR $comparevalue = '0')
+        ";
+        $params['fieldid'] = $fieldid;
+        $matchcourseids = $DB->get_fieldset_sql($sql, $params);
+    } else {
+        $comparevalue = $DB->sql_compare_text('value');
+        $select = "fieldid = :fieldid AND $comparevalue = :customfieldvalue AND instanceid $csql";
+        $params['fieldid'] = $fieldid;
+        $params['customfieldvalue'] = $customfieldvalue;
+        $matchcourseids = $DB->get_fieldset_select('customfield_data', 'instanceid', $select, $params);
+    }
+
+    // Prepare the list of courses to return.
+    $filteredcourses = [];
+    $numberofcoursesprocessed = 0;
+    $filtermatches = 0;
+
+    foreach ($coursesbyid as $course) {
+        $numberofcoursesprocessed++;
+
+        if (in_array($course->id, $matchcourseids)) {
             $filteredcourses[] = $course;
             $filtermatches++;
         }
@@ -4665,4 +4848,155 @@ function course_get_recent_courses(int $userid = null, int $limit = 0, int $offs
     }
 
     return $recentcourses;
+}
+
+/**
+ * Calculate the course start date and offset for the given user ids.
+ *
+ * If the course is a fixed date course then the course start date will be returned.
+ * If the course is a relative date course then the course date will be calculated and
+ * and offset provided.
+ *
+ * The dates are returned as an array with the index being the user id. The array
+ * contains the start date and start offset values for the user.
+ *
+ * If the user is not enrolled in the course then the course start date will be returned.
+ *
+ * If we have a course which starts on 1563244000 and 2 users, id 123 and 456, where the
+ * former is enrolled in the course at 1563244693 and the latter is not enrolled then the
+ * return value would look like:
+ * [
+ *      '123' => [
+ *          'start' => 1563244693,
+ *          'startoffset' => 693
+ *      ],
+ *      '456' => [
+ *          'start' => 1563244000,
+ *          'startoffset' => 0
+ *      ]
+ * ]
+ *
+ * @param stdClass $course The course to fetch dates for.
+ * @param array $userids The list of user ids to get dates for.
+ * @return array
+ */
+function course_get_course_dates_for_user_ids(stdClass $course, array $userids): array {
+    if (empty($course->relativedatesmode)) {
+        // This course isn't set to relative dates so we can early return with the course
+        // start date.
+        return array_reduce($userids, function($carry, $userid) use ($course) {
+            $carry[$userid] = [
+                'start' => $course->startdate,
+                'startoffset' => 0
+            ];
+            return $carry;
+        }, []);
+    }
+
+    // We're dealing with a relative dates course now so we need to calculate some dates.
+    $cache = cache::make('core', 'course_user_dates');
+    $dates = [];
+    $uncacheduserids = [];
+
+    // Try fetching the values from the cache so that we don't need to do a DB request.
+    foreach ($userids as $userid) {
+        $cachekey = "{$course->id}_{$userid}";
+        $cachedvalue = $cache->get($cachekey);
+
+        if ($cachedvalue === false) {
+            // Looks like we haven't seen this user for this course before so we'll have
+            // to fetch it.
+            $uncacheduserids[] = $userid;
+        } else {
+            [$start, $startoffset] = $cachedvalue;
+            $dates[$userid] = [
+                'start' => $start,
+                'startoffset' => $startoffset
+            ];
+        }
+    }
+
+    if (!empty($uncacheduserids)) {
+        // Load the enrolments for any users we haven't seen yet. Set the "onlyactive" param
+        // to false because it filters out users with enrolment start times in the future which
+        // we don't want.
+        $enrolments = enrol_get_course_users($course->id, false, $uncacheduserids);
+
+        foreach ($uncacheduserids as $userid) {
+            // Find the user enrolment that has the earliest start date.
+            $enrolment = array_reduce(array_values($enrolments), function($carry, $enrolment) use ($userid) {
+                // Only consider enrolments for this user if the user enrolment is active and the
+                // enrolment method is enabled.
+                if (
+                    $enrolment->uestatus == ENROL_USER_ACTIVE &&
+                    $enrolment->estatus == ENROL_INSTANCE_ENABLED &&
+                    $enrolment->id == $userid
+                ) {
+                    if (is_null($carry)) {
+                        // Haven't found an enrolment yet for this user so use the one we just found.
+                        $carry = $enrolment;
+                    } else {
+                        // We've already found an enrolment for this user so let's use which ever one
+                        // has the earliest start time.
+                        $carry = $carry->uetimestart < $enrolment->uetimestart ? $carry : $enrolment;
+                    }
+                }
+
+                return $carry;
+            }, null);
+
+            if ($enrolment) {
+                // The course is in relative dates mode so we calculate the student's start
+                // date based on their enrolment start date.
+                $start = $course->startdate > $enrolment->uetimestart ? $course->startdate : $enrolment->uetimestart;
+                $startoffset = $start - $course->startdate;
+            } else {
+                // The user is not enrolled in the course so default back to the course start date.
+                $start = $course->startdate;
+                $startoffset = 0;
+            }
+
+            $dates[$userid] = [
+                'start' => $start,
+                'startoffset' => $startoffset
+            ];
+
+            $cachekey = "{$course->id}_{$userid}";
+            $cache->set($cachekey, [$start, $startoffset]);
+        }
+    }
+
+    return $dates;
+}
+
+/**
+ * Calculate the course start date and offset for the given user id.
+ *
+ * If the course is a fixed date course then the course start date will be returned.
+ * If the course is a relative date course then the course date will be calculated and
+ * and offset provided.
+ *
+ * The return array contains the start date and start offset values for the user.
+ *
+ * If the user is not enrolled in the course then the course start date will be returned.
+ *
+ * If we have a course which starts on 1563244000. If a user's enrolment starts on 1563244693
+ * then the return would be:
+ * [
+ *      'start' => 1563244693,
+ *      'startoffset' => 693
+ * ]
+ *
+ * If the use was not enrolled then the return would be:
+ * [
+ *      'start' => 1563244000,
+ *      'startoffset' => 0
+ * ]
+ *
+ * @param stdClass $course The course to fetch dates for.
+ * @param int $userid The user id to get dates for.
+ * @return array
+ */
+function course_get_course_dates_for_user_id(stdClass $course, int $userid): array {
+    return (course_get_course_dates_for_user_ids($course, [$userid]))[$userid];
 }

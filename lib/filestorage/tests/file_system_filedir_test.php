@@ -252,9 +252,7 @@ class core_files_file_system_filedir_testcase extends advanced_testcase {
             ->with($this->equalTo($file));
 
         $file = $this->get_stored_file('example content');
-        $method = new ReflectionMethod(file_system_filedir::class, 'get_local_path_from_storedfile');
-        $method->setAccessible(true);
-        $result = $method->invokeArgs($fs, array($file, true));
+        $result = $fs->get_local_path_from_storedfile($file, true);
 
         $this->assertEquals($filepath, $result);
     }
@@ -281,9 +279,7 @@ class core_files_file_system_filedir_testcase extends advanced_testcase {
             ->method('recover_file');
 
         $file = $this->get_stored_file('example content');
-        $method = new ReflectionMethod(file_system_filedir::class, 'get_local_path_from_storedfile');
-        $method->setAccessible(true);
-        $result = $method->invokeArgs($fs, array($file, false));
+        $result = $fs->get_local_path_from_storedfile($file, false);
 
         $this->assertEquals($filepath, $result);
     }

@@ -21,77 +21,77 @@ Feature: Show capabilities for multiple contexts
       | Capability: | enrol/category:config |
       | Roles:      | Student               |
     And I click on "Get the overview" "button"
-    Then I should see "System"
-    And I should see "Category: Miscellaneous"
-    And I should see "Course: Course 1"
-    And I should not see "Course: Course 2"
+    Then I should see "Permissions in System"
+    And I should see "Permissions in Category: Miscellaneous"
+    And I should see "Permissions in Course: Course 1"
+    And I should not see "Permissions in Course: Course 2"
 
   Scenario: Show capabilities table with one capability without overrides
     When I set the following fields to these values:
       | Capability: | enrol/cohort:config |
       | Roles:      | Student               |
     And I click on "Get the overview" "button"
-    Then I should see "System"
-    And I should not see "Category: Miscellaneous"
-    And I should not see "Course: Course 1"
-    And I should not see "Course: Course 2"
+    Then I should see "Permissions in System"
+    And I should not see "Permissions in Category: Miscellaneous"
+    And I should not see "Permissions in Course: Course 1"
+    And I should not see "Permissions in Course: Course 2"
 
   Scenario: Show capabilities table with two capabilities, 1st without overrides and 2nd with
     When I set the following fields to these values:
       | Capability: | enrol/category:synchronised, enrol/category:config |
       | Roles:      | Student                                            |
     And I click on "Get the overview" "button"
-    Then I should see "System"
-    And I should see "Category: Miscellaneous"
-    And I should see "Course: Course 1"
-    And I should not see "Course: Course 2"
+    Then I should see "Permissions in System"
+    And I should see "Permissions in Category: Miscellaneous"
+    And I should see "Permissions in Course: Course 1"
+    And I should not see "Permissions in Course: Course 2"
 
   Scenario: Show capabilities table with two capabilities, 1st with overrides and 2nd without
     When I set the following fields to these values:
       | Capability: | enrol/category:config, enrol/cohort:config |
       | Roles:      | Student                                    |
     And I click on "Get the overview" "button"
-    Then I should see "System"
-    And I should see "Category: Miscellaneous"
-    And I should see "Course: Course 1"
-    And I should not see "Course: Course 2"
+    Then I should see "Permissions in System"
+    And I should see "Permissions in Category: Miscellaneous"
+    And I should see "Permissions in Course: Course 1"
+    And I should not see "Permissions in Course: Course 2"
 
   Scenario: Show capabilities table with two capabilities, none with overrides
     When I set the following fields to these values:
       | Capability: | enrol/category:synchronised, enrol/cohort:config |
       | Roles:      | Student                                          |
     And I click on "Get the overview" "button"
-    Then I should see "System"
-    And I should not see "Category: Miscellaneous"
-    And I should not see "Course: Course 1"
-    And I should not see "Course: Course 2"
+    Then I should see "Permissions in System"
+    And I should not see "Permissions in Category: Miscellaneous"
+    And I should not see "Permissions in Course: Course 1"
+    And I should not see "Permissions in Course: Course 2"
 
   Scenario: Show capabilities table with capability with override and no role selected
     When I set the following fields to these values:
       | Capability: | enrol/category:config |
       | Roles:      |                       |
     And I click on "Get the overview" "button"
-    Then I should see "System"
-    And I should see "Category: Miscellaneous"
-    And I should see "Course: Course 1"
-    And I should not see "Course: Course 2"
+    Then I should see "Permissions in System"
+    And I should see "Permissions in Category: Miscellaneous"
+    And I should see "Permissions in Course: Course 1"
+    And I should not see "Permissions in Course: Course 2"
 
   Scenario: Show capabilities table with capability without override and no role selected
     When I set the following fields to these values:
       | Capability: | enrol/cohort:config |
       | Roles:      |                     |
     And I click on "Get the overview" "button"
-    Then I should see "System"
-    And I should not see "Category: Miscellaneous"
-    And I should not see "Course: Course 1"
-    And I should not see "Course: Course 2"
+    Then I should see "Permissions in System"
+    And I should not see "Permissions in Category: Miscellaneous"
+    And I should not see "Permissions in Course: Course 1"
+    And I should not see "Permissions in Course: Course 2"
 
   Scenario: Show capabilities table with capability with two overrides on different contexts
     When I set the following fields to these values:
       | Capability: | enrol/category:config, enrol/cohort:unenrol |
       | Roles:      |                                           |
     And I click on "Get the overview" "button"
-    Then I should see "System"
-    And I should see "Category: Miscellaneous"
-    And I should see "Course: Course 1"
-    And I should see "Course: Course 2"
+    Then I should see "Permissions in System"
+    And I should see "Permissions in Category: Miscellaneous"
+    And I should see "Permissions in Course: Course 1"
+    And I should see "Permissions in Course: Course 2"

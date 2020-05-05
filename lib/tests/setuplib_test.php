@@ -25,7 +25,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-
 /**
  * Unit tests for setuplib.php
  *
@@ -496,10 +495,45 @@ class core_setuplib_testcase extends advanced_testcase {
     }
 
     /**
-     * Test the generate_uuid() function.
+     * Test the \core\uuid::generate_uuid_via_pecl_uuid_extension() function.
      */
-    public function test_generate_uuid() {
-        $uuid = generate_uuid();
+    public function test_core_uuid_generate_uuid_via_pecl_uuid_extension() {
+        if (!extension_loaded('uuid')) {
+            $this->markTestSkipped("PHP 'uuid' extension not loaded.");
+        }
+        if (!function_exists('uuid_time')) {
+            $this->markTestSkipped("PHP PECL 'uuid' extension not loaded.");
+        }
+
+        // The \core\uuid::generate_uuid_via_pecl_uuid_extension static method is protected. Use Reflection to call the method.
+        $method = new ReflectionMethod('\core\uuid', 'generate_uuid_via_pecl_uuid_extension');
+        $method->setAccessible(true);
+        $uuid = $method->invoke(null);
+        $this->assertTrue(self::is_valid_uuid_v4($uuid), "Invalid v4 uuid: '$uuid'");
+    }
+
+    /**
+     * Test the \core\uuid::generate_uuid_via_random_bytes() function.
+     */
+    public function test_core_uuid_generate_uuid_via_random_bytes() {
+        try {
+            random_bytes(1);
+        } catch (Exception $e) {
+            $this->markTestSkipped('No source of entropy for random_bytes. ' . $e->getMessage());
+        }
+
+        // The \core\uuid::generate_uuid_via_random_bytes static method is protected. Use Reflection to call the method.
+        $method = new ReflectionMethod('\core\uuid', 'generate_uuid_via_random_bytes');
+        $method->setAccessible(true);
+        $uuid = $method->invoke(null);
+        $this->assertTrue(self::is_valid_uuid_v4($uuid), "Invalid v4 uuid: '$uuid'");
+    }
+
+    /**
+     * Test the \core\uuid::generate() function.
+     */
+    public function test_core_uuid_generate() {
+        $uuid = \core\uuid::generate();
         $this->assertTrue(self::is_valid_uuid_v4($uuid), "Invalid v4 UUID: '$uuid'");
     }
 }

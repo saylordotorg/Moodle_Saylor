@@ -993,11 +993,7 @@ class format_grid_renderer extends format_section_renderer_base {
                 'role' => 'link',
                 'aria-label' => $streditimagealt)
             ),
-            html_writer::empty_tag('img', array(
-                'src' => $urlpicedit,
-                'alt' => $streditimagealt,
-                'role' => 'img',
-                'aria-label' => $streditimagealt)).'&nbsp;'.$streditimage,
+            $this->output->pix_icon('t/edit', $streditimagealt).'&nbsp;'.$streditimage,
             array('title' => $streditimagealt)
         );
     }

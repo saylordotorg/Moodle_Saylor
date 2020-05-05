@@ -177,6 +177,10 @@ class api {
             'langmenu' => $CFG->langmenu,
             'langlist' => $CFG->langlist,
             'locale' => $CFG->locale,
+            'tool_mobile_minimumversion' => get_config('tool_mobile', 'minimumversion'),
+            'tool_mobile_iosappid' => get_config('tool_mobile', 'iosappid'),
+            'tool_mobile_androidappid' => get_config('tool_mobile', 'androidappid'),
+            'tool_mobile_setuplink' => clean_param(get_config('tool_mobile', 'setuplink'), PARAM_URL),
         );
 
         $typeoflogin = get_config('tool_mobile', 'typeoflogin');
@@ -293,6 +297,13 @@ class api {
             $settings->calendar_adminseesall = $CFG->calendar_adminseesall;
             $settings->calendar_lookahead = $CFG->calendar_lookahead;
             $settings->calendar_maxevents = $CFG->calendar_maxevents;
+        }
+
+        if (empty($section) or $section == 'coursecolors') {
+            $colornumbers = range(1, 10);
+            foreach ($colornumbers as $number) {
+                $settings->{'core_admin_coursecolor' . $number} = get_config('core_admin', 'coursecolor' . $number);
+            }
         }
 
         return $settings;
@@ -422,7 +433,9 @@ class api {
                 'NoDelegate_CoreRating' => new lang_string('ratings', 'rating'),
                 'NoDelegate_CoreTag' => new lang_string('tags'),
                 '$mmLoginEmailSignup' => new lang_string('startsignup'),
+                'NoDelegate_ForgottenPassword' => new lang_string('forgotten'),
                 'NoDelegate_ResponsiveMainMenuItems' => new lang_string('responsivemainmenuitems', 'tool_mobile'),
+                'NoDelegate_H5POffline' => new lang_string('h5poffline', 'tool_mobile'),
                 'NoDelegate_DarkMode' => new lang_string('darkmode', 'tool_mobile'),
             ),
             "$mainmenu" => array(

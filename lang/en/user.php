@@ -127,3 +127,4 @@ $string['privacy:privatefilespath'] = 'Private files';
 $string['privacy:sessionpath'] = 'Session data';
 $string['target:upcomingactivitiesdue'] = 'Upcoming activities due';
 $string['target:upcomingactivitiesdue_help'] = 'This target generates reminders for upcoming activities due.';
+$string['target:upcomingactivitiesdueinfo'] = 'All upcoming activities due insights are listed here. These students have received these insights directly.';

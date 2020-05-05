@@ -61,7 +61,7 @@ define(['jquery',
 
         $.when(
             str.get_string('configurecoursecompetencysettings', 'tool_lp'),
-            templates.render('tool_lp/course_competency_settings', context)
+            templates.render('tool_lp/course_competency_settings', context),
         )
         .then(function(title, templateResult) {
             this._dialogue = new Dialogue(

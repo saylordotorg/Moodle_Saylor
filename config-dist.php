@@ -206,17 +206,17 @@ $CFG->admin = 'admin';
 //
 // These variables define DEFAULT block variables for new courses
 // If this one is set it overrides all others and is the only one used.
-//      $CFG->defaultblocks_override = 'participants,activity_modules,search_forums,course_list:news_items,calendar_upcoming,recent_activity';
+//      $CFG->defaultblocks_override = 'activity_modules,search_forums,course_list:news_items,calendar_upcoming,recent_activity';
 //
 // These variables define the specific settings for defined course formats.
 // They override any settings defined in the formats own config file.
 //      $CFG->defaultblocks_site = 'site_main_menu,course_list:course_summary,calendar_month';
-//      $CFG->defaultblocks_social = 'participants,search_forums,calendar_month,calendar_upcoming,social_activities,recent_activity,course_list';
-//      $CFG->defaultblocks_topics = 'participants,activity_modules,search_forums,course_list:news_items,calendar_upcoming,recent_activity';
-//      $CFG->defaultblocks_weeks = 'participants,activity_modules,search_forums,course_list:news_items,calendar_upcoming,recent_activity';
+//      $CFG->defaultblocks_social = 'search_forums,calendar_month,calendar_upcoming,social_activities,recent_activity,course_list';
+//      $CFG->defaultblocks_topics = 'activity_modules,search_forums,course_list:news_items,calendar_upcoming,recent_activity';
+//      $CFG->defaultblocks_weeks = 'activity_modules,search_forums,course_list:news_items,calendar_upcoming,recent_activity';
 //
 // These blocks are used when no other default setting is found.
-//      $CFG->defaultblocks = 'participants,activity_modules,search_forums,course_list:news_items,calendar_upcoming,recent_activity';
+//      $CFG->defaultblocks = 'activity_modules,search_forums,course_list:news_items,calendar_upcoming,recent_activity';
 //
 // You can specify a different class to be created for the $PAGE global, and to
 // compute which blocks appear on each page. However, I cannot think of any good
@@ -620,6 +620,39 @@ $CFG->admin = 'admin';
 //
 //      $CFG->debugsessionlock = 5;
 //
+// Uninstall plugins from CLI only. This stops admins from uninstalling plugins from the graphical admin
+// user interface, and forces plugins to be uninstalled from the Command Line tool only, found at
+// admin/cli/plugin_uninstall.php.
+//
+//      $CFG->uninstallclionly = true;
+//
+//
+// Customise question bank display
+//
+// The display of Moodle's question bank is made up of a number of columns.
+// You can customise this display by giving a comma-separated list of column class
+// names here. Each class must be a subclass of \core_question\bank\column_base.
+// For example you might define a class like
+//      class \local_qbank_extensions\my_column extends \core_question\bank\column_base
+// in a local plugin, then add it to the list here. At the time of writing,
+// the default question bank display is equivalent to the following, but you  might like
+// to check the latest default in question/classes/bank/view.php before setting this.
+//
+//      $CFG->questionbankcolumns = 'checkbox_column,question_type_column,'
+//              . 'question_name_idnumber_tags_column,edit_menu_column,'
+//              . 'tags_action_column,edit_action_column,copy_action_column,'
+//              . 'preview_action_column,delete_action_column,export_xml_action_column,'
+//              . 'creator_name_column,modifier_name_column';
+//
+// Forum summary report
+//
+// In order for the forum summary report to calculate word count and character count data, those details are now stored
+// for each post in the database when posts are created or updated. For posts that existed prior to a Moodle 3.8 upgrade,
+// these are calculated by the refresh_forum_post_counts ad-hoc task in chunks of 5000 posts per batch by default.
+// That default can be overridden by setting an integer value for $CFG->forumpostcountchunksize.
+//
+//      $CFG->forumpostcountchunksize = 5000;
+//
 //=========================================================================
 // 7. SETTINGS FOR DEVELOPMENT SERVERS - not intended for production use!!!
 //=========================================================================
@@ -641,8 +674,15 @@ $CFG->admin = 'admin';
 // Enable verbose debug information during fetching of email messages from IMAP server.
 // $CFG->debugimap = true;
 //
+// Enable verbose debug information during sending of email messages to SMTP server.
+// Note: also requires $CFG->debug set to DEBUG_DEVELOPER.
+// $CFG->debugsmtp = true;
+//
 // Prevent JS caching
 // $CFG->cachejs = false; // NOT FOR PRODUCTION SERVERS!
+//
+// Prevent Template caching
+// $CFG->cachetemplates = false; // NOT FOR PRODUCTION SERVERS!
 //
 // Restrict which YUI logging statements are shown in the browser console.
 // For details see the upstream documentation:

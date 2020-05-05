@@ -1,14 +1,15 @@
 ﻿Version Information
 ===================
-Version 3.7.1.2 - 31/03/2020
-  1. Fix 'Multiple columns changes to one column for students when last section is set to hidden' - CONTRIB-8008.
-  2. Fix 'Section edit link is moved on top of previous sections edit link when deleting a section' - CONTRIB-7957.
+Version 3.8.1.0 - 31/03/2020
+  1. Fix 'Section edit link is moved on top of previous sections edit link when deleting a section' - CONTRIB-7957.
+  2. Fix 'Multiple columns changes to one column for students when last section is set to hidden' - CONTRIB-8008.
   3. Fix current section bar overlap.
 
-Version 3.7.1.1 - 17/11/2019
+Version 3.8.0.1
   1. Fix Collapsed topics format zoom issue - CONTRIB-7893.
   2. Adjust position of 'view only' icon.
   3. More accessible open all / close all - #67.
+  4. Moodle 3.8 version based on V3.7.1.1.
 
 Version 3.7.1.0
   1. Add missing Moodle define.

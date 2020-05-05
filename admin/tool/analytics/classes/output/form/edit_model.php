@@ -65,6 +65,15 @@ class edit_model extends \moodleform {
             $mform->addRule('target', get_string('required'), 'required', null, 'client');
         }
 
+        if (!empty($this->_customdata['targetname']) && !empty($this->_customdata['targetclass'])) {
+            $mform->addElement('static', 'targetname', get_string('target', 'tool_analytics'), $this->_customdata['targetname']);
+            $mform->addElement('hidden', 'target',
+                \tool_analytics\output\helper::class_to_option($this->_customdata['targetclass']));
+            // We won't update the model's target so no worries about its format (we can't use PARAM_ALPHANUMEXT
+            // because of class_to_option).
+            $mform->setType('target', PARAM_TEXT);
+        }
+
         // Indicators.
         if (!$this->_customdata['staticmodel']) {
             $indicators = array();
@@ -81,6 +90,13 @@ class edit_model extends \moodleform {
         }
 
         // Time-splitting methods.
+        if (!empty($this->_customdata['invalidcurrenttimesplitting'])) {
+            $mform->addElement('html', $OUTPUT->notification(
+                get_string('invalidcurrenttimesplitting', 'tool_analytics'),
+                \core\output\notification::NOTIFY_WARNING)
+            );
+        }
+
         $timesplittings = array('' => '');
         foreach ($this->_customdata['timesplittings'] as $classname => $timesplitting) {
             $optionname = \tool_analytics\output\helper::class_to_option($classname);
@@ -88,6 +104,28 @@ class edit_model extends \moodleform {
         }
         $mform->addElement('select', 'timesplitting', get_string('timesplittingmethod', 'analytics'), $timesplittings);
         $mform->addHelpButton('timesplitting', 'timesplittingmethod', 'analytics');
+
+        // Contexts restriction.
+        if (!empty($this->_customdata['supportscontexts'])) {
+
+            $options = [
+                'ajax' => 'tool_analytics/potential-contexts',
+                'multiple' => true,
+                'noselectionstring' => get_string('all')
+            ];
+
+            if (!empty($this->_customdata['id'])) {
+                $options['modelid'] = $this->_customdata['id'];
+                $contexts = $this->load_current_contexts();
+            } else {
+                // No need to preload any selected contexts.
+                $contexts = [];
+            }
+
+            $mform->addElement('autocomplete', 'contexts', get_string('contexts', 'tool_analytics'), $contexts, $options);
+            $mform->setType('contexts', PARAM_INT);
+            $mform->addHelpButton('contexts', 'contexts', 'tool_analytics');
+        }
 
         // Predictions processor.
         if (!$this->_customdata['staticmodel']) {
@@ -130,10 +168,34 @@ class edit_model extends \moodleform {
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 
+        $targetclass = \tool_analytics\output\helper::option_to_class($data['target']);
+        $target = \core_analytics\manager::get_target($targetclass);
+
         if (!empty($data['timesplitting'])) {
-            $realtimesplitting = \tool_analytics\output\helper::option_to_class($data['timesplitting']);
-            if (\core_analytics\manager::is_valid($realtimesplitting, '\core_analytics\local\time_splitting\base') === false) {
+            $timesplittingclass = \tool_analytics\output\helper::option_to_class($data['timesplitting']);
+            if (\core_analytics\manager::is_valid($timesplittingclass, '\core_analytics\local\time_splitting\base') === false) {
                 $errors['timesplitting'] = get_string('errorinvalidtimesplitting', 'analytics');
+            }
+
+            $timesplitting = \core_analytics\manager::get_time_splitting($timesplittingclass);
+            if (!$target->can_use_timesplitting($timesplitting)) {
+                $errors['timesplitting'] = get_string('invalidtimesplitting', 'tool_analytics');
+            }
+        }
+
+        if (!empty($data['contexts'])) {
+
+            $analyserclass = $target->get_analyser_class();
+            if (!$potentialcontexts = $analyserclass::potential_context_restrictions()) {
+                $errors['contexts'] = get_string('errornocontextrestrictions', 'analytics');
+            } else {
+
+                // Flip the contexts array so we can just diff by key.
+                $selectedcontexts = array_flip($data['contexts']);
+                $invalidcontexts = array_diff_key($selectedcontexts, $potentialcontexts);
+                if (!empty($invalidcontexts)) {
+                    $errors['contexts'] = get_string('errorinvalidcontexts', 'analytics');
+                }
             }
         }
 
@@ -155,5 +217,19 @@ class edit_model extends \moodleform {
         }
 
         return $errors;
+    }
+
+    /**
+     * Load the currently selected context options.
+     *
+     * @return array
+     */
+    protected function load_current_contexts() {
+        $contexts = [];
+        foreach ($this->_customdata['contexts'] as $context) {
+            $contexts[$context->id] = $context->get_context_name(true, true);
+        }
+
+        return $contexts;
     }
 }

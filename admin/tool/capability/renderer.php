@@ -134,7 +134,7 @@ class tool_capability_renderer extends plugin_renderer_base {
 
         $title = get_string('permissionsincontext', 'core_role', $context->get_context_name());
 
-        $html = $this->output->heading(html_writer::link($url, $context->get_context_name(), ['title' => $title]), 3);
+        $html = $this->output->heading(html_writer::link($url, $title), 3);
         $html .= html_writer::table($table);
         // If there are any child contexts, print them recursively.
         if (!empty($childcontextsids)) {

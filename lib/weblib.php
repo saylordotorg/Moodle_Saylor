@@ -2978,10 +2978,10 @@ function obfuscate_email($email) {
     $length = strlen($email);
     $obfuscated = '';
     while ($i < $length) {
-        if (rand(0, 2) && $email{$i}!='@') { // MDL-20619 some browsers have problems unobfuscating @.
-            $obfuscated.='%'.dechex(ord($email{$i}));
+        if (rand(0, 2) && $email[$i]!='@') { // MDL-20619 some browsers have problems unobfuscating @.
+            $obfuscated.='%'.dechex(ord($email[$i]));
         } else {
-            $obfuscated.=$email{$i};
+            $obfuscated.=$email[$i];
         }
         $i++;
     }
@@ -3615,7 +3615,9 @@ function print_password_policy() {
     $message = '';
     if (!empty($CFG->passwordpolicy)) {
         $messages = array();
-        $messages[] = get_string('informminpasswordlength', 'auth', $CFG->minpasswordlength);
+        if (!empty($CFG->minpasswordlength)) {
+            $messages[] = get_string('informminpasswordlength', 'auth', $CFG->minpasswordlength);
+        }
         if (!empty($CFG->minpassworddigits)) {
             $messages[] = get_string('informminpassworddigits', 'auth', $CFG->minpassworddigits);
         }
@@ -3629,8 +3631,20 @@ function print_password_policy() {
             $messages[] = get_string('informminpasswordnonalphanum', 'auth', $CFG->minpasswordnonalphanum);
         }
 
+        // Fire any additional password policy functions from plugins.
+        // Callbacks must return an array of message strings.
+        $pluginsfunction = get_plugins_with_function('print_password_policy');
+        foreach ($pluginsfunction as $plugintype => $plugins) {
+            foreach ($plugins as $pluginfunction) {
+                $messages = array_merge($messages, $pluginfunction());
+            }
+        }
+
         $messages = join(', ', $messages); // This is ugly but we do not have anything better yet...
-        $message = get_string('informpasswordpolicy', 'auth', $messages);
+        // Check if messages is empty before outputting any text.
+        if ($messages != '') {
+            $message = get_string('informpasswordpolicy', 'auth', $messages);
+        }
     }
     return $message;
 }
