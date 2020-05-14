@@ -403,7 +403,7 @@ class qtype_coderunner_question extends question_graded_automatically {
         if (!empty($this->templateparams)) {
             $this->parameters = json_decode($this->templateparams);
         } else {
-            $this->parameters = array();
+            $this->parameters = new stdClass();
         }
 
         // Twig expand everything in a context that includes the template
@@ -639,6 +639,8 @@ class qtype_coderunner_question extends question_graded_automatically {
         }
         if (isset($this->templateparams) && $this->templateparams != '') {
             $this->parameters = json_decode($this->templateparams);
+        } else {
+            $this->parameters = new stdClass();
         }
         return $sandboxparams;
     }

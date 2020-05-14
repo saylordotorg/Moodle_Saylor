@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="auth/nsdc/db" VERSION="2020022600" COMMENT="XMLDB file for Moodle auth/nsdc"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="auth_nsdc_linked_login" COMMENT="Accounts linked to a users Moodle account.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The user account this nsdc login is linked to."/>
+        <FIELD NAME="nsdcid" TYPE="char" LENGTH="32" NOTNULL="true" SEQUENCE="false" COMMENT="The candidate_id supplied by nsdc."/>
+        <FIELD NAME="username" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="The external username to map to this moodle account."/>
+        <FIELD NAME="phoneonly" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false" COMMENT="Does this account have a phone number (and not an email address) from NSDC."/>
+        <FIELD NAME="email" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="The external email to map to this moodle account"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="userid_key" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+        <KEY NAME="nsdcid_key" TYPE="unique" FIELDS="nsdcid"/>
+        <KEY NAME="uniq_key" TYPE="unique" FIELDS="userid, nsdcid, username"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="search_index" UNIQUE="false" FIELDS="nsdcid, username"/>
+      </INDEXES>
+    </TABLE>
+  </TABLES>
+</XMLDB>

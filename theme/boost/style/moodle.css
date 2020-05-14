@@ -2347,23 +2347,23 @@
   --indigo: #6610f2;
   --purple: #613d7c;
   --pink: #e83e8c;
-  --red: #d9534f;
+  --red: #d43f3a;
   --orange: #f0ad4e;
   --yellow: #ff7518;
-  --green: #5cb85c;
+  --green: #398439;
   --teal: #20c997;
   --cyan: #5bc0de;
   --white: #fff;
-  --gray: #868e96;
-  --gray-dark: #373a3c;
+  --gray: #6c757d;
+  --gray-dark: #343a40;
   --primary: #1177d1;
   --secondary: #ced4da;
-  --success: #5cb85c;
+  --success: #398439;
   --info: #5bc0de;
   --warning: #f0ad4e;
-  --danger: #d9534f;
+  --danger: #d43f3a;
   --light: #f8f9fa;
-  --dark: #373a3c;
+  --dark: #343a40;
   --breakpoint-xs: 0;
   --breakpoint-sm: 576px;
   --breakpoint-md: 768px;
@@ -2392,7 +2392,7 @@ body {
   font-size: 0.9375rem;
   font-weight: 400;
   line-height: 1.5;
-  color: #373a3c;
+  color: #343a40;
   text-align: left;
   background-color: #fff; }
 
@@ -2513,7 +2513,7 @@ table {
 caption {
   padding-top: 0.75rem;
   padding-bottom: 0.75rem;
-  color: #868e96;
+  color: #6c757d;
   text-align: left;
   caption-side: bottom; }
 
@@ -2723,7 +2723,7 @@ mark,
 .blockquote-footer {
   display: block;
   font-size: 80%;
-  color: #868e96; }
+  color: #6c757d; }
   .blockquote-footer::before {
     content: "\2014\00A0"; }
 
@@ -2747,7 +2747,7 @@ mark,
 
 .figure-caption {
   font-size: 90%;
-  color: #868e96; }
+  color: #6c757d; }
 
 code {
   font-size: 87.5%;
@@ -3370,7 +3370,7 @@ pre {
 .generaltable {
   width: 100%;
   margin-bottom: 1rem;
-  color: #373a3c; }
+  color: #343a40; }
   .table th, table.collection th, table.flexible th, .generaltable th,
   .table td,
   table.collection td,
@@ -3418,7 +3418,7 @@ table#listdirectories td {
   background-color: rgba(0, 0, 0, 0.05); }
 
 .table-hover tbody tr:hover, table.grading-report tbody tr:hover, .forumheaderlist tbody tr:hover, .generaltable tbody tr:hover, table.flexible tbody tr:hover, .category_subcategories tbody tr:hover, table#modules tbody tr:hover, table#permissions tbody tr:hover {
-  color: #373a3c;
+  color: #343a40;
   background-color: rgba(0, 0, 0, 0.075); }
 
 .table-primary,
@@ -3472,16 +3472,16 @@ table#listdirectories td {
 .table-success,
 .table-success > th,
 .table-success > td {
-  background-color: #d1ebd1; }
+  background-color: #c8ddc8; }
 
 .table-success th,
 .table-success td,
 .table-success thead th,
 .table-success tbody + tbody {
-  border-color: #aadaaa; }
+  border-color: #98bf98; }
 
 .table-hover .table-success:hover, table.grading-report .table-success:hover, .forumheaderlist .table-success:hover, .generaltable .table-success:hover, table.flexible .table-success:hover, .category_subcategories .table-success:hover, table#modules .table-success:hover, table#permissions .table-success:hover {
-  background-color: #bfe3bf; }
+  background-color: #b8d3b8; }
   .table-hover .table-success:hover > td, table.grading-report .table-success:hover > td, .forumheaderlist .table-success:hover > td, .generaltable .table-success:hover > td, table.flexible .table-success:hover > td, .category_subcategories .table-success:hover > td, table#modules .table-success:hover > td, table#permissions .table-success:hover > td,
   .table-hover .table-success:hover > th,
   table.grading-report .table-success:hover > th,
@@ -3491,7 +3491,7 @@ table#listdirectories td {
   .category_subcategories .table-success:hover > th,
   table#modules .table-success:hover > th,
   table#permissions .table-success:hover > th {
-    background-color: #bfe3bf; }
+    background-color: #b8d3b8; }
 
 .table-info,
 .table-info > th,
@@ -3565,16 +3565,16 @@ table#listdirectories td {
 .table-danger,
 .table-danger > th,
 .table-danger > td {
-  background-color: #f4cfce; }
+  background-color: #f3c9c8; }
 
 .table-danger th,
 .table-danger td,
 .table-danger thead th,
 .table-danger tbody + tbody {
-  border-color: #eba6a3; }
+  border-color: #e99b99; }
 
 .table-hover .table-danger:hover, table.grading-report .table-danger:hover, .forumheaderlist .table-danger:hover, .generaltable .table-danger:hover, table.flexible .table-danger:hover, .category_subcategories .table-danger:hover, table#modules .table-danger:hover, table#permissions .table-danger:hover {
-  background-color: #efbbb9; }
+  background-color: #eeb4b3; }
   .table-hover .table-danger:hover > td, table.grading-report .table-danger:hover > td, .forumheaderlist .table-danger:hover > td, .generaltable .table-danger:hover > td, table.flexible .table-danger:hover > td, .category_subcategories .table-danger:hover > td, table#modules .table-danger:hover > td, table#permissions .table-danger:hover > td,
   .table-hover .table-danger:hover > th,
   table.grading-report .table-danger:hover > th,
@@ -3584,7 +3584,7 @@ table#listdirectories td {
   .category_subcategories .table-danger:hover > th,
   table#modules .table-danger:hover > th,
   table#permissions .table-danger:hover > th {
-    background-color: #efbbb9; }
+    background-color: #eeb4b3; }
 
 .table-light,
 .table-light > th,
@@ -3613,16 +3613,16 @@ table#listdirectories td {
 .table-dark,
 .table-dark > th,
 .table-dark > td {
-  background-color: #c7c8c8; }
+  background-color: #c6c8ca; }
 
 .table-dark th,
 .table-dark td,
 .table-dark thead th,
 .table-dark tbody + tbody {
-  border-color: #97999a; }
+  border-color: #95999c; }
 
 .table-hover .table-dark:hover, table.grading-report .table-dark:hover, .forumheaderlist .table-dark:hover, .generaltable .table-dark:hover, table.flexible .table-dark:hover, .category_subcategories .table-dark:hover, table#modules .table-dark:hover, table#permissions .table-dark:hover {
-  background-color: #babbbb; }
+  background-color: #b9bbbe; }
   .table-hover .table-dark:hover > td, table.grading-report .table-dark:hover > td, .forumheaderlist .table-dark:hover > td, .generaltable .table-dark:hover > td, table.flexible .table-dark:hover > td, .category_subcategories .table-dark:hover > td, table#modules .table-dark:hover > td, table#permissions .table-dark:hover > td,
   .table-hover .table-dark:hover > th,
   table.grading-report .table-dark:hover > th,
@@ -3632,7 +3632,7 @@ table#listdirectories td {
   .category_subcategories .table-dark:hover > th,
   table#modules .table-dark:hover > th,
   table#permissions .table-dark:hover > th {
-    background-color: #babbbb; }
+    background-color: #b9bbbe; }
 
 .table-active,
 .table-active > th,
@@ -3654,8 +3654,8 @@ table#listdirectories td {
 
 .table .thead-dark th, table.collection .thead-dark th, table.flexible .thead-dark th, .generaltable .thead-dark th {
   color: #fff;
-  background-color: #373a3c;
-  border-color: #494d50; }
+  background-color: #343a40;
+  border-color: #454d55; }
 
 .table .thead-light th, table.collection .thead-light th, table.flexible .thead-light th, .generaltable .thead-light th {
   color: #495057;
@@ -3664,11 +3664,11 @@ table#listdirectories td {
 
 .table-dark {
   color: #fff;
-  background-color: #373a3c; }
+  background-color: #343a40; }
   .table-dark th,
   .table-dark td,
   .table-dark thead th {
-    border-color: #494d50; }
+    border-color: #454d55; }
   .table-dark.table-bordered, table.table-dark.collection {
     border: 0; }
   .table-dark.table-striped tbody tr:nth-of-type(odd), table.table-dark.collection tbody tr:nth-of-type(odd), table.table-dark#explaincaps tbody tr:nth-of-type(odd), table.table-dark#defineroletable tbody tr:nth-of-type(odd), table.table-dark.grading-report tbody tr:nth-of-type(odd), table.table-dark#listdirectories tbody tr:nth-of-type(odd), table.table-dark.rolecaps tbody tr:nth-of-type(odd), table.table-dark.userenrolment tbody tr:nth-of-type(odd), form#movecourses table.table-dark tbody tr:nth-of-type(odd), #page-admin-course-index .table-dark.editcourse tbody tr:nth-of-type(odd), .table-dark.forumheaderlist tbody tr:nth-of-type(odd), table.table-dark.flexible tbody tr:nth-of-type(odd), .table-dark.generaltable tbody tr:nth-of-type(odd) {
@@ -3748,7 +3748,7 @@ table#listdirectories td {
     outline: 0;
     box-shadow: 0 0 0 0.2rem rgba(17, 119, 209, 0.25); }
   .form-control::placeholder {
-    color: #868e96;
+    color: #6c757d;
     opacity: 1; }
   .form-control:disabled, .form-control[readonly] {
     background-color: #e9ecef;
@@ -3789,7 +3789,7 @@ select.form-control:focus::-ms-value {
   padding-bottom: 0.375rem;
   margin-bottom: 0;
   line-height: 1.5;
-  color: #373a3c;
+  color: #343a40;
   background-color: transparent;
   border: solid transparent;
   border-width: 1px 0; }
@@ -3845,7 +3845,7 @@ div.backup-section + form {
   margin-top: 0.3rem;
   margin-left: -1.25rem; }
   .form-check-input:disabled ~ .form-check-label {
-    color: #868e96; }
+    color: #6c757d; }
 
 .form-check-label {
   margin-bottom: 0; }
@@ -3866,7 +3866,7 @@ div.backup-section + form {
   width: 100%;
   margin-top: 0.25rem;
   font-size: 80%;
-  color: #5cb85c; }
+  color: #398439; }
 
 .valid-tooltip {
   position: absolute;
@@ -3879,18 +3879,18 @@ div.backup-section + form {
   font-size: 0.8203125rem;
   line-height: 1.5;
   color: #fff;
-  background-color: rgba(92, 184, 92, 0.9); }
+  background-color: rgba(57, 132, 57, 0.9); }
 
 .was-validated .form-control:valid, .form-control.is-valid {
-  border-color: #5cb85c;
+  border-color: #398439;
   padding-right: calc(1.5em + 0.75rem);
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%235cb85c' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23398439' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
   background-repeat: no-repeat;
   background-position: center right calc(0.375em + 0.1875rem);
   background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem); }
   .was-validated .form-control:valid:focus, .form-control.is-valid:focus {
-    border-color: #5cb85c;
-    box-shadow: 0 0 0 0.2rem rgba(92, 184, 92, 0.25); }
+    border-color: #398439;
+    box-shadow: 0 0 0 0.2rem rgba(57, 132, 57, 0.25); }
   .was-validated .form-control:valid ~ .valid-feedback,
   .was-validated .form-control:valid ~ .valid-tooltip, .form-control.is-valid ~ .valid-feedback,
   .form-control.is-valid ~ .valid-tooltip {
@@ -3901,12 +3901,12 @@ div.backup-section + form {
   background-position: top calc(0.375em + 0.1875rem) right calc(0.375em + 0.1875rem); }
 
 .was-validated .custom-select:valid, .custom-select.is-valid {
-  border-color: #5cb85c;
+  border-color: #398439;
   padding-right: calc((1em + 0.75rem) * 3 / 4 + 1.75rem);
-  background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3e%3cpath fill='%23373a3c' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e") no-repeat right 0.75rem center/8px 10px, url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%235cb85c' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e") #fff no-repeat center right 1.75rem/calc(0.75em + 0.375rem) calc(0.75em + 0.375rem); }
+  background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3e%3cpath fill='%23343a40' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e") no-repeat right 0.75rem center/8px 10px, url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23398439' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e") #fff no-repeat center right 1.75rem/calc(0.75em + 0.375rem) calc(0.75em + 0.375rem); }
   .was-validated .custom-select:valid:focus, .custom-select.is-valid:focus {
-    border-color: #5cb85c;
-    box-shadow: 0 0 0 0.2rem rgba(92, 184, 92, 0.25); }
+    border-color: #398439;
+    box-shadow: 0 0 0 0.2rem rgba(57, 132, 57, 0.25); }
   .was-validated .custom-select:valid ~ .valid-feedback,
   .was-validated .custom-select:valid ~ .valid-tooltip, .custom-select.is-valid ~ .valid-feedback,
   .custom-select.is-valid ~ .valid-tooltip {
@@ -3918,7 +3918,7 @@ div.backup-section + form {
   display: block; }
 
 .was-validated .form-check-input:valid ~ .form-check-label, .form-check-input.is-valid ~ .form-check-label {
-  color: #5cb85c; }
+  color: #398439; }
 
 .was-validated .form-check-input:valid ~ .valid-feedback,
 .was-validated .form-check-input:valid ~ .valid-tooltip, .form-check-input.is-valid ~ .valid-feedback,
@@ -3926,9 +3926,9 @@ div.backup-section + form {
   display: block; }
 
 .was-validated .custom-control-input:valid ~ .custom-control-label, .custom-control-input.is-valid ~ .custom-control-label {
-  color: #5cb85c; }
+  color: #398439; }
   .was-validated .custom-control-input:valid ~ .custom-control-label::before, .custom-control-input.is-valid ~ .custom-control-label::before {
-    border-color: #5cb85c; }
+    border-color: #398439; }
 
 .was-validated .custom-control-input:valid ~ .valid-feedback,
 .was-validated .custom-control-input:valid ~ .valid-tooltip, .custom-control-input.is-valid ~ .valid-feedback,
@@ -3936,17 +3936,17 @@ div.backup-section + form {
   display: block; }
 
 .was-validated .custom-control-input:valid:checked ~ .custom-control-label::before, .custom-control-input.is-valid:checked ~ .custom-control-label::before {
-  border-color: #80c780;
-  background-color: #80c780; }
+  border-color: #48a848;
+  background-color: #48a848; }
 
 .was-validated .custom-control-input:valid:focus ~ .custom-control-label::before, .custom-control-input.is-valid:focus ~ .custom-control-label::before {
-  box-shadow: 0 0 0 0.2rem rgba(92, 184, 92, 0.25); }
+  box-shadow: 0 0 0 0.2rem rgba(57, 132, 57, 0.25); }
 
 .was-validated .custom-control-input:valid:focus:not(:checked) ~ .custom-control-label::before, .custom-control-input.is-valid:focus:not(:checked) ~ .custom-control-label::before {
-  border-color: #5cb85c; }
+  border-color: #398439; }
 
 .was-validated .custom-file-input:valid ~ .custom-file-label, .custom-file-input.is-valid ~ .custom-file-label {
-  border-color: #5cb85c; }
+  border-color: #398439; }
 
 .was-validated .custom-file-input:valid ~ .valid-feedback,
 .was-validated .custom-file-input:valid ~ .valid-tooltip, .custom-file-input.is-valid ~ .valid-feedback,
@@ -3954,15 +3954,15 @@ div.backup-section + form {
   display: block; }
 
 .was-validated .custom-file-input:valid:focus ~ .custom-file-label, .custom-file-input.is-valid:focus ~ .custom-file-label {
-  border-color: #5cb85c;
-  box-shadow: 0 0 0 0.2rem rgba(92, 184, 92, 0.25); }
+  border-color: #398439;
+  box-shadow: 0 0 0 0.2rem rgba(57, 132, 57, 0.25); }
 
 .invalid-feedback {
   display: none;
   width: 100%;
   margin-top: 0.25rem;
   font-size: 80%;
-  color: #d9534f; }
+  color: #d43f3a; }
 
 .invalid-tooltip {
   position: absolute;
@@ -3975,18 +3975,18 @@ div.backup-section + form {
   font-size: 0.8203125rem;
   line-height: 1.5;
   color: #fff;
-  background-color: rgba(217, 83, 79, 0.9); }
+  background-color: rgba(212, 63, 58, 0.9); }
 
 .was-validated .form-control:invalid, .form-control.is-invalid {
-  border-color: #d9534f;
+  border-color: #d43f3a;
   padding-right: calc(1.5em + 0.75rem);
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='%23d9534f' viewBox='-2 -2 7 7'%3e%3cpath stroke='%23d9534f' d='M0 0l3 3m0-3L0 3'/%3e%3ccircle r='.5'/%3e%3ccircle cx='3' r='.5'/%3e%3ccircle cy='3' r='.5'/%3e%3ccircle cx='3' cy='3' r='.5'/%3e%3c/svg%3E");
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='%23d43f3a' viewBox='-2 -2 7 7'%3e%3cpath stroke='%23d43f3a' d='M0 0l3 3m0-3L0 3'/%3e%3ccircle r='.5'/%3e%3ccircle cx='3' r='.5'/%3e%3ccircle cy='3' r='.5'/%3e%3ccircle cx='3' cy='3' r='.5'/%3e%3c/svg%3E");
   background-repeat: no-repeat;
   background-position: center right calc(0.375em + 0.1875rem);
   background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem); }
   .was-validated .form-control:invalid:focus, .form-control.is-invalid:focus {
-    border-color: #d9534f;
-    box-shadow: 0 0 0 0.2rem rgba(217, 83, 79, 0.25); }
+    border-color: #d43f3a;
+    box-shadow: 0 0 0 0.2rem rgba(212, 63, 58, 0.25); }
   .was-validated .form-control:invalid ~ .invalid-feedback,
   .was-validated .form-control:invalid ~ .invalid-tooltip, .form-control.is-invalid ~ .invalid-feedback,
   .form-control.is-invalid ~ .invalid-tooltip {
@@ -3997,12 +3997,12 @@ div.backup-section + form {
   background-position: top calc(0.375em + 0.1875rem) right calc(0.375em + 0.1875rem); }
 
 .was-validated .custom-select:invalid, .custom-select.is-invalid {
-  border-color: #d9534f;
+  border-color: #d43f3a;
   padding-right: calc((1em + 0.75rem) * 3 / 4 + 1.75rem);
-  background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3e%3cpath fill='%23373a3c' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e") no-repeat right 0.75rem center/8px 10px, url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='%23d9534f' viewBox='-2 -2 7 7'%3e%3cpath stroke='%23d9534f' d='M0 0l3 3m0-3L0 3'/%3e%3ccircle r='.5'/%3e%3ccircle cx='3' r='.5'/%3e%3ccircle cy='3' r='.5'/%3e%3ccircle cx='3' cy='3' r='.5'/%3e%3c/svg%3E") #fff no-repeat center right 1.75rem/calc(0.75em + 0.375rem) calc(0.75em + 0.375rem); }
+  background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3e%3cpath fill='%23343a40' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e") no-repeat right 0.75rem center/8px 10px, url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='%23d43f3a' viewBox='-2 -2 7 7'%3e%3cpath stroke='%23d43f3a' d='M0 0l3 3m0-3L0 3'/%3e%3ccircle r='.5'/%3e%3ccircle cx='3' r='.5'/%3e%3ccircle cy='3' r='.5'/%3e%3ccircle cx='3' cy='3' r='.5'/%3e%3c/svg%3E") #fff no-repeat center right 1.75rem/calc(0.75em + 0.375rem) calc(0.75em + 0.375rem); }
   .was-validated .custom-select:invalid:focus, .custom-select.is-invalid:focus {
-    border-color: #d9534f;
-    box-shadow: 0 0 0 0.2rem rgba(217, 83, 79, 0.25); }
+    border-color: #d43f3a;
+    box-shadow: 0 0 0 0.2rem rgba(212, 63, 58, 0.25); }
   .was-validated .custom-select:invalid ~ .invalid-feedback,
   .was-validated .custom-select:invalid ~ .invalid-tooltip, .custom-select.is-invalid ~ .invalid-feedback,
   .custom-select.is-invalid ~ .invalid-tooltip {
@@ -4014,7 +4014,7 @@ div.backup-section + form {
   display: block; }
 
 .was-validated .form-check-input:invalid ~ .form-check-label, .form-check-input.is-invalid ~ .form-check-label {
-  color: #d9534f; }
+  color: #d43f3a; }
 
 .was-validated .form-check-input:invalid ~ .invalid-feedback,
 .was-validated .form-check-input:invalid ~ .invalid-tooltip, .form-check-input.is-invalid ~ .invalid-feedback,
@@ -4022,9 +4022,9 @@ div.backup-section + form {
   display: block; }
 
 .was-validated .custom-control-input:invalid ~ .custom-control-label, .custom-control-input.is-invalid ~ .custom-control-label {
-  color: #d9534f; }
+  color: #d43f3a; }
   .was-validated .custom-control-input:invalid ~ .custom-control-label::before, .custom-control-input.is-invalid ~ .custom-control-label::before {
-    border-color: #d9534f; }
+    border-color: #d43f3a; }
 
 .was-validated .custom-control-input:invalid ~ .invalid-feedback,
 .was-validated .custom-control-input:invalid ~ .invalid-tooltip, .custom-control-input.is-invalid ~ .invalid-feedback,
@@ -4032,17 +4032,17 @@ div.backup-section + form {
   display: block; }
 
 .was-validated .custom-control-input:invalid:checked ~ .custom-control-label::before, .custom-control-input.is-invalid:checked ~ .custom-control-label::before {
-  border-color: #e27c79;
-  background-color: #e27c79; }
+  border-color: #dd6864;
+  background-color: #dd6864; }
 
 .was-validated .custom-control-input:invalid:focus ~ .custom-control-label::before, .custom-control-input.is-invalid:focus ~ .custom-control-label::before {
-  box-shadow: 0 0 0 0.2rem rgba(217, 83, 79, 0.25); }
+  box-shadow: 0 0 0 0.2rem rgba(212, 63, 58, 0.25); }
 
 .was-validated .custom-control-input:invalid:focus:not(:checked) ~ .custom-control-label::before, .custom-control-input.is-invalid:focus:not(:checked) ~ .custom-control-label::before {
-  border-color: #d9534f; }
+  border-color: #d43f3a; }
 
 .was-validated .custom-file-input:invalid ~ .custom-file-label, .custom-file-input.is-invalid ~ .custom-file-label {
-  border-color: #d9534f; }
+  border-color: #d43f3a; }
 
 .was-validated .custom-file-input:invalid ~ .invalid-feedback,
 .was-validated .custom-file-input:invalid ~ .invalid-tooltip, .custom-file-input.is-invalid ~ .invalid-feedback,
@@ -4050,8 +4050,8 @@ div.backup-section + form {
   display: block; }
 
 .was-validated .custom-file-input:invalid:focus ~ .custom-file-label, .custom-file-input.is-invalid:focus ~ .custom-file-label {
-  border-color: #d9534f;
-  box-shadow: 0 0 0 0.2rem rgba(217, 83, 79, 0.25); }
+  border-color: #d43f3a;
+  box-shadow: 0 0 0 0.2rem rgba(212, 63, 58, 0.25); }
 
 .form-inline {
   display: flex;
@@ -4101,10 +4101,10 @@ div.backup-section + form {
     .form-inline .custom-control-label {
       margin-bottom: 0; } }
 
-.btn, #page-grade-grading-manage .actions .action, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input, #rubric-rubric.gradingform_rubric .addcriterion {
+.btn, #page-grade-grading-manage .actions .action {
   display: inline-block;
   font-weight: 400;
-  color: #373a3c;
+  color: #343a40;
   text-align: center;
   vertical-align: middle;
   user-select: none;
@@ -4116,23 +4116,21 @@ div.backup-section + form {
   border-radius: 0;
   transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out; }
   @media (prefers-reduced-motion: reduce) {
-    .btn, #page-grade-grading-manage .actions .action, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input, #rubric-rubric.gradingform_rubric .addcriterion {
+    .btn, #page-grade-grading-manage .actions .action {
       transition: none; } }
-  .btn:hover, #page-grade-grading-manage .actions .action:hover, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input:hover, #rubric-rubric.gradingform_rubric .addcriterion:hover {
-    color: #373a3c;
+  .btn:hover, #page-grade-grading-manage .actions .action:hover {
+    color: #343a40;
     text-decoration: none; }
-  .btn:focus, #page-grade-grading-manage .actions .action:focus, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input:focus, #rubric-rubric.gradingform_rubric .addcriterion:focus, .btn.focus, #page-grade-grading-manage .actions .focus.action, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input.focus, #rubric-rubric.gradingform_rubric .focus.addcriterion {
+  .btn:focus, #page-grade-grading-manage .actions .action:focus, .btn.focus, #page-grade-grading-manage .actions .focus.action {
     outline: 0;
     box-shadow: 0 0 0 0.2rem rgba(17, 119, 209, 0.25); }
-  .btn.disabled, .fp-viewbar.disabled a, #page-grade-grading-manage .actions .disabled.action, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input.disabled, #rubric-rubric.gradingform_rubric .disabled.addcriterion, .btn:disabled, #page-grade-grading-manage .actions .action:disabled, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input:disabled, #rubric-rubric.gradingform_rubric .addcriterion:disabled {
+  .btn.disabled, .fp-viewbar.disabled a, #page-grade-grading-manage .actions .disabled.action, .btn:disabled, #page-grade-grading-manage .actions .action:disabled {
     opacity: 0.65; }
 
-a.btn.disabled, .fp-viewbar.disabled a, #page-grade-grading-manage .actions a.disabled.action, #rubric-rubric.gradingform_rubric a.disabled.addcriterion,
+a.btn.disabled, .fp-viewbar.disabled a, #page-grade-grading-manage .actions a.disabled.action,
 fieldset:disabled a.btn,
 fieldset:disabled #page-grade-grading-manage .actions a.action,
-#page-grade-grading-manage .actions fieldset:disabled a.action,
-fieldset:disabled #rubric-rubric.gradingform_rubric a.addcriterion,
-#rubric-rubric.gradingform_rubric fieldset:disabled a.addcriterion {
+#page-grade-grading-manage .actions fieldset:disabled a.action {
   pointer-events: none; }
 
 .btn-primary {
@@ -4185,26 +4183,26 @@ fieldset:disabled #rubric-rubric.gradingform_rubric a.addcriterion,
 
 .btn-success {
   color: #fff;
-  background-color: #5cb85c;
-  border-color: #5cb85c; }
+  background-color: #398439;
+  border-color: #398439; }
   .btn-success:hover {
     color: #fff;
-    background-color: #48a648;
-    border-color: #449d44; }
+    background-color: #2d692d;
+    border-color: #2a602a; }
   .btn-success:focus, .btn-success.focus {
-    box-shadow: 0 0 0 0.2rem rgba(116, 195, 116, 0.5); }
+    box-shadow: 0 0 0 0.2rem rgba(87, 150, 87, 0.5); }
   .btn-success.disabled, .btn-success:disabled {
     color: #fff;
-    background-color: #5cb85c;
-    border-color: #5cb85c; }
+    background-color: #398439;
+    border-color: #398439; }
   .btn-success:not(:disabled):not(.disabled):active, .btn-success:not(:disabled):not(.disabled).active,
   .show > .btn-success.dropdown-toggle {
     color: #fff;
-    background-color: #449d44;
-    border-color: #409440; }
+    background-color: #2a602a;
+    border-color: #265726; }
     .btn-success:not(:disabled):not(.disabled):active:focus, .btn-success:not(:disabled):not(.disabled).active:focus,
     .show > .btn-success.dropdown-toggle:focus {
-      box-shadow: 0 0 0 0.2rem rgba(116, 195, 116, 0.5); }
+      box-shadow: 0 0 0 0.2rem rgba(87, 150, 87, 0.5); }
 
 .btn-info {
   color: #212529;
@@ -4254,26 +4252,26 @@ fieldset:disabled #rubric-rubric.gradingform_rubric a.addcriterion,
 
 .btn-danger {
   color: #fff;
-  background-color: #d9534f;
-  border-color: #d9534f; }
+  background-color: #d43f3a;
+  border-color: #d43f3a; }
   .btn-danger:hover {
     color: #fff;
-    background-color: #d23430;
-    border-color: #c9302c; }
+    background-color: #be2e2a;
+    border-color: #b42c27; }
   .btn-danger:focus, .btn-danger.focus {
-    box-shadow: 0 0 0 0.2rem rgba(223, 109, 105, 0.5); }
+    box-shadow: 0 0 0 0.2rem rgba(218, 92, 88, 0.5); }
   .btn-danger.disabled, .btn-danger:disabled {
     color: #fff;
-    background-color: #d9534f;
-    border-color: #d9534f; }
+    background-color: #d43f3a;
+    border-color: #d43f3a; }
   .btn-danger:not(:disabled):not(.disabled):active, .btn-danger:not(:disabled):not(.disabled).active,
   .show > .btn-danger.dropdown-toggle {
     color: #fff;
-    background-color: #c9302c;
-    border-color: #bf2e29; }
+    background-color: #b42c27;
+    border-color: #a92925; }
     .btn-danger:not(:disabled):not(.disabled):active:focus, .btn-danger:not(:disabled):not(.disabled).active:focus,
     .show > .btn-danger.dropdown-toggle:focus {
-      box-shadow: 0 0 0 0.2rem rgba(223, 109, 105, 0.5); }
+      box-shadow: 0 0 0 0.2rem rgba(218, 92, 88, 0.5); }
 
 .btn-light {
   color: #212529;
@@ -4300,26 +4298,26 @@ fieldset:disabled #rubric-rubric.gradingform_rubric a.addcriterion,
 
 .btn-dark {
   color: #fff;
-  background-color: #373a3c;
-  border-color: #373a3c; }
+  background-color: #343a40;
+  border-color: #343a40; }
   .btn-dark:hover {
     color: #fff;
-    background-color: #252728;
-    border-color: #1f2021; }
+    background-color: #23272b;
+    border-color: #1d2124; }
   .btn-dark:focus, .btn-dark.focus {
-    box-shadow: 0 0 0 0.2rem rgba(85, 88, 89, 0.5); }
+    box-shadow: 0 0 0 0.2rem rgba(82, 88, 93, 0.5); }
   .btn-dark.disabled, .btn-dark:disabled {
     color: #fff;
-    background-color: #373a3c;
-    border-color: #373a3c; }
+    background-color: #343a40;
+    border-color: #343a40; }
   .btn-dark:not(:disabled):not(.disabled):active, .btn-dark:not(:disabled):not(.disabled).active,
   .show > .btn-dark.dropdown-toggle {
     color: #fff;
-    background-color: #1f2021;
-    border-color: #191a1b; }
+    background-color: #1d2124;
+    border-color: #171a1d; }
     .btn-dark:not(:disabled):not(.disabled):active:focus, .btn-dark:not(:disabled):not(.disabled).active:focus,
     .show > .btn-dark.dropdown-toggle:focus {
-      box-shadow: 0 0 0 0.2rem rgba(85, 88, 89, 0.5); }
+      box-shadow: 0 0 0 0.2rem rgba(82, 88, 93, 0.5); }
 
 .btn-outline-primary {
   color: #1177d1;
@@ -4364,25 +4362,25 @@ fieldset:disabled #rubric-rubric.gradingform_rubric a.addcriterion,
       box-shadow: 0 0 0 0.2rem rgba(206, 212, 218, 0.5); }
 
 .btn-outline-success {
-  color: #5cb85c;
-  border-color: #5cb85c; }
+  color: #398439;
+  border-color: #398439; }
   .btn-outline-success:hover {
     color: #fff;
-    background-color: #5cb85c;
-    border-color: #5cb85c; }
+    background-color: #398439;
+    border-color: #398439; }
   .btn-outline-success:focus, .btn-outline-success.focus {
-    box-shadow: 0 0 0 0.2rem rgba(92, 184, 92, 0.5); }
+    box-shadow: 0 0 0 0.2rem rgba(57, 132, 57, 0.5); }
   .btn-outline-success.disabled, .btn-outline-success:disabled {
-    color: #5cb85c;
+    color: #398439;
     background-color: transparent; }
   .btn-outline-success:not(:disabled):not(.disabled):active, .btn-outline-success:not(:disabled):not(.disabled).active,
   .show > .btn-outline-success.dropdown-toggle {
     color: #fff;
-    background-color: #5cb85c;
-    border-color: #5cb85c; }
+    background-color: #398439;
+    border-color: #398439; }
     .btn-outline-success:not(:disabled):not(.disabled):active:focus, .btn-outline-success:not(:disabled):not(.disabled).active:focus,
     .show > .btn-outline-success.dropdown-toggle:focus {
-      box-shadow: 0 0 0 0.2rem rgba(92, 184, 92, 0.5); }
+      box-shadow: 0 0 0 0.2rem rgba(57, 132, 57, 0.5); }
 
 .btn-outline-info {
   color: #5bc0de;
@@ -4427,25 +4425,25 @@ fieldset:disabled #rubric-rubric.gradingform_rubric a.addcriterion,
       box-shadow: 0 0 0 0.2rem rgba(240, 173, 78, 0.5); }
 
 .btn-outline-danger {
-  color: #d9534f;
-  border-color: #d9534f; }
+  color: #d43f3a;
+  border-color: #d43f3a; }
   .btn-outline-danger:hover {
     color: #fff;
-    background-color: #d9534f;
-    border-color: #d9534f; }
+    background-color: #d43f3a;
+    border-color: #d43f3a; }
   .btn-outline-danger:focus, .btn-outline-danger.focus {
-    box-shadow: 0 0 0 0.2rem rgba(217, 83, 79, 0.5); }
+    box-shadow: 0 0 0 0.2rem rgba(212, 63, 58, 0.5); }
   .btn-outline-danger.disabled, .btn-outline-danger:disabled {
-    color: #d9534f;
+    color: #d43f3a;
     background-color: transparent; }
   .btn-outline-danger:not(:disabled):not(.disabled):active, .btn-outline-danger:not(:disabled):not(.disabled).active,
   .show > .btn-outline-danger.dropdown-toggle {
     color: #fff;
-    background-color: #d9534f;
-    border-color: #d9534f; }
+    background-color: #d43f3a;
+    border-color: #d43f3a; }
     .btn-outline-danger:not(:disabled):not(.disabled):active:focus, .btn-outline-danger:not(:disabled):not(.disabled).active:focus,
     .show > .btn-outline-danger.dropdown-toggle:focus {
-      box-shadow: 0 0 0 0.2rem rgba(217, 83, 79, 0.5); }
+      box-shadow: 0 0 0 0.2rem rgba(212, 63, 58, 0.5); }
 
 .btn-outline-light {
   color: #f8f9fa;
@@ -4469,47 +4467,47 @@ fieldset:disabled #rubric-rubric.gradingform_rubric a.addcriterion,
       box-shadow: 0 0 0 0.2rem rgba(248, 249, 250, 0.5); }
 
 .btn-outline-dark {
-  color: #373a3c;
-  border-color: #373a3c; }
+  color: #343a40;
+  border-color: #343a40; }
   .btn-outline-dark:hover {
     color: #fff;
-    background-color: #373a3c;
-    border-color: #373a3c; }
+    background-color: #343a40;
+    border-color: #343a40; }
   .btn-outline-dark:focus, .btn-outline-dark.focus {
-    box-shadow: 0 0 0 0.2rem rgba(55, 58, 60, 0.5); }
+    box-shadow: 0 0 0 0.2rem rgba(52, 58, 64, 0.5); }
   .btn-outline-dark.disabled, .btn-outline-dark:disabled {
-    color: #373a3c;
+    color: #343a40;
     background-color: transparent; }
   .btn-outline-dark:not(:disabled):not(.disabled):active, .btn-outline-dark:not(:disabled):not(.disabled).active,
   .show > .btn-outline-dark.dropdown-toggle {
     color: #fff;
-    background-color: #373a3c;
-    border-color: #373a3c; }
+    background-color: #343a40;
+    border-color: #343a40; }
     .btn-outline-dark:not(:disabled):not(.disabled):active:focus, .btn-outline-dark:not(:disabled):not(.disabled).active:focus,
     .show > .btn-outline-dark.dropdown-toggle:focus {
-      box-shadow: 0 0 0 0.2rem rgba(55, 58, 60, 0.5); }
+      box-shadow: 0 0 0 0.2rem rgba(52, 58, 64, 0.5); }
 
-.btn-link, .btn.btn-icon, #page-grade-grading-manage .actions .btn-icon.action, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input.btn-icon, #rubric-rubric.gradingform_rubric .btn-icon.addcriterion {
+.btn-link, .btn.btn-icon, #page-grade-grading-manage .actions .btn-icon.action {
   font-weight: 400;
   color: #1177d1;
   text-decoration: none; }
-  .btn-link:hover, .btn.btn-icon:hover, #page-grade-grading-manage .actions .btn-icon.action:hover, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input.btn-icon:hover, #rubric-rubric.gradingform_rubric .btn-icon.addcriterion:hover {
+  .btn-link:hover, .btn.btn-icon:hover, #page-grade-grading-manage .actions .btn-icon.action:hover {
     color: #0b4f8a;
     text-decoration: underline; }
-  .btn-link:focus, .btn.btn-icon:focus, #page-grade-grading-manage .actions .btn-icon.action:focus, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input.btn-icon:focus, #rubric-rubric.gradingform_rubric .btn-icon.addcriterion:focus, .btn-link.focus, .focus.btn.btn-icon, #page-grade-grading-manage .actions .focus.btn-icon.action, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input.focus.btn-icon, #rubric-rubric.gradingform_rubric .focus.btn-icon.addcriterion {
+  .btn-link:focus, .btn.btn-icon:focus, #page-grade-grading-manage .actions .btn-icon.action:focus, .btn-link.focus, .focus.btn.btn-icon, #page-grade-grading-manage .actions .focus.btn-icon.action {
     text-decoration: underline;
     box-shadow: none; }
-  .btn-link:disabled, .btn.btn-icon:disabled, #page-grade-grading-manage .actions .btn-icon.action:disabled, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input.btn-icon:disabled, #rubric-rubric.gradingform_rubric .btn-icon.addcriterion:disabled, .btn-link.disabled, .disabled.btn.btn-icon, .fp-viewbar.disabled a.btn-icon, #page-grade-grading-manage .actions .disabled.btn-icon.action, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input.disabled.btn-icon, #rubric-rubric.gradingform_rubric .disabled.btn-icon.addcriterion {
-    color: #868e96;
+  .btn-link:disabled, .btn.btn-icon:disabled, #page-grade-grading-manage .actions .btn-icon.action:disabled, .btn-link.disabled, .disabled.btn.btn-icon, .fp-viewbar.disabled a.btn-icon, #page-grade-grading-manage .actions .disabled.btn-icon.action {
+    color: #6c757d;
     pointer-events: none; }
 
-.btn-lg, .btn-group-lg > .btn, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .btn-group-lg > input, #rubric-rubric.gradingform_rubric .btn-group-lg > .addcriterion, #page-grade-grading-manage .actions .action {
+.btn-lg, .btn-group-lg > .btn, #page-grade-grading-manage .actions .action {
   padding: 0.5rem 1rem;
   font-size: 1.171875rem;
   line-height: 1.5;
   border-radius: 0; }
 
-.btn-sm, .btn-group-sm > .btn, #page-grade-grading-manage .actions .btn-group-sm > .action, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .btn-group-sm > input, #rubric-rubric.gradingform_rubric .btn-group-sm > .addcriterion {
+.btn-sm, .btn-group-sm > .btn, #page-grade-grading-manage .actions .btn-group-sm > .action {
   padding: 0.25rem 0.5rem;
   font-size: 0.8203125rem;
   line-height: 1.5;
@@ -4587,7 +4585,7 @@ p.arrow_button input[type="button"],
   padding: 0.5rem 0;
   margin: 0.125rem 0 0;
   font-size: 0.9375rem;
-  color: #373a3c;
+  color: #343a40;
   text-align: left;
   list-style: none;
   background-color: #fff;
@@ -4737,7 +4735,7 @@ p.arrow_button input[type="button"],
     text-decoration: none;
     background-color: #1177d1; }
   .dropdown-item.disabled, .dropdown-item:disabled {
-    color: #868e96;
+    color: #6c757d;
     pointer-events: none;
     background-color: transparent; }
 
@@ -4749,7 +4747,7 @@ p.arrow_button input[type="button"],
   padding: 0.5rem 1.5rem;
   margin-bottom: 0;
   font-size: 0.8203125rem;
-  color: #868e96;
+  color: #6c757d;
   white-space: nowrap; }
 
 .dropdown-item-text {
@@ -4762,32 +4760,22 @@ p.arrow_button input[type="button"],
   position: relative;
   display: inline-flex;
   vertical-align: middle; }
-  .btn-group > .btn, #page-grade-grading-manage .actions .btn-group > .action, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .btn-group > input, #rubric-rubric.gradingform_rubric .btn-group > .addcriterion,
+  .btn-group > .btn, #page-grade-grading-manage .actions .btn-group > .action,
   .btn-group-vertical > .btn,
-  #page-grade-grading-manage .actions .btn-group-vertical > .action,
-  #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .btn-group-vertical > input,
-  #rubric-rubric.gradingform_rubric .btn-group-vertical > .addcriterion {
+  #page-grade-grading-manage .actions .btn-group-vertical > .action {
     position: relative;
     flex: 1 1 auto; }
-    .btn-group > .btn:hover, #page-grade-grading-manage .actions .btn-group > .action:hover, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .btn-group > input:hover, #rubric-rubric.gradingform_rubric .btn-group > .addcriterion:hover,
+    .btn-group > .btn:hover, #page-grade-grading-manage .actions .btn-group > .action:hover,
     .btn-group-vertical > .btn:hover,
-    #page-grade-grading-manage .actions .btn-group-vertical > .action:hover,
-    #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .btn-group-vertical > input:hover,
-    #rubric-rubric.gradingform_rubric .btn-group-vertical > .addcriterion:hover {
+    #page-grade-grading-manage .actions .btn-group-vertical > .action:hover {
       z-index: 1; }
-    .btn-group > .btn:focus, #page-grade-grading-manage .actions .btn-group > .action:focus, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .btn-group > input:focus, #rubric-rubric.gradingform_rubric .btn-group > .addcriterion:focus, .btn-group > .btn:active, #page-grade-grading-manage .actions .btn-group > .action:active, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .btn-group > input:active, #rubric-rubric.gradingform_rubric .btn-group > .addcriterion:active, .btn-group > .btn.active, #page-grade-grading-manage .actions .btn-group > .active.action, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .btn-group > input.active, #rubric-rubric.gradingform_rubric .btn-group > .active.addcriterion,
+    .btn-group > .btn:focus, #page-grade-grading-manage .actions .btn-group > .action:focus, .btn-group > .btn:active, #page-grade-grading-manage .actions .btn-group > .action:active, .btn-group > .btn.active, #page-grade-grading-manage .actions .btn-group > .active.action,
     .btn-group-vertical > .btn:focus,
     #page-grade-grading-manage .actions .btn-group-vertical > .action:focus,
-    #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .btn-group-vertical > input:focus,
-    #rubric-rubric.gradingform_rubric .btn-group-vertical > .addcriterion:focus,
     .btn-group-vertical > .btn:active,
     #page-grade-grading-manage .actions .btn-group-vertical > .action:active,
-    #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .btn-group-vertical > input:active,
-    #rubric-rubric.gradingform_rubric .btn-group-vertical > .addcriterion:active,
     .btn-group-vertical > .btn.active,
-    #page-grade-grading-manage .actions .btn-group-vertical > .active.action,
-    #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .btn-group-vertical > input.active,
-    #rubric-rubric.gradingform_rubric .btn-group-vertical > .active.addcriterion {
+    #page-grade-grading-manage .actions .btn-group-vertical > .active.action {
       z-index: 1; }
 
 .btn-toolbar {
@@ -4797,7 +4785,7 @@ p.arrow_button input[type="button"],
   .btn-toolbar .input-group {
     width: auto; }
 
-.btn-group > .btn:not(:first-child), #page-grade-grading-manage .actions .btn-group > .action:not(:first-child), #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .btn-group > input:not(:first-child), #rubric-rubric.gradingform_rubric .btn-group > .addcriterion:not(:first-child),
+.btn-group > .btn:not(:first-child), #page-grade-grading-manage .actions .btn-group > .action:not(:first-child),
 .btn-group > .btn-group:not(:first-child) {
   margin-left: -1px; }
 
@@ -4811,11 +4799,11 @@ p.arrow_button input[type="button"],
   .dropleft .dropdown-toggle-split::before {
     margin-right: 0; }
 
-.btn-sm + .dropdown-toggle-split, .btn-group-sm > .btn + .dropdown-toggle-split, #page-grade-grading-manage .actions .btn-group-sm > .action + .dropdown-toggle-split, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .btn-group-sm > input + .dropdown-toggle-split, #rubric-rubric.gradingform_rubric .btn-group-sm > .addcriterion + .dropdown-toggle-split {
+.btn-sm + .dropdown-toggle-split, .btn-group-sm > .btn + .dropdown-toggle-split, #page-grade-grading-manage .actions .btn-group-sm > .action + .dropdown-toggle-split {
   padding-right: 0.375rem;
   padding-left: 0.375rem; }
 
-.btn-lg + .dropdown-toggle-split, .btn-group-lg > .btn + .dropdown-toggle-split, #page-grade-grading-manage .actions .btn-group-lg > .action + .dropdown-toggle-split, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .btn-group-lg > input + .dropdown-toggle-split, #rubric-rubric.gradingform_rubric .btn-group-lg > .addcriterion + .dropdown-toggle-split, #page-grade-grading-manage .actions .action + .dropdown-toggle-split {
+.btn-lg + .dropdown-toggle-split, .btn-group-lg > .btn + .dropdown-toggle-split, #page-grade-grading-manage .actions .btn-group-lg > .action + .dropdown-toggle-split, #page-grade-grading-manage .actions .action + .dropdown-toggle-split {
   padding-right: 0.75rem;
   padding-left: 0.75rem; }
 
@@ -4826,33 +4814,23 @@ p.arrow_button input[type="button"],
   
   .btn-group-vertical > .btn,
   #page-grade-grading-manage .actions .btn-group-vertical > .action,
-  #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .btn-group-vertical > input,
-  #rubric-rubric.gradingform_rubric .btn-group-vertical > .addcriterion,
   .btn-group-vertical > .btn-group {
     width: 100%; }
-  .btn-group-vertical > .btn:not(:first-child), #page-grade-grading-manage .actions .btn-group-vertical > .action:not(:first-child), #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .btn-group-vertical > input:not(:first-child), #rubric-rubric.gradingform_rubric .btn-group-vertical > .addcriterion:not(:first-child),
+  .btn-group-vertical > .btn:not(:first-child), #page-grade-grading-manage .actions .btn-group-vertical > .action:not(:first-child),
   .btn-group-vertical > .btn-group:not(:first-child) {
     margin-top: -1px; }
 
-.btn-group-toggle > .btn, #page-grade-grading-manage .actions .btn-group-toggle > .action, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .btn-group-toggle > input, #rubric-rubric.gradingform_rubric .btn-group-toggle > .addcriterion,
+.btn-group-toggle > .btn, #page-grade-grading-manage .actions .btn-group-toggle > .action,
 .btn-group-toggle > .btn-group > .btn,
-#page-grade-grading-manage .actions .btn-group-toggle > .btn-group > .action,
-#rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .btn-group-toggle > .btn-group > input,
-#rubric-rubric.gradingform_rubric .btn-group-toggle > .btn-group > .addcriterion {
+#page-grade-grading-manage .actions .btn-group-toggle > .btn-group > .action {
   margin-bottom: 0; }
-  .btn-group-toggle > .btn input[type="radio"], #page-grade-grading-manage .actions .btn-group-toggle > .action input[type="radio"], #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .btn-group-toggle > input input[type="radio"], #rubric-rubric.gradingform_rubric .btn-group-toggle > .addcriterion input[type="radio"],
+  .btn-group-toggle > .btn input[type="radio"], #page-grade-grading-manage .actions .btn-group-toggle > .action input[type="radio"],
   .btn-group-toggle > .btn input[type="checkbox"],
   #page-grade-grading-manage .actions .btn-group-toggle > .action input[type="checkbox"],
-  #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .btn-group-toggle > input input[type="checkbox"],
-  #rubric-rubric.gradingform_rubric .btn-group-toggle > .addcriterion input[type="checkbox"],
   .btn-group-toggle > .btn-group > .btn input[type="radio"],
   #page-grade-grading-manage .actions .btn-group-toggle > .btn-group > .action input[type="radio"],
-  #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .btn-group-toggle > .btn-group > input input[type="radio"],
-  #rubric-rubric.gradingform_rubric .btn-group-toggle > .btn-group > .addcriterion input[type="radio"],
   .btn-group-toggle > .btn-group > .btn input[type="checkbox"],
-  #page-grade-grading-manage .actions .btn-group-toggle > .btn-group > .action input[type="checkbox"],
-  #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .btn-group-toggle > .btn-group > input input[type="checkbox"],
-  #rubric-rubric.gradingform_rubric .btn-group-toggle > .btn-group > .addcriterion input[type="checkbox"] {
+  #page-grade-grading-manage .actions .btn-group-toggle > .btn-group > .action input[type="checkbox"] {
     position: absolute;
     clip: rect(0, 0, 0, 0);
     pointer-events: none; }
@@ -4897,96 +4875,39 @@ p.arrow_button input[type="button"],
 .input-group-prepend,
 .input-group-append {
   display: flex; }
-  .input-group-prepend .btn, .input-group-prepend #page-grade-grading-manage .actions .action, #page-grade-grading-manage .actions .input-group-prepend .action, .input-group-prepend #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .input-group-prepend input, .input-group-prepend #rubric-rubric.gradingform_rubric .addcriterion, #rubric-rubric.gradingform_rubric .input-group-prepend .addcriterion,
+  .input-group-prepend .btn, .input-group-prepend #page-grade-grading-manage .actions .action, #page-grade-grading-manage .actions .input-group-prepend .action,
   .input-group-append .btn,
   .input-group-append #page-grade-grading-manage .actions .action,
-  #page-grade-grading-manage .actions .input-group-append .action,
-  .input-group-append #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input,
-  #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .input-group-append input,
-  .input-group-append #rubric-rubric.gradingform_rubric .addcriterion,
-  #rubric-rubric.gradingform_rubric .input-group-append .addcriterion {
+  #page-grade-grading-manage .actions .input-group-append .action {
     position: relative;
     z-index: 2; }
-    .input-group-prepend .btn:focus, .input-group-prepend #page-grade-grading-manage .actions .action:focus, #page-grade-grading-manage .actions .input-group-prepend .action:focus, .input-group-prepend #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input:focus, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .input-group-prepend input:focus, .input-group-prepend #rubric-rubric.gradingform_rubric .addcriterion:focus, #rubric-rubric.gradingform_rubric .input-group-prepend .addcriterion:focus,
+    .input-group-prepend .btn:focus, .input-group-prepend #page-grade-grading-manage .actions .action:focus, #page-grade-grading-manage .actions .input-group-prepend .action:focus,
     .input-group-append .btn:focus,
     .input-group-append #page-grade-grading-manage .actions .action:focus,
-    #page-grade-grading-manage .actions .input-group-append .action:focus,
-    .input-group-append #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input:focus,
-    #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .input-group-append input:focus,
-    .input-group-append #rubric-rubric.gradingform_rubric .addcriterion:focus,
-    #rubric-rubric.gradingform_rubric .input-group-append .addcriterion:focus {
+    #page-grade-grading-manage .actions .input-group-append .action:focus {
       z-index: 3; }
-  .input-group-prepend .btn + .btn, .input-group-prepend #page-grade-grading-manage .actions .action + .btn, #page-grade-grading-manage .actions .input-group-prepend .action + .btn, .input-group-prepend #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input + .btn, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .input-group-prepend input + .btn, .input-group-prepend #rubric-rubric.gradingform_rubric .addcriterion + .btn, #rubric-rubric.gradingform_rubric .input-group-prepend .addcriterion + .btn, .input-group-prepend #page-grade-grading-manage .actions .btn + .action, #page-grade-grading-manage .actions .input-group-prepend .btn + .action, .input-group-prepend #page-grade-grading-manage .actions .action + .action, #page-grade-grading-manage .actions .input-group-prepend .action + .action, .input-group-prepend #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel #page-grade-grading-manage .actions input + .action, #page-grade-grading-manage .actions .input-group-prepend #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input + .action, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .input-group-prepend #page-grade-grading-manage .actions input + .action, #page-grade-grading-manage .actions #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .input-group-prepend input + .action, .input-group-prepend #rubric-rubric.gradingform_rubric #page-grade-grading-manage .actions .addcriterion + .action, #page-grade-grading-manage .actions .input-group-prepend #rubric-rubric.gradingform_rubric .addcriterion + .action, #rubric-rubric.gradingform_rubric .input-group-prepend #page-grade-grading-manage .actions .addcriterion + .action, #page-grade-grading-manage .actions #rubric-rubric.gradingform_rubric .input-group-prepend .addcriterion + .action, .input-group-prepend #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .btn + input, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .input-group-prepend .btn + input, .input-group-prepend #page-grade-grading-manage .actions #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .action + input, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .input-group-prepend #page-grade-grading-manage .actions .action + input, #page-grade-grading-manage .actions .input-group-prepend #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .action + input, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel #page-grade-grading-manage .actions .input-group-prepend .action + input, .input-group-prepend #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input + input, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .input-group-prepend input + input, .input-group-prepend #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .addcriterion + input, #rubric-rubric.gradingform_rubric .input-group-prepend #rubric-criteria .criterion .addlevel .addcriterion + input, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .input-group-prepend .addcriterion + input, .input-group-prepend #rubric-rubric.gradingform_rubric .btn + .addcriterion, #rubric-rubric.gradingform_rubric .input-group-prepend .btn + .addcriterion, .input-group-prepend #page-grade-grading-manage .actions #rubric-rubric.gradingform_rubric .action + .addcriterion, #rubric-rubric.gradingform_rubric .input-group-prepend #page-grade-grading-manage .actions .action + .addcriterion, #page-grade-grading-manage .actions .input-group-prepend #rubric-rubric.gradingform_rubric .action + .addcriterion, #rubric-rubric.gradingform_rubric #page-grade-grading-manage .actions .input-group-prepend .action + .addcriterion, .input-group-prepend #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input + .addcriterion, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .input-group-prepend input + .addcriterion, .input-group-prepend #rubric-rubric.gradingform_rubric .addcriterion + .addcriterion, #rubric-rubric.gradingform_rubric .input-group-prepend .addcriterion + .addcriterion,
+  .input-group-prepend .btn + .btn, .input-group-prepend #page-grade-grading-manage .actions .action + .btn, #page-grade-grading-manage .actions .input-group-prepend .action + .btn, .input-group-prepend #page-grade-grading-manage .actions .btn + .action, #page-grade-grading-manage .actions .input-group-prepend .btn + .action, .input-group-prepend #page-grade-grading-manage .actions .action + .action, #page-grade-grading-manage .actions .input-group-prepend .action + .action,
   .input-group-prepend .btn + .input-group-text,
   .input-group-prepend #page-grade-grading-manage .actions .action + .input-group-text,
   #page-grade-grading-manage .actions .input-group-prepend .action + .input-group-text,
-  .input-group-prepend #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input + .input-group-text,
-  #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .input-group-prepend input + .input-group-text,
-  .input-group-prepend #rubric-rubric.gradingform_rubric .addcriterion + .input-group-text,
-  #rubric-rubric.gradingform_rubric .input-group-prepend .addcriterion + .input-group-text,
   .input-group-prepend .input-group-text + .input-group-text,
   .input-group-prepend .input-group-text + .btn,
   .input-group-prepend #page-grade-grading-manage .actions .input-group-text + .action,
   #page-grade-grading-manage .actions .input-group-prepend .input-group-text + .action,
-  .input-group-prepend #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .input-group-text + input,
-  #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .input-group-prepend .input-group-text + input,
-  .input-group-prepend #rubric-rubric.gradingform_rubric .input-group-text + .addcriterion,
-  #rubric-rubric.gradingform_rubric .input-group-prepend .input-group-text + .addcriterion,
   .input-group-append .btn + .btn,
   .input-group-append #page-grade-grading-manage .actions .action + .btn,
   #page-grade-grading-manage .actions .input-group-append .action + .btn,
-  .input-group-append #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input + .btn,
-  #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .input-group-append input + .btn,
-  .input-group-append #rubric-rubric.gradingform_rubric .addcriterion + .btn,
-  #rubric-rubric.gradingform_rubric .input-group-append .addcriterion + .btn,
   .input-group-append #page-grade-grading-manage .actions .btn + .action,
   #page-grade-grading-manage .actions .input-group-append .btn + .action,
   .input-group-append #page-grade-grading-manage .actions .action + .action,
   #page-grade-grading-manage .actions .input-group-append .action + .action,
-  .input-group-append #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel #page-grade-grading-manage .actions input + .action,
-  #page-grade-grading-manage .actions .input-group-append #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input + .action,
-  #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .input-group-append #page-grade-grading-manage .actions input + .action,
-  #page-grade-grading-manage .actions #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .input-group-append input + .action,
-  .input-group-append #rubric-rubric.gradingform_rubric #page-grade-grading-manage .actions .addcriterion + .action,
-  #page-grade-grading-manage .actions .input-group-append #rubric-rubric.gradingform_rubric .addcriterion + .action,
-  #rubric-rubric.gradingform_rubric .input-group-append #page-grade-grading-manage .actions .addcriterion + .action,
-  #page-grade-grading-manage .actions #rubric-rubric.gradingform_rubric .input-group-append .addcriterion + .action,
-  .input-group-append #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .btn + input,
-  #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .input-group-append .btn + input,
-  .input-group-append #page-grade-grading-manage .actions #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .action + input,
-  #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .input-group-append #page-grade-grading-manage .actions .action + input,
-  #page-grade-grading-manage .actions .input-group-append #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .action + input,
-  #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel #page-grade-grading-manage .actions .input-group-append .action + input,
-  .input-group-append #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input + input,
-  #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .input-group-append input + input,
-  .input-group-append #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .addcriterion + input,
-  #rubric-rubric.gradingform_rubric .input-group-append #rubric-criteria .criterion .addlevel .addcriterion + input,
-  #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .input-group-append .addcriterion + input,
-  .input-group-append #rubric-rubric.gradingform_rubric .btn + .addcriterion,
-  #rubric-rubric.gradingform_rubric .input-group-append .btn + .addcriterion,
-  .input-group-append #page-grade-grading-manage .actions #rubric-rubric.gradingform_rubric .action + .addcriterion,
-  #rubric-rubric.gradingform_rubric .input-group-append #page-grade-grading-manage .actions .action + .addcriterion,
-  #page-grade-grading-manage .actions .input-group-append #rubric-rubric.gradingform_rubric .action + .addcriterion,
-  #rubric-rubric.gradingform_rubric #page-grade-grading-manage .actions .input-group-append .action + .addcriterion,
-  .input-group-append #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input + .addcriterion,
-  #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .input-group-append input + .addcriterion,
-  .input-group-append #rubric-rubric.gradingform_rubric .addcriterion + .addcriterion,
-  #rubric-rubric.gradingform_rubric .input-group-append .addcriterion + .addcriterion,
   .input-group-append .btn + .input-group-text,
   .input-group-append #page-grade-grading-manage .actions .action + .input-group-text,
   #page-grade-grading-manage .actions .input-group-append .action + .input-group-text,
-  .input-group-append #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input + .input-group-text,
-  #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .input-group-append input + .input-group-text,
-  .input-group-append #rubric-rubric.gradingform_rubric .addcriterion + .input-group-text,
-  #rubric-rubric.gradingform_rubric .input-group-append .addcriterion + .input-group-text,
   .input-group-append .input-group-text + .input-group-text,
   .input-group-append .input-group-text + .btn,
   .input-group-append #page-grade-grading-manage .actions .input-group-text + .action,
-  #page-grade-grading-manage .actions .input-group-append .input-group-text + .action,
-  .input-group-append #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .input-group-text + input,
-  #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .input-group-append .input-group-text + input,
-  .input-group-append #rubric-rubric.gradingform_rubric .input-group-text + .addcriterion,
-  #rubric-rubric.gradingform_rubric .input-group-append .input-group-text + .addcriterion {
+  #page-grade-grading-manage .actions .input-group-append .input-group-text + .action {
     margin-left: -1px; }
 
 .input-group-prepend {
@@ -5022,12 +4943,8 @@ p.arrow_button input[type="button"],
 .input-group-lg > .input-group-append > .input-group-text,
 .input-group-lg > .input-group-prepend > .btn,
 #page-grade-grading-manage .actions .input-group-lg > .input-group-prepend > .action,
-#rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .input-group-lg > .input-group-prepend > input,
-#rubric-rubric.gradingform_rubric .input-group-lg > .input-group-prepend > .addcriterion,
 .input-group-lg > .input-group-append > .btn,
-#page-grade-grading-manage .actions .input-group-lg > .input-group-append > .action,
-#rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .input-group-lg > .input-group-append > input,
-#rubric-rubric.gradingform_rubric .input-group-lg > .input-group-append > .addcriterion {
+#page-grade-grading-manage .actions .input-group-lg > .input-group-append > .action {
   padding: 0.5rem 1rem;
   font-size: 1.171875rem;
   line-height: 1.5; }
@@ -5042,12 +4959,8 @@ p.arrow_button input[type="button"],
 .input-group-sm > .input-group-append > .input-group-text,
 .input-group-sm > .input-group-prepend > .btn,
 #page-grade-grading-manage .actions .input-group-sm > .input-group-prepend > .action,
-#rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .input-group-sm > .input-group-prepend > input,
-#rubric-rubric.gradingform_rubric .input-group-sm > .input-group-prepend > .addcriterion,
 .input-group-sm > .input-group-append > .btn,
-#page-grade-grading-manage .actions .input-group-sm > .input-group-append > .action,
-#rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .input-group-sm > .input-group-append > input,
-#rubric-rubric.gradingform_rubric .input-group-sm > .input-group-append > .addcriterion {
+#page-grade-grading-manage .actions .input-group-sm > .input-group-append > .action {
   padding: 0.25rem 0.5rem;
   font-size: 0.8203125rem;
   line-height: 1.5; }
@@ -5083,7 +4996,7 @@ p.arrow_button input[type="button"],
     background-color: #9dcdf7;
     border-color: #9dcdf7; }
   .custom-control-input:disabled ~ .custom-control-label {
-    color: #868e96; }
+    color: #6c757d; }
     .custom-control-input:disabled ~ .custom-control-label::before {
       background-color: #e9ecef; }
 
@@ -5171,7 +5084,7 @@ p.arrow_button input[type="button"],
   line-height: 1.5;
   color: #495057;
   vertical-align: middle;
-  background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3e%3cpath fill='%23373a3c' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e") no-repeat right 0.75rem center/8px 10px;
+  background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3e%3cpath fill='%23343a40' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e") no-repeat right 0.75rem center/8px 10px;
   background-color: #fff;
   border: 1px solid #ced4da;
   border-radius: 0;
@@ -5188,7 +5101,7 @@ p.arrow_button input[type="button"],
     padding-right: 0.75rem;
     background-image: none; }
   .custom-select:disabled {
-    color: #868e96;
+    color: #6c757d;
     background-color: #e9ecef; }
   .custom-select::-ms-expand {
     display: none; }
@@ -5376,7 +5289,7 @@ p.arrow_button input[type="button"],
   .nav-link:hover, .nav-link:focus {
     text-decoration: none; }
   .nav-link.disabled {
-    color: #868e96;
+    color: #6c757d;
     pointer-events: none;
     cursor: default; }
 
@@ -5389,7 +5302,7 @@ p.arrow_button input[type="button"],
     .nav-tabs .nav-link:hover, .nav-tabs .nav-link:focus {
       border-color: #e9ecef #e9ecef #dee2e6; }
     .nav-tabs .nav-link.disabled {
-      color: #868e96;
+      color: #6c757d;
       background-color: transparent;
       border-color: transparent; }
   .nav-tabs .nav-link.active,
@@ -5818,7 +5731,7 @@ p.arrow_button input[type="button"],
   .breadcrumb-item + .breadcrumb-item::before {
     display: inline-block;
     padding-right: 0.5rem;
-    color: #868e96;
+    color: #6c757d;
     content: "/"; }
 
 .breadcrumb-item + .breadcrumb-item:hover::before {
@@ -5828,7 +5741,7 @@ p.arrow_button input[type="button"],
   text-decoration: none; }
 
 .breadcrumb-item.active {
-  color: #868e96; }
+  color: #6c757d; }
 
 .pagination {
   display: flex;
@@ -5865,7 +5778,7 @@ p.arrow_button input[type="button"],
   border-color: #1177d1; }
 
 .page-item.disabled .page-link {
-  color: #868e96;
+  color: #6c757d;
   pointer-events: none;
   cursor: auto;
   background-color: #fff;
@@ -5899,7 +5812,7 @@ p.arrow_button input[type="button"],
   .badge:empty {
     display: none; }
 
-.btn .badge, #page-grade-grading-manage .actions .action .badge, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input .badge, #rubric-rubric.gradingform_rubric .addcriterion .badge {
+.btn .badge, #page-grade-grading-manage .actions .action .badge {
   position: relative;
   top: -1px; }
 
@@ -5929,13 +5842,13 @@ p.arrow_button input[type="button"],
 
 .badge-success {
   color: #fff;
-  background-color: #5cb85c; }
+  background-color: #398439; }
   .badge-success[href]:hover, .badge-success[href]:focus {
     color: #fff;
-    background-color: #449d44; }
+    background-color: #2a602a; }
   .badge-success[href]:focus, .badge-success[href].focus {
     outline: 0;
-    box-shadow: 0 0 0 0.2rem rgba(92, 184, 92, 0.5); }
+    box-shadow: 0 0 0 0.2rem rgba(57, 132, 57, 0.5); }
 
 .badge-info {
   color: #212529;
@@ -5959,13 +5872,13 @@ p.arrow_button input[type="button"],
 
 .badge-danger {
   color: #fff;
-  background-color: #d9534f; }
+  background-color: #d43f3a; }
   .badge-danger[href]:hover, .badge-danger[href]:focus {
     color: #fff;
-    background-color: #c9302c; }
+    background-color: #b42c27; }
   .badge-danger[href]:focus, .badge-danger[href].focus {
     outline: 0;
-    box-shadow: 0 0 0 0.2rem rgba(217, 83, 79, 0.5); }
+    box-shadow: 0 0 0 0.2rem rgba(212, 63, 58, 0.5); }
 
 .badge-light {
   color: #212529;
@@ -5979,13 +5892,13 @@ p.arrow_button input[type="button"],
 
 .badge-dark {
   color: #fff;
-  background-color: #373a3c; }
+  background-color: #343a40; }
   .badge-dark[href]:hover, .badge-dark[href]:focus {
     color: #fff;
-    background-color: #1f2021; }
+    background-color: #1d2124; }
   .badge-dark[href]:focus, .badge-dark[href].focus {
     outline: 0;
-    box-shadow: 0 0 0 0.2rem rgba(55, 58, 60, 0.5); }
+    box-shadow: 0 0 0 0.2rem rgba(52, 58, 64, 0.5); }
 
 .jumbotron {
   padding: 2rem 1rem;
@@ -6044,13 +5957,13 @@ p.arrow_button input[type="button"],
 
 .alert-success,
 .que .comment {
-  color: #306030;
-  background-color: #def1de;
-  border-color: #d1ebd1; }
+  color: #1e451e;
+  background-color: #d7e6d7;
+  border-color: #c8ddc8; }
   .alert-success hr, .que .comment hr {
-    border-top-color: #bfe3bf; }
+    border-top-color: #b8d3b8; }
   .alert-success .alert-link, .que .comment .alert-link {
-    color: #1f3e1f; }
+    color: #0f210f; }
 
 .alert-info, #page-admin-index .releasenoteslink, #adminsettings .form-overridden, .que .formulation, .assignfeedback_editpdf_widget .label {
   color: #2f6473;
@@ -6075,13 +5988,13 @@ p.arrow_button input[type="button"],
 
 .alert-danger,
 #page-admin-index .adminerror {
-  color: #712b29;
-  background-color: #f7dddc;
-  border-color: #f4cfce; }
+  color: #6e211e;
+  background-color: #f6d9d8;
+  border-color: #f3c9c8; }
   .alert-danger hr, #page-admin-index .adminerror hr {
-    border-top-color: #efbbb9; }
+    border-top-color: #eeb4b3; }
   .alert-danger .alert-link, #page-admin-index .adminerror .alert-link {
-    color: #4c1d1b; }
+    color: #461513; }
 
 .alert-light {
   color: #818182;
@@ -6093,11 +6006,11 @@ p.arrow_button input[type="button"],
     color: #686868; }
 
 .alert-dark {
-  color: #1d1e1f;
-  background-color: #d7d8d8;
-  border-color: #c7c8c8; }
+  color: #1b1e21;
+  background-color: #d6d8d9;
+  border-color: #c6c8ca; }
   .alert-dark hr {
-    border-top-color: #babbbb; }
+    border-top-color: #b9bbbe; }
   .alert-dark .alert-link {
     color: #040505; }
 
@@ -6160,7 +6073,7 @@ p.arrow_button input[type="button"],
     text-decoration: none;
     background-color: #f8f9fa; }
   .list-group-item-action:active {
-    color: #373a3c;
+    color: #343a40;
     background-color: #e9ecef; }
 
 .list-group-item {
@@ -6173,7 +6086,7 @@ p.arrow_button input[type="button"],
   .list-group-item:last-child {
     margin-bottom: 0; }
   .list-group-item.disabled, .list-group-item:disabled {
-    color: #868e96;
+    color: #6c757d;
     pointer-events: none;
     background-color: #fff; }
   .list-group-item.active {
@@ -6262,15 +6175,15 @@ p.arrow_button input[type="button"],
     border-color: #6b6e71; }
 
 .list-group-item-success {
-  color: #306030;
-  background-color: #d1ebd1; }
+  color: #1e451e;
+  background-color: #c8ddc8; }
   .list-group-item-success.list-group-item-action:hover, .list-group-item-success.list-group-item-action:focus {
-    color: #306030;
-    background-color: #bfe3bf; }
+    color: #1e451e;
+    background-color: #b8d3b8; }
   .list-group-item-success.list-group-item-action.active {
     color: #fff;
-    background-color: #306030;
-    border-color: #306030; }
+    background-color: #1e451e;
+    border-color: #1e451e; }
 
 .list-group-item-info {
   color: #2f6473;
@@ -6295,15 +6208,15 @@ p.arrow_button input[type="button"],
     border-color: #7d5a29; }
 
 .list-group-item-danger {
-  color: #712b29;
-  background-color: #f4cfce; }
+  color: #6e211e;
+  background-color: #f3c9c8; }
   .list-group-item-danger.list-group-item-action:hover, .list-group-item-danger.list-group-item-action:focus {
-    color: #712b29;
-    background-color: #efbbb9; }
+    color: #6e211e;
+    background-color: #eeb4b3; }
   .list-group-item-danger.list-group-item-action.active {
     color: #fff;
-    background-color: #712b29;
-    border-color: #712b29; }
+    background-color: #6e211e;
+    border-color: #6e211e; }
 
 .list-group-item-light {
   color: #818182;
@@ -6317,15 +6230,15 @@ p.arrow_button input[type="button"],
     border-color: #818182; }
 
 .list-group-item-dark {
-  color: #1d1e1f;
-  background-color: #c7c8c8; }
+  color: #1b1e21;
+  background-color: #c6c8ca; }
   .list-group-item-dark.list-group-item-action:hover, .list-group-item-dark.list-group-item-action:focus {
-    color: #1d1e1f;
-    background-color: #babbbb; }
+    color: #1b1e21;
+    background-color: #b9bbbe; }
   .list-group-item-dark.list-group-item-action.active {
     color: #fff;
-    background-color: #1d1e1f;
-    border-color: #1d1e1f; }
+    background-color: #1b1e21;
+    border-color: #1b1e21; }
 
 .close, .moodle-dialogue-base .closebutton {
   float: right;
@@ -6374,7 +6287,7 @@ a.close.disabled, .moodle-dialogue-base a.disabled.closebutton {
   display: flex;
   align-items: center;
   padding: 0.25rem 0.75rem;
-  color: #868e96;
+  color: #6c757d;
   background-color: rgba(255, 255, 255, 0.85);
   background-clip: padding-box;
   border-bottom: 1px solid rgba(0, 0, 0, 0.05); }
@@ -6727,7 +6640,7 @@ a.close.disabled, .moodle-dialogue-base a.disabled.closebutton {
 
 .popover-body {
   padding: 0.5rem 0.75rem;
-  color: #373a3c; }
+  color: #343a40; }
 
 .carousel {
   position: relative; }
@@ -6953,12 +6866,12 @@ button.bg-secondary:focus {
   background-color: #b1bbc4 !important; }
 
 .bg-success {
-  background-color: #5cb85c !important; }
+  background-color: #398439 !important; }
 
 a.bg-success:hover, a.bg-success:focus,
 button.bg-success:hover,
 button.bg-success:focus {
-  background-color: #449d44 !important; }
+  background-color: #2a602a !important; }
 
 .bg-info {
   background-color: #5bc0de !important; }
@@ -6977,12 +6890,12 @@ button.bg-warning:focus {
   background-color: #ec971f !important; }
 
 .bg-danger {
-  background-color: #d9534f !important; }
+  background-color: #d43f3a !important; }
 
 a.bg-danger:hover, a.bg-danger:focus,
 button.bg-danger:hover,
 button.bg-danger:focus {
-  background-color: #c9302c !important; }
+  background-color: #b42c27 !important; }
 
 .bg-light {
   background-color: #f8f9fa !important; }
@@ -6993,12 +6906,12 @@ button.bg-light:focus {
   background-color: #dae0e5 !important; }
 
 .bg-dark {
-  background-color: #373a3c !important; }
+  background-color: #343a40 !important; }
 
 a.bg-dark:hover, a.bg-dark:focus,
 button.bg-dark:hover,
 button.bg-dark:focus {
-  background-color: #1f2021 !important; }
+  background-color: #1d2124 !important; }
 
 .bg-white {
   background-color: #fff !important; }
@@ -7044,7 +6957,7 @@ button.bg-dark:focus {
   border-color: #ced4da !important; }
 
 .border-success {
-  border-color: #5cb85c !important; }
+  border-color: #398439 !important; }
 
 .border-info {
   border-color: #5bc0de !important; }
@@ -7053,13 +6966,13 @@ button.bg-dark:focus {
   border-color: #f0ad4e !important; }
 
 .border-danger {
-  border-color: #d9534f !important; }
+  border-color: #d43f3a !important; }
 
 .border-light {
   border-color: #f8f9fa !important; }
 
 .border-dark {
-  border-color: #373a3c !important; }
+  border-color: #343a40 !important; }
 
 .border-white {
   border-color: #fff !important; }
@@ -9287,12 +9200,12 @@ a.text-secondary:hover, a.text-secondary:focus {
 
 .text-success, .green,
 .notifysuccess, .connected {
-  color: #5cb85c !important; }
+  color: #398439 !important; }
 
 a.text-success:hover, a.green:hover,
 a.notifysuccess:hover, a.connected:hover, a.text-success:focus, a.green:focus,
 a.notifysuccess:focus, a.connected:focus {
-  color: #3d8b3d !important; }
+  color: #224f22 !important; }
 
 .text-info, .highlight {
   color: #5bc0de !important; }
@@ -9317,10 +9230,10 @@ tr.flagged-tag a:focus, .moodle-dialogue-exception .param-stacktrace a.stacktrac
   color: #df8a13 !important; }
 
 .text-danger, .notconnected, .que .validationerror, .text-error {
-  color: #d9534f !important; }
+  color: #d43f3a !important; }
 
 a.text-danger:hover, a.notconnected:hover, .que a.validationerror:hover, a.text-error:hover, a.text-danger:focus, a.notconnected:focus, .que a.validationerror:focus, a.text-error:focus {
-  color: #b52b27 !important; }
+  color: #9f2723 !important; }
 
 .text-light {
   color: #f8f9fa !important; }
@@ -9329,13 +9242,13 @@ a.text-light:hover, a.text-light:focus {
   color: #cbd3da !important; }
 
 .text-dark, #categoryquestions .highlight {
-  color: #373a3c !important; }
+  color: #343a40 !important; }
 
 a.text-dark:hover, #categoryquestions a.highlight:hover, a.text-dark:focus, #categoryquestions a.highlight:focus {
-  color: #121314 !important; }
+  color: #121416 !important; }
 
 .text-body {
-  color: #373a3c !important; }
+  color: #343a40 !important; }
 
 .text-muted, a.dimmed,
 a.dimmed:link,
@@ -9353,11 +9266,11 @@ a.dimmed_text:visited,
 .usersuspended a:visited,
 .dimmed_category,
 .dimmed_category a, .tag_feed .media .muted a, #page-admin-qtypes .disabled,
-#page-admin-qbehaviours .disabled, #page-admin-plugins #plugins-control-panel .pluginname .componentname, #page-admin-plugins #plugins-control-panel .version .versionnumber, #page-admin-plugins #plugins-control-panel .notes .requiredby, #plugins-check-page .page-description, #plugins-check-page #plugins-check .requires-ok, #plugins-check-page #plugins-check .displayname .plugindir, #plugins-check-page #plugins-check-available-dependencies .displayname .component, #page-admin-search .adminpagepath li, .block .minicalendar td.weekend, .section .activity .stealth, .course-content .section-summary .section-summary-activities .activity-count, .course-content ul li.section.hidden .sectionname > span,
+#page-admin-qbehaviours .disabled, #page-admin-plugins #plugins-control-panel .pluginname .componentname, #page-admin-plugins #plugins-control-panel .version .versionnumber, #page-admin-plugins #plugins-control-panel .notes .requiredby, #page-admin-search .adminpagepath li, .block .minicalendar td.weekend, .section .activity .stealth, .course-content .section-summary .section-summary-activities .activity-count, .course-content ul li.section.hidden .sectionname > span,
 .course-content ul li.section.hidden .content > div.summary,
 .course-content ul li.section.hidden .activity .activityinstance, #course-category-listings .listitem[data-visible="0"], #course-category-listings .listitem[data-visible="0"] > div > a, #course-category-listings .listing-pagination-totals.dimmed, .fitem.disabled .fp-btn-choose, .form-defaultinfo,
 .form-label .form-shortname, .formsettingheading .form-horizontal, .no-felement.fstatic, .path-backup .backup_progress .backup_stage {
-  color: #868e96 !important; }
+  color: #6c757d !important; }
 
 .text-black-50 {
   color: rgba(0, 0, 0, 0.5) !important; }
@@ -9480,9 +9393,9 @@ a.dimmed_text:visited,
   background-size: calc(1.5em + 0.75rem + 2px)/2 calc(1.5em + 0.75rem + 2px)/2; }
 
 .tag-default {
-  background-color: #868e96; }
+  background-color: #6c757d; }
   .tag-default[href]:hover, .tag-default[href]:focus {
-    background-color: #6c757d; }
+    background-color: #545b62; }
 
 .tag-primary {
   background-color: #1177d1; }
@@ -9492,13 +9405,13 @@ a.dimmed_text:visited,
 .tag-success, .statusok, #page-admin-report-backups-index .backup-skipped,
 #page-admin-report-backups-index .backup-ok,
 #page-admin-report-backups-index .backup-notyetrun {
-  background-color: #5cb85c; }
+  background-color: #398439; }
   .tag-success[href]:hover, .statusok[href]:hover, #page-admin-report-backups-index .backup-skipped[href]:hover,
   #page-admin-report-backups-index .backup-ok[href]:hover,
   #page-admin-report-backups-index .backup-notyetrun[href]:hover, .tag-success[href]:focus, .statusok[href]:focus, #page-admin-report-backups-index .backup-skipped[href]:focus,
   #page-admin-report-backups-index .backup-ok[href]:focus,
   #page-admin-report-backups-index .backup-notyetrun[href]:focus {
-    background-color: #449d44; }
+    background-color: #2a602a; }
 
 .tag-info, #page-admin-index .adminwarning.availableupdatesinfo .moodleupdateinfo.maturity200 .info.release {
   background-color: #5bc0de; }
@@ -9507,22 +9420,22 @@ a.dimmed_text:visited,
 
 .tag-warning, .statuswarning, #page-admin-report-backups-index .backup-warning, #page-admin-index .updateplugin .updatepluginconfirmexternal, #page-admin-index .adminwarning.availableupdatesinfo .moodleupdateinfo.maturity100 .info.release,
 #page-admin-index .adminwarning.availableupdatesinfo .moodleupdateinfo.maturity150 .info.release {
-  background-color: #ff7518; }
+  background-color: #f0ad4e; }
   .tag-warning[href]:hover, .statuswarning[href]:hover, #page-admin-report-backups-index .backup-warning[href]:hover, #page-admin-index .updateplugin .updatepluginconfirmexternal[href]:hover, #page-admin-index .adminwarning.availableupdatesinfo .moodleupdateinfo.maturity100 .info.release[href]:hover,
   #page-admin-index .adminwarning.availableupdatesinfo .moodleupdateinfo.maturity150 .info.release[href]:hover, .tag-warning[href]:focus, .statuswarning[href]:focus, #page-admin-report-backups-index .backup-warning[href]:focus, #page-admin-index .updateplugin .updatepluginconfirmexternal[href]:focus, #page-admin-index .adminwarning.availableupdatesinfo .moodleupdateinfo.maturity100 .info.release[href]:focus,
   #page-admin-index .adminwarning.availableupdatesinfo .moodleupdateinfo.maturity150 .info.release[href]:focus {
-    background-color: #e45c00; }
+    background-color: #ec971f; }
 
 .tag-danger, .statusserious,
 .statuscritical, #page-admin-report-backups-index .backup-error,
 #page-admin-report-backups-index .backup-unfinished, #page-admin-index .adminwarning.availableupdatesinfo .moodleupdateinfo.maturity50 .info.release {
-  background-color: #d9534f; }
+  background-color: #d43f3a; }
   .tag-danger[href]:hover, .statusserious[href]:hover,
   .statuscritical[href]:hover, #page-admin-report-backups-index .backup-error[href]:hover,
   #page-admin-report-backups-index .backup-unfinished[href]:hover, #page-admin-index .adminwarning.availableupdatesinfo .moodleupdateinfo.maturity50 .info.release[href]:hover, .tag-danger[href]:focus, .statusserious[href]:focus,
   .statuscritical[href]:focus, #page-admin-report-backups-index .backup-error[href]:focus,
   #page-admin-report-backups-index .backup-unfinished[href]:focus, #page-admin-index .adminwarning.availableupdatesinfo .moodleupdateinfo.maturity50 .info.release[href]:focus {
-    background-color: #c9302c; }
+    background-color: #b42c27; }
 
 .custom-select {
   width: auto; }
@@ -10822,7 +10735,9 @@ body#page-lib-editor-tinymce-plugins-moodlemedia-preview {
 .choosercontainer #chooseform .moduletypetitle {
   text-transform: uppercase;
   padding-top: 1.2em;
-  padding-bottom: 0.4em; }
+  padding-bottom: 0.4em;
+  margin-bottom: 0.5rem;
+  font-size: 100%; }
 
 .choosercontainer #chooseform .option .typename,
 .choosercontainer #chooseform .nonoption .typename {
@@ -11066,7 +10981,7 @@ ul.badges {
   display: inline-block; }
 
 .statusbox.active {
-  background-color: #def1de; }
+  background-color: #d7e6d7; }
 
 .statusbox.inactive {
   background-color: #fcefdc; }
@@ -11314,7 +11229,7 @@ ul {
 .dropdown-item a {
   display: block;
   width: 100%;
-  color: #373a3c; }
+  color: #343a40; }
 
 .dropdown-item:active a {
   color: #fff; }
@@ -11404,10 +11319,10 @@ div.editor_atto_toolbar button .icon {
 .dir-ltr .dir-ltr-hide {
   display: none; }
 
-.switch {
+body:not(.behat-site) .switch {
   position: relative;
   display: inline-block; }
-  .switch input {
+  body:not(.behat-site) .switch input {
     float: left;
     width: 1px;
     transform: translateX(1px);
@@ -11415,7 +11330,7 @@ div.editor_atto_toolbar button .icon {
     margin: 0;
     opacity: 0;
     line-height: 1.25rem; }
-    .switch input + label {
+    body:not(.behat-site) .switch input + label {
       position: relative;
       min-height: 1.25rem;
       min-width: 2.5rem;
@@ -11426,14 +11341,14 @@ div.editor_atto_toolbar button .icon {
       outline: none;
       user-select: none;
       padding-left: 3rem; }
-    .switch input + label::before,
-    .switch input + label::after {
+    body:not(.behat-site) .switch input + label::before,
+    body:not(.behat-site) .switch input + label::after {
       content: '';
       position: absolute;
       left: 0;
       bottom: 0;
       display: block; }
-    .switch input + label::before {
+    body:not(.behat-site) .switch input + label::before {
       right: 0;
       height: 1rem;
       width: 2.5rem;
@@ -11441,7 +11356,7 @@ div.editor_atto_toolbar button .icon {
       background-color: #dee2e6;
       border-radius: 1.25rem;
       transition: 0.2s all; }
-    .switch input + label::after {
+    body:not(.behat-site) .switch input + label::after {
       left: 0;
       width: 1.25rem;
       height: 1.25rem;
@@ -11450,24 +11365,24 @@ div.editor_atto_toolbar button .icon {
       background-color: #fff;
       transition: 0.2s all;
       box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 2px 1px -1px rgba(0, 0, 0, 0.12); }
-    .switch input:checked + label::before {
+    body:not(.behat-site) .switch input:checked + label::before {
       background-color: rgba(17, 119, 209, 0.4); }
-    .switch input:checked + label::after {
+    body:not(.behat-site) .switch input:checked + label::after {
       margin-left: 1.25rem;
       background-color: #1177d1; }
-    .switch input:focus + label::before {
+    body:not(.behat-site) .switch input:focus + label::before {
       outline: none; }
-    .switch input:focus + label::after {
+    body:not(.behat-site) .switch input:focus + label::after {
       outline: none;
       box-shadow: 0 0 0 0.4rem rgba(17, 119, 209, 0.25); }
-    .switch input:disabled + label {
-      color: #868e96;
+    body:not(.behat-site) .switch input:disabled + label {
+      color: #6c757d;
       cursor: not-allowed; }
-    .switch input:disabled + label::before {
+    body:not(.behat-site) .switch input:disabled + label::before {
       background-color: #e9ecef; }
-    .switch input:disabled + label::after {
-      background-color: #868e96; }
-  .switch.sr-only-label input + label {
+    body:not(.behat-site) .switch input:disabled + label::after {
+      background-color: #6c757d; }
+  body:not(.behat-site) .switch.sr-only-label input + label {
     text-indent: -9999px;
     margin-bottom: 0;
     padding-left: 0; }
@@ -11557,12 +11472,12 @@ body.h5p-embed .h5pmessages {
 
 .emoji-auto-complete {
   height: 40px; }
-  .emoji-auto-complete .btn.btn-link.btn-icon.emoji-button, .emoji-auto-complete .btn.btn-icon.emoji-button, .emoji-auto-complete #page-grade-grading-manage .actions .btn-icon.emoji-button.action, #page-grade-grading-manage .actions .emoji-auto-complete .btn-icon.emoji-button.action, .emoji-auto-complete #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input.btn-icon.emoji-button, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .emoji-auto-complete input.btn-icon.emoji-button, .emoji-auto-complete #rubric-rubric.gradingform_rubric .btn-icon.emoji-button.addcriterion, #rubric-rubric.gradingform_rubric .emoji-auto-complete .btn-icon.emoji-button.addcriterion {
+  .emoji-auto-complete .btn.btn-link.btn-icon.emoji-button, .emoji-auto-complete .btn.btn-icon.emoji-button, .emoji-auto-complete #page-grade-grading-manage .actions .btn-icon.emoji-button.action, #page-grade-grading-manage .actions .emoji-auto-complete .btn-icon.emoji-button.action {
     height: 40px;
     width: 40px;
     line-height: 40px;
     font-size: 24px; }
-    .emoji-auto-complete .btn.btn-link.btn-icon.emoji-button.active, .emoji-auto-complete .btn.btn-icon.emoji-button.active, .emoji-auto-complete #page-grade-grading-manage .actions .btn-icon.emoji-button.active.action, #page-grade-grading-manage .actions .emoji-auto-complete .btn-icon.emoji-button.active.action, .emoji-auto-complete #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input.btn-icon.emoji-button.active, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .emoji-auto-complete input.btn-icon.emoji-button.active, .emoji-auto-complete #rubric-rubric.gradingform_rubric .btn-icon.emoji-button.active.addcriterion, #rubric-rubric.gradingform_rubric .emoji-auto-complete .btn-icon.emoji-button.active.addcriterion {
+    .emoji-auto-complete .btn.btn-link.btn-icon.emoji-button.active, .emoji-auto-complete .btn.btn-icon.emoji-button.active, .emoji-auto-complete #page-grade-grading-manage .actions .btn-icon.emoji-button.active.action, #page-grade-grading-manage .actions .emoji-auto-complete .btn-icon.emoji-button.active.action {
       background-color: #e9ecef; }
 
 .toast-wrapper {
@@ -11571,6 +11486,30 @@ body.h5p-embed .h5pmessages {
   z-index: 1051; }
   .toast-wrapper > :first-child {
     margin-top: 1rem; }
+
+.alert-primary a {
+  color: #05233e; }
+
+.alert-secondary a {
+  color: #525557; }
+
+.alert-success a, .que .comment a {
+  color: #0f210f; }
+
+.alert-info a, #page-admin-index .releasenoteslink a, #adminsettings .form-overridden a, .que .formulation a, .assignfeedback_editpdf_widget .label a {
+  color: #20454f; }
+
+.alert-warning a, #page-admin-index .adminwarning a, .uninstalldeleteconfirmexternal a, .que .outcome a, .que .comment a {
+  color: #573e1c; }
+
+.alert-danger a, #page-admin-index .adminerror a {
+  color: #461513; }
+
+.alert-light a {
+  color: #686868; }
+
+.alert-dark a {
+  color: #040505; }
 
 .icon {
   font-size: 16px;
@@ -11686,15 +11625,15 @@ body.h5p-embed .h5pmessages {
 
 .environmenttable .warn {
   background-color: #fcefdc;
-  color: #ff7518; }
+  color: #f0ad4e; }
 
 .environmenttable .error {
-  background-color: #f7dddc;
-  color: #d9534f; }
+  background-color: #f6d9d8;
+  color: #d43f3a; }
 
 .environmenttable .ok {
-  background-color: #def1de;
-  color: #5cb85c; }
+  background-color: #d7e6d7;
+  color: #398439; }
 
 .path-admin .admintable.environmenttable .name,
 .path-admin .admintable.environmenttable .info,
@@ -12026,7 +11965,7 @@ body.h5p-embed .h5pmessages {
   font-size: 0.8203125rem; }
 
 #page-admin-plugins #plugins-control-panel .uninstall a {
-  color: #d9534f; }
+  color: #d43f3a; }
 
 #page-admin-plugins #plugins-control-panel .notes .label {
   margin-right: 3px; }
@@ -12034,64 +11973,9 @@ body.h5p-embed .h5pmessages {
 #page-admin-plugins #plugins-control-panel .notes .requiredby {
   font-size: 0.8203125rem; }
 
-#plugins-check-page .checkforupdates .singlebutton {
-  margin: 5px 0;
-  padding: 0; }
-  #plugins-check-page .checkforupdates .singlebutton div,
-  #plugins-check-page .checkforupdates .singlebutton input {
-    margin: 0 3px 0 0; }
-
-#plugins-check-page #plugins-check-info .actions > div {
-  display: inline-block;
-  margin-right: 1em; }
-
-#plugins-check-page #plugins-check-info .actions .singlebutton {
-  margin: 5px 0;
-  padding: 0; }
-  #plugins-check-page #plugins-check-info .actions .singlebutton div,
-  #plugins-check-page #plugins-check-info .actions .singlebutton input {
-    margin: 0 3px 0 0; }
-
 #plugins-check-page #plugins-check .status-missing td,
 #plugins-check-page #plugins-check .status-downgrade td {
-  background-color: #f7dddc; }
-
-#plugins-check-page #plugins-check .displayname .plugindir {
-  font-size: 0.8203125rem; }
-
-#plugins-check-page #plugins-check .requires ul {
-  margin-left: 13px; }
-
-#plugins-check-page #plugins-check .status .actionbutton {
-  margin: 5px 0;
-  padding: 0; }
-  #plugins-check-page #plugins-check .status .actionbutton input {
-    margin: 0; }
-
-#plugins-check-page .plugins-check-dependencies-actions > div {
-  display: inline-block;
-  margin-right: 1em; }
-
-#plugins-check-page .plugins-check-dependencies-actions .singlebutton {
-  margin: 5px 0;
-  padding: 0; }
-  #plugins-check-page .plugins-check-dependencies-actions .singlebutton div,
-  #plugins-check-page .plugins-check-dependencies-actions .singlebutton input {
-    margin: 0 3px 0 0; }
-
-#plugins-check-page #plugins-check-available-dependencies .displayname .component {
-  font-size: 0.8203125rem; }
-
-#plugins-check-page #plugins-check-available-dependencies .info .actions > div {
-  display: inline-block;
-  margin-right: 1em; }
-
-#plugins-check-page #plugins-check-available-dependencies .info .actions .dependencyinstall {
-  display: block;
-  margin: 5px 0;
-  padding: 0; }
-  #plugins-check-page #plugins-check-available-dependencies .info .actions .dependencyinstall input {
-    margin: 0; }
+  background-color: #f6d9d8; }
 
 #plugins-check-page .pluginupdateinfo,
 #plugins-control-panel .pluginupdateinfo {
@@ -12100,7 +11984,7 @@ body.h5p-embed .h5pmessages {
   margin: 10px 0; }
   #plugins-check-page .pluginupdateinfo.maturity50,
   #plugins-control-panel .pluginupdateinfo.maturity50 {
-    background-color: #f7dddc; }
+    background-color: #f6d9d8; }
   #plugins-check-page .pluginupdateinfo.maturity100, #plugins-check-page .pluginupdateinfo.maturity150,
   #plugins-control-panel .pluginupdateinfo.maturity100,
   #plugins-control-panel .pluginupdateinfo.maturity150 {
@@ -12199,7 +12083,7 @@ body.h5p-embed .h5pmessages {
 
 #page-admin-tasklogs .task-class {
   font-size: 0.8203125rem;
-  color: #868e96; }
+  color: #6c757d; }
 
 .blockmovetarget .accesshide {
   position: relative;
@@ -12220,7 +12104,7 @@ body.h5p-embed .h5pmessages {
 
 .block .block-controls .dropdown-toggle {
   /* So that the caret takes the colour of the icon. */
-  color: #373a3c; }
+  color: #343a40; }
 
 [data-region="blocks-column"] {
   width: 360px;
@@ -12296,22 +12180,18 @@ body.h5p-embed .h5pmessages {
 .block .block-cards .btn-link,
 .block .block-cards .btn.btn-icon,
 .block .block-cards #page-grade-grading-manage .actions .btn-icon.action,
-#page-grade-grading-manage .actions .block .block-cards .btn-icon.action,
-.block .block-cards #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input.btn-icon,
-#rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .block .block-cards input.btn-icon,
-.block .block-cards #rubric-rubric.gradingform_rubric .btn-icon.addcriterion,
-#rubric-rubric.gradingform_rubric .block .block-cards .btn-icon.addcriterion {
+#page-grade-grading-manage .actions .block .block-cards .btn-icon.action {
   color: inherit; }
 
 .block .block-cards .multiline {
   white-space: normal; }
 
-.block .block-cards .btn.btn-link.btn-icon, .block .block-cards .btn.btn-icon, .block .block-cards #page-grade-grading-manage .actions .btn-icon.action, #page-grade-grading-manage .actions .block .block-cards .btn-icon.action, .block .block-cards #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input.btn-icon, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .block .block-cards input.btn-icon, .block .block-cards #rubric-rubric.gradingform_rubric .btn-icon.addcriterion, #rubric-rubric.gradingform_rubric .block .block-cards .btn-icon.addcriterion {
+.block .block-cards .btn.btn-link.btn-icon, .block .block-cards .btn.btn-icon, .block .block-cards #page-grade-grading-manage .actions .btn-icon.action, #page-grade-grading-manage .actions .block .block-cards .btn-icon.action {
   height: 36px;
   width: 36px;
   padding: 0;
   border-radius: 50%; }
-  .block .block-cards .btn.btn-link.btn-icon:hover, .block .block-cards .btn.btn-icon:hover, .block .block-cards #page-grade-grading-manage .actions .btn-icon.action:hover, #page-grade-grading-manage .actions .block .block-cards .btn-icon.action:hover, .block .block-cards #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input.btn-icon:hover, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .block .block-cards input.btn-icon:hover, .block .block-cards #rubric-rubric.gradingform_rubric .btn-icon.addcriterion:hover, #rubric-rubric.gradingform_rubric .block .block-cards .btn-icon.addcriterion:hover, .block .block-cards .btn.btn-link.btn-icon:focus, .block .block-cards .btn.btn-icon:focus, .block .block-cards #page-grade-grading-manage .actions .btn-icon.action:focus, #page-grade-grading-manage .actions .block .block-cards .btn-icon.action:focus, .block .block-cards #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input.btn-icon:focus, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .block .block-cards input.btn-icon:focus, .block .block-cards #rubric-rubric.gradingform_rubric .btn-icon.addcriterion:focus, #rubric-rubric.gradingform_rubric .block .block-cards .btn-icon.addcriterion:focus {
+  .block .block-cards .btn.btn-link.btn-icon:hover, .block .block-cards .btn.btn-icon:hover, .block .block-cards #page-grade-grading-manage .actions .btn-icon.action:hover, #page-grade-grading-manage .actions .block .block-cards .btn-icon.action:hover, .block .block-cards .btn.btn-link.btn-icon:focus, .block .block-cards .btn.btn-icon:focus, .block .block-cards #page-grade-grading-manage .actions .btn-icon.action:focus, #page-grade-grading-manage .actions .block .block-cards .btn-icon.action:focus {
     background-color: #e9ecef; }
 
 .dashboard-card-deck.one-row {
@@ -12467,7 +12347,7 @@ body.h5p-embed .h5pmessages {
     margin-right: 2px; }
 
 .block.invisibleblock .card-title {
-  color: #868e96; }
+  color: #6c757d; }
 
 .navbar {
   max-height: 50px; }
@@ -12969,24 +12849,25 @@ body:not(.editing) .sitetopic ul.section {
 
 .course-content ul.topics,
 .course-content ul.weeks {
-  padding: 0; }
+  padding: 0;
+  margin: 0;
+  list-style: none; }
   .course-content ul.topics li.section,
   .course-content ul.weeks li.section {
     margin-top: 1rem;
     padding-bottom: 1rem; }
-    .course-content ul.topics li.section .content,
-    .course-content ul.weeks li.section .content {
-      margin: 0;
-      padding: 0; }
     .course-content ul.topics li.section .summary,
     .course-content ul.topics li.section .content > .availabilityinfo,
     .course-content ul.weeks li.section .summary,
     .course-content ul.weeks li.section .content > .availabilityinfo {
       margin-left: 25px; }
     .course-content ul.topics li.section .left,
-    .course-content ul.weeks li.section .left {
-      padding-top: 0;
-      text-align: right; }
+    .course-content ul.topics li.section .right,
+    .course-content ul.weeks li.section .left,
+    .course-content ul.weeks li.section .right {
+      padding: 0 6px 0;
+      text-align: right;
+      width: auto; }
 
 .course-content {
   margin-top: 0; }
@@ -13064,7 +12945,7 @@ body:not(.editing) .sitetopic ul.section {
   vertical-align: text-bottom;
   margin-left: 0; }
 
-.path-course-view li.activity form.togglecompletion .btn, .path-course-view li.activity form.togglecompletion #page-grade-grading-manage .actions .action, #page-grade-grading-manage .actions .path-course-view li.activity form.togglecompletion .action, .path-course-view li.activity form.togglecompletion #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .path-course-view li.activity form.togglecompletion input, .path-course-view li.activity form.togglecompletion #rubric-rubric.gradingform_rubric .addcriterion, #rubric-rubric.gradingform_rubric .path-course-view li.activity form.togglecompletion .addcriterion {
+.path-course-view li.activity form.togglecompletion .btn, .path-course-view li.activity form.togglecompletion #page-grade-grading-manage .actions .action, #page-grade-grading-manage .actions .path-course-view li.activity form.togglecompletion .action {
   padding: 0; }
 
 .path-course-view li.activity form.togglecompletion img {
@@ -13361,9 +13242,8 @@ span.editinstructions {
     #course-category-listings ul.ml ul.ml {
       margin: 0; }
   #course-category-listings .listitem[data-selected='1'] {
-    background-color: rgba(0, 0, 0, 0.05); }
-    #course-category-listings .listitem[data-selected='1']:hover {
-      background-color: rgba(0, 0, 0, 0.075); }
+    border-left: calc(1px + 5px) solid #5bc0de;
+    padding-left: calc(1.25rem - 5px); }
   #course-category-listings .item-actions {
     margin-right: 1em;
     display: inline-block; }
@@ -13384,7 +13264,6 @@ span.editinstructions {
   #course-category-listings .listitem > div .without-actions {
     color: #333; }
   #course-category-listings .listitem > div .idnumber {
-    color: #a1a1a8;
     margin-right: 2em; }
   #course-category-listings .listitem[data-visible="0"] > div .item-actions .action-show {
     display: inline; }
@@ -13409,17 +13288,6 @@ span.editinstructions {
     margin: -2px 6px 0 0; }
   #course-category-listings #category-listing .listitem.collapsed > ul.ml {
     display: none; }
-  #course-category-listings #category-listing .listitem > div > .ba-checkbox {
-    width: 2.2em;
-    text-align: center;
-    margin: -1px 0.5em 0 0;
-    padding-top: 2px; }
-  #course-category-listings #category-listing .listitem.highlight > div > .ba-checkbox {
-    background-color: rgba(0, 0, 0, 0.075); }
-  #course-category-listings #category-listing .listitem[data-selected='1'] > div > .ba-checkbox {
-    margin: 0 0.5em 0 0;
-    padding: 0;
-    background-color: inherit; }
   #course-category-listings #category-listing .listitem:first-child > div .item-actions .action-moveup,
   #course-category-listings #category-listing .listitem:last-child > div .item-actions .action-movedown {
     display: none; }
@@ -14784,7 +14652,7 @@ a.ygtvspacer:hover {
       direction: ltr; }
   .message-app .matchtext {
     background-color: #b5d9f9;
-    color: #373a3c;
+    color: #343a40;
     height: 1.5rem; }
   .message-app .contact-status {
     position: absolute;
@@ -14795,7 +14663,7 @@ a.ygtvspacer:hover {
     border-radius: 50%; }
     .message-app .contact-status.online {
       border: 1px solid #fff;
-      background-color: #5cb85c; }
+      background-color: #398439; }
   .message-app .message p {
     margin: 0; }
   .message-app .clickable {
@@ -14806,13 +14674,9 @@ a.ygtvspacer:hover {
   .message-app .btn-link,
   .message-app .btn.btn-icon,
   .message-app #page-grade-grading-manage .actions .btn-icon.action,
-  #page-grade-grading-manage .actions .message-app .btn-icon.action,
-  .message-app #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input.btn-icon,
-  #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .message-app input.btn-icon,
-  .message-app #rubric-rubric.gradingform_rubric .btn-icon.addcriterion,
-  #rubric-rubric.gradingform_rubric .message-app .btn-icon.addcriterion {
+  #page-grade-grading-manage .actions .message-app .btn-icon.action {
     color: inherit; }
-  .message-app .btn-link:hover, .message-app .btn.btn-icon:hover, .message-app #page-grade-grading-manage .actions .btn-icon.action:hover, #page-grade-grading-manage .actions .message-app .btn-icon.action:hover, .message-app #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input.btn-icon:hover, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .message-app input.btn-icon:hover, .message-app #rubric-rubric.gradingform_rubric .btn-icon.addcriterion:hover, #rubric-rubric.gradingform_rubric .message-app .btn-icon.addcriterion:hover, .message-app .btn-link:focus, .message-app .btn.btn-icon:focus, .message-app #page-grade-grading-manage .actions .btn-icon.action:focus, #page-grade-grading-manage .actions .message-app .btn-icon.action:focus, .message-app #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input.btn-icon:focus, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .message-app input.btn-icon:focus, .message-app #rubric-rubric.gradingform_rubric .btn-icon.addcriterion:focus, #rubric-rubric.gradingform_rubric .message-app .btn-icon.addcriterion:focus {
+  .message-app .btn-link:hover, .message-app .btn.btn-icon:hover, .message-app #page-grade-grading-manage .actions .btn-icon.action:hover, #page-grade-grading-manage .actions .message-app .btn-icon.action:hover, .message-app .btn-link:focus, .message-app .btn.btn-icon:focus, .message-app #page-grade-grading-manage .actions .btn-icon.action:focus, #page-grade-grading-manage .actions .message-app .btn-icon.action:focus {
     background-color: rgba(0, 0, 0, 0.035);
     text-decoration: none; }
   .message-app .icon {
@@ -14825,40 +14689,40 @@ a.ygtvspacer:hover {
     display: inline-block; }
   .message-app .overview-section-toggle.collapsed .expanded-icon-container {
     display: none; }
-  .message-app .btn.btn-link.btn-icon, .message-app .btn.btn-icon, .message-app #page-grade-grading-manage .actions .btn-icon.action, #page-grade-grading-manage .actions .message-app .btn-icon.action, .message-app #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input.btn-icon, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .message-app input.btn-icon, .message-app #rubric-rubric.gradingform_rubric .btn-icon.addcriterion, #rubric-rubric.gradingform_rubric .message-app .btn-icon.addcriterion {
+  .message-app .btn.btn-link.btn-icon, .message-app .btn.btn-icon, .message-app #page-grade-grading-manage .actions .btn-icon.action, #page-grade-grading-manage .actions .message-app .btn-icon.action {
     height: 16px;
     width: 16px;
     padding: 0;
     border-radius: 50%;
     flex-shrink: 0; }
-    .message-app .btn.btn-link.btn-icon:hover, .message-app .btn.btn-icon:hover, .message-app #page-grade-grading-manage .actions .btn-icon.action:hover, #page-grade-grading-manage .actions .message-app .btn-icon.action:hover, .message-app #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input.btn-icon:hover, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .message-app input.btn-icon:hover, .message-app #rubric-rubric.gradingform_rubric .btn-icon.addcriterion:hover, #rubric-rubric.gradingform_rubric .message-app .btn-icon.addcriterion:hover, .message-app .btn.btn-link.btn-icon:focus, .message-app .btn.btn-icon:focus, .message-app #page-grade-grading-manage .actions .btn-icon.action:focus, #page-grade-grading-manage .actions .message-app .btn-icon.action:focus, .message-app #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input.btn-icon:focus, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .message-app input.btn-icon:focus, .message-app #rubric-rubric.gradingform_rubric .btn-icon.addcriterion:focus, #rubric-rubric.gradingform_rubric .message-app .btn-icon.addcriterion:focus {
+    .message-app .btn.btn-link.btn-icon:hover, .message-app .btn.btn-icon:hover, .message-app #page-grade-grading-manage .actions .btn-icon.action:hover, #page-grade-grading-manage .actions .message-app .btn-icon.action:hover, .message-app .btn.btn-link.btn-icon:focus, .message-app .btn.btn-icon:focus, .message-app #page-grade-grading-manage .actions .btn-icon.action:focus, #page-grade-grading-manage .actions .message-app .btn-icon.action:focus {
       background-color: #e9ecef; }
-    .message-app .btn.btn-link.btn-icon.icon-size-0, .message-app .btn.btn-icon.icon-size-0, .message-app #page-grade-grading-manage .actions .btn-icon.icon-size-0.action, #page-grade-grading-manage .actions .message-app .btn-icon.icon-size-0.action, .message-app #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input.btn-icon.icon-size-0, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .message-app input.btn-icon.icon-size-0, .message-app #rubric-rubric.gradingform_rubric .btn-icon.icon-size-0.addcriterion, #rubric-rubric.gradingform_rubric .message-app .btn-icon.icon-size-0.addcriterion {
+    .message-app .btn.btn-link.btn-icon.icon-size-0, .message-app .btn.btn-icon.icon-size-0, .message-app #page-grade-grading-manage .actions .btn-icon.icon-size-0.action, #page-grade-grading-manage .actions .message-app .btn-icon.icon-size-0.action {
       height: 20px !important;
       /* stylelint-disable-line declaration-no-important */
       width: 20px !important;
       /* stylelint-disable-line declaration-no-important */ }
-    .message-app .btn.btn-link.btn-icon.icon-size-1, .message-app .btn.btn-icon.icon-size-1, .message-app #page-grade-grading-manage .actions .btn-icon.icon-size-1.action, #page-grade-grading-manage .actions .message-app .btn-icon.icon-size-1.action, .message-app #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input.btn-icon.icon-size-1, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .message-app input.btn-icon.icon-size-1, .message-app #rubric-rubric.gradingform_rubric .btn-icon.icon-size-1.addcriterion, #rubric-rubric.gradingform_rubric .message-app .btn-icon.icon-size-1.addcriterion {
+    .message-app .btn.btn-link.btn-icon.icon-size-1, .message-app .btn.btn-icon.icon-size-1, .message-app #page-grade-grading-manage .actions .btn-icon.icon-size-1.action, #page-grade-grading-manage .actions .message-app .btn-icon.icon-size-1.action {
       height: 24px !important;
       /* stylelint-disable-line declaration-no-important */
       width: 24px !important;
       /* stylelint-disable-line declaration-no-important */ }
-    .message-app .btn.btn-link.btn-icon.icon-size-2, .message-app .btn.btn-icon.icon-size-2, .message-app #page-grade-grading-manage .actions .btn-icon.icon-size-2.action, #page-grade-grading-manage .actions .message-app .btn-icon.icon-size-2.action, .message-app #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input.btn-icon.icon-size-2, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .message-app input.btn-icon.icon-size-2, .message-app #rubric-rubric.gradingform_rubric .btn-icon.icon-size-2.addcriterion, #rubric-rubric.gradingform_rubric .message-app .btn-icon.icon-size-2.addcriterion {
+    .message-app .btn.btn-link.btn-icon.icon-size-2, .message-app .btn.btn-icon.icon-size-2, .message-app #page-grade-grading-manage .actions .btn-icon.icon-size-2.action, #page-grade-grading-manage .actions .message-app .btn-icon.icon-size-2.action {
       height: 28px !important;
       /* stylelint-disable-line declaration-no-important */
       width: 28px !important;
       /* stylelint-disable-line declaration-no-important */ }
-    .message-app .btn.btn-link.btn-icon.icon-size-3, .message-app .btn.btn-icon.icon-size-3, .message-app #page-grade-grading-manage .actions .btn-icon.icon-size-3.action, #page-grade-grading-manage .actions .message-app .btn-icon.icon-size-3.action, .message-app #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input.btn-icon.icon-size-3, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .message-app input.btn-icon.icon-size-3, .message-app #rubric-rubric.gradingform_rubric .btn-icon.icon-size-3.addcriterion, #rubric-rubric.gradingform_rubric .message-app .btn-icon.icon-size-3.addcriterion {
+    .message-app .btn.btn-link.btn-icon.icon-size-3, .message-app .btn.btn-icon.icon-size-3, .message-app #page-grade-grading-manage .actions .btn-icon.icon-size-3.action, #page-grade-grading-manage .actions .message-app .btn-icon.icon-size-3.action {
       height: 36px !important;
       /* stylelint-disable-line declaration-no-important */
       width: 36px !important;
       /* stylelint-disable-line declaration-no-important */ }
-    .message-app .btn.btn-link.btn-icon.icon-size-4, .message-app .btn.btn-icon.icon-size-4, .message-app #page-grade-grading-manage .actions .btn-icon.icon-size-4.action, #page-grade-grading-manage .actions .message-app .btn-icon.icon-size-4.action, .message-app #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input.btn-icon.icon-size-4, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .message-app input.btn-icon.icon-size-4, .message-app #rubric-rubric.gradingform_rubric .btn-icon.icon-size-4.addcriterion, #rubric-rubric.gradingform_rubric .message-app .btn-icon.icon-size-4.addcriterion {
+    .message-app .btn.btn-link.btn-icon.icon-size-4, .message-app .btn.btn-icon.icon-size-4, .message-app #page-grade-grading-manage .actions .btn-icon.icon-size-4.action, #page-grade-grading-manage .actions .message-app .btn-icon.icon-size-4.action {
       height: 44px !important;
       /* stylelint-disable-line declaration-no-important */
       width: 44px !important;
       /* stylelint-disable-line declaration-no-important */ }
-    .message-app .btn.btn-link.btn-icon.icon-size-5, .message-app .btn.btn-icon.icon-size-5, .message-app #page-grade-grading-manage .actions .btn-icon.icon-size-5.action, #page-grade-grading-manage .actions .message-app .btn-icon.icon-size-5.action, .message-app #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input.btn-icon.icon-size-5, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .message-app input.btn-icon.icon-size-5, .message-app #rubric-rubric.gradingform_rubric .btn-icon.icon-size-5.addcriterion, #rubric-rubric.gradingform_rubric .message-app .btn-icon.icon-size-5.addcriterion {
+    .message-app .btn.btn-link.btn-icon.icon-size-5, .message-app .btn.btn-icon.icon-size-5, .message-app #page-grade-grading-manage .actions .btn-icon.icon-size-5.action, #page-grade-grading-manage .actions .message-app .btn-icon.icon-size-5.action {
       height: 68px !important;
       /* stylelint-disable-line declaration-no-important */
       width: 68px !important;
@@ -15252,13 +15116,13 @@ body.path-question-type {
   margin: 0 0 0.5em; }
 
 .que .correctness.correct {
-  background-color: #5cb85c; }
+  background-color: #398439; }
 
 .que .correctness.partiallycorrect {
-  background-color: #ff7518; }
+  background-color: #f0ad4e; }
 
 .que .correctness.notanswered, .que .correctness.incorrect {
-  background-color: #d9534f; }
+  background-color: #d43f3a; }
 
 .que .qtext {
   margin-bottom: 1.5em; }
@@ -15357,7 +15221,7 @@ body.jsenabled .questionflag input[type=checkbox] {
     margin: 0; }
 
 #page-mod-quiz-edit .questionbankwindow div.header .title {
-  color: #373a3c; }
+  color: #343a40; }
 
 #page-mod-quiz-edit div.container div.generalbox {
   background-color: transparent;
@@ -15785,9 +15649,9 @@ body.path-question-type .mform fieldset.hidden {
 
 #adminsettings span.error {
   display: inline-block;
-  border: 1px solid #f4cfce;
+  border: 1px solid #f3c9c8;
   border-radius: 4px;
-  background-color: #f7dddc;
+  background-color: #f6d9d8;
   padding: 4px;
   margin-bottom: 4px; }
 
@@ -15832,7 +15696,7 @@ body.path-question-type .mform fieldset.hidden {
   display: none; }
 
 #adminsettings .error {
-  color: #d9534f; }
+  color: #d43f3a; }
 
 .mform ul.file-list {
   padding: 0;
@@ -16019,7 +15883,7 @@ fieldset.coursesearchbox label {
   padding: 0.2em;
   margin: 0;
   cursor: pointer;
-  color: #373a3c; }
+  color: #343a40; }
 
 .form-autocomplete-suggestions li:hover {
   background-color: #3f9def;
@@ -16030,7 +15894,7 @@ fieldset.coursesearchbox label {
   color: #495057; }
 
 .form-autocomplete-downarrow {
-  color: #373a3c;
+  color: #343a40;
   top: 0.2rem;
   right: 0.5rem;
   cursor: pointer; }
@@ -16139,27 +16003,27 @@ textarea[data-auto-rows] {
   .has-danger #page-admin-mnet-peers .mform .editor_atto_content.deletedhostinfo .custom-control,
   #page-admin-mnet-peers .mform .has-danger .editor_atto_content.deletedhostinfo .custom-control,
   .has-danger .editor_atto_content.maintenancewarning.error .custom-control {
-    color: #d9534f; }
+    color: #d43f3a; }
   .has-danger .editor_atto_content.form-control .form-control,
   .has-danger .editor_atto_content.form-control-danger .form-control,
   .has-danger #page-admin-mnet-peers .mform .editor_atto_content.deletedhostinfo .form-control,
   #page-admin-mnet-peers .mform .has-danger .editor_atto_content.deletedhostinfo .form-control,
   .has-danger .editor_atto_content.maintenancewarning.error .form-control {
-    border-color: #d9534f; }
+    border-color: #d43f3a; }
   .has-danger .editor_atto_content.form-control .input-group-addon,
   .has-danger .editor_atto_content.form-control-danger .input-group-addon,
   .has-danger #page-admin-mnet-peers .mform .editor_atto_content.deletedhostinfo .input-group-addon,
   #page-admin-mnet-peers .mform .has-danger .editor_atto_content.deletedhostinfo .input-group-addon,
   .has-danger .editor_atto_content.maintenancewarning.error .input-group-addon {
-    color: #d9534f;
-    border-color: #d9534f;
-    background-color: #fdf7f7; }
+    color: #d43f3a;
+    border-color: #d43f3a;
+    background-color: #f9e2e1; }
   .has-danger .editor_atto_content.form-control .form-control-feedback,
   .has-danger .editor_atto_content.form-control-danger .form-control-feedback,
   .has-danger #page-admin-mnet-peers .mform .editor_atto_content.deletedhostinfo .form-control-feedback,
   #page-admin-mnet-peers .mform .has-danger .editor_atto_content.deletedhostinfo .form-control-feedback,
   .has-danger .editor_atto_content.maintenancewarning.error .form-control-feedback {
-    color: #d9534f; }
+    color: #d43f3a; }
 
 [data-filetypesbrowserbody] [aria-expanded="false"] > [role="group"],
 [data-filetypesbrowserbody] [aria-expanded="false"] [data-filetypesbrowserfeature="hideifcollapsed"],
@@ -16272,10 +16136,10 @@ select {
   font-weight: inherit; }
 
 .path-mod-forum .subscriptionmode {
-  color: #373a3c; }
+  color: #343a40; }
 
 .path-mod-forum .activesetting {
-  color: #373a3c;
+  color: #343a40;
   font-weight: bold; }
 
 .discussion-settings-container .custom-select {
@@ -16411,7 +16275,7 @@ select {
   .path-mod-forum .nested-v2-display-mode .usersuspended a, .usersuspended .path-mod-forum .nested-v2-display-mode a,
   .path-mod-forum .nested-v2-display-mode .dimmed_category,
   .path-mod-forum .nested-v2-display-mode .dimmed_category a, .dimmed_category .path-mod-forum .nested-v2-display-mode a, .path-mod-forum .nested-v2-display-mode .tag_feed .media .muted a, .tag_feed .media .muted .path-mod-forum .nested-v2-display-mode a, .path-mod-forum .nested-v2-display-mode #page-admin-qtypes .disabled, #page-admin-qtypes .path-mod-forum .nested-v2-display-mode .disabled,
-  .path-mod-forum .nested-v2-display-mode #page-admin-qbehaviours .disabled, #page-admin-qbehaviours .path-mod-forum .nested-v2-display-mode .disabled, .path-mod-forum .nested-v2-display-mode #page-admin-plugins #plugins-control-panel .pluginname .componentname, #page-admin-plugins #plugins-control-panel .pluginname .path-mod-forum .nested-v2-display-mode .componentname, .path-mod-forum .nested-v2-display-mode #page-admin-plugins #plugins-control-panel .version .versionnumber, #page-admin-plugins #plugins-control-panel .version .path-mod-forum .nested-v2-display-mode .versionnumber, .path-mod-forum .nested-v2-display-mode #page-admin-plugins #plugins-control-panel .notes .requiredby, #page-admin-plugins #plugins-control-panel .notes .path-mod-forum .nested-v2-display-mode .requiredby, .path-mod-forum .nested-v2-display-mode #plugins-check-page .page-description, #plugins-check-page .path-mod-forum .nested-v2-display-mode .page-description, .path-mod-forum .nested-v2-display-mode #plugins-check-page #plugins-check .requires-ok, #plugins-check-page #plugins-check .path-mod-forum .nested-v2-display-mode .requires-ok, .path-mod-forum .nested-v2-display-mode #plugins-check-page #plugins-check .displayname .plugindir, #plugins-check-page #plugins-check .displayname .path-mod-forum .nested-v2-display-mode .plugindir, .path-mod-forum .nested-v2-display-mode #plugins-check-page #plugins-check-available-dependencies .displayname .component, #plugins-check-page #plugins-check-available-dependencies .displayname .path-mod-forum .nested-v2-display-mode .component, .path-mod-forum .nested-v2-display-mode #page-admin-search .adminpagepath li, #page-admin-search .adminpagepath .path-mod-forum .nested-v2-display-mode li, .path-mod-forum .nested-v2-display-mode .block .minicalendar td.weekend, .block .minicalendar .path-mod-forum .nested-v2-display-mode td.weekend, .path-mod-forum .nested-v2-display-mode .section .activity .stealth, .section .activity .path-mod-forum .nested-v2-display-mode .stealth, .path-mod-forum .nested-v2-display-mode .course-content .section-summary .section-summary-activities .activity-count, .course-content .section-summary .section-summary-activities .path-mod-forum .nested-v2-display-mode .activity-count, .path-mod-forum .nested-v2-display-mode .course-content ul li.section.hidden .sectionname > span, .course-content ul li.section.hidden .path-mod-forum .nested-v2-display-mode .sectionname > span,
+  .path-mod-forum .nested-v2-display-mode #page-admin-qbehaviours .disabled, #page-admin-qbehaviours .path-mod-forum .nested-v2-display-mode .disabled, .path-mod-forum .nested-v2-display-mode #page-admin-plugins #plugins-control-panel .pluginname .componentname, #page-admin-plugins #plugins-control-panel .pluginname .path-mod-forum .nested-v2-display-mode .componentname, .path-mod-forum .nested-v2-display-mode #page-admin-plugins #plugins-control-panel .version .versionnumber, #page-admin-plugins #plugins-control-panel .version .path-mod-forum .nested-v2-display-mode .versionnumber, .path-mod-forum .nested-v2-display-mode #page-admin-plugins #plugins-control-panel .notes .requiredby, #page-admin-plugins #plugins-control-panel .notes .path-mod-forum .nested-v2-display-mode .requiredby, .path-mod-forum .nested-v2-display-mode #page-admin-search .adminpagepath li, #page-admin-search .adminpagepath .path-mod-forum .nested-v2-display-mode li, .path-mod-forum .nested-v2-display-mode .block .minicalendar td.weekend, .block .minicalendar .path-mod-forum .nested-v2-display-mode td.weekend, .path-mod-forum .nested-v2-display-mode .section .activity .stealth, .section .activity .path-mod-forum .nested-v2-display-mode .stealth, .path-mod-forum .nested-v2-display-mode .course-content .section-summary .section-summary-activities .activity-count, .course-content .section-summary .section-summary-activities .path-mod-forum .nested-v2-display-mode .activity-count, .path-mod-forum .nested-v2-display-mode .course-content ul li.section.hidden .sectionname > span, .course-content ul li.section.hidden .path-mod-forum .nested-v2-display-mode .sectionname > span,
   .path-mod-forum .nested-v2-display-mode .course-content ul li.section.hidden .content > div.summary, .course-content ul li.section.hidden .path-mod-forum .nested-v2-display-mode .content > div.summary,
   .path-mod-forum .nested-v2-display-mode .course-content ul li.section.hidden .activity .activityinstance, .course-content ul li.section.hidden .activity .path-mod-forum .nested-v2-display-mode .activityinstance, .path-mod-forum .nested-v2-display-mode #course-category-listings .listitem[data-visible="0"], #course-category-listings .path-mod-forum .nested-v2-display-mode .listitem[data-visible="0"], .path-mod-forum .nested-v2-display-mode #course-category-listings .listitem[data-visible="0"] > div > a, #course-category-listings .path-mod-forum .nested-v2-display-mode .listitem[data-visible="0"] > div > a, .path-mod-forum .nested-v2-display-mode #course-category-listings .listing-pagination-totals.dimmed, #course-category-listings .path-mod-forum .nested-v2-display-mode .listing-pagination-totals.dimmed, .path-mod-forum .nested-v2-display-mode .fitem.disabled .fp-btn-choose, .fitem.disabled .path-mod-forum .nested-v2-display-mode .fp-btn-choose, .path-mod-forum .nested-v2-display-mode .form-defaultinfo,
   .path-mod-forum .nested-v2-display-mode .form-label .form-shortname, .form-label .path-mod-forum .nested-v2-display-mode .form-shortname, .path-mod-forum .nested-v2-display-mode .formsettingheading .form-horizontal, .formsettingheading .path-mod-forum .nested-v2-display-mode .form-horizontal, .path-mod-forum .nested-v2-display-mode .no-felement.fstatic, .path-mod-forum .nested-v2-display-mode .path-backup .backup_progress .backup_stage, .path-backup .backup_progress .path-mod-forum .nested-v2-display-mode .backup_stage,
@@ -16439,14 +16303,6 @@ select {
   #page-admin-plugins #plugins-control-panel .version .path-mod-forum.nested-v2-display-mode .versionnumber,
   .path-mod-forum.nested-v2-display-mode #page-admin-plugins #plugins-control-panel .notes .requiredby,
   #page-admin-plugins #plugins-control-panel .notes .path-mod-forum.nested-v2-display-mode .requiredby,
-  .path-mod-forum.nested-v2-display-mode #plugins-check-page .page-description,
-  #plugins-check-page .path-mod-forum.nested-v2-display-mode .page-description,
-  .path-mod-forum.nested-v2-display-mode #plugins-check-page #plugins-check .requires-ok,
-  #plugins-check-page #plugins-check .path-mod-forum.nested-v2-display-mode .requires-ok,
-  .path-mod-forum.nested-v2-display-mode #plugins-check-page #plugins-check .displayname .plugindir,
-  #plugins-check-page #plugins-check .displayname .path-mod-forum.nested-v2-display-mode .plugindir,
-  .path-mod-forum.nested-v2-display-mode #plugins-check-page #plugins-check-available-dependencies .displayname .component,
-  #plugins-check-page #plugins-check-available-dependencies .displayname .path-mod-forum.nested-v2-display-mode .component,
   .path-mod-forum.nested-v2-display-mode #page-admin-search .adminpagepath li,
   #page-admin-search .adminpagepath .path-mod-forum.nested-v2-display-mode li,
   .path-mod-forum.nested-v2-display-mode .block .minicalendar td.weekend,
@@ -16760,9 +16616,6 @@ select {
     .path-mod-forum .unified-grader .grader-module-content {
       transition: none; } }
 
-.path-mod-forum .unified-grader .grader-grading-panel.hidden + .grader-module-content {
-  margin-right: 0; }
-
 .path-mod-forum .unified-grader .drawer-button {
   position: relative; }
   .path-mod-forum .unified-grader .drawer-button.active::after {
@@ -17041,7 +16894,7 @@ div#dock {
   display: inline-block;
   min-height: 12rem; }
 
-#page-mod-quiz-mod #id_reviewoptionshdr .btn-link, #page-mod-quiz-mod #id_reviewoptionshdr .btn.btn-icon, #page-mod-quiz-mod #id_reviewoptionshdr #page-grade-grading-manage .actions .btn-icon.action, #page-grade-grading-manage .actions #page-mod-quiz-mod #id_reviewoptionshdr .btn-icon.action, #page-mod-quiz-mod #id_reviewoptionshdr #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input.btn-icon, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel #page-mod-quiz-mod #id_reviewoptionshdr input.btn-icon, #page-mod-quiz-mod #id_reviewoptionshdr #rubric-rubric.gradingform_rubric .btn-icon.addcriterion, #rubric-rubric.gradingform_rubric #page-mod-quiz-mod #id_reviewoptionshdr .btn-icon.addcriterion {
+#page-mod-quiz-mod #id_reviewoptionshdr .btn-link, #page-mod-quiz-mod #id_reviewoptionshdr .btn.btn-icon, #page-mod-quiz-mod #id_reviewoptionshdr #page-grade-grading-manage .actions .btn-icon.action, #page-grade-grading-manage .actions #page-mod-quiz-mod #id_reviewoptionshdr .btn-icon.action {
   line-height: 1.5;
   vertical-align: bottom; }
 
@@ -17108,7 +16961,7 @@ div#dock {
 
 .path-mod-quiz #mod_quiz_navblock .qnbutton.correct .trafficlight {
   background-image: url([[pix:theme|mod/quiz/checkmark]]);
-  background-color: #5cb85c; }
+  background-color: #398439; }
 
 .path-mod-quiz #mod_quiz_navblock .qnbutton.blocked .trafficlight {
   background-image: url([[pix:core|t/locked]]);
@@ -17116,16 +16969,16 @@ div#dock {
 
 .path-mod-quiz #mod_quiz_navblock .qnbutton.notanswered .trafficlight,
 .path-mod-quiz #mod_quiz_navblock .qnbutton.incorrect .trafficlight {
-  background-color: #d9534f; }
+  background-color: #d43f3a; }
 
 .path-mod-quiz #mod_quiz_navblock .qnbutton.partiallycorrect .trafficlight {
   background-image: url([[pix:theme|mod/quiz/whitecircle]]);
-  background-color: #ff7518; }
+  background-color: #f0ad4e; }
 
 .path-mod-quiz #mod_quiz_navblock .qnbutton.complete .trafficlight,
 .path-mod-quiz #mod_quiz_navblock .qnbutton.answersaved .trafficlight,
 .path-mod-quiz #mod_quiz_navblock .qnbutton.requiresgrading .trafficlight {
-  background-color: #868e96; }
+  background-color: #6c757d; }
 
 #page-mod-quiz-edit ul.slots li.section li.activity .instancemaxmarkcontainer form input {
   height: 1.4em;
@@ -17237,7 +17090,7 @@ div#dock {
 /**
  * Mod LTI.
  */
-.path-admin-mod-lti .btn .loader img, .path-admin-mod-lti #page-grade-grading-manage .actions .action .loader img, #page-grade-grading-manage .actions .path-admin-mod-lti .action .loader img, .path-admin-mod-lti #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input .loader img, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel .path-admin-mod-lti input .loader img, .path-admin-mod-lti #rubric-rubric.gradingform_rubric .addcriterion .loader img, #rubric-rubric.gradingform_rubric .path-admin-mod-lti .addcriterion .loader img,
+.path-admin-mod-lti .btn .loader img, .path-admin-mod-lti #page-grade-grading-manage .actions .action .loader img, #page-grade-grading-manage .actions .path-admin-mod-lti .action .loader img,
 .path-admin-mod-lti #tool-list-loader-container .loader img {
   height: auto; }
 
@@ -17422,7 +17275,7 @@ div#dock {
     content: ""; }
 
 .path-backup .notification.dependencies_enforced {
-  color: #d9534f;
+  color: #d43f3a;
   font-weight: bold; }
 
 .path-backup .backup_progress {
@@ -17436,7 +17289,7 @@ div#dock {
   color: inherit; }
 
 #page-backup-restore .filealiasesfailures {
-  background-color: #f7dddc; }
+  background-color: #f6d9d8; }
   #page-backup-restore .filealiasesfailures .aliaseslist {
     background-color: #fff; }
 
@@ -17509,7 +17362,7 @@ p.arrow_button {
 .btn-lineup {
   margin: 0 0 10px 5px; }
 
-.btn.btn-icon, #page-grade-grading-manage .actions .btn-icon.action, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input.btn-icon, #rubric-rubric.gradingform_rubric .btn-icon.addcriterion {
+.btn.btn-icon, #page-grade-grading-manage .actions .btn-icon.action {
   height: 36px;
   width: 36px;
   font-size: 16px;
@@ -17517,9 +17370,9 @@ p.arrow_button {
   padding: 0;
   border-radius: 50%;
   flex-shrink: 0; }
-  .btn.btn-icon:hover, #page-grade-grading-manage .actions .btn-icon.action:hover, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input.btn-icon:hover, #rubric-rubric.gradingform_rubric .btn-icon.addcriterion:hover, .btn.btn-icon:focus, #page-grade-grading-manage .actions .btn-icon.action:focus, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input.btn-icon:focus, #rubric-rubric.gradingform_rubric .btn-icon.addcriterion:focus {
+  .btn.btn-icon:hover, #page-grade-grading-manage .actions .btn-icon.action:hover, .btn.btn-icon:focus, #page-grade-grading-manage .actions .btn-icon.action:focus {
     background-color: #e9ecef; }
-  .btn.btn-icon.icon-size-0, #page-grade-grading-manage .actions .btn-icon.icon-size-0.action, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input.btn-icon.icon-size-0, #rubric-rubric.gradingform_rubric .btn-icon.icon-size-0.addcriterion {
+  .btn.btn-icon.icon-size-0, #page-grade-grading-manage .actions .btn-icon.icon-size-0.action {
     height: 20px !important;
     /* stylelint-disable-line declaration-no-important */
     width: 20px !important;
@@ -17528,7 +17381,7 @@ p.arrow_button {
     /* stylelint-disable-line declaration-no-important */
     line-height: 0 !important;
     /* stylelint-disable-line declaration-no-important */ }
-  .btn.btn-icon.icon-size-1, #page-grade-grading-manage .actions .btn-icon.icon-size-1.action, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input.btn-icon.icon-size-1, #rubric-rubric.gradingform_rubric .btn-icon.icon-size-1.addcriterion {
+  .btn.btn-icon.icon-size-1, #page-grade-grading-manage .actions .btn-icon.icon-size-1.action {
     height: 24px !important;
     /* stylelint-disable-line declaration-no-important */
     width: 24px !important;
@@ -17537,7 +17390,7 @@ p.arrow_button {
     /* stylelint-disable-line declaration-no-important */
     line-height: 4px !important;
     /* stylelint-disable-line declaration-no-important */ }
-  .btn.btn-icon.icon-size-2, #page-grade-grading-manage .actions .btn-icon.icon-size-2.action, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input.btn-icon.icon-size-2, #rubric-rubric.gradingform_rubric .btn-icon.icon-size-2.addcriterion {
+  .btn.btn-icon.icon-size-2, #page-grade-grading-manage .actions .btn-icon.icon-size-2.action {
     height: 28px !important;
     /* stylelint-disable-line declaration-no-important */
     width: 28px !important;
@@ -17546,7 +17399,7 @@ p.arrow_button {
     /* stylelint-disable-line declaration-no-important */
     line-height: 8px !important;
     /* stylelint-disable-line declaration-no-important */ }
-  .btn.btn-icon.icon-size-3, #page-grade-grading-manage .actions .btn-icon.icon-size-3.action, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input.btn-icon.icon-size-3, #rubric-rubric.gradingform_rubric .btn-icon.icon-size-3.addcriterion {
+  .btn.btn-icon.icon-size-3, #page-grade-grading-manage .actions .btn-icon.icon-size-3.action {
     height: 36px !important;
     /* stylelint-disable-line declaration-no-important */
     width: 36px !important;
@@ -17555,7 +17408,7 @@ p.arrow_button {
     /* stylelint-disable-line declaration-no-important */
     line-height: 16px !important;
     /* stylelint-disable-line declaration-no-important */ }
-  .btn.btn-icon.icon-size-4, #page-grade-grading-manage .actions .btn-icon.icon-size-4.action, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input.btn-icon.icon-size-4, #rubric-rubric.gradingform_rubric .btn-icon.icon-size-4.addcriterion {
+  .btn.btn-icon.icon-size-4, #page-grade-grading-manage .actions .btn-icon.icon-size-4.action {
     height: 44px !important;
     /* stylelint-disable-line declaration-no-important */
     width: 44px !important;
@@ -17564,7 +17417,7 @@ p.arrow_button {
     /* stylelint-disable-line declaration-no-important */
     line-height: 24px !important;
     /* stylelint-disable-line declaration-no-important */ }
-  .btn.btn-icon.icon-size-5, #page-grade-grading-manage .actions .btn-icon.icon-size-5.action, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input.btn-icon.icon-size-5, #rubric-rubric.gradingform_rubric .btn-icon.icon-size-5.addcriterion {
+  .btn.btn-icon.icon-size-5, #page-grade-grading-manage .actions .btn-icon.icon-size-5.action {
     height: 68px !important;
     /* stylelint-disable-line declaration-no-important */
     width: 68px !important;
@@ -17637,10 +17490,6 @@ p.arrow_button {
 #page-grade-grading-form-rubric-edit .gradingform_rubric_editform .status {
   font-size: 70%; }
 
-.gradingform_rubric.editor .addlevel input,
-.gradingform_rubric.editor .addcriterion input {
-  background: #fff none no-repeat top left; }
-
 #rubric-rubric.gradingform_rubric #rubric-criteria {
   margin-bottom: 1em; }
   #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .description {
@@ -17684,11 +17533,13 @@ p.arrow_button {
     #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .scorevalue input.hiddenelement, #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .scorevalue input.pseudotablink {
       width: 0; }
   #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel {
-    vertical-align: middle; }
+    vertical-align: top;
+    padding-top: 6px; }
     #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input {
-      background-position: 0 0;
+      font-weight: bold;
       height: 30px;
-      margin-right: 5px; }
+      line-height: 1rem;
+      padding-left: 24px; }
 
 #rubric-rubric.gradingform_rubric .addcriterion {
   margin-left: 5px;
@@ -18068,11 +17919,7 @@ body.reset-style input,
 body.reset-style textarea,
 body.reset-style .btn:not(.btn-icon),
 body.reset-style #page-grade-grading-manage .actions .action:not(.btn-icon),
-#page-grade-grading-manage .actions body.reset-style .action:not(.btn-icon),
-body.reset-style #rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel input:not(.btn-icon),
-#rubric-rubric.gradingform_rubric #rubric-criteria .criterion .addlevel body.reset-style input:not(.btn-icon),
-body.reset-style #rubric-rubric.gradingform_rubric .addcriterion:not(.btn-icon),
-#rubric-rubric.gradingform_rubric body.reset-style .addcriterion:not(.btn-icon) {
+#page-grade-grading-manage .actions body.reset-style .action:not(.btn-icon) {
   border-radius: 0.3rem; }
 
 body.behat-site .fixed-top {
@@ -18092,6 +17939,18 @@ body.behat-site [data-region="drawer"] {
   -moz-transition: initial;
   transition: initial;
   position: absolute; }
+
+body.behat-site .custom-control,
+body.behat-site .custom-switch {
+  padding-left: 0; }
+
+body.behat-site .custom-control-input {
+  position: static;
+  z-index: 0;
+  opacity: 1; }
+
+body.behat-site .custom-control-label::before, body.behat-site .custom-control-label::after {
+  content: none; }
 
 .phpinfo table,
 .phpinfo th,
@@ -18563,14 +18422,14 @@ span[data-flexitour="container"][x-placement="right"], span[data-flexitour="cont
   width: 275px; }
 
 .label {
-  background-color: #868e96; }
+  background-color: #6c757d; }
   .label[href]:hover, .label[href]:focus {
-    background-color: #6c757d; }
+    background-color: #545b62; }
 
 .label-success {
-  background-color: #5cb85c; }
+  background-color: #398439; }
   .label-success[href]:hover, .label-success[href]:focus {
-    background-color: #449d44; }
+    background-color: #2a602a; }
 
 .label-info {
   background-color: #5bc0de; }
@@ -18578,14 +18437,14 @@ span[data-flexitour="container"][x-placement="right"], span[data-flexitour="cont
     background-color: #31b0d5; }
 
 .label-warning {
-  background-color: #ff7518; }
+  background-color: #f0ad4e; }
   .label-warning[href]:hover, .label-warning[href]:focus {
-    background-color: #e45c00; }
+    background-color: #ec971f; }
 
 .label-important {
-  background-color: #d9534f; }
+  background-color: #d43f3a; }
   .label-important[href]:hover, .label-important[href]:focus {
-    background-color: #c9302c; }
+    background-color: #b42c27; }
 
 .pull-left {
   float: left !important;
@@ -18651,26 +18510,68 @@ body {
   border-radius: 50%; }
 
 .btn-outline-secondary {
-  color: #868e96;
-  border-color: #868e96;
-  border-color: #dee2e6; }
+  color: #6c757d;
+  border-color: #6c757d;
+  border-color: #6c757d; }
   .btn-outline-secondary:hover {
     color: #fff;
-    background-color: #868e96;
-    border-color: #868e96; }
+    background-color: #6c757d;
+    border-color: #6c757d; }
   .btn-outline-secondary:focus, .btn-outline-secondary.focus {
-    box-shadow: 0 0 0 0.2rem rgba(134, 142, 150, 0.5); }
+    box-shadow: 0 0 0 0.2rem rgba(108, 117, 125, 0.5); }
   .btn-outline-secondary.disabled, .btn-outline-secondary:disabled {
-    color: #868e96;
+    color: #6c757d;
     background-color: transparent; }
   .btn-outline-secondary:not(:disabled):not(.disabled):active, .btn-outline-secondary:not(:disabled):not(.disabled).active,
   .show > .btn-outline-secondary.dropdown-toggle {
     color: #fff;
-    background-color: #868e96;
-    border-color: #868e96; }
+    background-color: #6c757d;
+    border-color: #6c757d; }
     .btn-outline-secondary:not(:disabled):not(.disabled):active:focus, .btn-outline-secondary:not(:disabled):not(.disabled).active:focus,
     .show > .btn-outline-secondary.dropdown-toggle:focus {
-      box-shadow: 0 0 0 0.2rem rgba(134, 142, 150, 0.5); }
+      box-shadow: 0 0 0 0.2rem rgba(108, 117, 125, 0.5); }
+
+.btn-outline-info {
+  color: #1f7e9a;
+  border-color: #1f7e9a; }
+  .btn-outline-info:hover {
+    color: #fff;
+    background-color: #1f7e9a;
+    border-color: #1f7e9a; }
+  .btn-outline-info:focus, .btn-outline-info.focus {
+    box-shadow: 0 0 0 0.2rem rgba(31, 126, 154, 0.5); }
+  .btn-outline-info.disabled, .btn-outline-info:disabled {
+    color: #1f7e9a;
+    background-color: transparent; }
+  .btn-outline-info:not(:disabled):not(.disabled):active, .btn-outline-info:not(:disabled):not(.disabled).active,
+  .show > .btn-outline-info.dropdown-toggle {
+    color: #fff;
+    background-color: #1f7e9a;
+    border-color: #1f7e9a; }
+    .btn-outline-info:not(:disabled):not(.disabled):active:focus, .btn-outline-info:not(:disabled):not(.disabled).active:focus,
+    .show > .btn-outline-info.dropdown-toggle:focus {
+      box-shadow: 0 0 0 0.2rem rgba(31, 126, 154, 0.5); }
+
+.btn-outline-warning {
+  color: #a6670e;
+  border-color: #a6670e; }
+  .btn-outline-warning:hover {
+    color: #fff;
+    background-color: #a6670e;
+    border-color: #a6670e; }
+  .btn-outline-warning:focus, .btn-outline-warning.focus {
+    box-shadow: 0 0 0 0.2rem rgba(166, 103, 14, 0.5); }
+  .btn-outline-warning.disabled, .btn-outline-warning:disabled {
+    color: #a6670e;
+    background-color: transparent; }
+  .btn-outline-warning:not(:disabled):not(.disabled):active, .btn-outline-warning:not(:disabled):not(.disabled).active,
+  .show > .btn-outline-warning.dropdown-toggle {
+    color: #fff;
+    background-color: #a6670e;
+    border-color: #a6670e; }
+    .btn-outline-warning:not(:disabled):not(.disabled):active:focus, .btn-outline-warning:not(:disabled):not(.disabled).active:focus,
+    .show > .btn-outline-warning.dropdown-toggle:focus {
+      box-shadow: 0 0 0 0.2rem rgba(166, 103, 14, 0.5); }
 
 .bg-gray {
   background-color: #e9ecef !important; }

@@ -36,28 +36,37 @@ class mobile {
         // Get the user's credentials.
         $returnedcredentials = accredibledashboard_get_credentials(null, $USER->email);
 
-
-
         if (isset($returnedcredentials)) {
             $credentials = array();
 
             foreach ($returnedcredentials as $returnedcredential) {
                 $credential = new \stdClass();
                 $credential->url = $returnedcredential->url;
+                $credential->sso_url = $returnedcredential->sso_url;
                 $credential->name = $returnedcredential->name;
                 $credential->image = $sealurl;
+                $credential->wallet_url = $returnedcredential->wallet_url;
 
 
                 $credentials[] = $credential;
             }
         }
 
-        $data = array(
-            'credentials' => $credentials
-        );
-
         $html = '';
         if (isset($credentials)) {
+
+            reset($credentials);
+            $credential = current($credentials);
+
+            $wallet = new \stdClass();
+            $wallet->label = get_string('viewall', 'block_accredibledashboard');
+            $wallet->url = $credential->wallet_url;
+
+            $data = array(
+                'credentials' => $credentials,
+                'wallet' => $wallet
+            );
+
             $html = $OUTPUT->render_from_template('block_accredibledashboard/mobile_view', $data);
         }
  

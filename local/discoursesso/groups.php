@@ -63,7 +63,7 @@ if (optional_param('add', false, PARAM_BOOL) && confirm_sesskey()) {
 
         foreach ($userstoassign as $adduser) {
             if (discoursesso_add_group($adduser->id) === false) {
-            	echo $OUTPUT->notification('The cohort was not added.', NOTIFY_ERROR);
+            	echo $OUTPUT->notification('The cohort was not added.', \core\output\notification::NOTIFY_ERROR);
             }
         }
 
@@ -78,7 +78,7 @@ if (optional_param('remove', false, PARAM_BOOL) && confirm_sesskey()) {
     if (!empty($userstoremove)) {
         foreach ($userstoremove as $removeuser) {
             if (discoursesso_remove_group($removeuser->id) === false) {
-            	echo $OUTPUT->notification('The cohort was not removed.', NOTIFY_ERROR);
+            	echo $OUTPUT->notification('The cohort was not removed.', \core\output\notification::NOTIFY_ERROR);
             }
         }
         $potentialuserselector->invalidate_selected_users();

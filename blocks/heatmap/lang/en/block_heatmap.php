@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-
 /**
  * Simple clock block language strings
  *
@@ -45,6 +44,7 @@ $string['nologreaderenabled'] = 'No usable log reader is enabled.';
 $string['nologentries'] = 'No user participation was found.';
 $string['notstarted'] = 'No activity shown as the course has not started yet.';
 $string['pluginname'] = 'Heatmap';
+$string['privacy:metadata'] = 'The Heatmap block only shows data about courses and does not store any data itself.';
 $string['sincecoursestart'] = '(Since course start date)';
 $string['showbackground'] = 'Show both background colouring only';
 $string['showboth'] = 'Show both background and count icons';

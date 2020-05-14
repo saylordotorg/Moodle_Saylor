@@ -1,6 +1,18 @@
-### Version 1.978 of the Moodle Gapfill question type Dec 2019
+### Version 1.978 of the Moodle Gapfill question type Apr 2020
 Fixed issue with case sensitivity when using | operator and ignore duplicates
-Thanks to Jason Rogers of the South Carolina Dept of Education and Dipak Kumar of Blackboard for reporting this and helping test the solution
+Thanks to Jason Rogers of the South Carolina Dept of Education and Dipak Kumar of Blackboard for reporting this and helping test the solution.
+
+Fix for when force clean is on, which is planned to be a default, see
+https://tracker.moodle.org/browse/MDL-62352
+Thanks to  Hubong Nguen for the UK OU who contributed a patch for wordselect without which
+I would not have known about this.
+
+A fix for an error triggered in the question analysis in the quiz statistics report. Thanks to Chris Kenniburg of Dearborn schools for reporting this.
+
+The editing form was ignoring the settings/default for fixedgapsize. It is now recognising this and
+by default on installation the widths gaps will be set to that of the largest gap. See docs at
+https://docs.moodle.org/en/Gapfill_question_type#Fixed_Gapsize. I noticed that myself.
+
 
 ### Version 1.977 of the Moodle Gapfill question type Oct 2019
 

@@ -3520,11 +3520,12 @@ function ismoving($courseid) {
  * Returns a persons full name
  *
  * Given an object containing all of the users name values, this function returns a string with the full name of the person.
- * The result may depend on system settings or language.  'override' will force both names to be used even if system settings
- * specify one.
+ * The result may depend on system settings or language. 'override' will force the alternativefullnameformat to be used. In
+ * English, fullname as well as alternativefullnameformat is set to 'firstname lastname' by default. But you could have
+ * fullname set to 'firstname lastname' and alternativefullnameformat set to 'firstname middlename alternatename lastname'.
  *
  * @param stdClass $user A {@link $USER} object to get full name of.
- * @param bool $override If true then the name will be firstname followed by lastname rather than adhering to fullnamedisplay.
+ * @param bool $override If true then the alternativefullnameformat format rather than fullnamedisplay format will be used.
  * @return string
  */
 function fullname($user, $override=false) {
@@ -4301,7 +4302,13 @@ function delete_user(stdClass $user) {
 
     // Generate username from email address, or a fake email.
     $delemail = !empty($user->email) ? $user->email : $user->username . '.' . $user->id . '@unknownemail.invalid';
-    $delname = clean_param($delemail . "." . time(), PARAM_USERNAME);
+
+    $deltime = time();
+    $deltimelength = core_text::strlen((string) $deltime);
+
+    // Max username length is 100 chars. Select up to limit - (length of current time + 1 [period character]) from users email.
+    $delname = clean_param($delemail, PARAM_USERNAME);
+    $delname = core_text::substr($delname, 0, 100 - ($deltimelength + 1)) . ".{$deltime}";
 
     // Workaround for bulk deletes of users with the same email address.
     while ($DB->record_exists('user', array('username' => $delname))) { // No need to use mnethostid here.
@@ -4316,7 +4323,7 @@ function delete_user(stdClass $user) {
     $updateuser->email        = md5($user->username);// Store hash of username, useful importing/restoring users.
     $updateuser->idnumber     = '';                  // Clear this field to free it up.
     $updateuser->picture      = 0;
-    $updateuser->timemodified = time();
+    $updateuser->timemodified = $deltime;
 
     // Don't trigger update event, as user is being deleted.
     user_update_user($updateuser, false, false);
@@ -4423,10 +4430,15 @@ function authenticate_user_login($username, $password, $ignorelockout=false, &$f
     if (!\core\session\manager::validate_login_token($logintoken)) {
         $failurereason = AUTH_LOGIN_FAILED;
 
-        // Trigger login failed event.
-        $event = \core\event\user_login_failed::create(array('userid' => $user->id,
-                'other' => array('username' => $username, 'reason' => $failurereason)));
-        $event->trigger();
+        // Trigger login failed event (specifying the ID of the found user, if available).
+        \core\event\user_login_failed::create([
+            'userid' => ($user->id ?? 0),
+            'other' => [
+                'username' => $username,
+                'reason' => $failurereason,
+            ],
+        ])->trigger();
+
         error_log('[client '.getremoteaddr()."]  $CFG->wwwroot  Invalid Login Token:  $username  ".$_SERVER['HTTP_USER_AGENT']);
         return false;
     }
@@ -4877,11 +4889,15 @@ function get_complete_user_data($field, $value, $mnethostid = null, $throwexcept
     // Build the WHERE clause for an SQL query.
     $params = array('fieldval' => $value);
 
-    // Do a case-insensitive query, if necessary.
+    // Do a case-insensitive query, if necessary. These are generally very expensive. The performance can be improved on some DBs
+    // such as MySQL by pre-filtering users with accent-insensitive subselect.
     if (in_array($field, $caseinsensitivefields)) {
         $fieldselect = $DB->sql_equal($field, ':fieldval', false);
+        $idsubselect = $DB->sql_equal($field, ':fieldval2', false, false);
+        $params['fieldval2'] = $value;
     } else {
         $fieldselect = "$field = :fieldval";
+        $idsubselect = '';
     }
     $constraints = "$fieldselect AND deleted <> 1";
 
@@ -4896,6 +4912,10 @@ function get_complete_user_data($field, $value, $mnethostid = null, $throwexcept
     if (!empty($mnethostid)) {
         $params['mnethostid'] = $mnethostid;
         $constraints .= " AND mnethostid = :mnethostid";
+    }
+
+    if ($idsubselect) {
+        $constraints .= " AND id IN (SELECT id FROM {user} WHERE {$idsubselect})";
     }
 
     // Get all the basic user data.
@@ -5950,7 +5970,8 @@ function generate_email_messageid($localpart = null) {
  * @param string $subject plain text subject line of the email
  * @param string $messagetext plain text version of the message
  * @param string $messagehtml complete html version of the message (optional)
- * @param string $attachment a file on the filesystem, either relative to $CFG->dataroot or a full path to a file in $CFG->tempdir
+ * @param string $attachment a file on the filesystem, either relative to $CFG->dataroot or a full path to a file in one of
+ *          the following directories: $CFG->cachedir, $CFG->dataroot, $CFG->dirroot, $CFG->localcachedir, $CFG->tempdir
  * @param string $attachname the name of the file (extension indicates MIME)
  * @param bool $usetrueaddress determines whether $from email address should
  *          be sent out. Will be overruled by user profile setting for maildisplay
@@ -6219,12 +6240,31 @@ function email_to_user($user, $from, $subject, $messagetext, $messagehtml = '', 
 
             // Before doing the comparison, make sure that the paths are correct (Windows uses slashes in the other direction).
             $attachpath = str_replace('\\', '/', $attachmentpath);
-            // Make sure both variables are normalised before comparing.
-            $temppath = str_replace('\\', '/', realpath($CFG->tempdir));
 
-            // If the attachment is a full path to a file in the tempdir, use it as is,
+            // Add allowed paths to an array (also check if it's not empty).
+            $allowedpaths = array_filter([
+                $CFG->cachedir,
+                $CFG->dataroot,
+                $CFG->dirroot,
+                $CFG->localcachedir,
+                $CFG->tempdir
+            ]);
+            // Set addpath to true.
+            $addpath = true;
+            // Check if attachment includes one of the allowed paths.
+            foreach ($allowedpaths as $tmpvar) {
+                // Make sure both variables are normalised before comparing.
+                $temppath = str_replace('\\', '/', realpath($tmpvar));
+                // Set addpath to false if the attachment includes one of the allowed paths.
+                if (strpos($attachpath, $temppath) === 0) {
+                    $addpath = false;
+                    break;
+                }
+            }
+
+            // If the attachment is a full path to a file in the multiple allowed paths, use it as is,
             // otherwise assume it is a relative path from the dataroot (for backwards compatibility reasons).
-            if (strpos($attachpath, $temppath) !== 0) {
+            if ($addpath == true) {
                 $attachmentpath = $CFG->dataroot . '/' . $attachmentpath;
             }
 

@@ -147,6 +147,14 @@
 	margin: 0;
 }
 
+.coursebox .content .courseimage {
+    display: none;
+}
+
+.coursebox .content .coursefile {
+	display: none; 
+}
+
 .coursebox .enrolmenticons {
 	display: none;
 }
@@ -222,6 +230,27 @@
 /** Profile Page */
 
 .userprofile .profile_tree a[href*="/mod/forum"] {
+	display: none;
+}
+
+// Hide optional fields/categories in profile and registration
+div#fitem_id_city {
+	display: none;
+}
+
+div#fitem_id_country {
+	display: none;
+}
+
+fieldset#id_category_0 {
+	display: none;
+}
+
+fieldset#id_moodle_optional {
+	display: none;
+}
+
+fieldset#id_moodle_additional_names {
 	display: none;
 }
 

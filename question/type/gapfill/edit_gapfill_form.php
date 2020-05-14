@@ -146,7 +146,8 @@ class qtype_gapfill_edit_form extends question_edit_form {
 
         /* sets all gaps to the size of the largest gap, avoids giving clues to the correct answer */
         $mform->addElement('advcheckbox', 'fixedgapsize', get_string('fixedgapsize', 'qtype_gapfill'));
-         $mform->addHelpButton('fixedgapsize', 'fixedgapsize', 'qtype_gapfill');
+        $mform->setDefault('optionsaftertext', $config->fixedgapsize);
+        $mform->addHelpButton('fixedgapsize', 'fixedgapsize', 'qtype_gapfill');
 
          /* put draggable answer options after the text. They don't have to be dragged as far, handy on small screens */
         $mform->addElement('advcheckbox', 'optionsaftertext', get_string('optionsaftertext', 'qtype_gapfill'));
