@@ -233,6 +233,27 @@
 	display: none;
 }
 
+// Hide optional fields/categories in profile and registration
+div#fitem_id_city {
+	display: none;
+}
+
+div#fitem_id_country {
+	display: none;
+}
+
+fieldset#id_category_0 {
+	display: none;
+}
+
+fieldset#id_moodle_optional {
+	display: none;
+}
+
+fieldset#id_moodle_additional_names {
+	display: none;
+}
+
 /** Front Page */
 
 // Hide combo list "Courses" header
@@ -355,6 +376,11 @@
 // Eventually, override the renderer to go to next unit.
 
 .activity-navigation {
+	display: none;
+}
+
+// Hide activities and resources that are access-restricted.
+.li.section.hidden {
 	display: none;
 }
 
