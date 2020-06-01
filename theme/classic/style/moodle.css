@@ -17927,16 +17927,19 @@ p.arrow_button {
 .path-grade-report-grader .gradeparent table {
   border-radius: 0.25rem; }
 
-.path-grade-report-grader .gradeparent tr .cell {
+.path-grade-report-grader .gradeparent tr .cell,
+.path-grade-report-grader .gradeparent .floater .cell {
   background-color: #fff; }
 
 .path-grade-report-grader .gradeparent table,
 .path-grade-report-grader .gradeparent .cell {
   border-color: #dee2e6; }
 
-.path-grade-report-grader .gradeparent tr:nth-of-type(even) .cell,
-.path-grade-report-grader .gradeparent .floater .cell,
-.path-grade-report-grader .gradeparent .avg {
+.path-grade-report-grader .gradeparent .userrow.odd .cell,
+.path-grade-report-grader .gradeparent .floater .cell.odd,
+.path-grade-report-grader .gradeparent .heading .cell,
+.path-grade-report-grader .gradeparent .cell.category,
+.path-grade-report-grader .gradeparent .avg .cell {
   background-color: #f8f9fa; }
 
 .path-grade-report-grader .gradeparent table .clickable {
@@ -18971,6 +18974,15 @@ span[data-flexitour="container"][x-placement="right"], span[data-flexitour="cont
     flex: 0 0 20%;
     padding: 0 1rem;
     max-width: 20%; } }
+
+@media print {
+  #page-content .region-main {
+    max-width: 100% !important;
+    /* stylelint-disable-line declaration-no-important */
+    flex: 0 0 100% !important;
+    /* stylelint-disable-line declaration-no-important */
+    padding: 0 1rem 0 !important;
+    /* stylelint-disable-line declaration-no-important */ } }
 
 .block_myoverview .dashboard-card-deck .dashboard-card,
 .block_recentlyaccesseditems .dashboard-card-deck .dashboard-card {

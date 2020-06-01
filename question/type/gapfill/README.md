@@ -8,6 +8,9 @@ Alternative delimiting characters can be defined during question edit for exampl
 If the dropdown or dragdrop options are set in the question edit form, it can display a shuffled selection  of correct and
 wrong answers. These can then can be selected via dropddropdown lists or javascript powered drag and drop functionality.
 
+See change log at https://github.com/marcusgreen/moodle-qtype_gapfill/blob/master/changelog.md
+To install from the plugins database go to https://moodle.org/plugins/qtype_gapfill
+
 This question type was written by Marcus Green
 
 
@@ -18,5 +21,5 @@ moodle\question\type\gapfill
 Where moodle is webroot for your install.
 
 Go to Site Administration/Notifications
-See changelog.md for details of each update
+
 User documentation is at https://docs.moodle.org/en/Gapfill_question_type
