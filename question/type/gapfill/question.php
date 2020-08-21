@@ -236,7 +236,7 @@ class qtype_gapfill_question extends question_graded_automatically_with_countbac
      */
     public function get_expected_data() {
         $data = [];
-        foreach ($this->places as $key => $value) {
+        foreach (array_keys($this->places) as $key) {
             $data['p' . $key] = PARAM_RAW_TRIMMED;
         }
         return $data;
@@ -399,6 +399,34 @@ class qtype_gapfill_question extends question_graded_automatically_with_countbac
             return false;
         }
     }
+    /**
+     * Communicate with the dragdrop.js script
+     * tell it if singleuse of draggables is
+     * enabled
+     *
+     * @return void
+     */
+    public function initjs(?int $singleuse = 0) {
+        global $PAGE;
+        $PAGE->requires->js_call_amd('qtype_gapfill/dragdrop', 'init', ['singleuse' => $singleuse ?? 0]);
+    }
+
+    /**
+     * Check if singleuse is enabled and if so
+     * hide this draggable if it has already
+     * been dropped into a gap
+     *
+     * @param string $draggable
+     * @param question_attempt $qa
+     * @param string $cssclasses
+     * @return string
+     */
+    public function is_used(string $draggable, question_attempt $qa, string $cssclasses): string {
+        if ((($this->singleuse == 1) && in_array($draggable, $qa->get_last_qt_data()))) {
+            return $cssclasses .= ' hide ';
+        }
+        return $cssclasses;
+    }
 
     /**
      *
@@ -410,7 +438,7 @@ class qtype_gapfill_question extends question_graded_automatically_with_countbac
      */
     public function get_num_parts_right(array $response) {
         $numright = 0;
-        foreach ($this->places as $place => $notused) {
+        foreach (array_keys($this->places) as $place) {
             $rightanswer = $this->get_right_choice_for($place);
             if (!isset($response[$this->field($place)])) {
                 continue;
@@ -437,7 +465,7 @@ class qtype_gapfill_question extends question_graded_automatically_with_countbac
      * @return array a cleaned up response with the wrong bits reset.
      */
     public function clear_wrong_from_response(array $response) {
-        foreach ($this->places as $place => $notused) {
+        foreach (array_keys($this->places) as $place) {
             if (!array_key_exists($this->field($place), $response)) {
                 continue;
             }
@@ -470,7 +498,7 @@ class qtype_gapfill_question extends question_graded_automatically_with_countbac
             /* Hash of flatted answer values is is guaranteed
               not to to be an answer for any gap */
             $nonanswer = hash('ripemd160', implode(' ', $this->places));
-            foreach ($response as $key => $value) {
+            foreach (array_keys($response) as $key) {
                 $response[$key] = $nonanswer;
             }
             $response = array_merge($response, $au);
@@ -636,7 +664,7 @@ class qtype_gapfill_question extends question_graded_automatically_with_countbac
         $markedgaps = array();
         $question = $qa->get_question();
         $correctgaps = array();
-        foreach ($question->textfragments as $place => $notused) {
+        foreach (array_keys($question->textfragments) as $place) {
             if ($place < 1) {
                 continue;
             }

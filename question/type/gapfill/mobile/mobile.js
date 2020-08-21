@@ -24,6 +24,7 @@ var that = this;
 var result = {
 
     componentInit: function() {
+      debugger;
         /**
          * If the question is in a readonly state, e.g. after being
          * answered or in the review page then stop any further
@@ -50,10 +51,11 @@ var result = {
                 /* Remove picked class from everything else*/
                 draggables[i].classList.remove('picked');
             }
-            return event.currentTarget.innerHTML;
+            return event.currentTarget;
         }
         this.questionRendered = function questionRendered() {
             var self = this;
+	          var picked = {};
             var LastItemClicked = '';
             self.LastItemClicked = LastItemClicked;
             var draggables = this.componentContainer.querySelectorAll('.draggable');
@@ -62,21 +64,45 @@ var result = {
                 /* Optionsaftertext reference is to stop the listener being applied twice */
                 if (draggables[i].id && !this.question.optionsaftertext) {
                     draggables[i].addEventListener('click', function() {
-                        self.LastItemClicked = pickAnswerOption(draggables, event);
+                     picked  = pickAnswerOption(draggables, event);
+                     self.LastItemClicked = picked.innerHTML;
                     });
                 }
             }
             var droptargets = this.componentContainer.querySelectorAll('.droptarget');
             for (i = 0; i < droptargets.length; i++) {
-                    /* Paste text from last click into the droptarger */
-                    droptargets[i].addEventListener('click', function(event) {
+                       /* Paste text from last click into the droptarger */
+                       droptargets[i].addEventListener('click', function(event) {
                         event.currentTarget.value = self.LastItemClicked;
-                    });
+                        hideDropped(draggables, event);
+                   })
                     /* Clear contents on double click */
                     droptargets[i].addEventListener('dblclick', function(event) {
-                        event.currentTarget.value = '';
-                    });
+                       // event.currentTarget.value = '';
+                          showCleared(draggables,event);
+                    })
             }
+        };
+        function hideDropped(draggables, event) {
+          for (i = 0; i < draggables.length; i++) {
+            if (draggables[i].innerHTML == event.currentTarget.value) {
+              draggables[i].style.display = "none";
+            } else {
+              draggables[i].style.display = "inline-block";
+            }
+          }
+        };
+
+        function showCleared(draggables, event) {
+          debugger;
+          for (i = 0; i < draggables.length; i++) {
+            if(draggables[i].innerHTML == event.target.value){
+              draggables[i].style.display = "inline-block";
+              draggables[i].classList.remove('picked');
+            }
+          }
+          event.currentTarget.value = '';
+
         };
 
         if (!this.question) {
@@ -140,6 +166,9 @@ var result = {
                 this.question.optionsaftertext = true;
             }
 
+            if (div.querySelector('#gapfill_singleuse') !== null) {
+                this.question.singleuse = true;
+            }
         });
         // @codingStandardsIgnoreEnd
         return true;

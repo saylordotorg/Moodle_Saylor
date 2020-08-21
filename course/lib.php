@@ -733,20 +733,14 @@ function get_category_or_system_context($categoryid) {
 }
 
 /**
- * Returns full course categories trees to be used in html_writer::select()
+ * Returns the list of full course categories to be used in html_writer::select()
  *
- * Calls {@link core_course_category::make_categories_list()} to build the tree and
- * adds whitespace to denote nesting
+ * Calls {@see core_course_category::make_categories_list()} to build the list.
  *
  * @return array array mapping course category id to the display name
  */
 function make_categories_options() {
-    $cats = core_course_category::make_categories_list('', 0, ' / ');
-    foreach ($cats as $key => $value) {
-        // Prefix the value with the number of spaces equal to category depth (number of separators in the value).
-        $cats[$key] = str_repeat('&nbsp;', substr_count($value, ' / ')). $value;
-    }
-    return $cats;
+    return core_course_category::make_categories_list('', 0, ' / ');
 }
 
 /**
@@ -2568,7 +2562,7 @@ function update_course($data, $editoroptions = NULL) {
                 // The summary might be very long, we don't wan't to fill up the log record with the full text.
                 $updatedfields[$field] = '(updated)';
             }
-        } else if ($field == 'tags' && !empty($CFG->usetags)) {
+        } else if ($field == 'tags' && isset($data->tags)) {
             // Tags might not have the same array keys, just check the values.
             if (array_values($data->$field) !== array_values($value)) {
                 $updatedfields[$field] = $data->$field;

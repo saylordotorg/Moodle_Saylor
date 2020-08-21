@@ -1,6 +1,6 @@
 # CODE RUNNER
 
-Version: 3.7.7 May 2020
+Version: 3.7.9 August 2020
 
 Authors: Richard Lobb, University of Canterbury, New Zealand.
          Tim Hunt, The Open University, UK
@@ -16,58 +16,64 @@ unusual question type.
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-- [CODE RUNNER](#code-runner)
-  - [Introduction](#introduction)
-  - [Installation](#installation)
-    - [Upgrading from a CodeRunner version earlier than 2.4.0](#upgrading-from-a-coderunner-version-earlier-than-240)
-    - [Upgrading from CodeRunner versions between 2.4 and 3.0](#upgrading-from-coderunner-versions-between-24-and-30)
-      - [Note for enthusiasts only.](#note-for-enthusiasts-only)
-    - [Installing CodeRunner from scratch](#installing-coderunner-from-scratch)
-    - [Preliminary testing of the CodeRunner question type](#preliminary-testing-of-the-coderunner-question-type)
-    - [Setting the quiz review options](#setting-the-quiz-review-options)
-    - [Sandbox Configuration](#sandbox-configuration)
-    - [Running the unit tests](#running-the-unit-tests)
-  - [The Architecture of CodeRunner](#the-architecture-of-coderunner)
-  - [Question types](#question-types)
-    - [An example question type](#an-example-question-type)
-    - [Built-in question types](#built-in-question-types)
-    - [Some more-specialised question types](#some-more-specialised-question-types)
-  - [Templates](#templates)
-    - [Per-test templates](#per-test-templates)
-    - [Combinator templates](#combinator-templates)
-    - [Customising templates](#customising-templates)
-  - [Using the template as a script for more advanced questions](#using-the-template-as-a-script-for-more-advanced-questions)
-    - [Twig Escapers](#twig-escapers)
-  - [Template parameters](#template-parameters)
-    - [The Twig QUESTION variable](#the-twig-question-variable)
-    - [The Twig STUDENT variable](#the-twig-student-variable)
-  - [Randomising questions](#randomising-questions)
-    - [How it works](#how-it-works)
-    - [Randomising per-student rather than per-question-attempt](#randomising-per-student-rather-than-per-question-attempt)
-    - [An important warning about editing template parameters](#an-important-warning-about-editing-template-parameters)
-    - [Hoisting the template parameters](#hoisting-the-template-parameters)
-    - [Miscellaneous tips](#miscellaneous-tips)
-  - [Grading with templates](#grading-with-templates)
-    - [Per-test-case template grading](#per-test-case-template-grading)
-    - [Combinator-template grading](#combinator-template-grading)
-  - [Template grader examples](#template-grader-examples)
-    - [A simple grading-template example](#a-simple-grading-template-example)
-    - [A more advanced grading-template example](#a-more-advanced-grading-template-example)
-  - [Customising the result table](#customising-the-result-table)
-    - [Column specifiers](#column-specifiers)
-    - [HTML formatted columns](#html-formatted-columns)
-    - [Extended column specifier syntax (*obsolescent*)](#extended-column-specifier-syntax-obsolescent)
-    - [Default result columns](#default-result-columns)
-  - [User-interface selection](#user-interface-selection)
-    - [The Graph UI](#the-graph-ui)
-    - [The Table UI](#the-table-ui)
-    - [Other UI plugins](#other-ui-plugins)
-  - [User-defined question types](#user-defined-question-types)
-  - [Supporting or implementing new languages](#supporting-or-implementing-new-languages)
-  - [Multilanguage questions](#multilanguage-questions)
-  - [Administrator scripts](#administrator-scripts)
-  - [A note on accessibility](#a-note-on-accessibility)
-  - [APPENDIX: How programming quizzes should work](#appendix-how-programming-quizzes-should-work)
+- [Introduction](#introduction)
+- [Installation](#installation)
+  - [Upgrading from a CodeRunner version earlier than 2.4.0](#upgrading-from-a-coderunner-version-earlier-than-240)
+  - [Upgrading from CodeRunner versions between 2.4 and 3.0](#upgrading-from-coderunner-versions-between-24-and-30)
+    - [Note for enthusiasts only.](#note-for-enthusiasts-only)
+  - [Installing CodeRunner from scratch](#installing-coderunner-from-scratch)
+  - [Preliminary testing of the CodeRunner question type](#preliminary-testing-of-the-coderunner-question-type)
+  - [Setting the quiz review options](#setting-the-quiz-review-options)
+  - [Sandbox Configuration](#sandbox-configuration)
+  - [Running the unit tests](#running-the-unit-tests)
+- [The Architecture of CodeRunner](#the-architecture-of-coderunner)
+- [Question types](#question-types)
+  - [An example question type](#an-example-question-type)
+  - [Built-in question types](#built-in-question-types)
+  - [Some more-specialised question types](#some-more-specialised-question-types)
+- [Templates](#templates)
+  - [Per-test templates](#per-test-templates)
+  - [Combinator templates](#combinator-templates)
+  - [Customising templates](#customising-templates)
+- [Using the template as a script for more advanced questions](#using-the-template-as-a-script-for-more-advanced-questions)
+  - [Twig Escapers](#twig-escapers)
+- [Template parameters](#template-parameters)
+  - [The Twig QUESTION variable](#the-twig-question-variable)
+  - [The Twig STUDENT variable](#the-twig-student-variable)
+  - [Twig macros](#twig-macros)
+- [Randomising questions](#randomising-questions)
+  - [How it works](#how-it-works)
+  - [Randomising per-student rather than per-question-attempt](#randomising-per-student-rather-than-per-question-attempt)
+  - [An important warning about editing template parameters](#an-important-warning-about-editing-template-parameters)
+  - [Hoisting the template parameters](#hoisting-the-template-parameters)
+  - [Miscellaneous tips](#miscellaneous-tips)
+- [Grading with templates](#grading-with-templates)
+  - [Per-test-case template grading](#per-test-case-template-grading)
+  - [Combinator-template grading](#combinator-template-grading)
+- [Template grader examples](#template-grader-examples)
+  - [A simple grading-template example](#a-simple-grading-template-example)
+  - [A more advanced grading-template example](#a-more-advanced-grading-template-example)
+- [Customising the result table](#customising-the-result-table)
+  - [Column specifiers](#column-specifiers)
+  - [HTML formatted columns](#html-formatted-columns)
+  - [Extended column specifier syntax (*obsolescent*)](#extended-column-specifier-syntax-obsolescent)
+  - [Default result columns](#default-result-columns)
+- [User-interface selection](#user-interface-selection)
+  - [The Graph UI](#the-graph-ui)
+  - [The Table UI](#the-table-ui)
+  - [The Gap Filler UI](#the-gap-filler-ui)
+  - [The Html UI ](#the-html-ui)
+  - [Other UI plugins](#other-ui-plugins)
+- [User-defined question types](#user-defined-question-types)
+- [Supporting or implementing new languages](#supporting-or-implementing-new-languages)
+- [Multilanguage questions](#multilanguage-questions)
+- [Administrator scripts](#administrator-scripts)
+- [A note on accessibility](#a-note-on-accessibility)
+- [APPENDIX 1: How questions get marked](#appendix-1-how-questions-get-marked)
+  - [When a question is first instantiated.](#when-a-question-is-first-instantiated)
+  - [Grading a submission](#grading-a-submission)
+  - [Lots more to come when I get a round TUIT](#lots-more-to-come-when-i-get-a-round-tuit)
+- [APPENDIX 2: How programming quizzes should work](#appendix-2-how-programming-quizzes-should-work)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -1201,7 +1207,7 @@ macros are primarily intended for use with the Html UI (q.v.); each one inserts
 a named HTML element into the template that is being expanded. As an
 example, if the question author includes the following in a question field
 
-    {% from html import input %}
+    {% from 'html' import input %}
 
     ...
 
@@ -2004,7 +2010,7 @@ itself the empty string.
 An example of the use of this UI type can be seen in the
 *python3_program_testing* prototype in the *samples* folder.
 
-### The Gap Filler UI (new, experimental)
+### The Gap Filler UI
 
 This plugin replaces the usual textarea answer box with a div
 consisting of pre-formatted text supplied by the question author in either the
@@ -2013,7 +2019,7 @@ to the template parameter gapfiller_ui_source (default: globalextra).  HTML
 entry or textarea elements are then inserted at
 specified points. It is intended primarily for use with coding questions
 where the answerbox presents the students with code that has smallish bits
-missing.
+missing, but it can also be used in non-coding questions.
 
 The locations within the globalextra text at which the input elements are
 to be inserted are denoted by "tags" of the form
@@ -2032,8 +2038,8 @@ where size, rows and column are integer literals. These respectively
 inject an HTML input element or a textarea element of the
 specified size.
 
-The serialisation of the answer box contents, i.e. the text that
-copied back into the textarea for submissions
+The serialisation of the answer box contents, i.e. the text that is
+copied back into the textarea for submission
 as the answer, is simply a list of all the field values (strings), in order.
 
 As a special case of the serialisation, if the value list is empty, the
@@ -2051,7 +2057,7 @@ ever adding Twig expansion (e.g. for randomisation) to the question. This is
 not recommended.
 
 
-### The Html UI (unsupported and experimental)
+### The Html UI
 
 The HTML UI plug-in replaces the answer box with custom HTML provided by the
 question author. The HTML will usually include data entry fields such as
@@ -2120,26 +2126,6 @@ As a special case of the serialisation, if all values in the serialisation
 are either empty strings or a list of empty strings, the serialisation is
 itself the empty string.
 
-In programming questions, the HTML UI can be used to define a "fill-in-the-gaps"
-programming question. Here the `globalextra` should be set to the full
-program code, wrapped in a `<pre>` element. Since this is a raw text field which
-will necessarily contain some genuine HTML, it
-is necessary to manually perform html-escaping operations on the non-html code, such as replacing
-'<' characters with '&lt;'.
-
-Then, bits of the code can be cut out and replaced with HTML input
-elements either explicitly or by use of Twig macros like
-
-    {{ input('crui_expr1', 20) }}
-
-The question's template will receive the values of all input fields in JSON like
-
-    {"crui_expr1": ["*sp++"]}
-
-and, with sufficient ingenuity, can re-insert those field values into the original
-code, which can then be run with all the tests in the usual way. An example of
-this type of question is supplied as **TBS**.
-
 ### Other UI plugins
 
 Question authors who have admin access to the Moodle server can write their
@@ -2147,13 +2133,13 @@ own user-interface plugins; a JavaScript
 file with a name of the form `ui_something.js` in the
 folder
 
-        &lt;moodlehome&gt;/question/type/coderunner/amd/src
+        <moodlehome>/question/type/coderunner/amd/src
 
 is assumed to be a user interface plugin and is automatically added to
 the drop-down menu of available plugins. Such plugin files must be AMD modules
 and must implement the interface defined in the file
 
-        &lt;moodlehome&gt;/question/type/coderunner/amd/src/userinterfacewrapper.js
+        <moodlehome>/question/type/coderunner/amd/src/userinterfacewrapper.js
 
 Writing UI plugins is, however, not a job for the faint hearted.
 

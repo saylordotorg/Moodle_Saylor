@@ -1200,7 +1200,7 @@ class admin_externalpage implements part_of_admin_tree {
     /** @var string The external URL that we should link to when someone requests this external page. */
     public $url;
 
-    /** @var string The role capability/permission a user must have to access this external page. */
+    /** @var array The role capability/permission a user must have to access this external page. */
     public $req_capability;
 
     /** @var object The context in which capability/permission should be checked, default is site context. */
@@ -1424,7 +1424,7 @@ class admin_settingpage implements part_of_admin_tree {
     /** @var admin_settingdependency[] list of settings to hide when certain conditions are met */
     protected $dependencies = [];
 
-    /** @var string The role capability/permission a user must have to access this external page. */
+    /** @var array The role capability/permission a user must have to access this external page. */
     public $req_capability;
 
     /** @var object The context in which capability/permission should be checked, default is site context. */
@@ -1685,6 +1685,8 @@ abstract class admin_setting {
     private $forceltr = null;
     /** @var array list of other settings that may cause this setting to be hidden */
     private $dependenton = [];
+    /** @var bool Whether this setting uses a custom form control */
+    protected $customcontrol = false;
 
     /**
      * Constructor
@@ -2069,6 +2071,16 @@ abstract class admin_setting {
      */
     public function get_dependent_on() {
         return $this->dependenton;
+    }
+
+    /**
+     * Whether this setting uses a custom form control.
+     * This function is especially useful to decide if we should render a label element for this setting or not.
+     *
+     * @return bool
+     */
+    public function has_custom_form_control(): bool {
+        return $this->customcontrol;
     }
 }
 
@@ -8758,6 +8770,7 @@ function format_admin_setting($setting, $title='', $form='', $description='', $l
     $context->description = highlight($query, markdown_to_html($description));
     $context->element = $form;
     $context->forceltr = $setting->get_force_ltr();
+    $context->customcontrol = $setting->has_custom_form_control();
 
     return $OUTPUT->render_from_template('core_admin/setting', $context);
 }
@@ -10217,6 +10230,7 @@ class admin_setting_configstoredfile extends admin_setting {
         $this->filearea = $filearea;
         $this->itemid   = $itemid;
         $this->options  = (array)$options;
+        $this->customcontrol = true;
     }
 
     /**

@@ -11371,7 +11371,9 @@ h3.sectionname .inplaceeditable.inplaceeditingon .editinstructions {
     display: block; }
 
 ul {
-  padding-left: 1rem; }
+  padding-left: 1rem;
+  -webkit-margin-start: 0.2rem;
+  /* stylelint-disable-line */ }
 
 /* YUI 2 Tree View */
 /*rtl:raw:
@@ -11749,6 +11751,9 @@ body.h5p-embed .h5pmessages {
 
 .alert-dark a {
   color: #040505; }
+
+.alert a, #page-admin-index .releasenoteslink a, #page-admin-index .adminwarning a, #page-admin-index .adminerror a, .que .formulation a, .que .outcome a, .que .comment a, .assignfeedback_editpdf_widget .label a {
+  font-weight: 700; }
 
 .icon {
   font-size: 16px;
@@ -12457,8 +12462,10 @@ body.h5p-embed .h5pmessages {
   .dashboard-card-deck .dashboard-card .dashboard-card-footer {
     padding: 0.8rem; }
 
-.dashboard-card-deck.fixed-width-cards .dashboard-card {
-  width: 300px; }
+@media (min-width: 576px) {
+  .dashboard-card-deck.fixed-width-cards .dashboard-card {
+    width: 300px;
+    max-width: 100%; } }
 
 @media (min-width: 576px) {
   .dashboard-card-deck:not(.fixed-width-cards) .dashboard-card {
@@ -13484,7 +13491,7 @@ span.editinstructions {
     #course-category-listings ul.ml ul.ml {
       margin: 0; }
   #course-category-listings .listitem[data-selected='1'] {
-    border-left: calc(1px + 5px) solid #5bc0de;
+    border-left: calc(1px + 5px) solid #1177d1;
     padding-left: calc(1.25rem - 5px); }
   #course-category-listings .item-actions {
     margin-right: 1em;
@@ -15017,8 +15024,15 @@ a.ygtvspacer:hover {
   .message-app .lazy-load-list {
     overflow-y: auto; }
 
+#page-message-index #page-header {
+  display: none; }
+
 #page-message-index #region-main {
-  height: 100%; }
+  height: 100%;
+  margin-top: 0; }
+  #page-message-index #region-main .conversationcontainer {
+    max-height: calc(100vh - 50px);
+    overflow: auto; }
   #page-message-index #region-main div[role="main"] {
     height: 100%; }
     #page-message-index #region-main div[role="main"] #maincontent {
@@ -16721,17 +16735,19 @@ select {
   max-height: none;
   z-index: 1; }
 
-.path-mod-forum .unified-grader .body-container.hidden {
-  display: none !important;
-  /* stylelint-disable-line declaration-no-important */ }
+.path-mod-forum .unified-grader .body-container {
+  overflow: auto; }
+  .path-mod-forum .unified-grader .body-container.hidden {
+    display: none !important;
+    /* stylelint-disable-line declaration-no-important */ }
 
 .path-mod-forum .unified-grader .userpicture {
   height: 60px;
   width: 60px; }
 
 .path-mod-forum .unified-grader .grader-grading-panel {
-  position: absolute;
   top: 0;
+  position: absolute;
   height: 100%;
   z-index: 0;
   width: 430px; }
@@ -16982,7 +16998,13 @@ select {
 
 @media (max-width: 575.98px) {
   .path-mod-forum .unified-grader .grader-grading-panel {
-    width: 100%; } }
+    width: 100%;
+    position: fixed;
+    height: calc(100vh - 50px);
+    overflow: scroll;
+    top: 50px; }
+  .path-mod-forum .unified-grader .body-container {
+    overflow: visible; } }
 
 .maincalendar .calendarmonth td,
 .maincalendar .calendarmonth th {
@@ -18792,6 +18814,7 @@ span[data-flexitour="container"][x-placement="right"], span[data-flexitour="cont
   .blockcolumn,
   .region-main {
     flex: 0 0 100%;
+    max-width: 100%;
     padding: 0 1rem;
     margin-bottom: 1rem; } }
 
@@ -18800,7 +18823,8 @@ span[data-flexitour="container"][x-placement="right"], span[data-flexitour="cont
     display: flex; }
     #page-content .region-main {
       flex: 0 0 100%;
-      padding: 0 1rem; }
+      padding: 0 1rem;
+      max-width: 100%; }
     #page-content.blocks-pre .columnleft {
       flex: 0 0 32%;
       order: -1;
@@ -18860,7 +18884,8 @@ span[data-flexitour="container"][x-placement="right"], span[data-flexitour="cont
     display: flex; }
     #page-content .region-main {
       flex: 0 0 100%;
-      padding: 0 1rem; }
+      padding: 0 1rem;
+      max-width: 100%; }
     #page-content.blocks-pre .columnleft {
       flex: 0 0 25%;
       order: -1;
@@ -18920,7 +18945,8 @@ span[data-flexitour="container"][x-placement="right"], span[data-flexitour="cont
     display: flex; }
     #page-content .region-main {
       flex: 0 0 100%;
-      padding: 0 1rem; }
+      padding: 0 1rem;
+      max-width: 100%; }
     #page-content.blocks-pre .columnleft {
       flex: 0 0 20%;
       order: -1;
@@ -18984,9 +19010,30 @@ span[data-flexitour="container"][x-placement="right"], span[data-flexitour="cont
     padding: 0 1rem 0 !important;
     /* stylelint-disable-line declaration-no-important */ } }
 
-.block_myoverview .dashboard-card-deck .dashboard-card,
-.block_recentlyaccesseditems .dashboard-card-deck .dashboard-card {
-  width: calc(33.33% - 0.5rem); }
+@media (min-width: 576px) {
+  .dashboard-card-deck .dashboard-card {
+    width: calc(50% - 0.5rem); } }
+
+@media (min-width: 768px) {
+  .dashboard-card-deck .dashboard-card {
+    width: calc(50% - 0.5rem); }
+  .blocks-post .dashboard-card-deck .dashboard-card,
+  .blocks-pre .dashboard-card-deck .dashboard-card {
+    width: calc(100% - 0.5rem); } }
+
+@media (min-width: 992px) {
+  .dashboard-card-deck .dashboard-card {
+    width: calc(33.33% - 0.5rem); }
+  .blocks-post .dashboard-card-deck .dashboard-card,
+  .blocks-pre .dashboard-card-deck .dashboard-card {
+    width: calc(50% - 0.5rem); } }
+
+@media (min-width: 1200px) {
+  .dashboard-card-deck .dashboard-card {
+    width: calc(25% - 0.5rem); }
+  .blocks-post .dashboard-card-deck .dashboard-card,
+  .blocks-pre .dashboard-card-deck .dashboard-card {
+    width: calc(33.33% - 0.5rem); } }
 
 @media (min-width: 768px) {
   .blockcolumn .dashboard-card-deck {

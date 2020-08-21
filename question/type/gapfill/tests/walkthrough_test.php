@@ -46,7 +46,7 @@ class qtype_gapfill_walkthrough_test extends qbehaviour_walkthrough_test_base {
             'noduplicates' => 0,
             'delimitchars' => '[]'
         );
-        $gapfill = qtype_gapfill_test_helper::make_question2( $questiontext, $options);
+        $gapfill = qtype_gapfill_test_helper::make_question( $questiontext, $options);
         $maxmark = 2;
         $this->start_attempt_at_question($gapfill, 'deferredfeedback', $maxmark);
         $this->check_output_contains('1.0');
@@ -56,7 +56,7 @@ class qtype_gapfill_walkthrough_test extends qbehaviour_walkthrough_test_base {
     public function test_deferred_feedback_unanswered() {
 
         // Create a gapfill question.
-        $gapfill = qtype_gapfill_test_helper::make_question('gapfill');
+        $gapfill = qtype_gapfill_test_helper::make_question();
         $maxmark = 2;
         $this->start_attempt_at_question($gapfill, 'deferredfeedback', $maxmark);
         /* Check the initial state. */
@@ -85,7 +85,7 @@ class qtype_gapfill_walkthrough_test extends qbehaviour_walkthrough_test_base {
 
     public function test_deferred_with_correct() {
         // Create a gapfill question.
-        $gapfill = qtype_gapfill_test_helper::make_question('gapfill');
+        $gapfill = qtype_gapfill_test_helper::make_question();
         $maxmark = 2;
         $this->start_attempt_at_question($gapfill, 'deferredfeedback', $maxmark);
         // Check the initial state.
@@ -108,7 +108,7 @@ class qtype_gapfill_walkthrough_test extends qbehaviour_walkthrough_test_base {
     public function test_deferred_with_incorrect() {
 
         // Create a gapfill question.
-        $gapfill = qtype_gapfill_test_helper::make_question('gapfill');
+        $gapfill = qtype_gapfill_test_helper::make_question();
         $maxmark = 2;
         $this->start_attempt_at_question($gapfill, 'deferredfeedback', $maxmark);
         // Check the initial state.
@@ -147,7 +147,7 @@ class qtype_gapfill_walkthrough_test extends qbehaviour_walkthrough_test_base {
             'delimitchars' => '[]'
             );
 
-        $gapfill = qtype_gapfill_test_helper::make_question2( $questiontext, $options);
+        $gapfill = qtype_gapfill_test_helper::make_question( $questiontext, $options);
         $maxmark = 1;
             $this->start_attempt_at_question($gapfill, 'deferredfeedback', $maxmark);
         // Check the initial state.
@@ -164,7 +164,7 @@ class qtype_gapfill_walkthrough_test extends qbehaviour_walkthrough_test_base {
     public function test_deferred_with_partially_correct() {
 
         // Create a gapfill question.
-        $gapfill = qtype_gapfill_test_helper::make_question('gapfill');
+        $gapfill = qtype_gapfill_test_helper::make_question();
         $maxmark = 2;
         $this->start_attempt_at_question($gapfill, 'deferredfeedback', $maxmark);
         // Check the initial state.
@@ -186,7 +186,7 @@ class qtype_gapfill_walkthrough_test extends qbehaviour_walkthrough_test_base {
     public function test_deferred_with_blanks() {
         // Create a gapfill question.
         $questiontext = "The [cat] sat on the [mat]";
-        $gapfill = qtype_gapfill_test_helper::make_question2( $questiontext);
+        $gapfill = qtype_gapfill_test_helper::make_question( $questiontext);
         $maxmark = 2;
         $this->start_attempt_at_question($gapfill, 'deferredfeedback', $maxmark);
         // Check the initial state.
@@ -208,7 +208,7 @@ class qtype_gapfill_walkthrough_test extends qbehaviour_walkthrough_test_base {
          */
         $questiontext = "Moscow is the capital of [Россия], The French word for boy is [garçon]. A word that
                 ends with an accent is [andrà]  ";
-        $gapfill = qtype_gapfill_test_helper::make_question2( $questiontext);
+        $gapfill = qtype_gapfill_test_helper::make_question( $questiontext);
         $maxmark = 3;
         $this->start_attempt_at_question($gapfill, 'deferredfeedback', $maxmark);
         // Check the initial state.
@@ -225,7 +225,7 @@ class qtype_gapfill_walkthrough_test extends qbehaviour_walkthrough_test_base {
     public function test_interactive_with_correct() {
 
         // Create a gapfill question.
-        $gapfill = qtype_gapfill_test_helper::make_question('gapfill');
+        $gapfill = qtype_gapfill_test_helper::make_question();
         $maxmark = 2;
         $this->start_attempt_at_question($gapfill, 'interactive', $maxmark);
 
@@ -276,7 +276,8 @@ class qtype_gapfill_walkthrough_test extends qbehaviour_walkthrough_test_base {
     }
     public function test_interactive_wildcard_with_correct() {
         // Create a gapfill question.
-        $gapfill = qtype_gapfill_test_helper::make_question('gapfill', array('cat|dog', 'mat'));
+        $questiontext = " The [cat|dog] sat on the [mat] ";
+        $gapfill = qtype_gapfill_test_helper::make_question($questiontext);
         $maxmark = 2;
 
         $this->start_attempt_at_question($gapfill, 'interactive', $maxmark);
@@ -340,7 +341,7 @@ class qtype_gapfill_walkthrough_test extends qbehaviour_walkthrough_test_base {
         $options['noduplicates'] = 0;
         $options['disableregex'] = 1;
         $options['delimitchars'] = '[]';
-        $gapfill = qtype_gapfill_test_helper::make_question2( $questiontext, $options);
+        $gapfill = qtype_gapfill_test_helper::make_question( $questiontext, $options);
         $this->start_attempt_at_question($gapfill, 'interactive', $gapfill->gapstofill);
 
         $this->check_current_state(question_state::$todo);
@@ -380,7 +381,7 @@ What are the colors of the Olympic medals?
         /* answer with duplicate values, only one of each duplicate should get a mark */
         $submission = array('-submit' => 1, 'p1' => 'gold', 'p2' => 'silver', 'p3' => 'silver');
 
-        $gapfill = qtype_gapfill_test_helper::make_question2( $questiontext, $options);
+        $gapfill = qtype_gapfill_test_helper::make_question( $questiontext, $options);
 
         $this->start_attempt_at_question($gapfill, 'interactive', $gapfill->gapstofill);
 
@@ -406,7 +407,7 @@ What are the colors of the Olympic medals?
     }
 
     public function test_get_letter_hints() {
-        $gapfill = qtype_gapfill_test_helper::make_question2();
+        $gapfill = qtype_gapfill_test_helper::make_question();
         $gapfill->hints = [
             new question_hint(1, 'This is the first hint.', FORMAT_HTML),
             new question_hint(2, 'This is the second hint.', FORMAT_HTML),
@@ -441,7 +442,7 @@ What are the colors of the Olympic medals?
         $questiontext = '
  [one] sat on the [two] [!!] ';
 
-        $gapfill = qtype_gapfill_test_helper::make_question2( $questiontext);
+        $gapfill = qtype_gapfill_test_helper::make_question( $questiontext);
 
         $this->start_attempt_at_question($gapfill, 'interactive', $gapfill->gapstofill);
 
@@ -499,14 +500,14 @@ What are the colors of the Olympic medals?
 
     public function test_get_aftergap_text() {
         $questiontext = "The [cat] sat on the [mat]";
-        $gapfill = qtype_gapfill_test_helper::make_question2( $questiontext);
+        $gapfill = qtype_gapfill_test_helper::make_question( $questiontext);
         $maxmark = 2;
         $this->start_attempt_at_question($gapfill, 'immediatefeedback', $maxmark);
         $this->process_submission(array('-submit' => 1, 'p1' => 'cat', 'p2' => 'dog'));
         $html = $this->quba->render_question($this->slot, $this->displayoptions);
         $this->assertContains("[mat]", $html );
 
-        $gapfill = qtype_gapfill_test_helper::make_question2( $questiontext);
+        $gapfill = qtype_gapfill_test_helper::make_question( $questiontext);
         $maxmark = 2;
         $this->start_attempt_at_question($gapfill, 'immediatefeedback', $maxmark);
         $this->process_submission(array('-submit' => 1, 'p1' => 'cat', 'p2' => 'mat'));
@@ -527,7 +528,7 @@ What are the colors of the Olympic medals?
         $questiontext = '
  [one] sat on the [two] [!!] ';
 
-        $gapfill = qtype_gapfill_test_helper::make_question2( $questiontext);
+        $gapfill = qtype_gapfill_test_helper::make_question( $questiontext);
 
         $this->start_attempt_at_question($gapfill, 'deferredfeedback', $gapfill->gapstofill);
         /* A mark for a blank submission where the gap is [!!] */
@@ -556,7 +557,7 @@ What are the colors of the Olympic medals?
     public function test_immediatefeedback_with_correct() {
 
         // Create a gapfill question.
-        $gapfill = qtype_gapfill_test_helper::make_question('gapfill');
+        $gapfill = qtype_gapfill_test_helper::make_question();
         $maxmark = 2;
 
         $gapfill->showanswers = true;
@@ -584,7 +585,7 @@ What are the colors of the Olympic medals?
         // Finish the attempt.
     }
     public function test_get_gapsize() {
-        $gapfill = qtype_gapfill_test_helper::make_question2( "");
+        $gapfill = qtype_gapfill_test_helper::make_question( "");
         $this->assertEquals($gapfill->get_size("one"), 3);
         $this->assertEquals($gapfill->get_size("one|twleve"), 6);
     }

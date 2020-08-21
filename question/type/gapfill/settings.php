@@ -36,6 +36,9 @@ if (is_siteadmin()) {
      $settingspage->add(new admin_setting_configcheckbox('qtype_gapfill/disableregex',
         get_string('disableregex', 'qtype_gapfill'),
         get_string('disableregexset_text', 'qtype_gapfill'), 1));
+    $settingspage->add(new admin_setting_configcheckbox('qtype_gapfill/singleuse',
+            get_string('singleuse', 'qtype_gapfill'),
+            get_string('singleuse_text', 'qtype_gapfill'), 0));
     $settingspage->add(new admin_setting_configcheckbox('qtype_gapfill/fixedgapsize',
         get_string('fixedgapsize', 'qtype_gapfill'),
         get_string('fixedgapsizeset_text', 'qtype_gapfill') , 1));

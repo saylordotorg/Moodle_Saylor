@@ -596,7 +596,7 @@ function question_move_question_tags_to_new_context(array $questions, context $n
     $questionstagobjects = core_tag_tag::get_items_tags('core_question', 'question', $questionids);
 
     foreach ($questions as $question) {
-        $tagobjects = $questionstagobjects[$question->id];
+        $tagobjects = $questionstagobjects[$question->id] ?? [];
 
         foreach ($tagobjects as $tagobject) {
             $tagid = $tagobject->taginstanceid;
@@ -1849,6 +1849,8 @@ function question_get_question_capabilities() {
         'moodle/question:useall',
         'moodle/question:movemine',
         'moodle/question:moveall',
+        'moodle/question:tagmine',
+        'moodle/question:tagall',
     );
 }
 

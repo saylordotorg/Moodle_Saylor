@@ -100,7 +100,7 @@ class qtype_gapfill_test extends advanced_testcase {
 
     public function test_extra_question_fields() {
         $extraquestionfields = array('question_gapfill', 'answerdisplay', 'delimitchars',
-            'casesensitive', 'noduplicates', 'disableregex', 'fixedgapsize', 'optionsaftertext', 'letterhints');
+            'casesensitive', 'noduplicates', 'disableregex', 'fixedgapsize', 'optionsaftertext', 'letterhints' , 'singleuse');
         $this->assertEquals($this->qtype->extra_question_fields(), $extraquestionfields);
     }
 }

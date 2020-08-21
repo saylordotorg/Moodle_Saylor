@@ -139,14 +139,14 @@ class block_workflow_renderer extends plugin_renderer_base {
                 $editor->setValue(array('text' => $state->comment));
 
                 $output .= '<div class="block-workflow-panel">
-                                <form class="wkf-comments" action='.'>
+                                <form class="wkf-comments" action=".">
                                     <div class="wfk-textarea">' .
                                         html_writer::label(get_string('commentlabel', 'block_workflow'),
                                                 'wkf-comment-editor', false, array('class' => 'accesshide')) .
                                         $editor->toHtml() . '
                                     </div>
                                     <div class="wfk-submit">
-                                        <input type="button" class="submitbutton"/>
+                                        <input type="button" class="submitbutton" value="' . get_string('submit') . '" />
                                     </div>
                                 </form>
                                 <div class="loading-lightbox hidden">' .
@@ -367,6 +367,9 @@ class block_workflow_renderer extends plugin_renderer_base {
     protected function workflow_row(stdClass $workflow) {
         $row = new html_table_row();
         $row->attributes['class']   = 'workflow';
+        if ($workflow->obsolete != BLOCK_WORKFLOW_ENABLED) {
+            $row->attributes['class'] .= ' dimmed_text';
+        }
 
         // Shortname.
         $cell = new html_table_cell(s($workflow->shortname));

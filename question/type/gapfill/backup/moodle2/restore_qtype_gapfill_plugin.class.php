@@ -183,13 +183,12 @@ class restore_qtype_gapfill_plugin extends restore_qtype_plugin {
             $params = array($newquestionid, $data->answertext);
             $newitemid = $DB->get_field_sql($sql, $params, IGNORE_MULTIPLE);
 
-            // Not able to find the answer, let's try cleaning the answertext
+            // Not able to find the answer, let's try cleaning the answertext.
             // of all the question answers in DB as slower fallback. MDL-30018.
             if (!$newitemid) {
                 $params = array('question' => $newquestionid);
                 $answers = $DB->get_records('question_answers', $params, '', 'id, answer');
                 foreach ($answers as $answer) {
-                    // Clean in the same way than {@link xml_writer::xml_safe_utf8()}.
                     $clean = preg_replace('/[\x-\x8\xb-\xc\xe-\x1f\x7f]/is', '', $answer->answer); // Clean CTRL chars.
                     $clean = preg_replace("/\r\n|\r/", "\n", $clean); // Normalize line ending.
                     if ($clean === $data->answertext) {

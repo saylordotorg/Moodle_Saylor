@@ -78,5 +78,15 @@ function xmldb_qtype_gapfill_upgrade($oldversion = 0) {
         // Gapfill savepoint reached.
         upgrade_plugin_savepoint(true, 2017111700, 'qtype', 'gapfill');
     }
+    if ($oldversion < 2020070400) {
+        if (!$dbman->field_exists('question_gapfill', 'singleuse')) {
+            $field = new xmldb_field('singleuse', XMLDB_TYPE_INTEGER, '1');
+            $table = new xmldb_table('question_gapfill');
+            $dbman->add_field($table, $field);
+        }
+        // Gapfill savepoint reached.
+        upgrade_plugin_savepoint(true, 2020070400, 'qtype', 'gapfill');
+
+    }
     return true;
 }

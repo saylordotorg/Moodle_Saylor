@@ -3830,8 +3830,11 @@ function xmldb_main_upgrade($oldversion) {
             $DB->delete_records('competency_userevidencecomp', ['userevidenceid' => $userevidence->id]);
             $DB->delete_records('competency_userevidence', ['id' => $userevidence->id]);
 
-            $context = context_user::instance($userevidence->userid);
-            $fs->delete_area_files($context->id, 'core_competency', 'userevidence', $userevidence->id);
+            if ($record = $DB->get_record('context', ['contextlevel' => CONTEXT_USER, 'instanceid' => $userevidence->userid],
+                    '*', IGNORE_MISSING)) {
+                // Delete all orphaned user evidences files.
+                $fs->delete_area_files($record->id, 'core_competency', 'userevidence', $userevidence->userid);
+            }
         }
 
         $sql = "SELECT cp.id
@@ -3871,6 +3874,78 @@ function xmldb_main_upgrade($oldversion) {
         );
 
         upgrade_main_savepoint(true, 2019111802.08);
+    }
+
+    if ($oldversion < 2019111803.14) {
+        // Update default digital age consent map according to the current legislation on each country.
+
+        // The default age of digital consent map for 38 and below.
+        $oldageofdigitalconsentmap = implode(PHP_EOL, [
+            '*, 16',
+            'AT, 14',
+            'ES, 14',
+            'US, 13'
+        ]);
+
+        // Check if the current age of digital consent map matches the old one.
+        if (get_config('moodle', 'agedigitalconsentmap') === $oldageofdigitalconsentmap) {
+            // If the site is still using the old defaults, upgrade to the new default.
+            $ageofdigitalconsentmap = implode(PHP_EOL, [
+                '*, 16',
+                'AT, 14',
+                'BE, 13',
+                'BG, 14',
+                'CY, 14',
+                'CZ, 15',
+                'DK, 13',
+                'EE, 13',
+                'ES, 14',
+                'FI, 13',
+                'FR, 15',
+                'GB, 13',
+                'GR, 15',
+                'IT, 14',
+                'LT, 14',
+                'LV, 13',
+                'MT, 13',
+                'NO, 13',
+                'PT, 13',
+                'SE, 13',
+                'US, 13'
+            ]);
+            set_config('agedigitalconsentmap', $ageofdigitalconsentmap);
+        }
+
+        upgrade_main_savepoint(true, 2019111803.14);
+    }
+
+    if ($oldversion < 2019111804.01) {
+        // Clean up completion criteria records referring to NULL course prerequisites.
+        $select = 'criteriatype = :type AND courseinstance IS NULL';
+        $params = ['type' => 8]; // COMPLETION_CRITERIA_TYPE_COURSE.
+
+        $DB->delete_records_select('course_completion_criteria', $select, $params);
+
+        // Main savepoint reached.
+        upgrade_main_savepoint(true, 2019111804.01);
+    }
+
+    if ($oldversion < 2019111804.08) {
+        // Delete all user evidence files from users that have been deleted.
+        $sql = "SELECT DISTINCT f.*
+                  FROM {files} f
+             LEFT JOIN {context} c ON f.contextid = c.id
+                 WHERE f.component = :component
+                   AND f.filearea = :filearea
+                   AND c.id IS NULL";
+        $stalefiles = $DB->get_records_sql($sql, ['component' => 'core_competency', 'filearea' => 'userevidence']);
+
+        $fs = get_file_storage();
+        foreach ($stalefiles as $stalefile) {
+            $fs->get_file_instance($stalefile)->delete();
+        }
+
+        upgrade_main_savepoint(true, 2019111804.08);
     }
 
     return true;

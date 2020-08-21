@@ -85,6 +85,9 @@ $string['course'] = 'Import help';
 $string['courseshortname'] = 'Course Shortname';
 $string['visitquestions'] = 'Click <a href={$a}>here</a> to visit the questions';
 $string['letterhints'] = 'Letter hints';
+$string['singleuse'] = 'Single use draggables';
+$string['singleuse_text'] = 'Remove draggables from list when dropped into a gap';
+$string['singleuse_help'] = 'Remove draggables from list when dropped into a gap';
 
 /* Used in the settings */
 $string['addhinttext'] = 'Add hint text to editing form';

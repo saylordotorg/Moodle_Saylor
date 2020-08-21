@@ -30,23 +30,6 @@ defined('MOODLE_INTERNAL') || die;
 require_once($CFG->dirroot . '/course/format/grid/lib.php'); // For format_grid static constants.
 
 if ($ADMIN->fulltree) {
-
-    /* Default course display.
-     * Course display default, can be either one of:
-     * COURSE_DISPLAY_SINGLEPAGE or - All sections on one page.
-     * COURSE_DISPLAY_MULTIPAGE     - One section per page.
-     * as defined in moodlelib.php.
-     */
-    $name = 'format_grid/defaultcoursedisplay';
-    $title = get_string('defaultcoursedisplay', 'format_grid');
-    $description = get_string('defaultcoursedisplay_desc', 'format_grid');
-    $default = COURSE_DISPLAY_SINGLEPAGE;
-    $choices = array(
-        COURSE_DISPLAY_SINGLEPAGE => new lang_string('coursedisplay_single'),
-        COURSE_DISPLAY_MULTIPAGE => new lang_string('coursedisplay_multi')
-    );
-    $settings->add(new admin_setting_configselect($name, $title, $description, $default, $choices));
-
     // Container alignment.
     $name = 'format_grid/defaultimagecontaineralignment';
     $title = get_string('defaultimagecontaineralignment', 'format_grid');

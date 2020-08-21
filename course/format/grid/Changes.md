@@ -3,6 +3,8 @@ History
 Version 3.8.0.2 - TDB
   1. Fix 'Same color setting for "set or change img" as currentselectedimagecontainertextcolor in editing on' - #106.
   2. Fix scroll bar in main region when editing in Boost.
+  3. Remove redundant 'defaultcoursedisplay' setting - #119.
+  4. Tidy up old strings.
 
 Version 3.8.0.1 - 17/11/2019
   1. Fix section one not shown - #105.

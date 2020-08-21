@@ -7,7 +7,7 @@ services:
 
 addons:
  firefox: "47.0.1"
- postgresql: "9.4"
+ postgresql: "9.5"
  apt:
   packages:
    - openjdk-8-jre-headless
@@ -22,15 +22,15 @@ php:
 
 env:
  global:
-  - MOODLE_BRANCH=master
+  - MOODLE_BRANCH=MOODLE_38_STABLE
  matrix:
   - DB=pgsql
   - DB=mysqli
 
 before_install:
  - phpenv config-rm xdebug.ini
- - nvm install 8.9
- - nvm use 8.9
+ - nvm install 14.5
+ - nvm use 14.5
  - cd ../..
  - composer create-project -n --no-dev --prefer-dist blackboard-open-source/moodle-plugin-ci ci ^2
  - export PATH="$(cd ci/bin; pwd):$(cd ci/vendor/bin; pwd):$PATH"

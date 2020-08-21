@@ -22,6 +22,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
+global $CFG;
+require_once($CFG->dirroot . '/question/engine/tests/helpers.php');
 
 /**
  * utilities used by the other test classes
@@ -45,13 +47,12 @@ class qtype_gapfill_test_helper extends question_test_helper {
      * Slight improvements over original make_question class
      *
      * @param string $questiontext
-     * @param boolean $casesensitive
      * @param array $poptions
      * @return qtype_gapfill
      */
-    public static function make_question2($questiontext = 'The [cat] sat on the [mat]',
-        $poptions=array("noduplicates" => 0,
-        'disableregex' => 0, 'delimitchars' => '[])')) {
+    public static function make_question($questiontext = "The [cat] sat on the [mat]",
+        $poptions=['noduplicates' => 0,
+        'disableregex' => 0, 'delimitchars' => '[]' ]) {
         $type = 'gapfill';
         question_bank::load_question_definition_classes($type);
         $question = new qtype_gapfill_question();
@@ -95,6 +96,7 @@ class qtype_gapfill_test_helper extends question_test_helper {
                     'incorrectfeedback' => 'Incorrect Feedback',
                     'incorrectfeedbackformat' => '0',
                     'optionsaftertext' => false,
+                    'singleuse' => false,
                     'answers' => $answers,
         );
 
@@ -131,66 +133,6 @@ class qtype_gapfill_test_helper extends question_test_helper {
         return $question;
     }
 
-    /**
-     * First attempt at returning an instance of the class
-     *
-     * @param string $type
-     * @param stdClass $answers
-     * @return \qtype_gapfill_question
-     */
-    public static function make_question($type, $answers = array("cat", "mat")) {
-        question_bank::load_question_definition_classes($type);
-        $question = new qtype_gapfill_question();
-
-        test_question_maker::initialise_a_question($question);
-        $question->qtype = question_bank::get_qtype('gapfill');
-
-        $question->name = 'Gapfill Test Question';
-        $question->questiontext = "The [cat] sat on the [mat]";
-        $question->textfragments = array('The ', ' sat on the ');
-
-        $question->displayanswers = '1';
-        $question->casesensitive = '1';
-        $question->gapcount = '2';
-        $question->optionsaftertext = false;
-        $question->letterhints = '0';
-        $question->itemsettings = '[{"id":"51","question":"256","itemid":"id1_0","gaptext":"sat","correctfeedback":"OK<br>",'
-                . '"incorrectfeedback":"Wrong<br>"}]';
-
-        $question->generalfeedback = 'congratulations on your knowledge of pets and floor covering';
-
-        $question->places[1] = $answers[0];
-        $question->places[2] = $answers[1];
-        $answer1 = new question_answer(43, $answers[0], 4, 1, 1);
-        $answer2 = new question_answer(44, $answers[1], 4, 1, 1);
-        $question->answers = array($answer1, $answer2);
-
-        $question->options = new stdClass();
-
-        $question->options->showanswers = false;
-        $question->options->delimitchars = "[]";
-        $question->options->casesensitive = false;
-
-        $question->options->correctfeedback = "";
-        $question->options->correctfeedbackformat = "";
-        $question->options->partiallycorrectfeedback = "";
-        $question->options->partiallycorrectfeedbackformat = "";
-        $question->options->incorrectfeedback = "";
-        $question->options->incorrectfeedbackformat = "";
-        $question->options->shuffledanswers = "mat,cat";
-        $question->options->wronganswers = "bat,dog";
-        $question->shuffledanswers = "mat,cat,bat,dog";
-
-        $answers = new stdClass;
-
-        $question->options->answers = array($answer1, $answer2);
-
-        $question->hints = array(
-            new question_hint(1, 'This is the first hint.', FORMAT_HTML),
-            new question_hint(2, 'This is the second hint.', FORMAT_HTML),
-        );
-        return $question;
-    }
 
     /**
      * Gets the question data for a shortanswer question with just the correct
