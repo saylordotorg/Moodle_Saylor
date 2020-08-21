@@ -23,7 +23,7 @@ def plugins = [
     [
         "name" : 'format_flexsections',
         "url" : 'https://github.com/marinaglancy/moodle-format_flexsections.git',
-        "branch" : 'master',
+        "branch" : 'MOODLE_38',
         "dest" : 'course/format/flexsections'
     ],
     [
@@ -35,7 +35,7 @@ def plugins = [
     [
         "name" : 'format_topcoll',
         "url" : 'https://github.com/gjb2048/moodle-format_topcoll.git',
-        "branch" : 'master',
+        "branch" : 'MOODLE_38',
         "dest" : 'course/format/topcoll'
     ],
     [
@@ -47,7 +47,7 @@ def plugins = [
     [
         "name" : 'mod_checklist',
         "url" : 'https://github.com/davosmith/moodle-checklist.git',
-        "branch" : 'master',
+        "branch" : 'MOODLE_38_STABLE',
         "dest" : 'mod/checklist'
     ],
     [
@@ -173,7 +173,7 @@ def plugins = [
     [
         "name" : 'mod_reengagement',
         "url" : 'https://github.com/catalyst/moodle-mod_reengagement.git',
-        "branch" : 'master',
+        "branch" : 'MOODLE_38_STABLE',
         "dest" : 'mod/reengagement'
     ],
     [
