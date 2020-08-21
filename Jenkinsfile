@@ -343,7 +343,7 @@ def CopyDatabase(mysql_user, mysql_password, mysql_source_host, mysql_source_dbn
         // First, create the database structure.
         sh "mysqldump --single-transaction --host ${mysql_source_host} -u ${mysql_user} --password=${mysql_password} --no-data ${mysql_source_dbname} | mysql -h ${mysql_dest_host} -u ${mysql_user} --password=${mysql_password} ${mysql_dest_dbname}"
         // Piping output of dump directly to mysql to increase speed of transfer. 
-        sh "mysqldump --single-transaction --host ${mysql_source_host} -u ${mysql_user} --password=${mysql_password} --no-create-info --where= 'id < 5000' ${mysql_source_dbname} | mysql -h ${mysql_dest_host} -u ${mysql_user} --password=${mysql_password} ${mysql_dest_dbname}"
+        sh "mysqldump --single-transaction --host ${mysql_source_host} -u ${mysql_user} --password=${mysql_password} --no-create-info --where='id < 5000' ${mysql_source_dbname} | mysql -h ${mysql_dest_host} -u ${mysql_user} --password=${mysql_password} ${mysql_dest_dbname}"
     }
 
 }
