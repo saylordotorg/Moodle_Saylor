@@ -23,13 +23,13 @@ def plugins = [
     [
         "name" : 'format_flexsections',
         "url" : 'https://github.com/marinaglancy/moodle-format_flexsections.git',
-        "branch" : 'MOODLE_38',
+        "branch" : 'master',
         "dest" : 'course/format/flexsections'
     ],
     [
         "name" : 'format_grid',
         "url" : 'https://github.com/gjb2048/moodle-format_grid.git',
-        "branch" : 'master',
+        "branch" : 'MOODLE_38',
         "dest" : 'course/format/grid'
     ],
     [
