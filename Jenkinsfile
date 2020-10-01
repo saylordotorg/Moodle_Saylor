@@ -5,7 +5,7 @@
 def mysql_source_dbname = 'moodle'
 def mysql_dest_dbname = 'moodle_test'
 
-def moodle_version = 'MOODLE_38_STABLE'
+def moodle_version = 'MOODLE_39_STABLE'
 
 def plugins = [
     [
@@ -29,13 +29,13 @@ def plugins = [
     [
         "name" : 'format_grid',
         "url" : 'https://github.com/gjb2048/moodle-format_grid.git',
-        "branch" : 'MOODLE_38',
+        "branch" : 'master',
         "dest" : 'course/format/grid'
     ],
     [
         "name" : 'format_topcoll',
         "url" : 'https://github.com/gjb2048/moodle-format_topcoll.git',
-        "branch" : 'MOODLE_38',
+        "branch" : 'master',
         "dest" : 'course/format/topcoll'
     ],
     [
@@ -47,7 +47,7 @@ def plugins = [
     [
         "name" : 'mod_checklist',
         "url" : 'https://github.com/davosmith/moodle-checklist.git',
-        "branch" : 'MOODLE_38_STABLE',
+        "branch" : 'master',
         "dest" : 'mod/checklist'
     ],
     [
@@ -167,7 +167,7 @@ def plugins = [
     [
         "name" : 'mod_reengagement',
         "url" : 'https://github.com/catalyst/moodle-mod_reengagement.git',
-        "branch" : 'MOODLE_38_STABLE',
+        "branch" : 'master',
         "dest" : 'mod/reengagement'
     ],
     [
