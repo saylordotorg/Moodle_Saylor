@@ -1823,6 +1823,21 @@ class file_storage {
 
     /**
      * Serve file content using X-Sendfile header.
+     * Please make sure that all headers are already sent and the all
+     * access control checks passed.
+     *
+     * This alternate method to xsendfile() allows an alternate file system
+     * to use the full file metadata and avoid extra lookups.
+     *
+     * @param stored_file $file The file to send
+     * @return bool success
+     */
+    public function xsendfile_file(stored_file $file): bool {
+        return $this->filesystem->xsendfile_file($file);
+    }
+
+    /**
+     * Serve file content using X-Sendfile header.
      * Please make sure that all headers are already sent
      * and the all access control checks passed.
      *
@@ -2208,35 +2223,19 @@ class file_storage {
         $rs->close();
         mtrace('done.');
 
-        // remove orphaned preview files (that is files in the core preview filearea without
-        // the existing original file)
-        mtrace('Deleting orphaned preview files... ', '');
+        // Remove orphaned files:
+        // * preview files in the core preview filearea without the existing original file.
+        // * document converted files in core documentconversion filearea without the existing original file.
+        mtrace('Deleting orphaned preview, and document conversion files... ', '');
         cron_trace_time_and_memory();
         $sql = "SELECT p.*
                   FROM {files} p
              LEFT JOIN {files} o ON (p.filename = o.contenthash)
-                 WHERE p.contextid = ? AND p.component = 'core' AND p.filearea = 'preview' AND p.itemid = 0
-                       AND o.id IS NULL";
-        $syscontext = context_system::instance();
-        $rs = $DB->get_recordset_sql($sql, array($syscontext->id));
-        foreach ($rs as $orphan) {
-            $file = $this->get_file_instance($orphan);
-            if (!$file->is_directory()) {
-                $file->delete();
-            }
-        }
-        $rs->close();
-        mtrace('done.');
-
-        // Remove orphaned converted files (that is files in the core documentconversion filearea without
-        // the existing original file).
-        mtrace('Deleting orphaned document conversion files... ', '');
-        cron_trace_time_and_memory();
-        $sql = "SELECT p.*
-                  FROM {files} p
-             LEFT JOIN {files} o ON (p.filename = o.contenthash)
-                 WHERE p.contextid = ? AND p.component = 'core' AND p.filearea = 'documentconversion' AND p.itemid = 0
-                       AND o.id IS NULL";
+                 WHERE p.contextid = ?
+                   AND p.component = 'core'
+                   AND (p.filearea = 'preview' OR p.filearea = 'documentconversion')
+                   AND p.itemid = 0
+                   AND o.id IS NULL";
         $syscontext = context_system::instance();
         $rs = $DB->get_recordset_sql($sql, array($syscontext->id));
         foreach ($rs as $orphan) {

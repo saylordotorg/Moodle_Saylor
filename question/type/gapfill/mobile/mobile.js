@@ -24,7 +24,6 @@ var that = this;
 var result = {
 
     componentInit: function() {
-      debugger;
         /**
          * If the question is in a readonly state, e.g. after being
          * answered or in the review page then stop any further
@@ -51,58 +50,35 @@ var result = {
                 /* Remove picked class from everything else*/
                 draggables[i].classList.remove('picked');
             }
-            return event.currentTarget;
+            return event.currentTarget.innerHTML;
         }
         this.questionRendered = function questionRendered() {
             var self = this;
-	          var picked = {};
             var LastItemClicked = '';
             self.LastItemClicked = LastItemClicked;
             var draggables = this.componentContainer.querySelectorAll('.draggable');
             var i;
             for (i = 0; i < draggables.length; i++) {
-                /* Optionsaftertext reference is to stop the listener being applied twice */
+                // If singleuse is set some fields may be hidden .
+               draggables[i].classList.remove('hide');
+              /* Optionsaftertext reference is to stop the listener being applied twice */
                 if (draggables[i].id && !this.question.optionsaftertext) {
                     draggables[i].addEventListener('click', function() {
-                     picked  = pickAnswerOption(draggables, event);
-                     self.LastItemClicked = picked.innerHTML;
+                        self.LastItemClicked = pickAnswerOption(draggables, event);
                     });
                 }
             }
             var droptargets = this.componentContainer.querySelectorAll('.droptarget');
             for (i = 0; i < droptargets.length; i++) {
-                       /* Paste text from last click into the droptarger */
-                       droptargets[i].addEventListener('click', function(event) {
+                    /* Paste text from last click into the droptarger */
+                    droptargets[i].addEventListener('click', function(event) {
                         event.currentTarget.value = self.LastItemClicked;
-                        hideDropped(draggables, event);
-                   })
+                    });
                     /* Clear contents on double click */
                     droptargets[i].addEventListener('dblclick', function(event) {
-                       // event.currentTarget.value = '';
-                          showCleared(draggables,event);
-                    })
+                        event.currentTarget.value = '';
+                    });
             }
-        };
-        function hideDropped(draggables, event) {
-          for (i = 0; i < draggables.length; i++) {
-            if (draggables[i].innerHTML == event.currentTarget.value) {
-              draggables[i].style.display = "none";
-            } else {
-              draggables[i].style.display = "inline-block";
-            }
-          }
-        };
-
-        function showCleared(draggables, event) {
-          debugger;
-          for (i = 0; i < draggables.length; i++) {
-            if(draggables[i].innerHTML == event.target.value){
-              draggables[i].style.display = "inline-block";
-              draggables[i].classList.remove('picked');
-            }
-          }
-          event.currentTarget.value = '';
-
         };
 
         if (!this.question) {
@@ -151,10 +127,6 @@ var result = {
             this.logger.warn('Aborting because of an error parsing question.', this.question.name);
             return this.CoreQuestionHelperProvider.showComponentError(this.onAbort);
         }
-
-        // @codingStandardsIgnoreStart
-        // see MDL-64516
-        // Wait for the DOM to be rendered.
         setTimeout(()=> {
             /* Set isdragdrop to true if it is a dragdrop question. This will then be used
             * in template.html to determine when to show the  blue "tap to select..." prompt
@@ -166,11 +138,7 @@ var result = {
                 this.question.optionsaftertext = true;
             }
 
-            if (div.querySelector('#gapfill_singleuse') !== null) {
-                this.question.singleuse = true;
-            }
         });
-        // @codingStandardsIgnoreEnd
         return true;
     }
 };

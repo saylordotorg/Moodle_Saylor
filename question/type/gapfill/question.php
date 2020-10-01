@@ -403,10 +403,10 @@ class qtype_gapfill_question extends question_graded_automatically_with_countbac
      * Communicate with the dragdrop.js script
      * tell it if singleuse of draggables is
      * enabled
-     *
+     * @param int $singleuse
      * @return void
      */
-    public function initjs(?int $singleuse = 0) {
+    public function initjs($singleuse = 0) {
         global $PAGE;
         $PAGE->requires->js_call_amd('qtype_gapfill/dragdrop', 'init', ['singleuse' => $singleuse ?? 0]);
     }

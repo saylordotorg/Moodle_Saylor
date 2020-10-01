@@ -86,6 +86,7 @@ $string['basicltifieldset'] = 'Custom example fieldset';
 $string['basicltiintro'] = 'Activity description';
 $string['basicltiname'] = 'Activity name';
 $string['basicltisettings'] = 'Basic Learning Tool Interoperability (LTI) settings';
+$string['cachedef_keyset'] = 'Caches the keyset information of tools';
 $string['cancel'] = 'Cancel';
 $string['cancelled'] = 'Cancelled';
 $string['cannot_delete'] = 'You may not delete this tool configuration.';
@@ -210,7 +211,7 @@ In addition, all web service requests from the tool provider will use SSL.
 
 If using this option, confirm that this Moodle site and the tool provider support SSL.';
 $string['generaltool'] = 'General tool';
-$string['global_tool_types'] = 'Global preconfigured tools';
+$string['global_tool_types'] = 'Preconfigured tools';
 $string['grading'] = 'Grade routing';
 $string['icon_url'] = 'Icon URL';
 $string['icon_url_help'] = 'The icon URL allows the icon that shows up in the course listing for this activity to be modified. Instead of using the default
@@ -230,6 +231,10 @@ $string['initiatelogin'] = 'Initiate login URL';
 $string['initiatelogin_help'] = 'The tool URL to which requests for initiating a login are to be sent.  This URL is required before a message can be successfully sent to the tool.';
 $string['invalidid'] = 'LTI ID was incorrect';
 $string['jwtsecurity'] = 'LTI 1.3';
+$string['keytype'] = 'Public key type';
+$string['keytype_help'] = 'The authentication method used to validate the tool.';
+$string['keytype_keyset'] = 'Keyset URL';
+$string['keytype_rsa'] = 'RSA key';
 $string['launch_in_moodle'] = 'Launch tool in Moodle';
 $string['launch_in_popup'] = 'Launch tool in a pop-up';
 $string['launch_url'] = 'Tool URL';
@@ -254,8 +259,10 @@ real estate to the tool, and others provide a more integrated feel with the Mood
 $string['launchoptions'] = 'Launch options';
 $string['leaveblank'] = 'Leave blank if you do not need them';
 $string['lti'] = 'LTI';
-$string['lti:addinstance'] = 'Add a new external tool';
 $string['lti:addcoursetool'] = 'Add course-specific tool configurations';
+$string['lti:addmanualinstance'] = 'Add a manually-configured tool';
+$string['lti:addinstance'] = 'Add a new external tool';
+$string['lti:addpreconfiguredinstance'] = 'Add a preconfigured tool';
 $string['lti:grade'] = 'View grades returned by the external tool';
 $string['lti:manage'] = 'Be an Instructor when the tool is launched';
 $string['lti:admin'] = 'Be an administrator when the tool is launched';
@@ -328,10 +335,14 @@ $string['oauthsecurity'] = 'LTI 1.0/1.1';
 $string['optionalsettings'] = 'Optional settings';
 $string['organization'] = 'Organisation details';
 $string['organizationdescr'] = 'Organisation description';
-$string['organizationid'] = 'Organisation ID';
-$string['organizationid_help'] = 'A unique identifier for this Moodle instance. Typically, the DNS name of the organisation is used.
+$string['organizationid_default'] = 'Default organisation ID';
+$string['siteid'] = 'Site ID';
+$string['sitehost'] = 'Site hostname';
+$string['organizationid_default_help'] = 'The default value to use for Organisation ID. Site ID identifies this installation of Moodle.';
+$string['organizationidguid'] = 'Organisation ID';
+$string['organizationidguid_help'] = 'A unique identifier for this Moodle instance passed to the tool as the Platform Instance GUID.
 
-If this field is left blank, the host name of this Moodle site will be used as the default value.';
+If this field is left blank, the default value will be used.';
 $string['organizationurl'] = 'Organisation URL';
 $string['organizationurl_help'] = 'The base URL of this Moodle instance.
 
@@ -392,6 +403,8 @@ $string['privacy:metadata:userid'] = 'The ID of the user accessing the LTI Consu
 $string['privacy:metadata:useridnumber'] = 'The ID number of the user accessing the LTI Consumer';
 $string['privacy:metadata:username'] = 'The username of the user accessing the LTI Consumer';
 $string['publickey'] = 'Public key';
+$string['publickeyset'] = 'Public keyset';
+$string['publickeyset_help'] = 'Public keyset from where this site will retrieve the tool\'s public key to allow signatures of incoming messages and service requests to be verified.';
 $string['publickey_help'] = 'The public key (in PEM format) provided by the tool to allow signatures of incoming messages and service requests to be verified.';
 $string['quickgrade'] = 'Allow quick grading';
 $string['quickgrade_help'] = 'If enabled, multiple tools can be graded on one page. Add grades and comments then click the "Save all my feedback" button to save all changes for that page.';
@@ -574,3 +587,9 @@ $string['using_tool_cartridge'] = 'Using tool cartridge';
 $string['using_tool_configuration'] = 'Using tool configuration: ';
 $string['validurl'] = 'A valid URL must start with http(s)://';
 $string['viewsubmissions'] = 'View submissions and grading screen';
+
+// Deprecated since Moodle 3.9.
+$string['organizationid'] = 'Organisation ID';
+$string['organizationid_help'] = 'A unique identifier for this Moodle instance. Typically, the DNS name of the organisation is used.
+
+If this field is left blank, the host name of this Moodle site will be used as the default value.';

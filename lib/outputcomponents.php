@@ -2769,6 +2769,8 @@ class html_table {
      * The "summary" attribute on the "table" element is not supported in HTML5.
      * Consider describing the structure of the table in a "caption" element or in a "figure" element containing the table;
      * or, simplify the structure of the table so that no description is needed.
+     *
+     * @deprecated since Moodle 3.9.
      */
     public $summary;
 
@@ -3089,6 +3091,7 @@ class paging_bar implements renderable, templatable {
         $data->label = get_string('page');
         $data->pages = [];
         $data->haspages = $this->totalcount > $this->perpage;
+        $data->pagesize = $this->perpage;
 
         if (!$data->haspages) {
             return $data;
@@ -4680,6 +4683,12 @@ class action_menu_link extends action_link implements renderable {
     public $actionmenu = null;
 
     /**
+     * The number of instances of this action menu link (and its subclasses).
+     * @var int
+     */
+    protected static $instance = 1;
+
+    /**
      * Constructs the object.
      *
      * @param moodle_url $url The URL for the action.
@@ -4702,10 +4711,8 @@ class action_menu_link extends action_link implements renderable {
      * @return stdClass
      */
     public function export_for_template(renderer_base $output) {
-        static $instance = 1;
-
         $data = parent::export_for_template($output);
-        $data->instance = $instance++;
+        $data->instance = self::$instance++;
 
         // Ignore what the parent did with the attributes, except for ID and class.
         $data->attributes = [];

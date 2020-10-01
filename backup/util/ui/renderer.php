@@ -216,7 +216,7 @@ class core_backup_renderer extends plugin_renderer_base {
             $html .= html_writer::end_tag('div');
         }
 
-        $html .= $this->output->single_button($nextstageurl, get_string('continue'), 'post');
+        $html .= $this->continue_button($nextstageurl, 'post');
         $html .= html_writer::end_tag('div');
 
         return $html;
@@ -242,7 +242,7 @@ class core_backup_renderer extends plugin_renderer_base {
             get_string('backuptype', 'backup'),
             get_string('backuptype'.$details['type'], 'backup'));
         $html .= html_writer::end_tag('div');
-        $html .= $this->output->single_button($nextstageurl, get_string('continue'), 'post');
+        $html .= $this->continue_button($nextstageurl, 'post');
         $html .= html_writer::end_tag('div');
 
         return $html;
@@ -259,7 +259,7 @@ class core_backup_renderer extends plugin_renderer_base {
         $html  = html_writer::start_div('unknownformat');
         $html .= $this->output->heading(get_string('errorinvalidformat', 'backup'), 2);
         $html .= $this->output->notification(get_string('errorinvalidformatinfo', 'backup'), 'notifyproblem');
-        $html .= $this->output->single_button($nextstageurl, get_string('continue'), 'post');
+        $html .= $this->continue_button($nextstageurl, 'post');
         $html .= html_writer::end_div();
 
         return $html;
@@ -277,7 +277,7 @@ class core_backup_renderer extends plugin_renderer_base {
      */
     public function course_selector(moodle_url $nextstageurl, $wholecourse = true, restore_category_search $categories = null,
                                     restore_course_search $courses = null, $currentcourse = null) {
-        global $CFG, $PAGE;
+        global $CFG;
         require_once($CFG->dirroot.'/course/lib.php');
 
         // These variables are used to check if the form using this function was submitted.
@@ -572,11 +572,15 @@ class core_backup_renderer extends plugin_renderer_base {
      * @param string $backupid The backup record id.
      * @return string|boolean $status The status indicator for the operation.
      */
-    public function get_status_display($statuscode, $backupid) {
-        if ($statuscode == backup::STATUS_AWAITING || $statuscode == backup::STATUS_EXECUTING) {  // Inprogress.
+    public function get_status_display($statuscode, $backupid, $restoreid=null, $operation='backup') {
+        if ($statuscode == backup::STATUS_AWAITING
+            || $statuscode == backup::STATUS_EXECUTING
+            || $statuscode == backup::STATUS_REQUIRE_CONV) {  // In progress.
             $progresssetup = array(
-                    'backupid' => $backupid,
-                    'width' => '100'
+                'backupid' => $backupid,
+                'restoreid' => $restoreid,
+                'operation' => $operation,
+                'width' => '100'
             );
             $status = $this->render_from_template('core/async_backup_progress', $progresssetup);
         } else if ($statuscode == backup::STATUS_FINISHED_ERR) { // Error.
@@ -717,7 +721,7 @@ class core_backup_renderer extends plugin_renderer_base {
         $url = $component->get_url();
 
         $output = html_writer::start_tag('div', array('class' => 'restore-course-search form-inline mb-1'));
-        $output .= html_writer::start_tag('div', array('class' => 'rcs-results w-75'));
+        $output .= html_writer::start_tag('div', array('class' => 'rcs-results table-sm w-75'));
 
         $table = new html_table();
         $table->head = array('', get_string('shortnamecourse'), get_string('fullnamecourse'));
@@ -877,7 +881,7 @@ class core_backup_renderer extends plugin_renderer_base {
         $url = $component->get_url();
 
         $output = html_writer::start_tag('div', array('class' => 'restore-course-search form-inline mb-1'));
-        $output .= html_writer::start_tag('div', array('class' => 'rcs-results w-75'));
+        $output .= html_writer::start_tag('div', array('class' => 'rcs-results table-sm w-75'));
 
         $table = new html_table();
         $table->head = array('', get_string('name'), get_string('description'));
@@ -963,9 +967,53 @@ class core_backup_renderer extends plugin_renderer_base {
 
             $restorename = \async_helper::get_restore_name($context);
             $timecreated = $restore->timecreated;
-            $status = $this->get_status_display($restore->status, $restore->backupid);
+            $status = $this->get_status_display($restore->status, $restore->backupid, $restore->backupid, null, 'restore');
 
             $tablerow = array($restorename, userdate($timecreated), $status);
+            $tabledata[] = $tablerow;
+        }
+
+        $table->data = $tabledata;
+        $html = html_writer::table($table);
+
+        return $html;
+    }
+
+    /**
+     * Get markup to render table for all of a users course copies.
+     *
+     * @param int $userid The Moodle user id.
+     * @param int $courseid The id of the course to get the backups for.
+     * @return string $html The table HTML.
+     */
+    public function copy_progress_viewer(int $userid, int $courseid): string {
+        $tablehead = array(
+            get_string('copysource', 'backup'),
+            get_string('copydest', 'backup'),
+            get_string('time'),
+            get_string('copyop', 'backup'),
+            get_string('status', 'backup')
+        );
+
+        $table = new html_table();
+        $table->attributes['class'] = 'backup-files-table generaltable';
+        $table->head = $tablehead;
+
+        $tabledata = array();
+
+        // Get all in progress course copies for this user.
+        $copies = \core_backup\copy\copy::get_copies($userid, $courseid);
+
+        foreach ($copies as $copy) {
+            $sourceurl = new \moodle_url('/course/view.php', array('id' => $copy->sourceid));
+
+            $tablerow = array(
+                html_writer::link($sourceurl, $copy->source),
+                $copy->destination,
+                userdate($copy->time),
+                get_string($copy->operation),
+                $this->get_status_display($copy->status, $copy->backupid, $copy->restoreid, $copy->operation)
+            );
             $tabledata[] = $tablerow;
         }
 

@@ -145,8 +145,18 @@
 }
 
 .course-content ul.ctopics li.section .content .toggle span.the_toggle h3.sectionname,
-.course-content ul.ctopics li.section .content.sectionhidden h3.sectionname {
+.course-content ul.ctopics li.section .content .toggle span.the_toggle h3.sectionname a,
+.course-content ul.ctopics li.section .content .toggle span.the_toggle h3.sectionname a:hover,
+.course-content ul.ctopics li.section .content .toggle span.the_toggle h3.sectionname a:focus,
+.course-content ul.ctopics li.section .content.sectionhidden h3.sectionname,
+.course-content ul.ctopics li.section .content.sectionhidden h3.sectionname a,
+.course-content ul.ctopics li.section .content.sectionhidden h3.sectionname a:hover,
+.course-content ul.ctopics li.section .content.sectionhidden h3.sectionname a:focus {
     color: inherit;
+}
+
+.course-content ul.ctopics li.section .content .toggle span.the_toggle h3.sectionname,
+.course-content ul.ctopics li.section .content.sectionhidden h3.sectionname {
     margin: 4px;
 }
 
@@ -568,6 +578,10 @@ body.format-topcoll.dir-rtl .course-content ul.ctopics li.section .right {
     float: left;
 }
 
+body.format-topcoll .ctopics .mod-indent-outer {
+    width: 100% !important; /* Same as w-100 on MDL-68330. */
+}
+
 body.format-topcoll .ctopics .section .activity .mod-indent-outer,
 body.format-topcoll.editing.dir-rtl .ctopics .section .activity .mod-indent-outer {
     padding-left: 0;
@@ -776,8 +790,8 @@ body.jsenabled #toggle-all {
 
 /* Activity further information styling */
 .format-topcoll .ct-activity-meta-container {
+    margin: 0 10px 0 30px;
     padding: 5px 0 0 0;
-    margin: 0px 10px 0 30px;
 }
 
 .format-topcoll .ct-activity-due-date {

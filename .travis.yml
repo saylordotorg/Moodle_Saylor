@@ -20,7 +20,7 @@ services:
 php:
     # We only run the highest and lowest supported versions to reduce the load on travis-ci.org.
     - 7.4
-    - 7.1.30 # Make this sticky because current default version (7.1.11) has a bug with redis-extension output (MDL-66062)
+    - 7.2
 
 addons:
   postgresql: "9.6"
@@ -214,7 +214,7 @@ before_script:
         # We need the official upstream for comparison
         git remote add upstream https://github.com/moodle/moodle.git;
 
-        git fetch upstream MOODLE_38_STABLE;
+        git fetch upstream MOODLE_39_STABLE;
         export GIT_PREVIOUS_COMMIT="`git merge-base FETCH_HEAD $TRAVIS_COMMIT`";
         export GIT_COMMIT="$TRAVIS_COMMIT";
         export UPSTREAM_FETCH_HEAD=`git rev-parse FETCH_HEAD`

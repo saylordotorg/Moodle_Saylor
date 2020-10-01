@@ -253,7 +253,7 @@ function quiz_start_new_attempt($quizobj, $quba, $attempt, $attemptnumber, $time
             $forcedvariantsbyseed, $variantstrategy);
     }
 
-    $quba->start_all_questions($variantstrategy, $timenow);
+    $quba->start_all_questions($variantstrategy, $timenow, $attempt->userid);
 
     // Work out the attempt layout.
     $sections = $quizobj->get_sections();
@@ -316,7 +316,7 @@ function quiz_start_attempt_built_on_last($quba, $attempt, $lastattempt) {
 
     $oldnumberstonew = array();
     foreach ($oldquba->get_attempt_iterator() as $oldslot => $oldqa) {
-        $newslot = $quba->add_question($oldqa->get_question(), $oldqa->get_max_mark());
+        $newslot = $quba->add_question($oldqa->get_question(false), $oldqa->get_max_mark());
 
         $quba->start_question_based_on($newslot, $oldqa);
 

@@ -87,6 +87,8 @@ class core_badges_renderer extends plugin_renderer_base {
                     if (badges_open_badges_backpack_api() == OPEN_BADGES_V1) {
                         $action = new component_action('click', 'addtobackpack', array('assertion' => $assertion->out(false)));
                         $addurl = new moodle_url('#');
+                    } else if (badges_open_badges_backpack_api() == OPEN_BADGES_V2P1) {
+                        $addurl = new moodle_url('/badges/backpack-export.php', array('hash' => $badge->uniquehash));
                     } else {
                         $addurl = new moodle_url('/badges/backpack-add.php', array('hash' => $badge->uniquehash));
                     }
@@ -354,7 +356,11 @@ class core_badges_renderer extends plugin_renderer_base {
                     $this->output->add_action_handler($action, 'addbutton');
                     $output .= $tobackpack;
                 } else {
-                    $assertion = new moodle_url('/badges/backpack-add.php', array('hash' => $ibadge->hash));
+                    if (badges_open_badges_backpack_api() == OPEN_BADGES_V2P1) {
+                        $assertion = new moodle_url('/badges/backpack-export.php', array('hash' => $ibadge->hash));
+                    } else {
+                        $assertion = new moodle_url('/badges/backpack-add.php', array('hash' => $ibadge->hash));
+                    }
                     $attributes = ['class' => 'btn btn-secondary m-1', 'role' => 'button'];
                     $tobackpack = html_writer::link($assertion, get_string('addtobackpack', 'badges'), $attributes);
                     $output .= $tobackpack;
@@ -599,7 +605,7 @@ class core_badges_renderer extends plugin_renderer_base {
      * @return string
      */
     protected function render_badge_user_collection(\core_badges\output\badge_user_collection $badges) {
-        global $CFG, $USER, $SITE, $OUTPUT;
+        global $CFG, $USER, $SITE;
         $backpack = $badges->backpack;
         $mybackpack = new moodle_url('/badges/mybackpack.php');
 
@@ -645,7 +651,7 @@ class core_badges_renderer extends plugin_renderer_base {
             $externalhtml .= $this->output->heading_with_help(get_string('externalbadges', 'badges'), 'externalbadges', 'badges');
             if (!is_null($backpack)) {
                 if ($backpack->backpackid != $CFG->badges_site_backpack) {
-                    $externalhtml .= $OUTPUT->notification(get_string('backpackneedsupdate', 'badges'), 'warning');
+                    $externalhtml .= $this->output->notification(get_string('backpackneedsupdate', 'badges'), 'warning');
 
                 }
                 if ($backpack->totalcollections == 0) {
@@ -685,7 +691,7 @@ class core_badges_renderer extends plugin_renderer_base {
         $paging = new paging_bar($badges->totalcount, $badges->page, $badges->perpage, $this->page->url, 'page');
         $htmlpagingbar = $this->render($paging);
         $table = new html_table();
-        $table->attributes['class'] = 'collection';
+        $table->attributes['class'] = 'table table-bordered table-striped';
 
         $sortbyname = $this->helper_sortable_heading(get_string('name'),
                 'name', $badges->sort, $badges->dir);
@@ -743,7 +749,7 @@ class core_badges_renderer extends plugin_renderer_base {
 
         $htmlpagingbar = $this->render($paging);
         $table = new html_table();
-        $table->attributes['class'] = 'collection';
+        $table->attributes['class'] = 'table table-bordered table-striped';
 
         $sortbyname = $this->helper_sortable_heading(get_string('name'),
                 'name', $badges->sort, $badges->dir);

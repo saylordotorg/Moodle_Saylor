@@ -400,7 +400,7 @@ class page_requirements_manager {
      *
      * @return int the jsrev to use.
      */
-    protected function get_jsrev() {
+    public function get_jsrev() {
         global $CFG;
 
         if (empty($CFG->cachejs)) {
@@ -1390,6 +1390,7 @@ class page_requirements_manager {
         // First include must be to a module with no dependencies, this prevents multiple requests.
         $prefix = 'M.util.js_pending("core/first");';
         $prefix .= "require(['core/first'], function() {\n";
+        $prefix .= "require(['core/prefetch']);\n";
         $suffix = 'M.util.js_complete("core/first");';
         $suffix .= "\n});";
         $output .= html_writer::script($prefix . implode(";\n", $this->amdjscode) . $suffix);
@@ -1608,8 +1609,8 @@ class page_requirements_manager {
             $output .= html_writer::script('', $this->js_fix_url('/lib/babel-polyfill/polyfill.min.js'));
         }
 
-        // Include the MDN Polyfill.
-        $output .= html_writer::script('', $this->js_fix_url('/lib/mdn-polyfills/polyfill.js'));
+        // Include the Polyfills.
+        $output .= html_writer::script('', $this->js_fix_url('/lib/polyfills/polyfill.js'));
 
         // YUI3 JS needs to be loaded early in the body. It should be cached well by the browser.
         $output .= $this->get_yui3lib_headcode();

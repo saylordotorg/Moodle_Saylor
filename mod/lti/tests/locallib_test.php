@@ -386,6 +386,7 @@ class mod_lti_locallib_testcase extends advanced_testcase {
         $this->assertFalse(isset($params['resource_link_description']));
         $this->assertFalse(isset($params['launch_presentation_return_url']));
         $this->assertFalse(isset($params['lis_result_sourcedid']));
+        $this->assertEquals($params['tool_consumer_instance_guid'], 'www.example.com');
 
         // Custom parameters.
         $title = 'My custom title';
@@ -1077,6 +1078,8 @@ V6L11BWkpzGXSW4Hv43qa+GSYOD2QU68Mb59oSk2OB+BtOLpJofmbGEGgvmwyCI9
 MwIDAQAB
 -----END PUBLIC KEY-----';
 
+        $config->lti_keytype = LTI_RSA_KEY;
+
         $typeid = lti_add_type($type, $config);
 
         lti_verify_jwt_signature($typeid, '', 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4g' .
@@ -1084,6 +1087,46 @@ MwIDAQAB
             'S_TuYI3OG85AmiExREkrS6tDfTQ2B3WXlrr-wp5AokiRbz3_oB4OxG-W9KcEEbDRcZc0nH3L7LzYptiy1PtAylQGxHTWZXtGz4ht0bAecBgmpdgXMgu' .
             'EIcoqPJ1n3pIWk_dUZegpqx0Lka21H6XxUTxiy8OcaarA8zdnPUnV6AmNP3ecFawIFYdvJB_cm-GvpCSbr8G8y_Mllj8f4x9nBH8pQux89_6gUY618iY' .
             'v7tuPWBFfEbLxtF2pZS6YC1aSfLQxeNe8djT9YjpvRZA');
+    }
+
+    /**
+     * Test lti_verify_jwt_signature_jwk().
+     */
+    public function test_lti_verify_jwt_signature_jwk() {
+        $this->resetAfterTest();
+
+        $this->setAdminUser();
+
+        // Create a tool type, associated with that proxy.
+        $type = new stdClass();
+        $type->state = LTI_TOOL_STATE_CONFIGURED;
+        $type->name = "Test tool";
+        $type->description = "Example description";
+        $type->baseurl = $this->getExternalTestFileUrl('/test.html');
+
+        $config = new stdClass();
+        $config->lti_publickeyset = dirname(__FILE__) . '/fixtures/test_keyset';
+
+        $config->lti_keytype = LTI_JWK_KEYSET;
+
+        $typeid = lti_add_type($type, $config);
+
+        $jwt = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjU3YzExNzdkMmQ1M2EwMjFjNzM';
+        $jwt .= '3NTY0OTFjMTM3YjE3In0.eyJpc3MiOiJnclJvbkd3RTd1WjRwZ28iLCJzdWIiOiJnclJvb';
+        $jwt .= 'kd3RTd1WjRwZ28iLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0L21vb2RsZS9tb2QvbHRpL3R';
+        $jwt .= 'va2VuLnBocCIsImp0aSI6IjFlMUJPVEczVFJjbFdUem00dERsMGc9PSIsImlhdCI6MTU4M';
+        $jwt .= 'Dg1NTUwNX0.Lowhc9ovNAXRb2rkAnv1oozDXlRD54Mz2JS1i8Zx4yGWQzmXzam-La19_g0';
+        $jwt .= 'CTnwlKM6gxaInnRKFRAcwhJVcWec389liLAjMbna6d6iTWYTZr7q_4BIe3CT_oTMWASGta';
+        $jwt .= 'Paaq53ch1rO4YdueEtmtd1K47ibo4Lhu1jmP_icc3lxjfnqiv4vIYdy7W2JQEzpk1ImuQr';
+        $jwt .= 'AlO1xR3fZ6bgcJhVIaw5xoaZD3ZgEjuZOQXMkywv1bL-mL17RX336CzHd8rYZg82QXrBzb';
+        $jwt .= 'NWzAlaZxv9VSug8t6mORvM6TkYYWjqEBKemgkD5rNh1BHrPcjWP7vy2Jz7YMjLsmuvDuLK';
+        $jwt .= '_PHYIKL--s4gcXWoYmOu1vj-SgoPczTJPoiBD35hAKqVHy5ggHaYHBy95_bbcFd8H1smHw';
+        $jwt .= 'pejrAFj1QAwGyTISLzUm08oq7Ak0tSxRKKXw4lpZAka1MmYxO3tJ_3-MXw6Bwz12bNgitJ';
+        $jwt .= 'lQd6n3kkGLCJAmANeRkPsH6eZVwF0n2cjh2O1JAwyNcMD2vs4I8ftM1EqqoE2M3r6kt3AC';
+        $jwt .= 'EscmqzizI3j80USBCLUUb1UTsfJb2g7oyApJAp-13Q3InR3QyvWO8unG5VraFE7IL5I28h';
+        $jwt .= 'MkQAHuCI90DFmXB4leflAu7wNlIK_U8xkGl8X8Mnv6MWgg94Ki8jgIq_kA85JAqI';
+
+        lti_verify_jwt_signature($typeid, '', $jwt);
     }
 
     /**
@@ -1154,6 +1197,7 @@ MwIDAQAB
         $type->baseurl = $this->getExternalTestFileUrl('/test.html');
 
         $config = new stdClass();
+        $config->lti_keytype = LTI_RSA_KEY;
         $typeid = lti_add_type($type, $config);
 
         $this->expectExceptionMessage('No public key configured');
@@ -1271,6 +1315,7 @@ e+lf4s4OxQawWD79J9/5d3Ry0vbV3Am1FtGJiJvOwRsIfVChDpYStTcHTCMqtvWb
 V6L11BWkpzGXSW4Hv43qa+GSYOD2QU68Mb59oSk2OB+BtOLpJofmbGEGgvmwyCI9
 MwIDAQAB
 -----END PUBLIC KEY-----';
+        $config->lti_keytype = LTI_RSA_KEY;
 
         $typeid = lti_add_type($type, $config);
 
@@ -1382,5 +1427,144 @@ MwIDAQAB
         $this->assertEquals(json_encode(array_values($scopes)), $token->scope);
         $this->assertEquals($token->timecreated + LTI_ACCESS_TOKEN_LIFE, $token->validuntil);
         $this->assertNull($token->lastaccess);
+    }
+
+    /**
+     * Test lti_build_login_request().
+     */
+    public function test_lti_build_login_request() {
+        global $USER, $CFG;
+
+        $this->resetAfterTest();
+
+        $USER->id = 123456789;
+
+        $course   = $this->getDataGenerator()->create_course();
+        $instance = $this->getDataGenerator()->create_module('lti',
+            [
+                'course' => $course->id,
+            ]
+        );
+
+        $config = new stdClass();
+        $config->lti_clientid = 'some-client-id';
+        $config->typeid = 'some-type-id';
+        $config->lti_toolurl = 'some-lti-tool-url';
+
+        $request = lti_build_login_request($course->id, $instance->id, $instance, $config, 'basic-lti-launch-request');
+
+        $this->assertEquals($CFG->wwwroot, $request['iss']);
+        $this->assertEquals('http://some-lti-tool-url', $request['target_link_uri']);
+        $this->assertEquals(123456789, $request['login_hint']);
+        $this->assertEquals($instance->id, $request['lti_message_hint']);
+        $this->assertEquals('some-client-id', $request['client_id']);
+        $this->assertEquals('some-type-id', $request['lti_deployment_id']);
+    }
+
+    /**
+     * Test default orgid is host if not specified in config (tool installed in earlier version of Moodle).
+     */
+    public function test_lti_get_launch_data_default_organizationid_unset_usehost() {
+        global $DB;
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $config = new stdClass();
+        $config->lti_organizationid = '';
+        $course = $this->getDataGenerator()->create_course();
+        $type = $this->create_type($config);
+        $link = $this->create_instance($type, $course);
+        $launchdata = lti_get_launch_data($link);
+        $this->assertEquals($launchdata[1]['tool_consumer_instance_guid'], 'www.example.com');
+    }
+
+    /**
+     * Test default org id is set to host when config is usehost.
+     */
+    public function test_lti_get_launch_data_default_organizationid_set_usehost() {
+        global $DB;
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $config = new stdClass();
+        $config->lti_organizationid = '';
+        $config->lti_organizationid_default = LTI_DEFAULT_ORGID_SITEHOST;
+        $course = $this->getDataGenerator()->create_course();
+        $type = $this->create_type($config);
+        $link = $this->create_instance($type, $course);
+        $launchdata = lti_get_launch_data($link);
+        $this->assertEquals($launchdata[1]['tool_consumer_instance_guid'], 'www.example.com');
+    }
+
+    /**
+     * Test default org id is set to site id when config is usesiteid.
+     */
+    public function test_lti_get_launch_data_default_organizationid_set_usesiteid() {
+        global $DB;
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $config = new stdClass();
+        $config->lti_organizationid = '';
+        $config->lti_organizationid_default = LTI_DEFAULT_ORGID_SITEID;
+        $course = $this->getDataGenerator()->create_course();
+        $type = $this->create_type($config);
+        $link = $this->create_instance($type, $course);
+        $launchdata = lti_get_launch_data($link);
+        $this->assertEquals($launchdata[1]['tool_consumer_instance_guid'], md5(get_site_identifier()));
+    }
+
+    /**
+     * Test orgid can be overridden in which case default is ignored.
+     */
+    public function test_lti_get_launch_data_default_organizationid_orgid_override() {
+        global $DB;
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $config = new stdClass();
+        $config->lti_organizationid = 'overridden!';
+        $config->lti_organizationid_default = LTI_DEFAULT_ORGID_SITEID;
+        $course = $this->getDataGenerator()->create_course();
+        $type = $this->create_type($config);
+        $link = $this->create_instance($type, $course);
+        $launchdata = lti_get_launch_data($link);
+        $this->assertEquals($launchdata[1]['tool_consumer_instance_guid'], 'overridden!');
+    }
+
+    /**
+     * Create an LTI Tool.
+     *
+     * @param object $config tool config.
+     *
+     * @return object tool.
+     */
+    private function create_type(object $config) {
+        $type = new stdClass();
+        $type->state = LTI_TOOL_STATE_CONFIGURED;
+        $type->name = "Test tool";
+        $type->description = "Example description";
+        $type->clientid = "Test client ID";
+        $type->baseurl = $this->getExternalTestFileUrl('/test.html');
+
+        $configbase = new stdClass();
+        $configbase->lti_acceptgrades = LTI_SETTING_NEVER;
+        $configbase->lti_sendname = LTI_SETTING_NEVER;
+        $configbase->lti_sendemailaddr = LTI_SETTING_NEVER;
+        $mergedconfig = (object) array_merge( (array) $configbase, (array) $config);
+        $typeid = lti_add_type($type, $mergedconfig);
+        return lti_get_type($typeid);
+    }
+
+    /**
+     * Create an LTI Instance for the tool in a given course.
+     *
+     * @param object $type tool for which an instance should be added.
+     * @param object $course course where the instance should be added.
+     *
+     * @return object instance.
+     */
+    private function create_instance(object $type, object $course) {
+        $generator = $this->getDataGenerator()->get_plugin_generator('mod_lti');
+        return $generator->create_instance(array('course' => $course->id,
+                  'toolurl' => $type->baseurl,
+                  'typeid' => $type->id
+                  ), array());
     }
 }

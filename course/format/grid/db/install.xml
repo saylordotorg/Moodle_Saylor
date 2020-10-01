@@ -18,6 +18,7 @@
       </KEYS>
       <INDEXES>
         <INDEX NAME="section" UNIQUE="true" FIELDS="sectionid"/>
+        <INDEX NAME="course" UNIQUE="false" FIELDS="courseid"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="format_grid_summary" COMMENT="A table to hold a single flag on whether to show section 0 above the grid or in the grid" PREVIOUS="format_grid_icon">

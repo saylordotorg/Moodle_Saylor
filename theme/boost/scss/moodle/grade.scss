@@ -70,8 +70,6 @@
         margin-bottom: 1em;
 
         .action {
-            @extend .btn;
-            @extend .btn-lg;
             display: inline-block;
             position: relative;
             vertical-align: top;
@@ -180,10 +178,8 @@
                     padding-top: 6px;
 
                     input {
-                        font-weight: bold;
                         height: 30px;
                         line-height: 1rem;
-                        padding-left: 24px;
                     }
                 }
             }

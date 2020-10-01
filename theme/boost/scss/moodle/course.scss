@@ -1,10 +1,5 @@
 /* course.less */
 /* COURSE CONTENT */
-.section-modchooser-link img {
-    margin-right: 0.5rem;
-    width: 16px;
-    height: 16px;
-}
 
 .section_add_menus {
     text-align: right;
@@ -49,10 +44,11 @@ body:not(.editing)  .sitetopic ul.section {
     }
 }
 
-.course-content ul.section {
-    margin: $spacer;
+@include media-breakpoint-up(sm) {
+    .course-content ul.section {
+        margin: $spacer;
+    }
 }
-
 .section {
     .side {
         &.left {
@@ -93,7 +89,7 @@ body:not(.editing)  .sitetopic ul.section {
             min-height: 2em;
 
             > a {
-                display: block;
+                display: inline-block;
                 text-indent: -31px;
                 padding-left: 31px;
             }
@@ -106,7 +102,7 @@ body:not(.editing)  .sitetopic ul.section {
         }
 
         .stealth {
-            @extend .text-muted;
+            color: $text-muted;
         }
         a.stealth,
         a.stealth:hover {
@@ -121,10 +117,11 @@ body:not(.editing)  .sitetopic ul.section {
             display: block;
             height: inherit;
         }
-
-        .mod-indent-outer {
-            padding-left: 24px;
-            display: block;
+        @include media-breakpoint-up(sm) {
+            .mod-indent-outer {
+                padding-left: 24px;
+                display: block;
+            }
         }
     }
 
@@ -259,7 +256,7 @@ body:not(.editing)  .sitetopic ul.section {
 }
 
 .course-content .section-summary .section-summary-activities .activity-count {
-    @extend .text-muted;
+    color: $text-muted;
     font-size: $font-size-sm;
     margin: 3px;
     white-space: nowrap;
@@ -323,7 +320,7 @@ body:not(.editing)  .sitetopic ul.section {
     .sectionname > span,
     .content > div.summary,
     .activity .activityinstance {
-        @extend .text-muted;
+        color: $text-muted;
     }
 }
 
@@ -336,10 +333,16 @@ body:not(.editing)  .sitetopic ul.section {
     li.section {
         margin-top: $spacer;
         padding-bottom: $spacer;
+        .content {
+            margin: 0;
+            padding: 0;
+        }
 
-        .summary,
-        .content > .availabilityinfo {
-            margin-left: 25px;
+        @include media-breakpoint-up(sm) {
+            .summary,
+            .content > .availabilityinfo {
+                margin-left: 25px;
+            }
         }
 
         .left,
@@ -347,6 +350,20 @@ body:not(.editing)  .sitetopic ul.section {
             padding: 0 6px 0;
             text-align: right;
             width: auto;
+        }
+    }
+}
+
+@include media-breakpoint-down(sm) {
+    body:not(.editing) {
+        .course-content ul.topics,
+        .course-content ul.weeks {
+            li.section {
+                .left,
+                .right {
+                    display: none;
+                }
+            }
         }
     }
 }
@@ -361,6 +378,11 @@ body:not(.editing)  .sitetopic ul.section {
 
 .course-content li {
     &.section {
+        @include media-breakpoint-down(sm) {
+            ul {
+                padding-left: 0;
+            }
+        }
         ul {
             list-style: disc;
 
@@ -515,13 +537,15 @@ span.editinstructions {
     margin-left: 30px;
     font-size: $font-size-sm;
     padding: .1em .4em;
-    background-color: $state-info-bg;
-    color: $state-info-text;
     text-decoration: none;
     z-index: 9999;
+    border: $alert-border-width solid transparent;
 
-    @include box-shadow(2px 2px 5px 1px #ccc);
-    border: 1px solid $state-info-border;
+    @include alert-variant(
+        theme-color-level('info', $alert-bg-level),
+        theme-color-level('info', $alert-border-level),
+        theme-color-level('info', $alert-color-level)
+    );
 }
 
 /* Course drag and drop upload styles */
@@ -531,14 +555,15 @@ span.editinstructions {
     width: 40%;
     margin: 0 30%;
     padding: 6px;
-    border: 1px solid $state-info-border;
     text-align: center;
-    background: $state-info-bg;
-    color: $state-info-text;
     z-index: 1; // Required in order to have this above relatively positioned course content@mixin
+    border: $alert-border-width solid transparent;
 
-    @include box-shadow(2px 2px 5px 1px #ccc);
-    @include border-radius(8px);
+    @include alert-variant(
+        theme-color-level('info', $alert-bg-level),
+        theme-color-level('info', $alert-border-level),
+        theme-color-level('info', $alert-color-level)
+    );
 }
 
 .dndupload-preview {
@@ -901,11 +926,11 @@ span.editinstructions {
         }
         // The category or course is hidden.
         &[data-visible="0"] {
-            @extend .text-muted;
+            color: $text-muted;
 
             > div {
                 > a {
-                    @extend .text-muted;
+                    color: $text-muted;
                 }
 
                 .item-actions {
@@ -1034,7 +1059,7 @@ span.editinstructions {
         text-align: center;
 
         &.dimmed {
-            @extend .text-muted;
+            color: $text-muted;
             margin: 0.4rem 1rem 0.45rem;
         }
     }

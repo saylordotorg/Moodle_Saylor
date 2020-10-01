@@ -149,6 +149,18 @@ class grade_edit_tree {
                 $actionsmenu->add($icon);
             }
 
+            if ($this->element_duplicatable($element)) {
+                $duplicateparams = array();
+                $duplicateparams['id'] = $COURSE->id;
+                $duplicateparams['action'] = 'duplicate';
+                $duplicateparams['eid'] = $eid;
+                $duplicateparams['sesskey'] = sesskey();
+                $aurl = new moodle_url('index.php', $duplicateparams);
+                $duplicateicon = new pix_icon('t/copy', get_string('duplicate'));
+                $icon = new action_menu_link_secondary($aurl, $duplicateicon, get_string('duplicate'));
+                $actionsmenu->add($icon);
+            }
+
             $aurl = new moodle_url('index.php', array('id' => $COURSE->id, 'action' => 'moveselect', 'eid' => $eid, 'sesskey' => sesskey()));
             $moveaction .= $OUTPUT->action_icon($aurl, new pix_icon('t/move', get_string('move')));
         }
@@ -457,6 +469,24 @@ class grade_edit_tree {
             return true;
         }
 
+        return false;
+    }
+
+    /**
+     * Given an element of the grade tree, returns whether it is duplicatable or not (only manual grade items are duplicatable)
+     *
+     * @param array $element
+     * @return bool
+     */
+    public function element_duplicatable($element) {
+        if ($element['type'] != 'item') {
+            return false;
+        }
+
+        $gradeitem = $element['object'];
+        if ($gradeitem->itemtype != 'mod') {
+            return true;
+        }
         return false;
     }
 
@@ -840,20 +870,39 @@ class grade_edit_tree_column_select extends grade_edit_tree_column {
     }
 
     public function get_category_cell($category, $levelclass, $params) {
+        global $OUTPUT;
+
         if (empty($params['eid'])) {
             throw new Exception('Array key (eid) missing from 3rd param of grade_edit_tree_column_select::get_category_cell($category, $levelclass, $params)');
         }
-        $selectall = html_writer::link('#', get_string('all'), [
-            'data-action' => 'grade_edittree-index-bulkselect',
-            'data-checked' => true,
-        ]);
-        $selectnone = html_writer::link('#', get_string('none'), [
-            'data-action' => 'grade_edittree-index-bulkselect',
-            'data-checked' => false,
+
+        // Get toggle group for this master checkbox.
+        $togglegroup = $this->get_checkbox_togglegroup($category);
+        // Set label for this master checkbox.
+        $masterlabel = get_string('all');
+        // Use category name if available.
+        if ($category->fullname !== '?') {
+            $masterlabel = format_string($category->fullname);
+            // Limit the displayed category name to prevent the Select column from getting too wide.
+            if (core_text::strlen($masterlabel) > 20) {
+                $masterlabel = get_string('textellipsis', 'core', core_text::substr($masterlabel, 0, 12));
+            }
+        }
+        // Build the master checkbox.
+        $mastercheckbox = new \core\output\checkbox_toggleall($togglegroup, true, [
+            'id' => $togglegroup,
+            'name' => $togglegroup,
+            'value' => 1,
+            'classes' => 'itemselect ignoredirty',
+            'label' => $masterlabel,
+            // Consistent label to prevent the select column from resizing.
+            'selectall' => $masterlabel,
+            'deselectall' => $masterlabel,
+            'labelclasses' => 'm-0',
         ]);
 
         $categorycell = parent::get_category_cell($category, $levelclass, $params);
-        $categorycell->text = $selectall . ' / ' . $selectnone;
+        $categorycell->text = $OUTPUT->render($mastercheckbox);
         return $categorycell;
     }
 
@@ -864,12 +913,43 @@ class grade_edit_tree_column_select extends grade_edit_tree_column {
         $itemcell = parent::get_item_cell($item, $params);
 
         if ($params['itemtype'] != 'course' && $params['itemtype'] != 'category') {
-            $itemcell->text = '<label class="accesshide" for="select_'.$params['eid'].'">'.
-                get_string('select', 'grades', $item->itemname).'</label>
-                <input class="itemselect ignoredirty" type="checkbox" name="select_'.$params['eid'].'" id="select_'.$params['eid'].
-                '"/>';
+            global $OUTPUT;
+
+            // Fetch the grade item's category.
+            $category = grade_category::fetch(['id' => $item->categoryid]);
+            $togglegroup = $this->get_checkbox_togglegroup($category);
+
+            $checkboxid = 'select_' . $params['eid'];
+            $checkbox = new \core\output\checkbox_toggleall($togglegroup, false, [
+                'id' => $checkboxid,
+                'name' => $checkboxid,
+                'label' => get_string('select', 'grades', $item->itemname),
+                'labelclasses' => 'accesshide',
+                'classes' => 'itemselect ignoredirty',
+            ]);
+            $itemcell->text = $OUTPUT->render($checkbox);
         }
         return $itemcell;
+    }
+
+    /**
+     * Generates a toggle group name for a bulk-action checkbox based on the given grade category.
+     *
+     * @param grade_category $category The grade category.
+     * @return string
+     */
+    protected function get_checkbox_togglegroup(grade_category $category): string {
+        $levels = [];
+        $categories = explode('/', $category->path);
+        foreach ($categories as $categoryid) {
+            $level = 'category' . $categoryid;
+            if (!in_array($level, $levels)) {
+                $levels[] = 'category' . $categoryid;
+            }
+        }
+        $togglegroup = implode(' ', $levels);
+
+        return $togglegroup;
     }
 }
 

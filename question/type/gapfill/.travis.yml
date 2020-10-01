@@ -26,16 +26,15 @@ matrix:
         - MOODLE_BRANCH=master
         - DB=mysqli
 
-    - php: 7.3
-      env:
-        - MOODLE_BRANCH=MOODLE_38_STABLE
-        - DB=pgsql
-
     - php: 7.2
       env:
-        - MOODLE_BRANCH=MOODLE_37_STABLE
+        - MOODLE_BRANCH=MOODLE_39_STABLE
         - DB=mysqli
 
+    - php: 7.3
+      env:
+        - MOODLE_BRANCH=MOODLE_39_STABLE
+        - DB=pgsql
 
 before_install:
     - phpenv config-rm xdebug.ini
@@ -57,6 +56,6 @@ script:
   - moodle-plugin-ci validate
   - moodle-plugin-ci savepoints
   - moodle-plugin-ci mustache || true
-  - moodle-plugin-ci grunt || [ "$MOODLE_BRANCH" = 'master' ] || [ "$MOODLE_BRANCH" = 'MOODLE_38_STABLE' ] || [ "$MOODLE_BRANCH" = 'MOODLE_37_STABLE' ]
+  - moodle-plugin-ci grunt || [ "$CHECK_GRUNT" = 'no' ]
   - moodle-plugin-ci phpunit
   - moodle-plugin-ci behat || true # Behat seems to be broken at the moment :-(

@@ -68,7 +68,7 @@ class qtype_gapfill_renderer extends qtype_with_combined_feedback_renderer {
         $this->displayoptions = $options;
         $question = $qa->get_question();
         if (!$options->readonly) {
-            $question->initjs($question->singleuse);
+            $question->initjs((Boolean) $question->singleuse);
         }
         $this->itemsettings = json_decode($question->itemsettings);
         $seranswers = $qa->get_step(0)->get_qt_var('_allanswers');
@@ -107,9 +107,8 @@ class qtype_gapfill_renderer extends qtype_with_combined_feedback_renderer {
 
         }
 
-        $output .= "<br/>";
         if ($question->answerdisplay == 'dragdrop') {
-            $questiontext = $this->app_connect($question, $questiontext);
+            $questiontext = $this->app_connect($question, $questiontext)."</div>";
             if ($question->optionsaftertext == true) {
                 $output .= $questiontext . $answeroptions;
             } else {
@@ -290,11 +289,11 @@ class qtype_gapfill_renderer extends qtype_with_combined_feedback_renderer {
     /**
      * Get feedback for correct or incorrect response
      *
-     * @param array $settings
-     * @param boolean $correctness
+     * @param array|null $settings
+     * @param bool   $correctness
      * @return string
      */
-    protected function get_feedback(?array $settings, bool $correctness) :string {
+    protected function get_feedback($settings, bool $correctness) :string {
         if ($settings == null) {
             return "";
         }

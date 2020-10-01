@@ -22,11 +22,23 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$string['activitychoosercategory'] = 'Activity chooser';
+$string['activitychooserrecommendations'] = 'Recommended activities';
+$string['activitychoosersettings'] = 'Activity chooser settings';
+$string['activitychoosertabmode'] = 'Activity chooser tabs';
+$string['activitychoosertabmode_desc'] = "The activity chooser enables a teacher to easily select activities and resources to add to their course. This setting determines which tabs should be displayed in it. Note that the starred tab is only displayed for a user if they have starred one or more activities and the recommended tab is only displayed if a site administrator has specified some recommended activities.";
+$string['activitychoosertabmodeone'] = 'Starred, All, Activities, Resources, Recommended';
+$string['activitychoosertabmodetwo'] = 'Starred, All, Recommended';
+$string['activitychoosertabmodethree'] = 'Starred, Activities, Resources, Recommended';
 $string['aria:coursecategory'] = 'Course category';
 $string['aria:courseimage'] = 'Course image';
 $string['aria:courseshortname'] = 'Course short name';
 $string['aria:coursename'] = 'Course name';
+$string['aria:defaulttab'] = 'Default activities';
 $string['aria:favourite'] = 'Course is starred';
+$string['aria:favouritestab'] = 'Starred activities';
+$string['aria:recommendedtab'] = 'Recommended activities';
+$string['aria:modulefavourite'] = 'Star {$a} activity';
 $string['coursealreadyfinished'] = 'Course already finished';
 $string['coursenotyetstarted'] = 'The course has not yet started';
 $string['coursenotyetfinished'] = 'The course has not yet finished';
@@ -42,28 +54,32 @@ $string['customfieldsettings'] = 'Common course custom fields settings';
 $string['errorendbeforestart'] = 'The end date ({$a}) is before the course start date.';
 $string['favourite'] = 'Starred course';
 $string['gradetopassnotset'] = 'This course does not have a grade to pass set. It may be set in the grade item of the course (Gradebook setup).';
+$string['informationformodule'] = 'Information about the {$a} activity';
+$string['module'] = 'Activity';
 $string['nocourseactivity'] = 'Not enough course activity between the start and the end of the course';
 $string['nocourseendtime'] = 'The course does not have an end time';
 $string['nocoursesections'] = 'No course sections';
 $string['nocoursestudents'] = 'No students';
 $string['noaccesssincestartinfomessage'] = 'Hi {$a->userfirstname},
-
-</br><br/>A number of students in {$a->coursename} have never accessed the course.';
+<p>A number of students in {$a->coursename} have never accessed the course.</p>';
 $string['norecentaccessesinfomessage'] = 'Hi {$a->userfirstname},
-
-</br><br/>A number of students in {$a->coursename} have not accessed the course recently.';
+<p>A number of students in {$a->coursename} have not accessed the course recently.</p>';
 $string['noteachinginfomessage'] = 'Hi {$a->userfirstname},
-
-</br><br/>Courses with start dates in the next week have been identified as having no teacher or student enrolments.';
+<p>Courses with start dates in the next week have been identified as having no teacher or student enrolments.</p>';
 $string['privacy:perpage'] = 'The number of courses to show per page.';
 $string['privacy:completionpath'] = 'Course completion';
 $string['privacy:favouritespath'] = 'Course starred information';
+$string['privacy:metadata:activityfavouritessummary'] = 'The course system contains information about which items from the activity chooser have been starred by the user.';
 $string['privacy:metadata:completionsummary'] = 'The course contains completion information about the user.';
 $string['privacy:metadata:favouritessummary'] = 'The course contains information relating to the course being starred by the user.';
+$string['recommend'] = 'Recommend';
+$string['recommendcheckbox'] = 'Recommend activity: {$a}';
+$string['searchactivitiesbyname'] = 'Search for activities by name';
+$string['searchresults'] = 'Search results: {$a}';
+$string['submitsearch'] = 'Submit search';
 $string['studentsatriskincourse'] = 'Students at risk in {$a} course';
 $string['studentsatriskinfomessage'] = 'Hi {$a->userfirstname},
-
-</br><br/>Students in the {$a->coursename} course have been identified as being at risk.';
+<p>Students in the {$a->coursename} course have been identified as being at risk.</p>';
 $string['target:coursecompletion'] = 'Students at risk of not meeting the course completion conditions';
 $string['target:coursecompletion_help'] = 'This target describes whether the student is considered at risk of not meeting the course completion conditions.';
 $string['target:coursecompetencies'] = 'Students at risk of not achieving the competencies assigned to a course';

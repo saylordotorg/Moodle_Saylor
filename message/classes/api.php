@@ -1730,9 +1730,10 @@ class api {
      *
      * @param int $touserid the id of the message recipient
      * @param int|null $fromuserid the id of the message sender, null if all messages
+     * @param int|null $timecreatedto mark notifications created before this time as read
      * @return void
      */
-    public static function mark_all_notifications_as_read($touserid, $fromuserid = null) {
+    public static function mark_all_notifications_as_read($touserid, $fromuserid = null, $timecreatedto = null) {
         global $DB;
 
         $notificationsql = "SELECT n.*
@@ -1744,6 +1745,10 @@ class api {
             $notificationsql .= " AND useridfrom = ?";
             $notificationsparams[] = $fromuserid;
         }
+        if (!empty($timecreatedto)) {
+            $notificationsql .= " AND timecreated <= ?";
+            $notificationsparams[] = $timecreatedto;
+        }
 
         $notifications = $DB->get_recordset_sql($notificationsql, $notificationsparams);
         foreach ($notifications as $notification) {
@@ -1753,46 +1758,11 @@ class api {
     }
 
     /**
-     * Marks ALL messages being sent from $fromuserid to $touserid as read.
-     *
-     * Can be filtered by type.
-     *
      * @deprecated since 3.5
-     * @param int $touserid the id of the message recipient
-     * @param int $fromuserid the id of the message sender
-     * @param string $type filter the messages by type, either MESSAGE_TYPE_NOTIFICATION, MESSAGE_TYPE_MESSAGE or '' for all.
-     * @return void
      */
-    public static function mark_all_read_for_user($touserid, $fromuserid = 0, $type = '') {
-        debugging('\core_message\api::mark_all_read_for_user is deprecated. Please either use ' .
-            '\core_message\api::mark_all_notifications_read_for_user or \core_message\api::mark_all_messages_read_for_user',
-            DEBUG_DEVELOPER);
-
-        $type = strtolower($type);
-
-        $conversationid = null;
-        $ignoremessages = false;
-        if (!empty($fromuserid)) {
-            $conversationid = self::get_conversation_between_users([$touserid, $fromuserid]);
-            if (!$conversationid) { // If there is no conversation between the users then there are no messages to mark.
-                $ignoremessages = true;
-            }
-        }
-
-        if (!empty($type)) {
-            if ($type == MESSAGE_TYPE_NOTIFICATION) {
-                self::mark_all_notifications_as_read($touserid, $fromuserid);
-            } else if ($type == MESSAGE_TYPE_MESSAGE) {
-                if (!$ignoremessages) {
-                    self::mark_all_messages_as_read($touserid, $conversationid);
-                }
-            }
-        } else { // We want both.
-            self::mark_all_notifications_as_read($touserid, $fromuserid);
-            if (!$ignoremessages) {
-                self::mark_all_messages_as_read($touserid, $conversationid);
-            }
-        }
+    public static function mark_all_read_for_user() {
+        throw new \coding_exception('\core_message\api::mark_all_read_for_user has been removed. Please either use ' .
+            '\core_message\api::mark_all_notifications_as_read or \core_message\api::mark_all_messages_as_read');
     }
 
     /**
@@ -2644,7 +2614,7 @@ class api {
      * @return \stdClass the request
      */
     public static function create_contact_request(int $userid, int $requesteduserid) : \stdClass {
-        global $DB, $PAGE;
+        global $DB, $PAGE, $SITE;
 
         $request = new \stdClass();
         $request->userid = $userid;
@@ -2657,12 +2627,17 @@ class api {
         $userfrom = \core_user::get_user($userid);
         $userfromfullname = fullname($userfrom);
         $userto = \core_user::get_user($requesteduserid);
-        $url = new \moodle_url('/message/pendingcontactrequests.php');
+        $url = new \moodle_url('/message/index.php', ['view' => 'contactrequests']);
 
-        $subject = get_string_manager()->get_string('messagecontactrequestsnotificationsubject', 'core_message', $userfromfullname,
-            $userto->lang);
-        $fullmessage = get_string_manager()->get_string('messagecontactrequestsnotification', 'core_message', $userfromfullname,
-            $userto->lang);
+        $subject = get_string_manager()->get_string('messagecontactrequestsubject', 'core_message', (object) [
+            'sitename' => format_string($SITE->fullname, true, ['context' => \context_system::instance()]),
+            'user' => $userfromfullname,
+        ], $userto->lang);
+
+        $fullmessage = get_string_manager()->get_string('messagecontactrequest', 'core_message', (object) [
+            'url' => $url->out(),
+            'user' => $userfromfullname,
+        ], $userto->lang);
 
         $message = new \core\message\message();
         $message->courseid = SITEID;

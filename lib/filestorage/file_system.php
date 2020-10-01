@@ -63,7 +63,9 @@ abstract class file_system {
         } else {
             $path = $this->get_remote_path_from_storedfile($file);
         }
-        readfile_allow_large($path, $file->get_filesize());
+        if (readfile_allow_large($path, $file->get_filesize()) === false) {
+            throw new file_exception('storedfilecannotreadfile', $file->get_filename());
+        }
     }
 
     /**
@@ -431,6 +433,21 @@ abstract class file_system {
             return false;
         }
         return $image;
+    }
+
+    /**
+     * Serve file content using X-Sendfile header.
+     * Please make sure that all headers are already sent and the all
+     * access control checks passed.
+     *
+     * This alternate method to xsendfile() allows an alternate file system
+     * to use the full file metadata and avoid extra lookups.
+     *
+     * @param stored_file $file The file to send
+     * @return bool success
+     */
+    public function xsendfile_file(stored_file $file): bool {
+        return $this->xsendfile($file->get_contenthash());
     }
 
     /**

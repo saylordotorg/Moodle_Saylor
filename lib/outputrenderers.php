@@ -391,12 +391,11 @@ class renderer_base {
      * @return bool
      */
     public function should_display_main_logo($headinglevel = 1) {
-        global $PAGE;
 
         // Only render the logo if we're on the front page or login page and the we have a logo.
         $logo = $this->get_logo_url();
         if ($headinglevel == 1 && !empty($logo)) {
-            if ($PAGE->pagelayout == 'frontpage' || $PAGE->pagelayout == 'login') {
+            if ($this->page->pagelayout == 'frontpage' || $this->page->pagelayout == 'login') {
                 return true;
             }
         }
@@ -632,7 +631,7 @@ class core_renderer extends renderer_base {
      * @return string HTML fragment.
      */
     public function standard_head_html() {
-        global $CFG, $SESSION, $SITE, $PAGE;
+        global $CFG, $SESSION, $SITE;
 
         // Before we output any content, we need to ensure that certain
         // page components are set up.
@@ -728,7 +727,7 @@ class core_renderer extends renderer_base {
             $output .= "\n".$CFG->additionalhtmlhead;
         }
 
-        if ($PAGE->pagelayout == 'frontpage') {
+        if ($this->page->pagelayout == 'frontpage') {
             $summary = s(strip_tags(format_text($SITE->summary, FORMAT_HTML)));
             if (!empty($summary)) {
                 $output .= "<meta name=\"description\" content=\"$summary\" />\n";
@@ -836,6 +835,12 @@ class core_renderer extends renderer_base {
             }
         }
 
+        if (core_userfeedback::can_give_feedback()) {
+            $output .= html_writer::div(
+                $this->render_from_template('core/userfeedback_footer_link', ['url' => core_userfeedback::make_link()->out(false)])
+            );
+        }
+
         // This function is normally called from a layout.php file in {@link core_renderer::header()}
         // but some of the content won't be known until later, so we return a placeholder
         // for now. This will be replaced with the real content in {@link core_renderer::footer()}.
@@ -867,7 +872,8 @@ class core_renderer extends renderer_base {
                     html_writer::link($purgeurl, get_string('purgecaches', 'admin')) . '</div>';
         }
         if (!empty($CFG->debugvalidators)) {
-            // NOTE: this is not a nice hack, $PAGE->url is not always accurate and $FULLME neither, it is not a bug if it fails. --skodak
+            // NOTE: this is not a nice hack, $this->page->url is not always accurate and
+            // $FULLME neither, it is not a bug if it fails. --skodak.
             $output .= '<div class="validators"><ul class="list-unstyled ml-1">
               <li><a href="http://validator.w3.org/check?verbose=1&amp;ss=1&amp;uri=' . urlencode(qualified_me()) . '">Validate HTML</a></li>
               <li><a href="http://www.contentquality.com/mynewtester/cynthia.exe?rptmode=-1&amp;url1=' . urlencode(qualified_me()) . '">Section 508 Check</a></li>
@@ -1167,7 +1173,7 @@ class core_renderer extends renderer_base {
         if ($this->page->pagetype == 'site-index') {
             // Special case for site home page - please do not remove
             return '<div class="sitelink">' .
-                   '<a title="Moodle" href="http://moodle.org/">' .
+                   '<a title="Moodle" class="d-inline-block aalink" href="http://moodle.org/">' .
                    '<img src="' . $this->image_url('moodlelogo_grayhat') . '" alt="'.get_string('moodlelogo').'" /></a></div>';
 
         } else if (!empty($CFG->target_release) && $CFG->target_release != $CFG->release) {
@@ -1252,13 +1258,7 @@ class core_renderer extends renderer_base {
      * Start output by sending the HTTP headers, and printing the HTML <head>
      * and the start of the <body>.
      *
-     * To control what is printed, you should set properties on $PAGE. If you
-     * are familiar with the old {@link print_header()} function from Moodle 1.9
-     * you will find that there are properties on $PAGE that correspond to most
-     * of the old parameters to could be passed to print_header.
-     *
-     * Not that, in due course, the remaining $navigation, $menu parameters here
-     * will be replaced by more properties of $PAGE, but that is still to do.
+     * To control what is printed, you should set properties on $PAGE.
      *
      * @return string HTML that you must output this, preferably immediately.
      */
@@ -1383,7 +1383,7 @@ class core_renderer extends renderer_base {
      * @return string HTML fragment
      */
     public function footer() {
-        global $CFG, $DB, $PAGE;
+        global $CFG, $DB;
 
         // Give plugins an opportunity to touch the page before JS is finalized.
         $pluginswithfunction = get_plugins_with_function('before_footer', 'lib.php');
@@ -1416,11 +1416,12 @@ class core_renderer extends renderer_base {
         }
         $footer = str_replace($this->unique_performance_info_token, $performanceinfo, $footer);
 
-        // Only show notifications when we have a $PAGE context id.
-        if (!empty($PAGE->context->id)) {
+        // Only show notifications when the current page has a context id.
+        if (!empty($this->page->context->id)) {
             $this->page->requires->js_call_amd('core/notification', 'init', array(
-                $PAGE->context->id,
-                \core\notification::fetch_as_array($this)
+                $this->page->context->id,
+                \core\notification::fetch_as_array($this),
+                isloggedin()
             ));
         }
         $footer = str_replace($this->unique_end_html_token, $this->page->requires->get_end_code(), $footer);
@@ -1648,8 +1649,6 @@ class core_renderer extends renderer_base {
      * @return string the HTML to display
      */
     public function print_textarea($name, $id, $value, $rows, $cols) {
-        global $OUTPUT;
-
         editors_head_setup();
         $editor = editors_get_preferred_editor(FORMAT_HTML);
         $editor->set_text($value);
@@ -1663,7 +1662,7 @@ class core_renderer extends renderer_base {
             'cols' => $cols
         ];
 
-        return $OUTPUT->render_from_template('core_form/editor_textarea', $context);
+        return $this->render_from_template('core_form/editor_textarea', $context);
     }
 
     /**
@@ -1687,6 +1686,26 @@ class core_renderer extends renderer_base {
         $context = $menu->export_for_template($this);
 
         return $this->render_from_template('core/action_menu', $context);
+    }
+
+    /**
+     * Renders a Check API result
+     *
+     * @param result $result
+     * @return string HTML fragment
+     */
+    protected function render_check_result(core\check\result $result) {
+        return $this->render_from_template($result->get_template_name(), $result->export_for_template($this));
+    }
+
+    /**
+     * Renders a Check API result
+     *
+     * @param result $result
+     * @return string HTML fragment
+     */
+    public function check_result(core\check\result $result) {
+        return $this->render_check_result($result);
     }
 
     /**
@@ -2135,16 +2154,15 @@ class core_renderer extends renderer_base {
      * @param string $path The page link after doc root and language, no leading slash.
      * @param string $text The text to be displayed for the link
      * @param boolean $forcepopup Whether to force a popup regardless of the value of $CFG->doctonewwindow
+     * @param array $attributes htm attributes
      * @return string
      */
-    public function doc_link($path, $text = '', $forcepopup = false) {
+    public function doc_link($path, $text = '', $forcepopup = false, array $attributes = []) {
         global $CFG;
 
         $icon = $this->pix_icon('docs', '', 'moodle', array('class'=>'iconhelp icon-pre', 'role'=>'presentation'));
 
-        $url = new moodle_url(get_docs_url($path));
-
-        $attributes = array('href'=>$url);
+        $attributes['href'] = new moodle_url(get_docs_url($path));
         if (!empty($CFG->doctonewwindow) || $forcepopup) {
             $attributes['class'] = 'helplinkpopup';
         }
@@ -2161,7 +2179,7 @@ class core_renderer extends renderer_base {
      * @param string $pix short pix name
      * @param string $alt mandatory alt attribute
      * @param string $component standard compoennt name like 'moodle', 'mod_forum', etc.
-     * @param array $attributes htm lattributes
+     * @param array $attributes htm attributes
      * @return string HTML fragment
      */
     public function image_icon($pix, $alt, $component='moodle', array $attributes = null) {
@@ -2560,7 +2578,7 @@ class core_renderer extends renderer_base {
             $url = new moodle_url('/user/view.php', array('id' => $user->id, 'course' => $courseid));
         }
 
-        $attributes = array('href'=>$url);
+        $attributes = array('href' => $url, 'class' => 'd-inline-block aabtn');
         if (!$userpicture->visibletoscreenreaders) {
             $attributes['tabindex'] = '-1';
             $attributes['aria-hidden'] = 'true';
@@ -2615,7 +2633,7 @@ class core_renderer extends renderer_base {
      *       client_id=>uniqid(),
      *       acepted_types=>'*',
      *       return_types=>FILE_INTERNAL,
-     *       context=>$PAGE->context
+     *       context=>current page context
      * @return string HTML fragment
      */
     public function file_picker($options) {
@@ -2630,7 +2648,6 @@ class core_renderer extends renderer_base {
      * @return string
      */
     public function render_file_picker(file_picker $fp) {
-        global $CFG, $OUTPUT, $USER;
         $options = $fp->options;
         $client_id = $options->client_id;
         $strsaved = get_string('filesaved', 'repository');
@@ -2638,7 +2655,7 @@ class core_renderer extends renderer_base {
         $strloading  = get_string('loading', 'repository');
         $strdndenabled = get_string('dndenabled_inbox', 'moodle');
         $strdroptoupload = get_string('droptoupload', 'moodle');
-        $icon_progress = $OUTPUT->pix_icon('i/loading_small', $strloading).'';
+        $iconprogress = $this->pix_icon('i/loading_small', $strloading).'';
 
         $currentfile = $options->currentfile;
         if (empty($currentfile)) {
@@ -2663,7 +2680,7 @@ class core_renderer extends renderer_base {
         }
         $html = <<<EOD
 <div class="filemanager-loading mdl-align" id='filepicker-loading-{$client_id}'>
-$icon_progress
+$iconprogress
 </div>
 <div id="filepicker-wrapper-{$client_id}" class="mdl-left w-100" style="display:none">
     <div>
@@ -3450,6 +3467,35 @@ EOD;
             $this->render($am),
             $usermenuclasses
         );
+    }
+
+    /**
+     * Secure layout login info.
+     *
+     * @return string
+     */
+    public function secure_layout_login_info() {
+        if (get_config('core', 'logininfoinsecurelayout')) {
+            return $this->login_info(false);
+        } else {
+            return '';
+        }
+    }
+
+    /**
+     * Returns the language menu in the secure layout.
+     *
+     * No custom menu items are passed though, such that it will render only the language selection.
+     *
+     * @return string
+     */
+    public function secure_layout_language_menu() {
+        if (get_config('core', 'langmenuinsecurelayout')) {
+            $custommenu = new custom_menu('', current_language());
+            return $this->render_custom_menu($custommenu);
+        } else {
+            return '';
+        }
     }
 
     /**
@@ -4260,13 +4306,13 @@ EOD;
      * @return string HTML to display the main header.
      */
     public function full_header() {
-        global $PAGE;
 
-        if ($PAGE->include_region_main_settings_in_header_actions() && !$PAGE->blocks->is_block_present('settings')) {
+        if ($this->page->include_region_main_settings_in_header_actions() &&
+                !$this->page->blocks->is_block_present('settings')) {
             // Only include the region main settings if the page has requested it and it doesn't already have
             // the settings block on it. The region main settings are included in the settings block and
             // duplicating the content causes behat failures.
-            $PAGE->add_header_action(html_writer::div(
+            $this->page->add_header_action(html_writer::div(
                 $this->region_main_settings_menu(),
                 'd-print-none',
                 ['id' => 'region-main-settings-menu']
@@ -4276,11 +4322,11 @@ EOD;
         $header = new stdClass();
         $header->settingsmenu = $this->context_header_settings_menu();
         $header->contextheader = $this->context_header();
-        $header->hasnavbar = empty($PAGE->layout_options['nonavbar']);
+        $header->hasnavbar = empty($this->page->layout_options['nonavbar']);
         $header->navbar = $this->navbar();
         $header->pageheadingbutton = $this->page_heading_button();
         $header->courseheader = $this->course_header();
-        $header->headeractions = $PAGE->get_header_actions();
+        $header->headeractions = $this->page->get_header_actions();
         return $this->render_from_template('core/full_header', $header);
     }
 
@@ -4728,7 +4774,6 @@ EOD;
      * @return string HTML fragment
      */
     public function render_progress_bar(progress_bar $bar) {
-        global $PAGE;
         $data = $bar->export_for_template($this);
         return $this->render_from_template('core/progress_bar', $data);
     }
@@ -4764,6 +4809,41 @@ class core_renderer_cli extends core_renderer {
      */
     public function header() {
         return $this->page->heading . "\n";
+    }
+
+    /**
+     * Renders a Check API result
+     *
+     * To aid in CLI consistency this status is NOT translated and the visual
+     * width is always exactly 10 chars.
+     *
+     * @param result $result
+     * @return string HTML fragment
+     */
+    protected function render_check_result(core\check\result $result) {
+        $status = $result->get_status();
+
+        $labels = [
+            core\check\result::NA        => '      ' . cli_ansi_format('<colour:gray>' ) . ' NA ',
+            core\check\result::OK        => '      ' . cli_ansi_format('<colour:green>') . ' OK ',
+            core\check\result::INFO      => '    '   . cli_ansi_format('<colour:blue>' ) . ' INFO ',
+            core\check\result::UNKNOWN   => ' '      . cli_ansi_format('<colour:grey>' ) . ' UNKNOWN ',
+            core\check\result::WARNING   => ' '      . cli_ansi_format('<colour:black><bgcolour:yellow>') . ' WARNING ',
+            core\check\result::ERROR     => '   '    . cli_ansi_format('<bgcolour:red>') . ' ERROR ',
+            core\check\result::CRITICAL  => ''       . cli_ansi_format('<bgcolour:red>') . ' CRITICAL ',
+        ];
+        $string = $labels[$status] . cli_ansi_format('<colour:normal>');
+        return $string;
+    }
+
+    /**
+     * Renders a Check API result
+     *
+     * @param result $result
+     * @return string fragment
+     */
+    public function check_result(core\check\result $result) {
+        return $this->render_check_result($result);
     }
 
     /**

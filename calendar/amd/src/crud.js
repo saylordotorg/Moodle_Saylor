@@ -63,6 +63,7 @@ function(
      * @return {Promise}
      */
     function confirmDeletion(eventId, eventTitle, eventCount) {
+        var pendingPromise = new Pending('core_calendar/crud:confirmDeletion');
         var deleteStrings = [
             {
                 key: 'deleteevent',
@@ -96,17 +97,16 @@ function(
             });
 
 
-            deletePromise = ModalFactory.create(
-                {
-                    type: ModalFactory.types.SAVE_CANCEL
-                }
-            );
+            deletePromise = ModalFactory.create({
+                type: ModalFactory.types.SAVE_CANCEL,
+            });
         }
 
         var stringsPromise = Str.get_strings(deleteStrings);
 
         var finalPromise = $.when(stringsPromise, deletePromise)
         .then(function(strings, deleteModal) {
+            deleteModal.setRemoveOnClose(true);
             deleteModal.setTitle(strings[0]);
             deleteModal.setBody(strings[1]);
             if (!isRepeatedEvent) {
@@ -138,6 +138,11 @@ function(
             });
 
             return deleteModal;
+        })
+        .then(function(modal) {
+            pendingPromise.resolve();
+
+            return modal;
         })
         .catch(Notification.exception);
 

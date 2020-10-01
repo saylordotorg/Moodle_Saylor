@@ -204,9 +204,10 @@ class format_grid_renderer extends format_section_renderer_base {
      *
      * @param stdClass $section The course_section entry from DB
      * @param stdClass $course The course entry from DB
+     * @param int $sectionreturn The section to return to after an action
      * @return string HTML to output.
      */
-    protected function section_header_onsectionpage_topic0notattop($section, $course) {
+    protected function section_header_onsectionpage_topic0notattop($section, $course, $sectionreturn = null) {
         $o = '';
         $sectionstyle = '';
 
@@ -219,9 +220,15 @@ class format_grid_renderer extends format_section_renderer_base {
             }
         }
 
-        $o .= html_writer::start_tag('li', array('id' => 'section-'.$section->section,
-            'class' => 'section main clearfix'.$sectionstyle, 'role' => 'region',
-            'aria-label' => get_section_name($course, $section)));
+        $o .= html_writer::start_tag('li', array(
+            'id' => 'section-'.$section->section,
+            'class' => 'section main clearfix'.$sectionstyle,
+            'role' => 'region',
+            'aria-labelledby' => "sectionid-{$section->id}-title",
+            'data-sectionid' => $section->section,
+            'data-sectionreturnid' => $sectionreturn
+            )
+        );
 
         // Create a span that contains the section title to be used to create the keyboard section move menu.
         $o .= html_writer::tag('span', get_section_name($course, $section), array('class' => 'hidden sectionname'));
@@ -234,7 +241,7 @@ class format_grid_renderer extends format_section_renderer_base {
         $o .= html_writer::start_tag('div', array('class' => 'content'));
 
         $sectionname = html_writer::tag('span', $this->section_title($section, $course));
-        $o .= $this->output->heading($sectionname, 3, 'sectionname accesshide');
+        $o .= $this->output->heading($sectionname, 3, 'sectionname', "sectionid-{$section->id}-title");
 
         $o .= html_writer::start_tag('div', array('class' => 'summary'));
         $o .= $this->format_summary_text($section);
@@ -308,7 +315,7 @@ class format_grid_renderer extends format_section_renderer_base {
             // Now the list of sections..
             echo $this->start_section_list();
 
-            echo $this->section_header_onsectionpage_topic0notattop($thissection, $course);
+            echo $this->section_header_onsectionpage_topic0notattop($thissection, $course, $displaysection);
             if ($course->enablecompletion) {
                 // Show completion help icon.
                 $completioninfo = new completion_info($course);
@@ -821,6 +828,7 @@ class format_grid_renderer extends format_section_renderer_base {
                         }
                         $sectiontitleattribues['title'] = $summary;
                         $sectiontitleattribues['data-toggle'] = 'gridtooltip';
+                        $sectiontitleattribues['data-container'] = '#gridbox-'.$thissection->section;
                         $sectiontitleattribues['data-placement'] = $this->courseformat->get_set_show_section_title_summary_position();
                     }
                 }
@@ -831,6 +839,7 @@ class format_grid_renderer extends format_section_renderer_base {
                    'div' to a 'nav' tag (www.w3.org/TR/2010/WD-html5-20100624/sections.html#the-nav-element) when I'm
                    that all browsers support it against the browser requirements of Moodle. */
                 $liattributes = array(
+                    'id' => 'gridbox-'.$thissection->section,
                     'role' => 'region',
                     'aria-labelledby' => 'gridsectionname-'.$thissection->section
                 );
@@ -1078,7 +1087,9 @@ class format_grid_renderer extends format_section_renderer_base {
                 'id' => 'section-' . $section,
                 'class' => $sectionstyle,
                 'role' => 'region',
-                'aria-label' => $sectionname)
+                'aria-label' => $sectionname,
+                'data-sectionid' => $section
+                )
             );
 
             if ($editing) {

@@ -21,16 +21,22 @@
  * @copyright  2020 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-define(['jquery', 'jqueryui', 'qtype_gapfill/jquery.ui.touch-punch-improved'], function ($) {
+define(['jquery', 'jqueryui', 'qtype_gapfill/jquery.ui.touch-punch-improved'], function($) {
   return {
-    init: function (singleuse) {
-      $(".droptarget").on('dblclick', function () {
+    init: function(singleuse) {
+      $(".droptarget").on('dblclick', function() {
         if (singleuse) {
           dragShow(this);
           $(this).val("");
         }
       });
 
+    /**
+     * Reveal draggables that are not
+     * the the current one
+     *
+     * @param {*} that
+     */
       function dragShow(that) {
         var draggables = $(".draggable");
         var targetVal = $(that).val();
@@ -43,7 +49,7 @@ define(['jquery', 'jqueryui', 'qtype_gapfill/jquery.ui.touch-punch-improved'], f
         }
       }
 
-      $(".droptarget").on('keydown drop', function () {
+      $(".droptarget").on('keydown drop', function() {
         dragShow(this);
       });
 
@@ -56,7 +62,7 @@ define(['jquery', 'jqueryui', 'qtype_gapfill/jquery.ui.touch-punch-improved'], f
 
       $(".droptarget").droppable({
         hoverClass: 'active',
-        drop: function (event, ui) {
+        drop: function(event, ui) {
           if ($(ui.draggable).hasClass('readonly')) {
             return;
           }
