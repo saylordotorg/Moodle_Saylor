@@ -271,6 +271,12 @@ def plugins = [
         "url" : 'https://github.com/saylordotorg/moodle-auth_nsdc.git',
         "branch" : 'master',
         "dest" : 'auth/nsdc'
+    ],
+    [
+        "name" : 'block_sharing_cart',
+        "url" : 'https://github.com/donhinkelman/moodle-block_sharing_cart.git',
+        "branch" : 'master',
+        "dest" : 'blocks/sharing_cart'
     ]
 ]
 
