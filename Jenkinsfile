@@ -243,12 +243,6 @@ def plugins = [
         "dest" : 'blocks/configurable_reports'
     ],
     [
-        "name" : 'mod_hvp',
-        "url" : 'https://github.com/saylordotorg/moodle-mod_hvp.git',
-        "branch" : 'master',
-        "dest" : 'mod/hvp'
-    ],
-    [
         "name" : 'report_completionoverview',
         "url" : 'https://github.com/Twoscope/moodle-report_completionoverview',
         "branch" : 'master',
