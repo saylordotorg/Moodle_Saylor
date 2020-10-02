@@ -99,6 +99,12 @@ def plugins = [
         "dest" : 'question/type/jme/jsme'
     ],
     [
+        "name" : 'quiz_honestycheck',
+        "url" : 'https://github.com/moodleou/moodle-quizaccess_honestycheck.git',
+        "branch" : 'master',
+        "dest" : 'mod/quiz/accessrule/honestycheck'
+    ],
+    [
         "name" : 'qtype_algebra',
         "url" : 'https://github.com/jmvedrine/moodle-qtype_algebra.git',
         "branch" : 'master',
