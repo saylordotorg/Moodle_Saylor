@@ -123,8 +123,6 @@ class qtype_gapfill_renderer extends qtype_with_combined_feedback_renderer {
             $output .= html_writer::nonempty_tag('div', $question->get_validation_error(array('answer' => $output)),
              ['class' => 'validationerror']);
         }
-        $output .= html_writer::end_div();
-
         return $output;
     }
 

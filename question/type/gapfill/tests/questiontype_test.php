@@ -45,11 +45,11 @@ class qtype_gapfill_test extends advanced_testcase {
         'question/type/gapfill/questiontype.php',
     );
 
-    protected function setUp() {
+    protected function setUp() : void {
         $this->qtype = new qtype_gapfill();
     }
 
-    protected function tearDown() {
+    protected function tearDown() : void {
         $this->qtype = null;
     }
     /**

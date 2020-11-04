@@ -7,7 +7,7 @@ services:
 
 addons:
   firefox: "47.0.1"
-  postgresql: "9.5"
+  postgresql: "9.6"
   apt:
     packages:
       - openjdk-8-jre-headless
@@ -24,10 +24,8 @@ env:
  matrix:
   - DB=pgsql MOODLE_BRANCH=master
   - DB=mysqli MOODLE_BRANCH=master
-  - DB=pgsql MOODLE_BRANCH=MOODLE_38_STABLE
-  - DB=mysqli MOODLE_BRANCH=MOODLE_38_STABLE
-  - DB=pgsql MOODLE_BRANCH=MOODLE_37_STABLE
-  - DB=mysqli MOODLE_BRANCH=MOODLE_37_STABLE
+  - DB=pgsql MOODLE_BRANCH=MOODLE_39_STABLE
+  - DB=mysqli MOODLE_BRANCH=MOODLE_39_STABLE
 
 before_install:
   - phpenv config-rm xdebug.ini

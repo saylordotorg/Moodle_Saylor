@@ -1,3 +1,7 @@
+### Version 2.10 of the Moodle Gapfill question type Oct 2020
+Removed an end_div tag because it broke the display of blocks in quiz.
+Thanks to Eliot Hoving of the UCL University in the UK for reporting this.
+
 ### Version 2.09 of the Moodle Gapfill question type Sep 2020
 Singleuse draggbles was always on because javascript interpreted "0" as true.
 The file renderer.php now casts it to Boolean (true or false) so singleuse draggables

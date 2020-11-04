@@ -6,6 +6,7 @@ http://moodle.org/plugins/view.php?plugin=mod_checklist
 
 ==Changes==
 
+* 2020-10-17 - speed improvement when calculating user start date on the course
 * 2019-12-16 - minor improvement to error message when no checklists to export
 * 2018-05-28 - fix typo causing major problems with defining roles
 * 2018-04-02 - declare plugin stores no user data (for GDPR), this version only compatible with M3.4+
