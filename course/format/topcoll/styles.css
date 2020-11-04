@@ -145,8 +145,18 @@
 }
 
 .course-content ul.ctopics li.section .content .toggle span.the_toggle h3.sectionname,
-.course-content ul.ctopics li.section .content.sectionhidden h3.sectionname {
+.course-content ul.ctopics li.section .content .toggle span.the_toggle h3.sectionname a,
+.course-content ul.ctopics li.section .content .toggle span.the_toggle h3.sectionname a:hover,
+.course-content ul.ctopics li.section .content .toggle span.the_toggle h3.sectionname a:focus,
+.course-content ul.ctopics li.section .content.sectionhidden h3.sectionname,
+.course-content ul.ctopics li.section .content.sectionhidden h3.sectionname a,
+.course-content ul.ctopics li.section .content.sectionhidden h3.sectionname a:hover,
+.course-content ul.ctopics li.section .content.sectionhidden h3.sectionname a:focus {
     color: inherit;
+}
+
+.course-content ul.ctopics li.section .content .toggle span.the_toggle h3.sectionname,
+.course-content ul.ctopics li.section .content.sectionhidden h3.sectionname {
     margin: 4px;
 }
 
@@ -568,6 +578,10 @@ body.format-topcoll.dir-rtl .course-content ul.ctopics li.section .right {
     float: left;
 }
 
+body.format-topcoll .ctopics .mod-indent-outer {
+    width: 100% !important; /* Same as w-100 on MDL-68330. */
+}
+
 body.format-topcoll .ctopics .section .activity .mod-indent-outer,
 body.format-topcoll.editing.dir-rtl .ctopics .section .activity .mod-indent-outer {
     padding-left: 0;
@@ -772,6 +786,54 @@ body.jsenabled #toggle-all {
 
 .format-topcoll .inplaceeditable.inplaceeditingon input {
     width: auto;
+}
+
+/* Activity further information styling */
+.format-topcoll .ct-activity-meta-container {
+    margin: 0 10px 0 30px;
+    padding: 5px 0 0 0;
+}
+
+.format-topcoll .ct-activity-due-date {
+    background-color: #555;
+    border-radius: 0.5em;
+    color: #fff;
+    font-size: 0.9em;
+    font-weight: 500;
+    line-height: 3em;
+    margin: 0 10px 0 0;
+    padding: 7px;
+    white-space: nowrap;
+}
+
+.format-topcoll .ct-activity-due-date a {
+    color: #fff;
+ }
+
+.format-topcoll .ct-activity-mod-feedback {
+    padding: 5px 0;
+}
+
+.format-topcoll .ct-activity-mod-feedback .icon {
+    font-size: 1.1em;
+}
+
+.format-topcoll .ct-activity-date-overdue {
+    background-color: #ee0000;
+}
+
+.format-topcoll .ct-activity-date-submitted {
+    background-color: #00cc00;
+}
+
+.format-topcoll .ct-activity-date-nearly-due {
+    background-color: #f79100;
+}
+
+.format-topcoll .ct-activity-due-date .icon,
+.format-topcoll .ct-activity-mod-engagement .icon,
+.format-topcoll .ct-activity-mod-feedback .icon {
+    font-size: 1.1em;
 }
 
 /* Print styles. */

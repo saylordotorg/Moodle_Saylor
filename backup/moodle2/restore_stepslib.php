@@ -122,7 +122,7 @@ class restore_gradebook_structure_step extends restore_structure_step {
         }
 
         // Identify the backup we're dealing with.
-        $backuprelease = floatval($this->get_task()->get_info()->backup_release); // The major version: 2.9, 3.0, ...
+        $backuprelease = $this->get_task()->get_info()->backup_release; // The major version: 2.9, 3.0, 3.10...
         $backupbuild = 0;
         preg_match('/(\d{8})/', $this->get_task()->get_info()->moodle_release, $matches);
         if (!empty($matches[1])) {
@@ -132,7 +132,7 @@ class restore_gradebook_structure_step extends restore_structure_step {
         // On older versions the freeze value has to be converted.
         // We do this from here as it is happening right before the file is read.
         // This only targets the backup files that can contain the legacy freeze.
-        if ($backupbuild > 20150618 && ($backuprelease < 3.0 || $backupbuild < 20160527)) {
+        if ($backupbuild > 20150618 && (version_compare($backuprelease, '3.0', '<') || $backupbuild < 20160527)) {
             $this->rewrite_step_backup_file_for_legacy_freeze($fullpath);
         }
 
@@ -505,8 +505,7 @@ class restore_gradebook_structure_step extends restore_structure_step {
         $gradebookcalculationsfreeze = get_config('core', 'gradebook_calculations_freeze_' . $this->get_courseid());
         preg_match('/(\d{8})/', $this->get_task()->get_info()->moodle_release, $matches);
         $backupbuild = (int)$matches[1];
-        // The function floatval will return a float even if there is text mixed with the release number.
-        $backuprelease = floatval($this->get_task()->get_info()->backup_release);
+        $backuprelease = $this->get_task()->get_info()->backup_release; // The major version: 2.9, 3.0, 3.10...
 
         // Extra credits need adjustments only for backups made between 2.8 release (20141110) and the fix release (20150619).
         if (!$gradebookcalculationsfreeze && $backupbuild >= 20141110 && $backupbuild < 20150619) {
@@ -521,7 +520,7 @@ class restore_gradebook_structure_step extends restore_structure_step {
         // Courses from before 3.1 (20160518) may have a letter boundary problem and should be checked for this issue.
         // Backups from before and including 2.9 could have a build number that is greater than 20160518 and should
         // be checked for this problem.
-        if (!$gradebookcalculationsfreeze && ($backupbuild < 20160518 || $backuprelease <= 2.9)) {
+        if (!$gradebookcalculationsfreeze && ($backupbuild < 20160518 || version_compare($backuprelease, '2.9', '<='))) {
             require_once($CFG->libdir . '/db/upgradelib.php');
             upgrade_course_letter_boundary($this->get_courseid());
         }
@@ -3985,6 +3984,60 @@ class restore_activity_grade_history_structure_step extends restore_structure_st
 }
 
 /**
+ * This structure steps restores the content bank content
+ */
+class restore_contentbankcontent_structure_step extends restore_structure_step {
+
+    /**
+     * Define structure for content bank step
+     */
+    protected function define_structure() {
+
+        $paths = [];
+        $paths[] = new restore_path_element('contentbankcontent', '/contents/content');
+
+        return $paths;
+    }
+
+    /**
+     * Define data processed for content bank
+     *
+     * @param mixed  $data
+     */
+    public function process_contentbankcontent($data) {
+        global $DB;
+
+        $data = (object)$data;
+        $oldid = $data->id;
+
+        $params = [
+            'name'           => $data->name,
+            'contextid'      => $this->task->get_contextid(),
+            'contenttype'    => $data->contenttype,
+            'instanceid'     => $data->instanceid,
+            'timecreated'    => $data->timecreated,
+        ];
+        $exists = $DB->record_exists('contentbank_content', $params);
+        if (!$exists) {
+            $params['configdata'] = $data->configdata;
+            $params['usercreated'] = $this->get_mappingid('user', $data->usercreated);
+            $params['usermodified'] = $this->get_mappingid('user', $data->usermodified);
+            $params['timemodified'] = time();
+            $newitemid = $DB->insert_record('contentbank_content', $params);
+            $this->set_mapping('contentbank_content', $oldid, $newitemid, true);
+        }
+    }
+
+    /**
+     * Define data processed after execute for content bank
+     */
+    protected function after_execute() {
+        // Add related files.
+        $this->add_related_files('contentbank', 'public', 'contentbank_content');
+    }
+}
+
+/**
  * This structure steps restores one instance + positions of one block
  * Note: Positions corresponding to one existing context are restored
  * here, but all the ones having unknown contexts are sent to backup_ids
@@ -4577,11 +4630,11 @@ class restore_create_categories_and_questions extends restore_structure_step {
 
         // Before 3.5, question categories could be created at top level.
         // From 3.5 onwards, all question categories should be a child of a special category called the "top" category.
-        $backuprelease = floatval($this->get_task()->get_info()->backup_release);
+        $backuprelease = $this->get_task()->get_info()->backup_release; // The major version: 2.9, 3.0, 3.10...
         preg_match('/(\d{8})/', $this->get_task()->get_info()->moodle_release, $matches);
         $backupbuild = (int)$matches[1];
         $before35 = false;
-        if ($backuprelease < 3.5 || $backupbuild < 20180205) {
+        if (version_compare($backuprelease, '3.5', '<') || $backupbuild < 20180205) {
             $before35 = true;
         }
         if (empty($mapping->info->parent) && $before35) {
@@ -4649,10 +4702,28 @@ class restore_create_categories_and_questions extends restore_structure_step {
         }
 
         $userid = $this->get_mappingid('user', $data->createdby);
-        $data->createdby = $userid ? $userid : $this->task->get_userid();
+        if ($userid) {
+            // The question creator is included in the backup, so we can use their mapping id.
+            $data->createdby = $userid;
+        } else {
+            // Leave the question creator unchanged when we are restoring the same site.
+            // Otherwise use current user id.
+            if (!$this->task->is_samesite()) {
+                $data->createdby = $this->task->get_userid();
+            }
+        }
 
         $userid = $this->get_mappingid('user', $data->modifiedby);
-        $data->modifiedby = $userid ? $userid : $this->task->get_userid();
+        if ($userid) {
+            // The question modifier is included in the backup, so we can use their mapping id.
+            $data->modifiedby = $userid;
+        } else {
+            // Leave the question modifier unchanged when we are restoring the same site.
+            // Otherwise use current user id.
+            if (!$this->task->is_samesite()) {
+                $data->modifiedby = $this->task->get_userid();
+            }
+        }
 
         // With newitemid = 0, let's create the question
         if (!$questionmapping->newitemid) {
@@ -4838,11 +4909,11 @@ class restore_move_module_questions_categories extends restore_execution_step {
     protected function define_execution() {
         global $DB;
 
-        $backuprelease = floatval($this->task->get_info()->backup_release);
+        $backuprelease = $this->task->get_info()->backup_release; // The major version: 2.9, 3.0, 3.10...
         preg_match('/(\d{8})/', $this->task->get_info()->moodle_release, $matches);
         $backupbuild = (int)$matches[1];
         $after35 = false;
-        if ($backuprelease >= 3.5 && $backupbuild > 20180205) {
+        if (version_compare($backuprelease, '3.5', '>=') && $backupbuild > 20180205) {
             $after35 = true;
         }
 

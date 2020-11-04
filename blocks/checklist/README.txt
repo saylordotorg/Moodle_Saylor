@@ -5,6 +5,7 @@ http://moodle.org/plugins/view.php?plugin=mod_checklist
 
 ==Changes==
 
+* 2020-02-16 - very minor change to avoid possible rounding discrepencies in the progress bar
 * 2019-08-07 - make compatible with latest version of mod_checklist (after MySQL 8 enforced rename of grouping => groupingid)
 * 2018-04-02 - declare plugin stores no user data (for GDPR), this version only compatible with M3.4+
 * 2015-12-23 - hide block from guests / users without 'updateown' capability (and no 'viewreports' capability)

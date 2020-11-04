@@ -34,7 +34,7 @@ defined('MOODLE_INTERNAL') || die();
  */
 class qtype_ddwtos_test_helper extends question_test_helper {
     public function get_test_questions() {
-        return array('fox', 'maths', 'oddgroups');
+        return array('fox', 'maths', 'oddgroups', 'missingchoiceno', 'infinite');
     }
 
     /**
@@ -129,6 +129,31 @@ class qtype_ddwtos_test_helper extends question_test_helper {
     }
 
     /**
+     * Get data required to save a drag-drop into text question where the author
+     * missed out one of the group numbers.
+     *
+     * @return stdClass data to create a ddwtos question.
+     */
+    public function get_ddwtos_question_form_data_missingchoiceno() {
+        $fromform = new stdClass();
+
+        $fromform->name = 'Drag-drop into text question with one index missing';
+        $fromform->questiontext = ['text' => 'The [[1]] sat on the [[3]].', 'format' => FORMAT_HTML];
+        $fromform->defaultmark = 1.0;
+        $fromform->generalfeedback = array('text' => 'The right answer is: "The cat sat on the mat."', 'format' => FORMAT_HTML);
+        $fromform->choices = array(
+                array('answer' => 'cat', 'choicegroup' => '1'),
+                array('answer' => '',    'choicegroup' => '1'),
+                array('answer' => 'mat', 'choicegroup' => '1'),
+        );
+        test_question_maker::set_standard_combined_feedback_form_data($fromform);
+        $fromform->shownumcorrect = 0;
+        $fromform->penalty = 0.3333333;
+
+        return $fromform;
+    }
+
+    /**
      * @return qtype_ddwtos_question
      */
     public function make_ddwtos_question_maths() {
@@ -160,5 +185,29 @@ class qtype_ddwtos_test_helper extends question_test_helper {
         $dd->textfragments = array('7 ', ' 11 ', ' 13 ', ' 17 ', ' 19 = 3');
 
         return $dd;
+    }
+
+    /**
+     * This is a simple question with infinite mode.
+     *
+     * @return stdClass data to create a ddwtos question.
+     */
+    public function get_ddwtos_question_form_data_infinite() {
+        $fromform = new stdClass();
+
+        $fromform->name = 'Drag-and-drop infinite question';
+        $fromform->questiontext = ['text' => 'One [[1]] Two [[2]] Three [[3]]', 'format' => FORMAT_HTML];
+        $fromform->defaultmark = 1.0;
+        $fromform->generalfeedback = ['text' => 'This is general feedback', 'format' => FORMAT_HTML];
+        $fromform->choices = [
+                ['answer' => 'Option1', 'choicegroup' => '1', 'infinite' => true],
+                ['answer' => 'Option2', 'choicegroup' => '1', 'infinite' => true],
+                ['answer' => 'Option3', 'choicegroup' => '1', 'infinite' => true]
+        ];
+        test_question_maker::set_standard_combined_feedback_form_data($fromform);
+        $fromform->shownumcorrect = 0;
+        $fromform->penalty = 0.3333333;
+
+        return $fromform;
     }
 }

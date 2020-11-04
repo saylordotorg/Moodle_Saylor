@@ -144,27 +144,33 @@ class qtype_gapfill_edit_form extends question_edit_form {
         $mform->addElement('select', 'answerdisplay', get_string('answerdisplay', 'qtype_gapfill'), $answerdisplaytypes);
         $mform->addHelpButton('answerdisplay', 'answerdisplay', 'qtype_gapfill');
 
-        /* sets all gaps to the size of the largest gap, avoids giving clues to the correct answer */
+        // Sets all gaps to the size of the largest gap, avoids giving clues to the correct answer.
         $mform->addElement('advcheckbox', 'fixedgapsize', get_string('fixedgapsize', 'qtype_gapfill'));
-        $mform->setDefault('optionsaftertext', $config->fixedgapsize);
+        $mform->setDefault('fixedgapsize', $config->fixedgapsize);
         $mform->addHelpButton('fixedgapsize', 'fixedgapsize', 'qtype_gapfill');
 
-         /* put draggable answer options after the text. They don't have to be dragged as far, handy on small screens */
+         // Single use (remove draggables from list when dropped in gap).
+         $mform->addElement('advcheckbox', 'singleuse', get_string('singleuse', 'qtype_gapfill'));
+         $mform->addHelpButton('singleuse', 'singleuse', 'qtype_gapfill');
+         $mform->setDefault('singleuse', $config->singleuse);
+
+        // Put draggable answer options after the text. They don't have to be dragged as far, handy on small screens.
         $mform->addElement('advcheckbox', 'optionsaftertext', get_string('optionsaftertext', 'qtype_gapfill'));
         $mform->setDefault('optionsaftertext', $config->optionsaftertext);
         $mform->addHelpButton('optionsaftertext', 'optionsaftertext', 'qtype_gapfill');
 
-         /* use plain string matching instead of regular expressions */
+        // Use plain string matching instead of regular expressions.
         $mform->addElement('advcheckbox', 'disableregex', get_string('disableregex', 'qtype_gapfill'));
         $mform->addHelpButton('disableregex', 'disableregex', 'qtype_gapfill');
         $mform->setDefault('disableregex', $config->disableregex);
         $mform->setAdvanced('disableregex');
 
-         $mform->addElement('advcheckbox', 'letterhints', get_string('letterhints', 'qtype_gapfill'));
-         $mform->setDefault('letterhints', $config->letterhints);
-         $mform->addHelpButton('letterhints', 'letterhints', 'qtype_gapfill');
+        $mform->addElement('advcheckbox', 'letterhints', get_string('letterhints', 'qtype_gapfill'));
+        $mform->setDefault('letterhints', $config->letterhints);
+        $mform->addHelpButton('letterhints', 'letterhints', 'qtype_gapfill');
+        $mform->setAdvanced('letterhints');
 
-         /* Discards duplicates before processing answers, useful for tables with gaps like [cat|dog][cat|dog] */
+        // Discards duplicates before processing answers, useful for tables with gaps like [cat|dog][cat|dog] .
         $mform->addElement('advcheckbox', 'noduplicates', get_string('noduplicates', 'qtype_gapfill'));
         $mform->addHelpButton('noduplicates', 'noduplicates', 'qtype_gapfill');
         $mform->setAdvanced('noduplicates');
@@ -236,7 +242,7 @@ class qtype_gapfill_edit_form extends question_edit_form {
     }
 
     /**
-     * Perform any preprocessing needed on the data passed to {@link set_data()}
+     * Perform any preprocessing needed on the data passed in
      * before it is used to initialise the form.
      * @param object $question the data being passed to the form.
      * @return object $question the modified data.

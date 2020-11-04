@@ -30,3 +30,5 @@ $plugin->cron      = 0;
 $plugin->component = 'quizaccess_honestycheck';
 $plugin->maturity  = MATURITY_STABLE;
 $plugin->release   = 'v1.5 for Moodle 3.4+';
+
+$plugin->outestssufficient = true;

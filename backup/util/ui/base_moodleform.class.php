@@ -317,7 +317,7 @@ abstract class base_moodleform extends moodleform {
             $label = format_string($settingui->get_label($task), true, array('context' => $context));
             $labelicon = $settingui->get_icon();
             if (!empty($labelicon)) {
-                $label .= '&nbsp;'.$OUTPUT->render($labelicon);
+                $label .= $OUTPUT->render($labelicon);
             }
             $this->_form->addElement('static', 'static_'.$settingui->get_name(), $label, $settingui->get_static_value().$icon);
             $this->_form->addElement('html', html_writer::end_tag('div'));
@@ -402,7 +402,8 @@ abstract class base_moodleform extends moodleform {
 
         // Get list of module types on course.
         $modinfo = get_fast_modinfo($COURSE);
-        $modnames = $modinfo->get_used_module_names(true);
+        $modnames = array_map('strval', $modinfo->get_used_module_names(true));
+        core_collator::asort($modnames);
         $PAGE->requires->yui_module('moodle-backup-backupselectall', 'M.core_backup.backupselectall',
                 array($modnames));
         $PAGE->requires->strings_for_js(array('select', 'all', 'none'), 'moodle');

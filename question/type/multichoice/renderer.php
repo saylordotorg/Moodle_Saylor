@@ -88,6 +88,7 @@ abstract class qtype_multichoice_renderer_base extends qtype_with_combined_feedb
             $inputattributes['name'] = $this->get_input_name($qa, $value);
             $inputattributes['value'] = $this->get_input_value($value);
             $inputattributes['id'] = $this->get_input_id($qa, $value);
+            $inputattributes['aria-labelledby'] = $inputattributes['id'] . '_label';
             $isselected = $question->is_choice_selected($response, $value);
             if ($isselected) {
                 $inputattributes['checked'] = 'checked';
@@ -102,13 +103,16 @@ abstract class qtype_multichoice_renderer_base extends qtype_with_combined_feedb
                     'value' => 0,
                 ));
             }
+
+            $questionnumber = html_writer::span($this->number_in_style($value, $question->answernumbering), 'answernumber');
+            $answertext = $question->format_text($ans->answer, $ans->answerformat, $qa, 'question', 'answer', $ansid);
+            $questionanswer = html_writer::div($answertext, 'flex-fill ml-1');
+
             $radiobuttons[] = $hidden . html_writer::empty_tag('input', $inputattributes) .
-                    html_writer::tag('label',
-                        html_writer::span($this->number_in_style($value, $question->answernumbering), 'answernumber') .
-                        $question->make_html_inline($question->format_text(
-                                $ans->answer, $ans->answerformat,
-                                $qa, 'question', 'answer', $ansid)),
-                        array('for' => $inputattributes['id'], 'class' => 'ml-1'));
+                    html_writer::div($questionnumber . $questionanswer, 'd-flex w-100', [
+                        'id' => $inputattributes['id'] . '_label',
+                        'data-region' => 'answer-label',
+                    ]);
 
             // Param $options->suppresschoicefeedback is a hack specific to the
             // oumultiresponse question type. It would be good to refactor to
@@ -138,7 +142,9 @@ abstract class qtype_multichoice_renderer_base extends qtype_with_combined_feedb
                 array('class' => 'qtext'));
 
         $result .= html_writer::start_tag('div', array('class' => 'ablock'));
-        $result .= html_writer::tag('div', $this->prompt(), array('class' => 'prompt'));
+        if ($question->showstandardinstruction == 1) {
+            $result .= html_writer::tag('div', $this->prompt(), array('class' => 'prompt'));
+        }
 
         $result .= html_writer::start_tag('div', array('class' => 'answer'));
         foreach ($radiobuttons as $key => $radio) {
@@ -147,6 +153,9 @@ abstract class qtype_multichoice_renderer_base extends qtype_with_combined_feedb
         }
         $result .= html_writer::end_tag('div'); // Answer.
 
+        // Load JS module for the question answers.
+        $this->page->requires->js_call_amd('qtype_multichoice/answers', 'init',
+            [$qa->get_outer_question_div_unique_id()]);
         $result .= $this->after_choices($qa, $options);
 
         $result .= html_writer::end_tag('div'); // Ablock.
@@ -274,7 +283,6 @@ class qtype_multichoice_single_renderer extends qtype_multichoice_renderer_base 
 
         $question = $qa->get_question();
         $response = $question->get_response($qa);
-        $clearchoicefieldname = $qa->get_qt_field_name('clearchoice');
         $hascheckedchoice = false;
         foreach ($question->get_order($qa) as $value => $ansid) {
             if ($question->is_choice_selected($response, $value)) {
@@ -283,26 +291,43 @@ class qtype_multichoice_single_renderer extends qtype_multichoice_renderer_base 
             }
         }
 
-        $questiondivid = $qa->get_outer_question_div_unique_id();
+        $clearchoiceid = $this->get_input_id($qa, -1);
+        $clearchoicefieldname = $qa->get_qt_field_name('clearchoice');
+        $clearchoiceradioattrs = [
+            'type' => $this->get_input_type(),
+            'name' => $qa->get_qt_field_name('answer'),
+            'id' => $clearchoiceid,
+            'value' => -1,
+            'class' => 'sr-only',
+            'aria-hidden' => 'true'
+        ];
+        $clearchoicewrapperattrs = [
+            'id' => $clearchoicefieldname,
+            'class' => 'qtype_multichoice_clearchoice',
+        ];
 
         // When no choice selected during rendering, then hide the clear choice option.
-        $csshidden = '';
+        // We are using .sr-only and aria-hidden together so while the element is hidden
+        // from both the monitor and the screen-reader, it is still tabbable.
+        $linktabindex = 0;
         if (!$hascheckedchoice && $response == -1) {
-            $csshidden = ' d-none';
+            $clearchoicewrapperattrs['class'] .= ' sr-only';
+            $clearchoicewrapperattrs['aria-hidden'] = 'true';
+            $clearchoiceradioattrs['checked'] = 'checked';
+            $linktabindex = -1;
         }
+        // Adds an hidden radio that will be checked to give the impression the choice has been cleared.
+        $clearchoiceradio = html_writer::empty_tag('input', $clearchoiceradioattrs);
+        $clearchoice = html_writer::link('#', get_string('clearchoice', 'qtype_multichoice'),
+            ['tabindex' => $linktabindex, 'role' => 'button', 'class' => 'btn btn-link ml-3 mt-n1 mb-n1']);
+        $clearchoiceradio .= html_writer::label($clearchoice, $clearchoiceid);
 
-        $clearchoicelink = html_writer::link('', get_string('clearchoice', 'qtype_multichoice'), [
-            'class' => $csshidden,
-            'role' => 'button',
-            'data-action' => 'clearresults',
-            'data-target' => '#' . $questiondivid
-        ]);
-        $result = html_writer::tag('div', $clearchoicelink, ['id' => $clearchoicefieldname,
-            'class' => 'qtype_multichoice_clearchoice']);
+        // Now wrap the radio and label inside a div.
+        $result = html_writer::tag('div', $clearchoiceradio, $clearchoicewrapperattrs);
 
         // Load required clearchoice AMD module.
         $this->page->requires->js_call_amd('qtype_multichoice/clearchoice', 'init',
-            [$questiondivid]);
+            [$qa->get_outer_question_div_unique_id(), $clearchoicefieldname]);
 
         return $result;
     }

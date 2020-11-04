@@ -26,24 +26,21 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$string['alttext'] = 'Image alt text';
+$string['alttext_help'] = 'This text will be set as the image alt attribute';
 $string['display_summary'] = 'Move out of grid';
 $string['display_summary_alt'] = 'Move this section out of the grid';
 $string['editimage'] = 'Change image';
 $string['editimage_alt'] = 'Set or change image';
-$string['formatgrid'] = 'Grid format'; // Name to display for format.
-$string['general_information'] = 'General Information';  // No longer used kept for legacy versions.
 $string['hidden_topic'] = 'This section has been hidden';
 $string['hide_summary'] = 'Move section into grid';
 $string['hide_summary_alt'] = 'Move this section into the grid';
-$string['namegrid'] = 'Grid view';
-$string['title'] = 'Section title';
 $string['topic'] = 'Section';
 $string['topic0'] = 'General';
-$string['topicoutline'] = 'Section';  // No longer used kept for legacy versions.
 
 // Moodle 2.0 Enhancement - Moodle Tracker MDL-15252, MDL-21693 & MDL-22056 - http://docs.moodle.org/en/Development:Languages.
 $string['sectionname'] = 'Section';
-$string['pluginname'] = 'Grid format';
+$string['pluginname'] = 'Grid';
 $string['section0name'] = 'General';
 
 // WAI-ARIA - http://www.w3.org/TR/wai-aria/roles.
@@ -129,9 +126,6 @@ $string['defaultcurrentselectedimagecontainertextcolour'] = 'Default current sel
 $string['defaultcurrentselectedimagecontainertextcolour_desc'] = 'The default current selected image container text colour.';
 $string['defaultcurrentselectedimagecontainercolour'] = 'Default current selected image container colour';
 $string['defaultcurrentselectedimagecontainercolour_desc'] = 'The default current selected image container colour.';
-
-$string['defaultcoursedisplay'] = 'Course display default';
-$string['defaultcoursedisplay_desc'] = "Either show all the sections on a single page or section zero and the chosen section on page.";
 
 $string['defaultfitsectioncontainertowindow'] = 'Fit section container to window by default';
 $string['defaultfitsectioncontainertowindow_desc'] = 'The default setting for \'Fit section container to window\'.';

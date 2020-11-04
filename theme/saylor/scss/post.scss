@@ -387,8 +387,67 @@ fieldset#id_moodle_additional_names {
 }
 
 /** Standoutbox */
+// The standoutbox is incorporating CSS from other classes including:
+// card, text-center, border, and rounded.
+// This should make it cleaner for us to implement in resources.
+.standoutbox {
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 3rem;
+	margin-bottom: 3rem;
+	border: 1px solid $gray-300 !important;
+	text-align: center;
+	border-radius: .25rem !important;
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+	word-wrap: break-word;
+	background-color: #fff;
+	-webkit-background-clip: border-box;
+	background-clip: border-box;
+
+}
+
 // For a gray standoutbox, use the bootstrap class bg-light.
-// Blue standoutbox
+// Blue standoutbox legacy
 .standoutbox.blue {
 	background-color: $expand-light-blue-50;
 }
+// Blue standoutbox
+.standoutbox.standoutbox-blue {
+	background-color: $expand-light-blue-50;
+}
+// Gray standoutbox
+.standoutbox.standoutbox-gray {
+	background-color: $gray-100;
+}
+
+// Sizing
+// Initially, set all standoutboxes to 100% width (with margins).
+.standoutbox {
+	max-width: 100%;
+}
+
+@include media-breakpoint-up(sm) {
+	.standoutbox {
+		max-width: 90%;
+	}
+	.standoutbox.standoutbox-sm {
+		max-width: 70%;
+	}
+}
+@include media-breakpoint-up(md) {
+	.standoutbox {
+		max-width: 80%;
+	}
+	.standoutbox.standoutbox-sm {
+		max-width: 50%;
+	}
+}
+@include media-breakpoint-up(lg) {
+	.standoutbox.standoutbox-sm {
+		max-width: 40%;
+	}
+}
+@include media-breakpoint-up(xl) {}

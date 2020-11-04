@@ -59,7 +59,9 @@ var result = {
             var draggables = this.componentContainer.querySelectorAll('.draggable');
             var i;
             for (i = 0; i < draggables.length; i++) {
-                /* Optionsaftertext reference is to stop the listener being applied twice */
+                // If singleuse is set some fields may be hidden .
+               draggables[i].classList.remove('hide');
+              /* Optionsaftertext reference is to stop the listener being applied twice */
                 if (draggables[i].id && !this.question.optionsaftertext) {
                     draggables[i].addEventListener('click', function() {
                         self.LastItemClicked = pickAnswerOption(draggables, event);
@@ -125,10 +127,6 @@ var result = {
             this.logger.warn('Aborting because of an error parsing question.', this.question.name);
             return this.CoreQuestionHelperProvider.showComponentError(this.onAbort);
         }
-
-        // @codingStandardsIgnoreStart
-        // see MDL-64516
-        // Wait for the DOM to be rendered.
         setTimeout(()=> {
             /* Set isdragdrop to true if it is a dragdrop question. This will then be used
             * in template.html to determine when to show the  blue "tap to select..." prompt
@@ -141,7 +139,6 @@ var result = {
             }
 
         });
-        // @codingStandardsIgnoreEnd
         return true;
     }
 };

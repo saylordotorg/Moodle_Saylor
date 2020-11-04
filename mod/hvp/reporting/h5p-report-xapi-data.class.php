@@ -218,6 +218,11 @@ class H5PReportXAPIData {
         $additionals['target'] = $this->getObjectDefinition('target', array());
         break;
 
+      case 'long-fill-in':
+        $additionals['longfillin'] = true;
+        $additionals['extensions'] = $this->getObjectDefinition('extensions', (object)array());
+        break;
+
       default:
         $additionals['extensions'] = $this->getObjectDefinition('extensions', (object)array());
     }

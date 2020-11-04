@@ -119,5 +119,28 @@ function xmldb_format_grid_upgrade($oldversion = 0) {
         purge_all_caches();
     }
 
+    if ($oldversion < 2019111702) {
+        $table = new xmldb_table('format_grid_icon');
+
+        $field = new xmldb_field('alttext', XMLDB_TYPE_TEXT, null, null, null, null, null);
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_plugin_savepoint(true, '2019111702', 'format', 'grid');
+    }
+
+    if ($oldversion < 2020070700) {
+        $table = new xmldb_table('format_grid_icon');
+        $index = new xmldb_index('course', XMLDB_INDEX_NOTUNIQUE, array('courseid'));
+
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        upgrade_plugin_savepoint(true, '2020070700', 'format', 'grid');
+    }
+
     return true;
 }

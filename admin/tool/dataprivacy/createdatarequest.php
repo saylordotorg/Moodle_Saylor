@@ -67,8 +67,8 @@ if (!$manage && !\tool_dataprivacy\api::can_contact_dpo()) {
     redirect($returnurl, get_string('contactdpoviaprivacypolicy', 'tool_dataprivacy'), 0, \core\output\notification::NOTIFY_ERROR);
 }
 
-$mform = new tool_dataprivacy_data_request_form($url->out(false), ['manage' => !empty($manage)]);
-$mform->set_data(['type' => $requesttype]);
+$mform = new tool_dataprivacy_data_request_form($url->out(false), ['manage' => !empty($manage),
+    'persistent' => new \tool_dataprivacy\data_request(0, (object) ['type' => $requesttype])]);
 
 // Data request cancelled.
 if ($mform->is_cancelled()) {
@@ -103,7 +103,11 @@ if ($data = $mform->get_data()) {
     if ($manage) {
         $foruser = core_user::get_user($data->userid);
         $redirectmessage = get_string('datarequestcreatedforuser', 'tool_dataprivacy', fullname($foruser));
+    } else if (\tool_dataprivacy\api::is_automatic_request_approval_on($data->type)) {
+        // Let the user know that the request has been submitted and will be processed soon.
+        $redirectmessage = get_string('approvedrequestsubmitted', 'tool_dataprivacy');
     } else {
+        // Let the user know that the request has been submitted to the privacy officer.
         $redirectmessage = get_string('requestsubmitted', 'tool_dataprivacy');
     }
     redirect($returnurl, $redirectmessage);

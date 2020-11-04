@@ -10,25 +10,25 @@ matrix:
  allow_failures:
  fast_finish: true
  include:
- - php: 7.1
-   env: DB=mysqli
-   services:
-   - mysql
- - php: 7.1
-   env: DB=pgsql
-   addons:
-      postgresql: 9.4
  - php: 7.2
    env: DB=mysqli
-   services:
-   - mysql
+   services: mysql
  - php: 7.2
    env: DB=pgsql
+   services: postgresql
    addons:
-      postgresql: 9.4
+      postgresql: 9.5
+ - php: 7.3
+   env: DB=mysqli
+   services: mysql
+ - php: 7.3
+   env: DB=pgsql
+   services: postgresql
+   addons:
+      postgresql: 9.5
 env:
  global:
-  - MOODLE_BRANCH=MOODLE_38_STABLE
+  - MOODLE_BRANCH=MOODLE_39_STABLE
   - IGNORE_PATHS=amd/src/tooltip.js,test/test_image.php,upgrade/convert_legacy_image.php,yui/src/gridkeys/js/event-nav-keys-debug.js,yui/src/gridkeys/js/event-nav-keys.js,yui/src/gridkeys/scripts/backport.js,yui/gridkeys/gridkeys.js
   - IGNORE_NAMES=gf_colourpopup.php,gf_colourpopup.js
 

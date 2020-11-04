@@ -179,12 +179,13 @@ function theme_get_css_filename($themename, $globalrevision, $themerevision, $di
  * @param theme_config[] $themeconfigs An array of theme_config instances.
  * @param array          $directions   Must be a subset of ['rtl', 'ltr'].
  * @param bool           $cache        Should the generated files be stored in local cache.
+ * @return array         The built theme content in a multi-dimensional array of name => direction => content
  */
-function theme_build_css_for_themes($themeconfigs = [], $directions = ['rtl', 'ltr'], $cache = true) {
+function theme_build_css_for_themes($themeconfigs = [], $directions = ['rtl', 'ltr'], $cache = true): array {
     global $CFG;
 
     if (empty($themeconfigs)) {
-        return;
+        return [];
     }
 
     require_once("{$CFG->libdir}/csslib.php");
@@ -212,7 +213,7 @@ function theme_build_css_for_themes($themeconfigs = [], $directions = ['rtl', 'l
                 css_store_css($themeconfig, $filename, $themecss[$direction]);
             }
         }
-        $themescss[] = $themecss;
+        $themescss[$themeconfig->name] = $themecss;
 
         if ($cache) {
             // Only update the theme revision after we've successfully created the
@@ -1207,7 +1208,6 @@ class theme_config {
      * @return string CSS markup
      */
     public function get_css_content_debug($type, $subtype, $sheet) {
-
         if ($type === 'scss') {
             // The SCSS file of the theme is requested.
             $csscontent = $this->get_css_content_from_scss(true);
@@ -1428,8 +1428,19 @@ class theme_config {
         raise_memory_limit(MEMORY_EXTRA);
         core_php_time_limit::raise(300);
 
+        // TODO: MDL-62757 When changing anything in this method please do not forget to check
+        // if the validate() method in class admin_setting_configthemepreset needs updating too.
+        $cacheoptions = '';
+        if ($themedesigner) {
+            $scsscachedir = $CFG->localcachedir . '/scsscache/';
+            $cacheoptions = array(
+                  'cacheDir' => $scsscachedir,
+                  'prefix' => 'scssphp_',
+                  'forceRefresh' => false,
+            );
+        }
         // Set-up the compiler.
-        $compiler = new core_scss();
+        $compiler = new core_scss($cacheoptions);
         $compiler->prepend_raw_scss($this->get_pre_scss_code());
         if (is_string($scss)) {
             $compiler->set_file($scss);
@@ -1504,7 +1515,7 @@ class theme_config {
      *
      * @return string The SCSS code to inject.
      */
-    protected function get_extra_scss_code() {
+    public function get_extra_scss_code() {
         $content = '';
 
         // Getting all the candidate functions.
@@ -1534,7 +1545,7 @@ class theme_config {
      *
      * @return string The SCSS code to inject.
      */
-    protected function get_pre_scss_code() {
+    public function get_pre_scss_code() {
         $content = '';
 
         // Getting all the candidate functions.

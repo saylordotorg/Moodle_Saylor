@@ -39,8 +39,10 @@ require_once($CFG->dirroot . '/question/engine/lib.php');
 class qtype_gapfill extends question_type {
 
     /**
-     * @return bool whether the quiz statistics report can analyse
+     * Whether the quiz statistics report can analyse
      * all the student responses. See questiontypebase for more
+     *
+     * @return bool
      */
     public function can_analyse_responses() {
           return false;
@@ -50,16 +52,10 @@ class qtype_gapfill extends question_type {
      * @return array
      */
     public function extra_question_fields() {
-        return array('question_gapfill', 'answerdisplay', 'delimitchars', 'casesensitive',
-            'noduplicates', 'disableregex', 'fixedgapsize', 'optionsaftertext', 'letterhints');
+        return ['question_gapfill', 'answerdisplay', 'delimitchars', 'casesensitive',
+            'noduplicates', 'disableregex', 'fixedgapsize', 'optionsaftertext', 'letterhints', 'singleuse'];
     }
 
-    /**
-     * Utility method used by {@link qtype_renderer::head_code()}
-     * It looks for any of the files script.js or script.php that
-     * exist in the plugin folder and ensures they get included.
-     * It also includes the jquery files required for this plugin
-     */
 
     /**
      * Called during question editing
@@ -184,16 +180,6 @@ class qtype_gapfill extends question_type {
         $form->defaultmark = count($gaps);
         return parent::save_question($question, $form);
     }
-    /**
-     * Communicate with the dragdrop.js script
-     *
-     * @return void
-     */
-    public function find_standard_scripts() {
-        global $PAGE;
-        parent::find_standard_scripts();
-        $PAGE->requires->js_call_amd('qtype_gapfill/dragdrop', 'init');
-    }
 
     /**
      * chop the delimit string into a two element array
@@ -279,6 +265,7 @@ class qtype_gapfill extends question_type {
             $options->fixedgapsize = '';
             $options->optionsaftertext = '';
             $options->letterhints = '';
+            $options->singleuse = '';
             $options->id = $DB->insert_record('question_gapfill', $options);
         }
 
@@ -290,6 +277,8 @@ class qtype_gapfill extends question_type {
         $options->fixedgapsize = $question->fixedgapsize;
         $options->optionsaftertext = $question->optionsaftertext;
         $options->letterhints = $question->letterhints;
+        $options->singleuse = $question->singleuse;
+
         $options = $this->save_combined_feedback_helper($options, $question, $context, true);
         $DB->update_record('question_gapfill', $options);
     }

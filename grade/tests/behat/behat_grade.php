@@ -118,6 +118,29 @@ class behat_grade extends behat_base {
     }
 
     /**
+     * Duplicates a grade item or category.
+     *
+     * Teacher must be on the grade setup page.
+     *
+     * @Given /^I duplicate the grade item "(?P<grade_item_string>(?:[^"]|\\")*)"$/
+     * @param string $gradeitem
+     */
+    public function i_duplicate_the_grade_item($gradeitem) {
+
+        $gradeitem = behat_context_helper::escape($gradeitem);
+
+        if ($this->running_javascript()) {
+            $xpath = "//tr[contains(.,$gradeitem)]//*[contains(@class,'moodle-actionmenu')]//a[contains(@class,'toggle-display')]";
+            if ($this->getSession()->getPage()->findAll('xpath', $xpath)) {
+                $this->execute("behat_general::i_click_on", array($this->escape($xpath), "xpath_element"));
+            }
+        }
+
+        $this->execute("behat_general::i_click_on_in_the", array(get_string('duplicate'), 'link',
+            "//tr[descendant::*[text() = " . $this->escape($gradeitem) . "]]", 'xpath_element'));
+    }
+
+    /**
      * Sets a calculated manual grade item. Needs a table with item name - idnumber relation.
      * The step requires you to be in the 'Gradebook setup' page.
      *
@@ -203,7 +226,7 @@ class behat_grade extends behat_base {
             $inputxpath = "//input[@class='idnumber'][" .
                     "parent::li[@class='item'][text()='" . $gradeitem . "']" .
                     " | " .
-                    "parent::li[@class='categoryitem' | @class='courseitem']" .
+                    "parent::li[@class='categoryitem' or @class='courseitem']" .
                     "/parent::ul/parent::li[starts-with(text(),'" . $gradeitem . "')]" .
                     "]";
             $this->execute('behat_forms::i_set_the_field_with_xpath_to', array($inputxpath, $idnumber));

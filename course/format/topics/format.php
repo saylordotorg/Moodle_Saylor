@@ -59,4 +59,3 @@ if (!empty($displaysection)) {
 
 // Include course format js module
 $PAGE->requires->js('/course/format/topics/format.js');
-$PAGE->requires->js_call_amd('core_course/sectionlistener');

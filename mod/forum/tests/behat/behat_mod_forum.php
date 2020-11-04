@@ -121,7 +121,7 @@ class behat_mod_forum extends behat_base {
         // Fill form and post.
         $this->execute('behat_forms::i_set_the_following_fields_to_these_values', $table);
 
-        $this->execute('behat_forms::press_button', get_string('submit', 'core'));
+        $this->execute('behat_forms::press_button', get_string('posttoforum', 'mod_forum'));
     }
 
     /**
@@ -529,6 +529,6 @@ class behat_mod_forum extends behat_base {
         global $DB;
         $post = $DB->get_record("forum_posts", array("subject" => $postsubject), 'id', MUST_EXIST);
         $url = new moodle_url('/mod/forum/post.php', ['reply' => $post->id]);
-        $this->getSession()->visit($this->locate_path($url->out_as_local_url(false)));
+        $this->execute('behat_general::i_visit', [$url]);
     }
 }

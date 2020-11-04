@@ -119,7 +119,7 @@ class block_heatmap extends block_base {
         $now = time();
 
         // Check that the course has started.
-        if ($whattoshow == 'sincestart' && $now < $COURSE->startdate) {
+        if ($activitysince == 'sincestart' && $now < $COURSE->startdate) {
             $this->content->text = get_string('notstarted', 'block_heatmap');
             return $this->content;
         }

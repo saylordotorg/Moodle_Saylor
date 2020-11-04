@@ -58,6 +58,7 @@ $outcome = new stdClass();
 $outcome->success = true;
 $outcome->response = new stdClass();
 $outcome->error = '';
+$outcome->count = 0;
 
 $searchanywhere = get_user_preferences('userselector_searchanywhere', false);
 
@@ -99,6 +100,13 @@ switch ($action) {
 
         if (empty($roleid)) {
             $roleid = null;
+        } else {
+            if (!has_capability('moodle/role:assign', $context)) {
+                throw new enrol_ajax_exception('assignnotpermitted');
+            }
+            if (!array_key_exists($roleid, get_assignable_roles($context, ROLENAME_ALIAS, false))) {
+                throw new enrol_ajax_exception('invalidrole');
+            }
         }
 
         if (empty($startdate)) {
@@ -157,14 +165,10 @@ switch ($action) {
             foreach ($users as $user) {
                 $plugin->enrol_user($instance, $user->id, $roleid, $timestart, $timeend, null, $recovergrades);
             }
-            $counter = count($users);
+            $outcome->count += count($users);
             foreach ($cohorts as $cohort) {
                 $totalenrolledusers = $plugin->enrol_cohort($instance, $cohort->id, $roleid, $timestart, $timeend, null, $recovergrades);
-                $counter += $totalenrolledusers;
-            }
-            // Display a notification message after the bulk user enrollment.
-            if ($counter > 0) {
-                \core\notification::info(get_string('totalenrolledusers', 'enrol', $counter));
+                $outcome->count += $totalenrolledusers;
             }
         } else {
             throw new enrol_ajax_exception('enrolnotpermitted');

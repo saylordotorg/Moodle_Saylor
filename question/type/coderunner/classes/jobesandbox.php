@@ -61,8 +61,16 @@ class qtype_coderunner_jobesandbox extends qtype_coderunner_sandbox {
     // refusing requests or misconfigured. The actual HTTP returncode and response
     // are left in $httpcode and $response resp.
     public function __construct() {
+        global $CFG;
         qtype_coderunner_sandbox::__construct();
-        $this->jobeserver = get_config('qtype_coderunner', 'jobe_host');
+
+        // Hack to force use of a local jobe host when behat testing.
+        if ($CFG->prefix == "bht_") {
+            $this->jobeserver = "localhost";
+        } else {
+            $this->jobeserver = get_config('qtype_coderunner', 'jobe_host');
+        }
+        
         $this->apikey = get_config('qtype_coderunner', 'jobe_apikey');
 
         list($this->httpcode, $this->response) = $this->http_request(
@@ -100,7 +108,8 @@ class qtype_coderunner_jobesandbox extends qtype_coderunner_sandbox {
      *         files (an associative array mapping filenames to string
      *         filecontents.
      *         If the $params array is null, sandbox defaults are used.
-     * @return an object with at least an attribute 'error'. This is one of the
+     * @return an object with at least the attribute 'error'.
+     *         The error attribute is one of the
      *         values 0 through 8 (OK to UNKNOWN_SERVER_ERROR) as defined in the
      *         base class. If
      *         error is 0 (OK), the returned object has additional attributes
@@ -116,6 +125,10 @@ class qtype_coderunner_jobesandbox extends qtype_coderunner_sandbox {
      *         If error is anything other than OK, the attribute stderr will
      *         contain the text of the actual HTTP response header, e.g
      *         Bad Parameter if the response was 400 Bad Parameter.
+     *         If the run was actually submitted to a jobe server, the returned
+     *         object also has an attribute 'sandboxinfo', which
+     *         is an associative array with the keys 'jobeserver' and 'jobeapikey'
+     *         showing which jobeserver was used and what key was used (if any).
      */
 
     public function execute($sourcecode, $language, $input, $files=null, $params=null) {
@@ -158,7 +171,7 @@ class qtype_coderunner_jobesandbox extends qtype_coderunner_sandbox {
         if (self::DEBUGGING) {
             $runspec['debug'] = 1;
         }
-
+        
         if ($params !== null) {
             // Process any given sandbox parameters.
             $runspec['parameters'] = $params;
@@ -172,7 +185,7 @@ class qtype_coderunner_jobesandbox extends qtype_coderunner_sandbox {
                 $this->jobeserver = $params['jobeserver'];
             }
             if (isset($params['jobeapikey'])) {
-                $this->jobeapikey = $params['jobeapikey'];
+                $this->apikey = $params['jobeapikey'];
             }
         }
 
@@ -193,15 +206,22 @@ class qtype_coderunner_jobesandbox extends qtype_coderunner_sandbox {
                 $httpcode = $this->submit($postbody);
             }
         }
+        
+        $runresult = array();
+        $runresult['sandboxinfo'] = array(
+            'jobeserver' => $this->jobeserver,
+            'jobeapikey' => $this->apikey
+        );
 
         if ($httpcode != 200   // We don't deal with Jobe servers that return 202!
                 || !is_object($this->response)  // Or any sort of broken ...
                 || !isset($this->response->outcome)) {     // ... communication with server.
             $errorcode = $httpcode == 200 ? self::UNKNOWN_SERVER_ERROR : $this->get_error_code($httpcode);
             $this->currentjobid = null;
-            return (object) array('error' => $errorcode, 'stderr' => $this->response);
+            $runresult['error'] = $errorcode;
+            $runresult['stderr'] = $this->response;
         } else if ($this->response->outcome == self::RESULT_SERVER_OVERLOAD) {
-            return (object) array('error' => self::SERVER_OVERLOAD);
+            $runresult['error'] = self::SERVER_OVERLOAD;
         } else {
             $stderr = $this->filter_file_path($this->response->stderr);
             // Any stderr output is treated as a runtime error.
@@ -209,15 +229,14 @@ class qtype_coderunner_jobesandbox extends qtype_coderunner_sandbox {
                 $this->response->outcome = self::RESULT_RUNTIME_ERROR;
             }
             $this->currentjobid = null;
-            return (object) array(
-              'error'   => self::OK,
-              'result'  => $this->response->outcome,
-              'signal'  => 0,              // Jobe doesn't return this.
-              'cmpinfo' => $this->response->cmpinfo,
-              'output'  => $this->filter_file_path($this->response->stdout),
-              'stderr'  => $stderr
-            );
+            $runresult['error'] = self::OK;
+            $runresult['stderr'] = $stderr;
+            $runresult['result'] = $this->response->outcome;
+            $runresult['signal'] = 0; // Jobe doesn't return signals.
+            $runresult['cmpinfo'] = $this->response->cmpinfo;
+            $runresult['output'] = $this->filter_file_path($this->response->stdout);
         }
+        return (object) $runresult;
     }
 
 
@@ -289,13 +308,7 @@ class qtype_coderunner_jobesandbox extends qtype_coderunner_sandbox {
      * and the HTTP headers that should be used in the request.
      */
     private function get_jobe_connection_info($resource) {
-        global $CFG;
-        // Hack to force use of a local jobe host when behat testing.
-        if ($CFG->prefix == "b_") {
-            $jobe = "localhost";
-        } else {
-            $jobe = $this->jobeserver;
-        }
+        $jobe = $this->jobeserver;
         $protocol = 'http://';
         $url = (strpos($jobe, 'http') === 0 ? $jobe : $protocol.$jobe)."/jobe/index.php/restapi/$resource";
 

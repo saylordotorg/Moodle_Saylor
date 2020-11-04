@@ -18,34 +18,67 @@
  *
  * @package    qtype
  * @subpackage gapfill
- * @copyright  2017 Marcus Green
+ * @copyright  2020 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 define(['jquery', 'jqueryui', 'qtype_gapfill/jquery.ui.touch-punch-improved'], function($) {
-    return {
-        init: function() {
-            $(".draggable").draggable({
-                revert: false,
-                helper: 'clone',
-                cursor: 'pointer',
-                scroll: 'false',
-                start: function() {
-                    $(this).fadeTo('fast', 0.5);
-                },
-                stop: function() {
-                    $(this).fadeTo(0, 1);
-                }
-            });
-            $(".droptarget").droppable({
-                hoverClass: 'active',
-                drop: function(event, ui) {
-                    if ($(ui.draggable).hasClass('readonly')) {
-                        return;
-                    }
-                    this.value = $(ui.draggable).text();
-                    $(this).css("background-color", "white");
-                }
-            });
+  return {
+    init: function(singleuse) {
+      $(".droptarget").on('dblclick', function() {
+        if (singleuse) {
+          dragShow(this);
+          $(this).val("");
         }
-    };
+      });
+
+    /**
+     * Reveal draggables that are not
+     * the the current one
+     *
+     * @param {*} that
+     */
+      function dragShow(that) {
+        var draggables = $(".draggable");
+        var targetVal = $(that).val();
+        var i;
+        for (i = 0; i < draggables.length; i++) {
+          var sourceVal = draggables[i].textContent;
+          if (sourceVal == targetVal) {
+            $(draggables[i]).removeClass("hide");
+          }
+        }
+      }
+
+      $(".droptarget").on('keydown drop', function() {
+        dragShow(this);
+      });
+
+      $(".draggable").draggable({
+        revert: false,
+        helper: 'clone',
+        cursor: 'pointer',
+        scroll: 'false',
+      });
+
+      $(".droptarget").droppable({
+        hoverClass: 'active',
+        drop: function(event, ui) {
+          if ($(ui.draggable).hasClass('readonly')) {
+            return;
+          }
+          this.value = $(ui.draggable).text();
+          $(this).css("background-color", "white");
+          $(this).addClass("dropped");
+          if (singleuse) {
+            $(ui.draggable).addClass("hide");
+          }
+        }
+      });
+      $(".droptarget").dblclick(function() {
+        $(this).val("");
+        $(this).removeClass("dropped");
+        $(this).css("background-color", "white");
+     });
+    }
+  };
 });

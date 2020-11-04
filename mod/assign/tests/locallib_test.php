@@ -3785,69 +3785,43 @@ Anchor link 2:<a title=\"bananas\" href=\"../logo-240x60.gif\">Link text</a>
         $this->assertEquals(1, $completiondata->completionstate);
     }
 
-    public function get_assignments_with_rescaled_null_grades_provider() {
-        return [
-            'Negative less than one is errant' => [
-                'grade' => -0.64,
-                'count' => 1,
-            ],
-            'Negative more than one is errant' => [
-                'grade' => -30.18,
-                'count' => 1,
-            ],
-            'Negative one exactly is not errant' => [
-                'grade' => ASSIGN_GRADE_NOT_SET,
-                'count' => 0,
-            ],
-            'Positive grade is not errant' => [
-                'grade' => 1,
-                'count' => 0,
-            ],
-            'Large grade is not errant' => [
-                'grade' => 100,
-                'count' => 0,
-            ],
-            'Zero grade is not errant' => [
-                'grade' => 0,
-                'count' => 0,
-            ],
-        ];
-    }
-
     /**
-     * Test determining if the assignment as any null grades that were rescaled.
-     * @dataProvider get_assignments_with_rescaled_null_grades_provider
+     * Test updating activity completion when submitting an assessment for MDL-67126.
      */
-    public function test_get_assignments_with_rescaled_null_grades($grade, $count) {
-        global $DB;
-
+    public function test_update_activity_completion_records_team_submission_new() {
         $this->resetAfterTest();
 
-        $course = $this->getDataGenerator()->create_course();
+        $course = $this->getDataGenerator()->create_course(['enablecompletion' => 1]);
         $teacher = $this->getDataGenerator()->create_and_enrol($course, 'teacher');
         $student = $this->getDataGenerator()->create_and_enrol($course, 'student');
+        $otherstudent = $this->getDataGenerator()->create_and_enrol($course, 'student');
 
-        $this->setUser($teacher);
+        $grouping = $this->getDataGenerator()->create_grouping(array('courseid' => $course->id));
+        $group1 = $this->getDataGenerator()->create_group(['courseid' => $course->id]);
+
+        groups_add_member($group1, $student);
+        groups_add_member($group1, $otherstudent);
+
         $assign = $this->create_instance($course, [
-                'grade' => 100,
-            ]);
+                'submissiondrafts' => 0,
+                'completion' => COMPLETION_TRACKING_AUTOMATIC,
+                'completionsubmit' => 1,
+                'teamsubmission' => 1,
+                'assignsubmission_onlinetext_enabled' => 1
+        ]);
 
-        // Try getting a student's grade. This will give a grade of -1.
-        // Then we can override it with a bad negative grade.
-        $assign->get_user_grade($student->id, true);
+        $cm = $assign->get_course_module();
 
-        // Set the grade to something errant.
-        $DB->set_field(
-            'assign_grades',
-            'grade',
-            $grade,
-            [
-                'userid' => $student->id,
-                'assignment' => $assign->get_instance()->id,
-            ]
-        );
+        $this->add_submission($student, $assign);
 
-        $this->assertCount($count, get_assignments_with_rescaled_null_grades());
+        $completion = new completion_info($course);
+
+        // Completion should now be met.
+        $completiondata = $completion->get_data($cm, false, $student->id);
+        $this->assertEquals(1, $completiondata->completionstate);
+
+        $completiondata = $completion->get_data($cm, false, $otherstudent->id);
+        $this->assertEquals(1, $completiondata->completionstate);
     }
 
     /**

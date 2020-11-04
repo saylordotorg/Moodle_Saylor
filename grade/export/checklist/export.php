@@ -286,18 +286,16 @@ foreach ($users as $user) {
         } else if ($field === '_startdate') {
             $firstview = null;
             $manager = get_log_manager();
-            $readers = $manager->get_readers('\core\log\sql_reader');
-            /** @var \core\log\sql_reader $reader */
+            $readers = $manager->get_readers('\core\log\sql_internal_table_reader');
+            /** @var \core\log\sql_internal_table_reader $reader */
             $reader = reset($readers);
             if ($reader) {
-                $select = "userid = ? AND courseid = ? AND target = 'course' AND action = 'viewed'";
-                $params = array($user->id, $course->id);
-                $events = $reader->get_events_select($select, $params, 'timecreated ASC', 0, 1);
-                /** @var \core\event\base $event */
-                $event = reset($events);
-                if ($event) {
-                    $firstview = $event->timecreated;
-                }
+                $tablename = $reader->get_internal_log_table_name();
+                $cond = [
+                    'userid' => $user->id, 'courseid' => $course->id,
+                    'target' => 'course', 'action' => 'viewed'
+                ];
+                $firstview = $DB->get_field($tablename, 'MIN(timecreated)', $cond);
             }
             $datestr = '';
             if ($firstview) {

@@ -507,6 +507,18 @@ function(
                 timeFrom
             )
             .then(function(result) {
+                // Prevent older requests from contaminating the current view.
+                if (result.id != viewState.id) {
+                    result.messages = [];
+                    // Purge old conversation cache to prevent messages lose.
+                    if (result.id in stateCache) {
+                        delete stateCache[result.id];
+                    }
+                }
+
+                return result;
+            })
+            .then(function(result) {
                 if (result.messages.length && ignoreList.length) {
                     result.messages = result.messages.filter(function(message) {
                         // Skip any messages in our ignore list.
@@ -1271,6 +1283,32 @@ function(
     };
 
     /**
+     * Create a plain version of an HTML text.
+     *
+     * This texts is used as a message preview while is sent to the server. This way
+     * it is possible to prevent self-xss.
+     *
+     * @param {String} text Text to send.
+     * @return {String} The plain text version of the text.
+     */
+    const previewText = function(text) {
+        // Remove all script and styles from text (we don't want it there).
+        let plaintext = text.replace(/<style([\s\S]*?)<\/style>/gi, '');
+        plaintext = plaintext.replace(/<script([\s\S]*?)<\/script>/gi, '');
+        // Beautify a bit the output adding some line breaks.
+        plaintext = plaintext.replace(/<\/div>/ig, '\n');
+        plaintext = plaintext.replace(/<\/li>/ig, '\n');
+        plaintext = plaintext.replace(/<li>/ig, '  *  ');
+        plaintext = plaintext.replace(/<\/ul>/ig, '\n');
+        plaintext = plaintext.replace(/<\/p>/ig, '\n');
+        plaintext = plaintext.replace(/<br[^>]*>/gi, '\n');
+        // Remove all remaining tags and convert line breaks into html.
+        plaintext = plaintext.replace(/<[^>]+>/ig, '');
+        plaintext = plaintext.replace(/\n+/ig, '\n');
+        return plaintext.replace(/\n/ig, '<br>');
+    };
+
+    /**
      * Buffers messages to be sent to the server. We use a buffer here to allow the
      * user to freely input messages without blocking the interface for them.
      *
@@ -1280,14 +1318,22 @@ function(
      */
     var sendMessage = function(text) {
         var id = 'temp' + Date.now();
+        // Render a preview version of the message while sending.
+        let loadingmessage = {
+            id: id,
+            useridfrom: viewState.loggedInUserId,
+            text:  previewText(text),
+            timecreated: null
+        };
+        var newState = StateManager.addMessages(viewState, [loadingmessage]);
+        render(newState);
+        // Send the real message.
         var message = {
             id: id,
             useridfrom: viewState.loggedInUserId,
             text: text,
             timecreated: null
         };
-        var newState = StateManager.addMessages(viewState, [message]);
-        render(newState);
         sendMessageBuffer.push(message);
         processSendMessageBuffer();
     };
@@ -1865,6 +1911,9 @@ function(
     var resetState = function(body, conversationId, loggedInUserProfile) {
         // Reset all of the states back to the beginning if we're loading a new
         // conversation.
+        if (newMessagesPollTimer) {
+            newMessagesPollTimer.stop();
+        }
         loadedAllMessages = false;
         messagesOffset = 0;
         newMessagesPollTimer = null;
@@ -1891,10 +1940,6 @@ function(
 
         if (!viewState) {
             viewState = initialState;
-        }
-
-        if (newMessagesPollTimer) {
-            newMessagesPollTimer.stop();
         }
 
         render(initialState);

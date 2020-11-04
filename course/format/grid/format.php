@@ -195,7 +195,7 @@ if ($gfsettings['sectiontitleboxposition'] == 1) { // Inside.
     echo '}';
 }
 
-echo '.course-content ul.gridicons li .gridicon_link .tooltip-inner {';
+echo '.course-content ul.gridicons li .tooltip-inner {';
 echo 'background-color: ';
 if ($gfsettings['sectiontitlesummarybackgroundcolour'][0] != '#') {
     echo '#';
@@ -209,7 +209,7 @@ echo $gfsettings['sectiontitlesummarytextcolour'].';';
 echo '}';
 
 $tooltiparrowposition = $courseformat->get_set_show_section_title_summary_position();
-echo '.course-content ul.gridicons li .gridicon_link .tooltip.'.$tooltiparrowposition.' .tooltip-arrow {';
+echo '.course-content ul.gridicons li .tooltip.'.$tooltiparrowposition.' .tooltip-arrow {';
 echo 'border-'.$tooltiparrowposition.'-color: ';
 if ($gfsettings['sectiontitlesummarybackgroundcolour'][0] != '#') {
     echo '#';
@@ -217,7 +217,7 @@ if ($gfsettings['sectiontitlesummarybackgroundcolour'][0] != '#') {
 echo $gfsettings['sectiontitlesummarybackgroundcolour'].';';
 echo '}';
 
-echo '.course-content ul.gridicons li .gridicon_link .tooltip.in {';
+echo '.course-content ul.gridicons li .tooltip.in {';
 echo 'opacity: '.$gfsettings['sectiontitlesummarybackgroundopacity'].';';
 echo '}';
 

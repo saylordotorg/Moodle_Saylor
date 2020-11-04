@@ -108,13 +108,13 @@ abstract class moodle_database {
     /** @var float Last time in seconds with millisecond precision. */
     protected $last_time;
     /** @var bool Flag indicating logging of query in progress. This helps prevent infinite loops. */
-    private $loggingquery = false;
+    protected $loggingquery = false;
 
     /** @var bool True if the db is used for db sessions. */
     protected $used_for_db_sessions = false;
 
     /** @var array Array containing open transactions. */
-    private $transactions = array();
+    protected $transactions = array();
     /** @var bool Flag used to force rollback of all current transactions. */
     private $force_rollback = false;
 
@@ -1094,11 +1094,48 @@ abstract class moodle_database {
 
     /**
      * Returns detailed information about columns in table. This information is cached internally.
+     *
      * @param string $table The table's name.
      * @param bool $usecache Flag to use internal cacheing. The default is true.
      * @return database_column_info[] of database_column_info objects indexed with column names
      */
-    public abstract function get_columns($table, $usecache=true);
+    public function get_columns($table, $usecache = true): array {
+        if (!$table) { // Table not specified, return empty array directly.
+            return [];
+        }
+
+        if ($usecache) {
+            if ($this->temptables->is_temptable($table)) {
+                if ($data = $this->get_temp_tables_cache()->get($table)) {
+                    return $data;
+                }
+            } else {
+                if ($data = $this->get_metacache()->get($table)) {
+                    return $data;
+                }
+            }
+        }
+
+        $structure = $this->fetch_columns($table);
+
+        if ($usecache) {
+            if ($this->temptables->is_temptable($table)) {
+                $this->get_temp_tables_cache()->set($table, $structure);
+            } else {
+                $this->get_metacache()->set($table, $structure);
+            }
+        }
+
+        return $structure;
+    }
+
+    /**
+     * Returns detailed information about columns in table. This information is cached internally.
+     *
+     * @param string $table The table's name.
+     * @return database_column_info[] of database_column_info objects indexed with column names
+     */
+    protected abstract function fetch_columns(string $table): array;
 
     /**
      * Normalise values based on varying RDBMS's dependencies (booleans, LOBs...)
@@ -1955,6 +1992,29 @@ abstract class moodle_database {
     }
 
     /**
+     * Deletes records from a table using a subquery. The subquery should return a list of values
+     * in a single column, which match one field from the table being deleted.
+     *
+     * The $alias parameter must be set to the name of the single column in your subquery result
+     * (e.g. if the subquery is 'SELECT id FROM whatever', then it should be 'id'). This is not
+     * needed on most databases, but MySQL requires it.
+     *
+     * (On database where the subquery is inefficient, it is implemented differently.)
+     *
+     * @param string $table Table to delete from
+     * @param string $field Field in table to match
+     * @param string $alias Name of single column in subquery e.g. 'id'
+     * @param string $subquery Subquery that will return values of the field to delete
+     * @param array $params Parameters for subquery
+     * @throws dml_exception If there is any error
+     * @since Moodle 3.9.3
+     */
+    public function delete_records_subquery(string $table, string $field, string $alias,
+            string $subquery, array $params = []): void {
+        $this->delete_records_select($table, $field . ' IN (' . $subquery . ')', $params);
+    }
+
+    /**
      * Delete one or more records from a table which match a particular WHERE clause.
      *
      * @param string $table The database table to be checked against.
@@ -2678,6 +2738,22 @@ abstract class moodle_database {
      */
     public function perf_get_reads() {
         return $this->reads;
+    }
+
+    /**
+     * Returns whether we want to connect to slave database for read queries.
+     * @return bool Want read only connection
+     */
+    public function want_read_slave(): bool {
+        return false;
+    }
+
+    /**
+     * Returns the number of reads before first write done by this database.
+     * @return int Number of reads.
+     */
+    public function perf_get_reads_slave(): int {
+        return 0;
     }
 
     /**

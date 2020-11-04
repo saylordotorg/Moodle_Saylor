@@ -523,7 +523,7 @@ class core_moodlelib_testcase extends advanced_testcase {
         $this->assertSame('', clean_param('mod__something', PARAM_COMPONENT));
         $this->assertSame('', clean_param('auth_xx-yy', PARAM_COMPONENT));
         $this->assertSame('', clean_param('_auth_xx', PARAM_COMPONENT));
-        $this->assertSame('', clean_param('a2uth_xx', PARAM_COMPONENT));
+        $this->assertSame('a2uth_xx', clean_param('a2uth_xx', PARAM_COMPONENT));
         $this->assertSame('', clean_param('auth_xx_', PARAM_COMPONENT));
         $this->assertSame('', clean_param('auth_xx.old', PARAM_COMPONENT));
         $this->assertSame('', clean_param('_user', PARAM_COMPONENT));
@@ -2862,10 +2862,12 @@ class core_moodlelib_testcase extends advanced_testcase {
      * the user table and fire event.
      */
     public function test_update_internal_user_password_no_cache() {
+        global $DB;
         $this->resetAfterTest();
 
         $user = $this->getDataGenerator()->create_user(array('auth' => 'cas'));
-        $this->assertEquals(AUTH_PASSWORD_NOT_CACHED, $user->password);
+        $DB->update_record('user', ['id' => $user->id, 'password' => AUTH_PASSWORD_NOT_CACHED]);
+        $user->password = AUTH_PASSWORD_NOT_CACHED;
 
         $sink = $this->redirectEvents();
         update_internal_user_password($user, 'wonkawonka');
@@ -3594,7 +3596,7 @@ class core_moodlelib_testcase extends advanced_testcase {
         $user = $this->getDataGenerator()->create_user(
             [
                 "username" => $username,
-                "confirmed" => false,
+                "confirmed" => 0,
                 "email" => 'test@example.com',
             ]
         );
@@ -3623,7 +3625,7 @@ class core_moodlelib_testcase extends advanced_testcase {
         $user = $this->getDataGenerator()->create_user(
             [
                 "username" => "many_-.@characters@_@-..-..",
-                "confirmed" => false,
+                "confirmed" => 0,
                 "email" => 'test@example.com',
             ]
         );

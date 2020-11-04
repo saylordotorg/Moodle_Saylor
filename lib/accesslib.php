@@ -521,6 +521,16 @@ function has_capability($capability, context $context, $user = null, $doanything
         }
     }
 
+    if (!empty($USER->loginascontext)) {
+        // The current user is logged in as another user and can assume their identity at or below the `loginascontext`
+        // defined in the USER session.
+        // The user may not assume their identity at any other location.
+        if (!$USER->loginascontext->is_parent_of($context, true)) {
+            // The context being checked is not the specified context, or one of its children.
+            return false;
+        }
+    }
+
     // Find out if user is admin - it is not possible to override the doanything in any way
     // and it is not possible to switch to admin role either.
     if ($doanything) {
@@ -858,6 +868,34 @@ function require_capability($capability, context $context, $userid = null, $doan
                             $errormessage = 'nopermissions', $stringfile = '') {
     if (!has_capability($capability, $context, $userid, $doanything)) {
         throw new required_capability_exception($context, $capability, $errormessage, $stringfile);
+    }
+}
+
+/**
+ * A convenience function that tests has_capability for a list of capabilities, and displays an error if
+ * the user does not have that capability.
+ *
+ * This is just a utility method that calls has_capability in a loop. Try to put
+ * the capabilities that fewest users are likely to have first in the list for best
+ * performance.
+ *
+ * @category access
+ * @see has_capability()
+ *
+ * @param array $capabilities an array of capability names.
+ * @param context $context the context to check the capability in. You normally get this with context_xxxx::instance().
+ * @param int $userid A user id. By default (null) checks the permissions of the current user.
+ * @param bool $doanything If false, ignore effect of admin role assignment
+ * @param string $errormessage The error string to to user. Defaults to 'nopermissions'.
+ * @param string $stringfile The language file to load the error string from. Defaults to 'error'.
+ * @return void terminates with an error if the user does not have the given capability.
+ */
+function require_all_capabilities(array $capabilities, context $context, $userid = null, $doanything = true,
+                                  $errormessage = 'nopermissions', $stringfile = ''): void {
+    foreach ($capabilities as $capability) {
+        if (!has_capability($capability, $context, $userid, $doanything)) {
+            throw new required_capability_exception($context, $capability, $errormessage, $stringfile);
+        }
     }
 }
 
@@ -2206,7 +2244,7 @@ function reset_role_capabilities($roleid) {
  * the database.
  *
  * @access private
- * @param string $component examples: 'moodle', 'mod/forum', 'block/quiz_results'
+ * @param string $component examples: 'moodle', 'mod_forum', 'block_quiz_results'
  * @return boolean true if success, exception in case of any problems
  */
 function update_capabilities($component = 'moodle') {
@@ -2560,43 +2598,49 @@ function get_capability_string($capabilityname) {
  */
 function get_component_string($component, $contextlevel) {
 
-    if ($component === 'moodle' or $component === 'core') {
-        switch ($contextlevel) {
-            // TODO MDL-46123: this should probably use context level names instead
-            case CONTEXT_SYSTEM:    return get_string('coresystem');
-            case CONTEXT_USER:      return get_string('users');
-            case CONTEXT_COURSECAT: return get_string('categories');
-            case CONTEXT_COURSE:    return get_string('course');
-            case CONTEXT_MODULE:    return get_string('activities');
-            case CONTEXT_BLOCK:     return get_string('block');
-            default:                print_error('unknowncontext');
-        }
+    if ($component === 'moodle' || $component === 'core') {
+        return context_helper::get_level_name($contextlevel);
     }
 
     list($type, $name) = core_component::normalize_component($component);
     $dir = core_component::get_plugin_directory($type, $name);
     if (!file_exists($dir)) {
         // plugin not installed, bad luck, there is no way to find the name
-        return $component.' ???';
+        return $component . ' ???';
     }
 
+    // Some plugin types need an extra prefix to make the name easy to understand.
     switch ($type) {
-        // TODO MDL-46123: this is really hacky and should be improved.
-        case 'quiz':         return get_string($name.':componentname', $component);// insane hack!!!
-        case 'repository':   return get_string('repository', 'repository').': '.get_string('pluginname', $component);
-        case 'gradeimport':  return get_string('gradeimport', 'grades').': '.get_string('pluginname', $component);
-        case 'gradeexport':  return get_string('gradeexport', 'grades').': '.get_string('pluginname', $component);
-        case 'gradereport':  return get_string('gradereport', 'grades').': '.get_string('pluginname', $component);
-        case 'webservice':   return get_string('webservice', 'webservice').': '.get_string('pluginname', $component);
-        case 'block':        return get_string('block').': '.get_string('pluginname', basename($component));
+        case 'quiz':
+            $prefix = get_string('quizreport', 'quiz') . ': ';
+            break;
+        case 'repository':
+            $prefix = get_string('repository', 'repository') . ': ';
+            break;
+        case 'gradeimport':
+            $prefix = get_string('gradeimport', 'grades') . ': ';
+            break;
+        case 'gradeexport':
+            $prefix = get_string('gradeexport', 'grades') . ': ';
+            break;
+        case 'gradereport':
+            $prefix = get_string('gradereport', 'grades') . ': ';
+            break;
+        case 'webservice':
+            $prefix = get_string('webservice', 'webservice') . ': ';
+            break;
+        case 'block':
+            $prefix = get_string('block') . ': ';
+            break;
         case 'mod':
-            if (get_string_manager()->string_exists('pluginname', $component)) {
-                return get_string('activity').': '.get_string('pluginname', $component);
-            } else {
-                return get_string('activity').': '.get_string('modulename', $component);
-            }
-        default: return get_string('pluginname', $component);
+            $prefix = get_string('activity') . ': ';
+            break;
+
+        // Default case, just use the plugin name.
+        default:
+            $prefix = '';
     }
+    return $prefix . get_string('pluginname', $component);
 }
 
 /**
@@ -5553,6 +5597,30 @@ abstract class context extends stdClass implements IteratorAggregate {
     }
 
     /**
+     * Determine if the current context is a parent of the possible child.
+     *
+     * @param   context $possiblechild
+     * @param   bool $includeself Whether to check the current context
+     * @return  bool
+     */
+    public function is_parent_of(context $possiblechild, bool $includeself): bool {
+        // A simple substring check is used on the context path.
+        // The possible child's path is used as a haystack, with the current context as the needle.
+        // The path is prefixed with '+' to ensure that the parent always starts at the top.
+        // It is suffixed with '+' to ensure that parents are not included.
+        // The needle always suffixes with a '/' to ensure that the contextid uses a complete match (i.e. 142/ instead of 14).
+        // The haystack is suffixed with '/+' if $includeself is true to allow the current context to match.
+        // The haystack is suffixed with '+' if $includeself is false to prevent the current context from matching.
+        $haystacksuffix = $includeself ? '/+' : '+';
+
+        $strpos = strpos(
+            "+{$possiblechild->path}{$haystacksuffix}",
+            "+{$this->path}/"
+        );
+        return $strpos === 0;
+    }
+
+    /**
      * Returns parent contexts of this context in reversed order, i.e. parent first,
      * then grand parent, etc.
      *
@@ -5574,6 +5642,30 @@ abstract class context extends stdClass implements IteratorAggregate {
         }
 
         return $result;
+    }
+
+    /**
+     * Determine if the current context is a child of the possible parent.
+     *
+     * @param   context $possibleparent
+     * @param   bool $includeself Whether to check the current context
+     * @return  bool
+     */
+    public function is_child_of(context $possibleparent, bool $includeself): bool {
+        // A simple substring check is used on the context path.
+        // The current context is used as a haystack, with the possible parent as the needle.
+        // The path is prefixed with '+' to ensure that the parent always starts at the top.
+        // It is suffixed with '+' to ensure that children are not included.
+        // The needle always suffixes with a '/' to ensure that the contextid uses a complete match (i.e. 142/ instead of 14).
+        // The haystack is suffixed with '/+' if $includeself is true to allow the current context to match.
+        // The haystack is suffixed with '+' if $includeself is false to prevent the current context from matching.
+        $haystacksuffix = $includeself ? '/+' : '+';
+
+        $strpos = strpos(
+            "+{$this->path}{$haystacksuffix}",
+            "+{$possibleparent->path}/"
+        );
+        return $strpos === 0;
     }
 
     /**

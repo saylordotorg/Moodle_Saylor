@@ -84,7 +84,7 @@ function quiz_add_instance($quiz) {
     $cmid = $quiz->coursemodule;
 
     // Process the options from the form.
-    $quiz->created = time();
+    $quiz->timecreated = time();
     $result = quiz_process_options($quiz);
     if ($result && is_string($result)) {
         return $result;
@@ -561,8 +561,8 @@ function quiz_user_complete($course, $user, $mod, $quiz) {
                 } else {
                     echo get_string('hidden', 'grades');
                 }
+                echo ' - '.userdate($attempt->timefinish).'<br />';
             }
-            echo ' - '.userdate($attempt->timemodified).'<br />';
         }
     } else {
         print_string('noattempts', 'quiz');
@@ -1260,7 +1260,8 @@ function quiz_update_events($quiz, $override = null) {
 
         $event = new stdClass();
         $event->type = !$timeclose ? CALENDAR_EVENT_TYPE_ACTION : CALENDAR_EVENT_TYPE_STANDARD;
-        $event->description = format_module_intro('quiz', $quiz, $cmid);
+        $event->description = format_module_intro('quiz', $quiz, $cmid, false);
+        $event->format = FORMAT_HTML;
         // Events module won't show user events when the courseid is nonzero.
         $event->courseid    = ($userid) ? 0 : $quiz->course;
         $event->groupid     = $groupid;

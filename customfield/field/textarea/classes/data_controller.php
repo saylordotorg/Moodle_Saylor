@@ -59,7 +59,7 @@ class data_controller extends \core_customfield\data_controller {
      *
      * @return string
      */
-    protected function get_form_element_name() : string {
+    public function get_form_element_name() : string {
         return parent::get_form_element_name() . '_editor';
     }
 
@@ -96,7 +96,7 @@ class data_controller extends \core_customfield\data_controller {
             $this->save();
         }
 
-        if ($fromform['text']) {
+        if (array_key_exists('text', $fromform)) {
             $textoptions = $this->value_editor_options();
             $data = (object) ['field_editor' => $fromform];
             $data = file_postupdate_standard_editor($data, 'field', $textoptions, $textoptions['context'],

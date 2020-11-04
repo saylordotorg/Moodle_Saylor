@@ -45,11 +45,11 @@ class qtype_gapfill_test extends advanced_testcase {
         'question/type/gapfill/questiontype.php',
     );
 
-    protected function setUp() {
+    protected function setUp() : void {
         $this->qtype = new qtype_gapfill();
     }
 
-    protected function tearDown() {
+    protected function tearDown() : void {
         $this->qtype = null;
     }
     /**
@@ -100,7 +100,7 @@ class qtype_gapfill_test extends advanced_testcase {
 
     public function test_extra_question_fields() {
         $extraquestionfields = array('question_gapfill', 'answerdisplay', 'delimitchars',
-            'casesensitive', 'noduplicates', 'disableregex', 'fixedgapsize', 'optionsaftertext', 'letterhints');
+            'casesensitive', 'noduplicates', 'disableregex', 'fixedgapsize', 'optionsaftertext', 'letterhints' , 'singleuse');
         $this->assertEquals($this->qtype->extra_question_fields(), $extraquestionfields);
     }
 }

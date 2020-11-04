@@ -35,10 +35,11 @@ class FillInProcessor extends TypeProcessor {
     $this->setStyle('styles/fill-in.css');
 
     // Generate interaction options
-    $caseMatters = $this->determineCaseMatters($crp[0]);
+    $caseMatters = $this->determineCaseMatters(empty($crp[0]) ?  '' : $crp[0]);
 
     // Process correct responses and user responses patterns
     $processedCRPs     = $this->processCRPs($crp, $caseMatters['nextIndex']);
+
     $processedResponse = $this->processResponse($response);
 
     // Build report from description, correct responses and user responses
@@ -49,12 +50,14 @@ class FillInProcessor extends TypeProcessor {
     );
 
     $header = $this->generateHeader($scoreSettings);
+    $longFillIn = property_exists($extras, 'longfillin') ? ' h5p-long-fill-in' : '';
     $container =
-      '<div class="h5p-reporting-container h5p-fill-in-container">' .
+      '<div class="h5p-reporting-container h5p-fill-in-container' . $longFillIn . '">' .
         $header . $report .
       '</div>';
-    $footer = $this->generateFooter();
 
+    // Footer only required if there is a correct responses pattern
+    $footer = (isset($crp)) ? $this->generateFooter() : '';
 
     return $container . $footer;
   }
@@ -106,6 +109,10 @@ class FillInProcessor extends TypeProcessor {
 
     // CRPs sorted by placeholder order
     $sortedCRP = array();
+
+    if (!is_array($crp)) {
+      return $sortedCRP;
+    }
 
     foreach ($crp as $crpString) {
 
@@ -200,6 +207,16 @@ class FillInProcessor extends TypeProcessor {
    */
   private function getPlaceholderReplacements($crp, $response, $caseSensitive) {
     $placeholderReplacements = array();
+
+    // Return response without markup if answers are neither right nor wrong
+    if (sizeof($crp) === 0) {
+      foreach($response as $answer) {
+        $placeholderReplacements[] =
+          '<span class="h5p-fill-in-user-response h5p-fill-in-user-response-correct h5p-fill-in-no-correct">' .
+          nl2br($answer) .
+          '</span>';
+      }
+    }
 
     foreach ($crp as $index => $value) {
 

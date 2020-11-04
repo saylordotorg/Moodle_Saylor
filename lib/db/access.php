@@ -185,7 +185,7 @@ $capabilities = array(
 
         'riskbitmask' => RISK_SPAM | RISK_PERSONAL | RISK_XSS,
 
-        'captype' => 'write',
+        'captype' => 'read',
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => array(
             'editingteacher' => CAP_ALLOW,
@@ -388,6 +388,17 @@ $capabilities = array(
         'archetypes' => array(
             'editingteacher' => CAP_ALLOW,
             'manager' => CAP_ALLOW
+        )
+    ),
+
+    'moodle/site:viewanonymousevents' => array(
+
+        'riskbitmask' => RISK_PERSONAL,
+
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW,
         )
     ),
 
@@ -958,7 +969,7 @@ $capabilities = array(
 
     'moodle/course:viewhiddenactivities' => array(
 
-        'captype' => 'write',
+        'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,
         'archetypes' => array(
             'teacher' => CAP_ALLOW,
@@ -1547,7 +1558,7 @@ $capabilities = array(
 
     'moodle/course:viewhiddensections' => array(
 
-        'captype' => 'write',
+        'captype' => 'read',
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => array(
             'editingteacher' => CAP_ALLOW,
@@ -2459,5 +2470,90 @@ $capabilities = array(
         'archetypes' => [
             'manager' => CAP_ALLOW,
         ]
+    ],
+
+    // Allow users to recommend activities in the activity chooser.
+    'moodle/course:recommendactivity' => [
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'archetypes' => [
+            'manager' => CAP_ALLOW,
+        ]
+    ],
+
+    // Content bank capabilities.
+    'moodle/contentbank:access' => array(
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW,
+            'coursecreator' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+        )
+    ),
+
+    'moodle/contentbank:upload' => array(
+        'riskbitmask' => RISK_SPAM,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW,
+            'coursecreator' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+        )
+    ),
+
+    // Delete any content from the content bank.
+    'moodle/contentbank:deleteanycontent' => [
+        'riskbitmask' => RISK_DATALOSS,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => [
+            'manager' => CAP_ALLOW,
+            'coursecreator' => CAP_ALLOW,
+        ]
+    ],
+
+    // Delete content created by yourself.
+    'moodle/contentbank:deleteowncontent' => [
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => [
+            'user' => CAP_ALLOW,
+        ]
+    ],
+
+    // Manage (rename, move, publish, share, etc.) any content from the content bank.
+    'moodle/contentbank:manageanycontent' => [
+        'riskbitmask' => RISK_DATALOSS,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW,
+            'coursecreator' => CAP_ALLOW,
+        )
+    ],
+
+    // Manage (rename, move, publish, share, etc.) content created by yourself.
+    'moodle/contentbank:manageowncontent' => [
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW,
+            'coursecreator' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+        )
+    ],
+
+    // Allow users to create/edit content within the content bank.
+    'moodle/contentbank:useeditor' => [
+        'riskbitmask' => RISK_SPAM,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW,
+            'coursecreator' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+        )
     ],
 );

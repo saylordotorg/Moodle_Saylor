@@ -201,13 +201,13 @@ class helper {
         if ($category->can_change_sortorder()) {
             $actions['moveup'] = array(
                 'url' => new \moodle_url($baseurl, array('action' => 'movecategoryup')),
-                'icon' => new \pix_icon('t/up', new \lang_string('up')),
-                'string' => new \lang_string('up')
+                'icon' => new \pix_icon('t/up', new \lang_string('moveup')),
+                'string' => new \lang_string('moveup')
             );
             $actions['movedown'] = array(
                 'url' => new \moodle_url($baseurl, array('action' => 'movecategorydown')),
-                'icon' => new \pix_icon('t/down', new \lang_string('down')),
-                'string' => new \lang_string('down')
+                'icon' => new \pix_icon('t/down', new \lang_string('movedown')),
+                'string' => new \lang_string('movedown')
             );
         }
 
@@ -244,7 +244,7 @@ class helper {
         }
 
         // Delete.
-        if ($category->can_delete_full()) {
+        if (!empty($category->move_content_targets_list()) || $category->can_delete_full()) {
             $actions['delete'] = array(
                 'url' => new \moodle_url($baseurl, array('action' => 'deletecategory')),
                 'icon' => new \pix_icon('t/delete', new \lang_string('delete')),
@@ -359,7 +359,7 @@ class helper {
      *
      * @param \core_course_category $category
      * @param \core_course_list_element $course
-     * @return string
+     * @return array
      */
     public static function get_course_listitem_actions(\core_course_category $category, \core_course_list_element $course) {
         $baseurl = new \moodle_url(
@@ -373,6 +373,14 @@ class helper {
                 'url' => new \moodle_url('/course/edit.php', array('id' => $course->id, 'returnto' => 'catmanage')),
                 'icon' => new \pix_icon('t/edit', \get_string('edit')),
                 'attributes' => array('class' => 'action-edit')
+            );
+        }
+        // Copy.
+        if (self::can_copy_course($course->id)) {
+            $actions[] = array(
+                'url' => new \moodle_url('/backup/copy.php', array('id' => $course->id, 'returnto' => 'catmanage')),
+                'icon' => new \pix_icon('t/copy', \get_string('copycourse')),
+                'attributes' => array('class' => 'action-copy')
             );
         }
         // Delete.
@@ -400,12 +408,12 @@ class helper {
         if ($category->can_resort_courses()) {
             $actions[] = array(
                 'url' => new \moodle_url($baseurl, array('action' => 'movecourseup')),
-                'icon' => new \pix_icon('t/up', \get_string('up')),
+                'icon' => new \pix_icon('t/up', \get_string('moveup')),
                 'attributes' => array('data-action' => 'moveup', 'class' => 'action-moveup')
             );
             $actions[] = array(
                 'url' => new \moodle_url($baseurl, array('action' => 'movecoursedown')),
-                'icon' => new \pix_icon('t/down', \get_string('down')),
+                'icon' => new \pix_icon('t/down', \get_string('movedown')),
                 'attributes' => array('data-action' => 'movedown', 'class' => 'action-movedown')
             );
         }
@@ -995,5 +1003,25 @@ class helper {
         } else {
             return array($parent);
         }
+    }
+
+    /**
+     * Get an array of the capabilities required to copy a course.
+     *
+     * @return array
+     */
+    public static function get_course_copy_capabilities(): array {
+        return array('moodle/backup:backupcourse', 'moodle/restore:restorecourse', 'moodle/course:view', 'moodle/course:create');
+    }
+
+    /**
+     * Returns true if the current user can copy this course.
+     *
+     * @param int $courseid
+     * @return bool
+     */
+    public static function can_copy_course(int $courseid): bool {
+        $coursecontext = \context_course::instance($courseid);
+        return has_all_capabilities(self::get_course_copy_capabilities(), $coursecontext);
     }
 }

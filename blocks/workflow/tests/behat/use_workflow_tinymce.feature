@@ -27,7 +27,7 @@ Feature: Workflow block - follow a workflow using TinyMCE
     And I add the "Workflows" block
     Then I should see "There is currently no workflow assigned for this page"
 
-  @javascript
+  @javascript @_file_upload
   Scenario: Add a workflow to a course and step through it using TinyMCE
     When I log in as "admin"
     And I navigate to "Plugins > Blocks > Workflows" in site administration
@@ -71,15 +71,15 @@ Feature: Workflow block - follow a workflow using TinyMCE
     Then I should see "Set the course format" in the "ul.block_workflow_todolist li" "css_element"
 
     When I press "Edit comments"
-    Then I should see "Update comment"
+    Then I should see "Edit comments"
     # Cannot actually set a comment, becuase Behat does not support TinyMCE any more.
-    And I click on "#id_submitbutton" "css_element"
+    And I click on "Save changes" "button" in the "Edit comments" "dialogue"
 
     # Finish task
     When I press "Finish step"
     Then I should see "Finish step"
     And I should see "Test course workflow"
-    When I click on "#id_submitbutton" "css_element"
+    When I click on "Finish step" "button" in the "Finish step" "dialogue"
     Then I should see "Prepare your web site"
     And I should see "Any Teacher"
 
@@ -111,7 +111,7 @@ Feature: Workflow block - follow a workflow using TinyMCE
 
     # Finish task & course visiblility again.
     When I press "Finish step"
-    And I click on "#id_submitbutton" "css_element"
+    And I click on "Finish step" "button" in the "Finish step" "dialogue"
     Then I should see "The workflow has been completed."
     And I should see "Workflow overview"
     And I reload the page

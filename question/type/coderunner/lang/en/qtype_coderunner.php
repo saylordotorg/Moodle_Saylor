@@ -55,7 +55,7 @@ $string['answerbox_group_help'] = 'Set the number of rows to allocate for the an
 $string['answerpreload'] = 'Answer box preload';
 $string['answerpreload_help'] = 'Text supplied here will be preloaded into the student\'s answer box.';
 $string['asolutionis'] = 'Question author\'s solution:';
-$string['attachmentoptions'] = 'Attachment options (experimental)';
+$string['attachmentoptions'] = 'Attachment options';
 
 $string['attachmentsoptional'] = 'Attachments are optional';
 $string['attachmentsrequired'] = 'Require attachments';
@@ -137,7 +137,7 @@ $string['emptypenaltyregime'] = 'Penalty regime must be defined (since version 3
 $string['enable'] = 'Enable';
 $string['enablecombinator'] = 'Enable combinator';
 $string['enable_diff_check'] = 'Enable \'Show differences\' button';
-$string['enable_diff_check_desc'] = 'Present students with a \'Show differences\' button if their answer is wrong and an exact-match validator is being used (experimental)';
+$string['enable_diff_check_desc'] = 'Present students with a \'Show differences\' button if their answer is wrong and an exact-match validator is being used';
 $string['enable_sandbox_desc'] = 'Permit use of the specified sandbox for running student submissions';
 $string['equalitygrader'] = 'Exact match';
 $string['error_loading_prototype'] = 'Error loading prototype. Network problems or server down, perhaps?';
@@ -189,9 +189,11 @@ $string['graphhelp'] = '- Double click at a blank space to create a new node/sta
 - Shift click on a blank space, drag to a node to create a start link (FSMs only).
 - Click and drag a link to alter its curve.
 - Click on a link/node to edit its text.
+- Click in link text and drag to move it.
 - Typing _ followed by a digit makes that digit a subscript.
 - Typing \\epsilon creates an epsilon character (and similarly for \\alpha, \\beta etc).
-- Click on a link/node then press the Delete key to remove it (or function-delete on a Mac).';
+- Click on a link/node then press the Delete key to remove it (or function-delete on a Mac).
+- Ctrl+z to undo and Ctrl+y or Ctrl+Shift+z to redo.';
 $string['goodemptyprecheck'] = 'Passed';
 $string['gotcolhdr'] = 'Got';
 $string['grader'] = 'Grader';
@@ -226,7 +228,7 @@ field, which is the value displayed in the \'Got\' column of the results table.
 The other columns of the results table (testcode, stdin, expected) can also
 be defined by the template grading program and will be used instead of the values from
 the testcase. As an example, if the output of the program is the string
-<tt>{"fraction":0.5, "got": "Half the answers were right!"}</tt>, half marks would be
+<code>{"fraction":0.5, "got": "Half the answers were right!"}</code>, half marks would be
 given for that particular test case and the \'Got\' column would display the
 text "Half the answers were right!". Other columns can be added to the result
 table by adding extra attributes to the JSON record and also to the question\'s
@@ -337,7 +339,7 @@ The mandatory penalty regime is a comma-separated list of penalties (each a perc
 to apply to successive submissions. These are absolute, not cumulative. As a
 special case the last penalty can be \'...\' to mean "extend the previous
 two penalties as an arithmetic progression up to 100". For example,
-<tt>0,5,10,30,...</tt> is equivalent to <tt>0,5,10,30,50,70,90,100</tt>.
+<code>0,5,10,30,...</code> is equivalent to <code>0,5,10,30,50,70,90,100</code>.
 If there are more submissions than defined penalties, the last value is used.
 Spaces can be used in lieu of commas as a separator.
 
@@ -557,27 +559,28 @@ marked as accept states (shown with a double circle) by double clicking. Default
 <li>isdirected. True if edges are directed. Default: true.</li>
 <li>noderadius. The radius of a node, in pixels. Default: 26.</li>
 <li>fontsize. The font size used for node and edge labels. Default: 20 points.</li>
-<li>textoffset. An offset in pixels used when positioning link label text. Default 4.</li>
+<li>textoffset. An offset in pixels used when positioning link label text. Deprecated
+as link text can now be manually dragged. Default 5.</li>
 <li>helpmenutext. A string to be used in lieu of the default Help info, if supplied.
 No default.</li>
 <li>locknodepositions. True to prevent the user from moving nodes. Useful when the
 answer box is preloaded with a graph that the student has to annotate by
 changing node or edge labels or by adding/removing edges. Note, though that
-nodes can still be added and deleted.</li>
-<li>locknodeset. True to prevent user from adding or deleting nodes or toggling
-the accept-state (from fsm graphs).</li>
+nodes can still be added and deleted (but see locknodeset).</li>
 <li>locknodelabels. True to prevent the user from editing node labels (including
-newly added nodes).</li>
+of newly added nodes). This will also prevent any new nodes having non-empty labels.
+Default: false.</li>
+<li>locknodeset. True to prevent the user from adding or deleting nodes or (for FSMs)
+toggling the accept state. Default: false</li>
 <li>lockedgepositions. True to prevent the user from dragging edges to change
-their curvature. Possibly useful if the
-answer box is preloaded with a graph that the student has to annotate by
-changing node or edge labels or by adding/removing edges. Also ensures that
+their curvature. Also ensures that
 edges added by a student are straight, e.g. to draw a polygon on a set of
 given points. Note, though that
-edges can still be added and deleted.</li>
-<li>lockedgeset. True to prevent the user from adding or removing edges.</li>
-<li>lockedgelabels. True to prevent the user from editing edge labels (including
-newly added ones</li>
+edges can still be added and deleted (but see lockedgeset). Default: false.</li>
+<li>lockedgelabels. True to prevent the user from editing edge labels. This also
+prevents non-empty labels on new edges. Default: false.</li>
+<li>lockedgeset. True to prevent the user from adding edges to, or deleting
+edges from, the preloaded graph. Default: false.<li>
 </ul></p>';
 
 $string['qtype_java_class'] = '<p>A Java write-a-class question, where the student submits a
@@ -759,20 +762,27 @@ marked as accept states (shown with a double circle) by double clicking. Default
 <li>isdirected. True if edges are directed. Default: false.</li>
 <li>noderadius. The radius of a node, in pixels. Default: 26.</li>
 <li>fontsize. The font size used for node and edge labels. Default: 20 points.</li>
-<li>textoffset. An offset in pixels used when positioning link label text. Default 4.</li>
+<li>textoffset. An offset in pixels used when positioning link label text. Deprecated
+as link text can now be manually dragged. Default 5.</li>
 <li>helpmenutext. A string to be used in lieu of the default Help info, if supplied.
 No default.</li>
-<li>locknodes. True to prevent the user from moving nodes. Useful when the
+<li>locknodepositions. True to prevent the user from moving nodes. Useful when the
 answer box is preloaded with a graph that the student has to annotate by
 changing node or edge labels or by adding/removing edges. Note, though that
-nodes can still be added and deleted.</li>
-<li>lockedges. True to prevent the user from dragging edges to change
-their curvature. Possibly useful if the
-answer box is preloaded with a graph that the student has to annotate by
-changing node or edge labels or by adding/removing edges. Also ensures that
+nodes can still be added and deleted (but see locknodeset).</li>
+<li>locknodelabels. True to prevent the user from editing node labels (including
+of newly added nodes). This will also prevent any new nodes having non-empty labels.
+Default: false.</li>
+<li>locknodeset. True to prevent the user from adding or deleting nodes or (for FSMs)
+toggling the accept state. Default: false</li>
+<li>lockedgepositions. True to prevent the user from dragging edges to change
+their curvature. Also ensures that
 edges added by a student are straight, e.g. to draw a polygon on a set of
-given points. Note, though that
-edges can still be added and deleted.</li>
+given points. Default: false.</li>
+<li>lockedgelabels. True to prevent the user from editing edge labels. This also
+prevents non-empty labels on new edges. Default: false.</li>
+<li>lockedgeset. True to prevent the user from adding edges to, or deleting
+edges from, the preloaded graph. Default: false.<li>
 </ul></p>';
 
 $string['qtype_python3_w_input'] = '<p>A Python3 question type, which can handle
@@ -804,7 +814,7 @@ If this is likely to prove a problem, the easiest work-around is to define
 one of the test case standard input fields to be a non-empty value - this
 forces CodeRunner into a fallback mode of running each test case separately.</p>';
 
-$string['qtype_sql'] = '<p>An <b>experimental</b> SQL question type, using sqlite3,
+$string['qtype_sql'] = '<p>A SQL question type, using sqlite3,
  run from Python3. sqlite3 must be installed on the Jobe server for this question
  type.</p>
  <p>The working directory is searched for files with an extension \'.db\'. If
@@ -941,7 +951,7 @@ is used to pass further sandbox-specific data, such as compile options and
 API-keys. It should generally be left blank but if non-blank it must be a valid
 JSON record. In the case of the jobe sandbox, available attributes include
 disklimit, streamsize, numprocs, compileargs, linkargs and interpreterargs. For
-example <tt>{"compileargs":["-std=c89"]}</tt> for a C question would force C89
+example <code>{"compileargs":["-std=c89"]}</code> for a C question would force C89
 compliance and no other C options would be used. See the jobe documentation
 for details. Some sandboxes (e.g. the deprecated Ideone sandbox) may silently ignore any or all of
 these settings.
@@ -951,9 +961,8 @@ question is
 usually as specified via the administrator settings for the CodeRunner plugin.
 However, it is possible to select a different jobeserver by defining a \'jobeserver\'
 parameter and also, optionally, a \'jobeapikey\' parameter. For example, if the
-\'Parameters\' field is set to <tt>{"jobeserver": "myspecialjobe.com"}</tt>, the run
-will instead by submitted to the server "myspecialjobe.com". Warning: this
-feature is still experimental and may change in the future.
+\'Parameters\' field is set to <code>{"jobeserver": "myspecialjobe.com"}</code>, the run
+will instead by submitted to the server "myspecialjobe.com".
 ';
 $string['sandboxerror'] = 'Error from the sandbox [{$a->sandbox}]: {$a->message}';
 $string['sandboxparams'] = 'Parameters';
@@ -1034,11 +1043,11 @@ in a context in which STUDENT_ANSWER is the student\'s
 response and TEST.testcode is the code for the current testcase. These values
 (and other testcase values like TEST.expected, TEST.stdin, TEST.mark)
 can be inserted into the template by enclosing them in double braces, e.g.
-<tt>{{TEST.testcode}}</tt>. For use within literal strings, an appropriate escape
-function should be applied, e.g. <tt>{{STUDENT_ANSWER | e(\'py\')}}</tt> is the student
+<code>{{TEST.testcode}}</code>. For use within literal strings, an appropriate escape
+function should be applied, e.g. <code>{{STUDENT_ANSWER | e(\'py\')}}</code> is the student
 answer escaped in a manner suitable for use within Python triple-double-quoted
-strings. Other escape functions are <tt>e(\'c\')</tt>, <tt>e(\'java\')</tt>,
-<tt>e(\'matlab\')</tt>. The program that is output by Twig is then compiled and executed
+strings. Other escape functions are <code>e(\'c\')</code>, <code>e(\'java\')</code>,
+<code>e(\'matlab\')</code>. The program that is output by Twig is then compiled and executed
 with the language of the selected built-in type and with stdin set
 to TEST.stdin. Output from that program is then passed to the selected grader.
 See the help under \'Grading controls\' for more on that.
@@ -1059,7 +1068,7 @@ QUESTION.parameters.&lt;&lt;param&gt;&gt;. For example, if template params is
         {"age": 23}
 
 the value 23 would be substituted into the template in place of the
-template variable <tt>{{ QUESTION.parameters.age }}</tt>.
+template variable <code>{{ QUESTION.parameters.age }}</code>.
 
 The set of template parameters passed to the template consists of any template
 parameters defined in the prototype with the question template parameters
@@ -1133,7 +1142,9 @@ the question author\'s template.
 
 The Student Answer dropdown displays a list
 of available plugins. For coding questions, the Ace editor is usually used.
-A value of \'None\' can be used to provide just a raw text box. The value
+A value of \'None\' can be used to provide just a raw text box.
+
+The value
 \'Graph\' provides the user with a simple graph-drawing user-interface for use
 with questions that ask the student to draw a graph to some specification; such
 questions will usually have a single test case, graded with a template
@@ -1147,12 +1158,13 @@ incoming edges without a start node and to allow double clicking a node
 to define it as an accept state;
 {"noderadius": 30}, say, to set a different noderadius in pixels;
 {"helpmenutext": "Line1\nLine2\nLine3"} to replace the default help menu with a
-customised version.
+customised version. Other template parameters are documented within the built-in
+directed\_graph and undirected\_graph question types.
 The template parameters
 from the actual question are merged with, and override, those from the
 prototype (since CodeRunner V3.2.2).
 
-There is also a \'Table\' user interface element, which displays a table of text
+The \'Table\' user interface element, which displays a table of text
 areas for the student to
 fill in. It is used by the \'python3_program_testing\' question type, which is
 included in the sample questions on github. This takes template parameters of
@@ -1163,6 +1175,9 @@ the percentages of the table width to allocate to all columns, including the
 row label column if specified) and table_locked_cells (a list of [row, column]
 pairs of cells that the user cannot alter - the row and column indices are
 0-origin but do not include the row label column or the column header row).
+
+The \'Gapfiller\' and \'Html\' user interfaces are documented in the 
+main CodeRunner documentation at https://github.com/trampgeek/moodle-qtype_coderunner#code-runner.
 
 Students with poor eyesight, or authors wishing to inspect serialisations
 (say to understand the representation used by the Graph UI),

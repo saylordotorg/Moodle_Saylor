@@ -71,10 +71,12 @@ class core_question_generator extends component_generator_base {
      * examples from the appropriate {@link question_test_helper} subclass.
      * Then, any files you want to change from the value in the base example you
      * can override using $overrides.
+     *
      * @param string $qtype the question type to create an example of.
      * @param string $which as for the corresponding argument of
      *      {@link question_test_helper::get_question_form_data}. null for the default one.
      * @param array|stdClass $overrides any fields that should be different from the base example.
+     * @return stdClass the question data.
      */
     public function create_question($qtype, $which = null, $overrides = null) {
         global $CFG;
@@ -94,12 +96,24 @@ class core_question_generator extends component_generator_base {
     }
 
     /**
+     * Create a tag on a question.
+     *
+     * @param array $data with two elements ['questionid' => 123, 'tag' => 'mytag'].
+     */
+    public function create_question_tag(array $data): void {
+        $question = question_bank::load_question($data['questionid']);
+        core_tag_tag::add_item_tag('core_question', 'question', $question->id,
+                context::instance_by_id($question->contextid), $data['tag'], 0);
+    }
+
+    /**
      * Update an existing question.
      *
      * @param stdClass $question the question data to update.
      * @param string $which as for the corresponding argument of
      *      {@link question_test_helper::get_question_form_data}. null for the default one.
      * @param array|stdClass $overrides any fields that should be different from the base example.
+     * @return stdClass the question data.
      */
     public function update_question($question, $which = null, $overrides = null) {
         global $CFG, $DB;
@@ -115,10 +129,15 @@ class core_question_generator extends component_generator_base {
 
         $question = question_bank::get_qtype($qtype)->save_question($question, $fromform);
 
-        if ($overrides && array_key_exists('createdby', $overrides)) {
-            // Manually update the createdby because questiontypebase forces current user and some tests require a
-            // specific user.
-            $question->createdby = $overrides['createdby'];
+        if ($overrides && (array_key_exists('createdby', $overrides) || array_key_exists('modifiedby', $overrides))) {
+            // Manually update the createdby and modifiedby because questiontypebase forces
+            // current user and some tests require a specific user.
+            if (array_key_exists('createdby', $overrides)) {
+                $question->createdby = $overrides['createdby'];
+            }
+            if (array_key_exists('modifiedby', $overrides)) {
+                $question->modifiedby = $overrides['modifiedby'];
+            }
             $DB->update_record('question', $question);
         }
 

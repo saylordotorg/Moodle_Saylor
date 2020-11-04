@@ -30,11 +30,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU Public License
  *
  */
-// Used by the Moodle Core for identifing the format and displaying in the list of formats for a course in its settings.
-// Possibly legacy to be removed after Moodle 2.0 is stable.
-$string['nametopcoll'] = 'Collapsed Topics';
-$string['formattopcoll'] = 'Collapsed Topics';
-
 // Used in format.php.
 $string['topcolltoggle'] = 'Toggle';
 $string['topcollsidewidthlang'] = 'en-28px';
@@ -374,6 +369,55 @@ $string['resetalldisplayinstructions'] = 'Display instructions';
 $string['resetdisplayinstructions_help'] = 'Resets the display instructions to the default value so it will be the same as a course the first time it is in the Collapsed Topics format.';
 $string['resetalldisplayinstructions_help'] = 'Resets the display instructions to the default value for all courses so it will be the same as a course the first time it is in the Collapsed Topics format.';
 
+// Activity display *********************************.
+$string['answered'] = 'Answered';
+$string['attempted'] = 'Attempted';
+$string['contributed'] = 'Contributed';
+$string['draft'] = 'Not published to students';
+$string['due'] = 'Due {$a}';
+$string['expired'] = 'Expired';
+$string['feedbackavailable'] = 'Feedback available';
+$string['notanswered'] = 'Not answered';
+$string['notattempted'] = 'Not attempted';
+$string['notcontributed'] = 'Not contributed';
+$string['notsubmitted'] = 'Not submitted';
+$string['overdue'] = 'Overdue';
+$string['reopened'] = 'Reopened';
+$string['submitted'] = 'Submitted';
+
+$string['xofyanswered'] = '{$a->completed} of {$a->participants} answered';
+$string['xofyattempted'] = '{$a->completed} of {$a->participants} attempted';
+$string['xofycontributed'] = '{$a->completed} of {$a->participants} contributed';
+$string['xofysubmitted'] = '{$a->completed} of {$a->participants} submitted';
+$string['xungraded'] = '{$a} ungraded';
+
+$string['checked'] = 'Checked';
+$string['warning'] = 'Warning';
+
+$string['coursesectionactivityfurtherinformation'] = 'Course page further information';
+$string['coursesectionactivityfurtherinformationassign'] = 'Show assignment information';
+$string['coursesectionactivityfurtherinformationassigndesc'] = 'Show assignment information, such as due date, submission status.  For teachers / admins, show number of submissions.';
+$string['coursesectionactivityfurtherinformationquiz'] = 'Show quiz information';
+$string['coursesectionactivityfurtherinformationquizdesc'] = 'Show quiz information, such as submission status.  For teachers / admins, show number of submissions.';
+$string['coursesectionactivityfurtherinformationchoice'] = 'Show choice information';
+$string['coursesectionactivityfurtherinformationchoicedesc'] = 'Show choice information, such as submission status.  For teachers / admins, show number of submissions.';
+$string['coursesectionactivityfurtherinformationfeedback'] = 'Show feedback information';
+$string['coursesectionactivityfurtherinformationfeedbackdesc'] = 'Show feedback information, such as submission status.  For teachers / admins, show number of submissions.';
+$string['coursesectionactivityfurtherinformationlesson'] = 'Show lesson information';
+$string['coursesectionactivityfurtherinformationlessondesc'] = 'Show lesson information, such as submission status.  For teachers / admins, show number of submissions.';
+$string['coursesectionactivityfurtherinformationdata'] = 'Show database information';
+$string['coursesectionactivityfurtherinformationdatadesc'] = 'Show data information, such as submission status.  For teachers / admins, show number of submissions.';
+
+// Duplicate section.
+$string['creatingsection'] = 'Creating new section';
+$string['duplicate'] = 'Duplicate';
+$string['duplicateconfirm'] = 'Are you sure you want to duplicate the current section?  This can take a while depending on the amount of resources.';
+$string['duplicating'] = 'Duplicating';
+$string['errornosectioninfo'] = 'The indicated topic have not information';
+$string['progresscounter'] = 'Duplicating activities ({$a->current}/{$a->size})';
+$string['progressfull'] = 'Duplicating topic';
+$string['rebuildcoursecache'] = 'Rebuild course cache';
+
 // Privacy.
 $string['privacy:metadata:preference:toggle'] = 'The state of the toggles on a course.';
 $string['privacy:request:preference:toggle'] = 'The course id "{$a->name}" has the value "{$a->value}" which represents "{$a->decoded}" for the state of the toggles.';
@@ -381,7 +425,3 @@ $string['privacy:request:preference:toggle'] = 'The course id "{$a->name}" has t
 // Readme.
 $string['readme_title'] = 'Collapsed Topics read-me';
 $string['readme_desc'] = 'Please click on \'{$a->url}\' for lots more information about Collapsed Topics.';
-
-// Depreciated.  Remove in M3.4 version.
-$string['defaultcoursedisplay'] = 'Course display';
-$string['defaultcoursedisplay_desc'] = "Either show all the sections on a single page or section zero and the chosen section on page.";

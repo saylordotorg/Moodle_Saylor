@@ -85,6 +85,7 @@ class core_course_management_renderer extends plugin_renderer_base {
                     $categoryid = '';
                 }
                 $select = new single_select($this->page->url, 'categoryid', $categories, $categoryid, $nothing);
+                $select->attributes['aria-label'] = get_string('selectacategory');
                 $html .= $this->render($select);
             }
             $html .= html_writer::end_div();
@@ -264,15 +265,15 @@ class core_course_management_renderer extends plugin_renderer_base {
         $html .= html_writer::start_div('float-left ' . $checkboxclass);
         $html .= html_writer::start_div('custom-control custom-checkbox mr-1 ');
         $html .= html_writer::empty_tag('input', $bcatinput);
-        $html .= html_writer::tag('label', '', array(
-            'aria-label' => get_string('bulkactionselect', 'moodle', $text),
+        $labeltext = html_writer::span(get_string('bulkactionselect', 'moodle', $text), 'sr-only');
+        $html .= html_writer::tag('label', $labeltext, array(
             'class' => 'custom-control-label',
             'for' => 'categorylistitem' . $category->id));
         $html .= html_writer::end_div();
         $html .= html_writer::end_div();
         $html .= $icon;
         if ($hasactions) {
-            $textattributes = array('class' => 'float-left categoryname');
+            $textattributes = array('class' => 'float-left categoryname aalink');
         } else {
             $textattributes = array('class' => 'float-left categoryname without-actions');
         }
@@ -381,9 +382,7 @@ class core_course_management_renderer extends plugin_renderer_base {
     }
 
     public function render_action_menu($menu) {
-        global $OUTPUT;
-
-        return $OUTPUT->render($menu);
+        return $this->output->render($menu);
     }
 
     /**
@@ -542,7 +541,7 @@ class core_course_management_renderer extends plugin_renderer_base {
         $html .= html_writer::start_div('card-body');
         $html .= $this->course_listing_actions($category, $course, $perpage);
         $html .= $this->listing_pagination($category, $page, $perpage, false, $viewmode);
-        $html .= html_writer::start_tag('ul', array('class' => 'ml course-list', 'role' => 'group'));
+        $html .= html_writer::start_tag('ul', array('class' => 'ml course-list'));
         foreach ($category->get_courses($options) as $listitem) {
             $html .= $this->course_listitem($category, $listitem, $courseid);
         }
@@ -643,13 +642,13 @@ class core_course_management_renderer extends plugin_renderer_base {
         $html .= html_writer::start_div('float-left ' . $checkboxclass);
         $html .= html_writer::start_div('custom-control custom-checkbox mr-1 ');
         $html .= html_writer::empty_tag('input', $bulkcourseinput);
-        $html .= html_writer::tag('label', '', array(
-            'aria-label' => get_string('bulkactionselect', 'moodle', $text),
+        $labeltext = html_writer::span(get_string('bulkactionselect', 'moodle', $text), 'sr-only');
+        $html .= html_writer::tag('label', $labeltext, array(
             'class' => 'custom-control-label',
             'for' => 'courselistitem' . $course->id));
         $html .= html_writer::end_div();
         $html .= html_writer::end_div();
-        $html .= html_writer::link($viewcourseurl, $text, array('class' => 'float-left coursename'));
+        $html .= html_writer::link($viewcourseurl, $text, array('class' => 'float-left coursename aalink'));
         $html .= html_writer::start_div('float-right');
         if ($course->idnumber) {
             $html .= html_writer::tag('span', s($course->idnumber), array('class' => 'text-muted idnumber'));
@@ -1217,14 +1216,14 @@ class core_course_management_renderer extends plugin_renderer_base {
         if ($bulkcourseinput) {
             $html .= html_writer::start_div('custom-control custom-checkbox mr-1');
             $html .= html_writer::empty_tag('input', $bulkcourseinput);
-            $html .= html_writer::tag('label', '', array(
-                'aria-label' => get_string('bulkactionselect', 'moodle', $text),
+            $labeltext = html_writer::span(get_string('bulkactionselect', 'moodle', $text), 'sr-only');
+            $html .= html_writer::tag('label', $labeltext, array(
                 'class' => 'custom-control-label',
                 'for' => 'coursesearchlistitem' . $course->id));
             $html .= html_writer::end_div();
         }
         $html .= html_writer::end_div();
-        $html .= html_writer::link($viewcourseurl, $text, array('class' => 'float-left coursename'));
+        $html .= html_writer::link($viewcourseurl, $text, array('class' => 'float-left coursename aalink'));
         $html .= html_writer::tag('span', $categoryname, array('class' => 'float-left ml-3 text-muted'));
         $html .= html_writer::start_div('float-right');
         $html .= $this->search_listitem_actions($course);
@@ -1325,12 +1324,12 @@ class core_course_management_renderer extends plugin_renderer_base {
         $output .= html_writer::start_tag('form', array('class' => 'card', 'id' => $formid,
                 'action' => $searchurl, 'method' => 'get'));
         $output .= html_writer::start_tag('fieldset', array('class' => 'coursesearchbox invisiblefieldset'));
-        $output .= html_writer::tag('div', $this->output->heading($strsearchcourses.': ', 2, 'm-0'),
+        $output .= html_writer::tag('legend', $this->output->heading($strsearchcourses.': ', 2, 'm-0'),
                 array('class' => 'card-header'));
         $output .= html_writer::start_div('card-body');
         $output .= html_writer::start_div('input-group col-sm-6 col-lg-4 m-auto');
         $output .= html_writer::empty_tag('input', array('class' => 'form-control', 'type' => 'text', 'id' => $inputid,
-                'size' => $inputsize, 'name' => 'search', 'value' => s($value)));
+                'size' => $inputsize, 'name' => 'search', 'value' => s($value), 'aria-label' => get_string('searchcourses')));
         $output .= html_writer::start_tag('span', array('class' => 'input-group-btn'));
         $output .= html_writer::tag('button', get_string('go'), array('class' => 'btn btn-primary', 'type' => 'submit'));
         $output .= html_writer::end_tag('span');

@@ -848,7 +848,7 @@ class checklist_class {
         }
 
         // Gather some extra details needed in the output.
-        $intro = $this->formatted_intro();
+        $intro = format_module_intro('checklist', $this->checklist, $this->cm->id);
         $progress = null;
         if ($status->is_showprogressbar()) {
             $progress = $this->get_progress();
@@ -874,14 +874,6 @@ class checklist_class {
         }
 
         $this->output->checklist_items($this->items, $this->useritems, $this->groupings, $intro, $status, $progress, $student);
-    }
-
-    protected function formatted_intro() {
-        global $CFG;
-        $intro = file_rewrite_pluginfile_urls($this->checklist->intro, 'pluginfile.php', $this->context->id,
-                                              'mod_checklist', 'intro', null);
-        $opts = array('trusted' => $CFG->enabletrusttext);
-        return format_text($intro, $this->checklist->introformat, $opts);
     }
 
     protected function view_import_export() {
@@ -2632,19 +2624,19 @@ class checklist_class {
                 break;
         }
 
-        $ausers = false;
+        $ausers = [];
         if (get_config('mod_checklist', 'onlyenrolled')) {
             $users = get_enrolled_users($this->context, 'mod/checklist:updateown', $activegroup, 'u.id', null, 0, 0, true);
         } else {
             $users = get_users_by_capability($this->context, 'mod/checklist:updateown', 'u.id', '', '', '',
                                              $activegroup, '', false);
         }
-        if (!$users) {
+        if ($users) {
             $users = array_keys($users);
             if ($this->only_view_mentee_reports()) {
                 $users = $this->filter_mentee_users($users);
             }
-            if (!empty($users)) {
+            if ($users) {
                 list($usql, $uparams) = $DB->get_in_or_equal($users);
                 $ausers = $DB->get_records_sql('SELECT u.id FROM {user} u WHERE u.id '.$usql.$orderby, $uparams);
             }

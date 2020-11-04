@@ -2117,6 +2117,46 @@ class core_message_externallib_testcase extends externallib_advanced_testcase {
         $this->assertCount(0, $unreadnotifications);
     }
 
+    public function test_mark_all_notifications_as_read_time_created_to() {
+        global $DB;
+
+        $this->resetAfterTest(true);
+
+        $sender1 = $this->getDataGenerator()->create_user();
+        $sender2 = $this->getDataGenerator()->create_user();
+
+        $recipient = $this->getDataGenerator()->create_user();
+        $this->setUser($recipient);
+
+        // Record messages as sent on one second intervals.
+        $time = time();
+
+        $this->send_message($sender1, $recipient, 'Message 1', 1, $time);
+        $this->send_message($sender2, $recipient, 'Message 2', 1, $time + 1);
+        $this->send_message($sender1, $recipient, 'Message 3', 1, $time + 2);
+        $this->send_message($sender2, $recipient, 'Message 4', 1, $time + 3);
+
+        // Mark notifications sent from sender1 up until the second message; should only mark the first notification as read.
+        core_message_external::mark_all_notifications_as_read($recipient->id, $sender1->id, $time + 1);
+
+        $params = [$recipient->id];
+
+        $this->assertEquals(1, $DB->count_records_select('notifications', 'useridto = ? AND timeread IS NOT NULL', $params));
+        $this->assertEquals(3, $DB->count_records_select('notifications', 'useridto = ? AND timeread IS NULL', $params));
+
+        // Mark all notifications as read from any sender up to the time the third message was sent.
+        core_message_external::mark_all_notifications_as_read($recipient->id, 0, $time + 2);
+
+        $this->assertEquals(3, $DB->count_records_select('notifications', 'useridto = ? AND timeread IS NOT NULL', $params));
+        $this->assertEquals(1, $DB->count_records_select('notifications', 'useridto = ? AND timeread IS NULL', $params));
+
+        // Mark all notifications as read from any sender with a time after all messages were sent.
+        core_message_external::mark_all_notifications_as_read($recipient->id, 0, $time + 10);
+
+        $this->assertEquals(4, $DB->count_records_select('notifications', 'useridto = ? AND timeread IS NOT NULL', $params));
+        $this->assertEquals(0, $DB->count_records_select('notifications', 'useridto = ? AND timeread IS NULL', $params));
+    }
+
     /**
      * Test get_user_notification_preferences
      */
@@ -5870,6 +5910,54 @@ class core_message_externallib_testcase extends externallib_advanced_testcase {
         $result = external_api::clean_returnvalue(core_message_external::get_conversations_returns(), $result);
         $conversations = $result['conversations'];
         $this->assertCount(0, $conversations);
+    }
+
+    /**
+     * Test that group conversations containing MathJax don't break the WebService.
+     */
+    public function test_get_conversations_group_with_mathjax() {
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        // Enable MathJax filter in content and headings.
+        $this->configure_filters([
+            ['name' => 'mathjaxloader', 'state' => TEXTFILTER_ON, 'move' => -1, 'applytostrings' => true],
+        ]);
+
+        // Create some users, a course and a group with a linked conversation.
+        $user1 = self::getDataGenerator()->create_user();
+        $user2 = self::getDataGenerator()->create_user();
+
+        $coursename = 'Course $$(a+b)=2$$';
+        $groupname = 'Group $$(a+b)=2$$';
+        $course1 = $this->getDataGenerator()->create_course(['shortname' => $coursename]);
+
+        $this->getDataGenerator()->enrol_user($user1->id, $course1->id);
+        $this->getDataGenerator()->enrol_user($user2->id, $course1->id);
+        $group1 = $this->getDataGenerator()->create_group([
+            'name' => $groupname,
+            'courseid' => $course1->id,
+            'enablemessaging' => 1,
+        ]);
+
+        // Add users to group1.
+        $this->getDataGenerator()->create_group_member(array('groupid' => $group1->id, 'userid' => $user1->id));
+        $this->getDataGenerator()->create_group_member(array('groupid' => $group1->id, 'userid' => $user2->id));
+
+        // Call the WebService.
+        $result = core_message_external::get_conversations($user1->id, 0, 20, null, false);
+        $result = external_api::clean_returnvalue(core_message_external::get_conversations_returns(), $result);
+        $conversations = $result['conversations'];
+
+        // Format original data.
+        $coursecontext = \context_course::instance($course1->id);
+        $coursename = external_format_string($coursename, $coursecontext->id);
+        $groupname = external_format_string($groupname, $coursecontext->id);
+
+        $this->assertStringContainsString('<span class="filter_mathjaxloader_equation">', $conversations[0]['name']);
+        $this->assertStringContainsString('<span class="filter_mathjaxloader_equation">', $conversations[0]['subname']);
+        $this->assertEquals($groupname, $conversations[0]['name']);
+        $this->assertEquals($coursename, $conversations[0]['subname']);
     }
 
     /**

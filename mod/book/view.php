@@ -152,7 +152,6 @@ foreach ($chapters as $ch) {
 if ($book->navstyle) {
     $navprevicon = right_to_left() ? 'nav_next' : 'nav_prev';
     $navnexticon = right_to_left() ? 'nav_prev' : 'nav_next';
-    $navprevdisicon = right_to_left() ? 'nav_next_dis' : 'nav_prev_dis';
 
     $chnavigation = '';
     if ($previd) {
@@ -166,10 +165,6 @@ if ($book->navstyle) {
                 $cm->id . '&amp;chapterid=' . $previd . '">' .
                 '<span class="chaptername"><span class="arrow">' . $OUTPUT->larrow() . '&nbsp;</span></span>' .
                 $navprev . ':&nbsp;<span class="chaptername">' . $prevtitle . '</span></a>';
-        }
-    } else {
-        if ($book->navstyle == 1) {
-            $chnavigation .= $OUTPUT->pix_icon($navprevdisicon, '', 'mod_book');
         }
     }
     if ($nextid) {
@@ -222,7 +217,7 @@ $navclasses = book_get_nav_classes();
 
 if ($book->navstyle) {
     // Upper navigation.
-    echo '<div class="navtop clearfix ' . $navclasses[$book->navstyle] . '">' . $chnavigation . '</div>';
+    echo '<div class="navtop border-top py-3 clearfix ' . $navclasses[$book->navstyle] . '">' . $chnavigation . '</div>';
 }
 
 // The chapter itself.
@@ -251,7 +246,7 @@ if (core_tag_tag::is_enabled('mod_book', 'book_chapters')) {
 
 if ($book->navstyle) {
     // Lower navigation.
-    echo '<div class="navbottom clearfix ' . $navclasses[$book->navstyle] . '">' . $chnavigation . '</div>';
+    echo '<div class="navbottom py-3 border-bottom clearfix ' . $navclasses[$book->navstyle] . '">' . $chnavigation . '</div>';
 }
 
 echo $OUTPUT->footer();

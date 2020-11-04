@@ -215,6 +215,9 @@ class core_message_external extends external_api {
                 //          We should have thrown exceptions as these errors prevent results to be returned.
                 // See http://docs.moodle.org/dev/Errors_handling_in_web_services#When_to_send_a_warning_on_the_server_side .
                 $resultmsg['msgid'] = -1;
+                if (!isset($errormessage)) { // Nobody has set a message error or thrown an exception, let's set it.
+                    $errormessage = get_string('messageundeliveredbynotificationsettings', 'error');
+                }
                 $resultmsg['errormessage'] = $errormessage;
             }
 
@@ -1255,8 +1258,8 @@ class core_message_external extends external_api {
         return new external_single_structure(
             array(
                 'id' => new external_value(PARAM_INT, 'The conversation id'),
-                'name' => new external_value(PARAM_TEXT, 'The conversation name, if set', VALUE_DEFAULT, null),
-                'subname' => new external_value(PARAM_TEXT, 'A subtitle for the conversation name, if set', VALUE_DEFAULT, null),
+                'name' => new external_value(PARAM_RAW, 'The conversation name, if set', VALUE_DEFAULT, null),
+                'subname' => new external_value(PARAM_RAW, 'A subtitle for the conversation name, if set', VALUE_DEFAULT, null),
                 'imageurl' => new external_value(PARAM_URL, 'A link to the conversation picture, if set', VALUE_DEFAULT, null),
                 'type' => new external_value(PARAM_INT, 'The type of the conversation (1=individual,2=group,3=self)'),
                 'membercount' => new external_value(PARAM_INT, 'Total number of conversation members'),
@@ -1316,7 +1319,7 @@ class core_message_external extends external_api {
             array(
                 'id' => new external_value(PARAM_INT, 'Conversations id'),
                 'type' => new external_value(PARAM_INT, 'Conversation type: private or public'),
-                'name' => new external_value(PARAM_TEXT, 'Multilang compatible conversation name'. VALUE_OPTIONAL),
+                'name' => new external_value(PARAM_RAW, 'Multilang compatible conversation name'. VALUE_OPTIONAL),
                 'timecreated' => new external_value(PARAM_INT, 'The timecreated timestamp for the conversation'),
             ), 'information about conversation', VALUE_OPTIONAL),
             'Conversations between users', VALUE_OPTIONAL
@@ -3255,6 +3258,9 @@ class core_message_external extends external_api {
                 'useridfrom' => new external_value(
                     PARAM_INT, 'the user id who send the message, 0 for any user. -10 or -20 for no-reply or support user',
                     VALUE_DEFAULT, 0),
+                'timecreatedto' => new external_value(
+                    PARAM_INT, 'mark messages created before this time as read, 0 for all messages',
+                    VALUE_DEFAULT, 0),
             )
         );
     }
@@ -3267,9 +3273,10 @@ class core_message_external extends external_api {
      * @throws moodle_exception
      * @param  int      $useridto       the user id who received the message
      * @param  int      $useridfrom     the user id who send the message. -10 or -20 for no-reply or support user
+     * @param  int      $timecreatedto  mark message created before this time as read, 0 for all messages
      * @return external_description
      */
-    public static function mark_all_notifications_as_read($useridto, $useridfrom) {
+    public static function mark_all_notifications_as_read($useridto, $useridfrom, $timecreatedto = 0) {
         global $USER;
 
         $params = self::validate_parameters(
@@ -3277,6 +3284,7 @@ class core_message_external extends external_api {
             array(
                 'useridto' => $useridto,
                 'useridfrom' => $useridfrom,
+                'timecreatedto' => $timecreatedto,
             )
         );
 
@@ -3285,6 +3293,7 @@ class core_message_external extends external_api {
 
         $useridto = $params['useridto'];
         $useridfrom = $params['useridfrom'];
+        $timecreatedto = $params['timecreatedto'];
 
         if (!empty($useridto)) {
             if (core_user::is_real_user($useridto)) {
@@ -3306,7 +3315,7 @@ class core_message_external extends external_api {
             throw new moodle_exception('accessdenied', 'admin');
         }
 
-        \core_message\api::mark_all_notifications_as_read($useridto, $useridfrom);
+        \core_message\api::mark_all_notifications_as_read($useridto, $useridfrom, $timecreatedto);
 
         return true;
     }
@@ -4115,11 +4124,6 @@ class core_message_external extends external_api {
      */
     public static function message_processor_config_form($userid, $name, $formvalues) {
         global $USER, $CFG;
-
-        // Check if messaging is enabled.
-        if (empty($CFG->messaging)) {
-            throw new moodle_exception('disabled', 'message');
-        }
 
         $params = self::validate_parameters(
             self::message_processor_config_form_parameters(),

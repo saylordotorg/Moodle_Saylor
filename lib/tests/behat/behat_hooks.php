@@ -64,14 +64,12 @@ use Behat\Testwork\Hook\Scope\BeforeSuiteScope,
 class behat_hooks extends behat_base {
 
     /**
-     * @var Last browser session start time.
-     */
-    protected static $lastbrowsersessionstart = 0;
-
-    /**
      * @var For actions that should only run once.
      */
     protected static $initprocessesfinished = false;
+
+    /** @var bool Whether the first javascript scenario has been seen yet */
+    protected static $firstjavascriptscenarioseen = false;
 
     /**
      * @var bool Scenario running
@@ -87,6 +85,17 @@ class behat_hooks extends behat_base {
      * @var Null or the exception last step throw in the before or after hook.
      */
     protected static $currentstepexception = null;
+
+    /**
+     * If an Exception is thrown in the BeforeScenario hook it will cause the Scenario to be skipped, and the exit code
+     * to be non-zero triggering a potential rerun.
+     *
+     * To combat this the exception is stored and re-thrown when looking for exceptions.
+     * This allows the test to instead be failed and re-run correctly.
+     *
+     * @var null|Exception
+     */
+    protected static $currentscenarioexception = null;
 
     /**
      * If we are saving any kind of dump on failure we should use the same parent dir during a run.
@@ -115,38 +124,21 @@ class behat_hooks extends behat_base {
     protected static $scenariotags;
 
     /**
-     * Hook to capture BeforeSuite event so as to give access to moodle codebase.
-     * This will try and catch any exception and exists if anything fails.
-     *
-     * @param BeforeSuiteScope $scope scope passed by event fired before suite.
-     * @BeforeSuite
-     */
-    public static function before_suite_hook(BeforeSuiteScope $scope) {
-        // If behat has been initialised then no need to do this again.
-        if (self::$initprocessesfinished) {
-            return;
-        }
-
-        try {
-            self::before_suite($scope);
-        } catch (behat_stop_exception $e) {
-            echo $e->getMessage() . PHP_EOL;
-            exit(1);
-        }
-    }
-
-    /**
      * Gives access to moodle codebase, ensures all is ready and sets up the test lock.
      *
-     * Includes config.php to use moodle codebase with $CFG->behat_*
-     * instead of $CFG->prefix and $CFG->dataroot, called once per suite.
+     * Includes config.php to use moodle codebase with $CFG->behat_* instead of $CFG->prefix and $CFG->dataroot, called
+     * once per suite.
      *
+     * @BeforeSuite
      * @param BeforeSuiteScope $scope scope passed by event fired before suite.
-     * @static
-     * @throws behat_stop_exception
      */
-    public static function before_suite(BeforeSuiteScope $scope) {
+    public static function before_suite_hook(BeforeSuiteScope $scope) {
         global $CFG;
+
+        // If behat has been initialised then no need to do this again.
+        if (!self::is_first_scenario()) {
+            return;
+        }
 
         // Defined only when the behat CLI command is running, the moodle init setup process will
         // read this value and switch to $CFG->behat_dataroot and $CFG->behat_prefix instead of
@@ -175,8 +167,7 @@ class behat_hooks extends behat_base {
         // before each scenario (accidental user deletes) in the BeforeScenario hook.
 
         if (!behat_util::is_test_mode_enabled()) {
-            throw new behat_stop_exception('Behat only can run if test mode is enabled. More info in ' .
-                behat_command::DOCS_URL);
+            self::log_and_stop('Behat only can run if test mode is enabled. More info in ' .  behat_command::DOCS_URL);
         }
 
         // Reset all data, before checking for check_server_status.
@@ -184,26 +175,28 @@ class behat_hooks extends behat_base {
         behat_util::clean_tables_updated_by_scenario_list();
         behat_util::reset_all_data();
 
-        // Check if server is running and using same version for cli and apache.
+        // Check if the web server is running and using same version for cli and apache.
         behat_util::check_server_status();
 
         // Prevents using outdated data, upgrade script would start and tests would fail.
         if (!behat_util::is_test_data_updated()) {
             $commandpath = 'php admin/tool/behat/cli/init.php';
-            throw new behat_stop_exception("Your behat test site is outdated, please run\n\n    " .
-                    $commandpath . "\n\nfrom your moodle dirroot to drop and install the behat test site again.");
+            $message = <<<EOF
+Your behat test site is outdated, please run the following command from your Moodle dirroot to drop, and reinstall the Behat test site.
+
+    {$commandpath}
+
+EOF;
+            self::log_and_stop($message);
         }
+
         // Avoid parallel tests execution, it continues when the previous lock is released.
         test_lock::acquire('behat');
 
-        // Store the browser reset time if reset after N seconds is specified in config.php.
-        if (!empty($CFG->behat_restart_browser_after)) {
-            // Store the initial browser session opening.
-            self::$lastbrowsersessionstart = time();
-        }
-
         if (!empty($CFG->behat_faildump_path) && !is_writable($CFG->behat_faildump_path)) {
-            throw new behat_stop_exception('You set $CFG->behat_faildump_path to a non-writable directory');
+            self::log_and_stop(
+                "The \$CFG->behat_faildump_path value is set to a non-writable directory ({$CFG->behat_faildump_path})."
+            );
         }
 
         // Handle interrupts on PHP7.
@@ -212,6 +205,25 @@ class behat_hooks extends behat_base {
             if (!in_array('pcntl_signal', $disabled)) {
                 declare(ticks = 1);
             }
+        }
+    }
+
+    /**
+     * Run final tests before running the suite.
+     *
+     * @BeforeSuite
+     * @param BeforeSuiteScope $scope scope passed by event fired before suite.
+     */
+    public static function before_suite_final_checks(BeforeSuiteScope $scope) {
+        $happy = defined('BEHAT_TEST');
+        $happy = $happy && defined('BEHAT_SITE_RUNNING');
+        $happy = $happy && php_sapi_name() == 'cli';
+        $happy = $happy && behat_util::is_test_mode_enabled();
+        $happy = $happy && behat_util::is_test_site();
+
+        if (!$happy) {
+            error_log('Behat only can modify the test database and the test dataroot!');
+            exit(1);
         }
     }
 
@@ -271,54 +283,117 @@ class behat_hooks extends behat_base {
     }
 
     /**
-     * Hook to capture before scenario event to get scope.
-     *
-     * @param BeforeScenarioScope $scope scope passed by event fired before scenario.
-     * @BeforeScenario
+     * Helper function to restart the Mink session.
      */
-    public function before_scenario_hook(BeforeScenarioScope $scope) {
+    protected function restart_session(): void {
+        $session = $this->getSession();
+        if ($session->isStarted()) {
+            $session->restart();
+        } else {
+            $session->start();
+        }
+        if ($this->running_javascript() && $this->getSession()->getDriver()->getWebDriverSessionId() === 'session') {
+            throw new DriverException('Unable to create a valid session');
+        }
+    }
+
+    /**
+     * Restart the session before each non-javascript scenario.
+     *
+     * @BeforeScenario @~javascript
+     * @param BeforeScenarioScope $scope scope passed by event fired before scenario.
+     */
+    public function before_goutte_scenarios(BeforeScenarioScope $scope) {
+        if ($this->running_javascript()) {
+            // A bug in the BeforeScenario filtering prevents the @~javascript filter on this hook from working
+            // properly.
+            // See https://github.com/Behat/Behat/issues/1235 for further information.
+            return;
+        }
+
+        $this->restart_session();
+    }
+
+    /**
+     * Start the session before the first javascript scenario.
+     *
+     * This is treated slightly differently to try to capture when Selenium is not running at all.
+     *
+     * @BeforeScenario @javascript
+     * @param BeforeScenarioScope $scope scope passed by event fired before scenario.
+     */
+    public function before_first_scenario_start_session(BeforeScenarioScope $scope) {
+        if (!self::is_first_javascript_scenario()) {
+            // The first Scenario has started.
+            // The `before_subsequent_scenario_start_session` function will restart the session instead.
+            return;
+        }
+        self::$firstjavascriptscenarioseen = true;
+
+        $docsurl = behat_command::DOCS_URL;
+        $driverexceptionmsg = <<<EOF
+
+The Selenium or WebDriver server is not running. You must start it to run tests that involve Javascript.
+See {$docsurl} for more information.
+
+The following debugging information is available:
+
+EOF;
+
+
         try {
-            $this->before_scenario($scope);
-        } catch (behat_stop_exception $e) {
-            echo $e->getMessage() . PHP_EOL;
-            exit(1);
+            $this->restart_session();
+        } catch (CurlExec | DriverException $e) {
+            // The CurlExec Exception is thrown by WebDriver.
+            self::log_and_stop(
+                $driverexceptionmsg . '. ' .
+                $e->getMessage() . "\n\n" .
+                format_backtrace($e->getTrace(), true)
+            );
+        } catch (UnknownError $e) {
+            // Generic 'I have no idea' Selenium error. Custom exception to provide more feedback about possible solutions.
+            self::log_and_stop(
+                $e->getMessage() . "\n\n" .
+                format_backtrace($e->getTrace(), true)
+            );
+        }
+    }
+
+    /**
+     * Start the session before each javascript scenario.
+     *
+     * Note: Before the first scenario the @see before_first_scenario_start_session() function is used instead.
+     *
+     * @BeforeScenario @javascript
+     * @param BeforeScenarioScope $scope scope passed by event fired before scenario.
+     */
+    public function before_subsequent_scenario_start_session(BeforeScenarioScope $scope) {
+        if (self::is_first_javascript_scenario()) {
+            // The initial init has not yet finished.
+            // The `before_first_scenario_start_session` function will have started the session instead.
+            return;
+        }
+        self::$currentscenarioexception = null;
+
+        try {
+            $this->restart_session();
+        } catch (Exception $e) {
+            self::$currentscenarioexception = $e;
         }
     }
 
     /**
      * Resets the test environment.
      *
+     * @BeforeScenario
      * @param BeforeScenarioScope $scope scope passed by event fired before scenario.
-     * @throws behat_stop_exception If here we are not using the test database it should be because of a coding error
      */
-    public function before_scenario(BeforeScenarioScope $scope) {
-        global $DB, $CFG;
-
-        // As many checks as we can.
-        if (!defined('BEHAT_TEST') ||
-               !defined('BEHAT_SITE_RUNNING') ||
-               php_sapi_name() != 'cli' ||
-               !behat_util::is_test_mode_enabled() ||
-               !behat_util::is_test_site()) {
-            throw new behat_stop_exception('Behat only can modify the test database and the test dataroot!');
-        }
-
-        $moreinfo = 'More info in ' . behat_command::DOCS_URL;
-        $driverexceptionmsg = 'Selenium server is not running, you need to start it to run tests that involve Javascript. ' . $moreinfo;
-        try {
-            $session = $this->getSession();
-            if (!$session->isStarted()) {
-                $session->start();
-            }
-        } catch (CurlExec $e) {
-            // Exception thrown by WebDriver, so only @javascript tests will be caugth; in
-            // behat_util::check_server_status() we already checked that the server is running.
-            throw new behat_stop_exception($driverexceptionmsg);
-        } catch (DriverException $e) {
-            throw new behat_stop_exception($driverexceptionmsg);
-        } catch (UnknownError $e) {
-            // Generic 'I have no idea' Selenium error. Custom exception to provide more feedback about possible solutions.
-            throw new behat_stop_exception($e->getMessage());
+    public function before_scenario_hook(BeforeScenarioScope $scope) {
+        global $DB;
+        if (self::$currentscenarioexception) {
+            // A BeforeScenario hook triggered an exception and marked this test as failed.
+            // Skip this hook as it will likely fail.
+            return;
         }
 
         $suitename = $scope->getSuite()->getName();
@@ -354,9 +429,6 @@ class behat_hooks extends behat_base {
 
         }
 
-        // Reset mink session between the scenarios.
-        $session->reset();
-
         // Reset $SESSION.
         \core\session\manager::init_empty_session();
 
@@ -367,18 +439,19 @@ class behat_hooks extends behat_base {
         behat_util::reset_all_data();
         error_reporting($errorlevel);
 
+        if ($this->running_javascript()) {
+            // Fetch the user agent.
+            // This isused to choose between the SVG/Non-SVG versions of themes.
+            $useragent = $this->getSession()->evaluateScript('return navigator.userAgent;');
+            \core_useragent::instance(true, $useragent);
+
+            // Restore the saved themes.
+            behat_util::restore_saved_themes();
+        }
+
         // Assign valid data to admin user (some generator-related code needs a valid user).
         $user = $DB->get_record('user', array('username' => 'admin'));
         \core\session\manager::set_user($user);
-
-        // Reset the browser if specified in config.php.
-        if (!empty($CFG->behat_restart_browser_after) && $this->running_javascript()) {
-            $now = time();
-            if (self::$lastbrowsersessionstart + $CFG->behat_restart_browser_after < $now) {
-                $session->restart();
-                self::$lastbrowsersessionstart = $now;
-            }
-        }
 
         // Set the theme if not default.
         if ($suitename !== "default") {
@@ -423,7 +496,7 @@ class behat_hooks extends behat_base {
             // Again, this would be better in the BeforeSuite hook, but that does not have access to the selectors in
             // order to perform the necessary searches.
             $session = $this->getSession();
-            $session->visit($this->locate_path('/'));
+            $this->execute('behat_general::i_visit', ['/']);
 
             // Checking that the root path is a Moodle test site.
             if (self::is_first_scenario()) {
@@ -475,6 +548,12 @@ class behat_hooks extends behat_base {
      * @BeforeStep
      */
     public function before_step_javascript(BeforeStepScope $scope) {
+        if (self::$currentscenarioexception) {
+            // A BeforeScenario hook triggered an exception and marked this test as failed.
+            // Skip this hook as it will likely fail.
+            return;
+        }
+
         self::$currentstepexception = null;
 
         // Only run if JS.
@@ -566,25 +645,13 @@ class behat_hooks extends behat_base {
     }
 
     /**
-     * Executed after scenario having switch window to restart session.
-     * This is needed to close all extra browser windows and starting
-     * one browser window.
+     * Reset the session between each scenario.
      *
      * @param AfterScenarioScope $scope scope passed by event fired after scenario.
-     * @AfterScenario @_switch_window
+     * @AfterScenario
      */
-    public function after_scenario_switchwindow(AfterScenarioScope $scope) {
-        for ($count = 0; $count < behat_base::get_extended_timeout(); $count++) {
-            try {
-                $this->getSession()->restart();
-                break;
-            } catch (DriverException $e) {
-                // Wait for timeout and try again.
-                sleep(self::get_timeout());
-            }
-        }
-        // If session is not restarted above then it will try to start session before next scenario
-        // and if that fails then exception will be thrown.
+    public function reset_webdriver_between_scenarios(AfterScenarioScope $scope) {
+        $this->getSession()->stop();
     }
 
     /**
@@ -703,6 +770,11 @@ class behat_hooks extends behat_base {
      * @see Moodle\BehatExtension\EventDispatcher\Tester\ChainedStepTester
      */
     public function i_look_for_exceptions() {
+        // If the scenario already failed in a hook throw the exception.
+        if (!is_null(self::$currentscenarioexception)) {
+            throw self::$currentscenarioexception;
+        }
+
         // If the step already failed in a hook throw the exception.
         if (!is_null(self::$currentstepexception)) {
             throw self::$currentstepexception;
@@ -718,6 +790,15 @@ class behat_hooks extends behat_base {
      */
     protected static function is_first_scenario() {
         return !(self::$initprocessesfinished);
+    }
+
+    /**
+     * Returns whether the first scenario of the suite is running
+     *
+     * @return bool
+     */
+    protected static function is_first_javascript_scenario(): bool {
+        return !self::$firstjavascriptscenarioseen;
     }
 
     /**
@@ -759,20 +840,19 @@ class behat_hooks extends behat_base {
      * @param BeforeStepScope $scope
      * @BeforeStep
      */
-    public function first_step_setup_complete(BeforeStepScope $scope) {
+    public function first_step_setup_complete(BeforeStepScope $scope): void {
         self::$initprocessesfinished = true;
     }
 
-}
+    /**
+     * Log a notification, and then exit.
+     *
+     * @param   string $message The content to dispaly
+     */
+    protected static function log_and_stop(string $message): void {
+        error_log($message);
 
-/**
- * Behat stop exception
- *
- * This exception is thrown from before suite or scenario if any setup problem found.
- *
- * @package    core_test
- * @copyright  2016 Rajesh Taneja <rajesh@moodle.com>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-class behat_stop_exception extends \Exception {
+        exit(1);
+    }
+
 }

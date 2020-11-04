@@ -297,18 +297,27 @@ class behat_app extends behat_base {
                 }, false, 60);
 
         // Run the scripts to install Moodle 'pending' checks.
-        $this->getSession()->executeScript(
-                file_get_contents(__DIR__ . '/app_behat_runtime.js'));
+        $this->execute_script(file_get_contents(__DIR__ . '/app_behat_runtime.js'));
 
         // Wait until the site login field appears OR the main page.
         $situation = $this->spin(
                 function($context, $args) {
-                    $input = $context->getSession()->getPage()->find('xpath', '//input[@name="url"]');
-                    if ($input) {
+                    $page = $context->getSession()->getPage();
+
+                    $element = $page->find('xpath', '//page-core-login-site//input[@name="url"]');
+                    if ($element) {
+                        // Wait for the onboarding modal to open, if any.
+                        $this->wait_for_pending_js();
+                        $element = $page->find('xpath', '//page-core-login-site-onboarding');
+                        if ($element) {
+                            $this->i_press_in_the_app('Skip');
+                        }
+
                         return 'login';
                     }
-                    $mainmenu = $context->getSession()->getPage()->find('xpath', '//page-core-mainmenu');
-                    if ($mainmenu) {
+
+                    $element = $page->find('xpath', '//page-core-mainmenu');
+                    if ($element) {
                         return 'mainpage';
                     }
                     throw new DriverException('Moodle app login URL prompt not found');
@@ -317,7 +326,7 @@ class behat_app extends behat_base {
         // If it's the login page, we automatically fill in the URL and leave it on the user/pass
         // page. If it's the main page, we just leave it there.
         if ($situation === 'login') {
-            $this->i_set_the_field_in_the_app('Site address', $CFG->wwwroot);
+            $this->i_set_the_field_in_the_app('campus.example.edu', $CFG->wwwroot);
             $this->i_press_in_the_app('Connect!');
         }
 
@@ -363,8 +372,7 @@ class behat_app extends behat_base {
      */
     public function i_press_the_standard_button_in_the_app(string $button) {
         $this->spin(function($context, $args) use ($button) {
-            $result = $this->getSession()->evaluateScript('return window.behat.pressStandard("' .
-                    $button . '");');
+            $result = $this->evaluate_script("return window.behat.pressStandard('{$button}');");
             if ($result !== 'OK') {
                 throw new DriverException('Error pressing standard button - ' . $result);
             }
@@ -381,7 +389,7 @@ class behat_app extends behat_base {
      */
     public function i_close_the_popup_in_the_app() {
         $this->spin(function($context, $args)  {
-            $result = $this->getSession()->evaluateScript('return window.behat.closePopup();');
+            $result = $this->evaluate_script("return window.behat.closePopup();");
             if ($result !== 'OK') {
                 throw new DriverException('Error closing popup - ' . $result);
             }
@@ -439,7 +447,7 @@ class behat_app extends behat_base {
             } else {
                 $nearbit = '';
             }
-            $result = $context->getSession()->evaluateScript('return window.behat.press("' .
+            $result = $this->evaluate_script('return window.behat.press("' .
                     addslashes_js($text) . '"' . $nearbit .');');
             if ($result !== 'OK') {
                 throw new DriverException('Error pressing item - ' . $result);
@@ -462,7 +470,7 @@ class behat_app extends behat_base {
      */
     public function i_set_the_field_in_the_app(string $field, string $value) {
         $this->spin(function($context, $args) use ($field, $value) {
-            $result = $this->getSession()->evaluateScript('return window.behat.setField("' .
+            $result = $this->evaluate_script('return window.behat.setField("' .
                     addslashes_js($field) . '", "' . addslashes_js($value) . '");');
             if ($result !== 'OK') {
                 throw new DriverException('Error setting field - ' . $result);
@@ -484,7 +492,7 @@ class behat_app extends behat_base {
      */
     public function the_header_should_be_in_the_app(string $text) {
         $result = $this->spin(function($context, $args) {
-            $result = $this->getSession()->evaluateScript('return window.behat.getHeader();');
+            $result = $this->evaluate_script('return window.behat.getHeader();');
             if (substr($result, 0, 3) !== 'OK:') {
                 throw new DriverException('Error getting header - ' . $result);
             }
@@ -526,7 +534,7 @@ class behat_app extends behat_base {
         if (count($names) !== 2) {
             throw new DriverException('Expected to see 2 tabs open, not ' . count($names));
         }
-        $this->getSession()->getDriver()->executeScript('window.close()');
+        $this->execute_script('window.close()');
         $this->getSession()->switchToWindow($names[0]);
     }
 
@@ -538,6 +546,6 @@ class behat_app extends behat_base {
      * @throws DriverException If the navigator.online mode is not available
      */
     public function i_switch_offline_mode(string $offline) {
-        $this->getSession()->evaluateScript('appProvider.setForceOffline(' . $offline . ');');
+        $this->execute_script('appProvider.setForceOffline(' . $offline . ');');
     }
 }
