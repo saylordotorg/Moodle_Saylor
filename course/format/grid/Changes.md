@@ -1,6 +1,6 @@
 History
 =============
-Version 3.9.0.2 - TBD
+Version 3.9.1.0 - 14/11/2020
   1. Fix summary tooltip dismissing itself when floating over the section name.  If you find it is still an issue, then
      consider using the 'sectiontitlesummarymaxlength' setting.
 

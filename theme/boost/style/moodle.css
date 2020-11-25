@@ -9630,6 +9630,9 @@ input[disabled] {
     text-align: right;
 }
 */
+.dir-rtl .custom-switch .custom-control-input:checked ~ .custom-control-label::after {
+  transform: translateX(-0.9375rem); }
+
 /* core.less */
 #region-main {
   overflow-x: auto;
@@ -11641,6 +11644,10 @@ body.h5p-embed .h5pmessages {
 
 .text-break {
   overflow-wrap: break-word !important;
+  /* stylelint-disable-line declaration-no-important */ }
+
+.word-break {
+  word-break: break-word !important;
   /* stylelint-disable-line declaration-no-important */ }
 
 .z-index-0 {
@@ -15764,6 +15771,10 @@ body.jsenabled .questionflag input[type=checkbox] {
 #page-question-preview #techinfo {
   margin: 1em 0; }
 
+#page-question-preview .collapsibleregion .collapsibleregioncaption,
+#page-question-preview .collapsibleregion .collapsibleregionextracontent {
+  display: inline-block; }
+
 #page-mod-quiz-edit ul.slots .activityinstance > a {
   display: flex;
   max-width: 100%;
@@ -17405,9 +17416,13 @@ div#dock {
   clear: left; }
 
 #page-mod-quiz-mod #id_reviewoptionshdr .form-check {
-  width: 90%;
+  width: auto;
   height: 22px;
   justify-content: flex-start; }
+
+#page-mod-quiz-mod #id_reviewoptionshdr .review_option_item {
+  width: 90%;
+  height: 22px; }
 
 .path-mod-quiz #mod_quiz_navblock .qnbutton {
   text-decoration: none;

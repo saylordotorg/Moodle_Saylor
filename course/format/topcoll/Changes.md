@@ -1,6 +1,6 @@
 ﻿Version Information
 ===================
-Version 3.9.1.0 - TBC
+Version 3.9.1.0 - 10/11/20
   1. Fix 'Tests fail on PHP7.4' - #77.
   2. Colour fixes for Adaptable theme version 3.0.0.
   3. Fix 'Show hidden sections in collapsed form does not reveal section titles to students' - CONTRIB-7510.
@@ -12,6 +12,7 @@ Version 3.9.1.0 - TBC
   9. No students port from Adaptable - https://gitlab.com/jezhops/moodle-theme_adaptable/-/issues/185.
  10. Fix 'Due date disappears when moving activities' - #87.
  11. Fix 'Issue with Assignment Meta-information' - #86.
+ 12. Make show information alert colors accessible - #88 - thanks to https://github.com/haietza for the colours.
 
 Version 3.9.0.4 - 31/07/2020
   1. Add 'Duplicate section' functionality from 'onetopic' format, thanks to David Herney Bernal for the code - #72.

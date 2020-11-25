@@ -505,14 +505,14 @@ What are the colors of the Olympic medals?
         $this->start_attempt_at_question($gapfill, 'immediatefeedback', $maxmark);
         $this->process_submission(array('-submit' => 1, 'p1' => 'cat', 'p2' => 'dog'));
         $html = $this->quba->render_question($this->slot, $this->displayoptions);
-        $this->assertContains("[mat]", $html );
+        $this->assertStringContainsString("[mat]", $html );
 
         $gapfill = qtype_gapfill_test_helper::make_question( $questiontext);
         $maxmark = 2;
         $this->start_attempt_at_question($gapfill, 'immediatefeedback', $maxmark);
         $this->process_submission(array('-submit' => 1, 'p1' => 'cat', 'p2' => 'mat'));
         $html = $this->quba->render_question($this->slot, $this->displayoptions);
-        $this->assertNotContains("[mat]", $html );
+        $this->assertStringNotContainsString("[mat]", $html );
 
     }
     public function test_deferred_grade_for_blank() {

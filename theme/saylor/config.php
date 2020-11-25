@@ -26,9 +26,9 @@ defined('MOODLE_INTERNAL') || die();
 
 $THEME->name = 'saylor';
 $THEME->parents = array('boost');
-// This setting list the style sheets we want to include in our theme. Because we want to use SCSS instead of CSS - we won't        
-// list any style sheets. If we did we would list the name of a file in the /style/ folder for our theme without any css file      
-// extensions. 
+// This setting list the style sheets we want to include in our theme. Because we want to use SCSS instead of CSS - we won't
+// list any style sheets. If we did we would list the name of a file in the /style/ folder for our theme without any css file
+// extensions.
 $THEME->sheets = array();
 $THEME->editor_sheets = array();
 $THEME->javascripts_footer = array('prettify');
@@ -38,7 +38,7 @@ $THEME->rendererfactory = 'theme_overridden_renderer_factory';
 $THEME->requiredblocks = '';
 $THEME->addblockposition = BLOCK_ADDBLOCK_POSITION_FLATNAV;
 $THEME->hidefromselector = false;
-$THEME->scss = function($theme) {                                                                      
+$THEME->scss = function($theme) {
     return theme_saylor_get_main_scss_content($theme);
 };
 
