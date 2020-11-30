@@ -267,12 +267,6 @@ def plugins = [
         "dest" : 'blocks/accredibledashboard'
     ],
     [
-        "name" : 'block_quickmail',
-        "url" : 'https://github.com/lsuits/lsu-block_quickmail.git',
-        "branch" : 'master',
-        "dest" : 'blocks/quickmail'
-    ],
-    [
         "name" : 'auth_nsdc',
         "url" : 'https://github.com/saylordotorg/moodle-auth_nsdc.git',
         "branch" : 'master',
