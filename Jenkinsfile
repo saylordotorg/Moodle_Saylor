@@ -71,7 +71,7 @@ def plugins = [
     [
         "name" : 'block_workflow',
         "url" : 'https://github.com/moodleou/moodle-block_workflow.git',
-        "branch" : 'master',
+        "branch" : 'main',
         "dest" : 'blocks/workflow'
     ],
     [
