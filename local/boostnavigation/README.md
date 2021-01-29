@@ -1,7 +1,7 @@
 moodle-local_boostnavigation
 ============================
 
-[![Build Status](https://travis-ci.org/moodleuulm/moodle-local_boostnavigation.svg?branch=master)](https://travis-ci.org/moodleuulm/moodle-local_boostnavigation)
+[![Build Status](https://travis-ci.com/moodleuulm/moodle-local_boostnavigation.svg?branch=master)](https://travis-ci.com/moodleuulm/moodle-local_boostnavigation)
 
 Moodle plugin which tries to overcome some fixed appearance behaviours of Boost's nav drawer in a clean way
 
@@ -9,7 +9,7 @@ Moodle plugin which tries to overcome some fixed appearance behaviours of Boost'
 Requirements
 ------------
 
-This plugin requires Moodle 3.8+
+This plugin requires Moodle 3.10+
 
 
 Motivation for this plugin
@@ -33,41 +33,33 @@ Usage & Settings
 After installing the plugin, it does not do anything to Moodle yet.
 
 To configure the plugin and its behaviour, please visit:
-Site administration -> Appearance -> Boost navdrawer fumbling.
+Site administration -> Appearance.
 
-There, you find four sections:
+There, you find a section "Boost navigation fumbling" and multiple settings pages:
 
-### 1. Remove root nodes from Boost's nav drawer
+### 1. Root nodes
 
-Enabling any of these settings will remove nodes from Boost's nav drawer. 
+On this page, you can remove root nodes.
 
-### 2. Insert root nodes to Boost's nav drawer
+### 2. My courses root node
 
-Enabling any of these settings will insert additional nodes to Boost's nav drawer.
+On this page, you can remove, modify and collapse the my courses root node.
 
-### 3. Collapse root nodes in Boost's nav drawer
+### 3. Custom root nodes
 
-Enabling any of these settings will let users collapse root nodes in Boost's nav drawer. 
+On this page, you can insert and collapse custom root nodes.
 
-### 4. Remove course nodes from Boost's nav drawer
+### 4. Course nodes
 
-Similar to the "Remove root nodes from Boost's nav drawer" section, enabling any of these settings will remove nodes from the course navigation section of Boost's nav drawer.
+On this page, you can remove, insert and collapse course nodes.
 
-### 5. Insert course nodes to Boost's nav drawer
+### 5. Custom course nodes
 
-Similar to the "Remove root nodes from Boost's nav drawer" section, enabling any of these settings will insert additional nodes to the course navigation section of Boost's nav drawer.
+On this page, you can insert and collapse custom course nodes.
 
-### 6. Collapse course nodes in Boost's nav drawer
+### 6. Custom bottom nodes
 
-Similar to the "Collapse root odes in Boost's nav drawer" section, enabling any of these settings will let users collapse nodes in the course navigation section of Boost's nav drawer. 
-
-### 7. Insert bottom nodes to Boost's nav drawer
-
-Similar to the "Remove root nodes from Boost's nav drawer" section, enabling any of these settings will insert additional nodes add the end of Boost's nav drawer.
-
-### 8. Collapse bottom nodes in Boost's nav drawer
-
-Similar to the "Collapse root odes in Boost's nav drawer" section, enabling any of these settings will let users collapse nodes at the end of Boost's nav drawer. 
+On this page, you can insert and collapse custom bottom nodes.
 
 
 How this plugin works
@@ -126,11 +118,13 @@ We are always interested to read about your feature proposals or even get a pull
 Moodle release support
 ----------------------
 
-Due to limited resources, this plugin is only maintained for the most recent major release of Moodle. However, previous versions of this plugin which work in legacy major releases of Moodle are still available as-is without any further updates in the Moodle Plugins repository.
+Due to limited resources, this plugin is only maintained for the most recent major release of Moodle as well as the most recent LTS release of Moodle. Bugfixes are backported to the LTS release. However, new features and improvements are not necessarily backported to the LTS release.
 
-There may be several weeks after a new major release of Moodle has been published until we can do a compatibility check and fix problems if necessary. If you encounter problems with a new major release of Moodle - or can confirm that this plugin still works with a new major relase - please let us know on Github.
+Apart from these maintained releases, previous versions of this plugin which work in legacy major releases of Moodle are still available as-is without any further updates in the Moodle Plugins repository.
 
-If you are running a legacy version of Moodle, but want or need to run the latest version of this plugin, you can get the latest version of the plugin, remove the line starting with $plugin->requires from version.php and use this latest plugin version then on your legacy Moodle. However, please note that you will run this setup completely at your own risk. We can't support this approach in any way and there is a undeniable risk for erratic behavior.
+There may be several weeks after a new major release of Moodle has been published until we can do a compatibility check and fix problems if necessary. If you encounter problems with a new major release of Moodle - or can confirm that this plugin still works with a new major release - please let us know on Github.
+
+If you are running a legacy version of Moodle, but want or need to run the latest version of this plugin, you can get the latest version of the plugin, remove the line starting with $plugin->requires from version.php and use this latest plugin version then on your legacy Moodle. However, please note that you will run this setup completely at your own risk. We can't support this approach in any way and there is an undeniable risk for erratic behavior.
 
 
 Translating this plugin

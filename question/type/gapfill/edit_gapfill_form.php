@@ -78,8 +78,10 @@ class qtype_gapfill_edit_form extends question_edit_form {
         /* popup for entering feedback for individual words */
         $mform->addElement('html', '<div id="id_itemsettings_popup" title="' . get_string('additemsettings', 'qtype_gapfill')
                 . '" style="display:none;background-color:lightgrey" >');
-        $mform->addElement('editor', 'correct', '', array('size' => 70, 'rows' => 4),  ['autosave' => false]);
-        $mform->addElement('editor', 'incorrect', '', array('size' => 70, 'rows' => 4),  ['autosave' => false]);
+        $mform->addElement('editor', 'correct', get_string('correct', 'qtype_gapfill'),
+         array('size' => 70, 'rows' => 4),  ['autosave' => false]);
+        $mform->addElement('editor', 'incorrect', get_string('incorrect', 'qtype_gapfill'),
+         array('size' => 70, 'rows' => 4),  ['autosave' => false]);
         $mform->addElement('html', '</div>');
 
         /* presented for clicking on the gaps once they have been given numberical ids */

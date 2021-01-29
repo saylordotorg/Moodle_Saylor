@@ -27,9 +27,8 @@ global $CFG;
 
 require_once($CFG->dirroot . '/question/type/gapfill/questiontype.php');
 require_once($CFG->dirroot . '/question/type/gapfill/tests/helper.php');
-
 /**
- * Unit tests for the shortanswer question type class.
+ * Unit tests for the gapfill question type class.
  *
  * @copyright  2012 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -40,16 +39,16 @@ class qtype_gapfill_test extends advanced_testcase {
      *  explained here https://docs.moodle.org/dev/Unit_test_API
      * @var array
      */
-    public static $includecoverage = array(
+    protected static $includecoverage = array(
         'question/type/questiontypebase.php',
         'question/type/gapfill/questiontype.php',
     );
 
-    protected function setUp() : void {
+    protected function setUp(): void {
         $this->qtype = new qtype_gapfill();
     }
 
-    protected function tearDown() : void {
+    protected function tearDown(): void {
         $this->qtype = null;
     }
     /**
@@ -86,6 +85,27 @@ class qtype_gapfill_test extends advanced_testcase {
         return $q;
     }
 
+    public function test_save_question() {
+        $this->resetAfterTest();
+        global $DB;
+        $syscontext = context_system::instance();
+        $questiongenerator = $this->getDataGenerator()->get_plugin_generator('core_question');
+        $category = $questiongenerator->create_question_category([]);
+        $fromform = test_question_maker::get_question_form_data('gapfill', 'catmat');
+        $fromform->category = $category->id . ',' . $syscontext->id;
+
+        $question = new stdClass();
+        $question->category = $category->id;
+        $question->qtype = 'gapfill';
+        $question->createdby = 0;
+
+        $this->qtype->save_question($question, $fromform);
+        $this->assertEquals($DB->get_field('question', 'questiontext', ['id' => $question->id]), $question->questiontext);
+
+        $this->qtype->save_question_options($fromform);
+        $this->assertEquals($DB->get_field('question_gapfill', 'correctfeedback', ['question' => $question->id]), $fromform->correctfeedback['text']);
+
+    }
     public function test_name() {
         $this->assertEquals($this->qtype->name(), 'gapfill');
     }
@@ -100,7 +120,7 @@ class qtype_gapfill_test extends advanced_testcase {
 
     public function test_extra_question_fields() {
         $extraquestionfields = array('question_gapfill', 'answerdisplay', 'delimitchars',
-            'casesensitive', 'noduplicates', 'disableregex', 'fixedgapsize', 'optionsaftertext', 'letterhints' , 'singleuse');
+            'casesensitive', 'noduplicates', 'disableregex', 'fixedgapsize', 'optionsaftertext', 'letterhints', 'singleuse');
         $this->assertEquals($this->qtype->extra_question_fields(), $extraquestionfields);
     }
 }

@@ -32,16 +32,20 @@ define(['jquery', 'qtype_gapfill/Item'], function($, Item) {
           $('#id_fixedgapsize').prop('disabled', false);
           $("#id_optionsaftertext").prop('disabled', true).prop('checked', false);
           $('#id_singleuse').prop('disabled', true).prop('checked', false);
+          $('#id_disableregex').prop('disabled', false);
+
         }
         if (selected == 'dragdrop') {
           $('#id_optionsaftertext').prop('disabled', false);
           $('#id_singleuse').prop('disabled', false);
           $('#id_fixedgapsize').prop('disabled', false);
+          $('#id_disableregex').prop('disabled', false);
         }
         if (selected == 'dropdown') {
           $('#id_fixedgapsize').prop('disabled', true).prop('checked', false);
           $('#id_optionsaftertext').prop('disabled', true).prop('checked', false);
           $('#id_singleuse').prop('disabled', true).prop('checked', false);
+          $('#id_disableregex').prop('disabled', true).prop('checked', false);
         }
 
 

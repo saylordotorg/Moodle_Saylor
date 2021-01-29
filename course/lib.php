@@ -68,6 +68,14 @@ define('COURSE_DB_QUERY_LIMIT', 1000);
 /** Searching for all courses that have no value for the specified custom field. */
 define('COURSE_CUSTOMFIELD_EMPTY', -1);
 
+// Course activity chooser footer default display option.
+define('COURSE_CHOOSER_FOOTER_NONE', 'hidden');
+
+// Download course content options.
+define('DOWNLOAD_COURSE_CONTENT_DISABLED', 0);
+define('DOWNLOAD_COURSE_CONTENT_ENABLED', 1);
+define('DOWNLOAD_COURSE_CONTENT_SITE_DEFAULT', 2);
+
 function make_log_url($module, $url) {
     switch ($module) {
         case 'course':
@@ -634,17 +642,6 @@ function get_category_or_system_context($categoryid) {
     } else {
         return context_system::instance();
     }
-}
-
-/**
- * Returns the list of full course categories to be used in html_writer::select()
- *
- * Calls {@see core_course_category::make_categories_list()} to build the list.
- *
- * @return array array mapping course category id to the display name
- */
-function make_categories_options() {
-    return core_course_category::make_categories_list('', 0, ' / ');
 }
 
 /**
@@ -2111,7 +2108,7 @@ function move_courses($courseids, $categoryid) {
         $course->id = $dbcourse->id;
         $course->timemodified = time();
         $course->category  = $category->id;
-        $course->sortorder = $category->sortorder + MAX_COURSES_IN_CATEGORY - $i++;
+        $course->sortorder = $category->sortorder + get_max_courses_in_category() - $i++;
         if ($category->visible == 0) {
             // Hide the course when moving into hidden category, do not update the visibleold flag - we want to get
             // to previous state if somebody unhides the category.
@@ -4746,26 +4743,26 @@ function course_get_recent_courses(int $userid = null, int $limit = 0, int $offs
               JOIN {user_lastaccess} ul
                    ON ul.courseid = c.id
             $favsql
+         LEFT JOIN {enrol} eg ON eg.courseid = c.id AND eg.status = :statusenrolg AND eg.enrol = :guestenrol
              WHERE ul.userid = :userid
                AND c.visible = :visible
-               AND EXISTS (SELECT e.id
+               AND (eg.id IS NOT NULL
+                    OR EXISTS (SELECT e.id
                              FROM {enrol} e
-                        LEFT JOIN {user_enrolments} ue ON ue.enrolid = e.id
+                             JOIN {user_enrolments} ue ON ue.enrolid = e.id
                             WHERE e.courseid = c.id
                               AND e.status = :statusenrol
-                              AND ((ue.status = :status
-                                    AND ue.userid = ul.userid
-                                    AND ue.timestart < :now1
-                                    AND (ue.timeend = 0 OR ue.timeend > :now2)
-                                   )
-                                   OR e.enrol = :guestenrol
-                                  )
-                          )
+                              AND ue.status = :status
+                              AND ue.userid = :userid2
+                              AND ue.timestart < :now1
+                              AND (ue.timeend = 0 OR ue.timeend > :now2)
+                          ))
             $orderby";
 
     $now = round(time(), -2); // Improves db caching.
     $params = ['userid' => $userid, 'contextlevel' => CONTEXT_COURSE, 'visible' => 1, 'status' => ENROL_USER_ACTIVE,
-               'statusenrol' => ENROL_INSTANCE_ENABLED, 'guestenrol' => 'guest', 'now1' => $now, 'now2' => $now] + $favparams;
+               'statusenrol' => ENROL_INSTANCE_ENABLED, 'guestenrol' => 'guest', 'now1' => $now, 'now2' => $now,
+               'userid2' => $userid, 'statusenrolg' => ENROL_INSTANCE_ENABLED] + $favparams;
 
     $recentcourses = $DB->get_records_sql($sql, $params, $offset, $limit);
 

@@ -4,6 +4,39 @@ moodle-local_boostnavigation
 Changes
 -------
 
+### v3.10-r2
+
+* 2021-01-05 - Feature: Move the content bank node from the root nodes section to the course nodes section.
+* 2021-01-05 - Bugfix: Collapsing custom course nodes had side effects to the my courses list.
+
+### v3.10-r1
+
+* 2020-12-07 - Prepare compatibility for Moodle 3.10.
+* 2020-12-07 - Change in Moodle release support:
+               For the time being, this plugin is maintained for the most recent LTS release of Moodle as well as the most recent major release of Moodle.
+               Bugfixes are backported to the LTS release. However, new features and improvements are not necessarily backported to the LTS release.
+* 2020-12-07 - Improvement: Declare which major stable version of Moodle this plugin supports (see MDL-59562 for details).
+
+### v3.9-r3
+
+* 2020-11-18 - Improvement: Show the value of the selected custom field in the filter hint node
+
+### v3.9-r2
+
+* 2020-11-15 - Feature: Use individual activity icons for activity course nodes.
+* 2020-11-14 - Feature: Support custom CSS classes when creating custom nodes.
+* 2020-11-14 - Improvement: Improve performance of the check if badges exist in the course before removing the badges course node.
+* 2020-11-13 - Update README.md to reflect the latest structure of the plugin's settings.
+* 2020-11-11 - Feature: Adopt the features to modify the My courses nodes list from the plugin local_boostcoc to local_boostnavigation.
+               This allows admins to align the My courses list in the nav drawer with the (filteres) course list in the My Overview block on the Dashboard.
+               Please don't enable these new features when you still have local_boostcoc in production.
+
+### v3.9-r1
+
+* 2020-11-09 - Feature: Add admin setting to remove the content bank nodes which are part of Moodle 3.9 - Credits to tblacker7 for the first draft.
+* 2020-11-09 - Fix Behat tests which broke with Moodle 3.9.
+* 2020-11-09 - Prepare compatibility for Moodle 3.9.
+
 ### v3.8-r2
 
 * 2020-08-04 - Bugfix: User logs can't be viewed anymore if the participants node was set to be removed - Credits to zpottie.

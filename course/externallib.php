@@ -262,6 +262,7 @@ class core_course_external extends external_api {
                         $module['id'] = $cm->id;
                         $module['name'] = external_format_string($cm->name, $modcontext->id);
                         $module['instance'] = $cm->instance;
+                        $module['contextid'] = $modcontext->id;
                         $module['modname'] = (string) $cm->modname;
                         $module['modplural'] = (string) $cm->modplural;
                         $module['modicon'] = $cm->get_icon_url()->out(false);
@@ -449,6 +450,7 @@ class core_course_external extends external_api {
                                     'url' => new external_value(PARAM_URL, 'activity url', VALUE_OPTIONAL),
                                     'name' => new external_value(PARAM_RAW, 'activity module name'),
                                     'instance' => new external_value(PARAM_INT, 'instance id', VALUE_OPTIONAL),
+                                    'contextid' => new external_value(PARAM_INT, 'Activity context id.', VALUE_OPTIONAL),
                                     'description' => new external_value(PARAM_RAW, 'activity description', VALUE_OPTIONAL),
                                     'visible' => new external_value(PARAM_INT, 'is the module visible', VALUE_OPTIONAL),
                                     'uservisible' => new external_value(PARAM_BOOL, 'Is the module visible for the user?',
@@ -616,6 +618,7 @@ class core_course_external extends external_api {
                     $courseinfo['customfields'][] = [
                         'type' => $data->get_type(),
                         'value' => $data->get_value(),
+                        'valueraw' => $data->get_data_controller()->get_value(),
                         'name' => $data->get_name(),
                         'shortname' => $data->get_shortname()
                     ];
@@ -740,6 +743,7 @@ class core_course_external extends external_api {
                                      'shortname' => new external_value(PARAM_ALPHANUMEXT, 'The shortname of the custom field'),
                                      'type'  => new external_value(PARAM_COMPONENT,
                                          'The type of the custom field - text, checkbox...'),
+                                     'valueraw' => new external_value(PARAM_RAW, 'The raw value of the custom field'),
                                      'value' => new external_value(PARAM_RAW, 'The value of the custom field')]
                                 ), 'Custom fields and associated values', VALUE_OPTIONAL),
                         ), 'course'
@@ -2494,6 +2498,7 @@ class core_course_external extends external_api {
                 $coursereturns['customfields'][] = [
                     'type' => $data->get_type(),
                     'value' => $data->get_value(),
+                    'valueraw' => $data->get_data_controller()->get_value(),
                     'name' => $data->get_name(),
                     'shortname' => $data->get_shortname()
                 ];
@@ -2645,6 +2650,7 @@ class core_course_external extends external_api {
                             'The shortname of the custom field - to be able to build the field class in the code'),
                         'type'  => new external_value(PARAM_ALPHANUMEXT,
                             'The type of the custom field - text field, checkbox...'),
+                        'valueraw' => new external_value(PARAM_RAW, 'The raw value of the custom field'),
                         'value' => new external_value(PARAM_RAW, 'The value of the custom field'),
                     )
                 ), 'Custom fields', VALUE_OPTIONAL),
@@ -4388,15 +4394,10 @@ class core_course_external extends external_api {
         $coursecontext = context_course::instance($courseid);
         self::validate_context($coursecontext);
 
-        $pluginswithfunction = get_plugins_with_function('custom_chooser_footer', 'lib.php');
-        if ($pluginswithfunction) {
-            foreach ($pluginswithfunction as $plugintype => $plugins) {
-                foreach ($plugins as $pluginfunction) {
-                    $footerdata = $pluginfunction($courseid, $sectionid);
-                    break; // Only a single plugin can modify the footer.
-                }
-                break; // Only a single plugin can modify the footer.
-            }
+        $activeplugin = get_config('core', 'activitychooseractivefooter');
+
+        if ($activeplugin !== COURSE_CHOOSER_FOOTER_NONE) {
+            $footerdata = component_callback($activeplugin, 'custom_chooser_footer', [$courseid, $sectionid]);
             return [
                 'footer' => true,
                 'customfooterjs' => $footerdata->get_footer_js_file(),

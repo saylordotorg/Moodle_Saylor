@@ -136,7 +136,7 @@ function local_boostnavigation_build_custom_nodes($customnodes, navigation_node 
         // Check for the mandatory conditions first.
         // If array contains too less or too many settings, do not proceed and therefore do not create the node.
         // Furthermore check it at least the first two mandatory params are not an empty string.
-        if (count($settings) >= 2 && count($settings) <= 10 && $settings[0] !== '' && $settings[1] !== '') {
+        if (count($settings) >= 2 && count($settings) <= 11 && $settings[0] !== '' && $settings[1] !== '') {
             foreach ($settings as $i => $setting) {
                 $setting = trim($setting);
                 if (!empty($setting)) {
@@ -253,13 +253,24 @@ function local_boostnavigation_build_custom_nodes($customnodes, navigation_node 
                                 $nodebeforenodekey = null;
 
                                 // Handle "beforenodes" that are known to be not direct children of $node but grand children.
-                            } else if ($nodebeforenodekey === 'calendar' || $nodebeforenodekey === 'privatefiles') {
+                            } else if ($nodebeforenodekey === 'calendar' || $nodebeforenodekey === 'privatefiles' ||
+                                    $nodebeforenodekey === 'contentbank') {
                                 $nodebeforenode = $targetnode->find($nodebeforenodekey, global_navigation::TYPE_UNKNOWN);
 
                                 if ($nodebeforenode) {
                                     $targetnode = $nodebeforenode->parent;
                                 }
                             }
+
+                            break;
+                        // Check for the optional eleventh parameter: css class.
+                        case 10:
+                            // Only proceed if some class is entered here. This parameter is optional.
+                            // If no class is given, the node will just get the classes which are needed for collapsing custom
+                            // nodes.
+                            $nodeclass = clean_param($setting, PARAM_NOTAGS); // More precisely, we would have needed
+                                                                              // PARAM_ALPHANUMEXT with spaces, but that does not
+                                                                              // exist unfortunately.
 
                             break;
                     }
@@ -319,6 +330,11 @@ function local_boostnavigation_build_custom_nodes($customnodes, navigation_node 
                 $customnode->showinflatnavigation = true;
             }
 
+            // Add custom class if any class was given.
+            if (!empty($nodeclass)) {
+                $customnode->add_class($nodeclass);
+            }
+
             // If it's a parent node.
             if (!$nodeischild) {
                 // If the nodes should be collapsed and collapsing hasn't been prepared yet, prepare collapsing of the parent node.
@@ -374,7 +390,19 @@ function local_boostnavigation_build_custom_nodes($customnodes, navigation_node 
                 // If the node should be collapsed, remove the active status in any case because otherwise it might get highlighted
                 // as active which does not make sense for collapse parent nodes.
                 if ($collapse) {
-                    $customnode->make_inactive();
+                    // If we are dealing with a custom course node.
+                    if (substr($keyprefix, 0, 32) == 'localboostnavigationcustomcourse') {
+                        // Basically, we could just call $customnode->make_inactive();
+                        // However, it has been shown that, if we do this to custom course nodes, there are side effects to the
+                        // my courses list as make_inactive() also makes the parent node (in this case: the course node) inactive.
+                        // So we make just this custom node inactive manually, just like make_inactive() would do it.
+                        $customnode->isactive = false;
+                        $customnode->remove_class('active_tree_node');
+
+                        // Otherwise.
+                    } else {
+                        $customnode->make_inactive();
+                    }
                 }
 
                 // Finally, set the node icon.
@@ -721,6 +749,8 @@ function local_boostnavigation_customnodesusageusers() {
             '<dd>'.get_string('setting_customnodesusageparameteriddd', 'local_boostnavigation', null, true).'</dd>'.
             '<dt>'.get_string('setting_customnodesusageparameterbeforenodedt', 'local_boostnavigation', null, true).'</dt>'.
             '<dd>'.get_string('setting_customnodesusageparameterbeforenodedd', 'local_boostnavigation', null, true).'</dd>'.
+            '<dt>'.get_string('setting_customnodesusageparameterclassdt', 'local_boostnavigation', null, true).'</dt>'.
+            '<dd>'.get_string('setting_customnodesusageparameterclassdd', 'local_boostnavigation', null, true).'</dd>'.
             '</dl>'.
             '<hr />'.
             get_string('setting_customnodesusagepleasenote', 'local_boostnavigation', null, true).
@@ -897,4 +927,73 @@ function local_boostnavigation_get_customnodeicon_config($customnodekeyprefix, $
 
     // As a fallback, which should not happen, return the default setting of the configs.
     return LOCAL_BOOSTNAVIGATION_COLLAPSEICON_NONE;
+}
+
+/**
+ * Check if there is any badge in the course.
+ *
+ * @param int $courseid
+ *
+ * @return bool
+ */
+function local_boostnavigation_course_has_badges($courseid) {
+    global $DB, $CFG;
+
+    require_once($CFG->dirroot . '/lib/badgeslib.php');
+
+    $sql = "SELECT id FROM {badge}
+            WHERE status != :deleted AND type = :type AND courseid = :courseid";
+    $params = array('deleted' => BADGE_STATUS_ARCHIVED,
+            'type' => BADGE_TYPE_COURSE,
+            'courseid' => $courseid);
+    $recordexists = $DB->record_exists_sql($sql, $params);
+
+    return $recordexists;
+}
+
+/**
+ * Get the string of the selected custom field value.
+ * This is a downsized version of get_customfield_values_for_export() with the only goal to get a single string.
+ *
+ * @param string $customfieldname The shortname of the custom field.
+ * @param int $customfieldvalue The value of the selected custom field.
+ *
+ * @return string
+ */
+function local_boostnavigation_get_customfield_valuestring($customfieldname, $customfieldvalue) {
+    global $CFG, $DB;
+
+    // Include block_myoverview library which contains the BLOCK_MYOVERVIEW_CUSTOMFIELD_EMPTY constant which is needed for
+    // calling the course_grouping_format_values() function later.
+    require_once($CFG->dirroot.'/blocks/myoverview/lib.php');
+
+    // Get the customfield record (which holds all available options).
+    $fieldrecord = $DB->get_record('customfield_field', ['shortname' => $customfieldname]);
+    // The field did not exist, we can't continue.
+    if (!$fieldrecord) {
+        return '';
+    }
+
+    // Get the field object and make sure that the field can be used for filtering courses at all.
+    $field = \core_customfield\field_controller::create($fieldrecord->id);
+    $isvisible = $field->get_configdata_property('visibility') == \core_course\customfield\course_handler::VISIBLETOALL;
+    // Only visible fields to everybody supporting course grouping will be displayed.
+    if (!$field->supports_course_grouping() || !$isvisible) {
+        return ''; // The field shouldn't have been selectable in the global settings, but just skip it now.
+    }
+
+    // Finally, get the string of the selected custom field value.
+    // We have to pass an array of value IDs to get (in this case: Just one single value) and we get back an array of the requested
+    // string plus the string for "No value selected".
+    $values = $field->course_grouping_format_values(array($customfieldvalue));
+    // Make sure that the array contains the string we need.
+    if (!is_array($values) || !array_key_exists($customfieldvalue, $values)) {
+        return '';
+    }
+
+    // Pick the string of the single value from the array.
+    $customfieldstring = $values[$customfieldvalue];
+
+    // Return the string.
+    return $customfieldstring;
 }

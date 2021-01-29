@@ -40,11 +40,17 @@ use moodle_url;
  */
 abstract class contenttype {
 
-    /** Plugin implements uploading feature */
+    /** @var string Constant representing whether the plugin implements uploading feature */
     const CAN_UPLOAD = 'upload';
 
-    /** Plugin implements edition feature */
+    /** @var string Constant representing whether the plugin implements edition feature */
     const CAN_EDIT = 'edit';
+
+    /**
+     * @var string Constant representing whether the plugin implements download feature
+     * @since  Moodle 3.10
+     */
+    const CAN_DOWNLOAD = 'download';
 
     /** @var \context This contenttype's context. **/
     protected $context = null;
@@ -112,6 +118,21 @@ abstract class contenttype {
             throw $e;
         }
 
+        return $content;
+    }
+
+    /**
+     * Replace a content using an uploaded file.
+     *
+     * @throws file_exception If file operations fail
+     * @throws dml_exception if the content creation fails
+     * @param stored_file $file the uploaded file
+     * @param content $content the original content record
+     * @return content Object with the updated content bank information.
+     */
+    public function replace_content(stored_file $file, content $content): content {
+        $content->import_file($file);
+        $content->update_content();
         return $content;
     }
 
@@ -218,6 +239,31 @@ abstract class contenttype {
         $event->trigger();
 
         return '';
+    }
+
+    /**
+     * Returns the URL to download the content.
+     *
+     * @since  Moodle 3.10
+     * @param  content $content The content to be downloaded.
+     * @return string           URL with the content to download.
+     */
+    public function get_download_url(content $content): string {
+        $downloadurl = '';
+        $file = $content->get_file();
+        if (!empty($file)) {
+            $url = \moodle_url::make_pluginfile_url(
+                $file->get_contextid(),
+                $file->get_component(),
+                $file->get_filearea(),
+                $file->get_itemid(),
+                $file->get_filepath(),
+                $file->get_filename()
+            );
+            $downloadurl = $url->out(false);
+        }
+
+        return $downloadurl;
     }
 
     /**
@@ -388,6 +434,38 @@ abstract class contenttype {
      * @return bool     True if plugin allows edition. False otherwise.
      */
     protected function is_edit_allowed(?content $content): bool {
+        // Plugins can overwrite this function to add any check they need.
+        return true;
+    }
+
+    /**
+     * Returns whether or not the user has permission to download the content.
+     *
+     * @since  Moodle 3.10
+     * @param  content $content The content to be downloaded.
+     * @return bool    True if the user can download the content. False otherwise.
+     */
+    final public function can_download(content $content): bool {
+        if (!$this->is_feature_supported(self::CAN_DOWNLOAD)) {
+            return false;
+        }
+
+        if (!$this->can_access()) {
+            return false;
+        }
+
+        $hascapability = has_capability('moodle/contentbank:downloadcontent', $this->context);
+        return $hascapability && $this->is_download_allowed($content);
+    }
+
+    /**
+     * Returns plugin allows downloading.
+     *
+     * @since  Moodle 3.10
+     * @param  content $content The content to be downloaed.
+     * @return bool    True if plugin allows downloading. False otherwise.
+     */
+    protected function is_download_allowed(content $content): bool {
         // Plugins can overwrite this function to add any check they need.
         return true;
     }

@@ -43,7 +43,7 @@ class core_setuplib_testcase extends advanced_testcase {
         } else {
             $docroot = $CFG->docroot;
         }
-        $this->assertRegExp('~^' . preg_quote($docroot, '') . '/\d{2}/' . current_language() . '/course/editing$~',
+        $this->assertRegExp('~^' . preg_quote($docroot, '') . '/\d{2,3}/' . current_language() . '/course/editing$~',
                 get_docs_url('course/editing'));
     }
 
@@ -92,8 +92,8 @@ class core_setuplib_testcase extends advanced_testcase {
         $exception     = new moodle_exception('generalexceptionmessage', 'error', '', $fixture, $fixture);
         $exceptioninfo = get_exception_info($exception);
 
-        $this->assertContains($expected, $exceptioninfo->message, 'Exception message does not contain system paths');
-        $this->assertContains($expected, $exceptioninfo->debuginfo, 'Exception debug info does not contain system paths');
+        $this->assertStringContainsString($expected, $exceptioninfo->message, 'Exception message does not contain system paths');
+        $this->assertStringContainsString($expected, $exceptioninfo->debuginfo, 'Exception debug info does not contain system paths');
     }
 
     public function test_localcachedir() {
@@ -204,6 +204,8 @@ class core_setuplib_testcase extends advanced_testcase {
     }
 
     public function test_get_request_storage_directory() {
+        $this->resetAfterTest(true);
+
         // Making a call to get_request_storage_directory should always give the same result.
         $firstdir = get_request_storage_directory();
         $seconddir = get_request_storage_directory();
@@ -230,6 +232,11 @@ class core_setuplib_testcase extends advanced_testcase {
         $fourthdir = get_request_storage_directory();
         $this->assertTrue(is_dir($fourthdir));
         $this->assertNotEquals($thirddir, $fourthdir);
+
+        $now = $this->setCurrentTimeStart();
+        set_config('localcachedirpurged', $now - 2);
+        purge_all_caches();
+        $this->assertTrue(is_dir($fourthdir));
     }
 
 
@@ -450,17 +457,23 @@ class core_setuplib_testcase extends advanced_testcase {
      */
     public function data_for_test_get_real_size() {
         return array(
-            array('8KB', 8192),
-            array('8Kb', 8192),
-            array('8K', 8192),
-            array('8k', 8192),
-            array('50MB', 52428800),
-            array('50Mb', 52428800),
-            array('50M', 52428800),
-            array('50m', 52428800),
-            array('8Gb', 8589934592),
-            array('8GB', 8589934592),
-            array('8G', 8589934592),
+            array('8KB',    8192),
+            array('8Kb',    8192),
+            array('8K',     8192),
+            array('8k',     8192),
+            array('50MB',   52428800),
+            array('50Mb',   52428800),
+            array('50M',    52428800),
+            array('50m',    52428800),
+            array('8GB',    8589934592),
+            array('8Gb',    8589934592),
+            array('8G',     8589934592),
+            array('7T',     7696581394432),
+            array('7TB',    7696581394432),
+            array('7Tb',    7696581394432),
+            array('6P',     6755399441055744),
+            array('6PB',    6755399441055744),
+            array('6Pb',    6755399441055744),
         );
     }
 

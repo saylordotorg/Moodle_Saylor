@@ -413,6 +413,12 @@ class grade_item extends grade_object {
         $this->delete_all_grades($source);
         $success = parent::delete($source);
         $transaction->allow_commit();
+
+        if ($success) {
+            $event = \core\event\grade_item_deleted::create_from_grade_item($this);
+            $event->trigger();
+        }
+
         return $success;
     }
 
@@ -1652,7 +1658,7 @@ class grade_item extends grade_object {
             return $this->dependson_cache;
         }
 
-        if ($this->is_locked()) {
+        if ($this->is_locked() && !$this->is_category_item()) {
             // locked items do not need to be regraded
             $this->dependson_cache = array();
             return $this->dependson_cache;

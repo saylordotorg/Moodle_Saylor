@@ -27,7 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 
 class core_dml_testcase extends database_driver_testcase {
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
         $dbman = $this->tdb->get_manager(); // Loads DDL libs.
     }
@@ -51,6 +51,19 @@ class core_dml_testcase extends database_driver_testcase {
         return $table;
     }
 
+    /**
+     * Convert a unix string to a OS (dir separator) dependent string.
+     *
+     * @param string $source the original srting, using unix dir separators and newlines.
+     * @return string the resulting string, using current OS dir separators newlines.
+     */
+    private function unix_to_os_dirsep(string $source): string {
+        if (DIRECTORY_SEPARATOR !== '/') {
+            return str_replace('/', DIRECTORY_SEPARATOR, $source);
+        }
+        return $source; // No changes, so far.
+    }
+
     public function test_diagnose() {
         $DB = $this->tdb;
         $result = $DB->diagnose();
@@ -60,7 +73,7 @@ class core_dml_testcase extends database_driver_testcase {
     public function test_get_server_info() {
         $DB = $this->tdb;
         $result = $DB->get_server_info();
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
         $this->assertArrayHasKey('description', $result);
         $this->assertArrayHasKey('version', $result);
     }
@@ -369,7 +382,7 @@ class core_dml_testcase extends database_driver_testcase {
         $params[] = 1;
         $params[] = time();
         $sqlarray = $DB->fix_sql_params($sql, $params);
-        $this->assertInternalType('array', $sqlarray);
+        $this->assertIsArray($sqlarray);
         $this->assertCount(3, $sqlarray[1]);
 
         // Named params missing from array.
@@ -397,7 +410,7 @@ class core_dml_testcase extends database_driver_testcase {
         $sql = "SELECT * FROM {{$tablename}} WHERE name = :name, course = :course";
         $params = array('name' => 'record1', 'course' => 1, 'extrastuff'=>'haha');
         $sqlarray = $DB->fix_sql_params($sql, $params);
-        $this->assertInternalType('array', $sqlarray);
+        $this->assertIsArray($sqlarray);
         $this->assertCount(2, $sqlarray[1]);
 
         // Params exceeding 30 chars length.
@@ -436,6 +449,55 @@ class core_dml_testcase extends database_driver_testcase {
         $inparams = array('abc', 'ABC', null, '1', 1, 1.4);
         list($sql, $params) = $DB->fix_sql_params($sql, $inparams);
         $this->assertSame(array_values($params), array_values($inparams));
+    }
+
+    /**
+     * Test the database debugging as SQL comment.
+     */
+    public function test_add_sql_debugging() {
+        global $CFG;
+        $DB = $this->tdb;
+
+        require_once($CFG->dirroot . '/lib/dml/tests/fixtures/test_dml_sql_debugging_fixture.php');
+        $fixture = new test_dml_sql_debugging_fixture($this);
+
+        $sql = "SELECT * FROM {users}";
+
+        $out = $fixture->four($sql);
+
+        $CFG->debugsqltrace = 0;
+        $this->assertEquals("SELECT * FROM {users}", $out);
+
+        $CFG->debugsqltrace = 1;
+        $out = $fixture->four($sql);
+        $expected = <<<EOD
+SELECT * FROM {users}
+-- line 65 of /lib/dml/tests/fixtures/test_dml_sql_debugging_fixture.php: call to ReflectionMethod->invoke()
+EOD;
+        $this->assertEquals($this->unix_to_os_dirsep($expected), $out);
+
+        $CFG->debugsqltrace = 2;
+        $out = $fixture->four($sql);
+        $expected = <<<EOD
+SELECT * FROM {users}
+-- line 65 of /lib/dml/tests/fixtures/test_dml_sql_debugging_fixture.php: call to ReflectionMethod->invoke()
+-- line 74 of /lib/dml/tests/fixtures/test_dml_sql_debugging_fixture.php: call to test_dml_sql_debugging_fixture->one()
+EOD;
+        $this->assertEquals($this->unix_to_os_dirsep($expected), $out);
+
+        $CFG->debugsqltrace = 5;
+        $out = $fixture->four($sql);
+        $expected = <<<EOD
+SELECT * FROM {users}
+-- line 65 of /lib/dml/tests/fixtures/test_dml_sql_debugging_fixture.php: call to ReflectionMethod->invoke()
+-- line 74 of /lib/dml/tests/fixtures/test_dml_sql_debugging_fixture.php: call to test_dml_sql_debugging_fixture->one()
+-- line 83 of /lib/dml/tests/fixtures/test_dml_sql_debugging_fixture.php: call to test_dml_sql_debugging_fixture->two()
+-- line 92 of /lib/dml/tests/fixtures/test_dml_sql_debugging_fixture.php: call to test_dml_sql_debugging_fixture->three()
+-- line 489 of /lib/dml/tests/dml_test.php: call to test_dml_sql_debugging_fixture->four()
+EOD;
+        $this->assertEquals($this->unix_to_os_dirsep($expected), $out);
+
+        $CFG->debugsqltrace = 0;
     }
 
     public function test_strtok() {
@@ -628,7 +690,7 @@ class core_dml_testcase extends database_driver_testcase {
         $dbman->create_table($table);
 
         $indices = $DB->get_indexes($tablename);
-        $this->assertInternalType('array', $indices);
+        $this->assertIsArray($indices);
         $this->assertCount(2, $indices);
         // We do not care about index names for now.
         $first = array_shift($indices);
@@ -686,7 +748,7 @@ class core_dml_testcase extends database_driver_testcase {
         $dbman->create_table($table);
 
         $columns = $DB->get_columns($tablename);
-        $this->assertInternalType('array', $columns);
+        $this->assertIsArray($columns);
 
         $fields = $table->getFields();
         $this->assertCount(count($columns), $fields);
@@ -1382,7 +1444,7 @@ class core_dml_testcase extends database_driver_testcase {
             $rids[] = $record->id;
         }
         $rs->close();
-        $this->assertEquals($ids, $rids, '', 0, 0, true);
+        $this->assertEqualsCanonicalizing($ids, $rids);
     }
 
     public function test_get_records() {
@@ -1511,7 +1573,7 @@ class core_dml_testcase extends database_driver_testcase {
         $DB->insert_record($tablename, array('course' => 2));
 
         $records = $DB->get_records_list($tablename, 'course', array(3, 2));
-        $this->assertInternalType('array', $records);
+        $this->assertIsArray($records);
         $this->assertCount(3, $records);
         $this->assertEquals(1, reset($records)->id);
         $this->assertEquals(2, next($records)->id);
@@ -1660,7 +1722,7 @@ class core_dml_testcase extends database_driver_testcase {
         $DB->insert_record($tablename, array('course' => 2));
 
         $records = $DB->get_records_menu($tablename, array('course' => 3));
-        $this->assertInternalType('array', $records);
+        $this->assertIsArray($records);
         $this->assertCount(2, $records);
         $this->assertNotEmpty($records[1]);
         $this->assertNotEmpty($records[2]);
@@ -1688,7 +1750,7 @@ class core_dml_testcase extends database_driver_testcase {
         $DB->insert_record($tablename, array('course' => 5));
 
         $records = $DB->get_records_select_menu($tablename, "course > ?", array(2));
-        $this->assertInternalType('array', $records);
+        $this->assertIsArray($records);
 
         $this->assertCount(3, $records);
         $this->assertArrayHasKey(1, $records);
@@ -1720,7 +1782,7 @@ class core_dml_testcase extends database_driver_testcase {
         $DB->insert_record($tablename, array('course' => 5));
 
         $records = $DB->get_records_sql_menu("SELECT * FROM {{$tablename}} WHERE course > ?", array(2));
-        $this->assertInternalType('array', $records);
+        $this->assertIsArray($records);
 
         $this->assertCount(3, $records);
         $this->assertArrayHasKey(1, $records);
@@ -1936,7 +1998,7 @@ class core_dml_testcase extends database_driver_testcase {
         $DB->insert_record($tablename, array('course' => 6));
 
         $fieldset = $DB->get_fieldset_select($tablename, 'course', "course > ?", array(1));
-        $this->assertInternalType('array', $fieldset);
+        $this->assertIsArray($fieldset);
 
         $this->assertCount(3, $fieldset);
         $this->assertEquals(3, $fieldset[0]);
@@ -1965,7 +2027,7 @@ class core_dml_testcase extends database_driver_testcase {
         $DB->insert_record($tablename, array('course' => 6, 'onebinary' => $binarydata));
 
         $fieldset = $DB->get_fieldset_sql("SELECT * FROM {{$tablename}} WHERE course > ?", array(1));
-        $this->assertInternalType('array', $fieldset);
+        $this->assertIsArray($fieldset);
 
         $this->assertCount(3, $fieldset);
         $this->assertEquals(2, $fieldset[0]);
@@ -1973,7 +2035,7 @@ class core_dml_testcase extends database_driver_testcase {
         $this->assertEquals(4, $fieldset[2]);
 
         $fieldset = $DB->get_fieldset_sql("SELECT onebinary FROM {{$tablename}} WHERE course > ?", array(1));
-        $this->assertInternalType('array', $fieldset);
+        $this->assertIsArray($fieldset);
 
         $this->assertCount(3, $fieldset);
         $this->assertEquals($binarydata, $fieldset[0]);
@@ -3819,7 +3881,7 @@ class core_dml_testcase extends database_driver_testcase {
         $this->assertSame('91.10', next($records)->name);
         // And verify we can operate with them without too much problem with at least 6 decimals scale accuracy.
         $sql = "SELECT AVG(" . $DB->sql_cast_char2real('name') . ") FROM {{$tablename}}";
-        $this->assertEquals(37.44444443333333, (float)$DB->get_field_sql($sql), '', 1.0E-6);
+        $this->assertEqualsWithDelta(37.44444443333333, (float)$DB->get_field_sql($sql), 1.0E-6);
 
         // Casting text field.
         $sql = "SELECT * FROM {{$tablename}} WHERE ".$DB->sql_cast_char2real('nametext', true)." > res";
@@ -3834,7 +3896,7 @@ class core_dml_testcase extends database_driver_testcase {
         $this->assertSame('91.10', next($records)->nametext);
         // And verify we can operate with them without too much problem with at least 6 decimals scale accuracy.
         $sql = "SELECT AVG(" . $DB->sql_cast_char2real('nametext', true) . ") FROM {{$tablename}}";
-        $this->assertEquals(37.44444443333333, (float)$DB->get_field_sql($sql), '', 1.0E-6);
+        $this->assertEqualsWithDelta(37.44444443333333, (float)$DB->get_field_sql($sql), 1.0E-6);
 
         // Check it works with values passed as param.
         $sql = "SELECT name FROM {{$tablename}} WHERE FLOOR(res - " . $DB->sql_cast_char2real(':param') . ") = 0";

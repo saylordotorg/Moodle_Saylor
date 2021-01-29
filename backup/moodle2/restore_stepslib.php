@@ -146,7 +146,11 @@ class restore_gradebook_structure_step extends restore_structure_step {
 
         $paths[] = new restore_path_element('attributes', '/gradebook/attributes');
         $paths[] = new restore_path_element('grade_category', '/gradebook/grade_categories/grade_category');
-        $paths[] = new restore_path_element('grade_item', '/gradebook/grade_items/grade_item');
+
+        $gradeitem = new restore_path_element('grade_item', '/gradebook/grade_items/grade_item');
+        $paths[] = $gradeitem;
+        $this->add_plugin_structure('local', $gradeitem);
+
         if ($userinfo) {
             $paths[] = new restore_path_element('grade_grade', '/gradebook/grade_items/grade_item/grade_grades/grade_grade');
         }
@@ -1877,6 +1881,11 @@ class restore_course_structure_step extends restore_structure_step {
             $data->idnumber = '';
         }
 
+        // If we restore a course from this site, let's capture the original course id.
+        if ($isnewcourse && $this->get_task()->is_samesite()) {
+            $data->originalcourseid = $this->get_task()->get_old_courseid();
+        }
+
         // Any empty value for course->hiddensections will lead to 0 (default, show collapsed).
         // It has been reported that some old 1.9 courses may have it null leading to DB error. MDL-31532
         if (empty($data->hiddensections)) {
@@ -2112,14 +2121,29 @@ class restore_ras_and_caps_structure_step extends restore_structure_step {
         $data = (object)$data;
 
         // Check roleid is one of the mapped ones
-        $newroleid = $this->get_mappingid('role', $data->roleid);
+        $newrole = $this->get_mapping('role', $data->roleid);
+        $newroleid = $newrole->newitemid ?? false;
+        $userid = $this->task->get_userid();
+
         // If newroleid and context are valid assign it via API (it handles dupes and so on)
         if ($newroleid && $this->task->get_contextid()) {
-            if (!get_capability_info($data->capability)) {
+            if (!$capability = get_capability_info($data->capability)) {
                 $this->log("Capability '{$data->capability}' was not found!", backup::LOG_WARNING);
             } else {
-                // TODO: assign_capability() needs one userid param to be able to specify our restore userid.
-                assign_capability($data->capability, $data->permission, $newroleid, $this->task->get_contextid());
+                $context = context::instance_by_id($this->task->get_contextid());
+                $overrideableroles = get_overridable_roles($context, ROLENAME_SHORT);
+                $safecapability = is_safe_capability($capability);
+
+                // Check if the new role is an overrideable role AND if the user performing the restore has the
+                // capability to assign the capability.
+                if (in_array($newrole->info['shortname'], $overrideableroles) &&
+                    ($safecapability && has_capability('moodle/role:safeoverride', $context, $userid) ||
+                        !$safecapability && has_capability('moodle/role:override', $context, $userid))
+                ) {
+                    assign_capability($data->capability, $data->permission, $newroleid, $this->task->get_contextid());
+                } else {
+                    $this->log("Insufficient capability to assign capability '{$data->capability}' to role!", backup::LOG_WARNING);
+                }
             }
         }
     }
@@ -2139,11 +2163,22 @@ class restore_default_enrolments_step extends restore_execution_step {
         }
 
         $course = $DB->get_record('course', array('id'=>$this->get_courseid()), '*', MUST_EXIST);
+        // Return any existing course enrolment instances.
+        $enrolinstances = enrol_get_instances($course->id, false);
 
-        if ($DB->record_exists('enrol', array('courseid'=>$this->get_courseid(), 'enrol'=>'manual'))) {
-            // Something already added instances, do not add default instances.
+        if ($enrolinstances) {
+            // Something already added instances.
+            // Get the existing enrolment methods in the course.
+            $enrolmethods = array_map(function($enrolinstance) {
+                return $enrolinstance->enrol;
+            }, $enrolinstances);
+
             $plugins = enrol_get_plugins(true);
-            foreach ($plugins as $plugin) {
+            foreach ($plugins as $pluginname => $plugin) {
+                // Make sure all default enrolment methods exist in the course.
+                if (!in_array($pluginname, $enrolmethods)) {
+                    $plugin->course_updated(true, $course, null);
+                }
                 $plugin->restore_sync_course($course);
             }
 

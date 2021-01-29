@@ -216,7 +216,7 @@ class qtype_gapfill extends question_type {
     }
 
     /**
-     * Save the units and the answers associated with this question.
+     * Save the answers and optionsassociated with this question.
      * @param stdClass $question
      * @return boolean to indicate success or failure.
      **/

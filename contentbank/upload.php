@@ -39,6 +39,15 @@ if (!$cb->is_context_allowed($context)) {
 
 require_capability('moodle/contentbank:upload', $context);
 
+$id = optional_param('id', null, PARAM_INT);
+if ($id) {
+    $content = $cb->get_content_from_id($id);
+    $contenttype = $content->get_content_type_instance();
+    if (!$contenttype->can_manage($content) || !$contenttype->can_upload()) {
+        print_error('nopermissions', 'error', $returnurl, get_string('replacecontent', 'contentbank'));
+    }
+}
+
 $title = get_string('contentbank');
 \core_contentbank\helper::get_page_ready($context, $title, true);
 if ($PAGE->course) {
@@ -60,7 +69,12 @@ if (has_capability('moodle/user:ignoreuserquota', $context)) {
     $maxareabytes = FILE_AREA_MAX_BYTES_UNLIMITED;
 }
 
-$accepted = $cb->get_supported_extensions_as_string($context);
+if ($id) {
+    $extensions = $contenttype->get_manageable_extensions();
+    $accepted = implode(',', $extensions);
+} else {
+    $accepted = $cb->get_supported_extensions_as_string($context);
+}
 
 $data = new stdClass();
 $options = array(
@@ -72,7 +86,7 @@ $options = array(
 );
 file_prepare_standard_filemanager($data, 'files', $options, $context, 'contentbank', 'public', 0);
 
-$mform = new contentbank_files_form(null, ['contextid' => $contextid, 'data' => $data, 'options' => $options]);
+$mform = new contentbank_files_form(null, ['contextid' => $contextid, 'data' => $data, 'options' => $options, 'id' => $id]);
 
 $error = '';
 
@@ -86,7 +100,11 @@ if ($mform->is_cancelled()) {
     $files = $fs->get_area_files($usercontext->id, 'user', 'draft', $formdata->file, 'itemid, filepath, filename', false);
     if (!empty($files)) {
         $file = reset($files);
-        $content = $cb->create_content_from_file($context, $USER->id, $file);
+        if ($id) {
+            $content = $contenttype->replace_content($file, $content);
+        } else {
+            $content = $cb->create_content_from_file($context, $USER->id, $file);
+        }
         $viewurl = new \moodle_url('/contentbank/view.php', ['id' => $content->get_id(), 'contextid' => $contextid]);
         redirect($viewurl);
     } else {

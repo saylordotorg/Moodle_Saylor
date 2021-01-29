@@ -357,9 +357,8 @@ class format_grid_renderer extends format_section_renderer_base {
             return parent::print_multiple_section_page($course, $sections, $mods, $modnames, $modnamesused);
         }
 
-        global $PAGE;
         $coursecontext = context_course::instance($course->id);
-        $editing = $PAGE->user_is_editing();
+        $editing = $this->page->user_is_editing();
         $hascapvishidsect = has_capability('moodle/course:viewhiddensections', $coursecontext);
 
         if ($editing) {
@@ -522,15 +521,15 @@ class format_grid_renderer extends format_section_renderer_base {
 
         if ($shownsections) {
             // Initialise the shade box functionality:...
-            $PAGE->requires->js_init_call('M.format_grid.init', array(
-                $PAGE->user_is_editing(),
+            $this->page->requires->js_init_call('M.format_grid.init', array(
+                $this->page->user_is_editing(),
                 $sectionredirect,
                 count($this->shadeboxshownarray),
                 $this->initialsection,
                 json_encode($this->shadeboxshownarray)));
-            if (!$PAGE->user_is_editing()) {
+            if (!$this->page->user_is_editing()) {
                 // Initialise the key control functionality...
-                $PAGE->requires->yui_module('moodle-format_grid-gridkeys', 'M.format_grid.gridkeys.init',
+                $this->page->requires->yui_module('moodle-format_grid-gridkeys', 'M.format_grid.gridkeys.init',
                     array(array('rtl' => $rtl)), null, true);
             }
         }

@@ -378,11 +378,13 @@ class mod_quiz_mod_form extends moodleform_mod {
             list($identifier, $component) = $string;
 
             $label = get_string($identifier, $component);
+            $group[] = $mform->createElement('html', html_writer::start_div('review_option_item'));
+            $el = $mform->createElement('checkbox', $field . $whenname, '', $label);
             if ($withhelp) {
-                $label .= ' ' . $OUTPUT->help_icon($identifier, $component);
+                $el->_helpbutton = $OUTPUT->render(new help_icon($identifier, $component));
             }
-
-            $group[] = $mform->createElement('checkbox', $field . $whenname, '', $label);
+            $group[] = $el;
+            $group[] = $mform->createElement('html', html_writer::end_div());
         }
         $mform->addGroup($group, $whenname . 'optionsgrp',
                 get_string('review' . $whenname, 'quiz'), null, false);
@@ -481,6 +483,31 @@ class mod_quiz_mod_form extends moodleform_mod {
                 $toform[$name] = $value;
             }
         }
+
+        if (empty($toform['completionminattempts'])) {
+            $toform['completionminattempts'] = 1;
+        } else {
+            $toform['completionminattemptsenabled'] = $toform['completionminattempts'] > 0;
+        }
+    }
+
+    /**
+     * Allows module to modify the data returned by form get_data().
+     * This method is also called in the bulk activity completion form.
+     *
+     * Only available on moodleform_mod.
+     *
+     * @param stdClass $data the form data to be modified.
+     */
+    public function data_postprocessing($data) {
+        parent::data_postprocessing($data);
+        if (!empty($data->completionunlocked)) {
+            // Turn off completion settings if the checkboxes aren't ticked.
+            $autocompletion = !empty($data->completion) && $data->completion == COMPLETION_TRACKING_AUTOMATIC;
+            if (empty($data->completionminattemptsenabled) || !$autocompletion) {
+                $data->completionminattempts = 0;
+            }
+        }
     }
 
     public function validation($data, $files) {
@@ -510,6 +537,12 @@ class mod_quiz_mod_form extends moodleform_mod {
                 } else {
                     $errors['gradepass'] = get_string('gradetopassmustbeset', 'quiz');
                 }
+            }
+        }
+
+        if (!empty($data['completionminattempts'])) {
+            if ($data['attempts'] > 0 && $data['completionminattempts'] > $data['attempts']) {
+                $errors['completionminattemptsgroup'] = get_string('completionminattemptserror', 'quiz');
             }
         }
 
@@ -593,6 +626,17 @@ class mod_quiz_mod_form extends moodleform_mod {
         $mform->addGroup($group, 'completionpassgroup', get_string('completionpass', 'quiz'), ' &nbsp; ', false);
         $mform->addHelpButton('completionpassgroup', 'completionpass', 'quiz');
         $items[] = 'completionpassgroup';
+
+        $group = array();
+        $group[] = $mform->createElement('checkbox', 'completionminattemptsenabled', '',
+            get_string('completionminattempts', 'quiz'));
+        $group[] = $mform->createElement('text', 'completionminattempts', '', array('size' => 3));
+        $mform->setType('completionminattempts', PARAM_INT);
+        $mform->addGroup($group, 'completionminattemptsgroup', get_string('completionminattemptsgroup', 'quiz'), array(' '), false);
+        $mform->disabledIf('completionminattempts', 'completionminattemptsenabled', 'notchecked');
+
+        $items[] = 'completionminattemptsgroup';
+
         return $items;
     }
 
@@ -603,7 +647,9 @@ class mod_quiz_mod_form extends moodleform_mod {
      * @return bool True if one or more rules is enabled, false if none are.
      */
     public function completion_rule_enabled($data) {
-        return !empty($data['completionattemptsexhausted']) || !empty($data['completionpass']);
+        return  !empty($data['completionattemptsexhausted']) ||
+                !empty($data['completionpass']) ||
+                !empty($data['completionminattemptsenabled']);
     }
 
     /**

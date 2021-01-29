@@ -302,6 +302,7 @@ class api {
             $settings->tool_mobile_forcelogout = get_config('tool_mobile', 'forcelogout');
             $settings->tool_mobile_customlangstrings = get_config('tool_mobile', 'customlangstrings');
             $settings->tool_mobile_disabledfeatures = get_config('tool_mobile', 'disabledfeatures');
+            $settings->tool_mobile_filetypeexclusionlist = get_config('tool_mobile', 'filetypeexclusionlist');
             $settings->tool_mobile_custommenuitems = get_config('tool_mobile', 'custommenuitems');
             $settings->tool_mobile_apppolicy = get_config('tool_mobile', 'apppolicy');
         }
@@ -320,6 +321,12 @@ class api {
             foreach ($colornumbers as $number) {
                 $settings->{'core_admin_coursecolor' . $number} = get_config('core_admin', 'coursecolor' . $number);
             }
+        }
+
+        if (empty($section) or $section == 'supportcontact') {
+            $settings->supportname = $CFG->supportname;
+            $settings->supportemail = $CFG->supportemail;
+            $settings->supportpage = $CFG->supportpage;
         }
 
         return $settings;

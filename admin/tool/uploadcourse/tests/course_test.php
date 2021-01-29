@@ -35,21 +35,16 @@ global $CFG;
  */
 class tool_uploadcourse_course_testcase extends advanced_testcase {
 
-    /**
-     * @expectedException coding_exception
-     */
     public function test_proceed_without_prepare() {
         $this->resetAfterTest(true);
         $mode = tool_uploadcourse_processor::MODE_CREATE_NEW;
         $updatemode = tool_uploadcourse_processor::UPDATE_NOTHING;
         $data = array();
         $co = new tool_uploadcourse_course($mode, $updatemode, $data);
+        $this->expectException(coding_exception::class);
         $co->proceed();
     }
 
-    /**
-     * @expectedException moodle_exception
-     */
     public function test_proceed_when_prepare_failed() {
         $this->resetAfterTest(true);
         $mode = tool_uploadcourse_processor::MODE_CREATE_NEW;
@@ -57,6 +52,7 @@ class tool_uploadcourse_course_testcase extends advanced_testcase {
         $data = array();
         $co = new tool_uploadcourse_course($mode, $updatemode, $data);
         $this->assertFalse($co->prepare());
+        $this->expectException(moodle_exception::class);
         $co->proceed();
     }
 
@@ -1055,6 +1051,9 @@ class tool_uploadcourse_course_testcase extends advanced_testcase {
     public function test_enrolment_data() {
         $this->resetAfterTest(true);
 
+        // We need to set the current user as one with the capability to edit manual enrolment instances in the new course.
+        $this->setAdminUser();
+
         $mode = tool_uploadcourse_processor::MODE_CREATE_NEW;
         $updatemode = tool_uploadcourse_processor::UPDATE_ALL_WITH_DATA_ONLY;
         $data = array('shortname' => 'c1', 'summary' => 'S', 'fullname' => 'FN', 'category' => '1');
@@ -1079,6 +1078,123 @@ class tool_uploadcourse_course_testcase extends advanced_testcase {
         $this->assertEquals(strtotime($data['enrolment_1_startdate']), $enroldata['manual']->enrolstartdate);
         $this->assertEquals(strtotime('1970-01-01 GMT + ' . $data['enrolment_1_enrolperiod']), $enroldata['manual']->enrolperiod);
         $this->assertEquals(strtotime('12th July 2013'), $enroldata['manual']->enrolenddate);
+    }
+
+    /**
+     * Data provider for testing enrolment errors
+     *
+     * @return array
+     */
+    public function enrolment_uploaddata_error_provider(): array {
+        return [
+            ['errorcannotcreateorupdateenrolment', [
+                'shortname' => 'C1',
+                'enrolment_1' => 'manual',
+            ]],
+            ['errorcannotdeleteenrolment', [
+                'shortname' => 'C1',
+                'enrolment_1' => 'manual',
+                'enrolment_1_delete' => '1',
+            ]],
+            ['errorcannotdisableenrolment', [
+                'shortname' => 'C1',
+                'enrolment_1' => 'manual',
+                'enrolment_1_disable' => '1',
+            ]],
+        ];
+    }
+
+    /**
+     * Test that user without permission, cannot modify enrolment instances when creating courses
+     *
+     * @param string $expectederror
+     * @param array $uploaddata
+     *
+     * @dataProvider enrolment_uploaddata_error_provider
+     */
+    public function test_enrolment_error_create_course(string $expectederror, array $uploaddata): void {
+        global $DB;
+
+        $this->resetAfterTest();
+
+        // Create category in which to create the new course.
+        $category = $this->getDataGenerator()->create_category();
+        $categorycontext = context_coursecat::instance($category->id);
+
+        $user = $this->getDataGenerator()->create_user();
+        $this->setUser($user);
+
+        // Assign the user as a manager of the category, disable ability to configure manual enrolment instances.
+        $roleid = $DB->get_field('role', 'id', ['shortname' => 'manager']);
+        role_assign($roleid, $user->id, $categorycontext);
+        role_change_permission($roleid, $categorycontext, 'enrol/manual:config', CAP_PROHIBIT);
+
+        $mode = tool_uploadcourse_processor::MODE_CREATE_NEW;
+        $updatemode = tool_uploadcourse_processor::UPDATE_ALL_WITH_DATA_ONLY;
+
+        $upload = new tool_uploadcourse_course($mode, $updatemode, array_merge($uploaddata, [
+            'category' => $category->id,
+            'fullname' => 'My course',
+        ]));
+
+        // Enrolment validation isn't performed during 'prepare' for new courses.
+        $this->assertTrue($upload->prepare());
+        $upload->proceed();
+
+        $errors = $upload->get_errors();
+        $this->assertArrayHasKey($expectederror, $errors);
+
+        $this->assertEquals(get_string($expectederror, 'tool_uploadcourse', 'Manual enrolments'),
+            (string) $errors[$expectederror]);
+    }
+
+    /**
+     * Test that user without permission, cannot modify enrolment instances when updating courses
+     *
+     * @param string $expectederror
+     * @param array $uploaddata
+     *
+     * @dataProvider enrolment_uploaddata_error_provider
+     */
+    public function test_enrolment_error_update_course(string $expectederror, array $uploaddata): void {
+        global $DB;
+
+        $this->resetAfterTest();
+
+        // Create category in which to create the new course.
+        $category = $this->getDataGenerator()->create_category();
+        $categorycontext = context_coursecat::instance($category->id);
+
+        $course = $this->getDataGenerator()->create_course([
+            'category' => $category->id,
+            'shortname' => $uploaddata['shortname'],
+        ]);
+
+        $user = $this->getDataGenerator()->create_user();
+        $this->setUser($user);
+
+        // Assign the user as a manager of the category, disable ability to configure manual enrolment instances.
+        $roleid = $DB->get_field('role', 'id', ['shortname' => 'manager']);
+        role_assign($roleid, $user->id, $categorycontext);
+        role_change_permission($roleid, $categorycontext, 'enrol/manual:config', CAP_PROHIBIT);
+
+        // Sanity check.
+        $instances = enrol_get_instances($course->id, true);
+        $this->assertCount(1, $instances);
+        $this->assertEquals('manual', reset($instances)->enrol);
+
+        $mode = tool_uploadcourse_processor::MODE_UPDATE_ONLY;
+        $updatemode = tool_uploadcourse_processor::UPDATE_ALL_WITH_DATA_ONLY;
+
+        $upload = new tool_uploadcourse_course($mode, $updatemode, $uploaddata);
+
+        $this->assertFalse($upload->prepare());
+
+        $errors = $upload->get_errors();
+        $this->assertArrayHasKey($expectederror, $errors);
+
+        $this->assertEquals(get_string($expectederror, 'tool_uploadcourse', 'Manual enrolments'),
+            (string) $errors[$expectederror]);
     }
 
     /**
@@ -1112,9 +1228,9 @@ class tool_uploadcourse_course_testcase extends advanced_testcase {
 
         // Confirm presence of course custom fields.
         $data = \core_course\customfield\course_handler::create()->export_instance_data_object($course->id);
-        $this->assertEquals('Wednesday, 1 April 2020, 4:00 PM', $data->mydatefield, '', 0.0, 10, false, true);
+        $this->assertEqualsIgnoringCase('Wednesday, 1 April 2020, 4:00 PM', $data->mydatefield);
         $this->assertEquals($dataupload['customfield_mytextfield'], $data->mytextfield);
-        $this->assertContains($dataupload['customfield_mytextareafield'], $data->mytextareafield);
+        $this->assertStringContainsString($dataupload['customfield_mytextareafield'], $data->mytextareafield);
     }
 
     /**

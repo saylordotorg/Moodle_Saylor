@@ -1,12 +1,10 @@
 language: php
 
-sudo: false
-
 cache:
   directories:
     - $HOME/.composer/cache
 
-matrix:
+jobs:
  allow_failures:
  fast_finish: true
  include:
@@ -17,18 +15,18 @@ matrix:
    env: DB=pgsql
    services: postgresql
    addons:
-      postgresql: 9.5
- - php: 7.3
+      postgresql: 9.6
+ - php: 7.4
    env: DB=mysqli
    services: mysql
- - php: 7.3
+ - php: 7.4
    env: DB=pgsql
    services: postgresql
    addons:
-      postgresql: 9.5
+      postgresql: 9.6
 env:
  global:
-  - MOODLE_BRANCH=MOODLE_39_STABLE
+  - MOODLE_BRANCH=MOODLE_310_STABLE
   - IGNORE_PATHS=amd/src/tooltip.js,test/test_image.php,upgrade/convert_legacy_image.php,yui/src/gridkeys/js/event-nav-keys-debug.js,yui/src/gridkeys/js/event-nav-keys.js,yui/src/gridkeys/scripts/backport.js,yui/gridkeys/gridkeys.js
   - IGNORE_NAMES=gf_colourpopup.php,gf_colourpopup.js
 
@@ -42,7 +40,7 @@ before_install:
 # Update Composer.
   - composer selfupdate
 # Install this project into a directory called "ci".
-  - composer create-project -n --no-dev moodlerooms/moodle-plugin-ci ci ^1
+  - composer create-project -n --no-dev --prefer-dist moodlehq/moodle-plugin-ci ci ^3
 # Update the $PATH so scripts from this project can be called easily.
   - export PATH="$(cd ci/bin; pwd):$(cd ci/vendor/bin; pwd):$PATH"
 
@@ -54,6 +52,6 @@ script:
   - moodle-plugin-ci phpcpd
   - moodle-plugin-ci phpmd
   - moodle-plugin-ci codechecker
-  - moodle-plugin-ci csslint
-  - moodle-plugin-ci jshint
+  - moodle-plugin-ci validate
+  - moodle-plugin-ci savepoints
   - moodle-plugin-ci phpunit

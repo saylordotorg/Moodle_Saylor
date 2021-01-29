@@ -38,7 +38,7 @@ class format_grid_courseformatlib_testcase extends advanced_testcase {
     protected $courseformatone;
     protected $courseformattwo;
 
-    protected function setUp() {
+    protected function setUp(): void {
         $this->resetAfterTest(true);
 
         set_config('theme', 'boost');

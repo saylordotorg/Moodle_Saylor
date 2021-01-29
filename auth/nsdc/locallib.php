@@ -323,12 +323,17 @@ function course_status_update($data, $user, $production = false) {
     $response = json_decode(curl_exec($ch));
     $information = curl_getinfo($ch);
 
-    $statuscode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $statuscode = $information['http_code'];
 
     if ($statuscode !== 200) {
         // NSDC reports an error.
-        $error = ' ('.$statuscode.') '.$response->error;
-        throw new moodle_exception('nsdc_api_returned_error', 'auth_nsdc', '', $error);
+        // As of mid-2020 ALL call respond with 422 for some reason.
+        // Actual errors appear to response with an error object instead of message.
+        if (isset($response->error)) {
+            $error = ' ('.$statuscode.') '.$response->error;
+            throw new moodle_exception('nsdc_api_returned_error', 'auth_nsdc', '', $error);
+        }
+
     }
 
     return true;
