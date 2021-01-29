@@ -107,7 +107,7 @@ def plugins = [
     [
         "name" : 'qtype_pmatch',
         "url" : 'https://github.com/moodleou/moodle-qtype_pmatch.git',
-        "branch" : 'master',
+        "branch" : 'main',
         "dest" : 'question/type/pmatch'
     ],
     [
