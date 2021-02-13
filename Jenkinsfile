@@ -5,7 +5,7 @@
 def mysql_source_dbname = 'moodle'
 def mysql_dest_dbname = 'moodle_test'
 
-def moodle_version = 'MOODLE_39_STABLE'
+def moodle_version = 'MOODLE_310_STABLE'
 
 def plugins = [
     [
@@ -29,13 +29,13 @@ def plugins = [
     [
         "name" : 'format_grid',
         "url" : 'https://github.com/gjb2048/moodle-format_grid.git',
-        "branch" : 'MOODLE_39',
+        "branch" : 'master',
         "dest" : 'course/format/grid'
     ],
     [
         "name" : 'format_topcoll',
         "url" : 'https://github.com/gjb2048/moodle-format_topcoll.git',
-        "branch" : 'MOODLE_39',
+        "branch" : 'master',
         "dest" : 'course/format/topcoll'
     ],
     [
@@ -71,7 +71,7 @@ def plugins = [
     [
         "name" : 'block_workflow',
         "url" : 'https://github.com/moodleou/moodle-block_workflow.git',
-        "branch" : 'master',
+        "branch" : 'main',
         "dest" : 'blocks/workflow'
     ],
     [
@@ -113,7 +113,7 @@ def plugins = [
     [
         "name" : 'qtype_pmatch',
         "url" : 'https://github.com/moodleou/moodle-qtype_pmatch.git',
-        "branch" : 'master',
+        "branch" : 'main',
         "dest" : 'question/type/pmatch'
     ],
     [
