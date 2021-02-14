@@ -52,10 +52,8 @@ export default {
         help: getDataSelector('region', 'help'),
         modules: getDataSelector('region', 'modules'),
         favouriteTabNav: getDataSelector('region', 'favourite-tab-nav'),
-        recommendedTabNav: getDataSelector('region', 'recommended-tab-nav'),
         defaultTabNav: getDataSelector('region', 'default-tab-nav'),
         activityTabNav: getDataSelector('region', 'activity-tab-nav'),
-        resourceTabNav: getDataSelector('region', 'resources-tab-nav'),
         favouriteTab: getDataSelector('region', 'favourites'),
         recommendedTab: getDataSelector('region', 'recommended'),
         defaultTab: getDataSelector('region', 'default'),
@@ -86,8 +84,6 @@ export default {
         sitetopic: 'div.sitetopic',
         tab: 'a[data-toggle="tab"]',
         activetab: 'a[data-toggle="tab"][aria-selected="true"]',
-        visibletabs: 'a[data-toggle="tab"]:not(.d-none)',
-        searchicon: '.input-group-append .search-icon',
-        clearsearch: '.input-group-append .clear'
+        visibletabs: 'a[data-toggle="tab"]:not(.d-none)'
     },
 };

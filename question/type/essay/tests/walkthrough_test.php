@@ -499,7 +499,7 @@ class qtype_essay_walkthrough_testcase extends qbehaviour_walkthrough_test_base 
         // Test taht no HTML comment has been added to the response.
         $this->assertRegExp('/Once upon a time there was a frog called Freddy. He lived happily ever after.(?!&lt;!--)/', $this->currentoutput);
         // Test for the hash of an empty file area.
-        $this->assertNotContains('d41d8cd98f00b204e9800998ecf8427e', $this->currentoutput);
+        $this->assertStringNotContainsString('d41d8cd98f00b204e9800998ecf8427e', $this->currentoutput);
     }
 
     public function test_deferred_feedback_html_editor_with_files_attempt_wrong_filetypes() {
@@ -519,7 +519,7 @@ class qtype_essay_walkthrough_testcase extends qbehaviour_walkthrough_test_base 
 
         // Start attempt at the question.
         $q = question_bank::load_question($question->id);
-        $q->filetypeslist = ("pdf, docx");
+        $q->filetypeslist = '.pdf,.docx';
         $this->start_attempt_at_question($q, 'deferredfeedback', 1);
 
         $this->check_current_state(question_state::$todo);
@@ -578,7 +578,7 @@ class qtype_essay_walkthrough_testcase extends qbehaviour_walkthrough_test_base 
 
         // Start attempt at the question.
         $q = question_bank::load_question($question->id);
-        $q->filetypeslist = ("txt, docx");
+        $q->filetypeslist = '.txt,.docx';
         $this->start_attempt_at_question($q, 'deferredfeedback', 1);
 
         $this->check_current_state(question_state::$todo);

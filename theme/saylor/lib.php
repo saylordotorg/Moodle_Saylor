@@ -15,9 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package   theme_saylor
- * @copyright 2018 Saylor Academy
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * Theme functions.
+ *
+ * @package    theme_saylor
+ * @copyright  2021 Saylor Academy
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 // Check the file is being called internally from within Moodle.
@@ -187,6 +189,71 @@ function theme_saylor_extend_navigation_course(navigation_node $parentnode, stdC
 
 }
 
+/**
+ * Post process the CSS tree.
+ *
+ * @param string $tree The CSS tree.
+ * @param theme_config $theme The theme config object.
+ */
+function theme_saylor_css_tree_post_processor($tree, $theme) {
+    error_log('theme_saylor_css_tree_post_processor() is deprecated. Required' .
+        'prefixes for Bootstrap are now in theme/saylor/scss/moodle/prefixes.scss');
+    $prefixer = new theme_saylor\autoprefixer($tree);
+    $prefixer->prefix();
+}
+
+/**
+ * Inject additional SCSS.
+ *
+ * @param theme_config $theme The theme config object.
+ * @return string
+ */
+function theme_saylor_get_extra_scss($theme) {
+    $content = '';
+    $imageurl = $theme->setting_file_url('backgroundimage', 'backgroundimage');
+
+    // Sets the background image, and its settings.
+    if (!empty($imageurl)) {
+        $content .= 'body { ';
+        $content .= "background-image: url('$imageurl'); background-size: cover;";
+        $content .= ' }';
+    }
+
+    // Always return the background image with the scss when we have it.
+    return !empty($theme->settings->scss) ? $theme->settings->scss . ' ' . $content : $content;
+}
+
+/**
+ * Serves any files associated with the theme settings.
+ *
+ * @param stdClass $course
+ * @param stdClass $cm
+ * @param context $context
+ * @param string $filearea
+ * @param array $args
+ * @param bool $forcedownload
+ * @param array $options
+ * @return bool
+ */
+function theme_saylor_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options = array()) {
+    if ($context->contextlevel == CONTEXT_SYSTEM && ($filearea === 'logo' || $filearea === 'backgroundimage')) {
+        $theme = theme_config::load('saylor');
+        // By default, theme files must be cache-able by both browsers and proxies.
+        if (!array_key_exists('cacheability', $options)) {
+            $options['cacheability'] = 'public';
+        }
+        return $theme->setting_file_serve($filearea, $args, $forcedownload, $options);
+    } else {
+        send_file_not_found();
+    }
+}
+
+/**
+ * Returns the main SCSS content.
+ *
+ * @param theme_config $theme The theme config object.
+ * @return string
+ */
 function theme_saylor_get_main_scss_content($theme) {
     global $CFG;
 
@@ -195,24 +262,68 @@ function theme_saylor_get_main_scss_content($theme) {
     $fs = get_file_storage();
 
     $context = context_system::instance();
-
-    if ($filename == 'default.scss') {                   
-        $scss .= file_get_contents($CFG->dirroot . '/theme/saylor/scss/preset/default.scss');
+    if ($filename == 'default.scss') {
+        $scss .= file_get_contents($CFG->dirroot . '/theme/boost/scss/preset/default.scss');
     } else if ($filename == 'plain.scss') {
-        // We still load the default preset files directly from the boost theme. No sense in duplicating them.                      
         $scss .= file_get_contents($CFG->dirroot . '/theme/boost/scss/preset/plain.scss');
- 
-    } else if ($filename && ($presetfile = $fs->get_file($context->id, 'theme_saylor', 'preset', 0, '/', $filename))) {            
+    } else if ($filename && ($presetfile = $fs->get_file($context->id, 'theme_saylor', 'preset', 0, '/', $filename))) {
         $scss .= $presetfile->get_content();
     } else {
-        // Safety fallback - maybe new installs.                                                                             
+        // Safety fallback - maybe new installs etc.
         $scss .= file_get_contents($CFG->dirroot . '/theme/boost/scss/preset/default.scss');
     }
 
-    // Pre CSS - this is loaded AFTER any prescss from the setting but before the main scss.                                        
-    $pre = file_get_contents($CFG->dirroot . '/theme/saylor/scss/pre.scss');                                                         
-    // Post CSS - this is loaded AFTER the main scss but before the extra scss from the setting.                                    
-    $post = file_get_contents($CFG->dirroot . '/theme/saylor/scss/post.scss');  
- 
-    return $pre . "\n" . $scss . "\n" . $post;
+    // Saylor scss.
+    $saylorpre = file_get_contents($CFG->dirroot . '/theme/saylor/scss/saylor/_pre.scss');
+    $saylorvariables = file_get_contents($CFG->dirroot . '/theme/saylor/scss/saylor/_variables.scss');
+    $saylor = file_get_contents($CFG->dirroot . '/theme/saylor/scss/saylor.scss');
+
+    // Combine files together.
+    $allscss = $saylorvariables . "\n" . $saylorpre . "\n" . $scss . "\n" . $saylor;
+
+    return $allscss;
+}
+
+/**
+ * Get compiled css.
+ *
+ * @return string compiled css
+ */
+function theme_saylor_get_precompiled_css() {
+    global $CFG;
+    return file_get_contents($CFG->dirroot . '/theme/saylor/style/moodle.css');
+}
+
+/**
+ * Get SCSS to prepend.
+ *
+ * @param theme_config $theme The theme config object.
+ * @return array
+ */
+function theme_saylor_get_pre_scss($theme) {
+    global $CFG;
+
+    $scss = '';
+    $configurable = [
+        // Config key => [variableName, ...].
+        'brandcolor' => ['primary'],
+    ];
+
+    // Prepend variables first.
+    foreach ($configurable as $configkey => $targets) {
+        $value = isset($theme->settings->{$configkey}) ? $theme->settings->{$configkey} : null;
+        if (empty($value)) {
+            continue;
+        }
+        array_map(function($target) use (&$scss, $value) {
+            $scss .= '$' . $target . ': ' . $value . ";\n";
+        }, (array) $targets);
+    }
+
+    // Prepend pre-scss.
+    if (!empty($theme->settings->scsspre)) {
+        $scss .= $theme->settings->scsspre;
+    }
+
+    return $scss;
 }

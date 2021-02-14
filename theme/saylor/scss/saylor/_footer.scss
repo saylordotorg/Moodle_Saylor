@@ -1,0 +1,26 @@
+/** Footer */
+#page-footer a {
+ text-decoration: none;
+}
+
+#page-footer .footer-logo .icon {
+ width: auto;
+ height: 30px;
+}
+
+#footer-logo-share-bottom .footer-logo .icon {
+ width: auto;
+ height: 40px;
+}
+
+#footer-links h4 {
+ margin: 0;
+}
+
+#footer-ccby-logo .icon {
+ width: 80px;
+ height: auto;
+ @include media-breakpoint-down(xs) {
+   margin-bottom: 1rem;
+ }
+}

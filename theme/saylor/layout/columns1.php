@@ -13,10 +13,12 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
+ * A one column layout for the saylor theme.
  *
  * @package   theme_saylor
- * @copyright 2018 Saylor Academy
+ * @copyright 2021 Saylor Academy
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -28,8 +30,7 @@ $templatecontext = [
     'sitename' => format_string($SITE->shortname, true, ['context' => context_course::instance(SITEID), "escape" => false]),
     'output' => $OUTPUT,
     'bodyattributes' => $bodyattributes,
-    'opengraph' => $OUTPUT->get_open_graph_properties(),
+    'opengraph' => $OUTPUT ->get_open_graph_properties()
 ];
 
 echo $OUTPUT->render_from_template('/columns1', $templatecontext);
-

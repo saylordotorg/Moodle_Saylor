@@ -1,0 +1,57 @@
+
+/** Buttons */
+// Button color should be our button orange.
+
+.btn-primary {
+    @include button-variant($button-bg-orange, darken($button-bg-orange, 7.5%), darken($button-bg-orange, 10%), lighten($button-bg-orange,5%), lighten($button-bg-orange, 10%), darken($button-bg-orange,30%));
+}
+
+.btn-outline-primary {
+    @include button-outline-variant($button-bg-orange, #222222, lighten($button-bg-orange,5%), $button-bg-orange);
+}
+
+.btn-secondary {
+    @include button-variant($button-bg-orange, darken($button-bg-orange, 7.5%), darken($button-bg-orange, 10%), lighten($button-bg-orange,5%), lighten($button-bg-orange, 10%), darken($button-bg-orange,30%));
+}
+
+.btn-outline-secondary {
+    @include button-outline-variant($button-bg-orange, #222222, lighten($button-bg-orange,5%), $button-bg-orange);
+}
+
+// Button primary and secondary text should always be white.
+// Sometimes it was showing up as the secondary color.
+.btn .btn-primary, .btn .btn-secondary {
+    color: $white;
+}
+
+.btn-primary:focus, .btn-primary.focus {
+  outline: inherit;
+}
+
+
+/*
+// Reset the default styling back to the bootstrap defaults for
+// the secondary outline button because gray-200 is much too light
+// for an outline button.
+.btn-outline-secondary {
+    @include button-outline-variant($gray-600);
+    border-color: $gray-600;
+}
+*/
+
+.btn-outline-info {
+    @include button-outline-variant($info-outline);
+}
+
+.btn-outline-warning {
+    @include button-outline-variant($warning-outline);
+}
+
+@include bg-variant(".bg-gray", $gray-200, true);
+
+// Enroll button
+#enroll-button-container {
+   font-size: 1.1em;
+   text-align: center;
+   padding-bottom: 5px;
+}

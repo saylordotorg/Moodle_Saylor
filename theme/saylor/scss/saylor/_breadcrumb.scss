@@ -1,0 +1,14 @@
+// Fixes CSS issues (e.g., spacing between words and containers and so on) when viewing on mobile devices
+
+.breadcrumb {
+  @include media-breakpoint-down(xs) {
+    border-radius: 0;
+  }
+}
+
+.breadcrumb:not(:empty) {
+  @include media-breakpoint-down(xs) {
+    margin-bottom: 0;
+    border-top: 2px solid #eee;
+  }
+}

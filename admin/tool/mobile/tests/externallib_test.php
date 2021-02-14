@@ -158,11 +158,11 @@ class tool_mobile_external_testcase extends externallib_advanced_testcase {
 
         $this->assertEquals('Google', $identityproviders[0]['name']);
         $this->assertEquals($irecord->image, $identityproviders[0]['iconurl']);
-        $this->assertContains($CFG->wwwroot, $identityproviders[0]['url']);
+        $this->assertStringContainsString($CFG->wwwroot, $identityproviders[0]['url']);
 
         $this->assertEquals('CAS', $identityproviders[1]['name']);
         $this->assertEmpty($identityproviders[1]['iconurl']);
-        $this->assertContains($CFG->wwwroot, $identityproviders[1]['url']);
+        $this->assertStringContainsString($CFG->wwwroot, $identityproviders[1]['url']);
 
         $this->assertEquals($expected, $result);
 
@@ -171,7 +171,7 @@ class tool_mobile_external_testcase extends externallib_advanced_testcase {
         set_config('auth_logo', $newurl, 'auth_cas');
         $result = external::get_public_config();
         $result = external_api::clean_returnvalue(external::get_public_config_returns(), $result);
-        $this->assertContains($newurl, $result['identityproviders'][1]['iconurl']);
+        $this->assertStringContainsString($newurl, $result['identityproviders'][1]['iconurl']);
     }
 
     /**
@@ -213,6 +213,7 @@ class tool_mobile_external_testcase extends externallib_advanced_testcase {
             array('name' => 'tool_mobile_forcelogout', 'value' => 0),
             array('name' => 'tool_mobile_customlangstrings', 'value' => ''),
             array('name' => 'tool_mobile_disabledfeatures', 'value' => ''),
+            array('name' => 'tool_mobile_filetypeexclusionlist', 'value' => ''),
             array('name' => 'tool_mobile_custommenuitems', 'value' => ''),
             array('name' => 'tool_mobile_apppolicy', 'value' => ''),
             array('name' => 'calendartype', 'value' => $CFG->calendartype),
@@ -229,6 +230,10 @@ class tool_mobile_external_testcase extends externallib_advanced_testcase {
                 'value' => get_config('core_admin', 'coursecolor' . $number)
             ];
         }
+        $expected[] = ['name' => 'supportname', 'value' => $CFG->supportname];
+        $expected[] = ['name' => 'supportemail', 'value' => $CFG->supportemail];
+        $expected[] = ['name' => 'supportpage', 'value' => $CFG->supportpage];
+
         $this->assertCount(0, $result['warnings']);
         $this->assertEquals($expected, $result['settings']);
 

@@ -35,7 +35,7 @@ function xmldb_block_tag_youtube_upgrade($oldversion) {
     // Automatically generated Moodle v3.10.0 release upgrade line.
     // Put any upgrade step following this.
 
-    if ($oldversion < 2020061501) {
+    if ($oldversion < 2020110901) {
         // We need to fix every tag_youtube block instance that has used a legacy category name as a category config.
         // The category config needs to store the category ID instead.
 
@@ -123,7 +123,7 @@ function xmldb_block_tag_youtube_upgrade($oldversion) {
             }
         }
 
-        upgrade_block_savepoint(true, 2020061501, 'tag_youtube', false);
+        upgrade_block_savepoint(true, 2020110901, 'tag_youtube', false);
     }
 
     return true;

@@ -69,6 +69,7 @@ $string['emailtagline'] = 'This is a copy of a message sent to you at "{$a->site
 $string['enabled'] = 'Enabled';
 $string['errorcallingprocessor'] = 'Error calling defined output';
 $string['errorconversationdoesnotexist'] = 'Conversation does not exist';
+$string['errormessagetoolong'] = 'The message is longer than the maximum allowed.';
 $string['errortranslatingdefault'] = 'Error translating default setting provided by plugin, using system defaults instead.';
 $string['eventgroupmessagesent'] = 'Group message sent';
 $string['eventnotificationviewed'] = 'Notification viewed';
@@ -262,8 +263,6 @@ $string['unreadnewgroupconversationmessage'] = 'New message from {$a->name} in {
 $string['unreadnewmessage'] = 'New message from {$a}';
 $string['useentertosend'] = 'Use enter to send';
 $string['usercantbemessaged'] = 'You can\'t message {$a} due to their message preferences. Try adding them as a contact.';
-$string['userisblockingyou'] = 'This user has blocked you from sending messages to them';
-$string['userisblockingyounoncontact'] = '{$a} only accepts messages from their contacts.';
 $string['userwouldliketocontactyou'] = '{$a} would like to contact you';
 $string['viewfullnotification'] = 'View full notification';
 $string['viewmessageswith'] = 'View messages with {$a}';
@@ -274,13 +273,6 @@ $string['wouldliketocontactyou'] = 'Would like to contact you';
 $string['you'] = 'You:';
 $string['youhaveblockeduser'] = 'You have blocked this user.';
 $string['yourcontactrequestpending'] = 'Your contact request is pending with {$a}';
-
-// Deprecated since Moodle 3.6.
-$string['eventmessagecontactblocked'] = 'Message contact blocked';
-$string['eventmessagecontactunblocked'] = 'Message contact unblocked';
-$string['messagingdisabled'] = 'Messaging is disabled on this site, emails will be sent instead';
-$string['userisblockingyou'] = 'This user has blocked you from sending messages to them.';
-$string['userisblockingyounoncontact'] = '{$a} only accepts messages from their contacts.';
 
 // Deprecated since Moodle 3.7.
 $string['nomessages'] = 'No messages';

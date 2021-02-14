@@ -145,7 +145,7 @@ class core_scheduled_task_testcase extends advanced_testcase {
         // Should be displayed in user timezone.
         // I used http://www.timeanddate.com/worldclock/fixedtime.html?msg=Moodle+Test&iso=20160502T01&p1=113
         // setting my location to Kathmandu to verify this time.
-        $this->assertContains('2:15 AM', core_text::strtoupper($userdate));
+        $this->assertStringContainsString('2:15 AM', core_text::strtoupper($userdate));
     }
 
     public function test_reset_scheduled_tasks_for_component_customised(): void {
@@ -396,8 +396,8 @@ class core_scheduled_task_testcase extends advanced_testcase {
         $testclass = new \core\task\scheduled_test_task();
 
         // The test task defaults to '*'.
-        $this->assertInternalType('string', $testclass->get_minute());
-        $this->assertInternalType('string', $testclass->get_hour());
+        $this->assertIsString($testclass->get_minute());
+        $this->assertIsString($testclass->get_hour());
 
         // Set a random value.
         $testclass->set_minute('R');
@@ -406,19 +406,19 @@ class core_scheduled_task_testcase extends advanced_testcase {
 
         // Verify the minute has changed within allowed bounds.
         $minute = $testclass->get_minute();
-        $this->assertInternalType('int', $minute);
+        $this->assertIsInt($minute);
         $this->assertGreaterThanOrEqual(0, $minute);
         $this->assertLessThanOrEqual(59, $minute);
 
         // Verify the hour has changed within allowed bounds.
         $hour = $testclass->get_hour();
-        $this->assertInternalType('int', $hour);
+        $this->assertIsInt($hour);
         $this->assertGreaterThanOrEqual(0, $hour);
         $this->assertLessThanOrEqual(23, $hour);
 
         // Verify the dayofweek has changed within allowed bounds.
         $dayofweek = $testclass->get_day_of_week();
-        $this->assertInternalType('int', $dayofweek);
+        $this->assertIsInt($dayofweek);
         $this->assertGreaterThanOrEqual(0, $dayofweek);
         $this->assertLessThanOrEqual(6, $dayofweek);
     }
@@ -567,5 +567,25 @@ class core_scheduled_task_testcase extends advanced_testcase {
         );
 
         call_user_func_array([$this, 'assertNotEquals'], $args);
+    }
+
+    /**
+     * Assert that the lastruntime column holds an original value after a scheduled task is reset.
+     */
+    public function test_reset_scheduled_tasks_for_component_keeps_original_lastruntime(): void {
+        global $DB;
+        $this->resetAfterTest(true);
+
+        // Set lastruntime for the scheduled task.
+        $DB->set_field('task_scheduled', 'lastruntime', 123456789, ['classname' => '\core\task\session_cleanup_task']);
+
+        // Reset the task.
+        \core\task\manager::reset_scheduled_tasks_for_component('moodle');
+
+        // Fetch the task again.
+        $taskafterreset = \core\task\manager::get_scheduled_task(core\task\session_cleanup_task::class);
+
+        // Confirm, that lastruntime is still in place.
+        $this->assertEquals(123456789, $taskafterreset->get_last_run_time());
     }
 }

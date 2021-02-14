@@ -47,7 +47,8 @@ function xmldb_format_grid_upgrade($oldversion = 0) {
 
         // Launch create table for course_grid_summary.
         $dbman->create_table($table);
-        upgrade_plugin_savepoint(true, '2011041802', 'format', 'grid');
+
+        upgrade_plugin_savepoint(true, 2011041802, 'format', 'grid');
     }
 
     if ($oldversion < 2012011701) {
@@ -72,7 +73,7 @@ function xmldb_format_grid_upgrade($oldversion = 0) {
             }
         }
 
-        upgrade_plugin_savepoint(true, '2012011701', 'format', 'grid');
+        upgrade_plugin_savepoint(true, 2012011701, 'format', 'grid');
     }
 
     if ($oldversion < 2012071500) {
@@ -95,7 +96,7 @@ function xmldb_format_grid_upgrade($oldversion = 0) {
             $dbman->add_field($table, $field);
         }
 
-        upgrade_plugin_savepoint(true, '2012071500', 'format', 'grid');
+        upgrade_plugin_savepoint(true, 2012071500, 'format', 'grid');
     }
 
     if ($oldversion < 2013110400) {
@@ -111,12 +112,7 @@ function xmldb_format_grid_upgrade($oldversion = 0) {
             $dbman->add_field($table, $field);
         }
 
-        upgrade_plugin_savepoint(true, '2013110400', 'format', 'grid');
-    }
-
-    // Automatic 'Purge all caches'....
-    if ($oldversion < 2114052000) {
-        purge_all_caches();
+        upgrade_plugin_savepoint(true, 2013110400, 'format', 'grid');
     }
 
     if ($oldversion < 2019111702) {
@@ -128,7 +124,7 @@ function xmldb_format_grid_upgrade($oldversion = 0) {
             $dbman->add_field($table, $field);
         }
 
-        upgrade_plugin_savepoint(true, '2019111702', 'format', 'grid');
+        upgrade_plugin_savepoint(true, 2019111702, 'format', 'grid');
     }
 
     if ($oldversion < 2020070700) {
@@ -139,8 +135,11 @@ function xmldb_format_grid_upgrade($oldversion = 0) {
             $dbman->add_index($table, $index);
         }
 
-        upgrade_plugin_savepoint(true, '2020070700', 'format', 'grid');
+        upgrade_plugin_savepoint(true, 2020070700, 'format', 'grid');
     }
+
+    // Automatic 'Purge all caches'....
+    purge_all_caches();
 
     return true;
 }

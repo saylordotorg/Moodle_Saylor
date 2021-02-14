@@ -225,7 +225,7 @@ body:not(.editing)  .sitetopic ul.section {
 
 .editing .section .activity:hover,
 .editing .section .activity.action-menu-shown {
-    background-color: $table-bg-accent;
+    background-color: $table-accent-bg;
 }
 
 .course-content .current {
@@ -234,7 +234,7 @@ body:not(.editing)  .sitetopic ul.section {
 
 .course-content .current::before {
     content: "";
-    border-left: $brand-primary 2px solid;
+    border-left: $primary 2px solid;
     position: absolute;
     left: -$card-spacer-x;
     top: 0;
@@ -715,12 +715,12 @@ span.editinstructions {
 
 .courses .coursebox {
     &.collapsed {
-        padding-top: $spacer-y / 2;
-        padding-bottom: $spacer-y / 2;
+        padding-top: $spacer / 2;
+        padding-bottom: $spacer / 2;
     }
 
     &.even {
-        background-color: $table-bg-accent;
+        background-color: $table-accent-bg;
     }
 }
 
@@ -951,7 +951,7 @@ span.editinstructions {
             > div,
             > div:hover,
             &[data-selected='1'] > div {
-                background-color: $table-bg-hover;
+                background-color: $table-hover-bg;
             }
         }
     }

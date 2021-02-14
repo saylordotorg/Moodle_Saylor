@@ -24,7 +24,6 @@
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/question/engine/tests/helpers.php');
-
 /**
  * utilities used by the other test classes
  *
@@ -44,6 +43,103 @@ class qtype_gapfill_test_helper extends question_test_helper {
     }
 
     /**
+     * Get the question data, as it would be loaded by get_question_options.
+     * @return object
+     */
+    public static function get_gapfill_question_form_data_catmat() {
+        $answerwords = ['cat', 'mat'];
+        $answers = [];
+        $id = 1;
+        foreach ($answerwords as $key => $answer) {
+            $id++;
+            $answers[$key] = (object) array(
+                'question' => '163',
+                'answer' => $answer,
+                'fraction' => '1',
+                'feedback' => 'Feedback text',
+                'feedbackformat' => '1',
+                'id' => $id,
+            );
+        }
+
+        $fromform = (object) [
+            'idnumber' => '1',
+            'category' => '2',
+            'contextid' => '1',
+            'parent' => '0',
+            'name' => 'Generic Gapfill Question',
+            'itemsettings' => '[
+                {
+                    "itemid":"id1_0",
+                    "questionid":"",
+                    "correctfeedback":"Cat is correct",
+                    "incorrectfeedback":"Mat is not correct",
+                    "gaptext":"cat"
+                }
+             ]',
+            'questiontext' => [
+                'text' => 'The [cat] sat on the [mat]',
+                'format' => FORMAT_HTML,
+            ],
+            'qtype' => 'gapfill',
+            'length' => '1',
+            'stamp' => 'tjh238.vledev.open.ac.uk+100708154547+JrHygi',
+            'version' => 'tjh238.vledev.open.ac.uk+100708154548+a3zh8v',
+            'hidden' => '0',
+            'timecreated' => '1278603947',
+            'timemodified' => '1278603947',
+            'createdby' => '3',
+            'modifiedby' => '3',
+            'defaultmark' => '1.0000000',
+            'penalty' => '0.3333333',
+            'maxmark' => '1.00000',
+            'id' => '117',
+            'question' => '163',
+            'layout' => '0',
+            'answerdisplay' => 'dragdrop',
+            'delimitchars' => '[]',
+            'casesensitive' => false,
+            'noduplicates' => '1',
+            'disableregex' => false,
+            'fixedgapsize' => '0',
+            'optionaftertext' => '',
+            'letterhints' => '1',
+            'generalfeedback' => [
+                'text' => '',
+                'format' => FORMAT_HTML,
+            ],
+            'correctfeedback' => [
+                'text' => 'Correct Feedback',
+                'format' => FORMAT_HTML,
+            ],
+            'partiallycorrectfeedback' => [
+                'text' => 'Partially Correct Feedback',
+                'format' => FORMAT_HTML,
+            ],
+            'incorrectfeedback' => [
+                'text' => 'Incorrect Feedback',
+                'format' => FORMAT_HTML,
+            ],
+            'optionsaftertext' => false,
+            'singleuse' => false,
+            'answers' => $answers,
+            'hint' => [
+                0 => [
+                    'text' => 'Hint 1.',
+                    'format' => FORMAT_HTML,
+                ],
+                1 => [
+                    'text' => 'Hint 2.',
+                    'format' => FORMAT_HTML,
+                ],
+            ],
+            'hintclearwrong' => [0, 1],
+            'hintshownumcorrect' => [1, 1],
+        ];
+
+        return $fromform;
+    }
+    /**
      * Slight improvements over original make_question class
      *
      * @param string $questiontext
@@ -51,8 +147,8 @@ class qtype_gapfill_test_helper extends question_test_helper {
      * @return qtype_gapfill
      */
     public static function make_question($questiontext = "The [cat] sat on the [mat]",
-        $poptions=['noduplicates' => 0,
-        'disableregex' => 0, 'delimitchars' => '[]' ]) {
+        $poptions = ['noduplicates' => 0,
+            'disableregex' => 0, 'delimitchars' => '[]']) {
         $type = 'gapfill';
         question_bank::load_question_definition_classes($type);
         $question = new qtype_gapfill_question();
@@ -69,62 +165,62 @@ class qtype_gapfill_test_helper extends question_test_helper {
         foreach ($answerwords as $key => $answer) {
             $id++;
             $answers[$key] = (object) array(
-                        'question' => '163',
-                        'answer' => $answer,
-                        'fraction' => '1',
-                        'feedback' => 'Feedback text',
-                        'feedbackformat' => '1',
-                        'id' => $id,
+                'question' => '163',
+                'answer' => $answer,
+                'fraction' => '1',
+                'feedback' => 'Feedback text',
+                'feedbackformat' => '1',
+                'id' => $id,
             );
         }
-        $options = (object) array(
-                    'id' => '117',
-                    'question' => '163',
-                    'layout' => '0',
-                    'answerdisplay' => 'dragdrop',
-                    'delimitchars' => '[]',
-                    'casesensitive' => false,
-                    'noduplicates' => '1',
-                    'disableregex' => $poptions['disableregex'],
-                    'fixedgapsize' => '0',
-                    'optionaftertext' => '',
-                    'letterhints' => '1',
-                    'correctfeedback' => 'Correct Feedback',
-                    'correctfeedbackformat' => '0',
-                    'partiallycorrectfeedback' => 'Partially Correct Feedback',
-                    'partiallycorrectfeedbackformat' => '0',
-                    'incorrectfeedback' => 'Incorrect Feedback',
-                    'incorrectfeedbackformat' => '0',
-                    'optionsaftertext' => false,
-                    'singleuse' => false,
-                    'answers' => $answers,
-        );
+        $options = (object) [
+            'id' => '117',
+            'question' => '163',
+            'layout' => '0',
+            'answerdisplay' => 'dragdrop',
+            'delimitchars' => '[]',
+            'casesensitive' => false,
+            'noduplicates' => '1',
+            'disableregex' => $poptions['disableregex'],
+            'fixedgapsize' => '0',
+            'optionaftertext' => '',
+            'letterhints' => '1',
+            'correctfeedback' => 'Correct Feedback',
+            'correctfeedbackformat' => '0',
+            'partiallycorrectfeedback' => 'Partially Correct Feedback',
+            'partiallycorrectfeedbackformat' => '0',
+            'incorrectfeedback' => 'Incorrect Feedback',
+            'incorrectfeedbackformat' => '0',
+            'optionsaftertext' => false,
+            'singleuse' => false,
+            'answers' => $answers,
+        ];
 
-        $questiondata = (object) array(
-                    'id' => '2',
-                    'idnumber' => '1',
-                    'category' => '2',
-                    'contextid' => '1',
-                    'parent' => '0',
-                    'name' => 'Generic Gapfill Question',
-                    'questiontext' => $questiontext,
-                    'questiontextformat' => '1',
-                    'generalfeedback' => '',
-                    'generalfeedbackformat' => '1',
-                    'qtype' => 'gapfill',
-                    'length' => '1',
-                    'stamp' => 'tjh238.vledev.open.ac.uk+100708154547+JrHygi',
-                    'version' => 'tjh238.vledev.open.ac.uk+100708154548+a3zh8v',
-                    'hidden' => '0',
-                    'timecreated' => '1278603947',
-                    'timemodified' => '1278603947',
-                    'createdby' => '3',
-                    'modifiedby' => '3',
-                    'defaultmark' => '1.0000000',
-                    'penalty' => '0.3333333',
-                    'maxmark' => '1.00000',
-                    'options' => $options
-        );
+        $questiondata = (object) [
+            'id' => '2',
+            'idnumber' => '1',
+            'category' => '2',
+            'contextid' => '1',
+            'parent' => '0',
+            'name' => 'Generic Gapfill Question',
+            'questiontext' => $questiontext,
+            'questiontextformat' => '1',
+            'generalfeedback' => '',
+            'generalfeedbackformat' => '1',
+            'qtype' => 'gapfill',
+            'length' => '1',
+            'stamp' => 'tjh238.vledev.open.ac.uk+100708154547+JrHygi',
+            'version' => 'tjh238.vledev.open.ac.uk+100708154548+a3zh8v',
+            'hidden' => '0',
+            'timecreated' => '1278603947',
+            'timemodified' => '1278603947',
+            'createdby' => '3',
+            'modifiedby' => '3',
+            'defaultmark' => '1.0000000',
+            'penalty' => '0.3333333',
+            'maxmark' => '1.00000',
+            'options' => $options,
+        ];
 
         $question = $question->qtype->make_question($questiondata);
         $question->gapstofill = count($answerwords);
@@ -132,7 +228,6 @@ class qtype_gapfill_test_helper extends question_test_helper {
         $question->noduplicates = $poptions['noduplicates'];
         return $question;
     }
-
 
     /**
      * Gets the question data for a shortanswer question with just the correct
@@ -146,6 +241,16 @@ class qtype_gapfill_test_helper extends question_test_helper {
         $qdata->qtype = 'gapfill';
         $qdata->name = 'catmat';
         $qdata->questiontext = 'The [cat] sat on the [mat]';
+        $qdata->itemsettings = '[
+            {
+                "itemid":"id1_0",
+                "questionid":"",
+                "correctfeedback":"Cat is correct",
+                "incorrectfeedback":"Mat is not correct",
+                "gaptext":"cat"
+            }
+        ]';
+
         $qdata->generalfeedback = 'someanswer';
 
         $qdata->options = new stdClass();

@@ -406,6 +406,13 @@ What are the colors of the Olympic medals?
         $this->check_step_count(2);
     }
 
+    public function test_no_duplicate_draggables() {
+        $qtext = 'Bicycles have [wheels]. Cars have [wheels|engines].';
+        $gapfill = qtype_gapfill_test_helper::make_question($qtext);
+        $this->start_attempt_at_question($gapfill, 'interactive', $gapfill->gapstofill);
+        // Confirm draggables are unique, i.e. wheels appears only once.
+        $this->assertEquals(2, count($gapfill->allanswers));
+    }
     public function test_get_letter_hints() {
         $gapfill = qtype_gapfill_test_helper::make_question();
         $gapfill->hints = [

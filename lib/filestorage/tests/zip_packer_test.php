@@ -37,7 +37,7 @@ class core_files_zip_packer_testcase extends advanced_testcase implements file_p
      */
     protected $progress;
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
 
         $this->testfile = __DIR__.'/fixtures/test.txt';
@@ -255,6 +255,55 @@ class core_files_zip_packer_testcase extends advanced_testcase implements file_p
     }
 
     /**
+     * Test functionality of {@see zip_packer} for entries with folders ending with dots.
+     *
+     * @link https://bugs.php.net/bug.php?id=77214
+     */
+    public function test_zip_entry_path_having_folder_ending_with_dot() {
+        $this->resetAfterTest(false);
+
+        $packer = get_file_packer('application/zip');
+        $tmp = make_request_directory();
+        $now = time();
+
+        // Create a test archive containing a folder ending with dot.
+        $zippath = $tmp . '/test_archive.zip';
+        $zipcontents = [
+            'HOW.TO' => ['Just run tests.'],
+            'README.' => ['This is a test ZIP file'],
+            './Current time' => [$now],
+            'Data/sub1./sub2/1221' => ['1221'],
+            'Data/sub1./sub2./Příliš žluťoučký kůň úpěl Ďábelské Ódy.txt' => [''],
+        ];
+
+        // Check that the archive can be created.
+        $result = $packer->archive_to_pathname($zipcontents, $zippath, false);
+        $this->assertTrue($result);
+
+        // Check list of files.
+        $listfiles = $packer->list_files($zippath);
+        $this->assertEquals(count($zipcontents), count($listfiles));
+
+        foreach ($listfiles as $fileinfo) {
+            $this->assertSame($fileinfo->pathname, $fileinfo->original_pathname);
+            $this->assertArrayHasKey($fileinfo->pathname, $zipcontents);
+        }
+
+        // Check actual extracting.
+        $targetpath = $tmp . '/target';
+        check_dir_exists($targetpath);
+        $result = $packer->extract_to_pathname($zippath, $targetpath, null, null, true);
+
+        $this->assertTrue($result);
+
+        foreach ($zipcontents as $filename => $filecontents) {
+            $filecontents = reset($filecontents);
+            $this->assertTrue(is_readable($targetpath . '/' . $filename));
+            $this->assertEquals($filecontents, file_get_contents($targetpath . '/' . $filename));
+        }
+    }
+
+    /**
      * @depends test_archive_to_storage
      */
     public function test_extract_to_pathname_onlyfiles() {
@@ -464,7 +513,7 @@ class core_files_zip_packer_testcase extends advanced_testcase implements file_p
         } catch (Exception $e) {
             // New PHP versions print PHP Warning.
             $this->assertInstanceOf('PHPUnit\Framework\Error\Warning', $e);
-            $this->assertContains('ZipArchive::close', $e->getMessage());
+            $this->assertStringContainsString('ZipArchive::close', $e->getMessage());
         }
         // This is crazy, but it shows how some PHP versions do return true.
         try {

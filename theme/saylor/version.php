@@ -1,5 +1,3 @@
-
-
 <?php
 // This file is part of Moodle - http://moodle.org/
 //
@@ -17,17 +15,16 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Theme version info
+ * Saylor.
  *
- * @package   theme_saylor
- * @copyright 2018
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    theme_saylor
+ * @copyright  2021 Saylor Academy
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die;
+defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'theme_saylor';
-$plugin->version   = 2020031300;
+$plugin->version   = 2021020500;
 $plugin->maturity = MATURITY_STABLE;
-$plugin->requires  = 2018120301.00; // Moodle 3.6.1 (Build: 20181205).
-$plugin->dependencies = ['theme_boost' => '2018051300'];
+$plugin->requires  = 2020110300;
+$plugin->component = 'theme_saylor';

@@ -1,0 +1,38 @@
+/** Course Catalog */
+
+.coursebox .content .summary {
+ width: 100%;
+ padding-left: .5rem;
+ margin: 0;
+}
+
+.coursebox .content .summary p {
+ margin: 0;
+}
+
+.coursebox .content .courseimage {
+   display: none;
+}
+
+.coursebox .content .coursefile {
+ display: none;
+}
+
+.coursebox .enrolmenticons {
+ display: none;
+}
+
+.coursebox .info .coursename a {
+ background-image: none;
+ padding-left: 0;
+}
+
+.coursebox .moreinfo {
+ float: none;
+ padding-top: 6px;
+}
+
+.coursename > .aalink:focus {
+  outline: inherit;
+  background-color: inherit;
+}

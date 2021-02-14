@@ -216,7 +216,6 @@ const registerListenerEvents = (modal, mappedModules, partialFavourite, footerDa
         const firstChooserOption = sectionChooserOptions.querySelector(selectors.regions.chooserOption.container);
 
         toggleFocusableChooserOption(firstChooserOption, true);
-        initTabsKeyboardNavigation(body);
         initChooserOptionsKeyboardNavigation(body, mappedModules, sectionChooserOptions, modal);
 
         return body;
@@ -233,77 +232,6 @@ const registerListenerEvents = (modal, mappedModules, partialFavourite, footerDa
         return footer;
     })
     .catch();
-};
-
-/**
- * Initialise the keyboard navigation controls for the tab list items.
- *
- * @method initTabsKeyboardNavigation
- * @param {HTMLElement} body Our modal that we are working with
- */
-const initTabsKeyboardNavigation = (body) => {
-    // Set up the tab handlers.
-    const favTabNav = body.querySelector(selectors.regions.favouriteTabNav);
-    const recommendedTabNav = body.querySelector(selectors.regions.recommendedTabNav);
-    const defaultTabNav = body.querySelector(selectors.regions.defaultTabNav);
-    const activityTabNav = body.querySelector(selectors.regions.activityTabNav);
-    const resourceTabNav = body.querySelector(selectors.regions.resourceTabNav);
-    const tabNavArray = [favTabNav, recommendedTabNav, defaultTabNav, activityTabNav, resourceTabNav];
-    tabNavArray.forEach((element) => {
-        return element.addEventListener('keydown', (e) => {
-            // The first visible navigation tab link.
-            const firstLink = e.target.parentElement.querySelector(selectors.elements.visibletabs);
-            // The last navigation tab link. It would always be the default activities tab link.
-            const lastLink = e.target.parentElement.lastElementChild;
-
-            if (e.keyCode === arrowRight) {
-                const nextLink = e.target.nextElementSibling;
-                if (nextLink === null) {
-                    e.target.tabIndex = -1;
-                    firstLink.tabIndex = 0;
-                    firstLink.focus();
-                } else if (nextLink.classList.contains('d-none')) {
-                    e.target.tabIndex = -1;
-                    lastLink.tabIndex = 0;
-                    lastLink.focus();
-                } else {
-                    e.target.tabIndex = -1;
-                    nextLink.tabIndex = 0;
-                    nextLink.focus();
-                }
-            }
-            if (e.keyCode === arrowLeft) {
-                const previousLink = e.target.previousElementSibling;
-                if (previousLink === null) {
-                    e.target.tabIndex = -1;
-                    lastLink.tabIndex = 0;
-                    lastLink.focus();
-                } else if (previousLink.classList.contains('d-none')) {
-                    e.target.tabIndex = -1;
-                    firstLink.tabIndex = 0;
-                    firstLink.focus();
-                } else {
-                    e.target.tabIndex = -1;
-                    previousLink.tabIndex = 0;
-                    previousLink.focus();
-                }
-            }
-            if (e.keyCode === home) {
-                e.target.tabIndex = -1;
-                firstLink.tabIndex = 0;
-                firstLink.focus();
-            }
-            if (e.keyCode === end) {
-                e.target.tabIndex = -1;
-                lastLink.tabIndex = 0;
-                lastLink.focus();
-            }
-            if (e.keyCode === space) {
-                e.preventDefault();
-                e.target.click();
-            }
-        });
-    });
 };
 
 /**
@@ -466,8 +394,7 @@ const toggleSearchResultsView = async(modal, mappedModules, searchQuery) => {
     const modalBody = modal.getBody()[0];
     const searchResultsContainer = modalBody.querySelector(selectors.regions.searchResults);
     const chooserContainer = modalBody.querySelector(selectors.regions.chooser);
-    const clearSearchButton = modalBody.querySelector(selectors.elements.clearsearch);
-    const searchIcon = modalBody.querySelector(selectors.elements.searchicon);
+    const clearSearchButton = modalBody.querySelector(selectors.actions.clearSearch);
 
     if (searchQuery.length > 0) { // Search query is present.
         const searchResultsData = searchModules(mappedModules, searchQuery);
@@ -481,7 +408,6 @@ const toggleSearchResultsView = async(modal, mappedModules, searchQuery) => {
             initChooserOptionsKeyboardNavigation(modalBody, mappedModules, searchResultItemsContainer, modal);
         }
         // Display the "clear" search button in the activity chooser search bar.
-        searchIcon.classList.add('d-none');
         clearSearchButton.classList.remove('d-none');
         // Hide the default chooser options container.
         chooserContainer.setAttribute('hidden', 'hidden');
@@ -490,7 +416,6 @@ const toggleSearchResultsView = async(modal, mappedModules, searchQuery) => {
     } else { // Search query is not present.
         // Hide the "clear" search button in the activity chooser search bar.
         clearSearchButton.classList.add('d-none');
-        searchIcon.classList.remove('d-none');
         // Hide the search results container.
         searchResultsContainer.setAttribute('hidden', 'hidden');
         // Display the default chooser options container.

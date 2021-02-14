@@ -76,6 +76,43 @@
                             <h2>{{ sitesummary }}</h2>
                         </div>
                     </div>
+
+                    <div class="container-fluid container-alert">
+                                {{#enable1alert}}
+                                    <div class="useralerts alert alert-{{{ alert1type }}} alert-dismissible fade show" role="alert">
+                                        <span class="title">
+                                            <b> {{{ alert1title }}} </b>
+                                        </span>
+                                        <p> {{{ alert1text }}} </p>
+                                        <button class="close" data-dismiss="alert" type="button" aria-label="Close">
+                                            <span aria-hidden="true" class="fa fa-times-circle"></span>
+                                        </button>
+                                    </div>
+                                {{/enable1alert}}
+                                {{#enable2alert}}
+                                    <div class="useralerts alert alert-{{{ alert2type }}} alert-dismissible fade show" role="alert">
+                                        <span class="title">
+                                            <b> {{{ alert2title }}} </b>
+                                        </span>
+                                        <p> {{{ alert2text }}} </p>
+                                        <button class="close" data-dismiss="alert" type="button" aria-label="Close">
+                                            <span aria-hidden="true" class="fa fa-times-circle"></span>
+                                        </button>
+                                    </div>
+                                {{/enable2alert}}
+                                {{#enable3alert}}
+                                    <div class="useralerts alert alert-{{{ alert3type }}} alert-dismissible fade show" role="alert">
+                                        <span class="title">
+                                            <b> {{{ alert3title }}} </b>
+                                        </span>
+                                        <p> {{{ alert3text }}} </p>
+                                        <button class="close" data-dismiss="alert" type="button" aria-label="Close">
+                                            <span aria-hidden="true" class="fa fa-times-circle"></span>
+                                        </button>
+                                    </div>
+                                {{/enable3alert}}
+                    </div>
+
                     {{{ output.main_content }}}
                     {{{ output.activity_navigation }}}
                     {{{ output.course_content_footer }}}
@@ -96,8 +133,14 @@
 </body>
 </html>
 {{#js}}
-require(['theme_boost/loader']);
-require(['theme_boost/drawer'], function(mod) {
-    mod.init();
+M.util.js_pending('theme_saylor/loader');
+require(['theme_saylor/loader'], function() {
+    M.util.js_complete('theme_saylor/loader');
+});
+
+M.util.js_pending('theme_saylor/drawer');
+require(['theme_saylor/drawer'], function(drawer) {
+    drawer.init();
+    M.util.js_complete('theme_saylor/drawer');
 });
 {{/js}}

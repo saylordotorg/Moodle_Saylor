@@ -1,6 +1,6 @@
 This file describes API changes in /question/type/multichoice/*.
 
-=== 3.9.3 ===
+=== 3.10 ===
 * The label for the multiple choice answers are being removed and the inputs (radio buttons/checkboxes) are now being labelled
 by the answer texts via the aria-labelledby attribute. Because of this, Behat steps that used to click on the labels for the
 multiple choice answer such as

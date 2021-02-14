@@ -191,20 +191,18 @@ class qtype_gapfill_question extends question_graded_automatically_with_countbac
          * that will be draggable when answering. It then discards any subsequent
          * fields with an | in it.
          */
-        $temp = array();
+        $answers = [];
+        foreach ($this->allanswers as $answer) {
+            if (strpos($answer, '|')) {
+                $answers = array_merge($answers, explode("|", $answer));
+            } else {
+                array_push($answers, $answer);
+            }
+        }
         /* array_unique is for when you have multiple identical answers separated
          * by |, i.e. olympic medals as [gold|silve|bronze]
          */
-        $this->allanswers = array_unique($this->allanswers);
-        foreach ($this->allanswers as $value) {
-            if (strpos($value, '|')) {
-                $temp = array_merge($temp, explode("|", $value));
-            } else {
-
-                array_push($temp, $value);
-            }
-        }
-        $this->allanswers = $temp;
+        $this->allanswers = array_unique($answers);
         shuffle($this->allanswers);
         $step->set_qt_var('_allanswers', serialize($this->allanswers));
     }
@@ -459,8 +457,8 @@ class qtype_gapfill_question extends question_graded_automatically_with_countbac
     }
 
     /**
-     * Given a response, rest the parts that are wrong. Relevent in
-     * interactive with multiple tries
+     * Given a response, reset the parts that are wrong to a blank string.
+     * Relevent when usinginteractive with multiple tries behaviour
      * @param array $response a response
      * @return array a cleaned up response with the wrong bits reset.
      */

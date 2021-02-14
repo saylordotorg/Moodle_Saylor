@@ -51,23 +51,27 @@
 {{> /head }}
 
 <body {{{ bodyattributes }}} onload="PR.prettyPrint()">
+{{> core/local/toast/wrapper}}
 
-<div id="page-wrapper">
+<div id="page-wrapper" class="d-print-block">
 
     {{{ output.standard_top_of_body_html }}}
-    {{> /navbar }}
 
-    <div id="page" class="container-fluid">
+    {{> /navbar }}
+    {{> /nav-drawer }}
+
+    <div id="page" class="container-fluid d-print-block">
         {{{ output.full_header }}}
 
-        <div id="page-content" class="row">
+        <div id="page-content" class="row pb-3 d-print-block">
             <div id="region-main-box" class="col-12">
                 {{#hasregionmainsettingsmenu}}
                 <div id="region-main-settings-menu" class="d-print-none {{#hasblocks}}has-blocks{{/hasblocks}}">
                     <div> {{{ output.region_main_settings_menu }}} </div>
                 </div>
                 {{/hasregionmainsettingsmenu}}
-                <section id="region-main" class="{{#hasblocks}}has-blocks {{/hasblocks}}my-3 card">
+                <section id="region-main" {{#hasblocks}}class="has-blocks mb-3"{{/hasblocks}} aria-label="{{#str}}content{{/str}}">
+
                     {{#hasregionmainsettingsmenu}}
                         <div class="region_main_settings_menu_proxy"></div>
                     {{/hasregionmainsettingsmenu}}
@@ -76,25 +80,32 @@
                     {{{ output.main_content }}}
                     {{{ output.activity_navigation }}}
                     {{{ output.course_content_footer }}}
+
                 </section>
                 {{#hasblocks}}
-                <section data-region="blocks-column" class="d-print-none mt-3">
+                <section data-region="blocks-column" class="d-print-none" aria-label="{{#str}}blocks{{/str}}">
                     {{{ sidepreblocks }}}
                 </section>
                 {{/hasblocks}}
             </div>
         </div>
     </div>
-    {{> /nav-drawer }}
+    {{{ output.standard_after_main_region_html }}}
+
 </div>
 
 {{> /footer }}
-
 </body>
 </html>
 {{#js}}
-require(['theme_boost/loader']);
-require(['theme_boost/drawer'], function(mod) {
-    mod.init();
+M.util.js_pending('theme_saylor/loader');
+require(['theme_saylor/loader'], function() {
+    M.util.js_complete('theme_saylor/loader');
+});
+
+M.util.js_pending('theme_saylor/drawer');
+require(['theme_saylor/drawer'], function(drawer) {
+    drawer.init();
+    M.util.js_complete('theme_saylor/drawer');
 });
 {{/js}}

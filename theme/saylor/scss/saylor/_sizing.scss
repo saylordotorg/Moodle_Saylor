@@ -1,0 +1,28 @@
+// Sizing
+// Initially, set all standoutboxes to 100% width (with margins).
+.standoutbox {
+ max-width: 100%;
+}
+
+@include media-breakpoint-up(sm) {
+ .standoutbox {
+   max-width: 90%;
+ }
+ .standoutbox.standoutbox-sm {
+   max-width: 70%;
+ }
+}
+@include media-breakpoint-up(md) {
+ .standoutbox {
+   max-width: 80%;
+ }
+ .standoutbox.standoutbox-sm {
+   max-width: 50%;
+ }
+}
+@include media-breakpoint-up(lg) {
+ .standoutbox.standoutbox-sm {
+   max-width: 40%;
+ }
+}
+@include media-breakpoint-up(xl) {}
