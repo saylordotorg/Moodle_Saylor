@@ -271,6 +271,12 @@ def plugins = [
         "url" : 'https://github.com/donhinkelman/moodle-block_sharing_cart.git',
         "branch" : 'master',
         "dest" : 'blocks/sharing_cart'
+    ],
+    [
+        "name" : 'block_quickmail',
+        "url" : 'https://github.com/lsuits/lsu-block_quickmail.git',
+        "branch" : 'master',
+        "dest" : 'blocks/quickmail'
     ]
 ]
 
