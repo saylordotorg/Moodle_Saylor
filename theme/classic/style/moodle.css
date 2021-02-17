@@ -14922,6 +14922,9 @@ a.ygtvspacer:hover {
   overflow: hidden; }
 
 .file-picker .yui3-datatable-header {
+  /*rtl:raw:
+    text-align: right;
+    */
   background: initial; }
 
 .fitem.disabled .filepicker-filelist,
@@ -14980,6 +14983,9 @@ a.ygtvspacer:hover {
 /* Override YUI default styling */
 /* stylelint-disable declaration-no-important */
 .filemanager .yui3-datatable-header {
+  /*rtl:raw:
+        text-align: right;
+        */
   background: #fff !important;
   border-bottom: 1px solid #ccc !important;
   border-left: 0 solid #fff !important;
@@ -15807,6 +15813,10 @@ a.ygtvspacer:hover {
   #categoryquestions th {
     text-align: left;
     font-weight: normal; }
+  #categoryquestions > tbody > tr.r1 {
+    background-color: rgba(0, 0, 0, 0.05); }
+  #categoryquestions > tbody > tr.highlight {
+    border: 1px solid #008196; }
   #categoryquestions .checkbox {
     padding-left: 5px; }
   #categoryquestions .checkbox input[type="checkbox"] {
@@ -16090,12 +16100,6 @@ body.jsenabled .questionflag input[type=checkbox] {
 
 #page-mod-quiz-edit div.questionbank .categoryquestionscontainer {
   background: transparent; }
-
-#page-mod-quiz-edit #categoryquestions > thead {
-  background: #fff; }
-
-#page-mod-quiz-edit #categoryquestions > tbody > tr:nth-of-type(even) {
-  background: #e4e4e4; }
 
 #page-mod-quiz-edit .questionbankwindow div.header {
   color: #444;
@@ -18743,6 +18747,12 @@ p.arrow_button {
   border: none; }
   .path-grade-report-user .user-grade.generaltable .levelodd {
     background-color: rgba(0, 0, 0, 0.05); }
+  .path-grade-report-user .user-grade .column-contributiontocoursetotal,
+  .path-grade-report-user .user-grade .column-range,
+  .path-grade-report-user .user-grade .column-percentage,
+  .path-grade-report-user .user-grade .column-weight {
+    /*rtl:ignore*/
+    direction: ltr; }
 
 /**
  * Single view.
@@ -19033,8 +19043,8 @@ body {
   border-radius: 2px;
   background-color: red;
   color: white;
-  font-size: 10px;
-  line-height: 10px;
+  font-size: 11px;
+  line-height: 11px;
   position: absolute;
   top: 5px;
   right: 0; }
@@ -19121,8 +19131,8 @@ body {
   border-radius: 2px;
   background-color: red;
   color: white;
-  font-size: 10px;
-  line-height: 10px;
+  font-size: 11px;
+  line-height: 11px;
   position: absolute;
   top: 5px;
   right: 0; }

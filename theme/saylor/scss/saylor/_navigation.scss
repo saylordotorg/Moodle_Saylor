@@ -1,0 +1,114 @@
+#page-wrapper {
+ min-height: 100%;
+ height: auto;
+ padding-bottom: 1rem;
+}
+
+.content .sectionname {
+ margin-top: .5rem;
+}
+
+// Reduce the spacing between the userpicture and the caret.
+.navbar-nav .avatars img.userpicture {
+   margin-right: -.5rem;
+   margin-left: .5vw;
+}
+
+// Course Navigation
+
+/** Nav Drawer */
+#nav-drawer {
+ border-right: $card-border-width solid $card-border-color;
+}
+
+// Hide the Participants node
+#nav-drawer a[data-key="participants"] {
+	display: none;
+}
+
+// Hide the Grades node
+#nav-drawer a[data-key="grades"] {
+	display: none;
+}
+
+/** Nav Bar */
+.navbar {
+   box-shadow: 0 3px 0 $primary;
+}
+
+#navbar-login {
+ box-shadow: 0 0;
+ margin: 1rem 0;
+}
+
+.navbar .btn {
+ background-color: $gray-200;
+ border-color: $gray-200;
+ box-shadow: none;
+ -webkit-box-shadow: none;
+}
+
+.navbar .btn-secondary:not(.disabled):active:focus{
+ box-shadow: none;
+ -webkit-box-shadow: none;
+}
+
+.navbar .nav-link .fa-bars {
+ color: $dark;
+}
+
+// Change height, margin and padding of navbar logo.
+.navbar-brand .logo .icon {
+   height: auto;
+   width: 100%;
+   max-width: 206px;
+   max-height: 45px;
+}
+
+.navbar-brand .logo {
+ height: $navbar-height;
+ width: 100%;
+}
+
+#navbar-brand {
+ height: $navbar-height;
+ max-width: 206px;
+ width: 100%;
+ padding-right: 4px;
+}
+
+
+.navbar-nav li.usermenu {
+ line-height: 1;
+ margin-right: -.5rem;
+}
+
+.navbar-nav .usermenu .login {
+   line-height: 1rem;
+}
+
+// Round corners for groups in the nav drawer.
+.list-group > ul > li:first-child {
+  border-top-left-radius: .25rem;
+  border-top-right-radius: .25rem;
+}
+
+.list-group > ul > li:last-child {
+  border-bottom-left-radius: .25rem;
+  border-bottom-right-radius: .25rem;
+}
+
+/** Resources */
+// Hide the resource navigation at the bottom of the resources.
+// It's confusing students.
+// Eventually, override the renderer to go to next unit.
+
+.activity-navigation {
+ display: none;
+}
+
+/** Navigation Menu */
+
+.list-group-item.localboostnavigationfirstcustombuttomusers {
+  margin-top: inherit;
+}

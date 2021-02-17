@@ -32,10 +32,12 @@ class qbehaviour_adaptive_adapted_for_coderunner_renderer extends qbehaviour_ada
 {
     public function controls(question_attempt $qa, question_display_options $options) {
         $question = $qa->get_question();
+        $buttons = '';
         if (!empty($question->precheck)) {
-            $buttons = $this->precheck_button($qa, $options) . "\n" . $this->submit_button($qa, $options);
-        } else {
-            $buttons = $this->submit_button($qa, $options);
+            $buttons .= $this->precheck_button($qa, $options);
+        }
+        if (!$question->hidecheck) {
+            $buttons .= $this->submit_button($qa, $options);
         }
         return $buttons;
     }

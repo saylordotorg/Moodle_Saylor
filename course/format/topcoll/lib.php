@@ -70,8 +70,10 @@ class format_topcoll extends format_base {
             $this->settings = $this->get_format_options();
             foreach ($this->settings as $settingname => $settingvalue) {
                 if (isset($settingvalue)) {
-                    if (($settingvalue == '-') || ($settingvalue <= 0)) {
-                        // Default value indicator is a hypen or a number less or equal to 0.
+                    $settingvtype = gettype($settingvalue);
+                    if ((($settingvtype == 'string') && ($settingvalue === '-')) ||
+                        (($settingvtype == 'integer') && ($settingvalue === 0))) {
+                        // Default value indicator is a hyphen or a number equal to 0.
                         $this->settings[$settingname] = get_config('format_topcoll', 'default'.$settingname);
                     }
                 }
@@ -1315,7 +1317,7 @@ class format_topcoll extends format_base {
                         $maxsection = $DB->get_field_sql('SELECT max(section) from {course_sections}
                             WHERE course = ?', array($this->courseid));
                         if ($maxsection) {
-                            // If there are no sections, or just default 0-section, 'numsections' will be set to default
+                            // If there are no sections, or just default 0-section, 'numsections' will be set to default.
                             $data['numsections'] = $maxsection;
                         }
                     }

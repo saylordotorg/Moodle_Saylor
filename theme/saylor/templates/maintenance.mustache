@@ -15,9 +15,9 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template theme_boost/maintenance
+    @template theme_saylor/maintenance
 
-    Boost maintenance layout template.
+    Saylor maintenance layout template.
 
     Context variables required for this template:
     * output - The core renderer for the page
@@ -42,13 +42,14 @@
 </head>
 
 <body {{{ output.body_attributes }}}>
+{{> core/local/toast/wrapper}}
 
 <div id="page-wrapper">
 
     {{{ output.standard_top_of_body_html }}}
     {{>/navbar}}
 
-    <div id="page" class="container card card-body">
+    <div id="page" class="container pb-3">
 
         <div class="row">
             <div class="col-12 py-3">
@@ -57,7 +58,7 @@
         </div>
 
         <div id="page-content" class="row">
-            <section id="region-main" class="col-12">
+            <section id="region-main" class="col-12" aria-label="{{#str}}content{{/str}}">
                 {{{ output.main_content }}}
             </section>
         </div>
@@ -70,5 +71,8 @@
 </body>
 </html>
 {{#js}}
-require(['theme_boost/loader']);
+M.util.js_pending('theme_saylor/loader');
+require(['theme_saylor/loader'], function() {
+  M.util.js_complete('theme_saylor/loader');
+});
 {{/js}}

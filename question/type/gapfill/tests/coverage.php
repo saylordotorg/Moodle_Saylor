@@ -14,28 +14,52 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
+/**
+ * Configuration for the generation of phpunit coverate report
+ * @package    qtype_gapfill
+ * @copyright  2021 Marcus Green
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
- // Coverage information for the gapfill question type.
+defined('MOODLE_INTERNAL') || die();
 return new class extends phpunit_coverage_info {
-    // List of folders relative to the plugin root to whitelist in coverage generation.
+    /**
+     * Default to cover code in all folders
+     * relative to root
+     *
+     * @var array
+     */
     protected $whitelistfolders = [
         '.'
     ];
 
-    // List of files relative to plugin root to whitelist in coverage generation.
+    /**
+     * Definitly generate unit test coverage of this file
+     *
+     * @var array
+     */
     protected $whitelistfiles = [
         'questiontype.php'
     ];
 
-    // List of folders relative to the plugin root to excludelist in coverage generation.
+    /**
+     * Don't check unit test coverage of files in these folders.
+     * For example it makes little sense to have
+     * unit tests for a lang file which has no functions
+     *
+     * @var array
+     */
     protected $excludelistfolders = [
         'db',
         'lang',
         'tests'
     ];
 
-    // List of files relative to the plugin root to excludelist in coverage generation.
+    /**
+     * No point in checking coverage of these files
+     *
+     * @var array
+     */
     protected $excludelistfiles = [
         'settings.php',
         'version.php'

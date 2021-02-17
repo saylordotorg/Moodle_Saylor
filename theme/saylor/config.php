@@ -1,6 +1,6 @@
 <?php
 // This file is part of Moodle - http://moodle.org/
-// http://www.saylor.org/about/mission/
+//
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -15,30 +15,25 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Saylor config.
  *
  * @package   theme_saylor
- * @copyright 2018 Saylor Academy
+ * @copyright 2021 Saylor Academy
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-// Check the file is being called internally from within Moodle.
 defined('MOODLE_INTERNAL') || die();
 
+require_once(__DIR__ . '/lib.php');
+
 $THEME->name = 'saylor';
-$THEME->parents = array('boost');
-// This setting list the style sheets we want to include in our theme. Because we want to use SCSS instead of CSS - we won't        
-// list any style sheets. If we did we would list the name of a file in the /style/ folder for our theme without any css file      
-// extensions. 
-$THEME->sheets = array();
-$THEME->editor_sheets = array();
-$THEME->javascripts_footer = array('prettify');
-$THEME->enable_dock = false;
-$THEME->yuicssmodules = array();
-$THEME->rendererfactory = 'theme_overridden_renderer_factory';
-$THEME->requiredblocks = '';
-$THEME->addblockposition = BLOCK_ADDBLOCK_POSITION_FLATNAV;
+$THEME->sheets = [];
+$THEME->editor_sheets = [];
+$THEME ->javascripts_footer = ['prettify', 'custom'];
+$THEME->editor_scss = ['editor'];
+$THEME->usefallback = true;
 $THEME->hidefromselector = false;
-$THEME->scss = function($theme) {                                                                      
+$THEME->scss = function($theme) {
     return theme_saylor_get_main_scss_content($theme);
 };
 
@@ -87,7 +82,7 @@ $THEME->layouts = [
     ),
     // My dashboard page.
     'mydashboard' => array(
-        'file' => 'columns2.php',
+        'file' => 'mydashboard.php',
         'regions' => array('side-pre'),
         'defaultregion' => 'side-pre',
         'options' => array('nonavbar' => true, 'langmenu' => true),
@@ -152,3 +147,14 @@ $THEME->layouts = [
         'defaultregion' => 'side-pre'
     )
 ];
+
+$THEME->parents = ['boost'];
+$THEME->enable_dock = false;
+$THEME->extrascsscallback = 'theme_saylor_get_extra_scss';
+$THEME->prescsscallback = 'theme_saylor_get_pre_scss';
+$THEME->precompiledcsscallback = 'theme_saylor_get_precompiled_css';
+$THEME->yuicssmodules = array();
+$THEME->rendererfactory = 'theme_overridden_renderer_factory';
+$THEME->requiredblocks = '';
+$THEME->addblockposition = BLOCK_ADDBLOCK_POSITION_FLATNAV;
+$THEME->iconsystem = \core\output\icon_system::FONTAWESOME;

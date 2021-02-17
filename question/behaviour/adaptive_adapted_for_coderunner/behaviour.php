@@ -45,6 +45,11 @@ define('PRECHECK', true);
 require_once($CFG->dirroot . '/question/behaviour/adaptive/behaviour.php');
 
 class qbehaviour_adaptive_adapted_for_coderunner extends qbehaviour_adaptive {
+    
+    public function __construct(question_attempt $qa, $preferredbehaviour) {
+        parent::__construct($qa, $preferredbehaviour);
+        $this->penaltiesenabled = $preferredbehaviour !== 'adaptivenopenalty';
+    }
 
     public function is_compatible_question(question_definition $question) {
         // Restrict behaviour to programming questions.
@@ -157,8 +162,14 @@ class qbehaviour_adaptive_adapted_for_coderunner extends qbehaviour_adaptive {
     // Grade the CodeRunner submission and cache the results in the pending step
     // for re-use.
     // Return a two-element array containing the mark (a fraction) and the state.
-    protected function grade_response(question_attempt_pending_step $pendingstep, $isprecheck) {
+    protected function grade_response(question_attempt_pending_step $pendingstep,
+            bool $isprecheck=false) {
         $response = $pendingstep->get_qt_data();
+        $numprechecks = intval($this->qa->get_last_behaviour_var('_numprechecks', 0));
+        $prevtries = intval($this->qa->get_last_behaviour_var('_try', 0));
+        $response['numchecks'] = $prevtries - $numprechecks;
+        $response['numprechecks'] = $numprechecks;
+        $response['fraction'] = floatval($pendingstep->get_fraction());
         $gradedata = $this->question->grade_response($response, $isprecheck);
         list($fraction, $state) = $gradedata;
         if (count($gradedata) > 2) {
@@ -179,10 +190,10 @@ class qbehaviour_adaptive_adapted_for_coderunner extends qbehaviour_adaptive {
         $numprechecks = $this->qa->get_last_behaviour_var('_numprechecks', 0);
         $prevtries -= $numprechecks; // Deduct prechecks from tries.
         $prevtries = max($prevtries, 0); // Can't be negative
-        if (empty($this->question->penaltyregime)) { // Legacy questions may lack penalty regime.
-            return parent::adjusted_fraction($fraction, $prevtries);
-        } else if ($prevtries == 0) {
+        if (!$this->penaltiesenabled || $prevtries == 0) {
             return $fraction;
+        } else if (empty($this->question->penaltyregime)) { // Legacy questions may lack penalty regime.
+            return parent::adjusted_fraction($fraction, $prevtries);
         } else {
             $penalties = explode(",", $this->question->penaltyregime);
             $n = count($penalties);

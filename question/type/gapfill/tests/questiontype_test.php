@@ -103,7 +103,8 @@ class qtype_gapfill_test extends advanced_testcase {
         $this->assertEquals($DB->get_field('question', 'questiontext', ['id' => $question->id]), $question->questiontext);
 
         $this->qtype->save_question_options($fromform);
-        $this->assertEquals($DB->get_field('question_gapfill', 'correctfeedback', ['question' => $question->id]), $fromform->correctfeedback['text']);
+        $this->assertEquals($DB->get_field('question_gapfill', 'correctfeedback', ['question' => $question->id]),
+         $fromform->correctfeedback['text']);
 
     }
     public function test_name() {

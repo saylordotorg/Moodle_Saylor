@@ -241,7 +241,7 @@ class qtype_gapfill_test_helper extends question_test_helper {
         $qdata->qtype = 'gapfill';
         $qdata->name = 'catmat';
         $qdata->questiontext = 'The [cat] sat on the [mat]';
-        $qtype->itemsettings = '[
+        $qdata->itemsettings = '[
             {
                 "itemid":"id1_0",
                 "questionid":"",

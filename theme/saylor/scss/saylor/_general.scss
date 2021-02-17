@@ -1,0 +1,173 @@
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.input-group > .form-control {
+    border-top-left-radius: .25rem !important;
+    border-bottom-left-radius: .25rem !important;
+}
+
+.navbar {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, .08);
+}
+
+// Rounded user pictures
+.userpicture {
+    border-radius: 50%;
+}
+
+h1,
+.h1,
+h2,
+.h2,
+h3,
+.h3,
+h4,
+.h4,
+h5,
+.h5,
+h6,
+.h6 {
+    font-family: $font-family-header;
+}
+
+.btn {
+    font-family: $font-family-buttons;
+}
+
+/* Can't find extend yet */
+
+.filemanager-container,
+.filepicker-filelist {
+    @extend .border;
+}
+
+// Small cap course titles
+.course-title
+{
+    font-variant: small-caps;
+    text-transform: lowercase;
+}
+
+// Rounded user pictures
+.userpicture {
+    border-radius: 50%;
+}
+
+// Increase font size for user log in/sign up top-right header.
+.usermenu {
+    font-size: 1.2em;
+}
+
+/** Page Backgrounds */
+#page-wrapper {
+    background-color: $light;
+}
+
+/** Progress Bar */
+// Increase progress bar height
+.block .block-cards .progress {
+    height: .75rem;
+}
+
+/** Progress Bar */
+.block_completion_progress .progressBarCell {
+ border: 1px solid $primary-dark-blue;
+ border-radius: .25rem;
+ margin: .25rem 0 0 .25rem;
+}
+
+.block_progress .progressBarCell {
+ border: 1px solid $primary-dark-blue;
+ border-radius: .25rem;
+ margin: .25rem 0 0 .25rem;
+}
+
+/** Honesty Check */
+
+#id_honestycheckheader .fcontainer .form-group .form-inline {
+ max-width: 100% !important;
+ flex: 0 0 auto !important;
+}
+
+/** Atto Editor */
+// Make the min height of editor boxes 160px.
+// In some places it's 28px and too small.
+.editor_atto_content {
+   min-height: 160px !important;
+}
+
+/** Standoutbox */
+// The standoutbox is incorporating CSS from other classes including:
+// card, text-center, border, and rounded.
+// This should make it cleaner for us to implement in resources.
+.standoutbox {
+ margin-left: auto;
+ margin-right: auto;
+ margin-top: 3rem;
+ margin-bottom: 3rem;
+ border: 1px solid $gray-300 !important;
+ text-align: center;
+ border-radius: .25rem !important;
+ position: relative;
+ display: flex;
+ flex-direction: column;
+ min-width: 0;
+ word-wrap: break-word;
+ background-color: #fff;
+ -webkit-background-clip: border-box;
+ background-clip: border-box;
+
+}
+
+// For a gray standoutbox, use the bootstrap class bg-light.
+// Blue standoutbox legacy
+.standoutbox.blue {
+ background-color: $expand-light-blue-50;
+}
+// Blue standoutbox
+.standoutbox.standoutbox-blue {
+ background-color: $expand-light-blue-50;
+}
+// Gray standoutbox
+.standoutbox.standoutbox-gray {
+ background-color: $gray-100;
+}
+
+// Frontpage alert styles.
+.useralerts {
+    p:first-of-type {
+        margin-bottom: 0;
+    }
+}
+
+.container-alert {
+  margin-top: 16px;
+}
+
+// User tour reset link
+.usertour {
+  text-align: center;
+}
+
+// Course Container
+
+#region-main {
+  @include media-breakpoint-down(xs) {
+    border: 1px solid rgba(0,0,0,.125);
+    padding: 1.25rem;
+  }
+}
+
+#region-main-settings-menu {
+  @include media-breakpoint-down(xs) {
+    margin-bottom: 1rem;
+  }
+}
+
+.page-context-header {
+  @include media-breakpoint-down(xs) {
+    padding: 0.5rem 0.25rem 0 0.75rem;
+  };
+}

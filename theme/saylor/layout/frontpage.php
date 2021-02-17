@@ -25,6 +25,56 @@ defined('MOODLE_INTERNAL') || die();
 user_preference_allow_ajax_update('drawer-open-nav', PARAM_ALPHA);
 require_once($CFG->libdir . '/behat/lib.php');
 
+// Settings for frontpage alerts.
+$enable1alert = '';
+$alert1type = '';
+$alert1title = '';
+$alert1text = '';
+$enable2alert = '';
+$alert2type = '';
+$alert2title = '';
+$alert2text = '';
+$enable3alert = '';
+$alert3type = '';
+$alert3title = '';
+$alert3text = '';
+
+if (isset($PAGE->theme->settings->enablealert)  && $PAGE->theme->settings->enablealert == 1) {
+    $enable1alert = [
+        'enable1alert' => true
+    ];
+}
+if (isset($PAGE->theme->settings->enable2alert)  && $PAGE->theme->settings->enable2alert == 1) {
+    $enable2alert = [
+        'enable2alert' => true
+    ];
+}
+if (isset($PAGE->theme->settings->enable3alert)  && $PAGE->theme->settings->enable3alert == 1) {
+    $enable3alert = [
+        'enable3alert' => true
+    ];
+}
+if ($enable1alert || $enable2alert || $enable3alert) {
+    $alertinfo = '<span class="fa-stack alerticon"><span aria-hidden="true" class="fa fa-info fa-stack-1x "></span></span>';
+    $alerterror = '<span class="fa-stack alerticon"><span aria-hidden="true" class="fa fa-warning fa-stack-1x "></span></span>';
+    $alertsuccess = '<span class="fa-stack alerticon"><span aria-hidden="true" class="fa fa-bullhorn fa-stack-1x "></span></span>';
+}
+if ($enable1alert) {
+    $alert1type = $PAGE->theme->settings->alert1type;
+    $alert1title = $PAGE->theme->settings->alert1title;
+    $alert1text = $PAGE->theme->settings->alert1text;
+}
+if ($enable2alert) {
+    $alert2type = $PAGE->theme->settings->alert2type;
+    $alert2title = $PAGE->theme->settings->alert2title;
+    $alert2text = $PAGE->theme->settings->alert2text;
+}
+if ($enable2alert) {
+    $alert3type = $PAGE->theme->settings->alert3type;
+    $alert3title = $PAGE->theme->settings->alert3title;
+    $alert3text = $PAGE->theme->settings->alert3text;
+}
+
 if (isloggedin()) {
     $navdraweropen = (get_user_preferences('drawer-open-nav', 'true') == 'true');
 } else {
@@ -43,6 +93,8 @@ $templatecontext = [
     'sitesummary' => get_string('bannerdescription', 'theme_saylor'),
     'bannerimageurl' => $OUTPUT->image_url('logos/frontpage', 'theme_saylor'),
     'output' => $OUTPUT,
+    'page' => $PAGE,
+    'CFG' => $CFG,
     'sidepreblocks' => $blockshtml,
     'hasblocks' => $hasblocks,
     'bodyattributes' => $bodyattributes,
@@ -51,8 +103,21 @@ $templatecontext = [
     'hasregionmainsettingsmenu' => !empty($regionmainsettingsmenu),
     'currentyear' => date('Y'),
     'opengraph' => $OUTPUT->get_open_graph_properties(),
+    'enable1alert' => $enable1alert,
+    'alert1type' => $alert1type,
+    'alert1title' => $alert1title,
+    'alert1text' => $alert1text,
+    'enable2alert' => $enable2alert,
+    'alert2type' => $alert2type,
+    'alert2title' => $alert2title,
+    'alert2text' => $alert2text,
+    'enable3alert' => $enable3alert,
+    'alert3type' => $alert3type,
+    'alert3title' => $alert3title,
+    'alert3text' => $alert3text
 ];
 
-$templatecontext['flatnavigation'] = $PAGE->flatnav;
-echo $OUTPUT->render_from_template('/frontpage', $templatecontext);
-
+$nav = $PAGE->flatnav;
+$templatecontext['flatnavigation'] = $nav;
+$templatecontext['firstcollectionlabel'] = $nav->get_collectionlabel();
+echo $OUTPUT->render_from_template('theme_saylor/frontpage', $templatecontext);

@@ -1,0 +1,41 @@
+#page-login-index #page-wrapper,
+#page-login-verify_age_location #page-wrapper,
+#page-admin-tool-policy-index #page-wrapper,
+#page-admin-tool-policy-view #page-wrapper,
+#page-login-signup #page-wrapper {
+ // We have to use rgba here in order to use transparency over the image.
+ // It's the rgb value of $primary-dark-blue.
+ background:
+   linear-gradient(rgba(23, 49, 64, 0.85), rgba(23, 49, 64, 0.85)),
+   url([[pix:theme_saylor|backgrounds/login_background_bridge]]);
+   background-size: cover;
+   background-repeat: no-repeat;
+   background-position: center bottom;
+}
+
+// Login Page
+.login-container {
+ color: $white;
+ margin-top: 5vw;
+}
+
+.login-container .forgetpass a {
+ color: $primary-orange;
+}
+
+.email-login {
+ margin-bottom: 2rem;
+}
+
+.signup .btn {
+ width: 15rem;
+}
+
+.identityproviders {
+ margin-top: 2rem;
+}
+
+.potentialidp a {
+ width: 10rem;
+ margin-top: .5rem;
+}
