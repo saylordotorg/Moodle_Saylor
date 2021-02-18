@@ -184,8 +184,8 @@ def plugins = [
     ],
     [
         "name" : 'block_completion_progress',
-        "url" : 'https://github.com/deraadt/moodle-block_completion_progress',
-        "branch" : 'master',
+        "url" : 'https://github.com/saylordotorg/moodle-block_completion_progress',
+        "branch" : 'fix/missing-progress-bar',
         "dest" : 'blocks/completion_progress'
     ],
     [
