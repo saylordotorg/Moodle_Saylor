@@ -277,6 +277,12 @@ def plugins = [
         "url" : 'https://github.com/lsuits/lsu-block_quickmail.git',
         "branch" : 'master',
         "dest" : 'blocks/quickmail'
+    ],
+    [
+        "name" : 'mod_questionnaire',
+        "url" : 'https://github.com/PoetOS/moodle-mod_questionnaire.git',
+        "branch" : 'MOODLE_310_STABLE',
+        "dest" : 'mod/questionnaire'
     ]
 ]
 
