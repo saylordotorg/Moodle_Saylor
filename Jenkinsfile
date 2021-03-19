@@ -343,7 +343,7 @@ def CopyDatabase(mysql_user, mysql_password, mysql_source_host, mysql_source_dbn
     // Drop previous test db and transfer source db
     // Test db host is mysql-dev-01
     withCredentials([string(credentialsId: 'mysql-dev-01_host', variable: 'mysql_dest_host')]) {
-        echo("Dropping test database and transferring source data")
+        echo("Dropping test database (${mysql_dest_dbname}) and transferring source data")
         sh 'mysql -h $mysql_dest_host -u $mysql_user --password=$mysql_password --execute=\"drop database ${mysql_dest_dbname}\"'
         sh 'mysql -h $mysql_dest_host -u $mysql_user --password=$mysql_password --execute=\"create database ${mysql_dest_dbname}\"'
         // First, create the database structure.
