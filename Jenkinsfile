@@ -344,8 +344,8 @@ def CopyDatabase(mysql_user, mysql_password, mysql_source_host, mysql_source_dbn
     // Test db host is mysql-dev-01
     withCredentials([string(credentialsId: 'mysql-dev-01_host', variable: 'mysql_dest_host')]) {
         echo("Dropping test database and transferring source data")
-        sh 'mysql -h $mysql_dest_host -u $mysql_user --password=$mysql_password --execute=\"drop database $mysql_dest_dbname\"'
-        sh 'mysql -h $mysql_dest_host -u $mysql_user --password=$mysql_password --execute=\"create database $mysql_dest_dbname\"'
+        sh 'mysql -h $mysql_dest_host -u $mysql_user --password=$mysql_password --execute="drop database $mysql_dest_dbname"'
+        sh 'mysql -h $mysql_dest_host -u $mysql_user --password=$mysql_password --execute="create database $mysql_dest_dbname"'
         // First, create the database structure.
         sh 'mysqldump --set-gtid-purged=OFF --single-transaction --no-tablespaces --host $mysql_source_host -u $mysql_user --password=$mysql_password --no-data $mysql_source_dbname | mysql -h $mysql_dest_host -u $mysql_user --password=$mysql_password $mysql_dest_dbname'
         // Piping output of dump directly to mysql to increase speed of transfer. 
