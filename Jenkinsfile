@@ -351,7 +351,7 @@ def CopyDatabase(mysql_user, mysql_password, mysql_source_host, mysql_source_dbn
             "\"create database ${mysql_dest_dbname}\"".toString()
         // First, create the database structure.
         sh 'mysqldump --set-gtid-purged=OFF --single-transaction --no-tablespaces --host $mysql_source_host -u $mysql_user --password=$mysql_password --no-data ' +
-            "${mysql_source_dbname} " +
+            "${mysql_source_dbname} ".toString() +
             '| mysql -h $mysql_dest_host -u $mysql_user --password=$mysql_password ' +
             "${mysql_dest_dbname}".toString()
         // Piping output of dump directly to mysql to increase speed of transfer. 
