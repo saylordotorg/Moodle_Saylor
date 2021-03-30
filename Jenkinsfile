@@ -335,7 +335,7 @@ def Cleanup() {
     // Will leave the moodle folder + plugins as an artifact.
         // Cleanup dummy moodledata folder from artifact
         sh 'rm -rf moodledata'
-        sh 'rm config.php'
+        //sh 'rm config.php'
 
 }
 
