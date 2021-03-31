@@ -44,7 +44,9 @@ if ($ADMIN->fulltree) {
     $description = get_string('defaultimagecontainerwidth_desc', 'format_grid');
     $default = format_grid::get_default_image_container_width();
     $choices = format_grid::get_image_container_widths();
-    $settings->add(new admin_setting_configselect($name, $title, $description, $default, $choices));
+    $setting = new admin_setting_configselect($name, $title, $description, $default, $choices);
+    $setting->set_updatedcallback('format_grid::update_displayed_images_callback');
+    $settings->add($setting);
 
     // Icon ratio.
     $name = 'format_grid/defaultimagecontainerratio';
@@ -52,7 +54,9 @@ if ($ADMIN->fulltree) {
     $description = get_string('defaultimagecontainerratio_desc', 'format_grid');
     $default = format_grid::get_default_image_container_ratio();
     $choices = format_grid::get_image_container_ratios();
-    $settings->add(new admin_setting_configselect($name, $title, $description, $default, $choices));
+    $setting = new admin_setting_configselect($name, $title, $description, $default, $choices);
+    $setting->set_updatedcallback('format_grid::update_displayed_images_callback');
+    $settings->add($setting);
 
     // Resize method - 1 = scale, 2 = crop.
     $name = 'format_grid/defaultimageresizemethod';
@@ -63,7 +67,9 @@ if ($ADMIN->fulltree) {
         1 => new lang_string('scale', 'format_grid'),
         2 => new lang_string('crop', 'format_grid')
     );
-    $settings->add(new admin_setting_configselect($name, $title, $description, $default, $choices));
+    $setting = new admin_setting_configselect($name, $title, $description, $default, $choices);
+    $setting->set_updatedcallback('format_grid::update_displayed_images_callback');
+    $settings->add($setting);
 
     // Default border colour in hexadecimal RGB with preceding '#'.
     $name = 'format_grid/defaultbordercolour';
@@ -299,13 +305,13 @@ if ($ADMIN->fulltree) {
         2 => new lang_string('webp', 'format_grid')
     );
     $setting = new admin_setting_configselect($name, $title, $description, $default, $choices);
-    $setting->set_updatedcallback('grid_format_update_displayed_images');
+    $setting->set_updatedcallback('format_grid::update_displayed_images_callback');
     $settings->add($setting);
 
     // Grey out hidden sections.
     $name = 'format_grid/defaultgreyouthidden';
-    $title = get_string('greyouthidden', 'format_grid');
-    $description = get_string('greyouthidden_desc', 'format_grid');
+    $title = get_string('defaultgreyouthidden', 'format_grid');
+    $description = get_string('defaultgreyouthidden_desc', 'format_grid');
     $default = 1;
     $choices = array(
         1 => new lang_string('no'),   // No.

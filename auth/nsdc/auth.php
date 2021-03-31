@@ -92,7 +92,7 @@ class auth_plugin_nsdc extends auth_plugin_base {
 
         $domain = 'http://test.nsdccindia.org';
         $endpoint = '/auth/Login/forgetpassword';
-        if ($pluginconfig->production) {
+        if ($this->config->production) {
             $domain = 'https://eskillindia.org';
         }
 

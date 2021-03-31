@@ -44,16 +44,6 @@ class restore_format_grid_plugin extends restore_format_plugin {
      * @return bool Need to restore numsections.
      */
     protected function need_restore_numsections() {
-        $backupinfo = $this->step->get_task()->get_info();
-        $backuprelease = $backupinfo->backup_release;
-        $prethreethree = version_compare($backuprelease, '3.3', 'lt');
-        if ($prethreethree) {
-            // Pre version 3.3 so, yes!
-            return true;
-        }
-        /* Post 3.3 may or may not have numsections in the backup depending on the version.
-           of Grid used.  So use the existance of 'numsections' in the course.xml
-           part of the backup to determine this. */
         $data = $this->connectionpoint->get_data();
         return (isset($data['tags']['numsections']));
     }
@@ -198,13 +188,6 @@ class restore_format_grid_plugin extends restore_format_plugin {
      * This method is only executed if course configuration was overridden
      */
     public function after_restore_course() {
-        if (!$this->need_restore_numsections()) {
-            /* Backup file was made in Moodle 3.3 or later and does not contain 'numsections',
-               so we don't need to process 'numsections'. */
-               return;
-        }
-
-        $data = $this->connectionpoint->get_data();
         $backupinfo = $this->step->get_task()->get_info();
         if ($backupinfo->original_course_format !== 'grid') {
             // Backup from another course format.
@@ -212,6 +195,21 @@ class restore_format_grid_plugin extends restore_format_plugin {
         }
 
         global $DB;
+        if (!$this->need_restore_numsections()) {
+            /* Backup file does not contain 'numsections' so we need to set it from
+               the number of sections we can determine the course has.  The 'default'
+               might be wrong, so there could be an entry in the db already with this
+               wrong value. */
+            $courseid = $this->task->get_courseid();
+            $courseformat = course_get_format($courseid);
+
+            $maxsection = $DB->get_field_sql('SELECT max(section) FROM {course_sections} WHERE course = ?', [$courseid]);
+
+            $courseformat->restore_numsections($maxsection);
+            return;
+        }
+
+        $data = $this->connectionpoint->get_data();
         $numsections = (int)$data['tags']['numsections'];
         foreach ($backupinfo->sections as $key => $section) {
             /* For each section from the backup file check if it was restored and if was "orphaned" in the original

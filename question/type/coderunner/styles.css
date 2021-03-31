@@ -22,6 +22,10 @@
     box-sizing: border-box;
 }
 
+.que.coderunner div.initialisationerror {
+    color: #ca3120;
+}
+
 .que.coderunner div.coderunnerexamples {
     padding-bottom: 10px;
 }
@@ -41,6 +45,10 @@ body#page-question-type-coderunner .ace_editor {
 
 .que.coderunner p.for-example-para {
     font-weight: bold;
+}
+
+.que.coderunner .btn  {
+    margin-right: 10px;
 }
 
 .que.coderunner div.coderunner-test-results {
@@ -257,6 +265,10 @@ body#page-question-type-coderunner div.edit_code textarea {
     font-family: courier, monospace;
 }
 
+body#page-question-type-coderunner pre.templateparamserror {
+    color: #ca3120;
+}
+
 body#page-question-type-coderunner div#id_qtype_coderunner_error_div:empty {
     display: none;
 }
@@ -271,6 +283,23 @@ body#page-question-type-coderunner div#id_qtype_coderunner_error_div {
 
 body#page-question-type-coderunner textarea#id_templateparams {
     resize: both;
+}
+
+body#page-question-type-coderunner .uiparamtablediv {
+    padding-top: 8px;
+}
+
+body#page-question-type-coderunner table.uiparamtable,
+body#page-question-type-coderunner table.uiparamtable th,
+body#page-question-type-coderunner table.uiparamtable td {
+    border: 1px solid #ccc;
+    padding: 4px;
+    background-color: #F8F8F8;
+}
+
+body#page-question-type-coderunner button.toggleuidetails {
+    border: none;
+    color: blue;
 }
 
 body#page-question-type-coderunner .ace_wrapper {

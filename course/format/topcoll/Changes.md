@@ -1,8 +1,24 @@
 ﻿Version Information
 ===================
+Version 3.10.1.2 - TBD
+----------------------
+  1. Fix 'PHP Notice:  Trying to access array offset on value of type null' when accessing a single section page on PHP 7.4.
+  2. Reset language improvements in line with global default tracking as implemented in 3.10.0.2.
+
+Version 3.10.1.1 - 07/03/2021
+-----------------------------
+  1. Fix intended setting values are changed.
+
+Version 3.10.1.0 - 04/03/2021
+-----------------------------
+  1. Improve colour picker to show the initial value in the current / preview colour boxes.
+  2. Port of Adaptable fix 'Activity meta information not showing when student first accesses page' - https://moodle.org/mod/forum/discuss.php?d=417731.
+  3. Fix completion progress tooltip not working - https://moodle.org/mod/forum/discuss.php?d=419034.
+
 Version 3.10.0.3 - 02/02/2021
 -----------------------------
   1. Fix 'course settings do not override defaults' - ref: https://moodle.org/mod/forum/discuss.php?d=417589.
+  2. Fix 'Undefined property: stdClass::$groupmember in moodle/course/format/topcoll/classes/activity.php on line 650' - #93.
 
 Version 3.10.0.2 - 12/01/2021
 -----------------------------

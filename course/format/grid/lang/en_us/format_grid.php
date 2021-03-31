@@ -76,10 +76,12 @@ $string['defaultsectiontitlealignment_desc'] = 'Set the section title alignment 
 
 // Reset.
 $string['resetgreyouthidden'] = 'Gray out unavailable';
-$string['resetgreyouthidden_desc'] = 'Resets the property \'Grid display show unavailable section images in gray and unlinked.\'';
-$string['resetgreyouthidden_help'] = 'Resets the property \'In Grid display show unavailable section images in gray and unlinked.\'';
+$string['resetgreyouthidden_help'] = 'Resets the property \'In Grid display show unavailable section images in gray and unlinked.\' to follow the site default value.';
+$string['resetallgreyouthidden'] = 'Gray out unavailables';
+$string['resetallgreyouthidden_help'] = 'Resets the property \'In Grid display show unavailable section images in gray and unlinked.\' to follow the site default value.';
 
 // Other.
 $string['greyouthidden'] = 'Gray out unavailable';
-$string['greyouthidden_desc'] = 'In Grid display show unavailable section images in gray and unlinked.';
 $string['greyouthidden_help'] = 'In Grid display show unavailable section images in gray and unlinked.';
+$string['defaultgreyouthidden'] = 'Gray out unavailable';
+$string['defaultgreyouthidden_desc'] = 'In Grid display show unavailable section images in gray and unlinked.';

@@ -490,3 +490,16 @@ body.jsenabled #gridshadebox_content.hide_content {
     opacity: 0.7;
 }
 /* @end */
+
+/* Colour picker */
+.gfcolourpopupbox {
+    border: 1px solid black;
+    cursor: pointer;
+    margin: 0 0 0 2px;
+    padding: 0 8px;
+}
+
+.gfcolourpopupsel {
+    position:absolute;
+    z-index: 500;
+}

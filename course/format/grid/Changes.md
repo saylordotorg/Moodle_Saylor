@@ -1,7 +1,14 @@
 History
 =============
-Version 3.10.0.2 - TBR
+Version 3.10.1.0 - 29/3/2021
  1. Fix 'Duplicated section name' - #134.
+ 2. All course settings now have an option to track the value of the global default as set by the administrator.  Thus, when they change,
+    then the course changes without any user interaction on the course.  The reset course functionality is still there and will
+    set the value of the setting to the this 'new' default value.  The default colour value is '-' and the colour picker box will
+    show the colour that has been set as the default.  All other settings will state what the default currently is.
+ 3. Fix settings not being reset: 'Greyout hidden' and 'Section 0 on its own page'.
+ 4. Fix incorrect value of 'numsections' when not present in the backup file.
+Note: If you see 'Default - {$a}' in a setting dropdown then you need to update core Moodle, please see: MDL-71048.
 
 Version 3.10.0.1 - 14/11/2020
 Note: Functionally the same as 3.9.1.0.

@@ -54,12 +54,12 @@ M.util.init_gfcolour_popup = function(Y, id, previewconf) {
                 this.box = this.input.ancestor().one('.admin_colourpicker');
                 this.image = Y.Node.create('<img alt="" class="colourdialogue" />');
                 this.image.setAttribute('src', M.util.image_url('i/colourpicker', 'moodle'));
+                const initvalue = '#' + this.input.getAttribute('initvalue');
                 this.preview = Y.Node.create('<div class="previewcolour"></div>');
-                this.preview.setStyle('width', this.height / 2).setStyle('height', this.height / 2).setStyle('backgroundColor', this.input.get('value'));
+                this.preview.setStyle('width', this.height / 2).setStyle('height', this.height / 2).setStyle('backgroundColor', initvalue);
                 this.current = Y.Node.create('<div class="currentcolour"></div>');
-                this.current.setStyle('width', this.height / 2).setStyle('height', this.height / 2 -1).setStyle('backgroundColor', this.input.get('value'));
+                this.current.setStyle('width', this.height / 2).setStyle('height', this.height / 2 - 1).setStyle('backgroundColor', initvalue);
                 this.box.setContent('').append(this.image).append(this.preview).append(this.current);
-                //this.box.setContent('');
 
                 if (typeof(previewconf) === 'object' && previewconf !== null) {
                     Y.one('#' + id + '_preview').on('click', function(e){
@@ -72,19 +72,19 @@ M.util.init_gfcolour_popup = function(Y, id, previewconf) {
                         }
                     }, this);
                 }
-                this.swatch.on('click',this.popup,this);
+                this.swatch.on('click',this.popup, this);
                 this.input.on('blur', this.setColour, this);
                 this.eventClick = this.image.on('click', this.pickColour, this);
                 this.eventMouseEnter = Y.on('mouseenter', this.startFollow, this.image, this);
             },
-            popup: function(e){
-                this.box.ancestor().setStyle('display','block');
+            popup: function(e) {
+                this.box.ancestor().setStyle('display', 'block');
             },
-            showColours : function(e){
+            showColours : function(e) {
                 this.eventFocus.detach();
                 this.box.setContent('').append(this.image).append(this.preview).append(this.current);
             },
-            setColour : function(e){
+            setColour : function(e) {
                 var colour = this.input.get('value');
                 this.swatch.setStyle('backgroundColor', '#' + colour);
             },
@@ -93,6 +93,7 @@ M.util.init_gfcolour_popup = function(Y, id, previewconf) {
                 this.eventMouseLeave = Y.on('mouseleave', this.endFollow, this.image, this);
                 this.eventMouseMove = this.image.on('mousemove', function(e){
                     var colour = this.determineColour(e);
+                    //this.swatch.setStyle('backgroundColor', '#' + colour);
                     this.preview.setStyle('backgroundColor', '#' + colour);
                 }, this);
             },
@@ -114,7 +115,7 @@ M.util.init_gfcolour_popup = function(Y, id, previewconf) {
                 this.input.focus();
                 this.swatch.setStyle('backgroundColor', '#' + colour);
                 this.current.setStyle('backgroundColor', '#' + colour);
-                this.box.ancestor().setStyle('display','none');
+                this.box.ancestor().setStyle('display', 'none');
             },
             /**
              * Calculates the colour from the given co-ordinates
@@ -145,9 +146,9 @@ M.util.init_gfcolour_popup = function(Y, id, previewconf) {
                     var divisor = Math.floor(x / limit);
                     var matrix = matrices[divisor];
 
-                    colour[0] += matrix[0]*factor;
-                    colour[1] += matrix[1]*factor;
-                    colour[2] += matrix[2]*factor;
+                    colour[0] += matrix[0] * factor;
+                    colour[1] += matrix[1] * factor;
+                    colour[2] += matrix[2] * factor;
 
                     if (eventx == x) {
                         break;
@@ -178,7 +179,7 @@ M.util.init_gfcolour_popup = function(Y, id, previewconf) {
                     if (number == 0 || isNaN(number)) {
                         hex += '00';
                     } else {
-                        hex += hexchars.charAt((number-number % 16) / 16) + hexchars.charAt(number % 16);
+                        hex += hexchars.charAt((number - number % 16) / 16) + hexchars.charAt(number % 16);
                     }
                 }
                 return hex;

@@ -106,9 +106,8 @@ abstract class qtype_coderunner_sandbox {
      * sandbox doesn't exist or is not enabled.
      */
     public static function get_instance($sandboxextname) {
-        $boxes = self::available_sandboxes();
-        if (array_key_exists($sandboxextname, $boxes) &&
-                get_config('qtype_coderunner', $sandboxextname . '_enabled')) {
+        $boxes = self::enabled_sandboxes();
+        if (array_key_exists($sandboxextname, $boxes)) {
             $classname = $boxes[$sandboxextname];
             $filename = self::get_filename($sandboxextname);
             require_once("$filename");
@@ -125,15 +124,24 @@ abstract class qtype_coderunner_sandbox {
      * that has been enabled by the administrator (through the usual
      * plug-in setting controls) and that supports the given language.
      * It's public so the tester can call it (yuck, hacky).
-     * @param type $language to run.
+     * If there's only one sandbox available, just return it without querying
+     * it. This could result in downstream "unsupported language" errors but
+     * saves an extra call to the jobe server in the most common case where
+     * there is a only a single Jobe server available anyway.
+     * @param string $language to run.
+     * @param bool $forcelanguagecheck true to ensure language is actually
+     * available even when there's only one sandbox available. 
      * @return an instance of the preferred sandbox for the given language
      * or null if no enabled sandboxes support this language.
      */
-    public static function get_best_sandbox($language) {
-        $sandboxes = self::available_sandboxes();
+    public static function get_best_sandbox($language, $forcelanguagecheck=false) {
+        $sandboxes = self::enabled_sandboxes();
         foreach ($sandboxes as $extname => $classname) {
             $sb = self::get_instance($extname);
             if ($sb) {
+                if (count($sandboxes) === 1 && !$forcelanguagecheck) {
+                    return $sb;  // There's only one sandbox, let's just try it!
+                }
                 $langs = $sb->get_languages();
                 if ($langs->error == $sb::OK) {
                     foreach ($langs->languages as $lang) {
@@ -155,7 +163,7 @@ abstract class qtype_coderunner_sandbox {
 
 
     /**
-     * A list of available standboxes. Keys are the externally known sandbox names
+     * A list of available sandboxes. Keys are the externally known sandbox names
      * as they appear in the exported questions, values are the associated
      * class names. File names are the same as the class names with the
      * leading qtype_coderunner and all underscores removed.
@@ -164,8 +172,27 @@ abstract class qtype_coderunner_sandbox {
     public static function available_sandboxes() {
         return array('jobesandbox'      => 'qtype_coderunner_jobesandbox',
                      'ideonesandbox'    => 'qtype_coderunner_ideonesandbox'
-                );
-
+        );
+    }
+        
+        
+    /**
+     * A list of enabled sandboxes.
+     * Keys are the externally known sandbox names
+     * as they appear in the exported questions, values are the associated
+     * class names. File names are the same as the class names with the
+     * leading qtype_coderunner and all underscores removed.
+     * @return array
+     */
+    public static function enabled_sandboxes() {
+        $available = self::available_sandboxes();
+        $enabled = array();
+        foreach ($available as $extname => $classname) {
+            if (get_config('qtype_coderunner', $extname . '_enabled')) {
+                $enabled[$extname] = $classname;
+            }
+        }
+        return $enabled;
     }
 
     /**

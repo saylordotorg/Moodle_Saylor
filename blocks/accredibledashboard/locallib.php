@@ -21,10 +21,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-// For composer dependencies
-require_once($CFG->dirroot . '/mod/accredible/vendor/autoload.php');
-
-use ACMS\Api;
+use mod_accredible\apiRest\apiRest;
 
 
 /**
@@ -44,7 +41,7 @@ function accredibledashboard_get_credentials($group_id, $email= null, $limit = 5
     $loop_limit = 100;
     $redirecturl = $CFG->wwwroot.'/my/';
 
-    $api = new Api($CFG->accredible_api_key);
+    $api = new apiRest($CFG->accredible_api_key);
 
     try {
 

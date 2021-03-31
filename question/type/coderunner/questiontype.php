@@ -87,6 +87,7 @@ class qtype_coderunner extends question_type {
             'allornothing',
             'penaltyregime',
             'precheck',
+            'hidecheck',
             'showsource',
             'answerboxlines',
             'answerboxcolumns',  // Defunct.
@@ -109,8 +110,12 @@ class qtype_coderunner extends question_type {
             'sandboxparams',
             'templateparams',
             'hoisttemplateparams',
+            'templateparamslang',
+            'templateparamsevalpertry',
+            'templateparamsevald',
             'twigall',
             'uiplugin',
+            'uiparameters',
             'attachments',
             'attachmentsrequired',
             'maxfilesize',
@@ -132,6 +137,7 @@ class qtype_coderunner extends question_type {
             'allornothing',
             'penaltyregime',
             'precheck',
+            'hidecheck',
             'showsource',
             'answerboxlines',
             'answerboxcolumns',
@@ -141,7 +147,11 @@ class qtype_coderunner extends question_type {
             'validateonsave',
             'templateparams',
             'hoisttemplateparams',
+            'templateparamslang',
+            'templateparamsevalpertry',
+            'templateparamsevald',
             'twigall',
+            'uiparameters',
             'attachments',
             'attachmentsrequired',
             'maxfilesize',
@@ -380,12 +390,7 @@ class qtype_coderunner extends question_type {
     // testcases) from the database into the question.
     // The various fields are initialised from the prototype, then overridden
     // by any non-null values in the specific question.
-    //
-    // As a special case, required by edit_coderunner_form, an option
-    // 'mergedtemplateparams' is set by merging the prototype question's
-    // template parameters with the given question's template parameters,
-    // with the caveat that template parameters with embedded twig code that
-    // aren't valid JSON are ignored.
+    // As a side effect, the question->prototype field is set to the prototype.
     public function get_question_options($question) {
         global $CFG, $DB, $OUTPUT;
         parent::get_question_options($question);
@@ -393,18 +398,11 @@ class qtype_coderunner extends question_type {
         if ($options->prototypetype != 0) { // Question prototype?
             // Yes. It's 100% customised with nothing to inherit.
             $options->customise = true;
-            $options->mergedtemplateparams = $options->templateparams;
         } else {
             $qtype = $options->coderunnertype;
             $context = $this->question_context($question);
-            $prototype = $this->get_prototype($qtype, $context);
-            $this->set_inherited_fields($options, $prototype);
-            if ($prototype !== null && trim($prototype->templateparams) !== '') {
-                $options->mergedtemplateparams = qtype_coderunner_util::merge_json(
-                    $prototype->templateparams, $options->templateparams);
-            } else { // Missing prototype!
-                $options->mergedtemplateparams = $options->templateparams;
-            }
+            $question->prototype = $this->get_prototype($qtype, $context);
+            $this->set_inherited_fields($options, $question->prototype);
         }
 
         // Add in any testcases.
@@ -436,24 +434,20 @@ class qtype_coderunner extends question_type {
             return;
         }
 
-        $noninheritedfields = $this->noninherited_fields();
-        foreach ($prototype as $field => $value) {
-            $isinheritedfield = !in_array($field, $noninheritedfields);
-            if ($isinheritedfield && $field != 'id' && $field != 'questionid') {
-                if (isset($target->$field) &&
-                          $target->$field !== null &&
-                          $target->$field !== '' &&
-                          $target->$field != $value) {
+        $extrafields = $this->extra_question_fields();
+        array_shift($extrafields); // Remove the extraneous qtype_coderunner_options entry.
+        $inheritedfields = array_diff($extrafields, $this->noninherited_fields());
+        foreach ($inheritedfields as $field) {
+            $prototypevalue = $prototype->$field;
+            if (isset($target->$field) &&
+                    $target->$field !== null &&
+                    $target->$field !== '' &&
+                    $target->$field != $prototypevalue) {
                     $target->customise = true; // An inherited field has been changed.
                 } else {
-                    $target->$field = $value;
+                    $target->$field = $prototypevalue; // Inherit the field value
                 }
             }
-        }
-
-        // Save prototype template params in the target, to be merged with
-        // the question template params if the target is actually run.
-        $target->prototypetemplateparams = $prototype->templateparams;
 
         if (!isset($target->sandbox)) {
             $target->sandbox = null;
@@ -496,16 +490,16 @@ class qtype_coderunner extends question_type {
      *
      * @param string $coderunnertype prototype name.
      * @param context $context a context.
-     * @return stdClass prototype row from question_coderunner_options, with the
-     * addition of the question text (for use in the edit-form question-type help button)
-     * or null if no prototype can be found or if more than one prototype is found.
+     * @return qtype_coderunner_question prototype the prototype for the given
+     * question type in the given context or null if no prototype can be found
+     * or if more than one prototype is found.
      */
     public static function get_prototype($coderunnertype, $context) {
         global $DB;
         list($contextcondition, $params) = $DB->get_in_or_equal($context->get_parent_context_ids(true));
         $params[] = $coderunnertype;
-
-        $sql = "SELECT qco.*, q.questiontext
+        
+        $sql = "SELECT q.id
                   FROM {question_coderunner_options} qco
                   JOIN {question} q ON qco.questionid = q.id
                   JOIN {question_categories} qc ON qc.id = q.category
@@ -513,11 +507,12 @@ class qtype_coderunner extends question_type {
                    AND qc.contextid $contextcondition
                    AND qco.coderunnertype = ?";
 
-        $validprotos = $DB->get_records_sql($sql, $params);
-        if (count($validprotos) !== 1) {
+        $validprotoids = $DB->get_records_sql($sql, $params);
+        if (count($validprotoids) !== 1) {
             return null;  // Exactly one prototype should be found.
         } else {
-            $prototype = reset($validprotos);
+            $proto = reset($validprotoids);
+            $prototype = question_bank::load_question($proto->id);
             self::update_question_text_maybe($prototype);
             return $prototype;
         }
@@ -741,6 +736,11 @@ class qtype_coderunner extends question_type {
             'useace' => 1,
             'iscombinatortemplate' => null,  // Probably unnecessary?
             'template' => null,  // Probably unnecessary?
+            'templateparamslang' => 'twig',
+            'templateparamsevalpertry' => 0,
+            'templateparamsevald' => null,
+            'uiparameters' => null,
+            'hidecheck' => 0,
             'attachments' => 0
         );
 

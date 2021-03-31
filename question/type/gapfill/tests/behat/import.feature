@@ -1,4 +1,5 @@
-@qtype @qtype_gapfill, @qtype_gapfill_import
+@mod @mod_quiz @qtype @qtype_gapfill $gapfill_import @javascript
+
 Feature: Test importing Gapfill questions
   As a teacher
   In order to reuse Gapfill questions
