@@ -289,6 +289,12 @@ def plugins = [
         "url" : 'https://github.com/catalyst/moodle-tool_mfa.git',
         "branch" : 'master',
         "dest" : 'tool/mfa'
+    ],
+    [
+        "name" : 'mod_solo',
+        "url" : 'https://github.com/justinhunt/moodle-mod_solo.git',
+        "branch" : 'main',
+        "dest" : 'mod/solo'
     ]
 ]
 
