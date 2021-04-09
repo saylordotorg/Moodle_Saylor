@@ -307,6 +307,12 @@ def plugins = [
         "url" : 'https://github.com/justinhunt/moodle-atto_poodll.git',
         "branch" : 'poodll3',
         "dest" : 'lib/editors/Atto/plugins/poodll'
+    ],
+    [
+        "name" : 'qtype_poodllrecording',
+        "url" : 'https://github.com/justinhunt/moodle-qtype_poodllrecording.git',
+        "branch" : 'poodll3',
+        "dest" : 'question/type/poodllrecording'
     ]
 ]
 
