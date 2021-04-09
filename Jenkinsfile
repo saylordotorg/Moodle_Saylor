@@ -325,6 +325,12 @@ def plugins = [
         "url" : 'https://github.com/catalyst/moodle-tool_crawler.git',
         "branch" : 'master',
         "dest" : 'tool/crawler'
+    ],
+    [
+        "name" : 'atto_linkadv',
+        "url" : 'https://github.com/sharpchi/moodle-atto_linkadv.git',
+        "branch" : 'master',
+        "dest" : 'lib/editor/atto/plugins/linkadv'
     ]
 ]
 
