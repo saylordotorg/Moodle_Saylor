@@ -283,6 +283,12 @@ def plugins = [
         "url" : 'https://github.com/PoetOS/moodle-mod_questionnaire.git',
         "branch" : 'MOODLE_310_STABLE',
         "dest" : 'mod/questionnaire'
+    ],
+    [
+        "name" : 'tool_mfa',
+        "url" : 'https://github.com/catalyst/moodle-tool_mfa.git',
+        "branch" : 'master',
+        "dest" : 'tool/mfa'
     ]
 ]
 
