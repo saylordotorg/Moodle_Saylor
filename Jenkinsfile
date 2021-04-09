@@ -295,6 +295,12 @@ def plugins = [
         "url" : 'https://github.com/justinhunt/moodle-mod_solo.git',
         "branch" : 'main',
         "dest" : 'mod/solo'
+    ],
+    [
+        "name" : 'filter_poodll',
+        "url" : 'https://github.com/justinhunt/moodle-filter_poodll.git',
+        "branch" : 'main',
+        "dest" : 'filter/poodll'
     ]
 ]
 
