@@ -299,7 +299,7 @@ def plugins = [
     [
         "name" : 'filter_poodll',
         "url" : 'https://github.com/justinhunt/moodle-filter_poodll.git',
-        "branch" : 'main',
+        "branch" : 'poodll3',
         "dest" : 'filter/poodll'
     ],
     [
