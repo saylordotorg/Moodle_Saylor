@@ -313,6 +313,12 @@ def plugins = [
         "url" : 'https://github.com/justinhunt/moodle-qtype_poodllrecording.git',
         "branch" : 'poodll3',
         "dest" : 'question/type/poodllrecording'
+    ],
+    [
+        "name" : 'mod_subcourse',
+        "url" : 'https://github.com/mudrd8mz/moodle-mod_subcourse.git',
+        "branch" : 'master',
+        "dest" : 'mod_subcourse'
     ]
 ]
 
