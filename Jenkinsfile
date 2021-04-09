@@ -318,7 +318,7 @@ def plugins = [
         "name" : 'mod_subcourse',
         "url" : 'https://github.com/mudrd8mz/moodle-mod_subcourse.git',
         "branch" : 'master',
-        "dest" : 'mod_subcourse'
+        "dest" : 'mod/subcourse'
     ],
     [
         "name" : 'tool_crawler',
