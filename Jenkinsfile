@@ -301,6 +301,12 @@ def plugins = [
         "url" : 'https://github.com/justinhunt/moodle-filter_poodll.git',
         "branch" : 'main',
         "dest" : 'filter/poodll'
+    ],
+    [
+        "name" : 'atto_poodll',
+        "url" : 'https://github.com/justinhunt/moodle-atto_poodll.git',
+        "branch" : 'poodll3',
+        "dest" : 'lib/editors/Atto/plugins/poodll'
     ]
 ]
 
