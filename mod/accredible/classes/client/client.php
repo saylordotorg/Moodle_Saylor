@@ -5,19 +5,19 @@ defined('MOODLE_INTERNAL') || die();
 
 class client {
 
-    public function get($url, $token) {
+    public static function get($url, $token) {
         return self::create_req($url, $token, 'GET');
     }
 
-    public function post($url, $token, $postBody) {
+    public static function post($url, $token, $postBody) {
         return self::create_req($url, $token, 'POST', $postBody);
     }
 
-    public function put($url, $token, $putBody) {
+    public static function put($url, $token, $putBody) {
         return self::create_req($url, $token, 'PUT', $putBody);
     }
 
-    function create_req($url, $token, $method, $postBody = null) {
+    static function create_req($url, $token, $method, $postBody = null) {
         $curl = curl_init();
 
         curl_setopt($curl, CURLOPT_URL, $url);

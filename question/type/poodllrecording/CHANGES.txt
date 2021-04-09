@@ -1,0 +1,39 @@
+Change List
+=========
+Version 3.1.05(Build 2020102200)
+-Fixed broken filename save with attempt (bug introduced in v3.1.04 Build 2020101700 )
+
+Version 3.1.04(Build 2020101700)
+-added event for external js to listen to (for use in safequizsave block)
+
+Version 3.1.03(Build 2020041000)
+-made it possible to check usable recorders from the admin settings
+
+Version 3.1.02(Build 2019062000)
+-Added timelimit setting to backup/restore [thanks Angelo Calo for bug report]
+
+Version 3.1.01(Build 2018070500)
+-Fixed issue with cascading filter settings
+
+Version 3.1.0(Build 2018041000)
+-Implemented new Moodle Privacy API
+
+Version 2018020501
+Fixed bug in restore logic where backimage had not been renamed to qresource
+
+Version 2017102301
+Fixed bug where the question installer does not use the new field name qresource, and instead uses backimage
+
+Version 2017100301
+Removed mp3 recording format to leave just audio, video and picture
+Made prep for new question resource setting
+
+Version 2016112701
+Added a CSS style to control submitted image widths
+
+Version 2016081401
+Support for PoodLL 3
+
+Version 2015121101
+Support for refactored PoodLL filter and support for Moodle 3.0
+

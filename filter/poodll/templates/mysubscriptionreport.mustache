@@ -1,0 +1,86 @@
+{{#subscription_check}}
+<table class="table table-bordered">
+  <thead class="thead-light">
+    <tr>
+      <th scope="col">{{#str}}subscription,filter_poodll{{/str}}</th>
+      <th scope="col" colspan=2>{{#str}}start,filter_poodll{{/str}}</th>
+      <th scope="col" colspan=2>{{#str}}end,filter_poodll{{/str}}</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#subscriptions}}
+    <tr>
+      <td>{{name}}</td>
+      <td colspan=2>{{start_date}}</td>
+      <td colspan=2>{{end_date}}</td>
+    </tr>
+    {{/subscriptions}}
+
+<tr class="thead-light">
+      <th scope="col">&nbsp;</th>
+      <th scope="col">{{#str}}thirty_days,filter_poodll{{/str}}</th>
+      <th scope="col">{{#str}}ninety_days,filter_poodll{{/str}}</th>
+      <th scope="col">{{#str}}oneeighty_days,filter_poodll{{/str}}</th>
+      <th scope="col">{{#str}}threehundredsixtyfive_days,filter_poodll{{/str}}</th>
+</tr>
+
+   <tr>
+    <td>{{#str}}poodll_users,filter_poodll{{/str}}</td>
+        {{#pusers}}
+            <td>{{value}}</td>
+        {{/pusers}}
+   </tr>
+
+   <tr>
+    <td>{{#str}}recordings,filter_poodll{{/str}}</td>
+        {{#record}}
+            <td>{{value}}</td>
+        {{/record}}
+   </tr>
+
+   <tr>
+    <td>{{#str}}recording_min,filter_poodll{{/str}}</td>
+        {{#recordmin}}
+            <td>{{value}}</td>
+        {{/recordmin}}
+   </tr>
+
+
+   <tr>
+    <td>{{#str}}per_recording_type,filter_poodll{{/str}}</td>
+        {{#recordtype}}
+        <td style="white-space:nowrap">
+             <div>
+                <div style="display:inline-block; float: none;">{{#str}}video,filter_poodll{{/str}}: {{video}}</div>
+             </div>
+             <div>
+                 <div style="display:inline-block; float: none;">{{#str}}audio,filter_poodll{{/str}}: {{audio}}</div>
+             </div>
+        </td>
+        {{/recordtype}}    
+   </tr>
+  </tbody>
+</table>
+{{/subscription_check}}
+
+
+
+
+{{^subscription_check}}
+<table class="table table-bordered">
+  <thead class="thead-light">
+    <tr>
+      <th scope="col">{{#str}}subscription,filter_poodll{{/str}}</th>
+      <th scope="col" colspan=2>{{#str}}start,filter_poodll{{/str}}</th>
+      <th scope="col" colspan=2>{{#str}}end,filter_poodll{{/str}}</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td colspan="5">{{#str}}no_subscriptions,filter_poodll{{/str}}</td>
+    </tr>
+  </tbody>
+</table>
+{{/subscription_check}}
+
+

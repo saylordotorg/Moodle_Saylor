@@ -1,0 +1,22 @@
+
+<div class='mod_solo_summary_teachereval'>
+    <div class='mod_solo_sr_title'>{{#str}}autoeval, mod_solo{{/str}}</div>
+    <div class='mod_solo_ct_body'>
+        <div class='mod_solo_rubric_results'>
+            <span class="mod_solo_evalstars">
+              <span class="mod_solo_placeholdertext mod_solo_bigfont">{{#str}}secs_till_check, mod_solo{{/str}}<br>15</span><br>
+              <div class="mod_solo_placeholderspinner" style="display: none"><i class="fa fa-spinner fa-spin fa-4x"></i></div>
+            </span>
+        </div>
+    </div>
+</div>
+
+{{#js}}
+    require([
+    "jquery",
+    "core/log",
+    "mod_solo/smallreporthelper",
+    ], function ($,log,smallreporthelper) {
+      smallreporthelper.init({{attemptid}});
+    });
+{{/js}}

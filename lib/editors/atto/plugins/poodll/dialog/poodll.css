@@ -1,0 +1,73 @@
+.mceLinkList, .mceAnchorList, #targetlist {
+    width: 280px;
+}
+
+.mceActionPanel {
+    margin-top: 7px;
+}
+
+.panel_wrapper div.current {
+    height: 320px;
+}
+
+#classlist, #title, #href {
+    width: 280px;
+}
+
+#popupurl, #popupname {
+    width: 200px;
+}
+
+#popupwidth, #popupheight, #popupleft, #popuptop {
+    width: 30px;
+    vertical-align: middle;
+    text-align: center;
+}
+
+#id, #style, #classes, #target, #dir, #hreflang, #lang, #charset, #type, #rel, #rev, #tabindex, #accesskey {
+    width: 200px;
+}
+
+#events_panel input {
+    width: 200px;
+}
+
+.pagelayout-embedded #content {
+    padding-top: 0px;
+}
+
+#content {
+    width: 0px;
+    height: 0px;
+}
+
+#page {
+    top: 0px;
+    margin-top: 0px;
+    padding-top: 0px;
+}
+
+#tinymce_poodll_container {
+    position: fixed;
+    left: 0px;
+    top: 0px;
+    margin: 5px;
+}
+
+.atto_poodll_iframe_container {
+    padding: relative;
+    padding-bottom: 56.25%;
+    padding-top: 30px;
+    height: 0;
+    overflow: hidden;
+}
+
+.atto_poodll_iframe_container iframe,
+.atto_poodll_iframe_container object,
+.atto_poodll_iframe_container embed {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}

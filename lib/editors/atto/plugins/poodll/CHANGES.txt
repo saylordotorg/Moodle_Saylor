@@ -1,0 +1,37 @@
+Change List
+=========
+Version 3.1.2(Build 2019071300)
+-Fixed default permission for authenticated user
+
+
+Version 3.1.1(Build 2018090300)
+-Added support for Cloud Poodll API token
+
+Version 3.1.0(Build 2018041000)
+-Implemented new Moodle Privacy API
+
+Version 2018020701
+Removed Red5 references
+
+Version 2017112001
+Fixed an incorrect path in dialog.php
+
+Version 2017100301
+Added a check for 0 id user when fetching usercontextid
+
+Version 2016112701
+Updated styles of widget dialog
+removed option to select the good ol poodll flash whiteboard
+
+Version 2016081402
+Added new html5 snapshot maker
+
+Version 2016081401
+Tweaks to support auto iframe resizing
+
+Version 2015121102
+Added jquery so that the drawingboard.js doesn't fail
+
+Version 2015121101
+Support for refactored PoodLL filter and support for Moodle 3.0
+

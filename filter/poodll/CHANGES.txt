@@ -1,0 +1,536 @@
+Change List
+=========
+Version 3.1.43a (Build 2021032901)
+-Zip file corrupt on Moodle org. This is a fresh attempt at a release
+
+Version 3.1.43 (Build 2021032900)
+-Update to speechmarks generator
+-Removed flicker on start of video recording which can cause audio/video sync issues
+
+Version 3.1.42 (Build 2021031600)
+-Minor update to support new version of custom timed recording question
+-Fixes to shadow player
+
+Version 3.1.41 (Build 2021022100)
+- Enabled video recording from mobile safari/safari
+
+Version 3.1.40 (Build 2021011200)
+- Fixed problem with usage report when no usage data
+
+Version 3.1.39 (Build 2020122200)
+- Added My Account dashboard
+- Refactored renderer
+
+Version 3.1.38 (Build 2020110400)
+- added support via cloud poodll for accelerated upload of video
+
+Version 3.1.37 (Build 2020102400)
+added user report
+
+Version 3.1.36 (Build 20201019XX)
+added caching for Polly files
+
+Version 3.1.35 (Build 2020062400)
+- Removed references to AWS SDK in old upgrade code. Since its not used in latest version
+
+Version 3.1.34 (Build 2020061400)
+-fixed issue where cloudpoodlltoken not properly fetched when useing widget/players
+
+Version 3.1.33 (Build 2020061100)
+-added check for adhoc task duplicates on M3.3 and above
+-fail (no retry) if adhoc move task fails to pull a file (because if file already exists locally AND overwriting leads to fail, then wasteful futile recurring retry)
+-removed AWS SDK and all calling code, replaced with AWS Remote
+
+Version 3.1.32 (Build 2020060300)
+-Fixed a bug where proxy settings not properly passed to AWS SDK
+
+Version 3.1.31 (Build 2020052600)
+-made FFMPEG calls a little safer
+-added beta version of Poodll Audio Player
+
+Version 3.1.30 (Build 2020052000)
+-Added support for audio/x-m4a mimetype
+-Added multipart uploader (experimental)
+-Fixed Adam player
+-Replaced Elastic Transcoder call (postupload) with DynamoDB job log (pre upload)
+-added player widget templates
+
+Version 3.1.29 (Build 2020041700)
+-fixed broken whiteboard saving
+
+Version 3.1.28 (Build 2020040500)
+-added owner field to stage_remote_process_job for cloud poodll
+-added singapore and mumbai regions for cloudpoodll
+-fixed cloudpoodlltoken to be callable from template JS
+-replaced interactivetranscriptaudio and interactivetranscriptvideo with superinteractiveaudio and superinteractivevideo
+-replaced TTS templates with cloud poodll ones for new users
+
+Version 3.1.25 (Build 2019121200)
+-fixed lightbox2 template and popover template on classic theme (M3.8)
+-fixed broken shimming in Moodle 3.8
+
+Version 3.1.24 (Build 2019112100)
+-added presets and changed presets that instantiate on install
+-changed default template install count to 40
+-fixed bug where bad characters in extensions list blew up Moodle
+-Optimisations of cron task
+
+Version 3.1.23(Build 2019110600)
+-Added an alert if try to leave page while recorder still uploading
+-stubs for new features
+-fixed broken countdown timer in Fresh recorder
+
+Version 3.1.22(Build 2019092400)
+-Improved InteractiveTranscriptVideo (had not been working on Safari)
+-Set default AWS SDK to V2 on Windows servers
+-Tweaked cron job processing
+
+Version 3.1.21(Build 2019052000)
+-added pushtospeak recorder
+-added better speech cards
+-added hints for audio encoder
+-support Moodle 3.7
+
+Version 3.1.20(Build 2019031902)
+-Another stability tweak to support situation where upload/postprocess and page unload overlap
+
+Version 3.1.19 (Build 2019031901)
+-improved timer on recorders which seemed to slip at times
+-added support for cloudpoodll non-transcode recorders
+-fixed bug affecting fast clicking people who submit recordings before S3 is ready
+
+Version 3.1.18 (Build 2019012001)
+-Removed old SWF files that were bloating Poodll
+
+Version 3.1.17 (Build 2019012000)
+-Added better cron calling
+-Added support for fast cloudpoodll loading in poodllloader.html (used by safari's mainly)
+
+Version 3.1.16(Build 2018122000)
+-Added a better check for license status on general settings page
+-Tweaks to split recorder so that it displays nicely on smallscreens
+
+Version 3.1.15(Build 2018120500)
+-Added more options for AWS loading
+-Added more information to support info file
+-Added a switch to detect a conflict and switch awssdk version when fetching presigned url
+-Added a check for dirs in presets folder which could cause a nasty error
+
+Version 3.1.14(Build 2018120300)
+-Fixed bug where API username/secret would not be recognised
+-Added 'none' option for AWS SDK loading
+-Added a check for enrol_arlo which loads Guzzle , which crashes AWS SDK load. Sets to AWS SDK v2 in that case.
+
+Version 3.1.13(Build 2018112500)
+-adds support for Poodll API in place of license key
+
+Version 3.1.12(Build 2018110900)
+-added support for AWS Ottawa region (ca-central-1)
+-added transcoder option to cloud poodll params
+-added support for AWS london, frankfurt and saopaulo regions
+
+Version 3.1.11(Build 2018102300)
+-Removed old video js interactive transcripts
+-Added new interactive transcripts
+-Fixed hard coded strings in Once and Fresh recorders
+-Added download feature to html5 recorders
+-Added subtitle support to Flowplayer First frame, Video JS, Media Element CDN and Native video players.
+-Added new version of Flowplayer for Flowplayer First Frame
+
+Version 3.1.10(Build 2018092300)
+-Fixed popup recorder template
+-Fixed dictation template
+-Added warning and upload skins
+-bug fix attempt for submissions that do not convert
+
+Version 3.1.09(Build 2018090300)
+-fixed a size issue on the fresh recorder that shows up on the clean theme
+-Set the once recorder background to white (was transparant)
+-Fixed an issue with file extensions field accepting spaces and blowing up Moodle
+-Added language strings for media API errors that occur in HTML5 recorders.
+-Added support for fetching Cloud Poodll API tokens
+
+Version 3.1.08(Build 2018081600)
+-Added a video version of once recorder
+-tidied up styles and recorder skins to be less affected by rogue theme css
+-removed burntrose recorder from html 5 rec. options and where selected, shift to use bmr
+-first official release of Fresh audio recorder skin
+-Added some new widget/player templates
+-Added compatibility-test.php to AWS v3 to assist with debugging issues
+-removed native audio player from plain recorder because it was ugly on chrome these days, also redid uploader skin
+
+
+Version 3.1.07(Build 2018070502)
+-Added a workaround for the case where Catalysts local_aws is installed
+-added a 3rdpartylibs.xml
+
+Version 3.1.06 (Build 2018070501)
+-Added a once audio recorder option to filter settings
+
+Version 3.1.05 (Build 2018070500)
+-Added a once audio recorder preset
+-Added a appid/subtitle job params
+-tweaked native audio
+
+Version 3.1.04 (Build 2018062300)
+-refactored AMD code so skins were better organised
+-added a more flexible cloud job register method
+
+Version 3.1.03 (Build 2018060900)
+-Removed legacy code that was not needed
+-Added scaffolding for ReadAloud and CloudPoodll
+
+Version 3.1.01(Build 2018041001)
+-Fixed issue in FFMPEG conversions that was preventing feedback submissions from converting
+
+Version 3.1.0(Build 2018041000)
+-Added a number of presets
+-Implemented new Moodle Privacy API
+
+Version 3.0.63(Build 2018032301)
+-fixed ajax media refresher which did not detect placeholder video size correctly
+-fixed wrong sized progress bar on 123 recorder
+-fixed shim code which restricted shimmed players and widgets to only one per page
+-removed old code from module.js
+-removed splash generation code from FFMPEG calls
+-fixed bug in ffmpeg convert task when called from /cli/poodllcron.php
+
+Version 3.0.62(Build 2018022101)
+-removed doubled up (and old) definition of the placeholder content hash. This was breaking ffmpeg conversions
+
+Version 3.0.61(Build 2018021901)
+-Added more presets for speech and text (beta)
+-fixed bug with video recording in plain recorder skin
+
+Version 3.0.60(Build 2018020701)
+-added presets for Amazon Polly (requires Amazon SWD SDK v3 not shipped with poodll)
+-changes to uploader to support poodll cloud
+-fixed drawing board js bug where toolbar events did not set canvas 'dirty' flag
+-fixed blob concatenation issues in IE and Edge
+-added usepoodll event 
+-added new placeholder audio and video
+
+Version 3.0.58(Build 2017120201)
+-fixed broken pause on recording
+-added an error dialog
+-added one button audio player
+-changed URL of Poodll subscriptions page
+
+Version 3.0.57(Build 2017111701)
+-Added video to onebutton recorder (still beta)
+-Added new device settings to all recorders, enabling users to select audio/video device from within recorder
+-added QR code scanner player preset and library
+
+Version 3.0.56(Build 2017110501)
+-Added animations for recorders
+-Fixed bugs where placeholder could overwrite converted file
+-Added support for more than 6 recorders on page (by def. Google Chrome doesn't like this)
+-Major code refactor of media stream recorder
+-Added completion check to Shadow player
+-New One Button Recorder (still in beta)
+-New Speech Recognition (still in beta)
+-New 'Clear Template' preset for blanking a tempalte
+
+Version 3.0.55(Build 2017100701)
+-fixed display and volume button bugs in multi/twice/thriceplayers
+-improved display of thrice players
+-added ability to update templates in bulk or individually
+-improved video transcript preset
+-fixed toggle preset
+-styled shadow player
+-improved iOS support
+
+Version 3.0.54(Build 2017092401)
+-support for iOS html5 audio recording
+-support for recorders as widgets
+-removed unneeded AWS libs to trim size and possible issues
+-removed legacy mp3 recorder skins
+-tweaks to remove certain calls to file_put_contents in 3rd party libs
+
+Version 3.0.53(Build 2017082601)
+-More and better recorder skins
+-Support for hints so we can set recorder sizes and skins at diff levels
+-Added ability to select html5 recorder skin at course and module level
+-Added player template for Paypal Accessible Video Player
+-Fixed bug sometimes called calls to support_info
+
+Version 3.0.52(Build 2017081501)
+-fixed bug introduced in 3.0.51 where aws notifications would fail
+
+Version 3.0.51(Build 2017081101)
+-added rewritten burnt rose recorder skin (need to manually update it from general settings page)
+-added nomediaplugin switch to players to prevent double filtering
+-removed lots of old code from poodlllogiclib and paoodlldatamanager
+-removed blob templates that we do not need anymore
+
+Version 3.0.50(Build 2017080401)
+-Added more skins
+-added multiplayer and scroller templates
+-fixed issue in poodllfilelib and poodlllogiclib
+-fixed broken recording timelimit feature
+
+
+Version 3.0.49(Build 2017071701)
+-fixed issue with players that do not "refresh" properly on Firefox
+-added recorder skin styles
+- added a new once player
+
+Version 3.0.48(Build 2017071001)
+-fixed error in whiteboads preventing multiple players on same page from saving properly
+
+Version 3.0.47(Build 2017070401)
+-fixed error in support info file from a bad SQL statement
+
+Version 3.0.46(Build 2017070301)
+-added download feature to players
+
+Version 3.0.45(Build 2017062501)
+-added 4 working AWS regions
+
+Version 3.0.44(Build 2017062301)
+-Added AWS regions(not fully implemented)
+-Added active user and poodll user counts and media recorderorder to support info
+-fixed problem with amd loader for flash recorder
+
+Version 3.0.43(Build 2017061801)
+-fixed broken pause recording
+-added ability to allow/deny flash recorders on Android device
+-added ability to disable zoom on literally canvas
+-refactor of some AMD recorder order code
+
+
+Version 3.0.42(Build 2017052201)
+-tweaked logging which was still giving (unnecessary) warning messages
+-tweaked placeholder save logic which was not working well with Poodll assignment feedback
+
+Version 3.0.41(Build 2017051601)
+-fixed unclosed span tag in burntrose skin
+-added refresh ability to cachebuster preset
+-better error handling in refreshable player presets
+-implemented different recorder_order settings for different media types
+
+Version 3.0.40(Build 2017050701)
+-Added cloud notifications, removing need for cron job
+-tweaks to presets to restore alternate content settings that got lost in 3.0.35
+-updated install defaults to set handler for youtube and other file extensions
+
+Version 3.0.39(Build 2017041704)
+-Added media refresh ability for FFMPEG conversions too
+-Added filename of converted file to FFMPEG log report
+
+Version 3.0.38(Build 2017041703)
+-further attempted fix for recursive getUserMedia call problemo
+-refactor of player skin code
+-removal of Own carousel
+
+Version 3.0.37(Build 2017041702)
+-attempted fix for recursive getUserMedia call problemo
+
+Version 3.0.35(Build 2017041700)
+-fixed an issue where Chrome failed to get webcam because js stack maxed on getUserMedia call
+
+Version 3.0.35(Build 2017041700)
+-fixed up skinning in prep for really improving recorders
+-added support for refeshing players in realtime when conversion process completes
+-some minor bug fixes for logging
+
+Version 3.0.34(Build 2017032602)
+-Beefed up protection against any XSS attempt via the Poodll filter string inputs
+https://github.com/justinhunt/moodle-filter_generico/issues/7
+-Added support for pulling Generico presets from theme directory
+
+Version 3.0.33(Build 2017032601)
+- reworked the html5 recording to be more reliable and better on firefox
+
+Version 3.0.32(Build 2017032405)
+-fixed a bug that truncated html5 audio recordings and ignored < 4s ones
+
+Version 3.0.31(Build 2017031901)
+-Fixed erroneous error message from error log on s3 move complete
+-Added support for MS Edge audio recording via HTML5
+
+
+Version 3.0.30(Build 2017030401)
+-Fixed erroneous error message from adhoc convert task
+-Fixed problem saving whiteboard vector data inside quiz question answers
+-Fixed issue with large base64 audio data being attached to form submissions needlesly
+-Fixed issue with mobile ios app on TinyMCE Poodll anywhere (insert button not enabling)
+
+Version 3.0.28(2017020401)
+-fixed iOS and Android version detection bug
+-fixed snapshot recorder default to upload on iOS
+
+Version 3.0.27(2017013001)
+-added browser agent to debug logs
+
+Version 3.0.26(2017013000)
+-added better checking for failed uploads and failed transcode calls
+-added debug logging and related setting
+-added log for registering adhoc tasks and completion of adhoc task
+-add diagnostic messages for red5 server settings
+
+Version 3.0.25(Build 2017010702)
+-added a few more diagnostic messages
+
+
+Version 3.0.24(Build 2017010702)
+-added a log output to show error message when retrying an S3 copy back
+
+Version 3.0.23(Build 2017010701)
+-fixed bug where proxy requests to elastic transcoder did not go through proxy
+
+Version 3.0.22(Build 2017010401)
+-added support for proxy servers (Red5)
+
+Version 3.0.21(Build 2016112803)
+-added support for proxy servers(amazon S3)
+-added Video JS Subtitle player template
+-added Native Video Subtitle player template
+-added Video JS audio player template
+-added Video JS audio transcript player template
+
+Version 3.0.20(Build 2016112802)
+-fixed problem with audiojs template which would error if id not found
+-fixed problem with undefined template being added when html and js not synced
+
+Version 3.0.19(Build 2016112801)
+-added a warning message if the recorder has not captured data
+-fixed a style problem if using burntrose theme
+
+Version 3.0.18(Build 2016111901)
+-fixed a bug on webservice detection for mobile/alternate content
+-tweaks to CSS so it dosplays ok on Moodle 3.2 with standard theme
+-improved the once player js tmplate
+-added source of amd libraries so that can debug with cachejs off
+-removed duplicates in presets directory
+
+
+Version 3.0.17(Build 2016111203)
+-added tinyvideojsplayer
+
+Version 3.0.16(Build 2016111202)
+-fixed alternate field bug, media files wouldn't play
+
+Version 3.0.15(Build 2016111201)
+-added alternate content fields for falling back to on non css/js env. (ala mobile app)
+-convert datavars to integers if they are numeric before passing to SQL
+
+Version 3.0.14(Build 2016110601)
+-added a once player js
+-added HTML5 recorder skin (burntrose)
+-added filter active and sort order fields to support info
+
+Version 3.0.13(Build  2016081414)
+-added ability to convert on Amazon even when using Red5
+-added a special pre signed url for the iOS app
+
+
+Version 3.0.12(Build 2016081413)
+-fixed a bug in the presigned url we pass to mobile
+-fixed a bug in the once player template that caused strange page jumps to oneplayer only pages
+-fixed a bug that caused a form submit in the elton player template
+-fixed a bug that broke FFMPEG conversions from red5/tokyo.poodll.com recordings
+-numerous tweaks to template presets
+-added audioquality setting to mobile settings
+
+Version 3.0.11(Build 2016081412)
+- updated youtube lightbox
+- added diagnostics page to settings
+- fixed broken drawingboard.js
+- tweaked some presets
+- fixed bug in mp3recorder(flash)  which killed recording on IE with latest flash
+
+Version 3.0.10(Build 2016081411)
+- Added the correct CSS to fetch progress image
+- Fixed problem affecting mp4/mp3 checkbox on red5 recorders
+- Fixed problem where Youtube parsing was broken
+- Fixed problem where no-cloud on m3 recorder could break html5 audio recorder
+- Added support for multiple html5 recorders on one page
+- Added support for multiple flashmp3 recorders on one page
+- Added support for multiple upload  recorders on one page
+- Added support for multiple snapshot recorders on one page
+- Added support for multiple mobile recorders on one page
+- Added VideoJS Player template
+
+Version 3.0.9(Build 2016081410)
+- Added a no cloud checkbox to the MP3 recorder settings on PoodLL General Settings page. If checked, mp3 files will get uploaded direct to moodle and bypass cloud
+- Added licence information (expire time etc) beneath registration code
+- Added a settings page for upcoming iOS app
+- Added a few new templates from default
+
+Version 3.0.8(Build 2016081409)
+- improved handling of uploads which led to failed uploads occasionally
+-fixed bug that occurred on new installs from version 3.0.7
+
+
+Version 3.0.7(Build 2016081408)
+-tweaks to how presets and templates display on settings pages
+-removed ability to save more than once during a recording. User needs to reload page. Not ideal but currently the second recording will likely not be saved properly after fetching from cloud
+-removed unused adhoc_s3_transcode task 
+-altered size of Flash audio recorders a little
+
+Version 3.0.6(Build 2016081407)
+-Fixed bug that could prevent files from finishing the conversion/copyback sequence
+
+Version 3.0.5(Build 2016081406)
+-Fixed bug stopping whiteboards upload
+
+Version 3.0.4(Build 2016081405)
+-fixed a bad bug which stopped non video filter strings being parsed
+
+Version 3.0.3(Build 2016081404)
+-removed a problem where non text links were filtered and replaced with players
+this would almost never be the desired situation
+-fix for failed uploads when not using cloud recording
+-added snapshot recorder (HTML5)
+-fixed html5 audio and video to show recording time
+
+Version 3.0.2(Build 2016081403)
+-added option to specify player to use in url of media file &player=xxx type appendages to media url
+-removed option to use AWS SDK v3 to reduce download size
+-removed libraries from js and 3rdparty mediaelement folders
+-fixed a bug in submitting audio/video  in assignment submission and quizzes. The save button was sometimes submitting the form.
+-fixed bug where literally canvas height was not set properly
+
+Version 3.0.1(Build 2016081402)
+-fixed issue with browsers caching placeholder audio/video and not using transcoded media
+
+Version 3.0.0(Build 2016081401)
+-tweaks to support callbackjs for recorders
+-preset improvements
+-support for ad hoc shimming in templates
+-support auto iframe resizing
+
+Version 2.8.7(Build 2016071605)
+-Added AWS SDK for PHP version 2.3 (for older php versions)
+-Tweaked ad-hoc task for moving from s3
+-fixed installation zip file which would not pass verification on install
+-added support for @@URLPARAM:xx@@ variables in PoodLL filter templates
+-altered default templates for audiojs and others
+
+Version 2.8.6(Build 2016071604)
+First release of PoodLL 3
+-html5 recorders
+-template based filter system
+
+Version 2015121106
+Fixed a bug that caused the whiteboard and recorders to fail to submit their media, when jquery was not present.
+
+Version 2015121105
+Fixed a bug that caused widgets(once player etc) to never evaluate registration properly, and fail to load with a registration error.
+Removed erroneous message from settings that talked about a literally canvas issue that no longer exists
+Made the default whiteboard literally canvas again
+
+Version 2015121104
+Fixed a bug preventing LiterallyCanvas from saving images properly in questions
+Fixed bug that prevented mobile devices being detected properly
+
+Version 2015121103
+Fixed bug that affected repository and atto file inserts
+
+Version 2015121102
+Removed drawingbpard.js files that were breaking require.js
+
+Version 2015121101
+Lots of refacoring and support for Moodle 3.0
+

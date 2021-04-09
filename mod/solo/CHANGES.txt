@@ -1,0 +1,23 @@
+
+1.0.5 (Build 2021030600)
+-Improved layout of form and added an optional setup tab
+-added string for capability 'grade'
+
+1.0.4 (Build 2021022200)
+-Add options for TTS prompt and better display of media prompt items on form
+
+1.0.3 (Build 2021021800)
+- Improved layout of results and added better stuff to prevent a user prematurely leaving the recording page.
+
+1.0.2 (Build 2021021200)
+- Simplified placeholder screen
+- Made target word count visible to students
+
+1.0.1 (Build 2021020600)
+- Improved differencing
+- Improved Unicode processing in diff
+- Language string updates
+- Improved final results page1
+
+1.0.0 (Build 2021011000)
+-Added simple grading method

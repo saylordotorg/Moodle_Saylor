@@ -1,0 +1,141 @@
+
+<!-- HTML from template body goes goes here  -->
+<div id='{{AUTOID}}_container' class='poodll_multiplayer'>
+
+  <div class="button-wrapper">
+    <button type='button' id='{{AUTOID}}' class='poodll_multiplayer_button'>
+		<audio id='{{AUTOID}}_player' class="onceplayerjs nomediaplugin" src="{{VIDEOURL}}"></audio>
+		<i class="fa fa-play fa-2x" aria-hidden="true"></i></button>
+  </div>
+  <div class="state-wrapper">
+    <div id='{{AUTOID}}_time' class='poodll_onceplayer_time'></div>
+    <!--<div id='{{AUTOID}}_state' class='poodll_onceplayer_state'></div>-->
+    <div id='{{AUTOID}}_playtime' class="poodll_multiplayer_playtime"></div>
+  </div>
+  <div class="volume-control">
+    <button type="button" id="{{AUTOID}}_vol-up" class="vol-up vol-but"></button>
+    <div class="meter">
+      <div id="{{AUTOID}}_indicator" class="indicator"></div>
+    </div>
+    <button type="button" id="{{AUTOID}}_vol-down" class="vol-down vol-but"></button>
+  </div>
+</div>
+
+<!-- Custom JS from template  goes goes here  -->
+{{#js}}
+ require(['jquery','filter_poodll/mediaparser'], function($,parser) {
+      
+$('#{{AUTOID}}').data('playtime', {{canplaycount}});
+      
+//get our player
+      
+var aplayer = $('#' + "{{AUTOID}}").children().first();
+var fa = $('#' + "{{AUTOID}}" + ' .fa');
+var thestate =$('#' + "{{AUTOID}}" + '_state'); 
+var thetime = $('#' + "{{AUTOID}}" + '_time'); 
+      
+var details = parser.parse('{{AUTOID}}_original', 'audio');
+aplayer.attr('src',details.mediaurl); // mediaurl, subtitlesurl, sources
+
+$(fa).removeClass('fa-minus');
+
+//set status
+thestate.text('- ready -');
+
+
+// setting base volume for audio player
+aplayer[0].volume = 0.2;
+
+
+
+// Append Playtime text
+$('#' + "{{AUTOID}}" + '_playtime').empty();
+ var playtimer = $('#' + "{{AUTOID}}").data('playtime');
+$('#' + "{{AUTOID}}" + '_playtime').append('Remaining plays: '+playtimer +'x');
+
+
+
+$('#' + "{{AUTOID}}" + '_vol-up').click(function(){
+    if(aplayer[0].volume +0.1 > 1){return;}
+	$('#' + "{{AUTOID}}" + '_indicator').css("width", '+=' + (0.1 * $('.meter').width()));
+	aplayer[0].volume+=0.1;
+});
+$('#' + "{{AUTOID}}" + '_vol-down').click(function(){
+    if(aplayer[0].volume - 0.1 < 0){return;}
+	$('#' + "{{AUTOID}}" + '_indicator').css("width", '-=' + (0.1 * $('.meter').width()));
+	aplayer[0].volume-=0.1;
+});
+
+ aplayer[0].addEventListener('ended', function(){
+      var playtimer = $('#' + "{{AUTOID}}");
+     $('#' + "{{AUTOID}}" + '_playtime').empty();
+     var currentplaycount = playtimer.data('playtime');
+       currentplaycount--;
+      playtimer.data('playtime',currentplaycount );
+
+     $(fa).removeClass('fa-circle-o-notch');
+     $(fa).removeClass('fa-spin');
+     $(fa).removeClass('fa-play');
+     aplayer[0].pause();
+
+
+     if(currentplaycount > 0){
+         $('#' + "{{AUTOID}}" + '_playtime').append('Remaining plays: '+currentplaycount+'x');
+         $(fa).addClass('fa-play');
+     }else{
+        $('#' + "{{AUTOID}}" + '_playtime').append('Remaining plays: 0');
+        $(fa).addClass('fa-minus');
+        $('#' + "{{AUTOID}}").data("disabled", true);
+     }//end of if currentplaycount > 0
+
+ });//end of ended listener
+
+//player clicked event
+	$('#' + "{{AUTOID}}").click(function(){
+        var playtimer = $('#' + "{{AUTOID}}");
+        var currentplaycount = playtimer.data('playtime');
+        if(currentplaycount==0){return;}
+		play_audio();
+});//end of click event
+
+
+function play_audio(){
+	aplayer[0].play();
+	thestate.text('- playing -');
+	$(fa).removeClass('fa-play');
+	$(fa).addClass('fa-circle-o-notch');
+	$(fa).addClass('fa-spin');
+}
+
+
+aplayer.bind('durationchange',function(){thetime.text(poodll_mp_fetchtime(aplayer));});
+
+
+//time display function
+function poodll_mp_sec2time(seconds){
+    var date = new Date(null);
+    date.setSeconds(seconds); 
+    return date.toISOString().substr(11, 8);
+}
+function poodll_mp_fetchtime(theplayer){
+     var a_currenttime= isNaN(theplayer[0].currentTime) ? 0 : theplayer[0].currentTime;
+     var a_duration= isNaN(theplayer[0].duration) ? 0 : theplayer[0].duration;
+     var currenttime = poodll_mp_sec2time(Math.floor(a_currenttime));
+     var totaltime = poodll_mp_sec2time(Math.floor(a_duration)); 
+     var displaytime = currenttime + ' / ' +  totaltime;
+    return displaytime;
+}
+//The timer display
+aplayer.on('timeupdate',function(e){
+ var displaytime = poodll_mp_fetchtime(aplayer)
+ thetime.text(displaytime);
+});
+
+//show current time
+ thetime.text(poodll_mp_fetchtime(aplayer));
+
+
+
+ 
+ });
+{{/js}}

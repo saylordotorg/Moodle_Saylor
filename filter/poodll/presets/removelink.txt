@@ -1,0 +1,1 @@
+{"name":"Remove Link","key":"removelink","version":"1.0.0","instructions":"This removes the link that was filtered from display","showatto":"0","showplayers":"1","requirecss":"","requirejs":"","shim":"","defaults":"","amd":"1","body":"<!-- we removed the link @@VIDEOURL@@ -->","bodyend":"","script":"","style":"","dataset":"","datasetvars":"","alternate":"","alternateend":""}

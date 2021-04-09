@@ -1,0 +1,19 @@
+
+{{#reattempturl}}
+    <div class="solo_actionbutton">
+        <a class="btn btn-secondary solo_reattempt_btn center" href="{{{reattempturl}}}" data-href="{{{reattempturl}}}" data-action="reattempt">
+            {{#str}}reattempt, mod_solo{{/str}}</a>
+    </div>
+{{/reattempturl}}
+{{#postattemptediturl}}
+<div class="solo_actionbutton">
+    <a class="btn btn-secondary solo_postattemptedit_btn center" href="{{{postattemptediturl}}}">{{#str}}dopostattemptedit, mod_solo{{/str}}</a>
+</div>
+{{/postattemptediturl}}
+{{^element.frozen}}
+    {{#js}}
+        require(['jquery', 'mod_solo/postattemptbuttons'], function($, postattemptbuttons) {
+        postattemptbuttons.init();
+        });
+    {{/js}}
+{{/element.frozen}}

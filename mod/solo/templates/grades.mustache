@@ -1,0 +1,89 @@
+{{!
+  This file is part of Moodle - http://moodle.org/
+
+  Moodle is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  Moodle is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+  @template mod_solo/grades
+
+  Displays student submissions to be graded.
+
+  The purpose of this template is to display submissions by students to be graded.
+}}
+<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css"/>
+<div class="mod_solo_totalgradeables"><h3>{{# str }} totalgradeables, mod_solo,{{totalgradeables}} {{/ str }}</h3></div>
+<table cellpadding="0" cellspacing="0" width="100%" class="table table-striped" id="mod_solo_grade_submissions_table">
+    <thead>
+    <tr>
+        <th>{{# str }} gradeslast, mod_solo {{/ str }}</th>
+        <th>{{# str }} gradesfirst, mod_solo {{/ str }}</th>
+        <th>{{# str }} gradesclarity, mod_solo {{/ str }}</th>
+        <th>{{# str }} gradeswords, mod_solo {{/ str }}</th>
+        <th>{{# str }} gradestargetwords, mod_solo {{/ str }}</th>
+        <th>{{# str }} gradesmethod, mod_solo {{/ str }}</th>
+        <th>{{# str }} gradesgrade, mod_solo {{/ str }}</th>
+        <th>{{# str }} gradesactions, mod_solo {{/ str }}</th>
+
+    </tr>
+    </thead>
+    <tfoot>
+    <tr>
+        <th>{{# str }} gradeslast, mod_solo {{/ str }}</th>
+        <th>{{# str }} gradesfirst, mod_solo {{/ str }}</th>
+        <th>{{# str }} gradesclarity, mod_solo {{/ str }}</th>
+        <th>{{# str }} gradeswords, mod_solo {{/ str }}</th>
+        <th>{{# str }} gradestargetwords, mod_solo {{/ str }}</th>
+        <th>{{# str }} gradesgrader, mod_solo {{/ str }}</th>
+        <th>{{# str }} gradesgrade, mod_solo {{/ str }}</th>
+        <th>{{# str }} gradesactions, mod_solo {{/ str }}&nbsp;</th>
+
+    </tr>
+    </tfoot>
+    <tbody id="history-table-body">
+    {{#data}}
+        <tr data-history-id="{{id}}" class="history-row">
+            <td>{{lastname}}</td>
+            <td>{{firstname}}</td>
+            <td class="text-center">{{aiaccuracy}}</td>
+            <td class="text-center">{{words}}</td>
+            <td class="text-center">{{targetwords}}/{{totaltargetwords}}</td>
+            <td class="text-center">{{grader}}</td>
+            <td class="m-0 text-center">{{grade}}</td>
+            <td>
+                {{#methodrubric}}
+                <a href="gradesubmissions.php?id={{cmid}}&userid={{userid}}&grademethod=rubric">
+                <button type="button" class="btn btn-primary">
+                    {{# str }} gradesgrade, mod_solo {{/ str }}
+                </button>&nbsp;</a>
+            {{/methodrubric}}
+                {{#methodsimple}}
+                    <a href="gradesubmissions.php?id={{cmid}}&userid={{userid}}&grademethod=simple">
+                        <button type="button" class="btn btn-primary">
+                            {{# str }} gradesgrade, mod_solo {{/ str }}
+                        </button>&nbsp;</a>
+                {{/methodsimple}}
+            </td>
+        </tr>
+    {{/data}}
+    </tbody>
+</table>
+
+{{#js}}
+    require([
+    "jquery",
+    'https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js',
+    ], function ($, datatable) {
+    let table = $("#mod_solo_grade_submissions_table").dataTable();
+    });
+{{/js}}

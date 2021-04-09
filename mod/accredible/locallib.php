@@ -40,7 +40,7 @@ function sync_course_with_accredible($course, $instance_id = null, $group_id = n
 
     $apiRest = new apiRest($CFG->accredible_api_key);
 
-	$description = Html2Text::convert($COURSE->summary);
+	$description = Html2Text::convert($course->summary);
 	if(empty($description)){
 		$description = "Recipient has compeleted the achievement.";
 	}
@@ -200,34 +200,37 @@ function accredible_check_if_cert_earned($record, $course, $user) {
         }
 
         $completion_activities = unserialize_completion_array($record->completionactivities);
-        // if this quiz is in the completion activities
-        if( isset($completion_activities[$quiz->id]) ) {
-            $completion_activities[$quiz->id] = true;
-            $quiz_attempts = $DB->get_records('quiz_attempts', array('userid' => $user->id, 'state' => 'finished'));
-            foreach($quiz_attempts as $quiz_attempt) {
-                // if this quiz was already attempted, then we shouldn't be issuing a certificate
-                if( $quiz_attempt->quiz == $quiz->id && $quiz_attempt->attempt > 1 ) {
-                    return null;
-                }
-                // otherwise, set this quiz as completed
-                if( isset($completion_activities[$quiz_attempt->quiz]) ) {
-                    $completion_activities[$quiz_attempt->quiz] = true;
-                }
-            }
 
-            // but was this the last required activity that was completed?
-            $course_complete = true;
-            foreach($completion_activities as $is_complete) {
-                if(!$is_complete) {
-                    $course_complete = false;
-                }
-            }
-            // if it was the final activity
-            if($course_complete) {
-                // Student earned certificate by completing completion activities
-                $earned = true;
-            }
-        }
+		if (!empty($quiz)) {
+			// if this quiz is in the completion activities
+			if( isset($completion_activities[$quiz->id]) ) {
+				$completion_activities[$quiz->id] = true;
+				$quiz_attempts = $DB->get_records('quiz_attempts', array('userid' => $user->id, 'state' => 'finished'));
+				foreach($quiz_attempts as $quiz_attempt) {
+					// if this quiz was already attempted, then we shouldn't be issuing a certificate
+					if( $quiz_attempt->quiz == $quiz->id && $quiz_attempt->attempt > 1 ) {
+						return null;
+					}
+					// otherwise, set this quiz as completed
+					if( isset($completion_activities[$quiz_attempt->quiz]) ) {
+						$completion_activities[$quiz_attempt->quiz] = true;
+					}
+				}
+
+				// but was this the last required activity that was completed?
+				$course_complete = true;
+				foreach($completion_activities as $is_complete) {
+					if(!$is_complete) {
+						$course_complete = false;
+					}
+				}
+				// if it was the final activity
+				if($course_complete) {
+					// Student earned certificate by completing completion activities
+					$earned = true;
+				}
+			}
+		}
         
     }
     return $earned;
@@ -299,7 +302,7 @@ function create_credential_legacy($user, $achievement_name, $course_name, $cours
 	  	// include the achievement id that triggered the error
 	  	// direct the user to accredible's support
 	  	// dump the achievement id to debug_info
-	  	throw new moodle_exception('credentialcreateerror', 'accredible', 'https://help.accredible.com/hc/en-us', $user->email, $group_id);
+	  	throw new moodle_exception('credentialcreateerror', 'accredible', 'https://help.accredible.com/hc/en-us', $user->email, $credential->credential->group_id);
 	}
 }
 

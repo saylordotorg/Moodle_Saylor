@@ -1,0 +1,41 @@
+<button id='{{AUTOID}}_slow' type="button">80%</button>
+<button id='{{AUTOID}}_medium' type="button">100%</button> 
+<button id='{{AUTOID}}_fast' type="button">125%</button>
+
+<br/>
+
+<audio id="{{AUTOID}}_player" controls="controls" class="nomediaplugin"></audio>
+
+
+<!-- Custom JS from template  goes goes here  -->
+{{#js}}
+ require(['jquery','filter_poodll/mediaparser'], function($,parser) {
+ 
+   var register_events =function (){
+
+      $('#{{AUTOID}}_slow').click(function(){
+         aplayer[0].playbackRate=0.80;
+      });
+
+      $('#{{AUTOID}}_medium').click(function(){
+         aplayer[0].playbackRate=1;
+      });
+
+      $('#{{AUTOID}}_fast').click(function(){
+         aplayer[0].playbackRate=1.25;
+      });
+
+    };
+
+    //fetch the media url
+    var details = parser.parse('{{AUTOID}}_original', 'audio');
+    
+    //get our player
+    var aplayer = $('#{{AUTOID}}_player');
+    aplayer.attr('src',details.mediaurl); 
+    
+    //registering events
+    register_events();
+ 
+ });
+{{/js}}

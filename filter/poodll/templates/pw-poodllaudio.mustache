@@ -1,0 +1,311 @@
+
+
+<div id="{{AUTOID}}_poodll-super-player" class="poodll-super-player">
+
+    <div id="{{AUTOID}}_poodll-super-player-time" class="poodll-super-player-time"></div>
+    <div id="{{AUTOID}}_poodll-super-player-image" class="poodll-super-player-image"></div>
+    <div id="{{AUTOID}}_poodll-super-player-waveform" class="poodll-super-player-waveform"></div>
+    <div id="{{AUTOID}}_poodll-super-player-captions" class="poodll-super-player-captions"></div>
+
+    <div class="poodll-super-player-controls">
+      
+        <div tabindex="0" id="{{AUTOID}}_poodll-super-player-step-backward" class="poodll-super-player-ctrl">
+            <i class="fa fa-step-backward"></i>
+        </div>
+
+        <div tabindex="0" id="{{AUTOID}}_poodll-super-player-backward" class="poodll-super-player-ctrl">
+            <i class="fa fa-backward"></i>
+        </div>
+
+        <div tabindex="0" id="{{AUTOID}}_poodll-super-player-play" class="poodll-super-player-play poodll-super-player-ctrl">
+            <div id="{{AUTOID}}_play-pause"><i class="fa fa-play"></i></div>
+            <div id="{{AUTOID}}_poodll-super-player-playback-rate" class="poodll-super-player-playback-rate">x1</div>
+        </div>
+
+        <div tabindex="0" id="{{AUTOID}}_poodll-super-player-forward" class="poodll-super-player-forward poodll-super-player-ctrl">
+            <i class="fa fa-forward"></i>
+        </div>
+
+        <div tabindex="0" id="{{AUTOID}}_poodll-super-player-step-forward" class="poodll-super-player-step-forward poodll-super-player-ctrl">
+            <i class="fa fa-step-forward"></i>
+        </div>
+
+    </div>
+
+    <div class="poodll-super-player-speed-controls">
+        <div tabindex="0" id="{{AUTOID}}_poodll-super-player-speed-down" class="poodll-super-player-speed-down poodll-super-player-ctrl-small">
+            <i class="fa fa-angle-double-left"></i>
+        </div>
+        <div tabindex="0" id="{{AUTOID}}_poodll-super-player-speed-up" class="poodll-super-player-speed-up poodll-super-player-ctrl-small">
+            <i class="fa fa-angle-double-right"></i>
+        </div>
+    </div>
+
+</div>
+
+<!-- Custom JS from template  goes goes here  -->
+{{#js}}
+
+ require(['jquery', 'filter_poodll/soundtouch', 'filter_poodll/wavesurfer', 'filter_poodll/mediaparser'], function($, soundtouch, WaveSurfer, parser) {
+
+      var app = {
+
+        captions: {},
+        strToSecs: function(str) {
+          var elements = str.split(/[:.]/);
+          var hours = parseInt(elements[0]);
+          var mins = parseInt(elements[1]);
+          var secs = parseInt(elements[2]);
+          var ms = parseInt(elements[3]);
+          return (60 * 60 * hours) + (60 * mins) + secs + (ms / 1000);
+        },
+        loadVTT: function(vtturl, callback) {
+          //create dummy player
+          var player = document.createElement("audio");
+          player.crossOrigin = 'anonymous';
+
+          //create subtitle track
+          var track = document.createElement("track");
+          track.kind = "captions";
+          track.label = "English";
+          track.srclang = "en";
+          track.src = vtturl;
+
+          //set to player, it will load
+          player.appendChild(track);
+          var texttrack = player.textTracks[0];
+          texttrack.mode = "showing";
+          //set event to fire when loads and return cues in callback
+          track.addEventListener("load", function() {
+            callback(texttrack.cues);
+          });
+        },
+        fancyTimeFormat: function(time) {
+          // Hours, minutes and seconds
+          var hrs = ~~(time / 3600);
+          var mins = ~~((time % 3600) / 60);
+          var secs = ~~time % 60;
+
+          // Output like "1:01" or "4:03:59" or "123:03:59"
+          var ret = "";
+          ret += "" + hrs + ":" + (mins < 10 ? "0" : "");
+          ret += "" + mins + ":" + (secs < 10 ? "0" : "");
+          ret += "" + secs;
+          return ret;
+        },
+        getCaption: function() {
+          var duration = app.wavesurfer.getDuration().toFixed(2);
+          var currentTime = app.wavesurfer.getCurrentTime().toFixed(2);
+          var matches = Object.values(app.captions).filter(function(e) {
+            return currentTime > e.startTime && currentTime < e.endTime
+          });
+          if (matches.length) {
+            $("#{{AUTOID}}_poodll-super-player-captions").text(matches[0].text);
+          } else {
+            $("#{{AUTOID}}_poodll-super-player-captions").text("");
+          }
+          $("#{{AUTOID}}_poodll-super-player-time").text(app.fancyTimeFormat(currentTime) + "/" + app.fancyTimeFormat(duration));
+        },
+        initSoundTouch: function() {
+
+          app.st = new soundtouch.SoundTouch(
+            app.wavesurfer.backend.ac.sampleRate
+          );
+
+          var buffer = app.wavesurfer.backend.buffer;
+          var channels = buffer.numberOfChannels;
+          var l = buffer.getChannelData(0);
+          var r = channels > 1 ? buffer.getChannelData(1) : l;
+          app.length = buffer.length;
+          app.seekingPos = null;
+          var seekingDiff = 0;
+
+          app.source = {
+            extract: function(target, numFrames, position) {
+              if (app.seekingPos != null) {
+                seekingDiff = app.seekingPos - position;
+                app.seekingPos = null;
+              }
+
+              position += seekingDiff;
+
+              for (var i = 0; i < numFrames; i++) {
+                target[i * 2] = l[i + position];
+                target[i * 2 + 1] = r[i + position];
+              }
+
+              return Math.min(numFrames, app.length - position);
+            }
+          };
+
+        },
+        init: function(options) {
+
+          app.options = options;
+
+          if (app.options.hasImage) {
+            $("#{{AUTOID}}_poodll-super-player-image").css("background-image", "url(" + app.options.image + ")");
+          } else {
+            $("#{{AUTOID}}_poodll-super-player-image").hide();
+          }
+
+          app.wavesurfer = WaveSurfer.create({
+            container: '#{{AUTOID}}_poodll-super-player-waveform',
+            height: 75,
+            cursorColor: 'red',
+            barHeight: 4,
+            barWidth: 4,
+            fillParent: true,
+            responsive: true
+          });
+
+          app.wavesurfer.load(app.options.audio);
+
+          if (app.options.hasVtt) {
+            app.loadVTT(app.options.vtt, function(captions) {
+              app.captions = captions;
+            });
+          } else {
+            $("#{{AUTOID}}_poodll-super-player-captions").hide();
+          }
+
+          app.wavesurfer.on("play", function() {
+            app.seekingPos = ~~(app.wavesurfer.backend.getPlayedPercents() * app.length);
+            app.st.tempo = app.wavesurfer.getPlaybackRate();
+
+            if (app.st.tempo === 1) {
+              app.wavesurfer.backend.disconnectFilters();
+            } else {
+              if (!app.soundtouchNode) {
+                var filter = new soundtouch.SimpleFilter(app.source, app.st);
+                app.soundtouchNode = soundtouch.getWebAudioNode(
+                  app.wavesurfer.backend.ac,
+                  filter
+                );
+              }
+              app.wavesurfer.backend.setFilter(app.soundtouchNode);
+            }
+          });
+
+          app.wavesurfer.on("ready", function() {
+            $("#{{AUTOID}}_poodll-super-player-waveform").css("background-image", "none");
+            app.getCaption();
+            app.initSoundTouch();
+          })
+
+          app.wavesurfer.on("pause", function() {
+            app.soundtouchNode && app.soundtouchNode.disconnect();
+          });
+
+          app.wavesurfer.on("finish", function() {
+            $("#{{AUTOID}}_play-pause").html("<i class='fa fa-play'></i>");
+          });
+
+          app.wavesurfer.on("audioprocess", function() {
+            app.getCaption();
+          });
+
+          app.wavesurfer.on("seek", function() {
+            app.seekingPos = ~~(app.wavesurfer.backend.getPlayedPercents() * app.length);
+            app.getCaption();
+          });
+
+          $("#{{AUTOID}}_poodll-super-player-step-backward").on("click keydown", function(e) {
+            if ([32, 13].includes(e.keyCode) || e.keyCode == undefined) {
+              e.preventDefault()
+              app.wavesurfer.seekTo(0);
+              app.getCaption();
+            }
+          })
+
+          $("#{{AUTOID}}_poodll-super-player-backward").on("click keydown", function(e) {
+            if ([32, 13].includes(e.keyCode) || e.keyCode == undefined) {
+              e.preventDefault()
+              app.wavesurfer.skipBackward();
+              app.getCaption();
+            }
+          })
+
+          $("#{{AUTOID}}_poodll-super-player-play").on("click keydown", function(e) {
+            if ([32, 13].includes(e.keyCode) || e.keyCode == undefined) {
+              e.preventDefault()
+              if (!app.wavesurfer.isPlaying()) {
+                app.wavesurfer.play();
+                $("#{{AUTOID}}_play-pause").html("<i class='fa fa-pause'></i>");
+              } else {
+                app.wavesurfer.pause();
+                $("#{{AUTOID}}_play-pause").html("<i class='fa fa-play'></i>");
+              }
+            }
+          })
+
+          $("#{{AUTOID}}_poodll-super-player-forward").on("click keydown", function(e) {
+            if ([32, 13].includes(e.keyCode) || e.keyCode == undefined) {
+              e.preventDefault()
+              app.wavesurfer.skipForward();
+              app.getCaption();
+            }
+          });
+
+          $("#{{AUTOID}}_poodll-super-player-step-forward").on("click keydown", function(e) {
+            if ([32, 13].includes(e.keyCode) || e.keyCode == undefined) {
+              e.preventDefault()
+              app.wavesurfer.seekTo(1);
+              app.getCaption();
+            }
+          });
+
+          $("#{{AUTOID}}_poodll-super-player-speed-up").on("click keydown", function(e) {
+            if ([32, 13].includes(e.keyCode) || e.keyCode == undefined) {
+              e.preventDefault()
+              var currentRate = app.wavesurfer.getPlaybackRate();
+              if (currentRate < 2) {
+                app.wavesurfer.setPlaybackRate(currentRate + 0.1);
+                $("#{{AUTOID}}_poodll-super-player-playback-rate").text("x" + app.wavesurfer.getPlaybackRate().toFixed(1));
+              }
+            }
+          });
+
+          $("#{{AUTOID}}_poodll-super-player-speed-down").on("click keydown", function(e) {
+            if ([32, 13].includes(e.keyCode) || e.keyCode == undefined) {
+              e.preventDefault()
+              var currentRate = app.wavesurfer.getPlaybackRate();
+              if (currentRate > 0.6) {
+                app.wavesurfer.setPlaybackRate(currentRate - 0.1);
+                $("#{{AUTOID}}_poodll-super-player-playback-rate").text("x" + app.wavesurfer.getPlaybackRate().toFixed(1));
+              }
+            }
+          });
+
+          var sizes = {
+            "big": 550,
+            "medium": 400,
+            "small": 300
+          }
+
+          $("#{{AUTOID}}_poodll-super-player").css("max-width", sizes[app.options.size] + "px");
+
+        }
+
+      }; // end of app definition
+
+
+     //fetch the media url
+     var mediadetails = parser.parse('{{AUTOID}}_original', 'audio');
+     var options={};
+     options.hasVtt = mediadetails.subtitlesurl ? true : false;
+     options.vtt= mediadetails.subtitlesurl; //"https://s3.amazonaws.com/poodll-audioprocessing-out-us-east-1/CP/365/jjustin/misc.poodll.com/21232f297a57a5a743894a0e4a801fc3/poodllfile5ec34af9814891.mp3.vtt",
+     options.audio= mediadetails.mediaurl;//"https://s3.amazonaws.com/poodll-audioprocessing-out-us-east-1/CP/365/jjustin/misc.poodll.com/21232f297a57a5a743894a0e4a801fc3/poodllfile5ec34af9814891.mp3",
+     options.captions= [];
+     options.waveform= true;
+     options.hasImage= mediadetails.imgurl ? true : false;
+     options.image = mediadetails.imgurl;
+     options.size = '{{size}}';
+     app.init(options);
+
+
+ }); //end of script
+
+
+
+{{/js}}

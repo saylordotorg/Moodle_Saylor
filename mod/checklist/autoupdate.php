@@ -14,6 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Automatically update checklist
+ * @copyright Davo Smith <moodle@davosmith.co.uk>
+ * @package mod_checklist
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 use mod_checklist\local\checklist_check;
 
 defined('MOODLE_INTERNAL') || die();
@@ -21,11 +28,15 @@ global $CFG;
 require_once($CFG->dirroot.'/mod/checklist/lib.php');
 
 /**
- * Remove the '//' at the start of the next line to output lots of
- * helpful information during automatic updates.
+ * Automatically update checklist
+ * @param int $userid
+ * @param array $itemchecks
+ * @param bool $newstate
+ * @return int
+ * @throws coding_exception
+ * @throws dml_exception
+ * @throws moodle_exception
  */
-// define("DEBUG_CHECKLIST_AUTOUPDATE", 1);
-
 function checklist_completion_update_checks($userid, $itemchecks, $newstate) {
     global $DB;
 
@@ -71,11 +82,11 @@ function checklist_completion_update_checks($userid, $itemchecks, $newstate) {
 }
 
 /**
+ * Internal function to update checkmarks associated with an activity
  * @param int $courseid
  * @param string $module
  * @param int $cmid
  * @param int $userid
- * @param object[] $checklists
  * @return int
  */
 function checklist_autoupdate_internal($courseid, $module, $cmid, $userid) {
@@ -120,6 +131,16 @@ function checklist_autoupdate_internal($courseid, $module, $cmid, $userid) {
     return 0;
 }
 
+/**
+ * Automatically update a checklist checkmarks
+ * @param int $cmid
+ * @param int $userid
+ * @param bool $newstate
+ * @return int
+ * @throws coding_exception
+ * @throws dml_exception
+ * @throws moodle_exception
+ */
 function checklist_completion_autoupdate($cmid, $userid, $newstate) {
     global $DB, $USER;
 
@@ -154,6 +175,14 @@ function checklist_completion_autoupdate($cmid, $userid, $newstate) {
     return $updatecount;
 }
 
+/**
+ * Update automatic checkmarks for the user on the course
+ * @param int $courseid
+ * @param int $userid
+ * @throws coding_exception
+ * @throws dml_exception
+ * @throws moodle_exception
+ */
 function checklist_course_completion_autoupdate($courseid, $userid) {
     global $DB;
 

@@ -1,0 +1,271 @@
+<div class="solo_grading_nav">
+    <a class="btn btn-secondary solo_grading_back_btn" href="#" alt="back"><i class="fa fa-arrow-left"></i></a>
+    <a class="btn btn-secondary solo_grading_forward_btn" href="#" alt="forward"><i class="fa fa-arrow-right"></i></a>
+</div>
+<div class="card-group">
+    {{#studentsToGrade}}
+    <div class="card" data-original-student="{{.}}">
+        <div class="card-header">
+            <div class="input-group mb-3">
+                {{selected}}
+                <div class="input-group-prepend">
+                    <label class="input-group-text" for="inputGroupSelect01">{{# str }} gradesstudent, mod_solo {{/ str }}</label>
+                </div>
+                <select class="custom-select" name="gradesUserSelect" id="gradesUserSelect-{{.}}">
+                    <option>{{# str }} gradeschoose, mod_solo {{/ str }}</option>
+                    {{#submissionCandidates}}
+                        <option value="{{id}}">{{lastname}}, {{firstname}}</option>
+                    {{/submissionCandidates}}
+                </select>
+            </div>
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">{{# str }} gradestranscript, mod_solo {{/ str }}</h5>
+            <div class="mod_solo_overflow_auto">
+                <div class="mod_solo_grading_passagecont mod_solo_summarytranscriptplaceholder mod_solo_overflow_auto min-vh-400" style="height: 400px;">
+                    <span class="chattranscript">Loading...</span>
+                </div>
+            </div>
+        </div>
+        <div class="alert alert-secondary justify-content-center align-middle" role="alert" style="text-align: center;">
+            <div class="mod_solo_nativeaudioplayer_cont">
+                <audio class="chatplayer" controls=""></audio>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    <span class="badge badge-light">Sentences: <span class="chatturns">0</span></span>
+                </div>
+                <div class="col">
+                    <span class="badge badge-light">Words: <span class="chatwords">0</span>(<span class="chatuniquewords">0</span>)</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <span class="badge badge-light">AV Sent: <span class="chatavturns">0</span></span>
+                </div>
+                <div class="col">
+                    <span class="badge badge-light">Grammar: <span class="chatautogrammarscore">0</span>%</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <span class="badge badge-light">Spelling: <span class="chatautospellscore">0</span>%</span>
+                </div>
+                <div class="col">
+                    <span class="badge badge-light">Clarity: <span class="chataiscore">0</span>%</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <span class="badge badge-light">Targ.Words: <span class="chattargetwords">0</span>/<span class="chattotaltargetwords">0</span></span>
+                </div>
+                <div class="col">
+                    <span class="badge badge-light">Big Words: <span class="chatlongwords">0</span></span>
+                </div>
+            </div>
+            <!--
+            <div class="row">
+                <div class="col">
+                    <span class="badge badge-light">Longest Sent: <span class="chatlongestturns">0</span></span>
+                </div>
+            </div>
+            -->
+        </div>
+        <div class="alert alert-secondary justify-content-center align-middle" style="text-align: center;" role="alert">
+            <input type="button" data-action="creategrademodal" disabled="disabled"
+                   data-cm-id="{{cmid}}"
+                   data-student-id="0" data-student-name="" class=" justify-content-center align-middle" name="grade" id="create-modal" value="Grade entry">
+        </div>
+        <div class="card-footer">
+            <small class="text-muted">
+                <strong>Grade</strong>: <span class="chatgrade">0</span><br >
+                <strong>Feedback</strong>: <span class="chatfeedback"></span>
+            </small>
+        </div>
+    </div>
+    {{/studentsToGrade}}
+</div>
+<div class="solo_grading_nav">
+    <a class="btn btn-secondary solo_grading_back_btn" href="#" alt="back"><i class="fa fa-arrow-left"></i></a>
+    <a class="btn btn-secondary solo_grading_forward_btn" href="#" alt="forward"><i class="fa fa-arrow-right"></i></a>
+</div>
+{{^element.frozen}}
+{{#js}}
+    $('[data-action=creategrademodal]').attr('disabled', 'disabled');
+
+    require(['jquery', 'core/modal_factory', 'core/ajax','core/templates', 'mod_solo/gradeform'],
+    function($, ModalFactory, ajax, templates, GradeForm) {
+        var currentpage = {{currentpage}};
+        const pages = JSON.parse('{{{pages}}}');
+        var backbutton=$(".solo_grading_back_btn");
+        var forwardbutton=$(".solo_grading_forward_btn");
+
+        //kick it off by loading the data into the columns
+        reloadAllElements();
+
+        //also init events on columns (we separate this from reloadAllEvents, because it only needs doing once)
+        initElementEvents();
+
+        //set up the nav buttons
+        resetNavButtons();
+
+        //reset nav buttons
+        function resetNavButtons(){
+          if(currentpage==0){
+             backbutton.attr('disabled','disabled');
+          }else{
+             backbutton.removeAttr('disabled');
+          }
+          backbutton.html("<i class='fa fa-arrow-left'></i> (" + currentpage + ")");
+
+          if(currentpage==pages.length-1){
+            forwardbutton.attr('disabled','disabled');
+          }else{
+            forwardbutton.removeAttr('disabled');
+          }
+          forwardbutton.html("<i class='fa fa-arrow-right'></i> (" + (pages.length -1 - currentpage) + ")");
+        }
+
+
+        //on back button, load a new page
+        $(".solo_grading_back_btn").click(function(){
+              if(currentpage>0){
+                 currentpage--;
+                 resetElements();
+                 reloadAllElements();
+              }//end of if current page
+              resetNavButtons();
+              return false;
+        });
+
+        //on forward button, load a new page
+        $(".solo_grading_forward_btn").click(function(){
+            if(currentpage < pages.length -1){
+                currentpage++;
+                resetElements();
+                reloadAllElements();
+            }//end of if current page
+            resetNavButtons();
+            return false;
+        });
+
+        //on change by select dropdown, load the column
+        $("[data-original-student]").change(function () { loadStudentData(this); });
+
+        //set the userids to the columns (prior to reload)
+        function resetElements(){
+            var i=0;
+            var originalStudentId = '';
+            document.querySelectorAll("[data-original-student]").forEach(
+                function(element) {
+                    if(i> pages[currentpage].length-1){
+                        originalStudentId = '';
+                    }else{
+                        originalStudentId = pages[currentpage][i];
+                    }
+                    $(element).attr("data-original-student",originalStudentId);
+                    i++;
+                }
+            );//end of for each
+        }
+
+        //load columns with user attempt ( userids on each column)
+        function initElementEvents(){
+            document.querySelectorAll("[data-original-student]").forEach(
+                function(element) {
+                    GradeForm.init($(element).find('input[type=button]'), {{contextid}}, '{{grademethod}}');
+                }
+            );
+        }
+
+        //load columns with user attempt ( userids on each column)
+        function reloadAllElements(){
+            document.querySelectorAll("[data-original-student]").forEach(
+                function(element) {
+                    var originalStudentId = $(element).attr("data-original-student");
+                    var selectBox = element.querySelector('select[name="gradesUserSelect"]');
+                    selectBox.value = originalStudentId;
+                    loadStudentData(element);
+                }
+            );
+        }
+
+        //load one column of data
+        function loadStudentData(element) {
+            const selectBox = element.querySelector('select[name="gradesUserSelect"]');
+            $(element).find('input[type=button]').attr('disabled', 'disabled');
+            studentId = selectBox.value;
+            if(selectBox.selectedIndex>=0){
+                studentName = selectBox[selectBox.selectedIndex].innerHTML;
+            }else{
+                studentName = "";
+            }
+            $(element).find('.chatplayer').removeAttr('src');
+            $(element).find('.chattranscript').html("No data.");
+            $(element).find('.chatturns').html(0);
+            $(element).find('.chatwords').html(0);
+            $(element).find('.chatlongwords').html(0);
+            $(element).find('.chatuniquewords').html(0);
+            $(element).find('.chatavturns').html(0);
+            $(element).find('.chatlongestturns').html(0);
+            $(element).find('.chattargetwords').html(0);
+            $(element).find('.chattotaltargetwords').html(0);
+            $(element).find('.chatautospellscore').html(0);
+            $(element).find('.chatautogrammarscore').html(0);
+            $(element).find('.chatgrade').html(0);
+            $(element).find('.chatfeedback').html("");
+            $(element).find('.chataiscore').html("");
+            if (studentId) {
+                $(selectBox).closest('[data-original-student]').attr('data-original-student', studentId);
+                $(element).find('input[type=button]').attr("data-student-id",studentId);
+                $(element).find('input[type=button]').attr("data-student-name",studentName);
+
+                var promises = ajax.call([
+                { methodname: 'mod_solo_get_grade_submission', args: {  userid: studentId, cmid: {{cmid}} } },
+                ]);
+
+                promises[0].done(function(response) {
+
+
+                    if(response && response.response[0]) {
+                        $(element).find('input[type=button]').removeAttr("disabled");
+                        $(element).find('.chatplayer').attr('src', response.response[0].filename);
+
+    var a ={};
+    var st = response.response[0].selftranscript;
+    a.selftranscriptparts=st.match( /[^\.!\?]+[\.!\?]+/g );
+    //edge case alert: if no sentence breaker we will get null, so load it up in that case
+    if(a.selftranscriptparts==null){a.selftranscriptparts=[st];}
+    templates.render('mod_solo/summarytranscript',{a: a}).then(
+         function(html,js){
+            $(element).find('.chattranscript').html(html);
+          }
+    );
+
+                      // $(element).find('.chattranscript').html(response.response[0].transcript);
+                        $(element).find('.chatturns').html(response.response[0].turns);
+                        $(element).find('.chatwords').html(response.response[0].words);
+                        $(element).find('.chatuniquewords').html(response.response[0].uniquewords);
+                        $(element).find('.chatlongwords').html(response.response[0].longwords);
+                        $(element).find('.chatavturns').html(response.response[0].avturn);
+                        $(element).find('.chatlongestturns').html(response.response[0].longestturn);
+                        $(element).find('.chattargetwords').html(response.response[0].targetwords);
+                        $(element).find('.chattotaltargetwords').html(response.response[0].totaltargetwords);
+                        $(element).find('.chatautospellscore').html(response.response[0].autospellscore);
+                        $(element).find('.chatautogrammarscore').html(response.response[0].autogrammarscore);
+                        $(element).find('.chatgrade').html(response.response[0].grade);
+                        $(element).find('.chatfeedback').html(response.response[0].feedback);
+                        $(element).find('.chataiscore').html(response.response[0].aiaccuracy);
+                    }
+                }).fail(function(ex) {
+                    // @todo do something with the exception
+                });
+            }
+        }
+    });
+{{/js}}
+{{/element.frozen}}
+

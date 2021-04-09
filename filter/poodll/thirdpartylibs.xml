@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<libraries>
+    <library>
+        <location>3rdparty/flowplayer-6.0.5</location>
+        <name>Flowplayer media player</name>
+        <version>6.0.5</version>
+        <license>GPL</license>
+        <licenseversion>3.0</licenseversion>
+    </library>
+    <library>
+        <location>3rdparty/flowplayer-7.2.7</location>
+        <name>Flowplayer media player</name>
+        <version>6.0.5</version>
+        <license>GPL</license>
+        <licenseversion>3.0</licenseversion>
+    </library>
+</libraries>

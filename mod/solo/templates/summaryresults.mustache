@@ -1,0 +1,38 @@
+
+    <div class='mod_solo_sr_left'>
+        {{#autotranscriptready}}
+        <div class='mod_solo_sr_title'>{{#str}}transcriptevaluation, mod_solo{{/str}}</div>
+        <div class='mod_solo_sr_details'>{{#str}}transcriptevaluationdetails, mod_solo{{/str}}</div>
+        {{/autotranscriptready}}
+        {{^autotranscriptready}}
+            <div class='mod_solo_sr_title'>{{#str}}selftranscript, mod_solo{{/str}}</div>
+        {{/autotranscriptready}}
+        <div class='mod_solo_ct_body'>
+            <div class="mod_solo_ct_audioplayer">{{>mod_solo/audioplayer}}</div>
+            {{{markedpassage}}}
+        </div>
+    </div>
+    <hr>
+    <p class="mod_solo_attemptdetailscontainer">
+        <a class="btn btn-primary mod_solo_attemptdetailsbutton" data-toggle="collapse" href="#attemptdetails" role="button" aria-expanded="false" aria-controls="attemptdetails">
+            {{#str}}moreattemptdetails, mod_solo{{/str}}
+        </a>
+
+    </p>
+    <div class="collapse" id="attemptdetails">
+        <div class='mod_solo_sr_left'>
+            <div class='mod_solo_sr_title'>{{#str}}stats, mod_solo{{/str}}</div>
+            {{>mod_solo/summarystats}}
+        </div>
+        <div class='mod_solo_sr_left'>
+            <div class='mod_solo_sr_title'>{{#str}}spellingeval, mod_solo{{/str}}</div>
+            {{>mod_solo/summaryspellingeval}}
+        </div>
+        <div class='mod_solo_sr_left'>
+            <div class='mod_solo_sr_title'>{{#str}}grammareval, mod_solo{{/str}}</div>
+            {{>mod_solo/summarygrammareval}}
+        </div>
+    </div>
+
+
+

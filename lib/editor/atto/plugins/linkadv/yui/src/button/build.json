@@ -1,0 +1,10 @@
+{
+  "name": "moodle-atto_linkadv-button",
+  "builds": {
+    "moodle-atto_linkadv-button": {
+      "jsfiles": [
+        "button.js"
+      ]
+    }
+  }
+}

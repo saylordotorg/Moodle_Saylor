@@ -1,0 +1,25 @@
+<div class="mod_solo_summarychoices">
+    <div class="summarybox summarytopic">
+        <div class="summaryboxtitle">{{#str}}topic , mod_solo{{/str}}</div>
+        <div class="summaryboxcontent">
+        {{speakingtopic}}
+        </div>
+
+   </div>
+    <div class="summarybox summarytargetwords">
+        <div class="summaryboxtitle">{{#str}}targetwords , mod_solo{{/str}}</div>
+        <div class="summaryboxcontent targetwords">
+        {{#targetwords}}
+           {{.}}<br/>
+        {{/targetwords}}
+        </div>
+
+    </div>
+    <div class="summarybox summaryconvlength">
+        <div class="summaryboxtitle">{{#str}}convlength , mod_solo{{/str}}</div>
+        <div class="summaryboxcontent">
+            {{#str}}xminutes , mod_solo, {{convlength}}{{/str}}
+        </div>
+
+    </div>
+</div>
