@@ -1,0 +1,23 @@
+<div class='a4e-basic_feedback'>
+  <h2>
+    <i class='fa fa-trophy'></i> {{totalcorrect}}/{{total}} {{#str}}correct, mod_wordcards{{/str}}
+    <hr/>
+    <i class='fa fa-clock-o'></i> {{prettytime}}
+  </h2>
+</div>
+
+{{> mod_wordcards/feedback_details}}
+
+<hr/>
+
+<div id="try-again-or-next">
+
+  <button style="width:50%;float:left;" id="wordcards-try-again" class="btn btn-danger btn-lg">
+    <i class="fa fa-refresh"></i> {{#str}}try_again, mod_wordcards{{/str}}
+  </button>
+
+  <button style="width:50%;float:left;" id='wordcards-close-results' class='btn btn-primary btn-lg'>
+    {{#str}}done, mod_wordcards{{/str}} <i class='fa fa-arrow-right'></i>
+  </button>
+
+</div>

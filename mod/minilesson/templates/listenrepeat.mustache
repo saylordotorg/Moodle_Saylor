@@ -1,0 +1,45 @@
+<div id="{{uniqueid}}_container" class="landr_container" style="display: none">
+{{> mod_minilesson/quiz_progress}}
+  {{> mod_minilesson/questionheader}}
+  <div class="minilesson_landr_player_box">
+    <div style="display:none;" class="landr_results">{{#str}}dc_results, mod_minilesson{{/str}}</div>
+
+    <div class="landr_title text-center">{{#str}}listenandrepeat, mod_minilesson{{/str}}</div>
+
+    <div class="landr_mainmenu">
+      <div class="landr_loaded" style="display:none;">
+        <p>{{#str}}lr_instructions1, mod_minilesson{{/str}}</p>
+        <p>{{#str}}lr_instructions2, mod_minilesson{{/str}}</p>
+          <button disabled class='btn btn-block btn-primary landr_start_btn'>
+              <i class='fa fa-play'></i> {{#str}}start, mod_minilesson{{/str}}
+          </button>
+      </div>
+      <div class="landr_not_loaded">
+        <p>{{#str}}loading, mod_minilesson{{/str}}</p>
+      </div>
+    </div>
+
+    <div style="display:none;" class="landr_game"></div>
+
+    <div style="display:none;" class="landr_controls">
+
+      <button class="btn btn-secondary landr_ctrl-btn landr_listen_btn">
+        <i class="fa fa-volume-up"></i> {{#str}}listen, mod_minilesson{{/str}}
+      </button>
+
+      <button class="btn btn-danger landr_ctrl-btn landr_skip_btn">
+        {{#str}}skip, mod_minilesson{{/str}} <i class="fa fa-arrow-right"></i>
+      </button>
+
+    </div>
+
+    <div class="landr_speakbtncontainer">
+
+        {{> mod_minilesson/cloudpushrecorder}}
+        {{> mod_minilesson/ttrecorder}}
+
+    </div>
+
+  </div>
+  {{> mod_minilesson/nextbutton}}
+</div>

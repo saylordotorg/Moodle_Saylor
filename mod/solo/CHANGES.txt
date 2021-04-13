@@ -1,3 +1,5 @@
+1.0.6 (Build 2021041100)
+- Fixed a bug in the teacher eval section of reports (thanks Hideto)
 
 1.0.5 (Build 2021030600)
 -Improved layout of form and added an optional setup tab

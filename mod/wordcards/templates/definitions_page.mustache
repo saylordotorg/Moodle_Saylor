@@ -1,0 +1,100 @@
+{{! Terms are organised as follows:
+<div class="term-wrapper">
+   <div class="term">
+      <div class="term-header">
+         <div class="term-title"></div>
+         <div class="term-tick"></div>
+      </div>
+      <div class="term-body"></div>
+   </div>
+</div>
+}}
+<div id="definitions-page-{{uniqid}}" class="definitions-container">
+<h3 class="text-center font-weight-bold" style="border-radius:10px;background-color:lightgray;padding:5px;margin-bottom:10px">Check all the words to continue: <span class="wordcards_display_options"><span class="wordcards_display_option event_grid"><i class="fa fa-th"></i></span><span class="wordcards_display_option event_flashcards"><i class="fa fa-clone"></i></span></span></h3>
+<div class="terms clearfix definition_grid">
+   {{#definitions}}
+   <div class="term-wrapper">
+      <div class="term {{#seen}}term-seen{{/seen}}" data-termid="{{id}}">
+         <div class="term-header">
+            <div class="term-title">{{term}} <i style="cursor:pointer;" data-modelaudio="{{audio}}" data-tts="{{term}}" data-ttsvoice="{{ttsvoice}}" class="fa fa-volume-up definition-play-tts"></i></div>
+            <div class="term-tick">
+               <a href="#" class="term-seen-action" title="{{markasseen}}"><img src="{{{notseenurl}}}" alt="{{termnotseen}}" /></a>
+               <div class="term-seen-state"><img src="{{{seenurl}}}" alt="{{termseen}}" /></div>
+               <div class="term-seen-loading"><img src="{{loadingurl}}" alt="{{loading}}"></div>
+            </div>
+            {{#model_sentence}}
+            <div class="term-modelsentence">
+               <span style="cursor:pointer;" data-modelaudio="{{model_sentence_audio}}" data-tts="{{model_sentence}}" data-ttsvoice="{{ttsvoice}}" class="model-sentence-play-tts"> {{model_sentence}}</span>
+            </div>
+            {{/model_sentence}}
+         </div>
+         <div class="term-body">
+            {{definition}} 
+         </div>
+      </div>
+   </div>
+   {{/definitions}}
+</div>
+<div class="terms clearfix definition_flashcards" style="display:none;">
+   <!--start --->
+   <div class="df_fl">
+      <div class="wrapper_pr">
+         <ol class="ProgressBar">
+            {{#definitions}}
+            <li class="ProgressBar-step">
+               <svg class="ProgressBar-icon">
+                  <use xlink:href="#checkmark-bold"/>
+               </svg>
+            </li>
+            {{/definitions}}
+         </ol>
+      </div>
+      <ul class="definition_flashcards_ul">
+         {{#definitions}}
+         <li>
+            <div class="row">
+               {{#image}}
+               <div class="col-md-6">
+                  <img src="{{image}}" class="flash_img" alt=""/>
+               </div>
+               {{/image}}
+               <div class="{{#image}}col-md-6{{/image}} {{^image}}col-md-12{{/image}}">
+                  <div class="term-wrapper {{#image}}add_wraper_handle_im{{/image}} {{^image}}add_wraper_handle{{/image}}">
+                     <div class="term {{#seen}}term-seen{{/seen}}" data-termid="{{id}}">
+                        <div class="term-header">
+                           <div class="term-title">{{term}} <i style="cursor:pointer;" data-modelaudio="{{audio}}" data-tts="{{term}}" data-ttsvoice="{{ttsvoice}}" class="fa fa-volume-up definition-play-tts"></i></div>
+                           <div class="term-tick">
+                              <a href="#" class="term-seen-action" title="{{markasseen}}"><img src="{{{notseenurl}}}" alt="{{termnotseen}}" /></a>
+                              <div class="term-seen-state"><img src="{{{seenurl}}}" alt="{{termseen}}" /></div>
+                              <div class="term-seen-loading"><img src="{{loadingurl}}" alt="{{loading}}"></div>
+                           </div>
+                           {{#model_sentence}}
+                           <div class="term-modelsentence">
+                              <span style="cursor:pointer;" data-modelaudio="{{model_sentence_audio}}" data-tts="{{model_sentence}}" data-ttsvoice="{{ttsvoice}}" class="model-sentence-play-tts"> {{model_sentence}}</span>
+                           </div>
+                           {{/model_sentence}}
+                        </div>
+                        <div class="term-body">
+                           {{definition}} 
+                        </div>
+                     </div>
+                  </div>
+               </div>
+         </li>
+         {{/definitions}}
+      </ul>
+      </div>
+      <div class="df_fl_control">
+         <button id="Prev"  title="Prev"> <i class="text-primary fa fa-angle-double-left" aria-hidden="true"></i> </button>
+         <button id="Next" style="float: right;" title="Next"> <i class="text-primary fa fa-angle-double-right" aria-hidden="true"></i></button>
+      </div>
+      <!--end --->
+   </div>
+   <div class="page-footer">
+      <button data-href="{{{nexturl}}}" data-action="{{nextaction}}" class="definitions-next btn btn-primary btn-lg btn-block">
+      {{nextbuttontext}}  <i class="fa fa-arrow-right"></i>
+      </button>
+      <small>{{noteaboutseenforteachers}}</small>
+      <audio id="poodll_vocabplayer"></audio>
+   </div>
+</div>

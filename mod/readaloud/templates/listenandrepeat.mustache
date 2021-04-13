@@ -1,0 +1,13 @@
+<div id="mod_readaloud_modal_inner">
+  <div style="font-size:24px;" id="mod_readaloud_modal_target_phrase"></div><hr>
+  <div id="mod_readaloud_modal_controls">
+    <button id="mod_readaloud_landr_modalplay" style="position:absolute;left:10px;bottom:20px" class="btn btn-lg btn-secondary"><i class="fa fa-volume-up"></i></button>
+    <button id="mod_readaloud_landr_modalskip" style="position:absolute;right:10px;bottom:20px" class="btn btn-lg btn-secondary"><i class="fa fa-arrow-right"></i></button>
+    <button id="mod_readaloud_landr_modalfinished" style="position:absolute;right:20px;bottom:20px" class="btn btn-lg btn-secondary"><i class="fa fa-check"></i></button>
+    <div style="width:246px;margin:auto;position:absolute;left:0;right:0;bottom:0;">
+        {{> mod_readaloud/cloudpushrecorder}}
+        {{> mod_readaloud/ttrecorder}}
+    </div>
+    <audio id='mod_readaloud_landr_hiddenplayer' class="mod_readaloud_landr_hiddenplayer nomediaplugin nopoodll"></audio>
+  </div>
+</div>

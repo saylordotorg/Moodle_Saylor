@@ -1,0 +1,18 @@
+<div id="mod_minilesson_items_cont" class="mod_minilesson_items_cont" style="display: {{display}};">
+    <table class="generaltable mod_minilesson_qpanel" id="{{tableid}}">
+        <thead>
+        <tr>
+            <th class="header c0 number" style="" scope="col">#</th>
+            <th class="header c1 name" style="" scope="col">{{#str}}itemname, mod_minilesson{{/str}}</th>
+            <th class="header c2 type" style="" scope="col">{{#str}}itemtype, mod_minilesson{{/str}}</th>
+            <th class="header c3 date" style="" scope="col">{{#str}}order, mod_minilesson{{/str}}</th>
+            <th class="header c4 action" style="" scope="col">{{#str}}action, mod_minilesson{{/str}}</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{#items}}
+            {{> mod_minilesson/itemlistitem}}
+        {{/items}}
+        </tbody>
+    </table>
+</div>

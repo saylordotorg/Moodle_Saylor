@@ -14,6 +14,10 @@ define(['jquery',
             audioctx: null, //unused
             msr: null,
             mediaType: null,
+            //Firefox fails to calc properly at 128000, and blobs concatenate at about 1/4 the correct length
+            //its a hack to get us over the broken firefox but 12800 works.
+            audioBitsPerSecond: 12800,
+            videoBitsPerSecond: 2500000,
 
 
             //for making multiple instances
@@ -41,7 +45,9 @@ define(['jquery',
 
 
                 if (this.mediaType === 'audio') {
+                    //this section can probably be removed. I can not see a need for it.
                     if (this.mediaStream.getVideoTracks().length && this.mediaStream.getAudioTracks().length) {
+                        log.debug('Somehow we got a video stream, paring it down to just audio. ');
                         var stream;
                         if (!!navigator.mozGetUserMedia) {
                             stream = new MediaStream();
@@ -75,6 +81,12 @@ define(['jquery',
                             this.mimeType = utils.is_chrome() ? 'audio/webm' : 'audio/ogg';
                         }
                     }
+                    var rec_options = {
+                        //videoBitsPerSecond : this.videoBitsPerSecond,
+                        audioBitsPerSecond: this.audioBitsPerSecond, //Firefox needs this
+                        mimeType: this.mimeType
+                    };
+
                 //else video
                 }else{
                     //if its a mediarecorder and does not support 'isTypeSupported' ..it can only be Safari ..
@@ -89,30 +101,29 @@ define(['jquery',
                                 break;
                             }
                         }
-                        //we make an intelligent choice if required to do so
+                        //we make an "intelligent" choice if required to do so
                         if (this.mimeType === false) {
                             this.mimeType = 'video/webm';
                         }
                     }
+
+                    var rec_options = {
+                        //videoBitsPerSecond : this.videoBitsPerSecond,
+                        //audioBitsPerSecond: this.audioBitsPerSecond,
+                        mimeType: this.mimeType
+                    };
                 }
 
-                // http://dxr.mozilla.org/mozilla-central/source/content/media/MediaRecorder.cpp
-                // https://wiki.mozilla.org/Gecko:MediaRecorder
-                // https://dvcs.w3.org/hg/dap/raw-file/default/media-stream-capture/MediaRecorder.html
 
-                // starting a recording session; which will initiate "Reading Thread"
-                // "Reading Thread" are used to prevent main-thread blocking scenarios
                 try {
-                    this.mediaRecorder = new MediaRecorder(this.mediaStream, {mimeType: this.mimeType });
+                    this.mediaRecorder = new MediaRecorder(this.mediaStream, rec_options);
                 } catch (e) {
-                    // if someone passed NON_supported mimeType
+                    // if a NON_supported rec_option got us here
                     // or if Firefox on Android
                     this.mediaRecorder = new MediaRecorder(this.mediaStream);
                     log.debug('MediaRecorder API seems unable to record mimeType:' + this.mimeType);
                 }
-
-                //set the mimetype to whatever the mediarecorder says it is
-                log.debug("msr_plain using mime type:",this.mimeType);
+                log.debug("msr_plain using mime type:" + this.mimeType);
 
                 // i.e. stop recording when <video> is paused by the user; and auto restart recording
                 // when video is resumed. E.g. yourStream.getVideoTracks()[0].muted = true; // it will auto-stop recording.
@@ -126,8 +137,13 @@ define(['jquery',
                         return;
                     }
 
-                    var blob = new Blob([e.data], {type: that.mimeType});
+                    //var blob = new Blob([e.data], {type: that.mimeType});
+                    var blob = e.data; //in firefox this leaves hints about the codec
                     that.msr.ondataavailable(blob);
+                 //   log.debug('e.data.size:' + e.data);
+                 //   log.debug('abr:' + that.mediaRecorder.audioBitsPerSecond);
+                 //   log.debug('vbr:' + that.mediaRecorder.videoBitsPerSecond);
+
                 };
 
                 this.mediaRecorder.onerror = function (error) {

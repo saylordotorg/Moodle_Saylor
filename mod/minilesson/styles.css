@@ -1,0 +1,1819 @@
+/* debugging */
+
+.mod_minilesson_debug .mod_minilesson_grading_passageword::after,
+.mod_minilesson_debug_transcriptword::after {
+  content: attr(data-wordnumber);
+  border: 1px solid blue;
+  font-size: 10px;
+  border-radius: 5px;
+  padding: 1px;
+}
+
+/* debugging */
+
+span.mod_minilesson_debugsequence {
+  border: 1px solid black;
+  margin: 1px;
+  display: inline-block;
+}
+
+.mod_minilesson_center {
+  text-align: center;
+}
+
+.mod_minilesson_center>div,
+.mod_minilesson_center>table
+/* insert any other block-level elements here */
+
+  {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.mod_minilesson_listbuttons input[type='submit'] {
+  width: 400px;
+}
+
+.mod_minilesson_actionbuttons {
+  display: flex;
+  float: right;
+}
+
+.mod_minilesson_quiz_finished {
+  display: none;
+  text-align: center;
+}
+
+.mod_minilesson_recording_cont {
+  display: block;
+  margin: auto;
+  text-align: center;
+  width: 100%;
+  background-image: url([[pix:mod_minilesson|loader]]);
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+
+.mod_minilesson_recorder_instr_right,
+.mod_minilesson_recorder_instr_left {
+  float: left;
+  width: 240px;
+  height: 100px;
+}
+
+.mod_minilesson_dummyrecorder {
+  float: left;
+}
+
+.mod_minilesson_dummy_recorder_hidden {
+  display: none;
+}
+
+.mod_minilesson_dummy_recorder_recording {
+  display: block;
+  float: left;
+  width: 239px;
+  height: 100px;
+  background-size: 90px 90px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-color: red;
+}
+
+.mod_minilesson_dummy_recorder_stopped {
+  display: block;
+  width: 239px;
+  height: 100px;
+  float: left;
+  background-size: 90px 90px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-color: grey;
+}
+
+.mod_minilesson_getpermissionmode {
+  background-color: red;
+  height: 170px;
+}
+
+.mod_minilesson_start_button_cont,
+.mod_minilesson_record_button_cont,
+.mod_minilesson_stop_button_cont {
+  clear: both;
+  padding: 5px;
+  text-align: center;
+  width: 100%;
+}
+
+.mod_minilesson_stop_button,
+.mod_minilesson_start_button,
+.mod_minilesson_record_button {
+  margin: auto;
+  width: 200px;
+}
+
+.mod_minilesson_voicecanvas {
+  width: 239px;
+  height: 100px;
+  z-index: 8;
+}
+
+.mod_minilesson_passage_cont {
+  display: none;
+  line-height: 2em;
+  font-size: 1.5em;
+  border-style: double;
+  padding: 3px;
+  border-color: gold;
+  margin-top: 15px;
+}
+
+.mod_minilesson_grading_passagecont {
+  line-height: 2em;
+  font-size: 1.5em;
+  border-style: double;
+  padding: 3px;
+  border-color: gold;
+  margin-top: 15px;
+}
+
+div.mod_minilesson_passage_cont.mod_minilesson_postattempt {
+  display: block;
+  /* background-color: #cccccc; */
+  position: relative;
+  font-size: 20px;
+  line-height: 1.8em;
+  border-style: none;
+}
+
+.mod_minilesson_postattempt .mod_minilesson-passage-pic {
+  max-width: 200px;
+  margin: 9px 1em 1em 0;
+  float: left;
+}
+
+.mod_minilesson_postattempt .mod_minilesson-passage-pic img {
+  width: 200px;
+}
+
+.mod_minilesson_mrseed-standing img {
+  width: 100px;
+  height: auto;
+}
+
+.mod_minilesson_mrseed-standing {
+  max-width: 100px;
+}
+
+.mod_minilesson_printtwocol_cont {
+  padding: 15px;
+  border: 2px solid #CCCCCC;
+  border-radius: 5px;
+  width: 1024px;
+}
+
+.mod_minilesson_twocol_cont {
+  padding: 15px;
+  border: 2px solid #CCCCCC;
+  border-radius: 5px;
+  width: 1024px;
+}
+
+.mod_minilesson_twocol_wpm_cont {
+  border: solid 1px;
+  padding-top: 15px;
+  padding-left: 10px;
+  border-radius: 5px;
+  background-color: aliceblue;
+}
+
+.mod_minilesson_twocol_quiz_cont {
+  border: solid 1px;
+  padding-top: 15px;
+  padding-left: 10px;
+  border-radius: 5px;
+  background-color: aliceblue;
+  margin-top: 10px;
+}
+
+.mod_minilesson_twocol_player_cont {
+  color: blue;
+}
+
+.mod_minilesson_twocol_player {
+  width: 100%;
+}
+
+.mod_minilesson_rightcol .btn {
+  width: 100%;
+  margin-top: 20px;
+}
+
+.mod_minilesson_grading_action_cont {
+  border-style: double;
+  padding: 3px;
+  border-color: gold;
+  margin-top: 15px;
+  align-items: center;
+}
+
+.mod_minilesson_passage_cont.mod_minilesson_postattempt .mod_minilesson_grading_badword {
+  color: black;
+  background-color: lightgrey;
+  border-color: blue;
+}
+
+.mod_minilesson_grading_badword {
+  color: red;
+  background-color: #ffcaca;
+  padding: 5px;
+  border-radius: 5px 5px 5px;
+  border: 1px solid red;
+  position: relative;
+}
+
+.mod_minilesson_grading_endspace {
+  color: blue;
+  background-color: #cacaff;
+  padding: 5px;
+  border-radius: 5px 5px 5px;
+  border: 1px solid blue;
+  position: relative;
+}
+
+.mod_minilesson_grading_passagespace {
+  padding: 2px;
+}
+
+div.mod_minilesson_postattempt .mod_minilesson_grading_unreadword {
+  text-decoration: none;
+  background-color: lightgrey;
+  padding-right: 2px;
+}
+
+div.mod_minilesson_postattempt .mod_minilesson_grading_unreadspace {
+  background-color: lightgrey;
+  padding: 0px 2px;
+}
+
+.mod_minilesson_grading_unreadword {
+  font-style: italic;
+  text-decoration: line-through;
+}
+
+.mod_minilesson_passage_finished {
+  background-color: #cccccc;
+  padding: 2px;
+}
+
+.mod_minilesson_feedback_cont {
+  display: none;
+}
+
+.mod_minilesson_wheretonext_cont {
+  display: none;
+}
+
+.mod_minilesson_quiz_cont {
+  display: none;
+  max-width: 750px;
+  margin: auto;
+}
+
+div.mod_minilesson_feedback_cont.mod_minilesson_postattempt {
+  display: block;
+}
+
+.mod_minilesson_evaluated_message {
+  text-align: center;
+  display: block;
+  margin-bottom: 15px;
+}
+
+.mod_minilesson_error_cont {
+  display: none;
+}
+
+.mod_minilesson_error_cont h3 {
+  color: red;
+}
+
+.mod_minilesson_grading_player_cont {
+  color: blue;
+}
+
+.mod_minilesson_hidden_player {
+  display: none;
+}
+
+.mod_minilesson_hidden_player_button {
+  color: white;
+  border-color: cadetblue;
+  background-color: cadetblue;
+  border-style: solid;
+  border: 1px;
+  padding: 3px;
+  text-align: center;
+}
+
+.mod_minilesson_hidden_player_button_active {
+  color: white;
+  border-color: tomato;
+  background-color: tomato;
+}
+
+.mod_minilesson_hidden_player_button_paused {
+  color: white;
+}
+
+.mod_minilesson_hidden_player_button_playing {
+  color: white;
+}
+
+.mod_minilesson_backtotop_cont {
+  width: fit-content;
+  margin-right: auto;
+  margin-left: auto;
+  margin-top: 20px;
+}
+
+.mod_minilesson_grading_accuracy_cont,
+.mod_minilesson_grading_wpm_cont,
+.mod_minilesson_grading_quiz_cont,
+.mod_minilesson_grading_error_cont,
+.mod_minilesson_grading_sessionscore_cont,
+.mod_minilesson_grading_errorrate_cont,
+.mod_minilesson_grading_scrate_cont {
+  color: blue;
+  /* display: flex; */
+  margin-left: 15px;
+}
+
+.mod_minilesson_grading_wpm_img {
+  color: blue;
+}
+
+.mod_minilesson_grading_score {
+  color: blue;
+  line-height: 18px;
+  margin-left: 5px;
+  text-align: center;
+  font-size: 2em;
+  height: 35px;
+  width: 80px;
+}
+
+.mod_minilesson_grading_error_img {
+  color: blue;
+}
+
+.mod_minilesson_grading_action_cont {
+  color: blue;
+  display: flex;
+}
+
+.mod_minilesson_afterattempt_cont,
+.mod_minilesson_wheretonext_cont,
+.mod_minilesson_ungraded_cont {
+  margin-left: auto;
+  margin-right: auto;
+  width: 40%;
+  text-align: center;
+  margin-top: 30px;
+  margin-bottom: 15px;
+}
+
+#mod_minilesson_hider {
+  display: none;
+  position: absolute;
+  top: 0%;
+  left: 0%;
+  width: 1600px;
+  height: 2000px;
+  margin-top: -1000px;
+  /*set to a negative number 1/2 of your height*/
+  margin-left: 0px;
+  /*set to a negative number 1/2 of your width*/
+  /*
+        z- index must be lower than pop up box
+       */
+  z-index: 99;
+  background-color: Black;
+  opacity: 0.6;
+}
+
+#mod_minilesson_progress_cont {
+  display: none;
+  position: absolute;
+  text-align: center;
+  top: 50%;
+  left: 50%;
+  width: 300px;
+  height: 120px;
+  margin-top: -60px;
+  /*set to a negative number 1/2 of your height*/
+  margin-left: -150px;
+  /*set to a negative number 1/2 of your width*/
+  border: 1px solid #ccc;
+  border: 2px solid black;
+  z-index: 100;
+  background-color: white;
+}
+
+/* spotcheckmode */
+
+.mod_minilesson_spotcheckmode .mod_minilesson_grading_passageword.mod_minilesson_grading_badword {
+  border-color: green;
+  background-color: #d7f9ca;
+}
+
+.mod_minilesson_spotcheckmode .mod_minilesson_grading_passagespace.mod_minilesson_aiunmatched {
+  background-color: lightgrey;
+}
+
+/* msvmode */
+
+.mod_minilesson_msvmode .mod_minilesson_grading_passageword.mod_minilesson_grading_badword {
+  border-color: red;
+  background-color: #ffcaca;
+  -webkit-print-color-adjust: exact;
+  /* Print background colour */
+}
+
+.mod_minilesson_msvmode .mod_minilesson_grading_passageword.mod_minilesson_grading_selfcorrectedword {
+  color: green;
+  background-color: #d7f9ca;
+  padding: 5px;
+  border-radius: 5px 5px 5px;
+  border: 1px solid green;
+  position: relative;
+}
+
+.mod_minilesson_msvmode .mod_minilesson_grading_passageword.mod_minilesson_grading_maybeselfcorrectedword {
+  text-decoration: underline;
+}
+
+.mod_minilesson_spotcheckmode .mod_minilesson_grading_passagespace.mod_minilesson_aiunmatched {
+  background-color: lightgrey;
+  -webkit-print-color-adjust: exact;
+  /* Print background colour */
+}
+
+.mod_minilesson_grading_passageword.mod_minilesson_aiunmatched {
+  background-color: lightgrey;
+  -webkit-print-color-adjust: exact;
+  /* Print background colour */
+}
+
+.mod_minilesson_grading_passagespace.mod_minilesson_aiunmatched {
+  background-color: lightgrey;
+}
+
+.mod_minilesson_grading_passageactions {
+  margin-top: 10px;
+}
+
+.mod_minilesson_grading_passageactions>button {
+  margin: 5px;
+}
+
+.btn.mod_minilesson_quickgrade_ok {
+  background-color: DodgerBlue;
+  /* Blue background */
+  border: none;
+  /* Remove borders */
+  color: white;
+  /* White text */
+  padding: 10px 14px;
+  /* Some padding */
+  font-size: 14px;
+  /* Set a font size */
+  cursor: pointer;
+  /* Mouse pointer on hover */
+  margin: 2px;
+  background-image: none;
+}
+
+/* Darker background on mouse-over */
+
+.btn.mod_minilesson_quickgrade_ok:hover {
+  background-color: RoyalBlue;
+}
+
+.btn.mod_minilesson_quickgrade_ng {
+  background-color: darkgrey;
+  /* Blue background */
+  border: none;
+  /* Remove borders */
+  color: white;
+  /* White text */
+  padding: 10px 14px;
+  /* Some padding */
+  font-size: 14px;
+  /* Set a font size */
+  cursor: pointer;
+  /* Mouse pointer on hover */
+  margin: 2px;
+  background-image: none;
+}
+
+/* Darker background on mouse-over */
+
+.btn.mod_minilesson_quickgrade_ng:hover {
+  background-color: grey;
+}
+
+/**
+ * App
+ */
+
+.mod_minilesson-app-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #fff;
+}
+
+.mod_minilesson-app {
+  box-sizing: border-box;
+  min-width: 1024px;
+  max-width: 1024px;
+  min-height: 768px;
+  max-height: 768px;
+  background: white;
+  padding: 1em;
+  border: #efefef 3px solid;
+  border-radius: 10px;
+  font-size: 18px;
+  display: flex;
+  position: relative;
+}
+
+.mod_minilesson-flex {
+  display: flex;
+}
+
+.mod_minilesson-flex-1 {
+  flex: 1;
+}
+
+.mod_minilesson-flex-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.mod_minilesson-flex-equal>* {
+  flex: 1;
+}
+
+.mod_minilesson-flex-center {
+  justify-content: center;
+}
+
+.mod_minilesson-flex-items-center {
+  align-items: center;
+}
+
+.mod_minilesson-app .mod_minilesson-passage {
+  line-height: 1.8em;
+  font-size: 20px;
+}
+
+.mod_minilesson-app .mod_minilesson-passage.blurred {
+  color: transparent;
+  text-shadow: 0 0 7px rgba(0, 0, 0, 0.5);
+}
+
+.mod_minilesson-app .mod_minilesson-passage-pic {
+  max-width: 200px;
+  margin: 9px 1em 1em 0;
+  float: left;
+}
+
+.mod_minilesson-app .mod_minilesson-passage-pic img {
+  max-width: 100%;
+}
+
+.mod_minilesson-app .mod_minilesson-passage.blurred img {
+  filter: blur(5px);
+}
+
+.mod_minilesson-texttospeech {
+  position: relative;
+  display: flex;
+}
+
+.mod_minilesson-texttospeech>div {
+  display: inline-block;
+}
+
+.mod_minilesson-texttospeech a {
+  margin: 0 0 0 0.5em;
+  align-self: flex-start;
+}
+
+.mod_minilesson-texttospeech a:focus,
+.mod_minilesson-texttospeech a:hover {
+  text-decoration: none;
+}
+
+.mod_minilesson-scrollview-wrapper,
+.mod_minilesson-scrollview {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.mod_minilesson-scrollview {
+  overflow: hidden;
+  padding-top: 50px;
+}
+
+.mod_minilesson-scrollview-before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50px;
+  min-height: 50px;
+  background: linear-gradient(white, transparent 80%);
+  margin-top: -1px;
+}
+
+.mod_minilesson-scrollview-actions {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding-top: 50px;
+  display: flex;
+  justify-content: center;
+  background: linear-gradient(transparent, white 80%);
+  margin-bottom: -1px;
+}
+
+.mod_minilesson-question-feedback {
+  text-align: center;
+}
+
+.mod_minilesson-quiz-tracker {
+  margin-bottom: 1em;
+}
+
+.mod_minilesson-quiz-tracker-el {
+  font-size: 14px;
+  padding: 0 4px;
+  margin-right: 3px;
+  display: inline-block;
+  border: 3px solid #ccc;
+}
+
+.mod_minilesson-quiz-tracker-el.is-current {
+  border-color: #000;
+}
+
+.mod_minilesson-quiz-tracker-el.is-answered {
+  border-color: hsl(348, 100%, 61%);
+}
+
+.mod_minilesson-quiz-tracker-el.is-answered.is-correct {
+  border-color: hsl(141, 71%, 48%);
+}
+
+.mod_minilesson-question-title {
+  line-height: 1.8em;
+  border-left: 3px solid #ccc;
+  padding-left: 20px;
+}
+
+.mod_minilesson-answers {
+  margin: 1em;
+}
+
+.mod_minilesson-answer {
+  color: #333;
+  display: flex;
+  margin: 5px;
+  border-radius: 5px;
+  background-color: #eee;
+  padding: 13px 23px;
+  width: 100%;
+  position: relative;
+  box-sizing: border-box;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+}
+
+.mod_minilesson-answer:hover,
+.mod_minilesson-answer:focus {
+  color: inherit;
+  text-decoration: none;
+}
+
+.mod_minilesson-answer.is-selected.is-incorrect {
+  color: white;
+  background: hsl(348, 100%, 61%);
+  border-color: hsl(348, 100%, 61%);
+  padding-right: 42px;
+}
+
+.mod_minilesson-answer.is-correct {
+  color: white;
+  background: hsl(141, 71%, 48%);
+  border-color: hsl(141, 71%, 48%);
+  padding-right: 42px;
+}
+
+.mod_minilesson-answer::after {
+  content: ' ';
+  position: absolute;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  display: inline-block;
+  background-repeat: no-repeat;
+}
+
+.mod_minilesson-answer.is-correct::after {
+  background-image: url([[pix:mod_minilesson|correct]]);
+}
+
+.mod_minilesson-answer.is-selected.is-incorrect::after {
+  background-image: url([[pix:mod_minilesson|incorrect]]);
+}
+
+.mod_minilesson-btn,
+.mod_minilesson-btn:hover,
+.mod_minilesson-btn:focus,
+.mod_minilesson-btn:visited,
+.mod_minilesson-btn:active {
+  border-radius: 5px;
+  background: hsl(204, 86%, 53%);
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 12px 20px;
+  text-decoration: none;
+}
+
+.mod_minilesson-btn.inactive,
+.mod_minilesson-btn:hover.inactive,
+.mod_minilesson-btn:focus.inactive,
+.mod_minilesson-btn:visited.inactive,
+.mod_minilesson-btn:active.inactive {
+  background: hsl(0, 0%, 96%);
+  color: hsl(0, 0%, 21%);
+}
+
+.mod_minilesson-btn-recorder-like {
+  border: 2px solid #000;
+  border-radius: 5px;
+  background: #cbf2dc;
+  color: #444;
+  font-size: xx-large;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 210px;
+  height: 80px;
+}
+
+/**
+ * Source: https://leaverou.github.io/bubbly/
+ */
+
+.mod_minilesson-speech-bubble {
+  position: relative;
+  background: #f7f7f7;
+  border-radius: 0.4em;
+}
+
+.mod_minilesson-speech-bubble:after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 10%;
+  width: 0;
+  height: 0;
+  border: 10px solid transparent;
+  border-top-color: #f7f7f7;
+  border-bottom: 0;
+  border-left: 0;
+  margin-left: -5px;
+  margin-bottom: -10px;
+}
+
+.mod_minilesson-speech-bubble-content {
+  text-align: center;
+  font-size: 25px;
+  padding: 25px;
+  min-height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  line-height: 35px;
+}
+
+.mod_minilesson-speech-bubble.size-medium .mod_minilesson-speech-bubble-content {
+  font-size: 20px;
+  padding: 10px;
+  min-height: auto;
+  line-height: 25px;
+}
+
+.mod_minilesson-speech-bubble.size-large .mod_minilesson-speech-bubble-content {
+  font-size: 32px;
+  font-weight: bold;
+  padding: 10px;
+  min-height: auto;
+  line-height: 25px;
+}
+
+.mod_minilesson-bloom {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.mod_minilesson-bloom img {
+  position: absolute;
+  /* The delay is set according to the blooming animation */
+  animation: minilesson-bloom;
+  animation-duration: 1200ms;
+}
+
+.mod_minilesson-mr-seed-wrapper {
+  position: relative;
+}
+
+.mod_minilesson-mr-seed-wrapper .mod_minilesson-speech-bubble {
+  position: absolute;
+  right: 0;
+  width: 50%;
+}
+
+@keyframes minilesson-bloom {
+  0% {
+    opacity: 0;
+  }
+  70% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/*! * * * * * * * * * * * * * * * * * * * *\  
+  CSShake :: shake-rotate
+  v1.5.0
+  CSS classes to move your DOM
+  (c) 2015 @elrumordelaluz
+  http://elrumordelaluz.github.io/csshake/
+  Licensed under MIT
+\* * * * * * * * * * * * * * * * * * * * */
+
+@keyframes shake-rotate {
+  2% {
+    transform: translate(0, 0) rotate(-4.5deg);
+  }
+  4% {
+    transform: translate(0, 0) rotate(-1.5deg);
+  }
+  6% {
+    transform: translate(0, 0) rotate(-6.5deg);
+  }
+  8% {
+    transform: translate(0, 0) rotate(2.5deg);
+  }
+  10% {
+    transform: translate(0, 0) rotate(6.5deg);
+  }
+  12% {
+    transform: translate(0, 0) rotate(-3.5deg);
+  }
+  14% {
+    transform: translate(0, 0) rotate(7.5deg);
+  }
+  16% {
+    transform: translate(0, 0) rotate(2.5deg);
+  }
+  18% {
+    transform: translate(0, 0) rotate(7.5deg);
+  }
+  20% {
+    transform: translate(0, 0) rotate(3.5deg);
+  }
+  22% {
+    transform: translate(0, 0) rotate(1.5deg);
+  }
+  24% {
+    transform: translate(0, 0) rotate(1.5deg);
+  }
+  26% {
+    transform: translate(0, 0) rotate(0.5deg);
+  }
+  28% {
+    transform: translate(0, 0) rotate(6.5deg);
+  }
+  30% {
+    transform: translate(0, 0) rotate(-1.5deg);
+  }
+  32% {
+    transform: translate(0, 0) rotate(-1.5deg);
+  }
+  34% {
+    transform: translate(0, 0) rotate(2.5deg);
+  }
+  36% {
+    transform: translate(0, 0) rotate(-2.5deg);
+  }
+  38% {
+    transform: translate(0, 0) rotate(1.5deg);
+  }
+  40% {
+    transform: translate(0, 0) rotate(7.5deg);
+  }
+  42% {
+    transform: translate(0, 0) rotate(-2.5deg);
+  }
+  44% {
+    transform: translate(0, 0) rotate(-0.5deg);
+  }
+  46% {
+    transform: translate(0, 0) rotate(-6.5deg);
+  }
+  48% {
+    transform: translate(0, 0) rotate(0.5deg);
+  }
+  50% {
+    transform: translate(0, 0) rotate(1.5deg);
+  }
+  52% {
+    transform: translate(0, 0) rotate(1.5deg);
+  }
+  54% {
+    transform: translate(0, 0) rotate(4.5deg);
+  }
+  56% {
+    transform: translate(0, 0) rotate(-4.5deg);
+  }
+  58% {
+    transform: translate(0, 0) rotate(5.5deg);
+  }
+  60% {
+    transform: translate(0, 0) rotate(-3.5deg);
+  }
+  62% {
+    transform: translate(0, 0) rotate(-0.5deg);
+  }
+  64% {
+    transform: translate(0, 0) rotate(7.5deg);
+  }
+  66% {
+    transform: translate(0, 0) rotate(6.5deg);
+  }
+  68% {
+    transform: translate(0, 0) rotate(-6.5deg);
+  }
+  70% {
+    transform: translate(0, 0) rotate(-4.5deg);
+  }
+  72% {
+    transform: translate(0, 0) rotate(3.5deg);
+  }
+  74% {
+    transform: translate(0, 0) rotate(-2.5deg);
+  }
+  76% {
+    transform: translate(0, 0) rotate(-4.5deg);
+  }
+  78% {
+    transform: translate(0, 0) rotate(1.5deg);
+  }
+  80% {
+    transform: translate(0, 0) rotate(1.5deg);
+  }
+  82% {
+    transform: translate(0, 0) rotate(-2.5deg);
+  }
+  84% {
+    transform: translate(0, 0) rotate(-3.5deg);
+  }
+  86% {
+    transform: translate(0, 0) rotate(-6.5deg);
+  }
+  88% {
+    transform: translate(0, 0) rotate(-0.5deg);
+  }
+  90% {
+    transform: translate(0, 0) rotate(5.5deg);
+  }
+  92% {
+    transform: translate(0, 0) rotate(4.5deg);
+  }
+  94% {
+    transform: translate(0, 0) rotate(-1.5deg);
+  }
+  96% {
+    transform: translate(0, 0) rotate(1.5deg);
+  }
+  98% {
+    transform: translate(0, 0) rotate(-3.5deg);
+  }
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0);
+  }
+}
+
+.mod_minilesson-shake {
+  animation-name: shake-rotate;
+  animation-duration: 100ms;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: 2;
+}
+
+.mod_minilesson_grading_passageactions {
+  margin-top: 10px;
+  display: flex;
+}
+
+.minilesson_speechcards_container {
+  border: 1px solid darkgray;
+  margin-bottom: 5px;
+  padding: 10px;
+}
+
+.minilesson_speechcards_pushrecorder {
+  text-align: center;
+  background-image: url([[pix:mod_minilesson|spinner]]);
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.glide__wrapper {
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.glide__slide {
+  height: 150px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.glide {
+  height: 150px !important;
+}
+
+.minilesson-poodllspeechcards_box {
+  text-align: center;
+  width: 60%;
+  /*225px;*/
+  font-size: 25px;
+  margin: auto;
+  border: 1px solid darkgray;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100px;
+  background-color: #f5f5f5;
+  box-shadow: 0px 0px 20px 5px rgba(0, 0, 0, 0.75);
+}
+
+.minilesson-speechcards_toprow {
+  margin: 15px auto;
+  display: flex;
+  justify-content: center;
+}
+
+.minilesson-speechcards_whatheard {
+  width: 400px;
+  border: dotted 1px;
+  border-color: green;
+  text-align: center;
+  margin: 1px;
+}
+
+.minilesson-speechcards_gotit {
+  color: white;
+  background-color: green;
+}
+
+/* PROGRESS DOTS */
+
+.minilesson_progress_dots {
+  font-size: 40px;
+  text-align: center;
+  letter-spacing: 10px;
+  border: 1px solid darkgray;
+  margin-bottom: 5px;
+}
+
+.minilesson_star_rating {
+  letter-spacing: 20px;
+  text-align: center;
+  font-size: 30px;
+}
+
+.minilesson_nextbutton {
+  float: right;
+}
+
+.minilesson_questionheader {
+  padding: 10px;
+  text-align: center;
+  margin-bottom: 5px;
+  background-color: #f5f5f5;
+  border-radius: 5px;
+}
+
+.dictationtrigger {
+  cursor: pointer;
+  margin: auto;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 40px;
+  height: 40px;
+}
+
+.dictationrow {
+  margin: 5px;
+  padding: 0;
+  border: 2px solid darkgray;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.dictate-feedback {
+  position: absolute;
+  margin: auto;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  width: 30px;
+  height: 30px;
+  font-size: 30px !important;
+}
+
+/* DICTATION CHAT */
+
+.minilesson_dictate_player_box {
+  border: 1px solid darkgray;
+  position: relative;
+  /* overflow: hidden;*/
+  /*max-width: 400px;*/
+  margin: auto;
+}
+
+.minilesson_dictate_player_box .dictate_prompt {
+  position: relative;
+  margin-top: 10px;
+}
+
+.minilesson_dictate_player_box .dictate_reply {
+  margin-top: 10px;
+  position: relative;
+}
+
+.dictate_error {}
+
+.minilesson_dictate_player_box .dictate_game {
+  min-height: 400px;
+  padding: 10px;
+  border-top: 1px solid darkgray;
+  border-bottom: 1px solid darkgray;
+  background-color: rgba(98, 135, 182, 1);
+}
+
+.minilesson_dictate_player_box .dictate_speech {
+  position: relative;
+  font-family: arial;
+  font-size: 16px;
+  background: #a53d38;
+  color: black;
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.minilesson_dictate_player_box  .dictate_right {
+  background-color: white;
+}
+
+.minilesson_dictate_player_box .dictate_teacher_left {
+  background-color: rgba(122, 221, 76, 1);
+}
+
+.minilesson_dictate_player_box .dictate_teacher_left:after {
+  content: '';
+  border: 20px solid transparent;
+  border-right-color: rgba(122, 221, 76, 1);
+  border-left: 0;
+  position: absolute;
+  left: -20px;
+  top: 50%;
+  margin-top: -20px;
+}
+
+.minilesson_dictate_player_box .dictate_right:after {
+  content: '';
+  border: 20px solid transparent;
+  border-left-color: white;
+  border-right: 0;
+  position: absolute;
+  right: -20px;
+  top: 50%;
+  margin-top: -20px;
+}
+
+.minilesson_dictate_player_box .dictate_speech-icon-left {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+  font-size: 50px !important;
+  height: 50px;
+}
+
+.minilesson_dictate_player_box .dictate_speech-icon-right {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+  font-size: 50px !important;
+  height: 50px;
+}
+
+.minilesson_dictate_player_box .dictate_mainmenu {
+  min-height: 400px;
+  background-color: #f5f5f5;
+  font-size: 20px;
+  padding: 10px;
+  border-top: 1px solid darkgray;
+  border-bottom: 1px solid darkgray;
+}
+
+.minilesson_dictate_player_box .dictate_title {
+  border: 2px solid darkgray;
+  height: 53px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.minilesson_dictate_player_box .dictate_controls {
+  /*
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  */
+  height: 35px;
+  background-color: white;
+}
+
+.minilesson_dictate_player_box .dictate_results {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 75px;
+  background-color: rgba(98, 135, 182, 1);
+  font-weight: bold;
+  color: white;
+  text-align: center;
+  z-index: 999;
+}
+
+.minilesson_dictate_player_box  .dictate_correct {
+  background-color: lightgreen;
+}
+
+.minilesson_dictate_player_box .dictate_incorrect {
+  background-color: lightpink;
+}
+
+.minilesson_dictate_player_box .dictate_targetWord {
+  padding: 3px;
+  border-radius: 5px;
+  margin: 5px;
+}
+
+.minilesson_dictate_player_box  .dictate_ctrl-btn {
+  width: 33.33%;
+  float: left;
+}
+
+/* LISTEN AND REPEAT */
+
+.minilesson_landr_player_box {
+  border: 1px solid darkgray;
+  position: relative;
+  /* overflow: hidden; */
+  /*max-width: 400px;*/
+  margin: auto;
+}
+
+.minilesson_landr_player_box .landr_prompt {
+  position: relative;
+  margin-top: 10px;
+}
+
+.minilesson_landr_player_box .landr_reply {
+  margin-top: 10px;
+  position: relative;
+}
+
+.minilesson_landr_player_box .landr_error {}
+
+.minilesson_landr_player_box .landr_game {
+  min-height: 400px;
+  padding: 10px;
+  border-top: 1px solid darkgray;
+  border-bottom: 1px solid darkgray;
+  background-color: rgba(98, 135, 182, 1);
+}
+
+.minilesson_landr_player_box .landr_speech {
+  position: relative;
+  font-family: arial;
+  font-size: 16px;
+  background: #a53d38;
+  color: black;
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.minilesson_landr_player_box  .landr_right {
+  background-color: white;
+}
+
+.minilesson_landr_player_box .landr_teacher_left {
+  background-color: rgba(122, 221, 76, 1);
+}
+
+.minilesson_landr_player_box .landr_teacher_left:after {
+  content: '';
+  border: 20px solid transparent;
+  border-right-color: rgba(122, 221, 76, 1);
+  border-left: 0;
+  position: absolute;
+  left: -20px;
+  top: 50%;
+  margin-top: -20px;
+}
+
+.minilesson_landr_player_box .landr_right:after {
+  content: '';
+  border: 20px solid transparent;
+  border-left-color: white;
+  border-right: 0;
+  position: absolute;
+  right: -20px;
+  top: 50%;
+  margin-top: -20px;
+}
+
+.minilesson_landr_player_box .landr_speech-icon-left {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+  font-size: 50px !important;
+  height: 50px;
+}
+
+.minilesson_landr_player_box .landr_speech-icon-right {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+  font-size: 50px !important;
+  height: 50px;
+}
+
+.minilesson_landr_player_box .landr_mainmenu {
+  height: 400px;
+  background-color: #f5f5f5;
+  font-size: 20px;
+  padding: 10px;
+  border-top: 1px solid darkgray;
+  border-bottom: 1px solid darkgray;
+}
+
+.minilesson_landr_player_box .landr_title {
+  border: 2px solid darkgray;
+  height: 53px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.minilesson_landr_player_box .landr_controls {
+  /* position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 75px;
+  */
+  height: 35px;
+  background-color: white;
+}
+
+.minilesson_landr_player_box .landr_controls .landr_ctrl-btn {
+  width: 50%;
+  float: left;
+}
+
+.minilesson_landr_player_box .landr_speakbtncontainer {
+  /*
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  */
+  height: 75px;
+  background-color: rgba(98, 135, 182, 1);
+  text-align: center;
+  display: none;
+}
+
+.minilesson_landr_player_box .landr_results {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 75px;
+  background-color: rgba(98, 135, 182, 1);
+  font-weight: bold;
+  color: white;
+  text-align: center;
+  z-index: 999;
+}
+
+.minilesson_landr_player_box .landr_correct {
+  background-color: lightgreen;
+}
+
+.minilesson_landr_player_box .landr_incorrect {
+  background-color: lightpink;
+}
+
+.minilesson_landr_player_box .landr_targetWord {
+  padding: 3px;
+  border-radius: 5px;
+  margin: 5px;
+}
+
+
+.mod_minilesson_result_div {
+  display: inline-block;
+  width: 250px;
+  height: 100px;
+  margin: 10px;
+  padding: 10px;
+  border: 1px solid black;
+  vertical-align: top;
+  position: relative;
+  padding-top: 35px;
+}
+
+.mod_minilesson_result_index {
+  font-weight: bold;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 20px;
+  background-color: #f5f5f5;
+  text-align: center;
+  border-bottom: 1px solid black;
+  border-right: 1px solid black;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mod_minilesson_result_title {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 20px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.mod_minilesson_result_score {}
+
+.mod_minilesson_result_grade {}
+
+.minilesson_speechcards_target_phrase {
+  text-align: center;
+  padding: 10px;
+  border: 1px solid black;
+  font-size: 32px;
+  width: 75%;
+  margin: auto;
+  border-radius: 10px;
+  box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.75);
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.minilesson_quiz_progress {
+  border: 1px solid #000;
+  height: 50px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  position: relative;
+}
+
+.minilesson_quiz_progress_item {
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  background-color: gray;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+  z-index: 1;
+}
+
+.minilesson_quiz_progress_item_current {
+  background-color: green;
+  color: white;
+}
+
+.minilesson_quiz_progress_finalitem {
+  border-radius: 15%;
+  width: 30px;
+  height: 30px;
+  background-color: darkred;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+  z-index: 1;
+}
+
+.minilesson_quiz_progress_item_completed {
+  background-color: darkgrey;
+}
+
+.minilesson_quiz_progress_line {
+  background-color: gray;
+  height: 10px;
+  position: absolute;
+  margin-top: auto;
+  margin-bottom: auto;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+}
+
+.minilesson_landr_player_box .landr_feedback,
+.minilesson_dictate_player_box .dictate_feedback {
+  font-size: 14px !important;
+  padding: 10px;
+}
+
+.mod_minilesson_link_box {
+  border: 1px solid black;
+  display: inline-block;
+  width: 150px;
+  height: 120px;
+  vertical-align: top;
+  margin: 10px;
+  position: relative;
+  background-size: 50%;
+  background-repeat: no-repeat;
+  background-position: center 10px;
+  cursor: pointer;
+}
+
+.mod_minilesson_link_box:hover {
+  background-color: #f5f5f5;
+}
+
+.mod_minilesson_link_box_title {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  text-align: center;
+  margin: 5px;
+}
+
+.mod_minilesson_link_box_container {
+  text-align: center;
+}
+
+.itemscoresbutton {
+  text-align: center;
+}
+
+/*TT Recorder Styles */
+.mod_minilesson_ttrec_waveButtonContainer {
+  position: relative;
+  margin: auto;
+  border: 2px solid darkgray;
+  border-radius: 10px;
+  width: 200px;
+}
+
+.mod_minilesson_ttrec_waveForm {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background-color: white;
+  border-radius: 10px;
+}
+
+.mod_minilesson_ttrec_waveButton {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  box-shadow: inset 0px 1px 3px #ffccbd, inset 0px -1px 3px #9c282e;
+  color: #000;
+  font-size: 26px;
+  text-shadow: 0px -1px 0px rgba(0, 0, 0, 0.3);
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  margin: auto;
+  color: white;
+  border: none;
+  outline: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background-color: red;
+}
+
+.mod_minilesson_quiz_reattempt {
+  margin: 10px;
+}
+
+.mod_minilesson_itemtext {
+  width: 100%;
+  max-width: 400px;
+  margin: auto;
+  text-align: center;
+  font-size: 1.3em;
+}
+.mod_minilesson_itemaudio {
+  width: 100%;
+  max-width: 400px;
+  margin: auto;
+}
+.mod_minilesson_itemvideo {
+  width: 100%;
+  max-width: 400px;
+  margin: auto;
+}
+.mod_minilesson_itemimage {
+  width: 100%;
+  max-width: 400px;
+  margin: auto;
+}
+.minilesson_questionheader_contents {
+  text-align: center;
+  margin-bottom: 10px;
+  margin-top: 10px;
+}
+.mod_minilesson_itemimage_cont,
+.mod_minilesson_itemvideo_cont,
+.mod_minilesson_itemaudio_cont,
+.mod_minilesson_itemiframe_cont,
+.mod_minilesson_itemttsaudio_cont {
+  width: 100%;
+  margin-top: 10px;
+  text-align: center;
+}
+
+.mod_minilesson_iframe_responsive {
+  overflow:hidden;
+  padding-bottom:56.25%;
+  position:relative;
+  height:0;
+  margin: auto;
+}
+
+.mod_minilesson_itemiframe_cont {
+  margin-top: 10px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  width: 100%;
+  height: 100%;
+  max-width: 400px;
+  max-height: 225px;
+}
+
+.mod_minilesson_iframe_responsive iframe {
+  left:0;
+  top:0;
+  height:100%;
+  width:100%;
+  position: absolute;
+  max-width: 400px;
+  max-height: 225px;
+}
+
+.minilesson_actionbutton {
+  margin: 5px;
+  padding: 5px;
+}
+
+.minilesson_dictate_player_box .dictate_loaded,
+.minilesson_landr_player_box .landr_loaded {
+  text-align: center;
+}
+
+.minilesson_landr_player_box  .landr_start_btn,
+.minilesson_dictate_player_box  .dictate_start_btn {
+  /* position: absolute; */
+  /* bottom: 0; */
+  margin-left: auto;
+  height: 50px;
+  width: 60%;
+  margin-right: auto;
+  margin-top: 80px;
+}
+
+.minilesson_mc_response {
+  padding: 10px;
+  border: 1px solid black;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  background-color: white;
+  cursor: pointer;
+  font-size: 1.33em;
+}
+
+.minilesson_mc_selected {
+  background-color: lightblue;
+}
+.minilesson_mc_disabled {
+  pointer-events: none;
+}
+
+.minilesson_mc_disabled {
+  pointer-events: none;
+}
+.minilesson_mc_right {
+  color: green;
+  float: right;
+}
+.minilesson_mc_wrong {
+  color: red;
+  float: right;
+}
+.minilesson_mc_playstate {
+  color: grey;
+  float: right;
+}
+
+

@@ -1,0 +1,32 @@
+<div class="a4e-flashcards-container">
+
+  <button class='btn btn-block btn-lg btn-primary mod_wordcards_matching_frontbtn'>
+    <i class="fa fa-retweet"></i> {{#str}}flip, mod_wordcards{{/str}}
+  </button>
+
+   <audio id="poodll_vocabplayer"></audio>
+  
+  {{#terms}} 
+  
+    <div class="a4e-card a4e-noselect">
+
+      <div style="background-image: url('{{image}}'); background-repeat: no-repeat; background-position: center;" class="front">
+        {{definition}}
+      </div>
+      
+      <div class="back">
+        <button class="play-tts btn btn-secondary btn-sm" data-modelaudio="{{audio}}" data-tts="{{term}}" data-ttsvoice="{{ttsvoice}}">
+          <i class="fa fa-volume-up"></i>
+        </button>
+        {{term}}
+      </div>
+      
+    </div>
+  
+  {{/terms}}
+  
+</div>
+
+<button id='wordcards-start-button' class='btn btn-success btn-lg center-block btn-block'>
+  <i class='fa fa-play'></i> {{#str}}starttest, mod_wordcards{{/str}}
+</button>

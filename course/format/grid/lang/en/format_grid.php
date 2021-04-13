@@ -283,8 +283,8 @@ $string['resetallgreyouthidden_help'] = 'Resets the property \'In Grid display s
 // Section 0 on own page when out of the grid and course layout is 'Show one section per page'.
 $string['setsection0ownpagenogridonesection'] = 'Section 0 on its own page when out of the grid and on a single section page';
 $string['setsection0ownpagenogridonesection_help'] = 'Have section 0 on its own page when it is out of the grid and the \'Course layout\' setting is \'One section per page\'.';
-$string['defaultsection0ownpagenogridonesection'] = 'Section 0 on its own page when out of the grid and on a single section page';
-$string['defaultsection0ownpagenogridonesection_desc'] = 'Have section 0 on its own page when it is out of the grid and the \'Course layout\' setting is \'One section per page\'.';
+$string['defaultsetsection0ownpagenogridonesection'] = 'Section 0 on its own page when out of the grid and on a single section page';
+$string['defaultsetsection0ownpagenogridonesection_desc'] = 'Have section 0 on its own page when it is out of the grid and the \'Course layout\' setting is \'One section per page\'.';
 $string['resetimagecontainernavigation'] = 'Image container navigation';
 $string['resetimagecontainernavigation_help'] = 'Resets the image container navigation to follow the site default value.';
 $string['resetallimagecontainernavigation'] = 'Image container navigations';

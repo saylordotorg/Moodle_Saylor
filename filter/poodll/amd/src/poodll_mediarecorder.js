@@ -49,46 +49,6 @@ define(['jquery', 'core/log', 'filter_poodll/utils_amd',
             return ret;
         },
 
-        // This recorder supports the current browser
-        xxxxsupports_current_browser: function (config) {
-
-            if (config.mediatype != 'audio' && config.mediatype != 'video') {
-                return false;
-            }
-            var protocol_ok = M.cfg.wwwroot.indexOf('https:') == 0 ||
-                M.cfg.wwwroot.indexOf('http://localhost') == 0;
-            if (protocol_ok
-                && navigator && navigator.mediaDevices
-                && navigator.mediaDevices.getUserMedia) {
-                var ret = false;
-                switch (config.mediatype) {
-                    case 'audio':
-                        // sadly desktop safari has a bug which prevents us enabling it
-                        if (utils.is_safari() && !(utils.is_ios()) && !config.html5ondsafari) {
-                            ret = false;
-                        } else {
-                            ret = true;
-                        }
-
-                        break;
-                    case 'video':
-                        var IsEdge = utils.is_edge() !== -1 &&
-                            (!!navigator.msSaveBlob || !!navigator.msSaveOrOpenBlob);
-                        var IsSafari = utils.is_safari();
-
-                        if (!IsEdge && !IsSafari) {
-                            ret = true;
-                        }
-                }
-                if (ret) {
-                    log.debug('PoodLL Media Recorder: supports this browser');
-                }
-                return ret;
-            } else {
-                return false;
-            }
-        },
-
         // Perform the embed of this recorder on the page
         // into the element passed in. with config
         embed: function (element, config) {
@@ -238,7 +198,7 @@ define(['jquery', 'core/log', 'filter_poodll/utils_amd',
             this.instanceprops[controlbarid].recorded_index = 0;
             this.instanceprops[controlbarid].mediaRecorder = null;
             this.instanceprops[controlbarid].blobs = [];
-            this.instanceprops[controlbarid].timeinterval = 5000;
+            this.instanceprops[controlbarid].timeinterval = 1000;
             this.instanceprops[controlbarid].audiomimetype = 'audio/webm';
             this.instanceprops[controlbarid].videorecordertype = 'auto';// mediarec or webp
             this.instanceprops[controlbarid].videocapturewidth = 320;
@@ -402,8 +362,8 @@ define(['jquery', 'core/log', 'filter_poodll/utils_amd',
 
             if (ip.blobs && ip.blobs.length > 0) {
                 log.debug('playing type:' + ip.blobs[0].type);
+                log.debug(ip.blobs);
                 utils.doConcatenateBlobs(ip.blobs, function (concatenatedBlob) {
-
 
                     log.debug(concatenatedBlob);
                     var mediaurl = URL.createObjectURL(concatenatedBlob);
@@ -538,10 +498,10 @@ define(['jquery', 'core/log', 'filter_poodll/utils_amd',
 
             // really we need to deal with preferences properly
             // this will get the available media constraints that need to be set like deviceid above
-            /*
-                var sc = navigator.mediaDevices.getSupportedConstraints();
-                log.debug(sc);
-            */
+
+              //  var sc = navigator.mediaDevices.getSupportedConstraints();
+              //  log.debug(sc);
+
 
             // init return object
             var mediaConstraints = {
@@ -556,20 +516,7 @@ define(['jquery', 'core/log', 'filter_poodll/utils_amd',
                 // fix mime type to wav
                 ip.audiomimetype = 'audio/wav';
 
-                //this was code to select first safari audio device
-                /*
-                                // Select final audio device,
-                                navigator.mediaDevices.enumerateDevices()
-                                .then(function(devices) {
-                                  devices.forEach(function(device) {
-                                    if (device.kind == 'audioinput') {
-                                        ip.useraudiodeviceid = device.deviceId;
-                                    }
-                                  });
-                                  }).catch(function(err) {
-                                    log.debug(err);
-                                });
-                */
+
             }// end of if Safari
 
             // check for a user selected device
@@ -577,6 +524,7 @@ define(['jquery', 'core/log', 'filter_poodll/utils_amd',
                 var constraints = {"deviceId": ip.useraudiodeviceid};
                 mediaConstraints.audio = constraints;
             }
+            // log.debug(mediaConstraints);
 
             return mediaConstraints;
         },
@@ -606,7 +554,8 @@ define(['jquery', 'core/log', 'filter_poodll/utils_amd',
 
                 // get blob after specific time interval
                 ip.mediaRecorder = poodll_msr;
-                ip.mediaRecorder.init(stream, ip.audioctx, ip.audioanalyser, ip.config.mediatype, encoder); // new MediaStreamRecorder(stream);
+                ip.mediaRecorder.init(stream, ip.audioctx, ip.audioanalyser, ip.config.mediatype, encoder);
+                //the following are really for stereoaudio  msr
                 ip.mediaRecorder.mimeType = ip.audiomimetype;
                 ip.mediaRecorder.audioChannels = 1;
 
@@ -614,7 +563,7 @@ define(['jquery', 'core/log', 'filter_poodll/utils_amd',
                 // so its created in the init and passed around
                 ip.mediaRecorder.start(ip.timeinterval, ip.audioctx);
                 ip.mediaRecorder.ondataavailable = function (blob) {
-                    log.debug(blob);
+                    //log.debug(blob);
                     ip.blobs.push(blob);
                 };
 

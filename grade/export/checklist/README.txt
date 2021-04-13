@@ -6,6 +6,7 @@ http://moodle.org/plugins/view.php?plugin=mod_checklist
 
 ==Changes==
 
+* 2021-04-10 - minor internal documenation update + switch from Travis to Github actions
 * 2020-10-17 - speed improvement when calculating user start date on the course
 * 2019-12-16 - minor improvement to error message when no checklists to export
 * 2018-05-28 - fix typo causing major problems with defining roles

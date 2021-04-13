@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<libraries>
+    <library>
+        <location>amd/src/glide.js</location>
+        <name>Glide JS</name>
+        <version>3.3.0</version>
+        <license>MIT</license>
+    </library>
+</libraries>

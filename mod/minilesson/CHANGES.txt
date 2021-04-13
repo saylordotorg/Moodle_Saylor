@@ -1,0 +1,60 @@
+Version 1.0.17 (Build 2021041100)
+- Added m4a file handler for audio
+- Added experimental config to make working with experimental types easier
+- Added multichoice audio
+
+Version 1.0.16 (Build 2021033000)
+- fixed bug in backup/restore of user attempts
+- fixed bug in reset of user attempts
+- destroy old questions so hidden media players stop playing
+
+Version 1.0.16 (Build 2021033000
+-added cleaning of text, so ssml requests did not get in trouble
+-improvements to JP handling
+
+Version 1.0.16 (Build 2021031500)
+-Added ttsoption so "slow" speech was not assumed. This distorts on some voices
+
+Version 1.0.15 (Build 2021022600)
+-Added mecab based comparison or Japanese text
+-Added setuptab to allow in iframe editing of settings
+
+Version 1.0.14 (Build 2021021802)
+-Added ability to show text or dots in listen and repeat.
+
+Version 1.0.13 (Build 2021021801)
+-Fixed bug in previous build with builtjs not shipped
+-slowed down TTS by default
+
+Version 1.0.12 (Build 2021021800)
+-Added TTS option to content options
+
+Version 1.0.11  (Build 2021013100)
+-Improved differencing
+-Standardized audio recorder
+-Better support for languages with non Latin alphabet
+-Layout and formatting improvements on "chat" screens and item font
+
+Version 1.0.10 (Build 2021012400)
+- Better support for non English speaking
+
+Version 1.0.9 (Build 2021012100)
+-improved multichoice display
+
+Version 1.0.8 (Build 2021011800)
+-fixed navigation when more than 6 items
+
+Version 1.0.7 (Build 2020122300)
+-Added better media select and display
+-Improved progress header
+-Tidied up settings
+-Added an ajax fragmentable form constructor
+
+Version 1.0.6 (Build 2020111700)
+-Updated speech servers
+
+Version 1.0.5 (Build 2020100200)
+-Added passagehash field;
+
+Version 1.0.0 (Build 2020060700)
+-initial commit of Poodll Time

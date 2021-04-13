@@ -1,0 +1,280 @@
+2.0.57 (Build 2021040500)
+-added speechmark generation to setup.php
+
+2.0.56 (Build 2021033000)
+- bug where some attempts may have errored on grading from 2021032900+ releases
+
+2.0.55 (Build 2021032903)
+- Auto advance on listen and repeat
+- disabled recorder button during recognition to prevent super clickers causing event chaos
+
+2.0.54 (Build 2021032902)
+- prev release update:
+
+2.0.53 (Build 2021032900)
+- Some passages lost audio/text sync on the last update. This restores it
+
+2.0.52 (Build 2021032600)
+- improvements to ui/markup for modelaudio and selection of words
+- added neural voices
+- auto creation of speech breaks, and sync'ing of existing one to new audio/voices
+
+
+2.0.51 (Build 2021030100)
+-added a setup tab for embedding in iframes
+
+2.0.50  (Build 2021013100)
+ -Improved differencing
+ -Standardized audio recorder
+ -Better support for languages with non Latin alphabet
+
+
+2.0.49 (Build 2021012400)
+- Better support for non English languages in practice mode
+
+2.0.48 (Build 2020121400)
+-Added an ajax fragmentable form constructor
+-Removed AWS streaming transcription option
+-Added a strict mode for transcription
+
+2.0.47 (Build 2020111700)
+- new speech servers
+
+2.0.46 (Build 2020110400)
+- added alternative speech recognizer and recorder for listen&repeat mode if not Google Chrome
+- better defaults
+
+2.0.45 (Build 2020100700)
+- non UTf8MB4 db encoding related comparison issues
+
+2.0.44 (Build 2020091700)
+- More string comparison fixes
+
+2.0.43 (Build 2020091300)
+- changed string comparisons again to be tolerant of unicode issues (a bit of a punt)
+- fixed issue when no exit early flag set, manual grading could fail.
+
+2.0.42 (Build 2020090300)
+- changed string comparisons to be binary safe
+
+2.0.41 (Build 2020082100)
+- fixed issue with modelaudio tab not accepting recordings or uploads
+
+
+2.0.40 (Build 2020072701)
+- fixed issue with Listen and Repeat mode getting fixated on en-US
+- fixed issue with name of jp/analyser class
+
+2.0.39 (Build 2020071401)
+- fixed a few issues on small screen devices and android chrome
+
+2.0.38 (Build 2020071400)
+- Added listen and repeat mode
+- Added lang model generation
+- Support for better transcription in Tokyo and US East regions
+- Tweaks to model audio page
+- Tweaks to main menu
+
+2.0.37 (Build 2020070400)
+- Support for groups mode and a few extra capablities
+
+2.0.35 (Build 2020062800)
+- Lang model generation
+
+2.0.34 (Build 2020062300)
+- Fix to support Essentials theme on M3.3
+
+2.0.33 (Build 2020061600)
+-M3.9 compat. change - js tether library
+-fixes to model audio page
+
+
+2.0.32 (Build 2020060300)
+-fixed broken simple report if no attempts
+
+2.0.31 (Build 2020060100)
+-added option to not show sessionscore/grade
+-added ability to choose recoder
+
+2.0.30 (Build 2020053100)
+- layout changes
+- smallreport
+
+2.0.29 (Build 2020041900)
+- added aws streaming transcription to cloudpoodll
+
+
+2.0.28 (Build 2020032801)
+-Improved transcriber.js integration
+
+2.0.27 (Build 2020030701)
+-fixed bug breaking first.js/js on IE 11
+
+2.0.26 (Build 2020030700)
+-removed ajaxhelper and use core/ajax
+-added streaming transcribe and progress report
+
+2.0.25 Build 2.0.25 (Build 2020022900)
+-Added TTS Speed setting
+
+2.0.24 Build 2.0.24 (Build 2020022000)
+-added tts voice for click to hear
+-added support for Japanese language (alpha .. not for production)
+-added shadowing and preview modes
+-refactor
+
+2.0.23 (Build 2020021800)
+-added sessionscoremethod setting for strict and normal grading modes
+
+2.0.22 (Build 2020012300)
+-added languages(arabic, chinese, portuguese, japanese, tamil, telegu, dutch, farsi, wales english, ireland english, scotland english, russian, turkish, malay, indonesian,hebrew, swiss german)
+-added user tagging
+-fixed SQL bug in grading which occurs if FULL_GROUP_BY is set in mysql or in postgresql
+
+2.0.21 (Build 2019112100)
+-Added better reporting to user of invalid creds
+-Optimisations of cron task
+-Removed empty scheduled task
+
+2.0.20(Build 2019110700))
+-added attempts summary report for admin/teachers
+-added attempt summary table to view.php if 2 or more attempts
+-Added expiredays to backup, had been missed
+
+2.0.19(Build 2019101400)
+-Removed chaining of click actions across playchain in spotcheck mode
+
+2.0.18 (Build 2019092501)
+- Fixed a misten ref. to another plugin readseed in grade.php
+- Changed fetch_transcripts and has_ transcripts to look at full transcript. Because plain transcript might exist AND be empty.
+- Changed grading and gradingby user reports to look at fulltranscript and not wpm to see if it was ai graded.
+- fixed gradenowhelper.js to show correct wpm and accuracy if user truly scores 0
+- Added grade by highest attempt score
+
+
+
+2.0.17 (Build 2019091901)
+-Fixed bug where allow early exit and fast transcode would cause errors when fetching audio duration
+
+
+2.0.16 (Build 2019091900)
+-Fixed bug where student-review and grading pages, would show different results to grading report, when allowearlyexit was true
+
+Version 2.0.15 (Build 2019091000)
+-Fixed bug where non admins and limited attempts would not show correctly on student review page
+-Fixed bug where user attempts report showed all user results
+
+Version 2.0.14 (Build 2019062600)
+-Fixed broken gradebook integration and completion settings
+
+Version 2.0.13 (Build 2019052001)'
+-fixed unencoded url in post activity ajax submission
+
+
+Version 2.0.12 (Build 2019052000)
+-Fixed up backup restore bug where userid not mapped correctly
+-Improved course deleted event
+-Added fast transcriber
+-Fixed problem in diff that failed to match transcript
+
+
+Version 2.0.11 (Build 2019042000)
+-Added more language support
+-compatibility with RS for self correction mode
+
+Version 2.0.10 (Build 2019030600)
+-Added support for new lines in passage
+-Show unread words in review in a more readable format (i.e. without strikeout)
+-Added Alternatives Admin tab
+
+Version 2.0.9 (Build 2019022000)
+-implemented better wildcard support
+
+Version 2.0.8 (Build 2019021800)
+-improved adhoc task logic
+-tweaks to diff algorythm
+
+Version 2.0.7 (Build 2019021600)
+-added more powerful alternates implementation
+-fixed matching algorythm bugs
+-set to generous match for plurals and -ed in English
+-added debug features (for devs)
+
+Version 2.0.6 (Build 2019012000)
+-Added better cron calling
+-Added support for fast poodll loading in poodllloader.html (used by safari's mainly)
+
+Version 2.0.5 (Build 2018121400)
+-fixed a bug that could break AI grading
+
+Version 2.0.4 (Build 2018120900)
+- changed lang string key "NG" to "notok" and English to "Not OK"
+- renamed audiohelper.js to recorderhelper.js
+- renamed gradinghelper.js to hiddenplayerhelper.js
+- added better error reporting if there is a problem with Auth
+- reinstated accuracy adjustment settings
+- padded spot check audio by 0.5 seconds on either side of start and end
+- improvements to diff algorithm
+
+Version 2.0.3 (Build 2018112600)
+- improved reliability of cron call to fetch token
+- better support for privacy api (incl moodle 3.6)
+
+Version 2.0.2 (Build 2018111800)
+-added support for auth details in token
+
+Version 2.0.1 (Build 2018111200)
+-Added Sao Paulo,  Frankfurt, London regions (no AI)
+-Add support for Ottawa region (yes AI)
+-Support for accents (en-UK, en-AU) and Canadian French (fr-CA) in AI regions
+-Fixed non English transcription calls that were broken
+
+Version 2.0.0 (Build 2018101200)
+-Release version of ReadAloud with CloudPoodll and AI integration
+
+Version 1.1.08 (Build 2018090701)
+--added support for HTML5 fallback tag (actually made sure we never fallback .. just show a warning)
+
+Version 1.1.04 (Build 2018082402)
+-added accadjustmethod and errorcount fields
+-implemented auto error estimation
+
+Version 1.1.03 (Build 2018071300)
+-added accadjust field
+
+Version 1.1.02 (Build 2018062600)
+-AI
+-Cloud Poodll integration
+-Backup and Restore
+-General refactor
+
+Version 1.1.1(Build 2018060902)
+-HTML5 version of ReadAloud
+
+Version 1.1.0(Build 2018041000)
+-Implemented new Moodle Privacy API
+
+Version 1.0.7(Build 2016111901)
+tightened up some non-moodle code in audiohelper.php and poodllfilelib.php to use Moodle APIs.
+More secure etc.
+
+Version 1.0.6(Build 2016090201)
+unnecessary break statement caused error on php7
+
+Version 1.0.5(Build 2016031001)
+The logic to determine the number of completed attempts by a student was wrong. fixed it
+
+Version 1.0.4(Build 2016031000)
+Added a settings to turn off the loading of bootstrap and fontawesom. Where a theme already has it, this can cause issues.
+
+Version 1.0.3(Build 2016022500)
+This fixes an issue with the renderer on later PHP versions where the trim function
+can't be used to return a value to another function. It caused a white page/500 error when viewing the assignment
+
+Version 1.0.2(Build 2016022102)
+Added fix for incorrectly named field fedbackformat
+
+
+Version 1.0.1(Build 2016022101)
+Added fix for failure to set form TTSLANGUAGE field type
+(https://github.com/justinhunt/moodle-mod_readaloud/issues/6)

@@ -1,0 +1,43 @@
+<div id="{{uniqueid}}_container" class="dictate_container" style="display: none">
+{{> mod_minilesson/quiz_progress}}
+  {{> mod_minilesson/questionheader}}
+  <div class="minilesson_dictate_player_box">
+    <div style="display:none;" class="dictate_results">{{#str}}dc_results, mod_minilesson{{/str}}</div>
+
+    <div class="dictate_title text-center">{{#str}}listenandtype, mod_minilesson{{/str}}</div>
+
+    <div class="dictate_mainmenu">
+      <div class="dictate_loaded" style="display:none;">
+        <p>{{#str}}dc_instructions1, mod_minilesson{{/str}}</p>
+        <p>{{#str}}dc_instructions2, mod_minilesson{{/str}}</p>
+        <button disabled class='btn btn-block btn-primary dictate_start_btn'>
+              <i class='fa fa-play'></i> {{#str}}start, mod_minilesson{{/str}}
+        </button>
+
+      </div>
+      <div class="dictate_not_loaded">
+        <p>{{#str}}loading, mod_minilesson{{/str}}</p>
+      </div>
+    </div>
+
+    <div style="display:none;" class="dictate_game"></div>
+
+    <div style="display:none;" class="dictate_controls">
+
+      <button class="btn btn-secondary dictate_ctrl-btn dictate_listen_btn">
+            <i class="fa fa-volume-up"></i> {{#str}}listen, mod_minilesson{{/str}}
+        </button>
+
+      <button class="btn btn-success dictate_ctrl-btn dictate_check_btn">
+            <i class="fa fa-check"></i> {{#str}}check, mod_minilesson{{/str}}
+        </button>
+
+
+      <button class="btn btn-danger dictate_ctrl-btn dictate_skip_btn">
+            {{#str}}skip, mod_minilesson{{/str}} <i class="fa fa-arrow-right"></i>
+        </button>
+
+    </div>
+  </div>
+  {{> mod_minilesson/nextbutton}}
+</div>

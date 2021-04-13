@@ -1,0 +1,27 @@
+<div id='wordcards-vocab-list'>
+  {{> mod_wordcards/vocablist_header}}
+  <div id="vocab-list-inner">{{> mod_wordcards/loading}}</div>
+</div>
+
+<div id='wordcards-gameboard'>
+
+  <div class="mod_wordcards_activity_header">
+    <h3>{{#str}}title_matchtype, mod_wordcards{{/str}}</h3>
+    <div class="mod_wordcards_instructions">{{#str}}instructions_matchtype, mod_wordcards{{/str}}</div>
+  </div>
+
+  <div id='wordcards-counter'>
+    <div id='wordcards-time-counter'></div>
+  </div>
+
+  {{> mod_wordcards/progress_dots}}
+
+  <div id='wordcards-question'></div>
+  <div id='wordcards-submitted'></div>
+  <div id='wordcards-input'></div>
+
+</div>
+
+<div id='wordcards-results'>
+  <div id='results-inner'>{{> mod_wordcards/loading}}</div>
+</div>

@@ -108,31 +108,70 @@ if (!$percentcol) {
 
 // Useful for debugging.
 if (defined('BEHAT_SITE_RUNNING')) {
+    /**
+     * Class FakeMoodleExcelWorkbook
+     */
     class FakeMoodleExcelWorkbook {
+        /**
+         * FakeMoodleExcelWorkbook constructor.
+         * @param mixed $ignore
+         */
         public function __construct($ignore) {
         }
 
+        /**
+         * Send the finished spreadsheet
+         * @param mixed $ignore
+         */
         public function send($ignore) {
         }
 
+        /**
+         * Write a string to the spreadsheet
+         * @param int $row
+         * @param int $col
+         * @param string $data
+         */
         public function write_string($row, $col, $data) {
             echo "($row, $col) = $data<br/>";
         }
 
+        /**
+         * Write a number to the spreadsheet
+         * @param int $row
+         * @param int $col
+         * @param string $data
+         */
         public function write_number($row, $col, $data) {
             echo "($row, $col) = $data<br/>";
         }
 
+        /**
+         * Add a worksheet to the workbook
+         * @param mixed $ignore
+         * @return FakeMoodleExcelWorkbook
+         */
         public function add_worksheet($ignore) {
             return new FakeMoodleExcelWorkbook($ignore);
         }
 
+        /**
+         * Close the workbook
+         */
         public function close() {
         }
     }
 }
 
-// Only write the data if it exists.
+/**
+ * Only write the data if it exists.
+ * @param object $myxls
+ * @param int $row
+ * @param int $col
+ * @param array $user
+ * @param array $extra
+ * @param string $element
+ */
 function safe_write_string($myxls, $row, $col, $user, $extra, $element) {
     if (isset($user[$element])) {
         $myxls->write_string($row, $col, $user[$element]);

@@ -139,7 +139,12 @@ switch ($showreport){
                 if(!empty($gradinginfo ) && $attempt->grade !=null) {
                     $rubricresults= utils::display_studentgrade($modulecontext,$moduleinstance,$attempt,$gradinginfo );
                     $feedback=$attempt->feedback;
-                    echo $attempt_renderer->show_teachereval( $rubricresults,$feedback);
+                    if($attempt->manualgraded){
+                        $evaluator = get_string("teachereval", constants::M_COMPONENT);
+                    }else{
+                        $evaluator = get_string("autoeval", constants::M_COMPONENT);
+                    }
+                    echo $attempt_renderer->show_teachereval( $rubricresults,$feedback, $evaluator);
 
                 }
 

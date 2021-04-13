@@ -24,27 +24,55 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Class block_checklist
+ */
 class block_checklist extends block_list {
+    /**
+     * Initialise the block
+     * @throws coding_exception
+     */
     public function init() {
         $this->title = get_string('checklist', 'block_checklist');
     }
 
+    /**
+     * Allow multiple instances of the block
+     * @return bool
+     */
     public function instance_allow_multiple() {
         return true;
     }
 
+    /**
+     * Does the block have global configuration?
+     * @return false
+     */
     public function has_config() {
         return false;
     }
 
+    /**
+     * Is there per-instance configuration?
+     * @return bool
+     */
     public function instance_allow_config() {
         return true;
     }
 
+    /**
+     * Where can this block be shown?
+     * @return array
+     */
     public function applicable_formats() {
         return array('course' => true, 'course-category' => false, 'site' => true, 'my' => true);
     }
 
+    /**
+     * Override the settings for this block instance
+     * @throws coding_exception
+     * @throws dml_exception
+     */
     public function specialization() {
         global $DB;
 
@@ -58,6 +86,10 @@ class block_checklist extends block_list {
         }
     }
 
+    /**
+     * Extra steps after block has been created
+     * @return void|bool
+     */
     public function instance_create() {
         global $COURSE;
         if ($COURSE->format === 'site') {
@@ -68,6 +100,11 @@ class block_checklist extends block_list {
         }
     }
 
+    /**
+     * Get the content of the block.
+     * @return stdClass|stdObject|null
+     * @throws coding_exception
+     */
     public function get_content() {
         if ($this->content !== null) {
             return $this->content;
@@ -107,6 +144,14 @@ class block_checklist extends block_list {
         return $this->content;
     }
 
+    /**
+     * Output the content of a single checklist
+     * @param int $checklistid
+     * @return stdObject|null
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     */
     protected function show_single_checklist($checklistid) {
         global $DB, $USER;
 
@@ -168,6 +213,13 @@ class block_checklist extends block_list {
         return $this->content;
     }
 
+    /**
+     * Output an overview of all checklists
+     * @return stdObject|null
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     */
     protected function show_checklist_overview() {
         global $COURSE, $DB;
 
@@ -337,6 +389,11 @@ class block_checklist extends block_list {
         return array_slice($checklists, 0, $maxdisplay);
     }
 
+    /**
+     * Output the user progress bar for the checklist
+     * @param stdClass $checklist
+     * @return string
+     */
     protected function print_user_progressbar($checklist) {
         global $OUTPUT;
         if (empty($checklist->totalitems)) {
@@ -355,6 +412,11 @@ class block_checklist extends block_list {
         return $output;
     }
 
+    /**
+     * Check the mod_checklist plugin is present and include the code for it
+     * @return bool
+     * @throws dml_exception
+     */
     protected function import_checklist_plugin() {
         global $CFG, $DB;
 
@@ -380,6 +442,13 @@ class block_checklist extends block_list {
         return true;
     }
 
+    /**
+     * Output the group selection menu
+     * @param object $cm
+     * @return string
+     * @throws coding_exception
+     * @throws moodle_exception
+     */
     protected function get_groups_menu($cm) {
         global $COURSE, $OUTPUT, $USER;
 
@@ -421,6 +490,15 @@ class block_checklist extends block_list {
         return html_writer::tag('div', $out, array('class' => 'groupselector'));
     }
 
+    /**
+     * Get the currently selected group
+     * @param object $cm
+     * @param int[]|null $allowedgroups
+     * @param bool $seeall
+     * @param bool $forceall
+     * @return int
+     * @throws coding_exception
+     */
     protected function get_selected_group($cm, $allowedgroups = null, $seeall = false, $forceall = false) {
         global $SESSION;
 

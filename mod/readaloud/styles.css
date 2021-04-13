@@ -1,0 +1,641 @@
+.mod_readaloud_center {
+  text-align: center;
+}
+
+.mod_readaloud_center>div,
+.mod_readaloud_center>table
+/* insert any other block-level elements here */
+
+  {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.mod_readaloud_listbuttons input[type="submit"] {
+  width: 400px;
+}
+
+.mod_readaloud_actionbuttons {
+  display: flex;
+  float: right;
+}
+
+/* debugging */
+
+.mod_readaloud_debug .mod_readaloud_grading_passageword::after,
+.mod_readaloud_debug_transcriptword::after {
+  content: attr(data-wordnumber);
+  border: 1px solid blue;
+  font-size: 10px;
+  border-radius: 5px;
+  padding: 1px;
+}
+
+/* debugging */
+
+span.mod_readaloud_debugsequence {
+  border: 1px solid black;
+  margin: 1px;
+  display: inline-block;
+}
+
+.mod_readaloud_recording_cont {
+  margin: auto;
+  text-align: center;
+  width: 100%;
+  background-image: url([[pix:mod_readaloud|loader]]);
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+
+.mod_readaloud_recorder_instr_right,
+.mod_readaloud_recorder_instr_left {
+  float: left;
+  width: 240px;
+  height: 100px;
+}
+
+.mod_readaloud_dummyrecorder {
+  float: left;
+}
+
+.mod_readaloud_dummy_recorder_hidden {
+  display: none;
+}
+
+.mod_readaloud_dummy_recorder_recording {
+  display: block;
+  float: left;
+  width: 239px;
+  height: 100px;
+  background-size: 90px 90px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-color: red;
+}
+
+.mod_readaloud_dummy_recorder_stopped {
+  display: block;
+  width: 239px;
+  height: 100px;
+  float: left;
+  background-size: 90px 90px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-color: grey;
+}
+
+.mod_readaloud_getpermissionmode {
+  background-color: red;
+  height: 170px;
+}
+
+.mod_readaloud_start_button_cont,
+.mod_readaloud_record_button_cont,
+.mod_readaloud_stop_button_cont {
+  clear: both;
+  padding: 5px;
+  text-align: center;
+  width: 100%;
+}
+
+.mod_readaloud_stop_button,
+.mod_readaloud_start_button,
+.mod_readaloud_record_button {
+  margin: auto;
+  width: 200px;
+}
+
+.mod_readaloud_voicecanvas {
+  width: 239px;
+  height: 100px;
+  z-index: 8;
+}
+
+.mod_readaloud_grading_passagecont {
+  /* */
+}
+
+.mod_readaloud_passage_cont {
+  line-height: 2em;
+  font-size: 1.5em;
+  border-style: double;
+  padding: 3px;
+  border-color: gold;
+  margin-top: 15px;
+}
+
+.mod_readaloud_grading_action_cont {
+  border-style: double;
+  padding: 3px;
+  border-color: gold;
+  margin-top: 15px;
+  align-items: center;
+}
+
+.mod_readaloud_grading_badword {
+  color: red;
+  background-color: #ffcaca;
+  padding: 5px;
+  border-radius: 5px 5px 5px;
+  border: 1px solid red;
+  position: relative;
+}
+
+.mod_readaloud_grading_endspace {
+  color: blue;
+  background-color: #cacaff;
+  padding: 5px;
+  border-radius: 5px 5px 5px;
+  border: 1px solid blue;
+  position: relative;
+}
+
+.mod_readaloud_grading_passagespace {
+  padding: 2px;
+}
+
+div.mod_readaloud_smallreport_rating {
+  padding: 5px;
+}
+
+div.mod_readaloud_postattempt .mod_readaloud_grading_unreadword {
+  text-decoration: none;
+  background-color: lightgrey;
+}
+
+div.mod_readaloud_postattempt .mod_readaloud_grading_unreadspace {
+  background-color: lightgrey;
+  padding: 0px 2px;
+}
+
+.mod_readaloud_grading_unreadword {
+  font-style: italic;
+  text-decoration: line-through;
+}
+
+.mod_readaloud_passage_finished {
+  background-color: #CCCCCC;
+  padding: 2px;
+}
+
+.mod_readaloud_instructions_cont {
+  display: block;
+}
+
+.mod_readaloud_menuinstructions_const {
+  display: none;
+}
+
+.mod_readaloud_activityinstructions_const {
+  display: none;
+}
+
+.mod_readaloud_recording_cont {
+  display: none;
+}
+
+.mod_readaloud_smallreport_cont {
+  padding: 5px;
+  border: 1px grey solid;
+}
+
+.mod_readaloud_feedback_cont {
+  display: none;
+}
+
+.mod_readaloud_wheretonext_cont {
+  display: none;
+}
+
+.mod_readaloud_startmenu_cont {
+  display: none;
+}
+
+.mod_readaloud_previewinstructions_cont {
+  display: none;
+}
+
+.mod_readaloud_landrinstructions_cont {
+  display: none;
+}
+
+div.mod_readaloud_feedback_cont.mod_readaloud_postattempt {
+  display: block;
+}
+
+.mod_readaloud_evaluated_message {
+  display: block;
+}
+
+.mod_readaloud_error_cont {
+  display: none;
+}
+
+.mod_readaloud_error_cont h3 {
+  color: red;
+}
+
+.mod_readaloud_grading_player_cont {
+  color: blue;
+}
+
+#mod_readaloud_grading_player {
+  width: 100% !important;
+  margin-top: 10px;
+}
+
+.mod_readaloud_hidden_player {
+  display: none;
+}
+
+#mod_readaloud_button_returnmenu {
+  display: none;
+}
+
+.mod_readaloud_menubuttons_cont {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.mod_readaloud_hidden_player_button {
+  color: white;
+  border-color: cadetblue;
+  background-color: cadetblue;
+  border-style: solid;
+  border: 1px;
+  padding: 3px;
+  text-align: center;
+}
+
+.mod_readaloud_hidden_player_button_active {
+  color: white;
+  border-color: tomato;
+  background-color: tomato;
+}
+
+.mod_readaloud_hidden_player_button_paused {
+  color: white;
+}
+
+.mod_readaloud_hidden_player_button_playing {
+  color: white;
+}
+
+.mod_readaloud_grading_accuracy_cont,
+.mod_readaloud_grading_wpm_cont,
+.mod_readaloud_grading_error_cont,
+.mod_readaloud_grading_sessionscore_cont {
+  color: blue;
+  display: flex;
+  margin-left: 15px;
+}
+
+.mod_readaloud_grading_wpm_img {
+  color: blue;
+}
+
+.mod_readaloud_grading_score {
+  color: blue;
+  line-height: 18px;
+  margin-left: 5px;
+  text-align: center;
+  font-size: 2em;
+  height: 35px;
+  width: 70px;
+}
+
+.mod_readaloud_grading_error_img {
+  color: blue;
+}
+
+.mod_readaloud_grading_action_cont {
+  color: blue;
+  display: flex;
+}
+
+.mod_readaloud_afterattempt_cont,
+.mod_readaloud_wheretonext_cont,
+.mod_readaloud_ungraded_cont {
+  margin-left: auto;
+  margin-right: auto;
+  width: 40%;
+  text-align: center;
+  margin-top: 30px;
+}
+
+#mod_readaloud_hider {
+  display: none;
+  position: absolute;
+  top: 0%;
+  left: 0%;
+  width: 1600px;
+  height: 2000px;
+  margin-top: -1000px;
+  /*set to a negative number 1/2 of your height*/
+  margin-left: 0px;
+  /*set to a negative number 1/2 of your width*/
+  /*
+      z- index must be lower than pop up box
+     */
+  z-index: 99;
+  background-color: Black;
+  opacity: 0.6;
+}
+
+#mod_readaloud_progress_cont {
+  display: none;
+  position: absolute;
+  text-align: center;
+  top: 50%;
+  left: 50%;
+  width: 300px;
+  height: 120px;
+  margin-top: -60px;
+  /*set to a negative number 1/2 of your height*/
+  margin-left: -150px;
+  /*set to a negative number 1/2 of your width*/
+  border: 2px solid black;
+  z-index: 100;
+  background-color: white;
+}
+
+.reviewmode .mod_readaloud_grading_passageword {
+  cursor: pointer;
+  padding: 5px;
+  background-color: #f5f5f5;
+  border-radius: 5px;
+}
+
+.reviewmode .mod_readaloud_grading_passageword:hover {
+  background-color: darkgray;
+}
+
+/* spotcheckmode */
+
+.mod_readaloud_grading_passageword.mod_readaloud_grading_badword.mod_readaloud_spotcheckmode {
+  border-color: green;
+  background-color: #d7f9ca;
+}
+
+.mod_readaloud_grading_passagespace.mod_readaloud_spotcheckmode {
+  background-color: green;
+}
+
+.mod_readaloud_grading_passageword.mod_readaloud_aiunmatched {
+  background-color: lightgrey;
+}
+
+.mod_readaloud_grading_passagespace.mod_readaloud_aiunmatched {
+  background-color: lightgrey;
+}
+
+.mod_readaloud_grading_passageactions {
+  margin-top: 10px;
+}
+
+.mod_readaloud_grading_passageactions>button {
+  margin: 5px;
+}
+
+.btn.mod_readaloud_quickgrade_ok {
+  background-color: DodgerBlue;
+  /* Blue background */
+  border: none;
+  /* Remove borders */
+  color: white;
+  /* White text */
+  padding: 10px 14px;
+  /* Some padding */
+  font-size: 14px;
+  /* Set a font size */
+  cursor: pointer;
+  /* Mouse pointer on hover */
+  margin: 2px;
+  background-image: none;
+}
+
+/* Darker background on mouse-over */
+
+.btn.mod_readaloud_quickgrade_ok:hover {
+  background-color: RoyalBlue;
+}
+
+.btn.mod_readaloud_quickgrade_ng {
+  background-color: darkgrey;
+  /* Blue background */
+  border: none;
+  /* Remove borders */
+  color: white;
+  /* White text */
+  padding: 10px 14px;
+  /* Some padding */
+  font-size: 14px;
+  /* Set a font size */
+  cursor: pointer;
+  /* Mouse pointer on hover */
+  margin: 2px;
+  background-image: none;
+}
+
+/* Darker background on mouse-over */
+
+.btn.mod_readaloud_quickgrade_ng:hover {
+  background-color: grey;
+}
+
+div.mod_readaloud_gradesadmin_cont {
+  margin-bottom: 20px;
+  margin-top: 20px;
+}
+
+div.mod_readaloud_attemptsummary {
+  margin-top: 10px;
+  margin-bottom: 5px;
+}
+
+div.mod_readaloud_attemptsummarytable {
+  border: 1px solid lightgrey;
+  max-width: 450px;
+  margin: auto;
+}
+
+.mod_readaloud_modelaudio_activesentence {
+  background-color: lightyellow;
+}
+
+.collapsespaces .mod_readaloud_grading_passagespace:not(.mod_readaloud_grading_endspace) {
+  display: none;
+}
+
+.mod_readaloud_modeltranscript {
+  background-color: #ddd;
+  border: 1px solid darkgrey;
+  padding: 5px;
+}
+
+.mod_readaloud_progresschart {
+  max-width: 600px;
+  margin: auto;
+}
+
+.mod_readaloud_progressheader {
+  margin-top: 20px;
+}
+
+.mode-chooser {
+  height: 200px;
+  border: 1px solid darkgray;
+  margin-bottom: 10px;
+  position: relative;
+  background-repeat: none;
+  background-repeat: no-repeat;
+  -webkit-background-size: 100px;
+  background-size: 100px;
+  background-position: center 5px;
+  cursor: pointer;
+  width: 300px;
+  margin: 5px;
+}
+
+.mode-chooser.preview {
+  background-image: url([[pix:mod_readaloud|preview]]);
+}
+
+.mode-chooser.readaloudshadow {
+  background-image: url([[pix:mod_readaloud|readaloudshadow]]);
+}
+
+.mode-chooser.readaloud {
+  background-image: url([[pix:mod_readaloud|readaloud]]);
+}
+
+.mode-chooser.landr {
+  background-image: url([[pix:mod_readaloud|listenandrepeat]]);
+}
+
+.mode-chooser.no-show {
+  display:none;
+}
+.mode-chooser.no-click {
+  background-color: lightgrey;
+  pointer-events: none;
+}
+
+.mode-chooser:hover {
+  background-color: #f5f5f5;
+}
+
+.mode-chooser-label {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  height: 80px;
+  border-top: 1px solid darkgray;
+  text-align: center;
+  padding: 5px;
+  font-size: 14px;
+}
+
+#mod_readaloud_button_stopandplay {
+  height: 40px;
+  border: 1px solid transparent;
+  display: none;
+}
+
+.mod_readaloud_modal_target_word {
+  margin-right: 10px;
+  display: inline-block;
+  padding: 5px;
+  margin: 5px;
+  border-radius: 5px;
+  position: relative;
+}
+
+.mod_readaloud_modal_target_word_correct {
+  background-color: rgba(0, 255, 0, 0.5);
+}
+
+.mod_readaloud_modal_target_word_incorrect {
+  background-color: rgba(255, 0, 0, 0.5);
+}
+
+.mod_readaloud_modal_target_word_correct::after {
+  content: " ✔";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -15px;
+}
+
+.mod_readaloud_modal_target_word_incorrect::after {
+  content: " ✘";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -15px;
+}
+
+.mod_readaloud_grading_passageword {
+  cursor: pointer;
+}
+
+#mod_readaloud_landr_modalfinished {
+  display: none;
+}
+
+#mod_readaloud_modal_inner{
+  text-align:center;
+}
+
+#mod_readaloud_modal_controls{
+  height:64px;
+}
+
+/*TT Recorder Styles */
+.mod_readaloud_ttrec_waveButtonContainer {
+  position: relative;
+  margin: auto;
+  border: 2px solid darkgray;
+  border-radius: 10px;
+  width: 200px;
+}
+
+.mod_readaloud_ttrec_waveForm {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background-color: white;
+  border-radius: 10px;
+}
+
+.mod_readaloud_ttrec_waveButton {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  box-shadow: inset 0px 1px 3px #ffccbd, inset 0px -1px 3px #9c282e;
+  color: #000;
+  font-size: 26px;
+  text-shadow: 0px -1px 0px rgba(0, 0, 0, 0.3);
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  margin: auto;
+  color: white;
+  border: none;
+  outline: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background-color: red;
+}
