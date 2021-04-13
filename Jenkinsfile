@@ -315,6 +315,12 @@ def plugins = [
         "dest" : 'question/type/poodllrecording'
     ],
     [
+        "name" : 'mod_minilesson',
+        "url" : 'https://github.com/justinhunt/moodle-mod_minilesson.git',
+        "branch" : 'master',
+        "dest" : 'mod/minilesson'
+    ],
+    [
         "name" : 'mod_subcourse',
         "url" : 'https://github.com/mudrd8mz/moodle-mod_subcourse.git',
         "branch" : 'master',
@@ -420,7 +426,7 @@ def CopyDatabase(mysql_user, mysql_password, mysql_source_host, mysql_source_dbn
             "${mysql_source_dbname} ".toString() +
             '| mysql -h $mysql_dest_host -u $mysql_user --password=$mysql_password ' +
             "${mysql_dest_dbname}".toString()
-        // Piping output of dump directly to mysql to increase speed of transfer. 
+        // Piping output of dump directly to mysql to increase speed of transfer.
         sh 'mysqldump --column-statistics=0 --set-gtid-purged=OFF --single-transaction --no-tablespaces --host $mysql_source_host -u $mysql_user --password=$mysql_password ' +
             "--ignore-table=${mysql_source_dbname}.mdl_logstore_standard_log --ignore-table=${mysql_source_dbname}.mdl_backup_logs --ignore-table=${mysql_source_dbname}.mdl_upgrade_log --ignore-table=${mysql_source_dbname}.mdl_sessions --ignore-table=${mysql_source_dbname}.mdl_stats_daily --ignore-table=${mysql_source_dbname}.mdl_stats_monthly --ignore-table=${mysql_source_dbname}.mdl_stats_weekly --ignore-table=${mysql_source_dbname}.mdl_stats_user_daily --ignore-table=${mysql_source_dbname}.mdl_stats_user_weekly --ignore-table=${mysql_source_dbname}.mdl_stats_user_monthly --ignore-table=${mysql_source_dbname}.mdl_grade_grades_history --ignore-table=${mysql_source_dbname}.mdl_grade_grades --ignore-table=${mysql_source_dbname}.mdl_question_attempts --ignore-table=${mysql_source_dbname}.mdl_question_attempt_steps --ignore-table=${mysql_source_dbname}.mdl_question_attempt_step_data ${mysql_source_dbname} | ".toString() +
             'mysql -h $mysql_dest_host -u $mysql_user --password=$mysql_password ' +
@@ -479,7 +485,7 @@ try {
 
         }
 
-    } 
+    }
     stage('Test - Set Up Environment') {
         node('master') {
             /* Load up necessary credentials */
@@ -571,7 +577,7 @@ try {
                 // Note: this might fail if no changes have been made since last build
                 NotifyOnFail("Failed to push to GitHub: ${err}")
 
-                throw err            
+                throw err
             }
 
             NotifyOnComplete()
