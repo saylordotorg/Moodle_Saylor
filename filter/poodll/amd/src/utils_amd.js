@@ -111,7 +111,11 @@ define(['jquery', 'core/log'], function ($, log) {
         },
 
         doConcatenateBlobs: function (theblobs, thecallback) {
-            switch (theblobs[0].type) {
+           // var mimetype = 'audio/ogg';
+            //can be of format: "audio/ogg; codecs=opus"
+            //still works though
+           var mimetype =theblobs[0].type;
+            switch (mimetype) {
                 case 'audio/wav':
                 case 'audio/pcm':
                     // mediastreamrecorder adds a header to each wav blob,
@@ -126,7 +130,7 @@ define(['jquery', 'core/log'], function ($, log) {
                 case 'audio/mp3':
                 case 'audio/m4a':
                 default:
-                    var concatenatedBlob = this._simpleConcatenateBlobs(theblobs, theblobs[0].type);
+                    var concatenatedBlob = this._simpleConcatenateBlobs(theblobs, mimetype);
                     thecallback(concatenatedBlob);
                     break;
             }// end of switch case

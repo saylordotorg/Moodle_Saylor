@@ -18,6 +18,7 @@
  * Language strings
  *
  * @package   block_checklist
+ * @copyright Fernando Sánchez 2011
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

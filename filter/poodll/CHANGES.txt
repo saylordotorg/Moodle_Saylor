@@ -1,5 +1,10 @@
 Change List
 =========
+Version 3.1.44 (Build 2021040900)
+-Firefox 87 requires audioBitsPerSecond to be set in mediarecorder options
+-See https://github.com/justinhunt/moodle-qtype_poodllrecording/issues/8
+- This fixes it for now. But we need to do more work on this
+
 Version 3.1.43a (Build 2021032901)
 -Zip file corrupt on Moodle org. This is a fresh attempt at a release
 

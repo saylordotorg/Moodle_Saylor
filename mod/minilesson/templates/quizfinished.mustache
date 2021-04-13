@@ -1,0 +1,38 @@
+
+
+<h1 class="text-center">Total Score: {{total}}%</h1>
+<hr>
+<p>
+    <a class="btn btn-primary itemscoresbutton" data-toggle="collapse" href="#itemscores" role="button" aria-expanded="false" aria-controls="itemscores">
+        {{#str}}showitemscores, mod_minilesson{{/str}}
+    </a>
+
+</p>
+<div class="collapse" id="itemscores">
+{{#results}}
+    <div class="mod_minilesson_result_div">
+        <div class="mod_minilesson_result_index">{{index}}</div>
+        <div class="mod_minilesson_result_title">{{title}}</div>
+        <div class="mod_minilesson_result_score">Score: {{correctitems}}/{{totalitems}}</div>
+        <div class="mod_minilesson_result_grade">Grade: {{grade}}%</div>
+    </div>
+{{/results}}
+</div>
+{{#backtocourse}}
+<div class="minilesson_actionbutton">
+<a class="btn btn-secondary backtocourse center" href="{{{courseurl}}}">{{#str}}backtotop, mod_minilesson{{/str}}</a>
+</div>
+{{/backtocourse}}
+{{#reattempturl}}
+<div class="minilesson_actionbutton">
+<a class="btn btn-secondary btn_finished_attempt center" href="{{{reattempturl}}}" data-href="{{{reattempturl}}}" data-action="reattempt">
+    {{#str}}reattempt, mod_minilesson{{/str}}</a>
+</div>
+{{/reattempturl}}
+{{^element.frozen}}
+{{#js}}
+    require(['jquery', 'mod_minilesson/quizfinished'], function($, quizfinished) {
+      quizfinished.init();
+    });
+{{/js}}
+{{/element.frozen}}

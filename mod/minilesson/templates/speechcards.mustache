@@ -1,0 +1,27 @@
+<div id="{{uniqueid}}_container" class="minilesson_questioncontainer" style="display: none">
+  {{> mod_minilesson/quiz_progress}}
+  {{> mod_minilesson/questionheader}} {{> mod_minilesson/progress_dots}}
+
+  <div class="minilesson_speechcards-container">
+
+    <div class="minilesson_speechcards_target_phrase">
+
+
+    </div>
+
+    <div class="minilesson_star_rating">· · ·</div>
+
+    {{> mod_minilesson/cloudpushrecorder}}
+    {{> mod_minilesson/ttrecorder}}
+
+    <div style="text-align:center;">
+      <button style="border: 2px solid darkgray;border-radius: 5px;" class="center-block btn btn-secondary minilesson-speechcards_button minilesson-speechcards_nextbutton" data-glide-dir=">">
+        <i class="fa fa-times"></i> {{#str}}skip, mod_wordcards{{/str}}
+      </button>
+    </div>
+
+  </div>
+
+  {{> mod_minilesson/nextbutton}}
+
+</div>

@@ -160,12 +160,11 @@ if($start_or_continue) {
         if($attempt && !empty($gradinginfo ) && $attempt->grade !=null) {
             $feedback=$attempt->feedback;
             $starrating=true;
+            $rubricresults= utils::display_studentgrade($context,$moduleinstance,$attempt,$gradinginfo,$starrating);
             if($attempt->manualgraded){
                 $evaluator = get_string("teachereval", constants::M_COMPONENT);
-                $rubricresults= utils::display_studentgrade($context,$moduleinstance,$attempt,$gradinginfo,$starrating);
             }else{
                 $evaluator = get_string("autoeval", constants::M_COMPONENT);
-                $rubricresults= utils::display_studentgrade($context,$moduleinstance,$attempt,$gradinginfo,$starrating );
             }
             echo $attempt_renderer->show_teachereval($rubricresults,$feedback,$evaluator);
             $autotranscriptready=true;

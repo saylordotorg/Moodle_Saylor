@@ -1,0 +1,86 @@
+1.3.6 (Build 2021040100)
+-tab and form changes
+-added better lang string for import
+
+1.3.5 (Build 2021030100)
+-Added mecab based comparison for Japanese text
+-Added setup tab
+
+1.3.4 (Build 2021013100)
+ -Improved differencing
+ -Standardized audio recorder
+ -Better support for languages with non Latin alphabet
+
+1.3.3 (Build 2021012400)
+- Better support for non English languages in speech cards
+
+1.3.2 (Build 2020122500)
+- Fixed bug which prevented students "check"ing a definition
+
+1.3.1 (Build 2020121900)
+- Improved import form so that TTS voice and model sentence can be imported
+- Made widths of form fields better
+
+1.3.0 (Build 2020121100)
+-Added a proper flashcards mode
+
+1.2.9 (Build 2020112500)
+-Added an ajax fragmentable form constructor
+-Fixed bug affecting keyboard on mobile devices
+
+1.2.8 (Build 2020111700)
+-Added new speech servers
+
+1.2.7 (Build 2020111000)
+-Adding in TT Recorder
+-Fixed faulty NOT NULL setting on model sentence install.xml
+
+1.2.6 (Build 2020110900)
+-Adding in model sentence and model sentence audio
+
+1.2.5 (Build 2020100200)
+-Adding in missing DB updates not applied in July
+
+1.2.4 (Build 2020091300)
+-Added white text outline on card fronts
+-Fixed issue with images and audio uploads not beong removed
+-Fixed issue with caching of playback audio
+-fixed issue with TTS being used when uploaded audio was available
+
+1.2.3 (Build 2020073100)
+-Added support for non alphabet distractors on keyboard
+-Fixed Postgresql support issue in grading
+-Added new practice type Listen-Choose
+
+1.2.2 (Build 2020071700)
+- fixed some poor ID and CSS declarations that were not scoped
+- added clearer instructions and help icons to form fields
+
+1.2.1 (Build 2020071500)
+-Fixed an issue with upgrades from previous attempts
+-Added a Readme and thirdpartylibs.xml
+-Fixed an issue with an unnecessary dependency on mod_readaloud
+
+1.2.0 Build( 2020070500)
+-Added attempts layer, so user can re-attempt, and grades taken from latest attempt
+-Added support for groups
+-Capabilities tidy up
+
+1.1.9 (Build 2020050200)
+-fixed up version number trouble
+-set proper defaults on fields
+
+1.1.7 (Build 20200425000)
+-Added grading
+
+1.1.5 (Build 20200419100)
+-Added languages and user tagging
+
+1.1.4 (Build 20200201100)
+-Added languages and user tagging
+
+1.1.1 (Build 2019091402)
+-TTS improvements
+
+1.1.0 (Build 2019091400)
+-First release of Wordcards with Apps 4 EFL integrated

@@ -1,0 +1,13 @@
+<tr id="mod_minilesson_item_row_{{id}}" class="mod_minilesson_item_row" data-id="{{id}}">
+    <td class="itemnumber cell c0" style="">{{index}}</td>
+    <td class="itemid cell c1" style="">{{name}}</td>
+    <td class="itemname cell c2" style="">{{typelabel}}</td>
+    <td class="itemdate cell c3" style="">
+        <a href="#" class="mod_minilesson_item_move" data-id="{{id}}" data-direction="up">{{#pix}}{{up.key}},{{up.component}},{{up.title}}{{/pix}}</a>
+        <a href="#" class="mod_minilesson_item_move" data-id="{{id}}" data-direction="down">{{#pix}}{{down.key}},{{down.component}},{{down.title}}{{/pix}}</a>
+    </td>
+    <td class="itemaction cell c4" style=""><a href="#" class="mod_minilesson_item_row_editlink" data-id="{{id}}" data-qtype='{{type}}' data-type="edit" alt="{{#str}}edititem, mod_minilesson{{/str}}">{{#pix}}i/edit{{/pix}}</a>
+        <a href="#" class="mod_minilesson_item_row_previewlink" data-id="{{id}}" data-name="{{name}}" data-type="preview" alt="{{#str}}previewitem, mod_minilesson{{/str}}">{{#pix}}i/preview{{/pix}}</a>
+        <a href="#" class="mod_minilesson_item_row_deletelink" data-id="{{id}}" data-name="{{name}}" data-type="delete" alt="{{#str}}deleteitem, mod_minilesson{{/str}}">{{#pix}}i/delete{{/pix}}</a>
+    </td>
+</tr>

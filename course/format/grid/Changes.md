@@ -1,6 +1,11 @@
 History
 =============
+Version 3.10.1.1 - TBR
+============================
+ 1. Fix 'Site default not applied to setsection0ownpagenogridonesection'.
+
 Version 3.10.1.0 - 29/3/2021
+============================
  1. Fix 'Duplicated section name' - #134.
  2. All course settings now have an option to track the value of the global default as set by the administrator.  Thus, when they change,
     then the course changes without any user interaction on the course.  The reset course functionality is still there and will

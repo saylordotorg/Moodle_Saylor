@@ -24,8 +24,12 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Class block_checklist_edit_form
+ */
 class block_checklist_edit_form extends block_edit_form {
     /**
+     * Fields specific to this block type
      * @param MoodleQuickForm $mform
      * @throws coding_exception
      */

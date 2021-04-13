@@ -231,6 +231,7 @@ class qtype_gapfill_renderer extends qtype_with_combined_feedback_renderer {
         } else if ($question->answerdisplay == "gapfill") {
             /* it is a typetext (gapfill) question */
             $inputattributes['class'] = 'typetext ' . $inputclass;
+            $inputattributes['spellcheck'] = 'false';
             if ($question->letterhints) {
                 $inputattributes = $question->get_letter_hints($qa, $inputattributes, $rightanswer, $currentanswer);
             }

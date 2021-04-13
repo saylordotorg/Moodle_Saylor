@@ -1,0 +1,947 @@
+/* Global div encapsulating all the terms. */
+
+.path-mod-wordcards .terms {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+/* Each term is defined by a .term-wrapper. */
+
+.path-mod-wordcards .term-wrapper {
+    width: 32%;
+    display: inline-block;
+    border: 1px solid #eee;
+    margin-right: 1%;
+    border-radius: 3px;
+    margin-bottom: 10px;
+    float: left;
+}
+
+/* Remove the margin at the end of each 'row'. */
+
+.path-mod-wordcards .term-wrapper:nth-of-type(3n) {
+    margin-right: 0;
+}
+
+.dir-rtl.path-mod-wordcards .term-wrapper {
+    margin-left: 1%;
+    margin-right: 0;
+}
+
+/* Another term div, in case the wrapper wasn't enough. */
+
+.path-mod-wordcards .term {
+    display: block;
+    padding: 5px;
+}
+
+/* The term header, where the title and tick will be. */
+
+.path-mod-wordcards .term-header {
+    position: relative;
+}
+
+/* Term title. Where a right padding is kept to leave room for the tick. */
+
+.path-mod-wordcards .term-header  {
+    font-weight: bold;
+    padding-right: 25px;
+    border-bottom: 1px solid #ccc;
+    /* Separator between title and body. */
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+}
+
+.dir-rtl.path-mod-wordcards .term-header .term-title {
+    padding-right: 0;
+    padding-left: 25px;
+}
+
+/* The term tick, absolutely positioned to the right. */
+
+.path-mod-wordcards .term-header .term-tick {
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+.dir-rtl.path-mod-wordcards .term-header .term-tick {
+    left: 0;
+    right: auto;
+}
+
+/* The term body, where the definition will be displayed. */
+
+.path-mod-wordcards .term-body {
+}
+
+/* Various classes for the appearance of the tick. */
+
+.path-mod-wordcards .term-seen-action {
+    display: block;
+}
+
+.path-mod-wordcards .term-seen-state {
+    display: none;
+}
+
+.path-mod-wordcards .term-seen .term-seen-action {
+    display: none;
+}
+
+.path-mod-wordcards .term-seen .term-seen-state {
+    display: block;
+}
+
+.path-mod-wordcards .term-seen-loading {
+    display: none;
+}
+
+.path-mod-wordcards .term-loading .term-tick > * {
+    /* Hide all the children. */
+    display: none;
+}
+
+.path-mod-wordcards .term-loading .term-seen-loading {
+    display: block;
+}
+
+.path-mod-wordcards .page-footer {
+    margin-top: 20px;
+}
+
+.path-mod-wordcards .page-footer p {
+    text-align: right;
+}
+
+.dirt-rtl.path-mod-wordcards .page-footer p {
+    text-align: left;
+}
+
+.path-mod-wordcards .wordcards {
+    position: relative;
+}
+
+.path-mod-wordcards .wordcards .wordcard {
+    position: absolute;
+    display: table;
+    box-sizing: border-box;
+    background-color: #fff;
+    border: 1px solid #eee;
+    border-radius: 3px;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.path-mod-wordcards .wordcards .wordcard .wordcard-wrapper {
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+}
+
+.path-mod-wordcards .wordcards .wordcard .wordcard-content {
+    overflow: hidden;
+    box-sizing: border-box;
+    padding: 5px;
+}
+
+.path-mod-wordcards .wordcards .wordcard.selected,
+.path-mod-wordcards .wordcards .wordcard.found {
+    background-color: green;
+    color: white;
+    cursor: initial;
+}
+
+.path-mod-wordcards .wordcards .wordcard.mismatch {
+    background-color: red;
+    color: white;
+}
+
+.path-mod-wordcards .wordcards .congrats {
+    width: 300px;
+    height: 100px;
+    padding: 20px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin: -70px 0 0 -170px;
+    display: none;
+    text-align: center;
+    z-index: 1;
+}
+
+.path-mod-wordcards .wordcards .congrats div {
+    padding-bottom: 10px;
+}
+
+.path-mod-wordcards .wordcards_timer {
+    position: absolute;
+    z-index: 1;
+    background-color: #ececec;
+    display: none;
+}
+
+.path-mod-wordcards .wordcards_timer_time {
+}
+
+/**
+ * Students navigate through tabs which look like arrows.
+ *
+ * Arrows need some ::before and ::after to work. A common CSS trick with borders.
+ */
+
+.path-mod-wordcards .student-navigation .student-tab {
+    text-decoration: none;
+    display: block;
+    float: left;
+    height: 40px;
+    background: #ccc;
+    /* Color for disabled tab. */
+    text-align: center;
+    padding: 10px 4px 0 20px;
+    position: relative;
+    margin: 0 10px 10px 0;
+    text-decoration: none;
+    color: #fff;
+    box-sizing: border-box;
+    font-size: 14px;
+}
+
+.dir-rtl.path-mod-wordcards .student-navigation .student-tab {
+    float: right;
+    padding: 10px 20px 0 4px;
+    margin: 0 0 10px 10px;
+}
+
+.path-mod-wordcards .student-navigation .student-tab::after {
+    content: "";
+    border-top: 20px solid transparent;
+    border-bottom: 20px solid transparent;
+    border-left: 12px solid #ccc;
+    /* Color for disabled tab. */
+    position: absolute;
+    right: -12px;
+    top: 0;
+    z-index: 1;
+}
+
+.dir-rtl.path-mod-wordcards .student-navigation .student-tab::after {
+    border-left: 0;
+    border-right: 12px solid #ccc;
+    /* Color for disabled tab. */
+    left: -12px;
+    right: auto;
+}
+
+.path-mod-wordcards .student-navigation .student-tab::before {
+    content: "";
+    border-top: 20px solid transparent;
+    border-bottom: 20px solid transparent;
+    border-left: 12px solid white;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+.dir-rtl.path-mod-wordcards .student-navigation .student-tab::before {
+    border-left: 0;
+    border-right: 12px solid white;
+    right: 0;
+    left: auto;
+}
+
+.path-mod-wordcards .student-navigation .student-tab.active {
+    background: #3498db;
+    /* The arrow colour for clickable tab. */
+}
+
+.path-mod-wordcards .student-navigation .student-tab.active::after {
+    border-left-color: #3498db;
+    /* The arrow colour for clickable tab. */
+}
+
+.dir-rtl.path-mod-wordcards .student-navigation .student-tab.active::after {
+    border-right-color: #3498db;
+    /* The arrow colour for clickable tab. */
+}
+
+.path-mod-wordcards .student-navigation a.student-tab.current,
+.path-mod-wordcards .student-navigation a.student-tab:hover {
+    background: #0070a8;
+    /* The arrow colour for current tab and on hover effect. */
+}
+
+.path-mod-wordcards .student-navigation a.student-tab.current::after,
+.path-mod-wordcards .student-navigation a.student-tab:hover::after {
+    border-left-color: #0070a8;
+    /* The arrow colour for current tab and on hover effect. */
+}
+
+.dir-rtl.path-mod-wordcards .student-navigation a.student-tab.current::after,
+.dir-rtl.path-mod-wordcards .student-navigation a.student-tab:hover::after {
+    border-right-color: #0070a8;
+    /* The arrow colour for current tab and on hover effect. */
+}
+
+/* The step is the number within the arrows. */
+
+.path-mod-wordcards .student-navigation .student-tab .step {
+    border-radius: 50%;
+    background: #fff;
+    color: #ccc;
+    /* Color for disabled tab. */
+    width: 20px;
+    display: inline-block;
+    height: 20px;
+    font-size: 14px;
+}
+
+.path-mod-wordcards .student-navigation .student-tab.active .step {
+    color: #3498db;
+    /* The arrow colour for clickable tab. */
+}
+
+.path-mod-wordcards .student-navigation a.student-tab.current .step,
+.path-mod-wordcards .student-navigation a.student-tab:hover .step {
+    color: #0070a8;
+    /* The arrow colour for current tab and on hover effect. */
+}
+
+.path-mod-wordcards .student-navigation .student-tab .text {
+    display: inline-block;
+}
+
+/* Simple media query to reduce the number of terms to two on the width. */
+
+@media (max-width: 767px) {
+    .path-mod-wordcards .term-wrapper {
+        width: 49%;
+    }
+
+    .path-mod-wordcards .term-wrapper:nth-of-type(3n) {
+        margin-right: 1%;
+    }
+
+    .path-mod-wordcards .term-wrapper:nth-of-type(2n) {
+        margin-right: 0;
+    }
+
+    .dir-rtl.path-mod-wordcards .term-wrapper:nth-of-type(3n) {
+        margin-right: 0;
+        margin-left: 1%;
+    }
+
+    .dir-rtl.path-mod-wordcards .term-wrapper:nth-of-type(2n) {
+        margin-left: 0;
+    }
+}
+
+/* Simple media query for terms to go full width. */
+
+@media (max-width: 500px) {
+    .path-mod-wordcards .term-wrapper {
+        width: 100%;
+        margin-right: 0;
+        margin-left: 0;
+    }
+}
+
+/* ACTIVITY CSS */
+
+#wordcards-gameboard {
+    margin-top: 20px;
+    display: none;
+}
+
+#wordcards-results {
+    display: none;
+}
+
+#wordcards-answer-input {
+    width: 100%;
+    border-radius: 5px;
+    padding: 5px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+#wordcards-quit-button {
+    display: none;
+}
+
+#wordcards-counter {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    text-align: center;
+    font-size: 28px;
+    background-color: black;
+    color: lawngreen;
+    border: 5px solid lightgray;
+    height: 50px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#wordcards-question {
+    border: 3px solid #6780ca;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    text-align: center;
+    font-size: 35px;
+    padding: 10px;
+    background-color: #f5f5f5;
+    height: 100px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: content-box;
+}
+
+.a4e-flashcard-img {
+    width: 64px;
+    height: auto;
+    display: block;
+}
+
+.a4e-prompt-img {
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    bottom: 0;
+    height: 100px;
+    width: auto;
+    border: 1px solid black;
+}
+
+.a4e-distractors {
+    text-align: center;
+    font-size: 20px;
+}
+
+.a4e-distractor:hover {
+    background-color: #f7f7f7;
+}
+
+.a4e-distractor {
+    cursor: pointer;
+}
+
+.a4e-correct-glyph {
+    color: green;
+}
+
+.a4e-incorrect-glyph {
+    color: red;
+}
+
+.a4e-click-disabled {
+    pointer-events: none;
+}
+
+/* FLASHCARDS */
+
+.a4e-flashcards-container {
+    text-align: center;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border: 2px solid darkgray;
+    padding: 5px;
+}
+
+.a4e-card {
+    cursor: pointer;
+    display: inline-block;
+    margin: 5px;
+    width: 250px;
+    height: 100px;
+}
+
+.a4e-card .front {
+    position: relative;
+    background-color: #FFFFFF;
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    padding: 10px;
+    width: 250px;
+    height: 100px;
+    text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;
+}
+
+.a4e-card .back {
+    position: relative;
+    background-color: #F7E7E7;
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    padding: 10px;
+    width: 250px;
+    height: 100px;
+}
+
+.play-tts {
+    position: absolute;
+    left: 0;
+    top: -12px;
+    border-right: 1px solid darkgray !important;
+    border-bottom: 1px solid darkgray !important;
+}
+
+/* FEEDBACK */
+
+.a4e-correct {
+    background-color: rgba(0, 255, 0, .5) !important;
+    border: 1px solid black;
+    border-radius: 5px;
+    padding: 1px;
+}
+
+.a4e-incorrect {
+    background-color: rgba(255, 0, 0, .5) !important;
+    border: 1px solid black;
+    border-radius: 5px;
+    padding: 1px;
+}
+
+.a4e-basic_feedback {
+    text-align: center;
+    padding: 10px;
+    margin-bottom: 5px;
+    border: 1px solid darkgray;
+}
+
+.a4e-detailed_feedback_div {
+    text-align: left;
+    padding: 10px;
+    font-size: 20px;
+    border-radius: 5px;
+    margin: 5px;
+    display: inline-block;
+    width: 100%;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    vertical-align: top;
+}
+
+#wordcards-submitted {
+    height: 64px;
+    padding: 10px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    border: 1px solid black;
+    text-align: center;
+    font-size: 30px;
+}
+
+/* KEYBOARD */
+
+.chunk-key {
+    width: 50px;
+    height: 50px;
+    background-color: #f5f5f5;
+    border-radius: 5px;
+    border: 1px solid black;
+    margin: 5px;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.chunk-key-inner {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 36px;
+}
+
+#chunk-input {
+    width: 100%;
+    text-align: center;
+    border: 1px solid black;
+    vertical-align: top;
+    padding-top: 50px;
+    padding-bottom: 60px;
+    position: relative;
+    box-sizing: border-box;
+}
+
+#chunk-typed {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 40px;
+    border-bottom: 1px solid black;
+    box-sizing: border-box;
+}
+
+#chunk-typed-inner {
+    height: 40px;
+    font-size: 26px;
+    width: 100%;
+    overflow-x: auto;
+    box-sizing: border-box;
+    background-color: #f5f5f5;
+    border-bottom: 1px solid black;
+}
+
+#chunk-input-controls {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    border-top: 1px solid black;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+.chunk-input-control {
+    height: 49px;
+    width: 50%;
+    float: left;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    cursor: pointer;
+}
+
+.chunk-input-disabled {
+    opacity: 0.3;
+    pointer-events: none;
+}
+
+.a4e-key-pressed {
+    background-color: rgba(0, 0, 0, 0.3) !important;
+}
+
+.a4e-key-disabled {
+    pointer-events: none;
+    opacity: 0.3;
+}
+
+/* SPEECH CARDS */
+
+#speech-container {
+    border: 1px solid darkgray;
+    margin-bottom: 5px;
+    padding: 10px;
+}
+
+#wordcards-speechcards_pushrecorder {
+    text-align: center;
+    background-image: url([[pix:mod_wordcards|spinner]]);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.wordcards-speechcards_toprow {
+    margin: 15px auto;
+    display: flex;
+    justify-content: center;
+}
+
+.wordcards-speechcards_whatheard {
+    width: 400px;
+    border: dotted 1px;
+    border-color: green;
+    text-align: center;
+    margin: 1px;
+}
+
+.wordcards-speechcards_gotit {
+    color: white;
+    background-color: green;
+}
+
+.wordcards-speechcards_button {
+}
+
+.wordcards_loading {
+    text-align: center;
+    margin: 20px;
+    padding: 10px;
+}
+
+.wordcards_loadingtext {
+    margin: 10px;
+}
+
+.mod_wordcards_instructions {
+    text-align: center;
+    margin: auto;
+    font-style: italic;
+    padding: 5px;
+    max-width: 650px;
+}
+
+.mod_wordcards_activity_header {
+    text-align: center;
+    margin: auto;
+    padding: 10px;
+    border: 1px solid darkgray;
+    border-radius: 5px;
+}
+
+.mod_wordcards_activity_header h3 {
+    text-align: center;
+}
+
+/* PROGRESS DOTS */
+
+#wordcards-progress-dots {
+    font-size: 40px;
+    text-align: center;
+    letter-spacing: 10px;
+    border: 1px solid darkgray;
+    margin-bottom: 5px;
+}
+
+#wordcards-star-rating {
+    letter-spacing: 20px;
+    text-align: center;
+    font-size: 30px;
+}
+/*
+#container {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+*/
+
+#try-again-or-next {
+    height: 48px;
+    border: 1px solid black;
+    margin-bottom: 50px;
+}
+
+.mod_wordcards_actionbuttons {
+    text-align: right;
+}
+
+.mod_wordcards_listbuttons {
+    margin: 10px;
+    display: grid;
+}
+
+/*TT Recorder Styles */
+.mod_wordcards_ttrec_waveButtonContainer {
+    position: relative;
+    margin: auto;
+    border: 2px solid darkgray;
+    border-radius: 10px;
+    width: 200px;
+}
+
+.mod_wordcards_ttrec_waveForm {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background-color: white;
+    border-radius: 10px;
+}
+
+.mod_wordcards_ttrec_waveButton {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    box-shadow: inset 0px 1px 3px #ffccbd, inset 0px -1px 3px #9c282e;
+    color: #000;
+    font-size: 26px;
+    text-shadow: 0px -1px 0px rgba(0, 0, 0, 0.3);
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    margin: auto;
+    color: white;
+    border: none;
+    outline: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background-color: red;
+}
+
+.path-mod-wordcards .term-header .term-modelsentence {
+    font-weight: normal;
+    margin-top: 2px;
+}
+
+.wordcards-poodllspeechcards_box {
+    text-align: center;
+    padding: 10px;
+    border: 1px solid black;
+    font-size: 32px;
+    width: 75%;
+    margin: auto;
+    border-radius: 10px;
+    box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.75);
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+ /* flashcards_mode style start */
+ 
+.ProgressBar {
+  margin: 0 auto;
+  padding: 2em 0 3em;
+  list-style: none;
+  position: relative;
+  display: -webkit-box;
+  display: flex;
+  -webkit-box-pack: justify;
+          justify-content: space-between;
+	width: 37%;	  
+}
+
+.ProgressBar-step {
+  text-align: center;
+  position: relative;
+  width: 100%;
+  margin-left:3%;
+}
+.ProgressBar-step:before, .ProgressBar-step:after {
+  content: "";
+  height: 0.5em;
+  /*background-color: #9F9FA3;*/
+  position: absolute;
+  z-index: 1;
+  width: 100%;
+  left: -50%;
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+          transform: translateY(-50%);
+  -webkit-transition: all .25s ease-out;
+  transition: all .25s ease-out;
+}
+.ProgressBar-step:first-child:before, .ProgressBar-step:first-child:after {
+  display: none;
+}
+.ProgressBar-step:after {
+ /* background-color: #00637C;*/
+  width: 0%;
+}
+.ProgressBar-step.is-complete + .ProgressBar-step.is-current:after, .ProgressBar-step.is-complete + .ProgressBar-step.is-complete:after {
+  width: 100%;
+}
+
+.ProgressBar-icon {
+    width: 1.5em;
+    height: 1.5em;
+    /* background-color: #9F9FA3; */
+    /* fill: #9F9FA3; */
+	cursor: pointer;
+    border-radius: 50%;
+    border: 1px solid;
+    padding: 0.5em;
+    max-width: 100%;
+    z-index: 10;
+    position: relative;
+    -webkit-transition: all .25s ease-out;
+    transition: all .25s ease-out;
+}
+.is-current .ProgressBar-icon {
+    fill: #4f544f;
+    background-color: #4f544f;
+}
+.is-complete .ProgressBar-icon {
+ fill: #008000;
+  background-color: #008000;
+}
+
+.ProgressBar-stepLabel {
+  display: block;
+  text-transform: uppercase;
+  color: #9F9FA3;
+  position: absolute;
+  padding-top: 0.5em;
+  width: 100%;
+  -webkit-transition: all .25s ease-out;
+  transition: all .25s ease-out;
+}
+.is-current > .ProgressBar-stepLabel, .is-complete > .ProgressBar-stepLabel {
+  color: #00637C;
+}
+
+.wrapper_pr {
+  max-width: 100%;
+  /* margin: 4em auto; */
+  font-size: 16px;
+}
+ .definition_flashcards_ul li {
+   list-style: none;
+   }
+   .df_fl{
+   width: 60%;
+   margin: 0 auto;
+   }
+   .df_fl_control{
+   width: 60%;
+   margin: 0 auto;
+   }	
+   .df_fl_control a {
+   font-size: 35px;
+   color: #e2510c;
+   cursor: pointer;
+   }
+   .df_fl_control button {
+    border: unset !important;
+    background-color: unset;
+}
+.df_fl_control .fa {
+    font-size: 30px;
+}
+
+ul.definition_flashcards_ul {
+    border: 2px solid #546f1f;
+    padding: 8px;
+}
+.df_fl_control button:focus {
+    outline: unset !important;
+}
+.mb_nav {
+    text-align: center;
+}
+.add_opacity_level{
+	opacity: 0.6;
+}
+
+.add_wraper_handle_im{
+	margin-top: 5%;
+	width: 100% !important;
+}
+.add_wraper_handle{
+	width: 100% !important;
+}
+@media only screen and (max-width: 750px) {
+
+ .df_fl{
+   width: 100%;
+   margin: 0 auto;
+   }
+}
+
+.flash_img{
+    max-width: 100%;
+	width: auto;
+	height: 180px;
+}
+
+.wordcards_display_options {
+   float: right;
+}
+.wordcards_display_option {
+   cursor: pointer;
+   padding: 8px;
+}
+ /* flashcards_mode style code */

@@ -18,6 +18,7 @@
  * Language strings
  *
  * @package   gradeexport_checklist
+ * @copyright Luiggi Sansonetti 2012
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

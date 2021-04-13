@@ -1,0 +1,40 @@
+{{!
+    Student navigation are tabs made of CSS arrows.
+
+    Structure is as follows:
+
+    <div class="student-navigation">
+        <!-- For clickable tabs. -->
+        <a href="#" class="active student-tab">
+            <div class="step"></div>
+            <div class="text"></div>
+        </a>
+
+        <!-- For non-clickable tabs. -->
+        <div class="student-tab">
+            <div class="step"></div>
+            <div class="text"></div>
+        </div>
+    </div>
+
+}}
+
+<div class="student-navigation clearfix">
+    {{#tabs}}
+        {{^inactive}}
+            <a href="{{url}}" class="student-tab active {{#current}}current{{/current}}">
+        {{/inactive}}
+        {{#inactive}}
+            <div class="student-tab">
+        {{/inactive}}
+            {{step}}
+            <i class='fa {{icon}}'></i>
+            <div class="text">{{text}}</div>
+        {{^inactive}}
+            </a>
+        {{/inactive}}
+        {{#inactive}}
+            </div>
+        {{/inactive}}
+    {{/tabs}}
+</div>

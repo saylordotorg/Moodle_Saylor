@@ -1,0 +1,24 @@
+<div id='chunk-input' data-id='{{dataid}}' class='noselect'>
+  
+  <div id='chunk-typed'>
+    <div id='chunk-typed-inner'></div>
+  </div>
+  
+  {{#letters}}
+  
+  <div class='chunk-key' data-val='{{charcode}}' style='cursor: pointer'>
+    <div class='chunk-key-inner'>{{{letter}}}</div>
+  </div>{{/letters}}
+  
+  <div id='chunk-input-controls'>
+    
+    <div id='delete-chunk-input' class='btn-primary chunk-input-control'>
+      <i class='fa fa-caret-square-o-left'></i>
+    </div>
+    
+    <div id='submit-chunk-input' class='btn-success chunk-input-control'>
+      <i class='fa fa-check'></i>
+    </div>
+    
+  </div>
+</div>

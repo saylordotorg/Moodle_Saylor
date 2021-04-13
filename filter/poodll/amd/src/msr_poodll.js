@@ -62,8 +62,8 @@ define(['jquery',
 
             },
 
-            start: function () {
-                this.therecorder.start();
+            start: function (timeinterval) {
+                this.therecorder.start(timeinterval);
                 //start audio analyser which generates events for wav/freq visualisations
                 this.audioanalyser.start();
             },
