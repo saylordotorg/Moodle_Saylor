@@ -337,6 +337,12 @@ def plugins = [
         "url" : 'https://github.com/justinhunt/moodle-mod_wordcards.git',
         "branch" : 'master',
         "dest" : 'mod/wordcards'
+    ],
+    [
+        "name" : 'mod_minilesson',
+        "url" : 'https://github.com/justinhunt/moodle-mod_minilesson.git',
+        "branch" : 'master',
+        "dest" : 'mod/minilesson'
     ]
 ]
 
