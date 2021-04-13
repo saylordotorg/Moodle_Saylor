@@ -343,6 +343,12 @@ def plugins = [
         "url" : 'https://github.com/justinhunt/moodle-mod_minilesson.git',
         "branch" : 'master',
         "dest" : 'mod/minilesson'
+    ],
+    [
+        "name" : 'mod_readaloud',
+        "url" : 'https://github.com/justinhunt/moodle-mod_readaloud.git',
+        "branch" : 'master',
+        "dest" : 'mod/readaloud'
     ]
 ]
 
