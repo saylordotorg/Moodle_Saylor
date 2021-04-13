@@ -331,6 +331,12 @@ def plugins = [
         "url" : 'https://github.com/sharpchi/moodle-atto_linkadv.git',
         "branch" : 'master',
         "dest" : 'lib/editor/atto/plugins/linkadv'
+    ],
+    [
+        "name" : 'mod_wordcards',
+        "url" : 'https://github.com/justinhunt/moodle-mod_wordcards.git',
+        "branch" : 'master',
+        "dest" : 'mod/wordcards'
     ]
 ]
 
