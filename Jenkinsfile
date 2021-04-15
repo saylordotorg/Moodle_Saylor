@@ -355,6 +355,12 @@ def plugins = [
         "url" : 'https://github.com/justinhunt/moodle-mod_readaloud.git',
         "branch" : 'master',
         "dest" : 'mod/readaloud'
+    ],
+    [
+        "name" : 'filter_filtercodes',
+        "url" : 'https://github.com/michael-milette/moodle-filter_filtercodes.git',
+        "branch": 'master',
+        "dest" : 'filter/filtercodes'
     ]
 ]
 
