@@ -361,6 +361,60 @@ def plugins = [
         "url" : 'https://github.com/michael-milette/moodle-filter_filtercodes.git',
         "branch": 'master',
         "dest" : 'filter/filtercodes'
+    ],
+    [
+        "name" : 'theme_edumy',
+        "url" : 'https://github.com/dta121/theme_edumy.git',
+        "branch" : 'main',
+        "dest" : 'theme/edumy'
+    ],
+    [
+        "name" : 'report_completionoverview',
+        "url" : 'https://github.com/dta121/report_overviewstats.git',
+        "branch" : 'main',
+        "dest" : 'report/completionoverview'
+    ],
+    [
+        "name" : 'report_coursestats',
+        "url" : 'https://github.com/dta121/report_coursestats.git',
+        "branch" : 'main',
+        "dest" : 'report/coursestats'
+    ],
+    [
+        "name" : 'block_cocoon_course_categories_2',
+        "url" : 'https://github.com/dta121/block_cocoon_course_categories_2.git',
+        "branch" : 'main',
+        "dest" : 'blocks/cocoon_course_categories_2'
+    ],
+    [
+        "name" : 'block_cocoon_featuredcourses',
+        "url" : 'https://github.com/dta121/block_cocoon_featuredcourses.git',
+        "branch" : 'main',
+        "dest" : 'blocks/cocoon_featuredcourses'
+    ],
+    [
+        "name" : 'block_lambda_dedication',
+        "url" : 'https://github.com/dta121/block_lambda_dedication.git',
+        "branch" : 'master',
+        "dest" : 'blocks/lambda_dedication'
+    ],
+    [
+        "name" : 'local_lambda_dedication',
+        "url" : 'https://github.com/dta121/local_lambda_dedication.git',
+        "branch" : 'main',
+        "dest" : 'local/lambda_dedication'
+    ],
+    [
+        "name" : 'local_lambda_time_tracker',
+        "url" : 'https://github.com/dta121/local_lambda_time_tracker.git',
+        "branch" : 'main',
+        "dest" : 'local/lambda_time_tracker'
+    ],
+    [
+        "name" : 'block_lambda_time_tracker',
+        "url" : 'https://github.com/dta121/block_lambda_time_tracker',
+        "branch" : 'main',
+        "dest" : 'blocks/lambda_time_tracker'
     ]
 ]
 
