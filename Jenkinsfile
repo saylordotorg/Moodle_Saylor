@@ -415,6 +415,12 @@ def plugins = [
         "url" : 'https://github.com/dta121/block_lambda_time_tracker',
         "branch" : 'main',
         "dest" : 'blocks/lambda_time_tracker'
+    ],
+    [
+        "name" : 'mod_simplecertificate',
+        "url" : 'https://github.com/bozoh/moodle-mod_simplecertificate.git',
+        "branch" : 'master',
+        "dest" : 'mod/simplecertificate'
     ]
 ]
 
