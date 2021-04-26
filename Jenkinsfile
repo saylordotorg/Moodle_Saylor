@@ -367,18 +367,6 @@ def plugins = [
         "url" : 'https://github.com/bozoh/moodle-mod_simplecertificate.git',
         "branch" : 'master',
         "dest" : 'mod/simplecertificate'
-    ],
-    [
-    "name" : 'block_lambda_dedication',
-    "url" : 'https://github.com/saylordotorg/moodle-block_lambda_dedication.git',
-    "branch" : 'master',
-    "dest" : 'blocks/lambda_dedication'
-    ],
-    [
-    "name" : 'local_lambda_dedication',
-    "url" : 'https://github.com/saylordotorg/moodle-local_lambda_dedication.git',
-    "branch" : 'main',
-    "dest" : 'local/lambda_dedication'
     ]
 ]
 
