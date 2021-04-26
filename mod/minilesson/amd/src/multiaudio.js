@@ -44,9 +44,9 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'mod_minilesson/poll
         self.next_question(0);
       });
       
-      $("#" + itemdata.uniqueid + "_container .minilesson_mc_response").on('click', function(e) {
+      $("#" + itemdata.uniqueid + "_container .mcplayrow").on('click', function(e) {
         //if disabled =>just return (already answered)
-          if($("#" + itemdata.uniqueid + "_container .minilesson_mc_response").hasClass('minilesson_mc_disabled')){
+          if($("#" + itemdata.uniqueid + "_container .mcplayrow").hasClass('minilesson_mc_disabled')){
             return;
           }
 
@@ -64,6 +64,8 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'mod_minilesson/poll
           }else{
               theplayer[0].pause();
               theplayer[0].currentTime=0;
+              $("#" + itemdata.uniqueid + "_container .minilesson_mc_playstate").removeClass("fa-spin fa-spinner").addClass("fa-play");
+              self.playing = false;
           }
 
           //get selected item index
@@ -85,10 +87,8 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'mod_minilesson/poll
     process_accepted_response: function(itemdata, checked){
 
         //disable the answers, cos its answered
-        $("#" + itemdata.uniqueid + "_container .minilesson_mc_response").addClass('minilesson_mc_disabled');
+        $("#" + itemdata.uniqueid + "_container .mcplayrow").addClass('minilesson_mc_disabled');
 
-        //remove any audio player artifacts
-        $("#" + itemdata.uniqueid + "_container .minilesson_mc_playstate").hide();
 
         //turn dots into text (if they were dots)
         if(parseInt(itemdata.show_text)==0) {
@@ -104,7 +104,7 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'mod_minilesson/poll
         $("#" + itemdata.uniqueid + "_option" + itemdata.correctanswer + " .minilesson_mc_right").show();
 
         //highlight selected answers
-        $("#" + itemdata.uniqueid + "_option" + checked).addClass('minilesson_mc_selected');
+        $("#" + itemdata.uniqueid + "_option" + checked + ' .minilesson_mc_response').addClass('minilesson_mc_selected');
 
 
         var percent = checked == itemdata.correctanswer ? 100 : 0;

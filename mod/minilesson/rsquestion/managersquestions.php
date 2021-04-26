@@ -252,6 +252,11 @@ if ($edit) {
         }else{
             $data->addiframe = 0;
         }
+        if(!empty($data->{constants::QUESTIONTEXTAREA})){
+            $data->addtextarea = 1;
+        }else{
+            $data->addtextarea = 0;
+        }
 
         //init our itemmedia upload file field
         $draftitemid = file_get_submitted_draft_itemid(constants::MEDIAQUESTION);

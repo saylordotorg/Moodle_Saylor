@@ -154,6 +154,7 @@ abstract class baseform extends \moodleform {
                 $togglearray[] =& $mform->createElement('advcheckbox','addmedia',get_string('addmedia',constants::M_COMPONENT),'');
                 $togglearray[] =& $mform->createElement('advcheckbox','addiframe',get_string('addiframe',constants::M_COMPONENT),'');
                 $togglearray[] =& $mform->createElement('advcheckbox','addttsaudio',get_string('addttsaudio',constants::M_COMPONENT),'');
+                $togglearray[] =& $mform->createElement('advcheckbox','addtextarea',get_string('addtextarea',constants::M_COMPONENT),'');
                 $mform->addGroup($togglearray, 'togglearray', '', array(' '), false);
                 //in the case of page we assume they will want to use some media
                 if($this->type== constants::TYPE_PAGE) {
@@ -192,6 +193,14 @@ abstract class baseform extends \moodleform {
                     $mform->disabledIf(constants::TTSQUESTION, 'addttsaudio', 'neq', 1);
                     $mform->disabledIf(constants::TTSQUESTIONVOICE, 'addttsaudio', 'neq', 1);
                     $mform->disabledIf(constants::TTSQUESTIONOPTION, 'addttsaudio', 'neq', 1);
+                }
+                //Question textarea
+                $mform->addElement('textarea', constants::QUESTIONTEXTAREA, get_string('itemtextarea', constants::M_COMPONENT), array('wrap'=>'virtual','style'=>'width: 100%;'));
+                $mform->setType(constants::QUESTIONTEXTAREA, PARAM_RAW);
+                if($m35){
+                    $mform->hideIf(constants::QUESTIONTEXTAREA, 'addtextarea', 'neq', 1);
+                }else {
+                    $mform->disabledIf(constants::QUESTIONTEXTAREA, 'addtextarea', 'neq', 1);
                 }
 
 
@@ -252,6 +261,11 @@ abstract class baseform extends \moodleform {
 
     protected final function add_showtextpromptoptions($name, $label = null, $default=constants::TEXTPROMPT_DOTS) {
         $options = utils::fetch_options_textprompt();
+        return $this->add_dropdown($name,$label,$options,$default);
+    }
+
+    protected final function add_showlistorreadoptions($name, $label = null, $default=constants::LISTENORREAD_READ) {
+        $options = utils::fetch_options_listenorread();
         return $this->add_dropdown($name,$label,$options,$default);
     }
 
@@ -367,10 +381,19 @@ abstract class baseform extends \moodleform {
      * @param string $label, null means default
      * @return void
      */
-    protected final function add_voiceselect($name, $label = null) {
+    protected final function add_voiceselect($name, $label = null, $showif=false) {
+        global $CFG;
         $showall =true;
-        $voiceoptions = utils::get_tts_voices($this->moduleinstance->ttslanguage,$showall);
-        $this->add_dropdown($name, $label,$voiceoptions);
+        $allvoiceoptions = utils::get_tts_voices($this->moduleinstance->ttslanguage,$showall);
+        $somevoiceoptions = utils::get_tts_voices($this->moduleinstance->ttslanguage,!$showall);
+        $defaultvoice =array_pop($somevoiceoptions );
+        $this->add_dropdown($name, $label,$allvoiceoptions,$defaultvoice);
+        $m35 = $CFG->version >= 2018051700;
+        if($m35){
+            $this->_form->hideIf($name, $showif, 'neq', 1);
+        }else {
+            $this->_form->disabledIf($name, $showif, 'neq', 1);
+        }
     }
 
     /**
@@ -379,9 +402,16 @@ abstract class baseform extends \moodleform {
      * @param string $label, null means default
      * @return void
      */
-    protected final function add_voiceoptions($name, $label = null) {
+    protected final function add_voiceoptions($name, $label = null,  $showif=false) {
+        global $CFG;
         $voiceoptions = utils::get_tts_options();
         $this->add_dropdown($name, $label,$voiceoptions);
+        $m35 = $CFG->version >= 2018051700;
+        if($m35){
+            $this->_form->hideIf($name, $showif, 'neq', 1);
+        }else {
+            $this->_form->disabledIf($name, $showif, 'neq', 1);
+        }
     }
     /**
      * Convenience function: Adds a dropdown list of tts language

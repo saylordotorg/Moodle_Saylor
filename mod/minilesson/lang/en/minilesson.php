@@ -117,7 +117,7 @@ $string['notgradedyet'] = 'Your submission has been received, but has not been g
 $string['enabletts'] = 'Enable TTS(experimental)';
 $string['enabletts_details'] = 'TTS is currently not implemented';
 //we hijacked this setting for both TTS STT .... bad ... but they are always the same aren't they?
-$string['ttslanguage'] = 'TTS Voice Language';
+$string['ttslanguage'] = 'Target/Voice Language';
 $string['deleteattemptconfirm'] = "Are you sure that you want to delete this attempt?";
 $string['deletenow']='';
 $string['itemsperpage']='Items per page';
@@ -408,6 +408,9 @@ $string['showoptionsastext'] = 'Show answers as text';
 $string['showtextprompt'] = 'Show text prompt';
 $string['textprompt_words'] = 'Show full text';
 $string['textprompt_dots'] = 'Show dots instead of letters';
+$string['listenorread'] = "Display options as";
+$string['listenorread_read'] = 'plain text';
+$string['listenorread_listen']= 'audio players';
 
 $string['gradenow']= 'Grade Now';
 
@@ -441,6 +444,7 @@ $string['itemmedia'] ='Image, audio or video to show';
 $string['itemttsquestion'] ='Text to be read';
 $string['itemttsquestionvoice'] ='Speaker\'s voice';
 $string['itemiframe'] ='iFrame embed code';
+$string['itemtextarea'] = 'Text Block';
 $string['prompt-separate'] ='Text and media separate (recommended)';
 $string['prompt-richtext'] ='Rich Text';
 $string['prompttype'] ='Text and Media';
@@ -461,6 +465,7 @@ $string['reattemptbody'] = 'If you continue your previous attempt will be replac
 $string['addmedia'] = 'Add Media';
 $string['addiframe'] = 'Add iFrame';
 $string['addttsaudio'] = 'Add TTS Audio';
+$string['addtextarea'] = 'Add Text Block';
 
 //showtextprompt
 $string['showtextprompt'] = 'Show text prompt';
@@ -474,3 +479,4 @@ $string['ttsslow']='Slow';
 $string['ttsveryslow']='Very Slow';
 $string['ttsssml']='SSML';
 $string['choosevoiceoption']='Voice Options';
+

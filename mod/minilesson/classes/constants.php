@@ -76,6 +76,7 @@ const TTSQUESTION = 'itemtts';
 const TTSQUESTIONVOICE = 'itemttsvoice';
 const TTSQUESTIONOPTION = 'itemttsoption';
 const MEDIAQUESTION = 'itemmedia';
+const QUESTIONTEXTAREA = 'itemtextarea';
 const MEDIAIFRAME = 'customdata5';
 const TEXTANSWER = 'customtext';
 const CUSTOMDATA = 'customdata';
@@ -94,6 +95,11 @@ const MAXCUSTOMINT=5;
 const SHOWTEXTPROMPT = 'customint1';
 const TEXTPROMPT_WORDS = 1;
 const TEXTPROMPT_DOTS = 0;
+
+const LISTENORREAD = 'customint2';
+const LISTENORREAD_READ = 0;
+const LISTENORREAD_LISTEN = 1;
+
 
 const TTS_NORMAL = 0;
 const TTS_SLOW = 1;

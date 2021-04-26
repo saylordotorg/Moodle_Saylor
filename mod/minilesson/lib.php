@@ -760,6 +760,12 @@ function minilesson_output_fragment_mform($args) {
                 }else{
                     $data->addiframe = 0;
                 }
+                if(!empty($data->{constants::QUESTIONTEXTAREA})){
+                    $data->addtextarea = 1;
+                }else{
+                    $data->addtextarea = 0;
+                }
+
 
 
                 //init our itemmedia field

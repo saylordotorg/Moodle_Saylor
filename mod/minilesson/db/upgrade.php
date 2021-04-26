@@ -124,6 +124,22 @@ function xmldb_minilesson_upgrade($oldversion) {
         }
         upgrade_mod_savepoint(true, 2021031500, 'minilesson');
     }
+    // Add Question TextArea item  to minilesson table
+    if ($oldversion < 2021041500) {
+        $table = new xmldb_table(constants::M_QTABLE);
+
+        // Define fields itemtts and itemtts voice to be added to minilesson
+        $fields=[];
+        $fields[] = new xmldb_field('itemtextarea', XMLDB_TYPE_TEXT, null, null, null, null);
+
+        // Add fields
+        foreach ($fields as $field) {
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+        upgrade_mod_savepoint(true, 2021041500, 'minilesson');
+    }
 
     // Final return of upgrade result (true, all went good) to Moodle.
     return true;

@@ -1,8 +1,5 @@
-<div id="{{uniqueid}}_container" class="minilesson_questioncontainer" style="display: none">
-  {{> mod_minilesson/quiz_progress}}
-  <audio id="{{uniqueid}}_player"></audio>
-  <!-- @@CLOUDPOODLLTOKEN@@ -->
-  {{> mod_minilesson/questionheader}} {{#sentences}}
+{{> mod_minilesson/questionheader}}
+{{#sentences}}
   <div class="row dictationrow">
     <div class="col-md-1 poodlldictationplayer dictationplayer_{{index}}">
       <button class="dictationtrigger btn btn-secondary" data-src="@AUDIO@"><i class="fa fa-play"></i></button>
@@ -17,5 +14,5 @@
       </div>
     </div>
   </div>
-  {{/sentences}} {{> mod_minilesson/nextbutton}}
-</div>
+  {{/sentences}}
+{{> mod_minilesson/questionfooter}}

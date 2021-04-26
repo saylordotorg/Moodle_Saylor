@@ -1,10 +1,3 @@
-<div id="{{uniqueid}}_container" class="minilesson_questioncontainer" style="display: none">
-  {{> mod_minilesson/quiz_progress}}
-  <audio id="{{uniqueid}}_player"></audio>
-  <!-- @@CLOUDPOODLLTOKEN@@ -->
-  {{> mod_minilesson/questionheader}}
+{{> mod_minilesson/questionheader}}
   <iframe src="{{{customtext1}}}&useremail={{useremail}}" allow="camera;microphone" style="padding:20px;border:1px solid lightgray;width:100%;height:800px" ></iframe>
-
-
-  {{> mod_minilesson/nextbutton}}
-</div>
+{{> mod_minilesson/questionfooter}}

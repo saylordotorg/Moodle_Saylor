@@ -207,6 +207,11 @@ class helper
             }
         }
 
+        //Item Text Area
+        if (property_exists($data, constants::QUESTIONTEXTAREA)) {
+            $theitem->{constants::QUESTIONTEXTAREA} = $data->{constants::QUESTIONTEXTAREA};
+        }
+
 
         //save correct answer if we have one
         if (property_exists($data, constants::CORRECTANSWER)) {

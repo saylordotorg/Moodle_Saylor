@@ -643,6 +643,12 @@ class utils{
         return $options;
     }
 
+    public static function fetch_options_listenorread() {
+        $options = array(constants::LISTENORREAD_READ => get_string("listenorread_read", constants::M_COMPONENT),
+                constants::LISTENORREAD_LISTEN => get_string("listenorread_listen", constants::M_COMPONENT));
+        return $options;
+    }
+
     public static function fetch_pagelayout_options(){
         $options = Array(
                 'frametop'=>'frametop',

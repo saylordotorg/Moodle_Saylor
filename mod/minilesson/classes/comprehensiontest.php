@@ -121,6 +121,8 @@ class comprehensiontest
             $testitem->type=$item->type;
             if($this->mod->showqtitles||$forcetitles){$testitem->title=$item->name;}
             $testitem->uniqueid=$item->type . $testitem->number;
+
+            //The question header area (audio, video, tts, image iframe , text instrucions etc)
             switch($testitem->type) {
                 case constants::TYPE_DICTATION:
                 case constants::TYPE_DICTATIONCHAT:
@@ -186,6 +188,11 @@ class comprehensiontest
                     $testitem->itemttsoption=$item->{constants::TTSQUESTIONOPTION};
                 }
 
+                //Question TextArea
+                if(!empty(trim($item->{constants::QUESTIONTEXTAREA}))){
+                    $testitem->itemtextarea=nl2br($item->{constants::QUESTIONTEXTAREA});
+                }
+
                 //show text prompt or dots, for listen and repeat really
                 $testitem->show_text=$item->{constants::SHOWTEXTPROMPT};
 
@@ -196,14 +203,38 @@ class comprehensiontest
                     break;
             }
 
-
+            //Text answer fields
             for($anumber=1;$anumber<=constants::MAXANSWERS;$anumber++) {
                 if(!empty(trim($item->{constants::TEXTANSWER . $anumber}))) {
                     $testitem->{'customtext' . $anumber} = $item->{constants::TEXTANSWER . $anumber};
                 }
             }
 
+            //if we need polly then lets do that
+            $testitem->usevoice=$item->{constants::POLLYVOICE};
+            $testitem->voiceoption=$item->{constants::POLLYOPTION};
 
+            //vertical layout or horizontal layout determined by content options
+            $textset = isset($testitem->itemtextarea) && !empty($testitem->itemtextarea);
+            $imageset = isset($testitem->itemimage) && !empty($testitem->itemimage);
+            $videoset =isset($testitem->itemvideo) && !empty($testitem->itemvideo);
+            $iframeset =isset($testitem->itemiframe) && !empty($testitem->itemiframe);
+
+            //if its not a page, any big content item will make it horizontal layout
+            if($testitem->type!==constants::TYPE_PAGE) {
+                if($textset || $imageset|| $videoset||$iframeset){
+                    $testitem->horizontal = true;
+                }
+            //if its a page, a big content item + text would make it horizontal
+            //BUT ... we decided to nix this, but maybe we can do it in the future
+            }else if(false){
+                if($textset && ( $imageset|| $videoset||$iframeset)){
+                    $testitem->horizontal = true;
+                }
+            }
+
+
+            //Sentences and Audio Recorder Logic
             switch($testitem->type){
                 case constants::TYPE_DICTATION:
                 case constants::TYPE_DICTATIONCHAT:
@@ -267,7 +298,7 @@ class comprehensiontest
                         $s->indexplusone = $index + 1;
                         $s->sentence = $sentence;
                         $s->displaysentence = $displaysentence;
-                        $s->length = strlen($s->sentence);
+                        $s->length = \core_text::strlen($s->sentence);
                         $index++;
                         $testitem->sentences[] = $s;
                     }
@@ -314,6 +345,32 @@ class comprehensiontest
                     break;
 
                 case constants::TYPE_MULTICHOICE:
+                    //multichoice also needs sentences if we are listening. Its a bit of double up but we do that here.
+                    $testitem->sentences = [];
+                    if($item->{constants::LISTENORREAD}==constants::LISTENORREAD_LISTEN) {
+                        $testitem->audiocontent = 1;
+                    }
+                    for ($anumber = 1; $anumber <= constants::MAXANSWERS; $anumber++) {
+                        if (!empty(trim($item->{constants::TEXTANSWER . $anumber}))) {
+                            $sentence = trim($item->{constants::TEXTANSWER . $anumber});
+
+                            $s = new \stdClass();
+                            $s->index = $anumber - 1;
+                            $s->indexplusone = $anumber;
+                            $s->sentence = $sentence;
+                            $s->length = \core_text::strlen($sentence);
+
+                            if($item->{constants::LISTENORREAD}==constants::LISTENORREAD_LISTEN) {
+                                $s->displaysentence = $this->dottify_text($sentence);
+                            }else {
+                                $s->displaysentence =$sentence;
+                            }
+
+                            $testitem->sentences[] = $s;
+                        }
+                    }
+
+                    break;
                 case constants::TYPE_PAGE:
                 case constants::TYPE_TEACHERTOOLS:
                 case constants::TYPE_SHORTANSWER:
