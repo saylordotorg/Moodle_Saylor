@@ -379,18 +379,6 @@ def plugins = [
     "url" : 'https://github.com/saylordotorg/moodle-local_lambda_dedication.git',
     "branch" : 'main',
     "dest" : 'local/lambda_dedication'
-    ],
-    [
-    "name" : 'local_lambda_time_tracker',
-    "url" : 'https://github.com/saylordotorg/moodle-local_lambda_time_tracker.git',
-    "branch" : 'main',
-    "dest" : 'local/lambda_time_tracker'
-    ],
-    [
-    "name" : 'block_lambda_time_tracker',
-    "url" : 'https://github.com/saylordotorg/moodle-block_lambda_time_tracker.git',
-    "branch" : 'main',
-    "dest" : 'blocks/lambda_time_tracker'
     ]
 ]
 
