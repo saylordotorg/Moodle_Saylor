@@ -367,6 +367,12 @@ def plugins = [
         "url" : 'https://github.com/bozoh/moodle-mod_simplecertificate.git',
         "branch" : 'master',
         "dest" : 'mod/simplecertificate'
+    ],
+    [
+        "name" : 'availability_mobileapp',
+        "url" : 'https://github.com/moodlehq/moodle-availability_mobileapp.git',
+        "branch" : 'master',
+        "dest" : 'availability/condition'
     ]
 ]
 
