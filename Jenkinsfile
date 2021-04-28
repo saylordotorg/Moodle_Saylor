@@ -327,6 +327,12 @@ def plugins = [
         "dest" : 'mod/subcourse'
     ],
     [
+        "name" : 'auth_basic',
+        "url" : 'https://github.com/catalyst/moodle-auth_basic.git',
+        "branch" : 'master',
+        "dest" : 'auth/basic'
+    ],
+    [
         "name" : 'tool_crawler',
         "url" : 'https://github.com/catalyst/moodle-tool_crawler.git',
         "branch" : 'master',
