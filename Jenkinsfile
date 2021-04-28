@@ -372,7 +372,13 @@ def plugins = [
         "name" : 'availability_mobileapp',
         "url" : 'https://github.com/moodlehq/moodle-availability_mobileapp.git',
         "branch" : 'master',
-        "dest" : 'availability/condition'
+        "dest" : 'availability/condition/mobileapp'
+    ],
+    [
+      "name" : 'availability_cohort',
+      "url" : 'https://github.com/moodleuulm/moodle-availability_cohort.git',
+      "branch" : 'master',
+      "dest" : 'availability/condition/cohort'
     ]
 ]
 
