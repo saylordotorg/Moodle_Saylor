@@ -1,0 +1,10 @@
+{
+  "name": "moodle-availability_cohort-form",
+  "builds": {
+    "moodle-availability_cohort-form": {
+      "jsfiles": [
+        "form.js"
+      ]
+    }
+  }
+}
