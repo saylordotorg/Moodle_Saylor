@@ -49,6 +49,7 @@ class qbehaviour_adaptive_adapted_for_coderunner extends qbehaviour_adaptive {
     public function __construct(question_attempt $qa, $preferredbehaviour) {
         parent::__construct($qa, $preferredbehaviour);
         $this->penaltiesenabled = $preferredbehaviour !== 'adaptivenopenalty';
+        $this->preferredbehaviour = $preferredbehaviour;
     }
 
     public function is_compatible_question(question_definition $question) {
@@ -170,6 +171,7 @@ class qbehaviour_adaptive_adapted_for_coderunner extends qbehaviour_adaptive {
         $response['numchecks'] = $prevtries - $numprechecks;
         $response['numprechecks'] = $numprechecks;
         $response['fraction'] = floatval($pendingstep->get_fraction());
+        $response['preferredbehaviour'] = $this->preferredbehaviour;
         $gradedata = $this->question->grade_response($response, $isprecheck);
         list($fraction, $state) = $gradedata;
         if (count($gradedata) > 2) {

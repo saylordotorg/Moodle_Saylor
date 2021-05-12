@@ -24,17 +24,31 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Class restore_checklist_block_task
+ */
 class restore_checklist_block_task extends restore_block_task {
+    /**
+     * Define restore settings.
+     */
     protected function define_my_settings() {
         // No settings.
     }
 
+    /**
+     * List of file areas.
+     * @return array
+     */
     public function get_fileareas() {
         return array(); // No fileareas.
     }
 
+    /**
+     * Encode config attributes
+     * @return array
+     */
     public function get_configdata_encoded_attributes() {
-        return array(); // No special handleing of configdata.
+        return array(); // No special handling of configdata.
     }
 
     /**
@@ -44,6 +58,10 @@ class restore_checklist_block_task extends restore_block_task {
         // No steps to take.
     }
 
+    /**
+     * Extra steps after restore is complete
+     * @throws dml_exception
+     */
     public function after_restore() {
         global $DB;
 
@@ -67,10 +85,18 @@ class restore_checklist_block_task extends restore_block_task {
         }
     }
 
+    /**
+     * Decode contents
+     * @return array
+     */
     static public function define_decode_contents() {
         return array(); // Nothing to do.
     }
 
+    /**
+     * Decode rules
+     * @return array
+     */
     static public function define_decode_rules() {
         return array(); // Nothing to do.
     }

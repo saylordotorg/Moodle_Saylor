@@ -10,7 +10,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 require_once($CFG->libdir . "/externallib.php");
-require_once($CFG->libdir . "/coursecatlib.php");
  
 class local_wsfunc_external extends external_api {
  
@@ -42,7 +41,7 @@ class local_wsfunc_external extends external_api {
         $options['sort']['idnumber'] = 1;
  
         
-        $courselist = coursecat::get($params['cat'])->get_courses($options);
+        $courselist = \core_course_category::get($params['cat'])->get_courses($options);
 
         //Note: don't forget to validate the context and check capabilities
         // $context = context_course::instance($course->id, IGNORE_MISSING);

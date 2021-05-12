@@ -71,7 +71,6 @@ define(['jquery', 'core/modal_factory', 'core/modal_events'], function($, ModalF
                             '</div>';
                     }
 
-                    obj.body += '<p class="alert alert-danger mt-3">' + str('backup_heavy_load_warning_message') + '</p>';
 
                     ModalFactory.create({
                         type: ModalFactory.types.SAVE_CANCEL,
@@ -708,7 +707,7 @@ define(['jquery', 'core/modal_factory', 'core/modal_events'], function($, ModalF
                             }
                         } else {
                             var $container = $('.course-content');
-                            $container.one('*').before($clipboard);
+                            $container.prepend($clipboard);
                             $container.find(M.course.format.get_section_wrapper(null)).each(function(index, sectionDOM) {
                                 var $section = $(sectionDOM);
                                 var section = $section.attr('id').match(/(\d+)$/)[1];
@@ -970,7 +969,10 @@ define(['jquery', 'core/modal_factory', 'core/modal_events'], function($, ModalF
                             "courseid": courseId,
                         };
 
-                    on_backup_modal(data, sectionName, str('confirm_backup_section'), true);
+                    var body_html = '<p class="alert alert-danger mt-3">' + str('backup_heavy_load_warning_message') +
+                        '</p>' + str('confirm_backup_section');
+
+                    on_backup_modal(data, sectionName, body_html, true);
                 };
 
                 /**
@@ -1038,6 +1040,10 @@ define(['jquery', 'core/modal_factory', 'core/modal_events'], function($, ModalF
 
                     // Initialize items
                     $block.find('li.activity').each(function(index, item) {
+                        if($(item).attr('data-disable-copy') == 1) {
+                            add_actions(item, ['movedir', 'move', 'delete']);
+                            return;
+                        }
                         add_actions(item, activity_actions);
                     });
 

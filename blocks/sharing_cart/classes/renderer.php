@@ -33,40 +33,40 @@ use html_writer;
  *  Sharing Cart item tree renderer
  */
 class renderer {
-	/**
-	 *  Render an item tree
-	 *
-	 * @param array & $tree
-	 * @return string
-	 * @throws \coding_exception
-	 */
+    /**
+     *  Render an item tree
+     *
+     * @param array & $tree
+     * @return string
+     * @throws \coding_exception
+     */
     public static function render_tree(array &$tree) {
 
-    	$html  = html_writer::start_tag('ul', ['class' => 'tree list']);
+        $html = html_writer::start_tag('ul', ['class' => 'tree list']);
 
-    	$requirede_capabilities = required_capabilities::init([
-			'moodle/restore:restorecourse',
-			'moodle/restore:restoreactivity'
-		]);
-		if (!empty($requirede_capabilities->get_disallowed_actions())) {
-			$html .= html_writer::start_div('alert alert-danger', [
-				'role' => 'alert',
-				'id' => 'alert-disallow',
-				'data-disallowed-actions' => implode(',', $requirede_capabilities->get_disallowed_actions())
-			]);
-			$missing_key = $requirede_capabilities->total_capabilities_missing() > 1
-				? 'missing_capabilities'
-				: 'missing_capability';
-			$html .= get_string(
-				$missing_key,
-				'block_sharing_cart',
-				implode(', ', $requirede_capabilities->get_missing_capabilities())
-			);
-			$html .= html_writer::end_div();
-		}
+        $requirede_capabilities = required_capabilities::init([
+            'moodle/restore:restorecourse',
+            'moodle/restore:restoreactivity'
+        ]);
+        if (!empty($requirede_capabilities->get_disallowed_actions())) {
+            $html .= html_writer::start_div('alert alert-danger', [
+                'role' => 'alert',
+                'id' => 'alert-disallow',
+                'data-disallowed-actions' => implode(',', $requirede_capabilities->get_disallowed_actions())
+            ]);
+            $missing_key = $requirede_capabilities->total_capabilities_missing() > 1
+                ? 'missing_capabilities'
+                : 'missing_capability';
+            $html .= get_string(
+                $missing_key,
+                'block_sharing_cart',
+                implode(', ', $requirede_capabilities->get_missing_capabilities())
+            );
+            $html .= html_writer::end_div();
+        }
 
-		$html .= self::render_node($tree, '/');
-		$html .= html_writer::end_tag('ul');
+        $html .= self::render_node($tree, '/');
+        $html .= html_writer::end_tag('ul');
 
         return $html;
     }
@@ -144,7 +144,7 @@ class renderer {
     private static function render_item($path, $item) {
         $components = array_filter(explode('/', trim($path, '/')), 'strlen');
         $depth = count($components);
-        $class = $item->modname . ' ' . "modtype_{$item->modname}";
+        $class = $item->modname . ' ' . "modtype_{$item->modname}" . ($item->uninstalled_plugin ? ' disabled' : '');
 
         $coursename = '';
         if ($item->coursefullname != null) {
@@ -153,8 +153,13 @@ class renderer {
 
         $title = html_to_text($item->modtext) . $coursename;
 
+        if ($item->modname === 'label') {
+            $item->modtext = self::strip_label($item->modtext);
+            $item->modtext = self::replace_image_with_string($item->modtext);
+        }
+
         return '
-				<li class="activity ' . $class . '" id="block_sharing_cart-item-' . $item->id . '">
+				<li class="activity ' . $class . '" id="block_sharing_cart-item-' . $item->id . '" data-disable-copy="'. ($item->uninstalled_plugin ?? 0) .'">
 					<div class="sc-indent-' . $depth . '" title="' . $title . '">
 						' . self::render_modicon($item) . '
 						<span class="instancename">' . $item->modtext . '</span>
@@ -184,6 +189,10 @@ class renderer {
     public static function render_modicon($item) {
         global $OUTPUT;
 
+        if($item->uninstalled_plugin) {
+            return '<i class="icon fa fa-fw fa-exclamation text-danger align-self-center" title="'.get_string('uninstalled_plugin_warning_title', 'block_sharing_cart', 'mod_'.$item->modname).'"></i>';
+        }
+
         $src = '<img class="activityicon iconsmall iconcustom" src="' . $OUTPUT->image_url('icon', $item->modname) . '" alt="" />';
         if (!empty($item->modicon)) {
             // @see /lib/modinfolib.php#get_icon_url()
@@ -199,9 +208,28 @@ class renderer {
 
     public static function render_label($modtext) {
         $modtext = get_string('pluginname', 'label') .
-                ':<div style="font-size: 0.8em; width: 100%; max-height: 10em; white-space: nowrap; overflow: auto;">' . $modtext .
-                '</div>';
+            ':<div style="font-size: 0.8em; width: 100%; max-height: 10em; white-space: nowrap; overflow: auto;">' . $modtext .
+            '</div>';
 
+        return $modtext;
+    }
+
+    /**
+     * @param string $modtext
+     * @return string
+     */
+    private static function strip_label(string $modtext): string {
+        return strip_tags($modtext, '<img>');
+    }
+
+    /**
+     * @param string $modtext
+     * @return string
+     */
+    private static function replace_image_with_string(string $modtext): string {
+        if (strpos($modtext, '<img') !== false) {
+            $modtext = preg_replace('/<img[^>]+>/i', get_string('label_image_replaced_text', 'block_sharing_cart'), $modtext);
+        }
         return $modtext;
     }
 }

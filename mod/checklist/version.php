@@ -13,20 +13,19 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
 /**
- * Code fragment to define the version of checklist
- * This fragment is called by moodle_needs_upgrading() and /admin/index.php
+ * Version information
  *
- * @author  Davo Smith <moodle@davosmith.co.uk>
- * @package mod/checklist
+ * @copyright Davo Smith <moodle@davosmith.co.uk>
+ * @package mod_checklist
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
 
-$plugin->version = 2020111400;  // The current module version (Date: YYYYMMDDXX).
+$plugin->version = 2021040900;  // The current module version (Date: YYYYMMDDXX).
 $plugin->maturity = MATURITY_STABLE;
-$plugin->release = '3.9+ (Build: 2020111400)';
+$plugin->release = '3.9+ (Build: 2021040900)';
 $plugin->requires = 2020061500; // Moodle 3.9.0.
 $plugin->component = 'mod_checklist';

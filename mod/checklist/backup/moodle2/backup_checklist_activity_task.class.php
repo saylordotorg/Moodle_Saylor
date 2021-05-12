@@ -14,6 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Backup definition.
+ *
+ * @copyright Davo Smith <moodle@davosmith.co.uk>
+ * @package mod_checklist
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -21,8 +29,7 @@ require_once($CFG->dirroot.'/mod/checklist/backup/moodle2/backup_checklist_steps
 require_once($CFG->dirroot.'/mod/checklist/backup/moodle2/backup_checklist_settingslib.php'); // Because it exists (optional).
 
 /**
- * forum backup task that provides all the settings and steps to perform one
- * complete backup of the activity
+ * Checklist backup task that provides all the settings and steps to perform one complete backup of the activity
  */
 class backup_checklist_activity_task extends backup_activity_task {
 

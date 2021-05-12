@@ -14,13 +14,19 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Restore from backup.
+ * @copyright Davo Smith <moodle@davosmith.co.uk>
+ * @package mod_checklist
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot.'/mod/checklist/backup/moodle2/restore_checklist_stepslib.php'); // Because it exists (must).
 
 /**
- * checklist restore task that provides all the settings and steps to perform one
- * complete restore of the activity
+ * checklist restore task that provides all the settings and steps to perform one complete restore of the activity
  */
 class restore_checklist_activity_task extends restore_activity_task {
 
@@ -74,6 +80,10 @@ class restore_checklist_activity_task extends restore_activity_task {
         return $rules;
     }
 
+    /**
+     * Match up moduleids after restore is complete
+     * @throws dml_exception
+     */
     public function after_restore() {
         global $DB;
 
@@ -102,9 +112,9 @@ class restore_checklist_activity_task extends restore_activity_task {
 
     /**
      * Define the restore log rules that will be applied by the
-     * {@link restore_logs_processor} when restoring
-     * folder logs. It must return one array
-     * of {@link restore_log_rule} objects
+     * restore_logs_processor when restoring checklist logs. It must return one array
+     * of restore_log_rule objects
+     * @return restore_log_rule[]
      */
     static public function define_restore_log_rules() {
         $rules = array();
@@ -118,13 +128,14 @@ class restore_checklist_activity_task extends restore_activity_task {
 
     /**
      * Define the restore log rules that will be applied
-     * by the {@link restore_logs_processor} when restoring
+     * by the restore_logs_processor when restoring
      * course logs. It must return one array of
-     * {@link restore_log_rule} objects
+     * restore_log_rule objects
      *
      * Note this rules are applied when restoring course logs
      * by the restore final task, but are defined here at
      * activity level. All them are rules not linked to any module instance (cmid = 0)
+     * @return restore_log_rule[]
      */
     static public function define_restore_log_rules_for_course() {
         $rules = array();

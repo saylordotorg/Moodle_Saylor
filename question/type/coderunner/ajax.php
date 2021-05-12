@@ -19,6 +19,9 @@
  * question type by looking up the prototype in the question_coderunner_options
  * table. Fields 'success' and 'error' are added for validation checking by
  * the caller.
+ * 
+ * Alternatively, if called with a parameter uiplugin rather than qtype, returns
+ * a list describing the UI plugin parameters and their descriptions.
  *
  * @group qtype_coderunner
  * Assumed to be run after python questions have been tested, so focuses
@@ -39,20 +42,50 @@ require_once($CFG->dirroot . '/question/type/coderunner/questiontype.php');
 require_login();
 require_sesskey();
 
-$qtype  = required_param('qtype', PARAM_RAW_TRIMMED);
 $courseid = required_param('courseid', PARAM_INT);
+$qtype = optional_param('qtype', '', PARAM_RAW_TRIMMED);
+$uiplugin = strtolower(optional_param('uiplugin', '', PARAM_RAW_TRIMMED));
 
 header('Content-type: application/json; charset=utf-8');
 
 $coursecontext = context_course::instance($courseid);
-$questiontype = qtype_coderunner::get_prototype($qtype, $coursecontext);
-if ($questiontype === null) {
-    $questiontype = new stdClass();
-    $questiontype->success = false;
-    $questiontype->error = "Error fetching prototype '$qtype'.";
-} else {
-    $questiontype->success = true;
-    $questiontype->error = '';
+if ($qtype) {
+    $questiontype = qtype_coderunner::get_prototype($qtype, $coursecontext);
+    if ($questiontype === null) {
+        $questiontype = new stdClass();
+        $questiontype->success = false;
+        $questiontype->error = "Error fetching prototype '$qtype'.";
+    } else {
+        $questiontype->success = true;
+        $questiontype->error = '';
+    }
+    echo json_encode($questiontype);
+} else if ($uiplugin) {
+    $uiplugins = qtype_coderunner_ui_plugins::getInstance();
+    $allnames = $uiplugins->all_names();
+    $uiparamstable = array();
+    $columnheaders = array();
+    if (!in_array($uiplugin, $allnames)) {
+        $uiheader = get_string('unknownuiplugin', 'qtype_coderunner', array('pluginname'=>$uiplugin));
+    } else {
+        $uiparams = $uiplugins->parameters($uiplugin);
+        if ($uiparams->length() === 0) {
+            $uiheader = get_string('nouiparameters', 'qtype_coderunner', array('uiname' => $uiplugin));
+        } else {
+            $csv = implode(', ', $uiparams->all_names_starred());
+            $uiheader = get_string('uiparametertablehead', 'qtype_coderunner', 
+                    array('uiname' => $uiplugin)) . $csv . '.';
+            $uiparamstable = $uiparams->table();
+            $namehdr = get_string('uiparamname', 'qtype_coderunner');
+            $descrhdr = get_string('uiparamdesc', 'qtype_coderunner');
+            $defaulthdr = get_string('uiparamdefault', 'qtype_coderunner');
+            $columnheaders = array($namehdr, $descrhdr, $defaulthdr);
+        }
+    }
+    echo json_encode(array('header' => $uiheader,
+        'uiparamstable' => $uiparamstable,
+        'columnheaders' => $columnheaders,
+        'showdetails' => get_string('showdetails', 'qtype_coderunner'),
+        'hidedetails' => get_string('hidedetails', 'qtype_coderunner')));
 }
-echo json_encode($questiontype);
 die();

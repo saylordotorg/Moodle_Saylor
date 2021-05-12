@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Instance settings form
+ * Version information
  *
  * @package   block_checklist
  * @copyright 2010 Davo Smith
@@ -24,9 +24,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2020021600;
+$plugin->version = 2021041000;
 $plugin->requires = 2017111300; // Moodle 3.4+.
-$plugin->release = '3.4+ (Build: 2020021600)';
+$plugin->release = '3.4+ (Build: 2021041000)';
 $plugin->component = 'block_checklist';
 $plugin->maturity = MATURITY_STABLE;
 $plugin->dependencies = ['mod_checklist' => 2019061900]; // Must have checklist activity module installed.

@@ -1,3 +1,8 @@
+### Version 2.12 of the Moodle Gapfill question type May 2021
+Fix for iOS (e.g. iPads/iPhones). Thanks to  Deny Supanji  for reporting this. The text entry field now has the  spellchecker = false which stops it changing apostrophes into right quote marks.
+
+Refactored get attributes into separate function for clarity in renderer.php
+
 ### Version 2.11 of the Moodle Gapfill question type Jan 2021
 Fix for https://github.com/marcusgreen/moodle-qtype_gapfill/issues/64.
 CSS change to fix issue with dropping onto targets. Thanks to

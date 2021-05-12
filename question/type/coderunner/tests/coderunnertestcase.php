@@ -34,10 +34,10 @@ class qtype_coderunner_testcase extends advanced_testcase {
 
     protected $hasfailed = false; // Set to true when a test fails.
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
         self::setup_test_sandbox_configuration();
-        $this->resetAfterTest();
+        $this->resetAfterTest(false);
         $this->setAdminUser();
         $generator = $this->getDataGenerator()->get_plugin_generator('core_question');
         $this->category = $generator->create_question_category(array());
@@ -48,7 +48,7 @@ class qtype_coderunner_testcase extends advanced_testcase {
      * tests/fixtures/test-sandbox-config-dist.php and
      * tests/fixtures/test-sandbox-config.php.
      */
-    public static function setup_test_sandbox_configuration() {
+    public static function setup_test_sandbox_configuration(): void {
         global $CFG, $USER;
         require($CFG->dirroot . '/question/type/coderunner/tests/fixtures/test-sandbox-config-dist.php');
         $localconfig = $CFG->dirroot . '/question/type/coderunner/tests/fixtures/test-sandbox-config.php';
@@ -65,19 +65,19 @@ class qtype_coderunner_testcase extends advanced_testcase {
     // to conditionally skip later tests. See jobesendbox_test.
     // Name can't be made moodle-standards compliant as it's defined by phpunit.
     // $e is the exception to be thrown.
-    protected function onNotSuccessfulTest(Throwable $e) {
+    protected function onNotSuccessfulTest(Throwable $e): void {
         $this->hasfailed = true;
         throw $e;
     }
 
-    public function test_dummy() {
+    public function test_dummy(): void {
         /* Present to avoid a warning about no testcases. */
     }
 
     // Check if language installed. If not, mark test skipped and don't
     // return (exception raised internally).
-    protected function check_language_available($language) {
-        if (qtype_coderunner_sandbox::get_best_sandbox($language) === null) {
+    protected function check_language_available($language): void {
+        if (qtype_coderunner_sandbox::get_best_sandbox($language, true) === null) {
             $this->markTestSkipped(
                     "$language is not installed on your server. Test skipped.");
         }
@@ -95,7 +95,7 @@ class qtype_coderunner_testcase extends advanced_testcase {
     }
 
     // Check if a particular sandbox is enabled. Skip test if not.
-    protected function check_sandbox_enabled($sandbox) {
+    protected function check_sandbox_enabled($sandbox): void {
         if (!get_config('qtype_coderunner', $sandbox . '_enabled')) {
             $this->markTestSkipped("Sandbox $sandbox unavailable: test skipped");
         }

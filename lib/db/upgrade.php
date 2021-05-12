@@ -3023,5 +3023,41 @@ function xmldb_main_upgrade($oldversion) {
         upgrade_main_savepoint(true, 2020110901.03);
     }
 
+    if ($oldversion < 2020110901.08) {
+        // Get all the external backpacks and update the sortorder column, to avoid repeated/wrong values. As sortorder was not
+        // used since now, the id column will be the criteria to follow for re-ordering them with a valid value.
+        $i = 1;
+        $records = $DB->get_records('badge_external_backpack', null, 'id ASC');
+        foreach ($records as $record) {
+            $record->sortorder = $i++;
+            $DB->update_record('badge_external_backpack', $record);
+        }
+
+        upgrade_main_savepoint(true, 2020110901.08);
+    }
+
+    if ($oldversion < 2020110903.05) {
+        require_once($CFG->libdir . '/db/upgradelib.php');
+
+        // Check if this site has executed the problematic upgrade steps.
+        $needsfixing = upgrade_calendar_site_status(false);
+
+        // Only queue the task if this site has been affected by the problematic upgrade step.
+        if ($needsfixing) {
+
+            // Create adhoc task to search and recover orphaned calendar events.
+            $record = new \stdClass();
+            $record->classname = '\core\task\calendar_fix_orphaned_events';
+
+            // Next run time based from nextruntime computation in \core\task\manager::queue_adhoc_task().
+            $nextruntime = time() - 1;
+            $record->nextruntime = $nextruntime;
+            $DB->insert_record('task_adhoc', $record);
+        }
+
+        // Main savepoint reached.
+        upgrade_main_savepoint(true, 2020110903.05);
+    }
+
     return true;
 }

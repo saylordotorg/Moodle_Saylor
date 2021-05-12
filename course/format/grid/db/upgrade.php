@@ -138,6 +138,19 @@ function xmldb_format_grid_upgrade($oldversion = 0) {
         upgrade_plugin_savepoint(true, 2020070700, 'format', 'grid');
     }
 
+    if ($oldversion < 2020111402) {
+        // Change in default name.
+        $value = get_config('format_grid', 'defaultsection0ownpagenogridonesection');
+        set_config('defaultsetsection0ownpagenogridonesection', $value, 'format_grid');
+
+        global $CFG;
+        require_once($CFG->dirroot.'/course/format/grid/lib.php'); // For format_grid.
+
+        format_grid::update_displayed_images_callback();
+
+        upgrade_plugin_savepoint(true, 2020111402, 'format', 'grid');
+    }
+
     // Automatic 'Purge all caches'....
     purge_all_caches();
 

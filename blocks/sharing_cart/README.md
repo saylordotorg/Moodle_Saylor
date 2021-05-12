@@ -1,7 +1,7 @@
 Sharing Cart
 ============
 
-Version 3.9, release 1 - 2021.01.11
+Version 3.9, release 5 - 2021.04.26
 
 The "master" branch is no longer compatible with Moodle 3.2 or earlier.
 
@@ -9,10 +9,35 @@ The "master" branch is no longer compatible with Moodle 3.2 or earlier.
 * Moodle 2.2 => "MOODLE_22_STABLE" branch
 * Moodle 1.9 => "MOODLE_19_STABLE" branch
 
+Warning: PHP versions 7.2 and older are deprecated, and will cause problems, unrelated to the Sharing Cart, such as badges.
+
 Change Log
 ----------
+* 3.9, release 5   2021.04.26
+  * Fixed issues with capabilities and user data during backup.
+  * Fixed Error when different users create folders with the same name #95 
+* 3.9, release 4   2021.03.25
+  * Minor css and javascript changes
+  * Fixed "Copy section button" title
+  * If a module in the sharing cart is uninstalled it now:
+    * Is marked by a warning icon with a tooltip and light red background color
+    * Is unable to be restored until reinstalled
+* 3.9, release 3   2021.03.13
+  * Added more support for moodle 3.9 and fixed some minor issues #84.
+  * Merged pull request about metadata table #89.
+* 3.9, release 2   2021.01.25
+  * Remove incompatible HTML from help button language string.
 * 3.9, release 1   2021.01.11
-    * Improved section copy process
+  * Improved section copy process
+  * Removing html tags, when showing label in sharing cart block.
+* 3.8, release 20   2020.10.14
+    * Improved performance.
+    * Add sharing cart entity cleaner, after the file got delete from the system.
+* 3.8, release 19   2020.10.06
+    * Load cart items for the active user only during directory restore.
+* 3.8, release 18   2020.09.02
+    * Now only shows heavy load warning on sections.
+    * Warnings appear on the top of modals instead of the bottom.
 * 3.8, release 17   2020.09.01
     * Set active course to make sure capabilities work as expected.
     * Make course id naming similar for rest actions.

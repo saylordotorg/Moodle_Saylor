@@ -36,7 +36,7 @@
  * 4. A loadUi(uiname, params) method that kills any currently running UI element
  *    (if there is one) and (re)loads the specified one. The params parameter
  *    is a record that allows additional parameters to be passed in, such as
- *    those from the question's templateParams field and, in the case of the
+ *    those from the question's uiParams field and, in the case of the
  *    Ace UI, the 'lang' (language) that the editor is editing. This data
  *    is supplied by the PHP via the data-params attribute of the answer's
  *    base textarea.
@@ -59,7 +59,7 @@
  *    ID of the textArea from which the UI element should obtain its initial
  *    serialisation and to which it should write the serialisation when its save
  *    or destroy methods are called. params is a JavaScript object,
- *    decoded from the JSON templateParams defined by the question plus any
+ *    decoded from the JSON uiParams defined by the question plus any
  *    additional data required, such as the 'lang' in the case of Ace.
  *
  * 2. A getElement() method that returns the HTML element that the
@@ -86,6 +86,12 @@
  *    to the given dimensions.
  *
  * 8. A hasFocus() method that returns true if the UI element has focus.
+ *
+ * 9. A syncIntervalSecs() method that returns the time interval between
+ *    calls to the sync() method. 0 for no sync calls. The userinterfacewrapper
+ *    provides all instances with a generic (base-class) version that returns
+ *    the value of a UI parameter sync_interval_secs if given else uses the
+ *    UI interface wrapper default (currently 10).
  *
  * The return value from the module define is a record with a single field
  * 'Constructor' that references the constructor (e.g. Graph, AceWrapper etc)
@@ -118,7 +124,7 @@ define(['jquery'], function($) {
         // The text area should have an attribute data-params, which is a
         // JSON encoded record containing whatever additional parameters might
         // be needed by the User interface. As a minimum it should contain all
-        // the parameters from the template-params field of
+        // the parameters from the uiparameters field of
         // the question so that question authors can pass in additional data
         // such as whether graph edges are bidirectional or not in the case of
         // the graph UI. Additionally the Ace editor requires a 'lang' field
@@ -127,22 +133,23 @@ define(['jquery'], function($) {
         // data attribute contains an entry for 'current-ui-wrapper' that is
         // a reference to the wrapper ('this').
         var  h,
-             params,
-             t = this; // For use by embedded functions.
+            params,
+            t = this; // For use by embedded functions.
 
         this.GUTTER = 14;  // Size of gutter at base of wrapper Node (pixels)
         this.MIN_WRAPPER_HEIGHT = 50;
+        this.DEFAULT_SYNC_INTERVAL_SECS = 5;
 
         this.taId = textareaId;
         this.loadFailId = textareaId + '_loadfailerr';
         this.textArea = $(document.getElementById(textareaId));
         params = this.textArea.attr('data-params');
         if (params) {
-            this.templateParams = JSON.parse(params);
+            this.uiParams = JSON.parse(params);
         } else {
-            this.templateParams = {};
+            this.uiParams = {};
         }
-        this.templateParams.lang = this.textArea.attr('data-lang');
+        this.uiParams.lang = this.textArea.attr('data-lang');
         this.readOnly = this.textArea.prop('readonly');
         this.isLoading = false;  // True if we're busy loading a UI element
         this.loadFailed = false;  // True if UI failed to initialise properly
@@ -170,7 +177,7 @@ define(['jquery'], function($) {
 
         // Load the UI into the wrapper (aysnchronous).
         this.uiInstance = null;  // Defined by loadUi asynchronously
-        this.loadUi(uiname, this.templateParams);  // Load the required UI element
+        this.loadUi(uiname, this.uiParams);  // Load the required UI element
 
         // Add event handlers
         $(document).mousemove(function() {
@@ -223,6 +230,17 @@ define(['jquery'], function($) {
             });
         }
 
+        // The default method for a UIs sync_interval_secs method.
+        // Returns the sync_interval_secs parameter if given, else
+        // DEFAULT_SYNC_INTERVAL_SECS.
+        function syncIntervalSecsBase() {
+            if (params.hasOwnProperty('sync_interval_secs')) {
+                return parseInt(params.sync_interval_secs);
+            } else {
+                return t.DEFAULT_SYNC_INTERVAL_SECS;
+            }
+        }
+
         if (this.isLoading) {  // Oops, we're loading a UI element already
             this.retries += 1;
             if (this.retries > 20) {
@@ -248,7 +266,7 @@ define(['jquery'], function($) {
             this.isLoading = true;
             require(['qtype_coderunner/ui_' + this.uiname],
                 function(ui) {
-                    var uiInstance,loadFailDiv, jqLoadFailDiv, h, w;
+                    var uiInstance,loadFailDiv, jqLoadFailDiv, h, w, uiInstancePrototype;
 
                     h = t.wrapperNode.innerHeight() - t.GUTTER;
                     w = t.wrapperNode.innerWidth();
@@ -274,9 +292,35 @@ define(['jquery'], function($) {
                         t.uiInstance = uiInstance;
                         t.loadFailed = false;
                         t.checkForResize();
+
+                        // Set a default syncIntervalSecs method if uiInstance lacks one.
+                        uiInstancePrototype = Object.getPrototypeOf(uiInstance);
+                        uiInstancePrototype.syncIntervalSecs = uiInstancePrototype.syncIntervalSecs || syncIntervalSecsBase;
+                        t.startSyncTimer(uiInstance);
                     }
                     t.isLoading = false;
                 });
+        }
+    };
+
+
+    // Start a sync timer on the given uiInstance, unless its time interval is 0.
+    InterfaceWrapper.prototype.startSyncTimer = function(uiInstance) {
+        var timeout = uiInstance.syncIntervalSecs();
+        if (timeout) {
+            this.uiInstance.timer = setInterval(function () {
+                uiInstance.sync();
+            }, timeout * 1000);
+        } else {
+            this.uiInstance.timer = null;
+        }
+    };
+
+
+    // Stop the sync timer on the given uiInstance, if running.
+    InterfaceWrapper.prototype.stopSyncTimer = function(uiInstance) {
+        if (uiInstance.timer) {
+            clearTimeout(uiInstance.timer);
         }
     };
 
@@ -285,6 +329,7 @@ define(['jquery'], function($) {
         // Disable (shutdown) the embedded ui component.
         // The wrapper remains active for ctrl-alt-M events, but is hidden.
         if (this.uiInstance !== null) {
+            this.stopSyncTimer(this.uiInstance);
             this.textArea.show();
             if (this.uiInstance.hasFocus()) {
                 this.textArea.focus();

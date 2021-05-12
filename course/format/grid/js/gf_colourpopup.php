@@ -48,19 +48,12 @@ class MoodleQuickForm_gfcolourpopup extends HTML_QuickForm_text implements templ
     public $_helpbutton = '';
     public $_hiddenLabel = false;
 
-    public function __construct($elementName = null, $elementLabel = null, $attributes = null, $options = null) {
-        parent::__construct($elementName, $elementLabel, $attributes);
+    public function __construct($elementname = null, $elementlabel = null, $attributes = null, $options = null) {
+        parent::__construct($elementname, $elementlabel, $attributes);
         /* Pretend we are a 'static' MoodleForm element so that we get the core_form/element-static template where
            we can render our own markup via core_renderer::mform_element() in lib/outputrenderers.php.
            used in combination with 'use' statement above and export_for_template() method below. */
         $this->setType('static');
-    }
-
-    /*
-     * PHP4 constructor method, kept for compatibility
-     */
-    public function MoodleQuickForm_gfcolourpopup($elementName = null, $elementLabel = null, $attributes = null, $options = null) {
-        self::__construct($elementName, $elementLabel, $attributes, $options);
     }
 
     public function setHiddenLabel($hiddenLabel) {
@@ -68,22 +61,35 @@ class MoodleQuickForm_gfcolourpopup extends HTML_QuickForm_text implements templ
     }
 
     public function toHtml() {
-        global $CFG, $COURSE, $USER, $PAGE, $OUTPUT;
+        global $PAGE;
         $id = $this->getAttribute('id');
         $PAGE->requires->js('/course/format/grid/js/gf_colourpopup.js');
         $PAGE->requires->js_init_call('M.util.init_gfcolour_popup', array($id));
-        $colour = $this->getValue();
-        if ((!empty($colour)) && ($colour[0] == '#')) {
-            $colour = substr($colour, 1);
+        $value = $this->getValue();
+        if (!empty($value)) {
+            if ($value[0] == '#') {
+                $colour = substr($value, 1);
+            } else if ($value[0] == '-') {
+                $colour = $this->getAttribute('defaultcolour');
+            } else {
+                $colour = $value;
+            }
+        } else {
+            $value = '-';
+            $colour = $this->getAttribute('defaultcolour');
         }
-        $content = "<input size='8' name='" . $this->getName() . "' value='" . $colour . "'id='{$id}' type='text' " .
-                    $this->_getAttrString($this->_attributes) . " >";
-        $content .= html_writer::tag('span', '&nbsp;', array('id' => 'colpicked_' . $id, 'tabindex' => '-1',
-                                     'style' => 'background-color: #'.$colour.
-                                     '; cursor: pointer; margin: 0; padding: 0 8px; border: 1px solid black'));
-        $content .= html_writer::start_tag('div', array('id' => 'colpick_'.$id,
-                                           'style' => "display:none; position:absolute; z-index:500;",
-                    'class' => 'form-colourpicker defaultsnext'));
+        $content = "<input size='5' name='" . $this->getName() . "' value='" . $value . "' initvalue='".$colour."' id='{$id}' type='text' " .
+            $this->_getAttrString($this->_attributes) . " >";
+        $content .= html_writer::tag('span', '&nbsp;', array(
+            'id' => 'colpicked_'.$id,
+            'class' => 'gfcolourpopupbox',
+            'tabindex' => '-1',
+            'style' => 'background-color: #'.$colour.';')
+        );
+        $content .= html_writer::start_tag('div', array(
+            'id' => 'colpick_' . $id,
+            'style' => "display: none;",
+            'class' => 'gfcolourpopupsel form-colourpicker defaultsnext'));
         $content .= html_writer::tag('div', '', array('class' => 'admin_colourpicker clearfix'));
         $content .= html_writer::end_tag('div');
         return $content;

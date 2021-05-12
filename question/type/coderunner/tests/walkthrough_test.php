@@ -40,7 +40,7 @@ require_once($CFG->dirroot . '/question/type/coderunner/tests/coderunnertestcase
 
 class qtype_coderunner_walkthrough_test extends qbehaviour_walkthrough_test_base {
 
-    protected function setUp() {
+    protected function setUp(): void {
         global $CFG;
         parent::setUp();
         qtype_coderunner_testcase::setup_test_sandbox_configuration();
@@ -305,5 +305,15 @@ EOTEMPLATE;
         $this->check_output_contains('Debug: source code from all test runs');
         $this->check_output_contains('Run 1');
         $this->check_output_contains('SEPARATOR = &quot;#&lt;ab@17943918#@&gt;#&quot;');
+    }
+    
+    // Check hidecheck option works.
+    public function test_hide_check() {
+        $q = test_question_maker::make_question('coderunner', 'sqr');
+        $this->start_attempt_at_question($q, 'adaptive', 1, 1);
+        $this->check_output_contains('Check');
+        $q->hidecheck = 1;
+        $this->start_attempt_at_question($q, 'adaptive', 1, 1);
+        $this->check_output_does_not_contain('Check');
     }
 }

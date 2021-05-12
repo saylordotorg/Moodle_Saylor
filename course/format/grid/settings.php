@@ -44,7 +44,9 @@ if ($ADMIN->fulltree) {
     $description = get_string('defaultimagecontainerwidth_desc', 'format_grid');
     $default = format_grid::get_default_image_container_width();
     $choices = format_grid::get_image_container_widths();
-    $settings->add(new admin_setting_configselect($name, $title, $description, $default, $choices));
+    $setting = new admin_setting_configselect($name, $title, $description, $default, $choices);
+    $setting->set_updatedcallback('format_grid::update_displayed_images_callback');
+    $settings->add($setting);
 
     // Icon ratio.
     $name = 'format_grid/defaultimagecontainerratio';
@@ -52,7 +54,9 @@ if ($ADMIN->fulltree) {
     $description = get_string('defaultimagecontainerratio_desc', 'format_grid');
     $default = format_grid::get_default_image_container_ratio();
     $choices = format_grid::get_image_container_ratios();
-    $settings->add(new admin_setting_configselect($name, $title, $description, $default, $choices));
+    $setting = new admin_setting_configselect($name, $title, $description, $default, $choices);
+    $setting->set_updatedcallback('format_grid::update_displayed_images_callback');
+    $settings->add($setting);
 
     // Resize method - 1 = scale, 2 = crop.
     $name = 'format_grid/defaultimageresizemethod';
@@ -63,7 +67,9 @@ if ($ADMIN->fulltree) {
         1 => new lang_string('scale', 'format_grid'),
         2 => new lang_string('crop', 'format_grid')
     );
-    $settings->add(new admin_setting_configselect($name, $title, $description, $default, $choices));
+    $setting = new admin_setting_configselect($name, $title, $description, $default, $choices);
+    $setting->set_updatedcallback('format_grid::update_displayed_images_callback');
+    $settings->add($setting);
 
     // Default border colour in hexadecimal RGB with preceding '#'.
     $name = 'format_grid/defaultbordercolour';
@@ -278,6 +284,19 @@ if ($ADMIN->fulltree) {
     );
     $settings->add(new admin_setting_configselect($name, $title, $description, $default, $choices));
 
+    // Show the grid image in the section summary on a single page.
+    $name = 'format_grid/defaultsinglepagesummaryimage';
+    $title = get_string('defaultsinglepagesummaryimage', 'format_grid');
+    $description = get_string('defaultsinglepagesummaryimage_desc', 'format_grid');
+    $default = 1;
+    $choices = array(
+        1 => new lang_string('off', 'format_grid'),
+        2 => new lang_string('left', 'format_grid'),
+        3 => new lang_string('centre', 'format_grid'),
+        4 => new lang_string('right', 'format_grid')
+    );
+    $settings->add(new admin_setting_configselect($name, $title, $description, $default, $choices));
+
     // Fix the section container popup to the screen. 1 = no, 2 = yes.
     $name = 'format_grid/defaultfitsectioncontainertowindow';
     $title = get_string('defaultfitsectioncontainertowindow', 'format_grid');
@@ -299,13 +318,13 @@ if ($ADMIN->fulltree) {
         2 => new lang_string('webp', 'format_grid')
     );
     $setting = new admin_setting_configselect($name, $title, $description, $default, $choices);
-    $setting->set_updatedcallback('grid_format_update_displayed_images');
+    $setting->set_updatedcallback('format_grid::update_displayed_images_callback');
     $settings->add($setting);
 
     // Grey out hidden sections.
     $name = 'format_grid/defaultgreyouthidden';
-    $title = get_string('greyouthidden', 'format_grid');
-    $description = get_string('greyouthidden_desc', 'format_grid');
+    $title = get_string('defaultgreyouthidden', 'format_grid');
+    $description = get_string('defaultgreyouthidden_desc', 'format_grid');
     $default = 1;
     $choices = array(
         1 => new lang_string('no'),   // No.
@@ -314,9 +333,9 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configselect($name, $title, $description, $default, $choices));
 
     // Section 0 on own page when out of the grid and course layout is 'Show one section per page'.
-    $name = 'format_grid/defaultsection0ownpagenogridonesection';
-    $title = get_string('defaultsection0ownpagenogridonesection', 'format_grid');
-    $description = get_string('defaultsection0ownpagenogridonesection_desc', 'format_grid');
+    $name = 'format_grid/defaultsetsection0ownpagenogridonesection';
+    $title = get_string('defaultsetsection0ownpagenogridonesection', 'format_grid');
+    $description = get_string('defaultsetsection0ownpagenogridonesection_desc', 'format_grid');
     $default = 1;
     $choices = array(
         1 => new lang_string('no'),   // No.

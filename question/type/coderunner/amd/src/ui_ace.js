@@ -22,7 +22,7 @@
  *
  * A special case behaviour of the AceWrapper is that it needs to know
  * the Programming language that is being edited. This MUST be provided in
- * the constructor templateParams parameter (an associative array) as a string
+ * the constructor params parameter (an associative array) as a string
  * with key 'lang'.
  *
  * @package    qtype
@@ -43,9 +43,11 @@ define(['jquery'], function($) {
         // Constructor for the Ace interface object
 
         var textarea = $(document.getElementById(textareaId)),
+            wrapper = $(document.getElementById(textareaId + '_wrapper')),
             focused = textarea[0] === document.activeElement,
             lang = params.lang,
-            session;
+            session,
+            t = this;  // For embedded callbacks.
 
         try {
             window.ace.require("ace/ext/language_tools");
@@ -79,6 +81,11 @@ define(['jquery'], function($) {
             session = this.editor.getSession();
             session.setValue(this.textarea.val());
 
+            // Set theme if available (not currently enabled).
+            if (params.theme) {
+                this.editor.setTheme("ace/theme/" + params.theme);
+            }
+
             this.setLanguage(lang);
 
             this.setEventHandlers(textarea);
@@ -87,23 +94,25 @@ define(['jquery'], function($) {
             // Try to tell Moodle about parts of the editor with z-index.
             // It is hard to be sure if this is complete. ACE adds all its CSS using JavaScript.
             // Here, we just deal with things that are known to cause a problem.
-            $('.ace_gutter').addClass('moodle-has-zindex');
+            // Can't do these operations until editor has rendered. So ...
+            this.editor.renderer.on('afterRender', function() {
+                var gutter =  wrapper.find('.ace_gutter');
+                if (gutter.hasClass('moodle-has-zindex')) {
+                    return;  // So we only do what follows once.
+                }
+                gutter.addClass('moodle-has-zindex');
 
-            textarea.hide();
-            if (focused) {
-                this.editor.focus();
-                this.editor.navigateFileEnd();
-                /*
-                var session = this.editor.getSession(),
-                    lines = session.getLength();
-                this.editor.gotoLine(lines, session.getLine(lines - 1).length);
-                */
-            }
-            this.aceLabel = $('.answerprompt');
-            this.aceLabel.attr('for', 'ace_' + textareaId);
+                if (focused) {
+                    t.editor.focus();
+                    t.editor.navigateFileEnd();
+                }
+                t.aceLabel = wrapper.find('.answerprompt');
+                t.aceLabel.attr('for', 'ace_' + textareaId);
 
-            this.aceTextarea = $('.ace_text-input');
-            this.aceTextarea.attr('id', 'ace_' + textareaId);
+                t.aceTextarea = wrapper.find('.ace_text-input');
+                t.aceTextarea.attr('id', 'ace_' + textareaId);
+            });
+
             this.fail = false;
         }
         catch(err) {
@@ -127,6 +136,10 @@ define(['jquery'], function($) {
         // Nothing to do ... always sync'd
     };
 
+    // Disable autosync, too.
+    AceWrapper.prototype.syncIntervalSecs = function() {
+        return 0;
+    };
 
     AceWrapper.prototype.setLanguage = function(language) {
         var session = this.editor.getSession(),

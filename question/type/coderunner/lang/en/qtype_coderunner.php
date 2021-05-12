@@ -80,8 +80,8 @@ $string['badquestion'] = 'Error in question';
 $string['badrandomintarg'] = 'Bad argument to JSON @randomint function';
 $string['badrandompickarg'] = 'Bad argument to JSON @randompic function';
 $string['badsandboxparams'] = '\'Other\' field (sandbox params) must be either blank or a valid JSON record';
-$string['badtemplateparams'] = 'Template parameters must be either blank or a valid JSON record';
-$string['badtemplateparamsaftertwig'] = 'Twigging of template parameters yielded invalid JSON: <pre>{$a}</pre>';
+$string['badtemplateparams'] = 'Template parameters must evaluate to blank or a valid JSON record. Got: <pre class="templateparamserror">{$a}</pre>';
+$string['baduiparams'] = 'UI parameters must be blank or a valid JSON record.';
 $string['brokencombinator'] = 'Expected {$a->numtests} test results, got {$a->numresults}. Perhaps excessive output or error in question?';
 $string['brokentemplategrader'] = 'Bad output from grader: {$a->output}. Your program execution may have aborted (e.g. a timeout or memory limit exceeded).';
 $string['bulkquestiontester'] = 'The <a href="{$a->link}">bulk tester script</a> tests that the sample answers for all questions in the current context are marked right. Useful only once some questions with sample answers have been added; the initial install has none.';
@@ -141,6 +141,8 @@ $string['enable_diff_check_desc'] = 'Present students with a \'Show differences\
 $string['enable_sandbox_desc'] = 'Permit use of the specified sandbox for running student submissions';
 $string['equalitygrader'] = 'Exact match';
 $string['error_loading_prototype'] = 'Error loading prototype. Network problems or server down, perhaps?';
+$string['error_loading_ui_descr'] = 'Error loading UI description. Network problems or server down, perhaps?';
+$string['erroroninit'] = '**** ERROR WHEN INITIALISING QUESTION ****<br>{$a->error}<br>';
 $string['errorstring-ok'] = 'OK';
 $string['errorstring-autherror'] = 'Unauthorised to use sandbox';
 $string['errorstring-jobe400'] = 'Error from Jobe sandbox server: ';
@@ -170,13 +172,18 @@ $string['feedback'] = 'Feedback';
 $string['feedback_quiz'] = 'Set by quiz';
 $string['feedback_show'] = 'Force show';
 $string['feedback_hide'] = 'Force hide';
-$string['feedback_help'] = 'Choose \'Set by quiz\' to allow quiz feedback settings to control display of the result table, \'Force show\' to show the result table regardless and \'Force hide\' to hide it regardless';
+$string['feedback_help'] = 'Choose \'Set by quiz\' to allow the quiz\'s review options (specifically the
+\'Specific feedback\' setting) to control display of the result table, \'Force show\' to show the result table regardless and \'Force hide\' to hide it regardless';
 $string['fileheader'] = 'Support files';
 $string['filenamesexplain'] = 'Description';
 $string['filenamesregex'] = 'Regular expression';
 $string['filloutoneanswer'] = 'You must enter source code that satisfies the specification. The code you enter will be executed to determine its correctness and a grade awarded accordingly.';
 $string['firstfailure'] = 'First failing test case: {$a}';
 $string['forexample'] = 'For example';
+
+$string['gapfillerui_delimiters_descr'] = 'A 2-character array of the strings used to open and close the gap description';
+$string['gapfillerui_ui_source_descr'] = '"globalextra" to take the HTML to display from the globalextra field or "test0" to take it from the testcode field of the first test';
+$string['gapfillerui_sync_interval_secs_descr'] = 'The time interval in seconds between calls to sync the UI contents back to the question answer. 0 for no such auto-syncing.';
 
 $string['globalextra'] = 'Global extra';
 $string['globalextra_help'] = 'A field of text for general-purpose use by template authors, like the extra field of each test case, but global to all tests. Available to the template author as {{ QUESTION.globalextra }}.';
@@ -210,15 +217,18 @@ also collapses multiple spaces and tabs to a single space, deletes all blank
 lines and converts the strings to lower case.
 
 The \'regular expression\' grader uses the \'expected\'
-field of the test case as a regular expression and tests the output to see
-if a match to the expected result can be found anywhere within the output.
+field of the test case as a regular expression (without PERL-type delimiters)
+and tests the output to see
+if a match to the expected result can be found anywhere within the output. For
+example, an expected value of \'ab.*z\' would match any output that contains the
+the characters \'ab\' anywhere in the output and a \'z\' character somewhere later.
 To force matching of the entire output, start and end the regular expression
 with \'\A\' and \'\Z\' respectively. Regular expression matching uses MULTILINE
 and DOTALL options.
 
 The \'template grader\' option assumes that the output
 from the program is actually a
-grading result, i.e. that the template not tests *and grades* the student answer.
+grading result, i.e. that the template tests *and grades* the student answer.
 The only output from such a template program must be a JSON-encoded record.
 
 If the template is a per-test template (i.e., not a combinator), the JSON string must describe a row of the
@@ -243,8 +253,8 @@ that is displayed respectively before and after the (optional) result table. The
 \'testresults\' field, if given, is a list of lists used to display some sort
 of result table. The first row is the column-header row and all other rows
 define the table body. Two special column header values exist: \'iscorrect\'
-and \'ishidden\'. The \'iscorrect\' column(s) are used to display ticks or
-crosses for 1 or 0 row values respectively. The \'ishidden\' column isn\'t
+and \'ishidden\'. The \'iscorrect\' column(s) are used to display crosses or
+ticks for 0 and 1 respectively. The \'ishidden\' column isn\'t
 actually displayed but 0 or 1 values in the column can be used to turn on and
 off row visibility. Students do not see hidden rows but markers and other
 staff do. If a \'testresults\' table is supplied an optional
@@ -260,16 +270,31 @@ The \'showoutputonly\' field, if true, is used when the question is to be
 used only to display the output and perhaps images from a run, with no mark.
 ';
 $string['graph_ui_invalidserialisation'] = 'GraphUI: invalid serialisation';
+$string['graphui_isfsm_descr'] = 'True if the graph represents a Finite State Machine, in which case it can contain an incoming edge from nowhere (the start edge) and can have \'accept\' nodes';
+$string['graphui_isdirected_descr'] = 'True if edges are directed';
+$string['graphui_noderadius_descr'] = 'The radius of a node in pixels';
+$string['graphui_fontsize_descr'] = 'The font size in points used for node and edge labels.';
+$string['graphui_helpmenutext_descr'] = 'Text which if non-empty replaces the standard help menu text defined in the CodeRunner language strings';
+$string['graphui_textoffset_descr'] = 'The offset in pixels of a link label from its link (deprecated - use dragging instead).';
+$string['graphui_locknodepositions_descr'] = 'If true, prevents the user from moving nodes. Useful when the answer box is preloaded with a graph that the student has to annotate by changing node or edge labels or by adding/removing edges. Note, though that nodes can still be added and deleted. See locknodeset.';
+$string['graphui_locknodeset_descr'] = 'If true, prevents the the user from adding or deleting nodes or toggling node types to/from acceptors.';
+$string['graphui_locknodelabels_descr'] = 'If true, prevent the user from editing node labels. This will also prevent any new nodes having non-empty labels';
+$string['graphui_lockedgepositions_descr'] = 'If true prevents the user from dragging edges to change their curvature. Possibly useful if the answer box is preloaded with a graph that the student has to annotate by changing node or edge labels or by adding/removing edges. Also ensures that edges added by a student are straight, e.g. to draw a polygon on a set of given points. Note, though that edges can still be added and deleted. See lockedgeset.';
+$string['graphui_lockedgeset_descr'] = 'If true prevents the user from adding or deleting edges.';
+$string['graphui_lockedgelabels_descr'] = 'True to prevent the user from editing edge labels. This also prevents any new edges from having labels.';
 $string['hidden'] = 'Hidden';
+$string['hidecheck'] = 'Hide check';
+$string['hidedetails'] = 'Hide details';
 $string['hidedifferences'] = 'Hide differences';
 $string['HIDE'] = 'Hide';
 $string['HIDE_IF_FAIL'] = 'Hide if fail';
 $string['HIDE_IF_SUCCEED'] = 'Hide if succeed';
 $string['hiderestiffail'] = 'Hide rest if fail';
 $string['hoisttemplateparams'] = 'Hoist template parameters';
-
 $string['howtogetmore'] = 'For more detailed information, save the question with \'Validate on save\' unchecked and test manually';
+$string['htmlui_sync_interval_secs_descr'] = 'The time interval in seconds between calls to sync the UI contents back to the question answer. 0 for no such auto-syncing.';
 
+$string['illegaluiparamname'] = 'The following are not valid parameters for the {$a->uiname} UI: ';
 $string['iscombinatortemplate'] = 'Is combinator';
 $string['ideone_user'] = 'Ideone server user';
 $string['ideone_user_desc'] = 'The login name to use when connecting to the deprecated Ideone server (if the ideone sandbox is enabled)';
@@ -291,18 +316,15 @@ $string['jobe_canterbury_html'] = "<p style='color:gray; font-style:italic; font
 $string['language'] = 'Sandbox language';
 $string['languages'] = 'Languages';
 $string['languages_help'] = 'The sandbox language is the computer language used
-to run the submission.
-It must be known to the chosen sandbox (if a specific one has been
-selected) or to at least one of the enabled sandboxes (otherwise).
-This should not usually need altering from the value in the
+to run the submission. This should not usually need altering from the value in the
 parent template; tweak it at your peril.
 
 Ace-language is the
 language used by the Ace code editor (if enabled) for the student\'s answer.
 By default this is the same as the sandbox language; enter a different
 value here only if the template language is different from the language
-that the student is expected to write (e.g. if a Python preprocessor is
-used to validate a student\'s C program prior to running it).
+that the student is expected to write (e.g. if a Python template is
+used to preprocess a student\'s C program and then execute it in a subprocess).
 
 Multi-language questions, that is questions that students can answer in
 more than one language, are enabled by setting the Ace-language to a comma-separated
@@ -324,6 +346,8 @@ they must write it in the default language, if specified, or the
 first of the allowed languages otherwise.';
 
 $string['languageselectlabel'] = 'Language';
+$string['legacyuiparams'] = 'UI parameters can no longer be defined within the template parameters field. Please move the following to the UI parameters field instead: ';
+$string['legacyuiparams2'] = 'UI parameters can no longer be defined within the template parameters field. Please move the following to the UI parameters field instead, removing the \'{$a->uiname}_\' prefix: ';
 $string['mark'] = 'Mark';
 $string['marking'] = 'Mark allocation';
 $string['markinggroup'] = 'Marking';
@@ -346,7 +370,10 @@ Spaces can be used in lieu of commas as a separator.
 The default penalty regime can be set site-wide by a system administrator using
 Site administration > Plugins > Question types > CodeRunner.
 
-Set the penalty regime to \'0\' for zero penalties on all submissions.';
+Set the penalty regime to \'0\' for zero penalties on all submissions.
+
+The penalty regime is ignored and no penalties are applied if the quiz is
+run using the \'Adaptive (no penalties)\' behaviour.';
 $string['maxfilesize'] = 'Max allowed file size (bytes)';
 $string['maxfilesize_help'] = 'Select the maximum file upload size (bytes). Allowing large file uploads with large classes can impact performance and and disk space on both Moodle and Jobe servers.';
 $string['memorylimit'] = 'MemLimit (MB)';
@@ -357,12 +384,14 @@ $string['missingprototype'] = 'This question was defined to be of type \'{$a->cr
 Proceed to edit only if you know what you are doing!';
 $string['missingprototypes'] = 'Missing prototypes';
 $string['missingprototypewhenrunning'] = 'Broken question (missing prototype \'{$a->crtype}\'). Cannot be run.';
+$string['missinguiparams'] = 'The following UI parameters are required but not defined: ';
 $string['multipledefaults'] = 'At most one language can be selected as default';
 $string['multipleprototypes'] = 'Multiple prototypes found for \'{$a->crtype}\'';
 $string['mustrequirefewer'] = 'You cannot require more attachments than you allow.';
 
 $string['nearequalitygrader'] = 'Nearly exact match';
 $string['nodetailsavailable'] = 'Select a question type to see detailed help.';
+$string['nouiparameters'] = 'The {$a->uiname} UI does not take parameters.';
 $string['noqtype'] = 'No question type selected';
 $string['morehidden'] = 'Some hidden test cases failed, too.';
 $string['noerrorsallowed'] = 'Your code must pass all tests to earn any marks. Try again.';
@@ -373,6 +402,7 @@ $string['negativeorzeromark'] = 'Mark must be greater than zero';
 $string['options'] = 'Options';
 $string['ordering'] = 'Ordering';
 $string['overallresult'] = 'Overall result';
+$string['overloadoninit'] = 'Sandbox server overload prevented question initialisation';
 
 $string['passes'] = 'passes';
 $string['penaltyregime'] = '(penalty regime: {$a} %)';
@@ -394,26 +424,26 @@ $string['precheck_empty'] = 'Empty';
 $string['precheck_examples'] = 'Examples';
 $string['precheck_selected'] = 'Selected';
 $string['precheck_all'] = 'All';
-$string['precheck_help'] = 'If Precheck is enabled, students will have an extra button to the left of the
-usual check button to give them a penalty-free run to check their code against
-a subset of the question test cases.
+$string['precheck_help'] = 'Set what button are available for students to
+submit answers. Usually at least a Check button is shown but this can be
+hidden (e.g. for use in Deferred Feedback contexts) if <i>Hide check</i> is checked.
 
-If \'Empty\' is selected, a single run
+If Precheck is enabled, students will have an extra button to the left of the
+usual check button to give them a penalty-free run to check their code against
+a subset of the question test cases. Then<ul>
+<li>If \'Empty\' is selected, a single run
 will be done with the per-test template using a testcase in which all the
 fields (testcode, stdin, expected, etc) are the empty string. Non-empty output
 is deemed to be a precheck failure. Use with caution:
 some question types will not handle this correctly, e.g. write-a-program questions
 that generate output.
-
-If \'Examples\' is selected, the code will
+</li><li>If \'Examples\' is selected, the code will
 be tested against all the tests for which \'use_as_example\' has been checked.
-
-If \'Selected\' is selected, an extra UI element is added to each test case
+</li><li>If \'Selected\' is selected, an extra UI element is added to each test case
 to allow the author to select a specific subset of the tests.
-
-If \'All\' is selected, all test cases are run (although their behaviour might
+</li><li>If \'All\' is selected, all test cases are run (although their behaviour might
 be different from the normal Check, if the template code so chooses).
-
+</ul>
 The template can check whether or not the run is a precheck run using the
 Twig parameter {{ IS_PRECHECK }}, which is "1" during precheck runs and
 "0" otherwise.';
@@ -549,39 +579,7 @@ else:
 <p>Alternatively, there could be a set of test cases, each one checking
 one of the aspects of the specification. For example, the first test case might
 print the sorted keys, expecting to see \'A\', \'B\'. The second test case might
-print the outgoing edges from node \'A\', and so on.</p>
-<p>The question takes the following template parameters, all of which are recognised
-by the GraphUI plugin and control its behaviour.</p>
-<p><ul>
-<li>isfsm. True if the graph is of a Finite State Machine. If true, the graph
-can contain an incoming edge from nowhere (the start edge) and nodes can be
-marked as accept states (shown with a double circle) by double clicking. Default: true.</li>
-<li>isdirected. True if edges are directed. Default: true.</li>
-<li>noderadius. The radius of a node, in pixels. Default: 26.</li>
-<li>fontsize. The font size used for node and edge labels. Default: 20 points.</li>
-<li>textoffset. An offset in pixels used when positioning link label text. Deprecated
-as link text can now be manually dragged. Default 5.</li>
-<li>helpmenutext. A string to be used in lieu of the default Help info, if supplied.
-No default.</li>
-<li>locknodepositions. True to prevent the user from moving nodes. Useful when the
-answer box is preloaded with a graph that the student has to annotate by
-changing node or edge labels or by adding/removing edges. Note, though that
-nodes can still be added and deleted (but see locknodeset).</li>
-<li>locknodelabels. True to prevent the user from editing node labels (including
-of newly added nodes). This will also prevent any new nodes having non-empty labels.
-Default: false.</li>
-<li>locknodeset. True to prevent the user from adding or deleting nodes or (for FSMs)
-toggling the accept state. Default: false</li>
-<li>lockedgepositions. True to prevent the user from dragging edges to change
-their curvature. Also ensures that
-edges added by a student are straight, e.g. to draw a polygon on a set of
-given points. Note, though that
-edges can still be added and deleted (but see lockedgeset). Default: false.</li>
-<li>lockedgelabels. True to prevent the user from editing edge labels. This also
-prevents non-empty labels on new edges. Default: false.</li>
-<li>lockedgeset. True to prevent the user from adding edges to, or deleting
-edges from, the preloaded graph. Default: false.<li>
-</ul></p>';
+print the outgoing edges from node \'A\', and so on.</p>';
 
 $string['qtype_java_class'] = '<p>A Java write-a-class question, where the student submits a
 complete class as their answer. Each test will  typically instantiate an object of the specified
@@ -752,38 +750,7 @@ else:
 <p>Alternatively, there could be a set of test cases, each one checking
 one of the aspects of the specification. For example, the first test case might
 print the sorted keys, expecting to see \'A\', \'B\'. The second test case might
-print the edges connected to node \'A\', and so on.</p>
-<p>The question takes the following template parameters, all of which are recognised
-by the GraphUI plugin and control its behaviour.</p>
-<p><ul>
-<li>isfsm. True if the graph is of a Finite State Machine. If true, the graph
-can contain an incoming edge from nowhere (the start edge) and nodes can be
-marked as accept states (shown with a double circle) by double clicking. Default: false.</li>
-<li>isdirected. True if edges are directed. Default: false.</li>
-<li>noderadius. The radius of a node, in pixels. Default: 26.</li>
-<li>fontsize. The font size used for node and edge labels. Default: 20 points.</li>
-<li>textoffset. An offset in pixels used when positioning link label text. Deprecated
-as link text can now be manually dragged. Default 5.</li>
-<li>helpmenutext. A string to be used in lieu of the default Help info, if supplied.
-No default.</li>
-<li>locknodepositions. True to prevent the user from moving nodes. Useful when the
-answer box is preloaded with a graph that the student has to annotate by
-changing node or edge labels or by adding/removing edges. Note, though that
-nodes can still be added and deleted (but see locknodeset).</li>
-<li>locknodelabels. True to prevent the user from editing node labels (including
-of newly added nodes). This will also prevent any new nodes having non-empty labels.
-Default: false.</li>
-<li>locknodeset. True to prevent the user from adding or deleting nodes or (for FSMs)
-toggling the accept state. Default: false</li>
-<li>lockedgepositions. True to prevent the user from dragging edges to change
-their curvature. Also ensures that
-edges added by a student are straight, e.g. to draw a polygon on a set of
-given points. Default: false.</li>
-<li>lockedgelabels. True to prevent the user from editing edge labels. This also
-prevents non-empty labels on new edges. Default: false.</li>
-<li>lockedgeset. True to prevent the user from adding edges to, or deleting
-edges from, the preloaded graph. Default: false.<li>
-</ul></p>';
+print the edges connected to node \'A\', and so on.</p>';
 
 $string['qtype_python3_w_input'] = '<p>A Python3 question type, which can handle
 write-a-function, write-a-class or write-a-program question types. It differs
@@ -834,13 +801,13 @@ $string['qtype_sql'] = '<p>A SQL question type, using sqlite3,
 
 $string['qtypehelp'] = 'Help with q-type';
 $string['questioncheckboxes'] = 'Customisation';
-$string['questioncheckboxes_help'] = 'To customise the question type, e.g. to edit the question templates or
-sandbox parameters, click the \'Customise\'
+$string['questioncheckboxes_help'] = 'To customise the question type, e.g. to edit
+the question template, user interface or sandbox parameters, click the \'Customise\'
 checkbox and read the help available on the newly-visible form elements for
 more information.
 
 If the template-debugging checkbox is clicked, the program generated
-for each testcase will be displayed in the output.';
+for each Jobe sandbox run will be displayed in the output.';
 $string['questionloaderror'] = 'Failed to load question';
 $string['questionpreview'] = 'Question preview';
 $string['questiontype'] = 'Question type';
@@ -913,7 +880,7 @@ $string['resultcolumnsnotlist'] = 'Result columns field must a JSON-encoded list
 $string['resultcolumnspecbad'] = 'Invalid column specifier found: each one must be a list of two or more strings';
 $string['resultstring-norun'] = 'No run';
 $string['resultstring-compilationerror'] = 'Compilation error';
-$string['resultstring-runtimeerror'] = 'Error';
+$string['resultstring-runtimeerror'] = 'Run error';
 $string['resultstring-timelimit'] = 'Time limit exceeded';
 $string['resultstring-success'] = 'OK';
 $string['resultstring-memorylimit'] = 'Memory limit exceeded';
@@ -929,17 +896,11 @@ $string['run_failed'] = 'Failed to run tests';
 $string['sampleanswerattachments'] = 'Sample answer attachments';
 $string['sampleanswerattachments_help'] = 'If the sample answer needs attachments files, upload them here';
 $string['sandboxcontrols'] = 'Sandbox';
-$string['sandboxcontrols_help'] = '
-Select what sandbox to use for running the student submissions.
-DEFAULT uses the highest priority sandbox available for the chosen language.
-Since Jobe has replaced all sandbox
-types except the deprecated \'ideonesandbox\',
-the value \'jobesandbox\' is recommended for normal use, and results in better
-error messages if the Jobe server is down.
-
-You can also set the
-maximum CPU time in seconds  allowed for each testcase run and the maximum
-memory a single testcase run can consume (MB). A blank entry uses the sandbox\'s
+$string['sandboxcontrols_help'] = 'All jobs are run on the Jobe sandbox, which imposes
+constraints on memory, CPU time, file output etc. Here is where you adjust those constraints.
+    
+\'TimeLimit (secs)\' sets the maximum CPU time in seconds  allowed for each sandbox run
+and \'MemLimit (MB)\' sets the maximum memory the run can use. A blank entry uses the sandbox\'s
 default value (typically 5 secs for the CPU time limit and a language-dependent
 amount of memory), but the defaults may not be suitable for resource-demanding
 programs. A value of zero for the maximum memory results in no limit being
@@ -956,10 +917,7 @@ compliance and no other C options would be used. See the jobe documentation
 for details. Some sandboxes (e.g. the deprecated Ideone sandbox) may silently ignore any or all of
 these settings.
 
-If the sandbox is set to \'jobesandbox\', the jobe host to use for testing the
-question is
-usually as specified via the administrator settings for the CodeRunner plugin.
-However, it is possible to select a different jobeserver by defining a \'jobeserver\'
+It is possible to select a different jobeserver by defining a \'jobeserver\'
 parameter and also, optionally, a \'jobeapikey\' parameter. For example, if the
 \'Parameters\' field is set to <code>{"jobeserver": "myspecialjobe.com"}</code>, the run
 will instead by submitted to the server "myspecialjobe.com".
@@ -972,19 +930,31 @@ $string['showcolumns'] = 'Show columns:';
 $string['showcolumns_help'] = 'Select which columns of the results table should
 be displayed to students. Empty columns will be hidden regardless.
 The defaults are appropriate for most uses.';
+$string['showdetails'] = 'Show details';
 $string['showdifferences'] = 'Show differences';
 $string['showsource'] = 'Template debugging';
 $string['sourcecodeallruns'] = 'Debug: source code from all test runs';
 $string['stdin'] = 'Standard Input';
 $string['stdin_help'] = 'The standard input to the test, seen by the template as {{TEST.stdin}}';
 $string['student_answer'] = 'Student answer';
+$string['submitbuttons'] = 'Submit buttons';
 $string['supportscripts'] = 'Support scripts';
 $string['syntax_errors'] = 'Syntax Error(s)';
 
+$string['tableui_num_rows_descr'] = 'The (initial) number of rows in the table, excluding the top header row (if headers are given). Required.';
+$string['tableui_num_columns_descr'] = 'The number of columns in the table, excluding the left-most label column (if labels are given). Required.';
+$string['tableui_column_headers_descr'] = 'A list of strings for the column headers.';
+$string['tableui_dynamic_rows_descr'] = 'If true, and "Add row" button is provided to allow users to add rows to the table.';
+$string['tableui_row_labels_descr'] = 'A list of strings for the row labels, i.e. the values in column 0.';
+$string['tableui_locked_cells_descr'] = 'A list of 2-element lists giving the 0-origin coordinates of cells that the user cannot alter. Coordinates do not include a possible header row or row-label column.';
+$string['tableui_column_width_percents_descr'] = 'A list of floating point numbers giving the percentage of the available table width to allocate to the columns, including the row-label column if present.';
+$string['tableui_lines_per_cell_descr'] = 'The number of text rows in each textarea/cell';
+$string['tableui_sync_interval_secs_descr'] = 'The time interval in seconds between calls to sync the UI contents back to the question answer. 0 for no such auto-syncing.';
+
 $string['table_ui_invalidjson'] = 'Table UI: invalid JSON serialisation.';
 $string['table_ui_invalidserialisation'] = 'Table UI: invalid serialisation.';
-$string['table_ui_missingparams'] = 'Table UI needs template parameters table_num_columns and
-table_num_rows.';
+$string['table_ui_missingparams'] = 'Table UI needs parameters num_columns and
+num_rows.';
 $string['template'] = 'Template';
 $string['template_changed'] = 'Per-test template changed - disable combinator? [\'Cancel\' leaves it enabled.]';
 $string['templatecontrols'] = 'Template controls';
@@ -1044,8 +1014,8 @@ response and TEST.testcode is the code for the current testcase. These values
 (and other testcase values like TEST.expected, TEST.stdin, TEST.mark)
 can be inserted into the template by enclosing them in double braces, e.g.
 <code>{{TEST.testcode}}</code>. For use within literal strings, an appropriate escape
-function should be applied, e.g. <code>{{STUDENT_ANSWER | e(\'py\')}}</code> is the student
-answer escaped in a manner suitable for use within Python triple-double-quoted
+function should be applied, e.g. <code>{{STUDENT_ANSWER | e(\'py\')}}</code> is  
+suitable for use within Python triple-double-quoted
 strings. Other escape functions are <code>e(\'c\')</code>, <code>e(\'java\')</code>,
 <code>e(\'matlab\')</code>. The program that is output by Twig is then compiled and executed
 with the language of the selected built-in type and with stdin set
@@ -1053,38 +1023,38 @@ to TEST.stdin. Output from that program is then passed to the selected grader.
 See the help under \'Grading controls\' for more on that.
 
 Note that if a customised per-test template is used
-there will be a compile-and-execute cycle for every test case, whereas most
-built-in question types define instead a combinator template that combines
+there will be a compile-and-execute job submitted to the sandbox for every test case, 
+whereas most built-in question types define instead a combinator template that combines
 all test cases into a single run.
 
 If the template-debugging checkbox is clicked, the program generated
-for each testcase will be displayed in the output.';
+for each sandbox run will be displayed in the output.';
 $string['templateparams'] = 'Template params';
-$string['templateparams_help'] = 'The template parameters field lets you pass string parameters to a question\'s
-template(s). If non-blank, this must be a JSON-format record. The fields of
-the record can then be used within the template, where they appear as
-QUESTION.parameters.&lt;&lt;param&gt;&gt;. For example, if template params is
+$string['templateparamsevalpertry'] = 'Evaluate per student';
+$string['templateparamslang'] = 'Preprocessor';
+$string['templateparamsusingsandbox'] = str_replace("\n", ' ',
+'Preprocessors other than Twig use the sandbox server. When a student starts a
+quiz all such questions initiate a sandbox run before the question can even be
+displayed. In a test or exam, this can overload the sandbox server. Caveat emptor!');
+$string['templateparams_help'] = 'If non-blank, the template parameters field must
+evaluate to a JSON-format record. In its simplest form the field <i>is</i> just a JSON
+record defining a set of variables that are added to the environment for the Twig
+template engine when it expands the template (and other fields if Twig All is set).
 
-        {"age": 23}
+If a preprocessor is specified in the Template param controls section,
+the template parameters are first processed by the specified language
+to yield a JSON record. See <a href="https://coderunner.org.nz/mod/url/view.php?id=199">
+the documentation</a> for details.
 
-the value 23 would be substituted into the template in place of the
-template variable <code>{{ QUESTION.parameters.age }}</code>.
-
-The set of template parameters passed to the template consists of any template
-parameters defined in the prototype with the question template parameters
-merged in. Question parameters can thus override prototype parameters, but not
-delete them.
-
-Template parameters can also be used to provide randomisation within a question.
-When the question is first instantiated the template parameters are passed
-through the Twig template engine to yield the final JSON version.
-Twig\'s "random" function can
-be used to assign random values to template parameters. If the "Twig All" checkbox
-is checked, all other fields of the question (question text, answer, test cases
-etc) are the also processed by Twig, with the template parameters as an
-environment. This can result in different
-students seeing different random variants of the question. See the documentation
-for details.';
+<b>Warning:</b> use of a preprocessor other than Twig can have drastic performance
+implications if the Evaluate-on-each-attempt checkbox is
+checked, which it has to be if used for randomisation or for per-student question
+customisation. Preprocessing must be done before a question
+can be displayed to a student and, except for Twig, takes place on the Jobe sandbox
+server. Every attempt on every question of this sort by every student will result in a job
+being sent to that server. This can result in thousands of jobs hitting the
+Jobe server at once at the start of a large test or exam, which will probably
+overload it. Caveat Emptor!';
 $string['testalltitle'] = 'Test all questions in this context';
 $string['testallincategory'] = 'Test all questions in this category';
 $string['testcase'] = 'Test case {$a}';
@@ -1119,23 +1089,42 @@ $string['testtype_precheck'] = 'Precheck only';
 $string['testtype_both'] = 'Both';
 $string['tooshort'] = 'Answer is too short to be meaningful and has been ignored without penalty';
 $string['twigall'] = 'Twig all';
-$string['twigcontrols'] = 'Twig controls';
-$string['twigcontrols_help'] = 'Template parameters are normally referred to during Twig expansion in the form
+$string['twigcontrols'] = 'Template param controls';
+$string['twigcontrols_help'] = 'Template parameters were traditionally referred to during Twig expansion in the form
 {{QUESTION.parameters.someparam}} However, if the Hoist Template Parameters
 checkbox is checked, the parameters are hoisted into the Twig global name space
 and can be referenced simply as {{someparam}}.
 
-The Twig macro processor was traditionally applied only to the template. It is now
-applied to the template parameters as well and, if Twig All is checked, to the
-question text, sample answer, answer preload and all test case fields, using
-the Twig-expanded template parameters as an environment. You will usually
-need to turn on TwigAll if using randomisation within the template parameters';
+If Twig All is checked, Twig macro expansion is applied to the
+question text, sample answer, answer preload, UI parameters and all test case fields
+using the template parameters as an environment. You will usually
+need to turn on TwigAll if using randomisation within the template parameters.
+Note that this Twig All expansion occurs when the question is first initialised, whereas
+the Twig expansion of the template occurs much later, when the student submits
+an answer. The environment for expanding the template includes the QUESTION
+Twig variable (a subset of the entire question record), some fields of which
+might have been expanded as a result of using Twig All. 
+
+The text in the template parameters field must either be JSON or must evaluate
+to yield JSON when processed by the specified Preprocessor. Be warned that choosing
+a preprocessor other than Twig results in a submission to the Jobe sandbox before
+the question can even be displayed. See <a href="https://coderunner.org.nz/mod/url/view.php?id=199">
+the documentation</a> for how to write a non-Twig preprocessor.
+
+If using a preprocessor other than Twig, a Jobe sandbox submission is usually
+required for each question for each student when they start the quiz.
+If <i>Evaluate per student</i> is unchecked a single sandbox submission will
+take place only when the question is saved; this is a relatively low-cost operation but
+is not normally useful, as it essentially prevents
+any use of per-student randomisation. It can however be used to generate 
+question content in some situations.';
 $string['twigerror'] = 'Twig error {$a}';
 $string['twigerrorintest'] = 'Twig error when processing this test {$a}';
 $string['type_header'] = 'CodeRunner question type';
 $string['typename'] = 'Question type';
 $string['typerequired'] = 'Please select the type of question (language, format, etc)';
 
+$string['uichanged'] = 'UI changed. Save and reload page to see and edit available ui parameters (if any).';
 $string['uicontrols'] = 'Input UIs';
 $string['uicontrols_help'] = 'Select the User Interface controllers for the student answer and
 the question author\'s template.
@@ -1151,30 +1140,11 @@ questions will usually have a single test case, graded with a template
 that analyses the serialised
 representation of the graph and prints a message like "OK" if the answer is
 correct or a suitably informative error message otherwise.
-Template parameters can be set in either the prototype or the
-actual question to modify the behaviour of the Graph plugin as follows:
-{"isdirected": false} for non-directed graphs; {"isfsm": true} to allow
-incoming edges without a start node and to allow double clicking a node
-to define it as an accept state;
-{"noderadius": 30}, say, to set a different noderadius in pixels;
-{"helpmenutext": "Line1\nLine2\nLine3"} to replace the default help menu with a
-customised version. Other template parameters are documented within the built-in
-directed\_graph and undirected\_graph question types.
-The template parameters
-from the actual question are merged with, and override, those from the
-prototype (since CodeRunner V3.2.2).
 
 The \'Table\' user interface element, which displays a table of text
 areas for the student to
 fill in. It is used by the \'python3_program_testing\' question type, which is
-included in the sample questions on github. This takes template parameters of
-table_num_rows and table_num_columns (both required) and optional table_column_headers
-(a list of strings with which to label columns), table_row_labels (a list of
-strings with which to label rows) and table_column_width_percents (a list of
-the percentages of the table width to allocate to all columns, including the
-row label column if specified) and table_locked_cells (a list of [row, column]
-pairs of cells that the user cannot alter - the row and column indices are
-0-origin but do not include the row label column or the column header row).
+included in the sample questions on github. 
 
 The \'Gapfiller\' and \'Html\' user interfaces are documented in the 
 main CodeRunner documentation at https://github.com/trampgeek/moodle-qtype_coderunner#code-runner.
@@ -1191,10 +1161,20 @@ If \'Template uses ace\' is checked,
 the Ace code editor will manage both the template and the template parameters
 boxes. Otherwise a raw text box will be used.';
 $string['ui_fallback'] = 'Falling back to raw text area.';
+$string['uiparametergroup'] = 'UI parameters';
+$string['uiparametergroup_help'] = 'A JSON string defining any User Interface
+parameter values that are either required by the UI plugin or which override the
+default values. For example, to draw larger nodes when using the GraphUI: \'{"noderadius": 30}\'';
+$string['uiparameters'] = 'UI parameters (JSON)';
+$string['uiparametertablehead'] = 'The {$a->uiname} UI takes the following parameters: ';
+$string['uiparamname'] = 'Name';
+$string['uiparamdesc'] = 'Description';
+$string['uiparamdefault'] = 'Default';
 $string['unauthorisedbulktest'] = 'You do not have suitable access to any CodeRunner questions';
 $string['unauthoriseddbaccess'] = 'You are not authorised to use this script';
 $string['unknownerror'] = 'An unexpected error occurred. The sandbox may be down. Try again shortly.';
 $string['unknowncombinatorgraderfield'] = 'Unknown field name ({$a->fieldname}) in combinator grader output';
+$string['unknownuiplugin'] = 'Information on an unknown plugin ({$a->pluginname}) was requested.';
 $string['unserializefailed'] = 'Stored test results could not be deserialised. Perhaps try regrading?';
 $string['useasexample'] = 'Use as example';
 $string['useace'] = 'Template uses ace';

@@ -18,6 +18,7 @@
  * Language strings
  *
  * @package   block_checklist
+ * @copyright Peter Mocsi 2010
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -27,4 +28,3 @@ $string['choosegroup'] = 'Vyberte skupinu';
 $string['nochecklist'] = 'Prosím upravte tento blok na zobrazenie kontrolného zoznamu';
 $string['nochecklistplugin'] = 'Pre prácu s týmto blokom je potrebné nainštalovať najnovšiu verziu pluginu';
 $string['nousers'] = 'Žiadni užívatelia';
-

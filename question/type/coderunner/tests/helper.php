@@ -103,6 +103,7 @@ class qtype_coderunner_test_helper extends question_test_helper {
         $qdata->options->allornothing = 0;
         $qdata->options->showsource = 0;
         $qdata->options->precheck = 1;
+        $qdata->options->hidecheck = 0;
         $qdata->options->answerboxlines = 5;
         $qdata->options->displayfeedback = 1;
         // Exclude precheck as it defaults to null.
@@ -111,7 +112,7 @@ class qtype_coderunner_test_helper extends question_test_helper {
         // Exclude answer, defaults to null.
         $qdata->options->validateonsave = 1;
         // Ignore a bunch because they default to null.
-        $qdata->options->uiplugin = 'None';
+        $qdata->options->uiplugin = 'none';
         $qdata->options->attachments = 0;
         $qdata->options->attachmentsrequired = 0;
         $qdata->options->maxfilesize = 0;
@@ -137,10 +138,15 @@ class qtype_coderunner_test_helper extends question_test_helper {
         $form->answerboxcolumns = 100;
         $form->useace = 0;
         $form->precheck = 1;
+        $form->hidecheck = 0;
         $form->allornothing = 0;
         $form->penaltyregime = "10, 20, ...";
         $form->templateparams = "";
         $form->hoisttemplateparams = 1;
+        $form->templateparamslang = 'twig';
+        $form->templateparamsevalpertry = 0;
+        $form->templateparamsevald = null;
+        $form->uiparameters = null;
         $form->twigall = 0;
         $form->prototypetype = 0;
         $form->sandbox = 'DEFAULT';
@@ -153,6 +159,9 @@ class qtype_coderunner_test_helper extends question_test_helper {
         $form->name = 'Square function';
         $form->questiontext = array('text' => 'Write a function sqr(n) that returns n squared.', 'format' => FORMAT_HTML);
         $form->defaultmark = 31.0;
+        $form->answer = '';
+        $form->answerpreload = '';
+        $form->globalextra = '';
         $form->generalfeedback = array('text' => 'No feedback available for coderunner questions.', 'format' => FORMAT_HTML);
         $form->testcode = array('print(sqr(0))', 'print(sqr(1))', 'print(sqr(11))', 'print(sqr(-7))', 'print(sqr(-6))');
         $form->stdin = array('', '', '', '', '');
@@ -167,7 +176,7 @@ class qtype_coderunner_test_helper extends question_test_helper {
         $form->cputimelimitsecs = '';
         $form->memlimitmb = '';
         $form->customise = 1;
-        $form->uiplugin = 'None';
+        $form->uiplugin = 'none';
         $form->attachments = 0;
         $form->attachmentsrequired = 0;
         $form->maxfilesize = 0;
@@ -192,10 +201,15 @@ class qtype_coderunner_test_helper extends question_test_helper {
         $form->answerboxcolumns = 100;
         $form->useace = 0;
         $form->precheck = 1;
+        $form->hidecheck = 0;
         $form->allornothing = 0;
         $form->penaltyregime = "10, 20, ...";
         $form->templateparams = "";
         $form->hoisttemplateparams = 1;
+        $form->templateparamslang = 'twig';
+        $form->templateparamsevalpertry = 0;
+        $form->templateparamsevald = null;
+        $form->uiparameters = null;
         $form->twigall = 0;
         $form->prototypetype = 0;
         $form->sandbox = 'DEFAULT';
@@ -222,7 +236,7 @@ class qtype_coderunner_test_helper extends question_test_helper {
         $form->cputimelimitsecs = '';
         $form->memlimitmb = '';
         $form->customise = 1;
-        $form->uiplugin = 'None';
+        $form->uiplugin = 'none';
         $form->attachments = 0;
         $form->attachmentsrequired = 0;
         $form->maxfilesize = 0;
@@ -1136,13 +1150,6 @@ EOPROG;
 
         $question->options->answers = array();  // For compatability with questiontype base.
         $question->options->testcases = $question->testcases;
-
-        // Lastly, add in the merged template params (wouldn't it be nice if
-        // I could figure out how to use the actual get_options function :-/).
-        $question->get_prototype();
-        $question->options->mergedtemplateparams = qtype_coderunner_util::merge_json(
-                $question->prototype->templateparams, $question->options->templateparams);
-
     }
 
     // Given an array of tests in which each element has just the bare minimum
@@ -1180,11 +1187,16 @@ EOPROG;
         $coderunner->qtype = question_bank::get_qtype('coderunner');
         $coderunner->coderunnertype = $type;
         $coderunner->templateparams = '';
+        $coderunner->templateparamslang = 'twig';
+        $coderunner->templateparamsevalpertry = 0;
+        $coderunner->templateparamsevald = null;
+        $coderunner->uiparameters = null;
         $coderunner->hoisttemplateparams = 0;
         $coderunner->twigall = 0;
         $coderunner->prototypetype = 0;
         $coderunner->name = $name;
         $coderunner->precheck = 0;
+        $coderunner->hidecheck = 0;
         $coderunner->questiontext = $questiontext;
         $coderunner->displayfeedback = 1;
         $coderunner->answer = '';
@@ -1204,6 +1216,7 @@ EOPROG;
         $coderunner->maxfilesize = 0;
         $coderunner->filenamesregex = '';
         $coderunner->filenamesexplain = '';
+        $coderunner->parameters = array();  // Normally generated during question initialisation.
         foreach ($otheroptions as $key => $value) {
             $coderunner->$key = $value;
             $coderunner->options[$key] = $value;
@@ -1215,7 +1228,10 @@ EOPROG;
         $coderunnertype = new qtype_coderunner();
         $coderunnertype->clean_question_form($coderunner, true);
         $this->get_options($coderunner);
-
+        $coderunner->get_prototype();
+        if ($coderunner->prototype === null) {
+            debugging("No prototype found in make_coderunner_question");
+        }
         return $coderunner;
     }
 }

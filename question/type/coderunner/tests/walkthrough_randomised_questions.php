@@ -35,7 +35,7 @@ require_once($CFG->dirroot . '/question/type/coderunner/question.php');
 
 class qtype_coderunner_walkthrough_randomisation_test extends qbehaviour_walkthrough_test_base {
 
-    protected function setUp() {
+    protected function setUp(): void {
         global $CFG;
         parent::setUp();
         qtype_coderunner_testcase::setup_test_sandbox_configuration();
@@ -128,6 +128,10 @@ class qtype_coderunner_walkthrough_randomisation_test extends qbehaviour_walkthr
         $templateparams = '{"func": "{{ random(["sqr", "mysqr"]) }}", "n": {{ 111 + random(1) }} }';
 
         $q->templateparams = $seeding . $templateparams;
+        $q->templateparamslang = 'twig';
+        $q->templateparamsevalpertry = 0;
+        $q->templateparamsevald = null;
+        $q->uiparameters = null;
         $q->hoisttemplateparams = 1;
         $q->twigall = 1;
         $q->questiontext = 'Write a function {{ func }}';

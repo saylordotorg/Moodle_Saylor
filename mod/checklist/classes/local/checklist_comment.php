@@ -32,33 +32,62 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot.'/completion/data_object.php');
 
+/**
+ * Class checklist_comment
+ * @package mod_checklist
+ */
 class checklist_comment extends data_object {
+    /** @var string */
     public $table = 'checklist_comment';
+    /** @var string[] */
     public $requiredfields = [
         'id', 'itemid', 'userid', 'commentby', 'text'
     ];
 
     // DB fields.
+    /** @var int */
     public $itemid;
+    /** @var int */
     public $userid;
+    /** @var int */
     public $commentby;
+    /** @var string */
     public $text;
 
     // Extra data.
+    /** @var string|null */
     protected $commentbyname = null;
 
+    /** @var int|null */
     protected static $courseid = null;
 
+    /**
+     * checklist_comment constructor.
+     * @param array|null $params
+     * @param bool $fetch
+     * @throws \coding_exception
+     */
     public function __construct(array $params = null, $fetch = true) {
         // Really ugly hack to stop travis complaining about $required_fields.
         $this->{'required_fields'} = $this->requiredfields;
         parent::__construct($params, $fetch);
     }
 
+    /**
+     * Get a single matching record.
+     * @param array $params
+     * @return data_object|false|object
+     */
     public static function fetch($params) {
         return self::fetch_helper('checklist_comment', __CLASS__, $params);
     }
 
+    /**
+     * Get all matching records.
+     * @param array $params
+     * @param false $sort
+     * @return array|false|mixed
+     */
     public static function fetch_all($params, $sort = false) {
         $ret = self::fetch_all_helper('checklist_comment', __CLASS__, $params);
         if (!$ret) {
@@ -68,6 +97,7 @@ class checklist_comment extends data_object {
     }
 
     /**
+     * Get all matching comments by user id and item ids
      * @param int $userid
      * @param int[] $itemids
      * @return checklist_comment[] $itemid => $check
@@ -91,6 +121,7 @@ class checklist_comment extends data_object {
     }
 
     /**
+     * Get the name of the person who made the comment
      * @return string|null
      */
     public function get_commentby_name() {
@@ -98,6 +129,7 @@ class checklist_comment extends data_object {
     }
 
     /**
+     * Get the user profile URL for the commenting user
      * @return moodle_url
      */
     public function get_commentby_url() {
@@ -105,6 +137,7 @@ class checklist_comment extends data_object {
     }
 
     /**
+     * Add the name of the commenter to the given comments.
      * @param checklist_comment[] $comments
      */
     public static function add_commentby_names($comments) {
@@ -120,7 +153,17 @@ class checklist_comment extends data_object {
             return;
         }
 
-        $commentusers = $DB->get_records_list('user', 'id', $userids, '', 'id,'.get_all_user_name_fields(true));
+        if (class_exists('\core_user\fields')) {
+            $namesql = \core_user\fields::for_name()->get_sql('', true);
+        } else {
+            $namesql = (object)[
+                'selects' => ','.get_all_user_name_fields(true),
+                'joins' => '',
+                'params' => [],
+                'mappings' => [],
+            ];
+        }
+        $commentusers = $DB->get_records_list('user', 'id', $userids, '', 'id'.$namesql->selects);
         foreach ($comments as $comment) {
             if ($comment->commentby) {
                 if (isset($commentusers[$comment->commentby])) {
@@ -130,6 +173,10 @@ class checklist_comment extends data_object {
         }
     }
 
+    /**
+     * Store the current course id
+     * @param int $courseid
+     */
     public static function set_courseid($courseid) {
         self::$courseid = $courseid;
     }

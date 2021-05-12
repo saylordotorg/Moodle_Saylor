@@ -19,7 +19,8 @@ For full install instructions, see the
 [CodeRunner install instructions](https://github.com/trampgeek/moodle-qtype_coderunner/blob/master/Readme.md).
 
 ## CHANGE HISTORY
-31/01/21: V1.3.8. Add step info (numchecks, numprechecks and fracton) to response
+24/02/21: V1.3.9. Add quizbehaviour to step info.
+31/01/21: V1.3.8. Add step info (numchecks, numprechecks and fraction) to response
 array so that question author can alter feedback accordingly.
 11/02/20: V1.3.7. Set css class for correct styling of Precheck button.
 25/01/19: V1.3.6. Fix bug in privacy provider (not working with pre-version7 PHP).
