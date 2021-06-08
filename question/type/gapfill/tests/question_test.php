@@ -36,7 +36,7 @@ require_once($CFG->dirroot . '/question/type/gapfill/question.php');
  * @copyright  2012 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class qtype_gapfill_question_test extends advanced_testcase {
+class question_test extends advanced_testcase {
     public function test_get_expected_data() {
         $question = qtype_gapfill_test_helper::make_question();
         $expecteddata = array('p1' => 'raw_trimmed', 'p2' => 'raw_trimmed');

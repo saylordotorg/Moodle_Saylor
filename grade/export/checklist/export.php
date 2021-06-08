@@ -48,7 +48,7 @@ require_capability('gradeexport/checklist:view', $context);
 $viewall = has_capability('gradeexport/checklist:viewall', $context);
 $viewdistrict = has_capability('gradeexport/checklist:viewdistrict', $context);
 if (!$viewall && (!$viewdistrict || !$district)) {
-    print_error('nopermission', 'gradeexport_checklist');
+    throw new moodle_exception('nopermission', 'gradeexport_checklist');
 }
 
 if (!$viewall) {
@@ -56,14 +56,14 @@ if (!$viewall) {
     $sql .= "WHERE ud.fieldid = uf.id AND uf.shortname = 'district' AND ud.userid = ?";
     $mydistrict = $DB->get_record_sql($sql, [$USER->id]);
     if ($district != $mydistrict->district) {
-        print_error('wrongdistrict', 'gradeexport_checklist');
+        throw new moodle_exception('wrongdistrict', 'gradeexport_checklist');
     }
 }
 
 if ($group) {
     if ($course->groupmode != VISIBLEGROUPS && !has_capability('moodle/site:accessallgroups', $context)) {
         if (!groups_is_member($group)) {
-            print_error('wronggroup', 'gradeexport_checklist');
+            throw new moodle_exception('wronggroup', 'gradeexport_checklist');
         }
     }
 } else {
@@ -76,7 +76,7 @@ if ($group) {
 }
 
 if (!$checklist = $DB->get_record('checklist', array('id' => $checklistid))) {
-    print_error('checklistnotfound', 'gradeexport_checklist');
+    throw new moodle_exception('checklistnotfound', 'gradeexport_checklist');
 }
 
 $studentmarking = ($checklist->teacheredit != CHECKLIST_MARKING_TEACHER);
@@ -98,7 +98,7 @@ if ($district && $district !== 'ALL' && $users) {
     $users = $DB->get_records_sql($sql, array_merge($uparam, [$district]));
 }
 if (!$users) {
-    print_error('nousers', 'gradeexport_checklist');
+    throw new moodle_exception('nousers', 'gradeexport_checklist');
 }
 
 require_once($CFG->dirroot.'/grade/export/checklist/columns.php');

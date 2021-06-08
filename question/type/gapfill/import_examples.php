@@ -126,11 +126,11 @@ if ($fromform = $mform->get_data()) {
     echo $OUTPUT->header();
     // Do anything before that we need to.
     if (!$qformat->importpreprocess()) {
-        print_error('cannotimport', 'qtype_gapfill', $PAGE->out);
+        throw new \moodle_exception(get_string('cannotimport', ''), '', $PAGE->url);
     }
     // Process the uploaded file.
     if (!$qformat->importprocess($category)) {
-        print_error(get_string('cannotimport', ''), '', $PAGE->url);
+        throw new \moodle_exception(get_string('cannotimport', ''), '', $PAGE->url);
     } else {
         /* after the import offer a link to go to the course and view the questions */
         $visitquestions = new moodle_url('/question/edit.php?courseid=' . $mform->course->id);

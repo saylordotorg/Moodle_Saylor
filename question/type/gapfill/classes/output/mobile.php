@@ -39,7 +39,7 @@ class mobile {
 
     /**
      * Returns the gapfill question type for the quiz in the mobile app.
-     *
+     * @param array $args
      * @return void
      */
     public static function mobile_get_gapfill($args) {

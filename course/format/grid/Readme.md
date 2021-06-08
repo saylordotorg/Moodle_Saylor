@@ -1,4 +1,4 @@
-Grid Course Format
+Grid course format
 ============================
 A topics based format that uses a grid of user selectable images to pop up a light box of the section.
 
@@ -12,7 +12,7 @@ next release.
 Please ensure that your hardware and software complies with 'Requirements' in 'Installing Moodle' on
 'docs.moodle.org/310/en/Installing_Moodle'
 
-Free Software
+Free software
 =============
 The Grid format is 'free' software under the terms of the GNU GPLv3 License, please see 'COPYING.txt'.
 
@@ -72,7 +72,7 @@ Uninstallation
    and drop the 'format_grid_icon' and 'format_grid_summary' tables.
 5. Put Moodle out of Maintenance Mode.
 
-Upgrade Instructions
+Upgrade instructions
 ====================
 1. Ensure you have the version of Moodle as stated above in 'Required version of Moodle'.  This is essential as the
    format relies on underlying core code that is out of my control.
@@ -108,7 +108,7 @@ do so:
     'Site administration' -> 'Notifications' if this does not happen.
 6.  Put Moodle out of Maintenance Mode.
 
-Reporting Issues
+Reporting issues
 ================
 Before reporting an issue, please ensure that you are running the latest version for your release of Moodle.  Major version numbers
 are always the same, so for Moodle 2.5.x there will be a Grid format 2.5.x.  The primary release area is located on
@@ -171,7 +171,7 @@ and:
 
 https://github.com/gjb2048/moodle-format_grid/issues/23
 
-Making Changes
+Making changes
 ==============
 
 Changing the keyboard control code
@@ -229,14 +229,20 @@ You can't back up the course format data independently.
 
 Roadmap
 =============
+1. Maintenance of issues.
+2. Ongoing structured walk through and refactoring.
+3. Updates to support major releases when they happen.
+
+Parked
+------
 1. Improved instructions including Moodle docs.
 2. User definable grid row icon numbers - https://moodle.org/mod/forum/discuss.php?d=196716
-3. Continued maintenance of issues.
-4. Ongoing structured walk through and refactoring.
 
-Known Issues
+Known issues
 =============
-1. All listed on https://tracker.moodle.org/browse/CONTRIB/component/11231.
+All listed on:
+1. https://tracker.moodle.org/browse/CONTRIB/component/11231
+2. https://github.com/gjb2048/moodle-format_grid/issues
 
 History
 =============

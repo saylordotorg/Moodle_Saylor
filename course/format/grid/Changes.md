@@ -1,5 +1,23 @@
 History
 =============
+Version 3.10.1.3 - 02/06/21
+============================
+Due to the changes, this is a 'release candidate' release, therefore it is imperative that you test on a test server
+first and report any issues back to me please.  Please see the 'Reporting issues' section of the 'Readme.md' file.
+
+ 1. Rewrite of update of displayed images process, such that should fix #143 when upgrades are conducted on
+    staged Moodle installations where there is no data folder.  This also speeds up in general the update process
+    as the displayed images are only regenerated when the course is accessed - thus a 'reset all' should be
+    much faster.  The downside of all of this is a slower page load for the first user to access a course that has
+    had the displayed images updated.
+ 2. Fix backup files do not contain 'alttext' field for the image.
+
+Version 3.10.1.2 - 19/05/21
+============================
+ 1. Fix grid image placement for RTL languages.
+ 2. Fix missing 'set' prefix on 'section0ownpagenogridonesection' causing offset error on course restore.
+ 3. Fix 'PNG files not transparent' - #142.
+
 Version 3.10.1.1 - 12/05/21
 ============================
  1. Fix 'Site default not applied to setsection0ownpagenogridonesection'.

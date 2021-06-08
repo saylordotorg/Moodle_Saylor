@@ -5,16 +5,19 @@
                 <ion-icon name="information-circle"></ion-icon>
                 {{ 'core.question.howtodraganddrop' | translate }}
             </p>
-        <p>
-        <core-format-text *ngIf="question.optionsaftertext" [component]="component" [componentId]="componentId"
-            [text]="question.text" (afterRender)="questionRendered()"></core-format-text></p>
-	<div class="answeroptions">
-	<core-format-text  [text]="question.answeroptions" ></core-format-text>
-	</div>
-	<p><core-format-text *ngIf="!question.optionsaftertext"  [component]="component"
-            [componentId]="componentId" [text]="question.text" (afterRender)="questionRendered()"></core-format-text></p>
-        <core-format-text *ngIf="question.answers" [component]="component" [componentId]="componentId"
-         [text]="question.answers" (afterRender)="questionRendered()"></core-format-text>
-	    </ion-label>
+            <p>
+                <core-format-text *ngIf="question.optionsaftertext" [component]="component" [componentId]="componentId"
+                    [text]="question.text" (afterRender)="questionRendered()"></core-format-text>
+            </p>
+            <div class="answeroptions">
+              <core-format-text  [text]="question.answeroptions" ></core-format-text>
+            </div>
+            <p>
+                <core-format-text *ngIf="!question.optionsaftertext"  [component]="component"
+                [componentId]="componentId" [text]="question.text" (afterRender)="questionRendered()"></core-format-text>
+            </p>
+            <core-format-text *ngIf="question.answers" [component]="component" [componentId]="componentId"
+            [text]="question.answers" (afterRender)="questionRendered()"></core-format-text>
+        </ion-label>
     </ion-item>
 </section>

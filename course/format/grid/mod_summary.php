@@ -35,7 +35,7 @@ $showsummary = optional_param('showsummary', 0, PARAM_INT);
 
 // Ensure format_grid_summary field status exists.
 $courseformat = course_get_format($course);
-$summarystatus = $courseformat->get_summary_visibility($course);
+$summarystatus = \format_grid\toolbox::get_summary_visibility($course, $courseformat);
 $DB->set_field('format_grid_summary', 'showsummary', $showsummary,
     array('courseid' => $course, 'id' => $summarystatus->id));
 

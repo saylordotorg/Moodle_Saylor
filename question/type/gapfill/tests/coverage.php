@@ -29,7 +29,7 @@ return new class extends phpunit_coverage_info {
      *
      * @var array
      */
-    protected $whitelistfolders = [
+    protected $includelistfolders = [
         '.'
     ];
 
@@ -38,8 +38,9 @@ return new class extends phpunit_coverage_info {
      *
      * @var array
      */
-    protected $whitelistfiles = [
-        'questiontype.php'
+    protected $includelistfiles = [
+        'questiontype.php',
+        'qtype_gapfill'
     ];
 
     /**

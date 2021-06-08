@@ -87,15 +87,14 @@ if ($mform->is_cancelled()) {
 } else if ($formdata = $mform->get_data()) { // Form has been submitted.
     if ($formdata->deleteimage == 1) {
         // Delete the old images....
-        $courseformat = course_get_format($course);
-        $courseformat->delete_image($sectionid, $context->id);
+        \format_grid\toolbox::delete_image($sectionid, $context->id, $course->id);
     } else {
         if ($newfilename = $mform->get_new_filename('imagefile')) {
             $fs = get_file_storage();
 
             // We have a new file so can delete the old....
             $courseformat = course_get_format($course);
-            $sectionimage = $courseformat->get_image($course->id, $sectionid);
+            $sectionimage = \format_grid\toolbox::get_image($course->id, $sectionid);
             if (isset($sectionimage->image)) {
                 if ($file = $fs->get_file($context->id, 'course', 'section', $sectionid, '/', $sectionimage->image)) {
                     $file->delete();
@@ -103,7 +102,7 @@ if ($mform->is_cancelled()) {
             }
 
             // Resize the new image and save it...
-            $storedfilerecord = $courseformat->create_original_image_record($contextid, $sectionid, $newfilename);
+            $storedfilerecord = \format_grid\toolbox::create_original_image_record($contextid, $sectionid, $newfilename);
 
             $tempfile = $mform->save_stored_file(
                     'imagefile',
@@ -115,7 +114,7 @@ if ($mform->is_cancelled()) {
                     'temp.' . $storedfilerecord['filename'],
                     true);
 
-            $courseformat->create_section_image($tempfile, $storedfilerecord, $sectionimage);
+            \format_grid\toolbox::create_section_image($tempfile, $storedfilerecord, $sectionimage, $courseformat);
         }
 
         // Set alt text value regardless of whether image has changed.

@@ -68,7 +68,7 @@ class format_grid_observer {
         global $DB;
         // Delete any images associated with the course.
         $courseformat = format_grid::get_instance($courseid);
-        $courseformat->delete_images();
+        \format_grid\toolbox::delete_images($courseformat);
         unset($courseformat);  // Destruct.
 
         $DB->delete_records("format_grid_summary", array("courseid" => $courseid));

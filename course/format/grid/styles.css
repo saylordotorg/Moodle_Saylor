@@ -200,6 +200,7 @@ div#gridmiddle-column > ul {
 }
 
 .course-content ul.gridicons li .image_holder img {
+    /*rtl:ignore*/
     left: 50%;
     position: absolute;
     top: 50%;
@@ -504,6 +505,6 @@ body.jsenabled #gridshadebox_content.hide_content {
 }
 
 .gfcolourpopupsel {
-    position:absolute;
+    position: absolute;
     z-index: 500;
 }

@@ -259,7 +259,7 @@ class format_grid_renderer extends format_section_renderer_base {
         $o .= html_writer::start_tag('div', array('class' => 'content'));
 
         $o .= html_writer::start_tag('div', array('class' => 'summary'));
-        $o .= $this->single_section_page_summary($section, $sectionname, $course);
+        $o .= $this->single_section_page_summary($section, $sectionname, $course->id);
         $o .= html_writer::end_tag('div');
 
         $o .= $this->section_availability($section);
@@ -272,11 +272,11 @@ class format_grid_renderer extends format_section_renderer_base {
      *
      * @param stdClass $section The course_section entry from DB.
      * @param string $sectionname The section name.
-     * @param stdClass $course The course entry from DB.
+     * @param int $courseid The course id.
      *
      * @return string HTML to output.
      */
-    protected function single_section_page_summary($section, $sectionname, $course) {
+    protected function single_section_page_summary($section, $sectionname, $courseid) {
         $summary = $this->format_summary_text($section);
         $o = '';
 
@@ -297,23 +297,15 @@ class format_grid_renderer extends format_section_renderer_base {
                         $data->left = true;
                 }
 
-                $sectionimage = $this->courseformat->get_image($course->id, $section->id);
-                $coursecontext = context_course::instance($course->id);
-                /* If the image is set then check that displayedimageindex is greater than 0 otherwise create the displayed image.
-                   This is a catch-all for existing courses. */
-                if (isset($sectionimage->image) && ($sectionimage->displayedimageindex < 1)) {
-                    // Set up the displayed image:...
-                    $sectionimage->newimage = $sectionimage->image;
-                    $icbc = $this->courseformat->hex2rgb($this->settings['imagecontainerbackgroundcolour']);
-                    $sectionimage = $this->courseformat->setup_displayed_image($sectionimage, $coursecontext->id,
-                        $this->settings, $icbc);
-                }
+                $sectionimage = \format_grid\toolbox::get_image($courseid, $section->id);
+                $coursecontextid = context_course::instance($courseid)->id;
+                $this->check_displayed_image($sectionimage, $coursecontextid, $courseid);
 
-                $gridimagepath = $this->courseformat->get_image_path();
+                $gridimagepath = \format_grid\toolbox::get_image_path();
                 $iswebp = (get_config('format_grid', 'defaultdisplayedimagefiletype') == 2);
 
-                $data->image = $this->courseformat->output_section_image(
-                    $section->id, $sectionname, $sectionimage, $coursecontext->id, $section, $gridimagepath, $this, $iswebp);
+                $data->image = \format_grid\toolbox::output_section_image(
+                    $section->id, $sectionname, $sectionimage, $coursecontextid, $section, $gridimagepath, $this, $iswebp);
                 $data->summary = $summary;
 
                 $o = $this->render_from_template('format_grid/singlepagesummaryimage', $data);
@@ -725,7 +717,7 @@ class format_grid_renderer extends format_section_renderer_base {
                 $strhidesummaryalt = get_string('hide_summary_alt', 'format_grid');
 
                 echo html_writer::link(
-                        $this->courseformat->grid_moodle_url('mod_summary.php', array(
+                        \format_grid\toolbox::grid_moodle_url('mod_summary.php', array(
                             'sesskey' => sesskey(),
                             'course' => $course->id,
                             'showsummary' => 0)), html_writer::empty_tag('img', array(
@@ -801,10 +793,10 @@ class format_grid_renderer extends format_section_renderer_base {
         }
 
         // Get the section images for the course.
-        $sectionimages = $this->courseformat->get_images($course->id);
+        $sectionimages = \format_grid\toolbox::get_images($course->id);
 
         // CONTRIB-4099:...
-        $gridimagepath = $this->courseformat->get_image_path();
+        $gridimagepath = \format_grid\toolbox::get_image_path();
 
         if ($course->coursedisplay == COURSE_DISPLAY_MULTIPAGE) {
             $singlepageurl = $this->courseformat->get_view_url(null)->out(true);
@@ -928,20 +920,11 @@ class format_grid_renderer extends format_section_renderer_base {
                 // Ensure the record exists.
                 if (($sectionimages === false) || (!array_key_exists($thissection->id, $sectionimages))) {
                     // Method get_image has 'repair' functionality for when there are issues with the data.
-                    $sectionimage = $this->courseformat->get_image($course->id, $thissection->id);
+                    $sectionimage = \format_grid\toolbox::get_image($course->id, $thissection->id);
                 } else {
                     $sectionimage = $sectionimages[$thissection->id];
                 }
-
-                /* If the image is set then check that displayedimageindex is greater than 0 otherwise create the displayed image.
-                   This is a catch-all for existing courses. */
-                if (isset($sectionimage->image) && ($sectionimage->displayedimageindex < 1)) {
-                    // Set up the displayed image:...
-                    $sectionimage->newimage = $sectionimage->image;
-                    $icbc = $this->courseformat->hex2rgb($this->settings['imagecontainerbackgroundcolour']);
-                    $sectionimage = $this->courseformat->setup_displayed_image($sectionimage, $contextid,
-                        $this->settings, $icbc);
-                }
+                $this->check_displayed_image($sectionimage, $contextid, $course->id);
 
                 if ($course->coursedisplay != COURSE_DISPLAY_MULTIPAGE) {
                     if (($editing) && ($section == 0)) {
@@ -982,7 +965,7 @@ class format_grid_renderer extends format_section_renderer_base {
                             'hidden' => true, 'aria-label' => $summary));
                     }
 
-                    echo $this->courseformat->output_section_image(
+                    echo \format_grid\toolbox::output_section_image(
                         $section, $sectionname, $sectionimage, $contextid, $thissection, $gridimagepath, $this->output, $iswebp);
 
                     echo html_writer::end_tag('div');
@@ -1020,7 +1003,7 @@ class format_grid_renderer extends format_section_renderer_base {
                             'hidden' => true, 'aria-label' => $summary));
                     }
 
-                    $content .= $this->courseformat->output_section_image(
+                    $content .= \format_grid\toolbox::output_section_image(
                         $section, $sectionname, $sectionimage, $contextid, $thissection, $gridimagepath, $this->output, $iswebp);
 
                     $content .= html_writer::end_tag('div');
@@ -1069,7 +1052,7 @@ class format_grid_renderer extends format_section_renderer_base {
         $streditimagealt = get_string('editimage_alt', 'format_grid');
 
         echo html_writer::link(
-            $this->courseformat->grid_moodle_url('editimage.php', array(
+            \format_grid\toolbox::grid_moodle_url('editimage.php', array(
                 'sectionid' => $thissection->id,
                 'contextid' => $contextid,
                 'userid' => $USER->id,
@@ -1086,7 +1069,7 @@ class format_grid_renderer extends format_section_renderer_base {
         $strdisplaysummaryalt = get_string('display_summary_alt', 'format_grid');
 
         echo html_writer::link(
-            $this->courseformat->grid_moodle_url('mod_summary.php', array(
+            \format_grid\toolbox::grid_moodle_url('mod_summary.php', array(
                 'sesskey' => sesskey(),
                 'course' => $course->id,
                 'showsummary' => 1,
@@ -1326,5 +1309,23 @@ class format_grid_renderer extends format_section_renderer_base {
 
     public function set_initialsection($initialsection) {
         $this->initialsection = $initialsection;
+    }
+
+    /**
+     * Checks the displayed image.
+     *
+     * @param array $sectionimage The section image from the 'format_grid_icon' table.
+     * @param int $coursecontextid The context id.
+     * @param int $courseid The course id.
+     */
+    private function check_displayed_image($sectionimage, $coursecontextid, $courseid) {
+        /* If the image is set then check that displayedimageindex is greater than 0 otherwise create the displayed image.
+        This is a catch-all for existing courses. */
+        if (isset($sectionimage->image) && (($sectionimage->displayedimageindex < 1) || ($sectionimage->updatedisplayedimage == 1))) {
+            // Set up the displayed image:...
+            $sectionimage->newimage = $sectionimage->image;
+            $sectionimage = \format_grid\toolbox::setup_displayed_image($sectionimage, $coursecontextid,
+                $courseid, $this->settings);
+        }
     }
 }

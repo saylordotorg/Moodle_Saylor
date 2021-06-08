@@ -128,7 +128,7 @@ class qtype_gapfill extends question_type {
      */
     protected function initialise_question_instance(question_definition $question, $questiondata) {
         parent::initialise_question_instance($question, $questiondata);
-        $this->initialise_question_answers($question, $questiondata);
+        $this->initialise_question_answers($question, $questiondata, true);
         $this->initialise_combined_feedback($question, $questiondata);
         $question->itemsettings = $this->get_itemsettings($question);
         $question->places = array();

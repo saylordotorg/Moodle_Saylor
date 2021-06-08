@@ -184,8 +184,17 @@ class block_checklist extends block_list {
                     $users = checklist_class::filter_mentee_users($users);
                 }
                 if (!empty($users)) {
-                    $fields = get_all_user_name_fields(true);
-                    $ausers = $DB->get_records_list('user', 'id', $users, 'firstname ASC', "id, $fields");
+                    if (class_exists('\core_user\fields')) {
+                        $namesql = \core_user\fields::for_name()->get_sql('', true);
+                    } else {
+                        $namesql = (object)[
+                            'selects' => ','.get_all_user_name_fields(true),
+                            'joins' => '',
+                            'params' => [],
+                            'mappings' => [],
+                        ];
+                    }
+                    $ausers = $DB->get_records_list('user', 'id', $users, 'firstname ASC', "id $namesql->selects");
                 }
             }
 
