@@ -413,7 +413,7 @@ def StashPlugins(plugins) {
             sh "rm -r .git"
             sh "rm -r .github"
             echo("Stashing: ${plugins[x].get("name")}")
-            stash([name: (plugins[x].get("name"))])
+            stash([name: (plugins[x].get("name")), allowEmpty: true])
         }
     }
 }
