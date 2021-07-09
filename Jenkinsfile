@@ -391,8 +391,9 @@ def StashMoodle(moodle_version) {
             catch(err) {
                 NotifyOnFail("Unable to retrieve Moodle: ${err}")
             }
-        // Remove the Moodle .git folder.
+        // Remove the Moodle .git and .github folder.
         sh "rm -r .git"
+        sh "rm -r .github"
         stash([name: 'moodle'])
     }
 }
@@ -409,6 +410,8 @@ def StashPlugins(plugins) {
                 def failmessage = "Unable to retrieve plugin ${plugins[x].get('name')}: ${err}"
                 NotifyOnFail(failmessage)
             }
+            sh "rm -r .git"
+            sh "rm -r .github"
             echo("Stashing: ${plugins[x].get("name")}")
             stash([name: (plugins[x].get("name"))])
         }
