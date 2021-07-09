@@ -57,7 +57,7 @@ class custom_completion extends \core_completion\activity_custom_completion {
                 $status = $checklist->completionpercent <= $ticked;
             } else {
                 // Completionpercent is the percentage of items that need checking-off.
-                $status = $checklist->completionpercent <= ($ticked * 100 / $total);
+                $status = $total ? ($checklist->completionpercent <= ($ticked * 100 / $total)) : false;
             }
         }
 
@@ -95,6 +95,7 @@ class custom_completion extends \core_completion\activity_custom_completion {
      */
     public function get_sort_order(): array {
         return [
+            'completionusegrade',
             'completionpercent',
         ];
     }

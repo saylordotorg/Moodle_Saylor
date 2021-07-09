@@ -17,9 +17,8 @@
  * support for the mdl35+ mobile app. PHP calls this from within
  * classes/output/mobile.php
  */
-/* jshint esversion: 6 */
 /* eslint-disable no-console */
-
+/* eslint-env es6 */
 var that = this;
 var result = {
 
@@ -131,7 +130,7 @@ var result = {
             /* Set isdragdrop to true if it is a dragdrop question. This will then be used
             * in template.html to determine when to show the  blue "tap to select..." prompt
             */
-            if (div.querySelectorAll('.draggable').length > 0 ) {
+            if (div.querySelectorAll('.draggable').length > 0) {
                 this.question.isdragdrop = true;
             }
             if (div.querySelector('#gapfill_optionsaftertext') !== null) {
@@ -142,4 +141,5 @@ var result = {
         return true;
     }
 };
+/* eslint-disable-next-line */
 result;

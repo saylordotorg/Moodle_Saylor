@@ -337,13 +337,30 @@ class format_topcoll extends format_base {
     /**
      * Returns the list of blocks to be automatically added for the newly created course
      *
+     * First we check defaultdisplayblocks to see which of the four default blocks should be displayed,
+     * then build an array of strings that will hold the list of blocks to be displayed.
+     *
      * @return array of default blocks, must contain two keys BLOCK_POS_LEFT and BLOCK_POS_RIGHT
-     *     each of values is an array of block names (for left and right side columns)
+     *     each of values is an array of block names (for pre and post side columns respectively).
+     *     Confused?  See the definitions in /lib/blocklib.php.
      */
     public function get_default_blocks() {
+
+        // Assign the location side for the blocks. defaultdisplayblocksloc: 1=pre, 2=post
+        // Then put the string list of blocks on the side location.
+        $blocklist = explode(',' , get_config('format_topcoll' , 'defaultdisplayblocks'));
+        if (get_config('format_topcoll' , 'defaultdisplayblocksloc') == 2) {
+            $bpr = $blocklist;
+            $bpl = array();
+        } else {
+            $bpr = array();
+            $bpl = $blocklist;
+        }
+
+        // Return our block list on the correct side.
         return array(
-            BLOCK_POS_LEFT => array(),
-            BLOCK_POS_RIGHT => array('search_forums', 'news_items', 'calendar_upcoming', 'recent_activity')
+            BLOCK_POS_RIGHT => $bpr,
+            BLOCK_POS_LEFT  => $bpl
         );
     }
 
@@ -667,8 +684,8 @@ class format_topcoll extends format_base {
                     'layoutcolumnorientation',
                     0,
                     array(
-                        1 => new lang_string('no'),
-                        2 => new lang_string('yes')
+                        1 => new lang_string('columnvertical', 'format_topcoll'),
+                        2 => new lang_string('columnhorizontal', 'format_topcoll')
                     )
                 );
                 $courseformatoptionsedit['layoutcolumnorientation'] = array(

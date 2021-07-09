@@ -1580,7 +1580,7 @@ class format_grid extends format_base {
             }
 
             if (($performimagecontainersize) || ($performimageresizemethod)) {
-                \format_grid\toolbox::update_displayed_images($this->courseid, false);
+                \format_grid\toolbox::update_displayed_images($this->courseid);
             }
         }
 
@@ -1810,7 +1810,7 @@ class format_grid extends format_base {
                     }
 
                     if (($performimagecontainersize) || ($performimageresizemethod)) {
-                        \format_grid\toolbox::update_displayed_images($record->id, false);
+                        \format_grid\toolbox::update_displayed_images($record->id);
                         if ($record->id === $this->courseid) {
                             $ourimagesupdated = true;
                         }

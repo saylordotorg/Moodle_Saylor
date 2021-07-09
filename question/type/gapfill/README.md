@@ -1,4 +1,4 @@
-# Gapfill Moodle Question type [![Build Status](https://travis-ci.org/marcusgreen/moodle-qtype_gapfill.svg?branch=master)](https://travis-ci.org/marcusgreen/moodle-qtype_gapfill) [![GitHub Release](https://img.shields.io/github/release/marcusgreen/moodle-qtype_gapfill.svg)](https://github.com/marcusgreen//moodle-qtype_gapfill/releases)
+# Gapfill Moodle Question type [![Moodle Plugin CI](https://github.com/marcusgreen/moodle-qtype_gapfill/actions/workflows/moodle-ci.yml/badge.svg)](https://github.com/marcusgreen/moodle-qtype_gapfill/actions/workflows/moodle-ci.yml) [![GitHub Release](https://img.shields.io/github/release/marcusgreen/moodle-qtype_gapfill.svg)](https://github.com/marcusgreen//moodle-qtype_gapfill/releases)
 
 A very easy to use Cloze question type that supports drag/drop answers that work on mobile devices and the mobile app. For custom development and consultancy contact Moodle Partner Titus Learning (http://www.tituslearning.com).
 

@@ -464,7 +464,7 @@ class format_topcoll_renderer extends format_section_renderer_base {
         if (empty($this->tcsettings)) {
             $this->tcsettings = $this->courseformat->get_settings();
         }
-        if ((!$this->formatresponsive) && ($section->section != 0) &&
+        if ((!$onsectionpage) && (!$this->formatresponsive) && ($section->section != 0) &&
             ($this->tcsettings['layoutcolumnorientation'] == 2)) { // Horizontal column layout.
             $sectionstyle .= ' ' . $this->get_column_class($this->tcsettings['layoutcolumns']);
         }
@@ -787,6 +787,11 @@ class format_topcoll_renderer extends format_section_renderer_base {
             print_error('unknowncoursesection', 'error', course_get_url($course),
                 format_string($course->fullname));
         }
+
+        echo html_writer::start_tag('a', array('href' => new moodle_url('/course/view.php', array('id' => $course->id))));
+        $maincoursepage = get_string('maincoursepage', 'format_topcoll');
+        echo $this->output->pix_icon('t/less', $maincoursepage).$maincoursepage;
+        echo html_writer::end_tag('a');
 
         // Copy activity clipboard.
         echo $this->course_activity_clipboard($course, $displaysection);

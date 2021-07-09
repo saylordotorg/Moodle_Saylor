@@ -42,5 +42,4 @@ class provider implements
     public static function get_reason() : string {
         return 'privacy:null_reason';
     }
-
 }

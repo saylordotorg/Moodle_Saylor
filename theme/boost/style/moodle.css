@@ -11893,6 +11893,21 @@ input[disabled] {
 .core_payment_gateways_modal .custom-control-label::after {
   top: 45%; }
 
+.visual-scroll-x {
+  scrollbar-width: thin;
+  scrollbar-color: #0f6fc5 #a8d2f8;
+  -ms-overflow-style: -ms-autohiding-scrollbar; }
+  .visual-scroll-x::-webkit-scrollbar {
+    height: 8px;
+    -webkit-appearance: none;
+    appearance: none; }
+  .visual-scroll-x::-webkit-scrollbar-thumb {
+    background-color: #0f6fc5;
+    border-right: 1px solid #fff; }
+  .visual-scroll-x::-webkit-scrollbar-track {
+    background-color: #a8d2f8;
+    border-right: 1px solid #fff; }
+
 .icon {
   font-size: 16px;
   width: 16px;
@@ -16640,12 +16655,22 @@ textarea[data-auto-rows] {
   margin-right: 0; }
   .mform.full-width-labels .fitem.row > .col-md-3,
   .mform.full-width-labels .fitem.row > .col-md-9 {
-    float: none;
+    flex: 0 0 100%;
+    max-width: 100%;
     width: inherit;
     padding-right: 0;
     padding-left: 0; }
   .mform.full-width-labels .fitem.row.femptylabel > .col-md-3 {
     display: none; }
+  .mform.full-width-labels .fitem.row .form-control {
+    width: 100%; }
+
+.mform .col-form-label .form-label-addon {
+  margin-left: 0.25rem; }
+
+@media (min-width: 576px) {
+  .mform:not(.full-width-labels) .col-form-label .form-label-addon {
+    margin-left: auto; } }
 
 /** Allow wrapping an mform in a div with the form-inline class to have an inline, responsive form. */
 @media (min-width: 768px) {

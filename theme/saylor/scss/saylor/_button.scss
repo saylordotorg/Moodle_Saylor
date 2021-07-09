@@ -4,6 +4,8 @@
 
 .btn-primary {
     @include button-variant($button-bg-orange, darken($button-bg-orange, 7.5%), darken($button-bg-orange, 10%), lighten($button-bg-orange,5%), lighten($button-bg-orange, 10%), darken($button-bg-orange,30%));
+    color: $white !important;
+    margin: .25rem;
 }
 
 .btn-outline-primary {
@@ -11,7 +13,9 @@
 }
 
 .btn-secondary {
-    @include button-variant($button-bg-orange, darken($button-bg-orange, 7.5%), darken($button-bg-orange, 10%), lighten($button-bg-orange,5%), lighten($button-bg-orange, 10%), darken($button-bg-orange,30%));
+    @include button-variant($primary-dark-blue, $primary-light-blue, darken($primary-light-blue, 7.5%), lighten($primary-dark-blue,5%), lighten($primary-dark-blue, 10%), darken($primary-dark-blue,30%));
+    color: $white !important;
+    margin: .25rem;
 }
 
 .btn-outline-secondary {
@@ -21,10 +25,15 @@
 // Button primary and secondary text should always be white.
 // Sometimes it was showing up as the secondary color.
 .btn .btn-primary, .btn .btn-secondary {
-    color: $white;
+    color: $white !default;
+    margin: .25rem;
 }
 
 .btn-primary:focus, .btn-primary.focus {
+  outline: inherit;
+}
+
+.btn-secondary:focus, .btn-secondary.focus {
   outline: inherit;
 }
 
@@ -54,4 +63,23 @@
    font-size: 1.1em;
    text-align: center;
    padding-bottom: 5px;
+}
+
+/** Book Navigation */
+// Change the book navigation arrows to have buttons and text.
+// This is definitely a hack since we can't override any functions, renderers,
+// or mustache templates in /mod/book/view.php.
+
+.booknext {
+  @extend .btn, .btn-secondary, .btn-sm;
+}
+.booknext::before {
+  content: "Next Page ";
+}
+
+.bookprev {
+  @extend .btn, .btn-secondary, .btn-sm;
+}
+.bookprev::after {
+  content: "Previous Page ";
 }

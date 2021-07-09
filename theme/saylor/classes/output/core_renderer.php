@@ -431,7 +431,7 @@ class core_renderer extends \core_renderer {
             $output .= get_string('loginorsignupmessage', 'theme_saylor', $link->out());
         } elseif (isloggedin($coursecontext) && !is_enrolled($coursecontext)) {
             $link = new moodle_url('/enrol/index.php', array('id' => $COURSE->id));
-            $output .= $this->single_button($link->out(), get_string('enrolme', 'core_enrol'));
+            $output .= html_writer::link($link->out(), get_string('enrolme', 'core_enrol'), array('class' => 'btn btn-primary btn-lg'));
         };
         // Adding div that closes the main-enroll-button or the login/signup message.
         $output .= html_writer::end_tag('div');

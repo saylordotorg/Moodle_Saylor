@@ -76,7 +76,6 @@ $string['numbersections'] = 'Number of sections';
 $string['cannotfinduploadedimage'] = 'Cannot find the uploaded original image.  Please report error details and the information contained in the php.log file to developer.  Refresh the page and upload a fresh copy of the image.';
 $string['cannotconvertuploadedimagetodisplayedimage'] = 'Cannot convert uploaded image to displayed image - {$a}.  Please report error details and the information contained in the php.log file to developer.';
 $string['cannotgetimagelock'] = 'Cannot get image lock.  Please report error details to developer.';
-$string['cannotgetimagesforcourse'] = 'Cannot get images for course.  Please report error details to developer.';
 $string['cannotgetsummarylock'] = 'Cannot get summary lock.  Please report error details to developer.';
 $string['formatnotsupported'] = 'Format is not supported at this server, please fix the system configuration to have the GD PHP extension installed - {$a}.';
 $string['functionfailed'] = 'Function failed on image - {$a}.';

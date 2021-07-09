@@ -1,3 +1,8 @@
+### Version 2.131 of the Moodle Gapfill question type June 2021
+Fix for Mobile App/ionic5, long text questions were cutting off instead of wrapping.
+More english language example questions. Moved from travis ci to github actions and
+moodle-ci
+
 ### Version 2.12 of the Moodle Gapfill question type May 2021
 Fix for iOS (e.g. iPads/iPhones). Thanks to  Deny Supanji  for reporting this. The text entry field now has the  spellchecker = false which stops it changing apostrophes into right quote marks.
 

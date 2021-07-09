@@ -923,12 +923,15 @@ class toolbox {
         }
     }
 
-    public static function delete_images($courseformat) {
-        $courseid = $courseformat->get_courseid();
+    public static function delete_images($courseid) {
         $sectionimages = self::get_images($courseid);
 
         if (is_array($sectionimages)) {
-            global $DB;
+            global $CFG, $DB;
+
+            require_once($CFG->dirroot . '/course/format/lib.php'); // For 'course_get_format()'.
+            $courseformat = course_get_format($courseid);
+
             $contextid = $courseformat->get_contextid();
             $fs = get_file_storage();
             $gridimagepath = self::get_image_path();
@@ -962,7 +965,7 @@ class toolbox {
         global $DB;
         if ($gridformatcourses = $DB->get_records('course', array('format' => 'grid'), '', 'id')) {
             foreach ($gridformatcourses as $gridformatcourse) {
-                self::update_displayed_images($gridformatcourse->id, true);
+                self::update_displayed_images($gridformatcourse->id);
             }
         }
     }
@@ -971,13 +974,11 @@ class toolbox {
      * Updates the displayed images because the settings have changed.
      *
      * @param int $courseid The course id.
-     * @param int $ignorenorecords True we should not worry about no records existing, possibly down to a restore of a course.
      */
-    public static function update_displayed_images($courseid, $ignorenorecords) {
-        global $DB;
-
+    public static function update_displayed_images($courseid) {
         $sectionimages = self::get_images($courseid);
         if (is_array($sectionimages)) {
+            global $DB;
             $t = $DB->start_delegated_transaction();
             foreach ($sectionimages as $sectionimage) {
                 if ($sectionimage->displayedimageindex > 0) {
@@ -986,8 +987,6 @@ class toolbox {
                 }
             }
             $t->allow_commit();
-        } else if (!$ignorenorecords) { // Only report error if it's ok not to have records.
-            print_error('cannotgetimagesforcourse', 'format_grid', '', null, "update_displayed_images - Course id: " . $courseid);
         }
     }
 

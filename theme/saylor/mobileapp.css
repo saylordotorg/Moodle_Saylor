@@ -32,14 +32,17 @@ div.core-course-thumb.core-course-color-img {
 // Blue standoutbox legacy
 .standoutbox.blue {
 	background-color: #e3f5fa;
+	color: #1a1a1a;
 }
 // Blue standoutbox
 .standoutbox.standoutbox-blue {
 	background-color: #e3f5fa;
+	color: #1a1a1a;
 }
 // Gray standoutbox
 .standoutbox.standoutbox-gray {
 	background-color: #f5f5f5;
+	color: #1a1a1a;
 }
 
 // Sizing
