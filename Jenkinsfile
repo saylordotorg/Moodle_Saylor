@@ -393,7 +393,7 @@ def StashMoodle(moodle_version) {
             }
         // Remove the Moodle .git and .github folder.
         sh "rm -r .git"
-        sh "rm -r .github"
+        //sh "rm -r .github"
         stash([name: 'moodle'])
     }
 }
