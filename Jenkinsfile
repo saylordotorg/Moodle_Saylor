@@ -404,7 +404,7 @@ def StashPlugins(plugins) {
         node {
             deleteDir()
             try {
-                git([url: (plugins[x].get("url")), branch: (plugins[x].get("branch")), shallow: true])
+                git([url: (plugins[x].get("url")), branch: (plugins[x].get("branch"))])
             }
             catch(err) {
                 def failmessage = "Unable to retrieve plugin ${plugins[x].get('name')}: ${err}"
