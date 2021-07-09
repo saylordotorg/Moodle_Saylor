@@ -63,12 +63,6 @@ def plugins = [
         "dest" : 'grade/export/checklist'
     ],
     [
-        "name" : 'block_accessibility',
-        "url" : 'https://github.com/marxjohnson/moodle-block_accessibility.git',
-        "branch" : 'master',
-        "dest" : 'blocks/accessibility'
-    ],
-    [
         "name" : 'block_workflow',
         "url" : 'https://github.com/moodleou/moodle-block_workflow.git',
         "branch" : 'main',
