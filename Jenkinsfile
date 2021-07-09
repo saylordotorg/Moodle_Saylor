@@ -35,7 +35,7 @@ def plugins = [
     [
         "name" : 'format_topcoll',
         "url" : 'https://github.com/gjb2048/moodle-format_topcoll.git',
-        "branch" : 'MOODLE_30',
+        "branch" : 'master',
         "dest" : 'course/format/topcoll'
     ],
     [
