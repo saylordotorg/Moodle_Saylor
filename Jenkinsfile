@@ -379,6 +379,12 @@ def plugins = [
       "url" : 'https://github.com/moodleuulm/moodle-availability_cohort.git',
       "branch" : 'master',
       "dest" : 'availability/condition/cohort'
+    ],
+    [
+      "name" : 'format_board',
+      "url" : 'https://github.com/brandaorodrigo/moodle-format_board.git',
+      "branch" : 'master',
+      "dest" : 'course/format/board'
     ]
 ]
 
