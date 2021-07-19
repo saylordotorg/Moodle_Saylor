@@ -271,6 +271,12 @@ def plugins = [
         "url" : 'https://github.com/lsuits/lsu-block_quickmail.git',
         "branch" : 'master',
         "dest" : 'blocks/quickmail'
+    ],
+    [
+      "name" : 'format_board',
+      "url" : 'https://github.com/brandaorodrigo/moodle-format_board.git',
+      "branch" : 'master',
+      "dest" : 'course/format/board'
     ]
 ]
 
