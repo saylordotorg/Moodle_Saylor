@@ -1,6 +1,0 @@
-{
-    "require": {
-        "accredible/acms-api-php": "v0.2.4",
-        "soundasleep/html2text": "^0.5.0"
-    }
-}

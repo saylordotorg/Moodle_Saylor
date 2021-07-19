@@ -49,7 +49,7 @@ class block_accredibledashboard extends block_list {
 			// Add footer button to credential wallet.
 			reset($credentials);
 			$credential = current($credentials);
-			$this->content->items[] = '<div class="d-flex flex-row align-items-center py-1">'.html_writer::tag('a', get_string('viewall', 'block_accredibledashboard'), array('class' => 'btn btn-primary text-white mx-auto', 'href' => $credential->wallet_url, 'target' => '_blank', 'rel' => 'noopener noreferrer')).'</div>';
+			$this->content->items[] = '<div class="d-flex flex-row align-items-center py-1">'.html_writer::tag('a', get_string('viewall', 'block_accredibledashboard'), array('class' => 'btn btn-primary btn-lg text-white mx-auto', 'href' => $credential->wallet_url, 'target' => '_blank', 'rel' => 'noopener noreferrer')).'</div>';
 		
 
 			return $this->content;

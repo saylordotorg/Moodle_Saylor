@@ -74,12 +74,12 @@
   @extend .btn, .btn-secondary, .btn-sm;
 }
 .booknext::before {
-  content: "Next Page ";
+  content: "Next page ";
 }
 
 .bookprev {
   @extend .btn, .btn-secondary, .btn-sm;
 }
 .bookprev::after {
-  content: "Previous Page ";
+  content: "Previous page ";
 }

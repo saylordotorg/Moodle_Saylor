@@ -37,11 +37,18 @@
 <div class="card dashboard-card" role="listitem"
     data-region="course-content"
     data-course-id="{{{id}}}">
-{{! Course image/link goes here. }}
+    {{! Course image/link goes here. }}
+    <div>
+        <a href="{{viewurl}}" tabindex="-1">
+            <img class="card-img dashboard-card-img h-auto mw-100" height="1080" width="1920" style='background-image: url("{{{courseimage}}}");'>
+                <span class="sr-only">{{#str}}aria:courseimage, core_course{{/str}}</span>
+            </img>
+        </a>
+    </div>
     <div class="card-body pr-1 course-info-container" id="course-info-container-{{id}}-{{uniqid}}">
         <div class="d-flex align-items-start">
             <div class="w-100 text-truncate">
-                <div class="text-muted muted d-flex mb-1 flex-wrap">
+                <div class="text-muted muted d-flex pt-2 flex-wrap">
                     {{$coursecategory}}{{/coursecategory}}
                     {{#showshortname}}
                     {{$divider}}{{/divider}}
