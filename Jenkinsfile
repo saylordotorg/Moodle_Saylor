@@ -283,6 +283,12 @@ def plugins = [
         "url" : 'https://github.com/PoetOS/moodle-mod_questionnaire.git',
         "branch" : 'MOODLE_310_STABLE',
         "dest" : 'mod/questionnaire'
+    ],
+    [
+        "name" : 'mod_subcourse',
+        "url" : 'https://github.com/saylordotorg/deploy-moodle-mod_subcourse.git',
+        "branch" : 'master',
+        "dest" : 'mod/subcourse'
     ]
 ]
 
