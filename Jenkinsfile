@@ -316,7 +316,7 @@ def plugins = [
     ],
     [
         "name" : 'mod_subcourse',
-        "url" : 'https://github.com/mudrd8mz/moodle-mod_subcourse.git',
+        "url" : 'https://github.com/saylordotorg/deploy-moodle-mod_subcourse.git',
         "branch" : 'master',
         "dest" : 'mod/subcourse'
     ],
