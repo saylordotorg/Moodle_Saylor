@@ -315,12 +315,6 @@ def plugins = [
         "dest" : 'mod/minilesson'
     ],
     [
-        "name" : 'mod_subcourse',
-        "url" : 'https://github.com/mudrd8mz/moodle-mod_subcourse.git',
-        "branch" : 'master',
-        "dest" : 'mod/subcourse'
-    ],
-    [
         "name" : 'auth_basic',
         "url" : 'https://github.com/catalyst/moodle-auth_basic.git',
         "branch" : 'master',
