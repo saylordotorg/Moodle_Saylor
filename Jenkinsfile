@@ -386,17 +386,7 @@ def StashMoodle(moodle_version) {
     node {
         deleteDir()
             try {
-                checkout changelog: false, poll: true, scm: [$class: 'GitSCM', branches: [[name: plugins[x].get("branch")]], repoUrl: plugins[x].get("url")], doGenerateSubmoduleConfigurations: false, extensions: [
-                    [
-                      $class: 'SubmoduleOption', 
-                      disableSubmodules: false, 
-                      parentCredentials: true, 
-                      recursiveSubmodules: true, 
-                      reference: '', 
-                      trackingSubmodules: false
-                    ]
-                  ], 
-                  submoduleCfg: []]
+                checkout changelog: false, poll: true, scm: [$class: 'GitSCM', branches: [[name: plugins[x].get("branch")]], repoUrl: plugins[x].get("url")], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'SubmoduleOption', disableSubmodules: false, parentCredentials: true, recursiveSubmodules: true, reference: '', trackingSubmodules: false]], submoduleCfg: []
                 //git([url: 'https://github.com/moodle/moodle.git', branch: "${moodle_version}"])
             }
             catch(err) {
