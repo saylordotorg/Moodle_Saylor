@@ -35,6 +35,8 @@ $grades = new grades();
 
 // Course module ID.
 $id = required_param('id', PARAM_INT);
+
+
 // Course and course module data.
 $cm = get_coursemodule_from_id(constants::M_MODNAME, $id, 0, false, MUST_EXIST);
 $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
@@ -55,11 +57,30 @@ $method = $gradingmanager->get_active_method();
 $PAGE->set_title(format_string($moduleinstance->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($modulecontext);
-$PAGE->set_pagelayout('course');
+
+//Get an admin settings
+$config = get_config(constants::M_COMPONENT);
+if($config->enablesetuptab){
+    $PAGE->set_pagelayout('popup');
+}else{
+    $PAGE->set_pagelayout('course');
+}
+
 $PAGE->requires->jquery();
 
+// fetch groupmode/menu/id for this activity
+$groupmenu = '';
+if ($groupmode = groups_get_activity_groupmode($cm)) {
+    $groupmenu = groups_print_activity_menu($cm, $PAGE->url, true);
+    $groupmenu .= ' ';
+    $groupid = groups_get_activity_group($cm);
+}else{
+    $groupid  = 0;
+}
+
+
 // Get grades list data by course module and course.
-$studentgrades = $grades->getGrades($course->id, $id, $moduleinstance->id);
+$studentgrades = $grades->getGrades($course->id, $id, $moduleinstance->id, $groupid);
 foreach($studentgrades as $studentgrade){
     if($studentgrade->grade===null){
         $studentgrade->grade ='';
@@ -95,5 +116,6 @@ $gradesrenderer =
     $OUTPUT->render_from_template(constants::M_COMPONENT . '/grades', $templatedata);
 
 echo $renderer->header($moduleinstance, $cm, "grades");
+echo $groupmenu;
 echo $gradesrenderer;
 echo $renderer->footer();

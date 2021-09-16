@@ -398,6 +398,10 @@ $string['xofyanswered'] = '{$a->completed} of {$a->participants} answered';
 $string['xofyattempted'] = '{$a->completed} of {$a->participants} attempted';
 $string['xofycontributed'] = '{$a->completed} of {$a->participants} contributed';
 $string['xofysubmitted'] = '{$a->completed} of {$a->participants} submitted';
+$string['xanswered'] = '{$a->completed} answered';
+$string['xattempted'] = '{$a->completed} attempted';
+$string['xcontributed'] = '{$a->completed} contributed';
+$string['xsubmitted'] = '{$a->completed} submitted';
 $string['xungraded'] = '{$a} ungraded';
 
 $string['checked'] = 'Checked';
@@ -417,6 +421,11 @@ $string['coursesectionactivityfurtherinformationlessondesc'] = 'Show lesson info
 $string['coursesectionactivityfurtherinformationdata'] = 'Show database information';
 $string['coursesectionactivityfurtherinformationdatadesc'] = 'Show data information, such as submission status.  For teachers / admins, show number of submissions.';
 
+$string['cachedef_activitystudentrolescache'] = 'Caches the student roles.';
+$string['cachedef_activitymodulecountcache'] = 'Caches the number of students who can access a given module on a given course.';
+$string['cachedef_activitystudentscache'] = 'Caches the ids of the students on a given course.';
+$string['cannotgetmodulecountcachelock'] = 'Cannot get module count cache lock for course id {$a}.';
+
 // Duplicate section.
 $string['creatingsection'] = 'Creating new section';
 $string['duplicate'] = 'Duplicate';
@@ -434,3 +443,11 @@ $string['privacy:request:preference:toggle'] = 'The course id "{$a->name}" has t
 // Readme.
 $string['readme_title'] = 'Collapsed Topics read-me';
 $string['readme_desc'] = 'Please click on \'{$a->url}\' for lots more information about Collapsed Topics.';
+
+// Toggle Display Blocks.
+$string['defaultdisplayblocks'] = 'Blocks to display';
+$string['defaultdisplayblocks_desc'] = "Choose the blocks to display in the course.  Use the 'Ctrl' key in combination with the mouse to select more than one or none.";
+$string['defaultdisplayblocksloc'] = 'Block location for display';
+$string['defaultdisplayblocksloc_desc'] = "Choose the location for the blocks chosen above to display, pre or post side.";
+$string['sidepost'] = 'Post';
+$string['sidepre'] = 'Pre';

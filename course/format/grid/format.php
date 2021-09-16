@@ -77,8 +77,8 @@ if ($devicetype == "mobile") {
 $renderer->set_portable($portable);
 
 $gfsettings = $courseformat->get_settings();
-$imageproperties = $courseformat->calculate_image_container_properties(
-$gfsettings['imagecontainerwidth'], $gfsettings['imagecontainerratio'], $gfsettings['borderwidth']);
+$imageproperties = \format_grid\toolbox::calculate_image_container_properties(
+    $gfsettings['imagecontainerwidth'], $gfsettings['imagecontainerratio'], $gfsettings['borderwidth']);
 
 echo '<style type="text/css" media="screen">';
 echo '/* <![CDATA[ */';

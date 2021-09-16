@@ -162,12 +162,33 @@ class attempts extends basereport
         $this->headingdata->activityname = $formdata->activityname;
 
         $emptydata = array();
-        $sql = 'SELECT at.id,at.grade, st.words,at.userid,at.filename, st.turns, st.avturn, st.longestturn, st.targetwords,
+
+        //if we need to show just one group
+        if($formdata->groupid>0){
+
+                list($groupswhere, $allparams) = $DB->get_in_or_equal($formdata->groupid);
+
+                $sql = 'SELECT at.id,at.grade, st.words,at.userid,at.filename, st.turns, st.avturn, st.longestturn, st.targetwords,
+             st.totaltargetwords,st.autospellscore,st.autogrammarscore,st.aiaccuracy, at.timemodified ';
+                $sql .= '  FROM {' . constants::M_ATTEMPTSTABLE . '} at INNER JOIN {' . constants::M_STATSTABLE .
+                        '} st ON at.id = st.attemptid ';
+                $sql .= ' INNER JOIN {groups_members} gm ON at.userid=gm.userid';
+                $sql .= ' WHERE gm.groupid ' . $groupswhere . ' AND at.solo = ?';
+                $sql .= ' ORDER BY at.timemodified DESC';
+                $allparams[]=$formdata->soloid;
+                $alldata = $DB->get_records_sql($sql,$allparams);
+
+        //if its all groups or no groups
+        }else {
+
+                $sql = 'SELECT at.id,at.grade, st.words,at.userid,at.filename, st.turns, st.avturn, st.longestturn, st.targetwords,
          st.totaltargetwords,st.autospellscore,st.autogrammarscore,st.aiaccuracy, at.timemodified ';
-        $sql .= '  FROM {' . constants::M_ATTEMPTSTABLE . '} at INNER JOIN {' . constants::M_STATSTABLE .  '} st ON at.id = st.attemptid ';
-        $sql .= ' WHERE at.solo = :soloid';
-        $sql .= ' ORDER BY at.timemodified DESC';
-        $alldata = $DB->get_records_sql($sql,array('soloid'=>$formdata->soloid));
+                $sql .= '  FROM {' . constants::M_ATTEMPTSTABLE . '} at INNER JOIN {' . constants::M_STATSTABLE .
+                        '} st ON at.id = st.attemptid ';
+                $sql .= ' WHERE at.solo = :soloid';
+                $sql .= ' ORDER BY at.timemodified DESC';
+                $alldata = $DB->get_records_sql($sql, array('soloid' => $formdata->soloid));
+         }
 
 
 

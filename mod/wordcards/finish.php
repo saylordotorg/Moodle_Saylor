@@ -26,12 +26,21 @@ $mod->resume_progress($currentstate);
 
 utils::update_finalgrade($mod->get_id());
 
-$pagetitle = get_string('activitycompleted', 'mod_wordcards');
+$pagetitle = format_string($mod->get_mod()->name, true, $mod->get_course());
+$pagetitle .= ': ' . get_string('activitycompleted', 'mod_wordcards');
 
 $PAGE->set_url('/mod/wordcards/finish.php', ['id' => $cmid]);
 $PAGE->navbar->add($pagetitle, $PAGE->url);
 $PAGE->set_heading(format_string($course->fullname, true, [context_course::instance($course->id)]));
 $PAGE->set_title($pagetitle);
+
+//Get admin settings
+$config = get_config(constants::M_COMPONENT);
+if($config->enablesetuptab){
+    $PAGE->set_pagelayout('popup');
+}else{
+    $PAGE->set_pagelayout('course');
+}
 
 $output = $PAGE->get_renderer('mod_wordcards');
 

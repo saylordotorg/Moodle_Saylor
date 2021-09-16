@@ -1,5 +1,20 @@
 Change List
 =========
+Version 3.1.49 (Build 2021082700)
+- Fixed issue with mimetype and extension on whiteboard drawings
+
+Version 3.1.48 (Build 2021062800)
+- added screen recorder
+
+Version 3.1.47 (Build 2021061100)
+-updated native video template
+-tweaked the file extension parser in uploader.js
+-fixed issue with corrupt direct uploads (not bouncing off s3)
+
+Version 3.1.46 (Build 2021052000)
+-Added capetown and bahrain regions
+-Publish a (recording) 'started' event for Classic Poodll listeners
+
 Version 3.1.44 (Build 2021040900)
 -Firefox 87 requires audioBitsPerSecond to be set in mediarecorder options
 -See https://github.com/justinhunt/moodle-qtype_poodllrecording/issues/8

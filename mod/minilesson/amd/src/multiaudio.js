@@ -10,7 +10,7 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'mod_minilesson/poll
 
   return {
 
-      passmark: 85,
+      passmark: 90,//lower this if it often doesnt match (was 85)
       playing: false,
 
     //for making multiple instances
@@ -116,6 +116,7 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'mod_minilesson/poll
     init_components: function(index, itemdata, quizhelper) {
         var app= this;
         var correcttext = itemdata.sentences[itemdata.correctanswer-1].sentence;
+        var correctphonetic = itemdata.sentences[itemdata.correctanswer-1].phonetic;
         var cleanincorrecttexts=[];
         for(var i=0;i<itemdata.sentences.length;i++){
             if(i+1==itemdata.correctanswer) {
@@ -179,12 +180,13 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'mod_minilesson/poll
                                     $(".minilesson_nextbutton").prop("disabled", false);
                                     app.next_question(percent);
                                 }, 2000);
+                                return;
                             }//end of if similarity
                         }//end of for x
                     }
 
                     //Similarity check by phonetics(ajax)
-                    quizhelper.checkByPhonetic(spoken, cleancorrecttext, itemdata.language).then(function(similarity) {
+                    quizhelper.checkByPhonetic(cleancorrecttext,spoken, correctphonetic, itemdata.language).then(function(similarity) {
                         if (similarity === false) {
                             return $.Deferred().reject();
                         } else {

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Frame Message Test</title>
+</head>
+<script>
+    function postGrades(){
+        var urlParams = new URLSearchParams(window.location.search);
+        var targetWindow = window.parent;
+        var targetOrigin = '*';
+        var itemid=urlParams.get('itemid');
+        var gradesmessage = {itemid: itemid, correct: 10, incorrect: 0, percent: 100, message: 'none'};
+        targetWindow.postMessage(gradesmessage, targetOrigin );
+        console.log('posted', gradesmessage);
+    };
+
+</script>
+<body>
+<h1> Frame Test</h1>
+Push the button to submit the grades
+<button type="button" onClick="postGrades()">Submit Grades</button>
+</body>
+</html>

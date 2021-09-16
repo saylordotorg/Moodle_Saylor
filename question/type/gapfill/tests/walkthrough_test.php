@@ -33,7 +33,7 @@ require_once($CFG->dirroot . '/question/type/gapfill/tests/helper.php');
  * @copyright  2012 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class qtype_gapfill_walkthrough_test extends qbehaviour_walkthrough_test_base {
+class walkthrough_test extends qbehaviour_walkthrough_test_base {
 
     public function test_draggable_items() {
         /* This checks that the bug from line 130 of questiontype is fixed
@@ -41,17 +41,48 @@ class qtype_gapfill_walkthrough_test extends qbehaviour_walkthrough_test_base {
           if (!in_array($a->answer, $question->allanswers,true)) {
           Without the final true only one draggable will display */
         $questiontext = "[1.0] [1.00]";
-        $options = array(
+        $options = [
             'disableregex' => 1,
             'noduplicates' => 0,
-            'delimitchars' => '[]'
-        );
+            'delimitchars' => '[]',
+            'optionsaftertext' => false,
+            'singleuse' => false
+        ];
         $gapfill = qtype_gapfill_test_helper::make_question( $questiontext, $options);
         $maxmark = 2;
         $this->start_attempt_at_question($gapfill, 'deferredfeedback', $maxmark);
         $this->check_output_contains('1.0');
         $this->check_output_contains('1.00');
     }
+
+    public function test_app_connect() {
+        global $PAGE;
+
+        $questiontext = "The [cat] sat on the [mat]";
+        $options = [
+            'optionsaftertext' => true,
+            'singleuse' => true
+        ];
+        $gapfill = qtype_gapfill_test_helper::make_question( $questiontext, $options);
+        $renderer = $gapfill->get_renderer($PAGE);
+        $html = $renderer->app_connect($gapfill, 'randomstring');
+        $this->assertStringContainsString('gapfill_singleuse', $html, ' missing gapfill singleuse tag');
+    }
+
+    public function test_dropdowns() {
+        $questiontext = "The [cat] sat on the [mat]";
+        $options = [
+            'optionsaftertext' => true,
+            'singleuse' => true,
+            'answerdisplay' => 'dropdown'
+        ];
+
+        $gapfill = qtype_gapfill_test_helper::make_question( $questiontext, $options);
+        $this->start_attempt_at_question($gapfill, 'immediatefeedback');
+        $html = $this->quba->render_question($this->slot, $this->displayoptions);
+        $this->assertStringContainsString('select type', $html, ' missing select tags tag');
+    }
+
 
     public function test_deferred_feedback_unanswered() {
 
@@ -141,11 +172,9 @@ class qtype_gapfill_walkthrough_test extends qbehaviour_walkthrough_test_base {
                 | is done  with regex disabled so the (), ; and / cause
                 no problems";
 
-        $options = array(
+        $options = [
             'disableregex' => 1,
-            'noduplicates' => 0,
-            'delimitchars' => '[]'
-            );
+        ];
 
         $gapfill = qtype_gapfill_test_helper::make_question( $questiontext, $options);
         $maxmark = 1;
@@ -243,7 +272,7 @@ class qtype_gapfill_walkthrough_test extends qbehaviour_walkthrough_test_base {
                 $this->get_does_not_contain_try_again_button_expectation(),
                 $this->get_no_hint_visible_expectation());
 
-        // Save a  correct response.
+        // Save a correct response.
         $this->process_submission(array('p0' => 'cat', 'p1' => 'mat'));
         $this->check_step_count(2);
 
@@ -337,11 +366,10 @@ class qtype_gapfill_walkthrough_test extends qbehaviour_walkthrough_test_base {
 
     public function test_disableregex() {
         $questiontext = 'for([$i]=0;$<10;$i++)';
-        $options = array();
-        $options['noduplicates'] = 0;
-        $options['disableregex'] = 1;
-        $options['delimitchars'] = '[]';
-        $gapfill = qtype_gapfill_test_helper::make_question( $questiontext, $options);
+        $options = [
+            'disableregex' => 1,
+        ];
+        $gapfill = qtype_gapfill_test_helper::make_question($questiontext, $options);
         $this->start_attempt_at_question($gapfill, 'interactive', $gapfill->gapstofill);
 
         $this->check_current_state(question_state::$todo);
@@ -374,10 +402,10 @@ What are the colors of the Olympic medals?
 [gold|silver|bronze]
 [gold|silver|bronze]  ';
 
-        $options = array();
-        $options['noduplicates'] = 1;
-        $options['disableregex'] = 0;
-        $options['delimitchars'] = '[]';
+        $options = [
+            'disableregex' => 1,
+            'noduplicates' => 1,
+        ];
         /* answer with duplicate values, only one of each duplicate should get a mark */
         $submission = array('-submit' => 1, 'p1' => 'gold', 'p2' => 'silver', 'p3' => 'silver');
 
@@ -396,7 +424,7 @@ What are the colors of the Olympic medals?
 
         $this->check_current_mark(null);
 
-        // Save a  correct response.
+        // Save a correct response.
         $this->process_submission($submission);
 
         $this->quba->finish_all_questions();
@@ -505,6 +533,26 @@ What are the colors of the Olympic medals?
         $this->quba->finish_all_questions();
     }
 
+    public function test_matching_divs() {
+        $questiontext = "The [cat] sat on the [mat]";
+        // Defaults to optionsaftertext being false.
+        $gapfill = qtype_gapfill_test_helper::make_question($questiontext);
+        $this->start_attempt_at_question($gapfill, 'immediatefeedback');
+        $html = $this->quba->render_question($this->slot, $this->displayoptions);
+        $divstarts = substr_count($html, "<div");
+        $divends = substr_count($html, "</div>");
+        $this->assertEquals($divstarts, $divends, ' Mismatch in opening and closing div tags');
+        $options = [
+            'disableregex' => 1,
+            'optionsaftertext' => true,
+        ];
+        $gapfill = qtype_gapfill_test_helper::make_question($questiontext, $options);
+        $this->start_attempt_at_question($gapfill, 'immediatefeedback');
+        $html = $this->quba->render_question($this->slot, $this->displayoptions);
+        $divstarts = substr_count($html, "<div");
+        $divends = substr_count($html, "</div>");
+        $this->assertEquals($divstarts, $divends, ' Mismatch in opening and closing div tags');
+    }
     public function test_get_aftergap_text() {
         $questiontext = "The [cat] sat on the [mat]";
         $gapfill = qtype_gapfill_test_helper::make_question( $questiontext);
@@ -596,5 +644,4 @@ What are the colors of the Olympic medals?
         $this->assertEquals($gapfill->get_size("one"), 3);
         $this->assertEquals($gapfill->get_size("one|twleve"), 6);
     }
-
 }

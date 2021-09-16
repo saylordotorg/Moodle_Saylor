@@ -42,7 +42,7 @@ if ($CFG->branch >= 32 && $CFG->branch <= 34) { // Only supported in Moodle 3.2 
 }
 $settings->add($setting);
 
-// Course List Columns.
+// Option to use alternative braces to escape tags.
 $default = '1';
 $name = 'filter_filtercodes/escapebraces';
 $title = get_string('escapebraces', 'filter_filtercodes');
@@ -50,10 +50,63 @@ $description = get_string('escapebraces_desc', 'filter_filtercodes');
 $setting = new admin_setting_configcheckbox($name, $title, $description, $default);
 $settings->add($setting);
 
+// Hide completed courses in {mycoursesmenu} tags.
+$default = '0';
+$name = 'filter_filtercodes/hidecompletedcourses';
+$title = get_string('hidecompletedcourses', 'filter_filtercodes');
+$description = get_string('hidecompletedcourses_desc', 'filter_filtercodes');
+$setting = new admin_setting_configcheckbox($name, $title, $description, $default);
+$settings->add($setting);
+
+// Restrict {ifprofilefied} tag to only access to visible fields.
+$default = '0';
+$name = 'filter_filtercodes/ifprofilefiedonlyvisible';
+$title = get_string('ifprofilefiedonlyvisible', 'filter_filtercodes');
+$description = get_string('ifprofilefiedonlyvisible_desc', 'filter_filtercodes');
+$setting = new admin_setting_configcheckbox($name, $title, $description, $default);
+$settings->add($setting);
+
 // Option to enable scrape tag.
-$default = 0;
+$default = 0; // Default is disabled.
 $name = 'filter_filtercodes/enable_scrape';
 $title = get_string('enable_scrape', 'filter_filtercodes');
 $description = get_string('enable_scrape_description', 'filter_filtercodes');
 $setting = new admin_setting_configcheckbox($name, $title, $description, $default);
+$settings->add($setting);
+
+// Option to show teachers profile picture.
+$default = 0; // Default is to not show profile picture.
+$name = 'filter_filtercodes/courseteachershowpic';
+$title = get_string('courseteachershowpic', 'filter_filtercodes');
+$description = get_string('courseteachershowpic_desc', 'filter_filtercodes');
+$setting = new admin_setting_configcheckbox($name, $title, $description, $default);
+$settings->add($setting);
+
+// Option to select link type for {courseteachers} tag.
+$default = ''; // Default is to not link the teachers name.
+$name = 'filter_filtercodes/courseteacherlinktype';
+$title = get_string('courseteacherlinktype', 'filter_filtercodes');
+$description = get_string('courseteacherlinktype_desc', 'filter_filtercodes');
+$choices = ['' => get_string('none'),
+        'email' => get_string('issueremail', 'badges'),
+        'message' => get_string('message', 'message'),
+        'profile' => get_string('profile')];
+$setting = new admin_setting_configselect($name, $title, $description, $default, $choices);
+$settings->add($setting);
+
+// Option to show or hide background colour/pattern for {categorycards} tag.
+$default = 0; // Default is to not show colour/pattern.
+$name = 'filter_filtercodes/categorycardshowpic';
+$title = get_string('categorycardshowpic', 'filter_filtercodes');
+$description = get_string('categorycardshowpic_desc', 'filter_filtercodes');
+$setting = new admin_setting_configcheckbox($name, $title, $description, $default);
+$settings->add($setting);
+
+// Number of cards to show for {coursecardsbyenrol} tag.
+$default = 8; // Default is to not show colour/pattern.
+$name = 'filter_filtercodes/coursecardsbyenrol';
+$title = get_string('coursecardsbyenrol', 'filter_filtercodes');
+$choices = range(0, 20);
+$description = get_string('coursecardsbyenrol_desc', 'filter_filtercodes');
+$setting = new admin_setting_configselect($name, $title, $description, $default, $choices);
 $settings->add($setting);

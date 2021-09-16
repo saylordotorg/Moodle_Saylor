@@ -354,10 +354,16 @@
 #wordcards-gameboard {
     margin-top: 20px;
     display: none;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 #wordcards-results {
     display: none;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 #wordcards-answer-input {
@@ -399,6 +405,11 @@
     align-items: center;
     justify-content: center;
     box-sizing: content-box;
+}
+#wordcards-vocab-list {
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .a4e-flashcard-img {
@@ -460,7 +471,7 @@
     height: 100px;
 }
 
-.a4e-card .front {
+.a4e-card .wordcards_defcard {
     position: relative;
     background-color: #FFFFFF;
     border: 1px solid rgba(0, 0, 0, 0.3);
@@ -470,7 +481,7 @@
     text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;
 }
 
-.a4e-card .back {
+.a4e-card .wordcards_termcard {
     position: relative;
     background-color: #F7E7E7;
     border: 1px solid rgba(0, 0, 0, 0.3);
@@ -944,4 +955,11 @@ ul.definition_flashcards_ul {
    cursor: pointer;
    padding: 8px;
 }
- /* flashcards_mode style code */
+.wordcards_importintro {
+    max-width: 1200px;
+    margin: 10px;
+
+}
+.mod_wordcards_center {
+    text-align: center;
+}

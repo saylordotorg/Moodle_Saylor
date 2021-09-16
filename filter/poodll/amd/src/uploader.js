@@ -131,7 +131,12 @@ define(['jquery', 'core/log', 'filter_poodll/upskin_plain'], function ($, log, u
 
         //fetch file extension from the filetype
         fetchFileExtension: function (filetype) {
-            var ext = "";
+            var ext = "mp3";
+            //in the case of a string like this:
+            // "audio/webm;codecs=opus" we do not the codecs
+            if(filetype.indexOf(';')>0){
+                filetype = filetype.split(';')[0];
+            }
             switch (filetype) {
                 case "image/jpeg":
                     ext = "jpg";
@@ -440,6 +445,7 @@ define(['jquery', 'core/log', 'filter_poodll/upskin_plain'], function ($, log, u
                 //We NEED to redo this bit of code ..
                 //its duplicating!!!
                 if (!(filedata instanceof Blob)) {
+                    log.debug('filedata is not blob');
                     var params = "datatype=uploadfile";
                     //We must URI encode the filedata, because otherwise the "+" characters get turned into spaces
                     //spent hours tracking that down ...justin 20121012
@@ -459,6 +465,7 @@ define(['jquery', 'core/log', 'filter_poodll/upskin_plain'], function ($, log, u
                     //xhr.setRequestHeader("Connection", "close");
                     xhr.send(params);
                 } else {
+                    log.debug('filedata is blob');
                     //we have to base64 string the blob  before sending it
                     var reader = new window.FileReader();
                     reader.readAsDataURL(filedata);

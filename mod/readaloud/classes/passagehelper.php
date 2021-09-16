@@ -121,7 +121,7 @@ class passagehelper {
                 $ret = fullname($user);
                 break;
             case 'passage':
-                $ret = $this->activitydata->passage;
+                    $ret = $this->activitydata->passage;
                 break;
             case 'audiourl':
                 //we need to consider legacy client side URLs and cloud hosted ones
@@ -133,6 +133,11 @@ class passagehelper {
             case 'somedetails':
                 $ret = $this->attemptdata->id . ' ' . $this->activitydata->passage;
                 break;
+
+            case 'passagesegments':
+                $ret = $this->activitydata->passagesegments;
+                break;
+
             default:
                 $ret = $this->attemptdata->{$property};
         }

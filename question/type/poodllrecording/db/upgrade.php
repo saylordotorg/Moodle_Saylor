@@ -15,11 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Essay question type upgrade code.
+ * Poodll recording question type upgrade code.
  *
  * @package    qtype
  * @subpackage poodllrecording
- * @copyright  2011 The Open University
+ * @copyright  2011 Poodll
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -166,6 +166,21 @@ function xmldb_qtype_poodllrecording_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2017102301, 'qtype', 'poodllrecording');
 
     }
+
+    if ($oldversion < 2021052000) {
+
+
+        $table = new xmldb_table('qtype_poodllrecording_opts');
+        $field = new xmldb_field('safesave', XMLDB_TYPE_INTEGER, '2', null, XMLDB_TYPE_INTEGER, null, 0);
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // poodll savepoint reached
+        upgrade_plugin_savepoint(true, 2021052000, 'qtype', 'poodllrecording');
+
+    }
+
 
     return true;
 }

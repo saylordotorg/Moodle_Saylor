@@ -66,7 +66,7 @@ define(['jquery', 'core/modal_factory', 'core/modal_events'], function($, ModalF
                     if (obj.checkbox) {
                         obj.body +=
                             '<div class="modal-checbox-wrapper">' +
-                            '<input type="checkbox" id="modal-checkbox" class="modal-checkbox" checked>' +
+                            '<input type="checkbox" id="modal-checkbox" class="modal-checkbox">' +
                             '<label for="modal-checkbox">' + str('modal_checkbox') + '</label>' +
                             '</div>';
                     }
@@ -707,7 +707,7 @@ define(['jquery', 'core/modal_factory', 'core/modal_events'], function($, ModalF
                             }
                         } else {
                             var $container = $('.course-content');
-                            $container.one('*').before($clipboard);
+                            $container.prepend($clipboard);
                             $container.find(M.course.format.get_section_wrapper(null)).each(function(index, sectionDOM) {
                                 var $section = $(sectionDOM);
                                 var section = $section.attr('id').match(/(\d+)$/)[1];
@@ -1040,6 +1040,10 @@ define(['jquery', 'core/modal_factory', 'core/modal_events'], function($, ModalF
 
                     // Initialize items
                     $block.find('li.activity').each(function(index, item) {
+                        if($(item).attr('data-disable-copy') == 1) {
+                            add_actions(item, ['movedir', 'move', 'delete']);
+                            return;
+                        }
                         add_actions(item, activity_actions);
                     });
 

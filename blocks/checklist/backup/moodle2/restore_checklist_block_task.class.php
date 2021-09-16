@@ -89,7 +89,7 @@ class restore_checklist_block_task extends restore_block_task {
      * Decode contents
      * @return array
      */
-    static public function define_decode_contents() {
+    public static function define_decode_contents() {
         return array(); // Nothing to do.
     }
 
@@ -97,7 +97,7 @@ class restore_checklist_block_task extends restore_block_task {
      * Decode rules
      * @return array
      */
-    static public function define_decode_rules() {
+    public static function define_decode_rules() {
         return array(); // Nothing to do.
     }
 }

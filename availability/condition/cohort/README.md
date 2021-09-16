@@ -126,14 +126,25 @@ PHP7 Support
 Since Moodle 3.4 core, PHP7 is mandatory. We are developing and testing this plugin for PHP7 only.
 
 
+Maintainers
+-----------
+
+Ulm University\
+Communication and Information Centre (kiz)\
+Alexander Bias
+
+Bern University of Applied Sciences\
+Luca Bösch
+
+
 Copyright
 ---------
 
-Ulm University
-Communication and Information Centre (kiz)
+Ulm University\
+Communication and Information Centre (kiz)\
 Kathrin Osswald
 
-The development of this plugin was started on the Moodle DACH conference in Zurich (2018). 
-The other contributer we would like to give credits for:
+The development of this plugin was started on the Moodle DACH conference in Zurich (2018).\
+The other contributer we would like to give credits for:\
 Guido Hornig, <info@lernlink.de>
 

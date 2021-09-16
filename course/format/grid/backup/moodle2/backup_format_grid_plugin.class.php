@@ -48,8 +48,7 @@ class backup_format_grid_plugin extends backup_format_plugin {
         $plugin->add_child($pluginwrapper);
 
         // Set source to populate the data.
-        $pluginwrapper->set_source_table('format_grid_summary', array(
-            'courseid' => backup::VAR_PARENTID));
+        $pluginwrapper->set_source_table('format_grid_summary', array('courseid' => backup::VAR_PARENTID));
 
         // Temporarily remove the generated images so that they are not in the backup.
         $this->delete_displayed_images();
@@ -76,7 +75,7 @@ class backup_format_grid_plugin extends backup_format_plugin {
         require_once($CFG->dirroot . '/course/format/grid/lib.php'); // For format_grid.
 
         $courseformat = course_get_format($courseid);
-        $courseformat->delete_displayed_images();
+        \format_grid\toolbox::delete_displayed_images($courseformat);
     }
 
     /**
@@ -89,14 +88,13 @@ class backup_format_grid_plugin extends backup_format_plugin {
 
         // Create one standard named plugin element (the visible container).
         // The sectionid and courseid not required as populated on restore.
-        $pluginwrapper = new backup_nested_element($this->get_recommended_name(), null, array('image'));
+        $pluginwrapper = new backup_nested_element($this->get_recommended_name(), null, array('image', 'alttext'));
 
         // Connect the visible container ASAP.
         $plugin->add_child($pluginwrapper);
 
         // Set source to populate the data.
-        $pluginwrapper->set_source_table('format_grid_icon', array(
-            'sectionid' => backup::VAR_SECTIONID));
+        $pluginwrapper->set_source_table('format_grid_icon', array('sectionid' => backup::VAR_SECTIONID));
 
         // Don't need to annotate ids nor files.
         return $plugin;

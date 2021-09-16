@@ -123,22 +123,11 @@ class grading extends basereport
         $supergrouper = has_capability('moodle/site:accessallgroups', $context, $USER->id);
 
 
-        //if no groups, or can see all groups then the SQL is simple
-        if($supergrouper || $groupsmode !=SEPARATEGROUPS) {
 
-            $the_sql = "SELECT tu.* FROM {" . constants::M_ATTEMPTSTABLE . "} tu INNER JOIN {user} u ON tu.userid=u.id " .
-                    " WHERE tu.moduleid=? AND tu.status=" . constants::M_STATE_COMPLETE .
-                    " ORDER BY u.lastnamephonetic,u.firstnamephonetic,u.lastname,u.firstname,u.middlename,u.alternatename,tu.id DESC";
+        //if we need to show just one group
+        if($formdata->groupid > 0){
 
-            $alldata =$DB->get_records_sql($the_sql, array($formdata->moduleid));
-
-            //if need to partition to groups, SQL for groups
-        }else{
-            $groups = groups_get_user_groups($course->id);
-            if (!$groups || empty($groups[0])) {
-                return false;
-            }
-            list($groupswhere, $allparams) = $DB->get_in_or_equal(array_values($groups[0]));
+            list($groupswhere, $allparams) = $DB->get_in_or_equal($formdata->groupid);
 
             $allsql ="SELECT tu.* FROM {".constants::M_ATTEMPTSTABLE ."} tu " .
                     "INNER JOIN {groups_members} gm ON tu.userid=gm.userid " .
@@ -147,6 +136,17 @@ class grading extends basereport
                     "ORDER BY u.lastnamephonetic,u.firstnamephonetic,u.lastname,u.firstname,u.middlename,u.alternatename,tu.id DESC";
             $allparams[]=$formdata->moduleid;
             $alldata = $DB->get_records_sql($allsql, $allparams);
+
+            //if no groups, or can see all groups then the SQL is simple
+        }else{
+
+
+                $the_sql = "SELECT tu.* FROM {" . constants::M_ATTEMPTSTABLE . "} tu INNER JOIN {user} u ON tu.userid=u.id " .
+                        " WHERE tu.moduleid=? AND tu.status=" . constants::M_STATE_COMPLETE .
+                        " ORDER BY u.lastnamephonetic,u.firstnamephonetic,u.lastname,u.firstname,u.middlename,u.alternatename,tu.id DESC";
+
+                $alldata =$DB->get_records_sql($the_sql, array($formdata->moduleid));
+
         }
 
 

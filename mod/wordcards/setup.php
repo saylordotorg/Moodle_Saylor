@@ -61,13 +61,18 @@ require_login($course, true, $cm);
 
 
 // Set page meta data.
-$PAGE->set_title(format_string($moduleinstance->name));
+$pagetitle = format_string($moduleinstance->name);
+$PAGE->set_title($pagetitle);
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($modulecontext);
-$PAGE->set_pagelayout('course');
 
-
-
+//Get an admin settings
+$config = get_config(constants::M_COMPONENT);
+if($config->enablesetuptab){
+    $PAGE->set_pagelayout('popup');
+}else{
+    $PAGE->set_pagelayout('course');
+}
 
 // Render template and display page.
 $renderer = $PAGE->get_renderer(constants::M_COMPONENT);
@@ -107,10 +112,13 @@ if ($mform->is_cancelled()) {
 
 //if we got here we is loading up dat form
 $moduleinstance->n =$moduleinstance->id;
+$mod = mod_wordcards_module::get_by_cmid($cm->id);
 $data =(array)$moduleinstance;
 $data = utils::prepare_file_and_json_stuff($data,$modulecontext);
 $mform->set_data($data);
 
 echo $renderer->header($moduleinstance, $cm, "setup");
+echo $renderer->heading($pagetitle);
+echo $renderer->navigation($mod, "setup");
 $mform->display();
 echo $renderer->footer();

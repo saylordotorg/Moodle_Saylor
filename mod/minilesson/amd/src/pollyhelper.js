@@ -27,6 +27,32 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions'], function ($, log, d
             return speaktext;
         },
 
+        can_speak_neural: function(voice,region){
+            switch(region){
+                case "useast1":
+                case "tokyo":
+                case "sydney":
+                case "dublin":
+                case "ottawa":
+                case "frankfurt":
+                case "london":
+                case "singapore":
+                case "capetown":
+                    //ok
+                    break;
+                default:
+                    return false;
+            }
+
+            //check if the voice is supported
+            if(def.neural_voices.indexOf(voice) !== -1){
+                return true;
+            }else{
+                return false;
+            }
+
+        },
+
         fetch_polly_url: function(speaktext,voiceoption, voice) {
             var that = this;
             return new Promise(function(resolve,reject){
@@ -104,6 +130,9 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions'], function ($, log, d
 
                 }
 
+                //to use the neural or standard synthesis engine
+                var engine = that.can_speak_neural(voice,that.region) ?'neural' : 'standard';
+
                 //log.debug(params);
                 var xhrparams = "wstoken=" + that.token
                 + "&wsfunction=" + functionname
@@ -113,7 +142,8 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions'], function ($, log, d
                 + '&voice=' + voice
                 + '&appid=' + def.component
                 + '&owner=' + that.owner
-                + '&region=' + that.region;
+                + '&region=' + that.region
+                + '&engine=' + engine;
 
                 var serverurl = def.cloudpoodllurl + "/webservice/rest/server.php";
                 xhr.open("POST", serverurl, true);

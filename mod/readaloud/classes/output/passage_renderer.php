@@ -19,7 +19,7 @@ class passage_renderer extends \plugin_renderer_base {
       
       $ret .= $this->render_audioplayer($passagehelper->attemptdetails('audiourl'));
 
-      $ret .= '<div style="margin-top:10px;" class="table-responsive">';
+      $ret .= '<div style="margin-top:10px;" class="table-responsive mod_readaloud_scorestable">';
       $ret .= '<table class="table table-condensed table-bordered">';
       $ret .= '<thead><tr>';
       $ret .= '<th>'.get_string('wpm', constants::M_COMPONENT).'</th>';
@@ -46,17 +46,17 @@ class passage_renderer extends \plugin_renderer_base {
       
     }
 
-    public function render_gradenow($passagehelper,$collapsespaces=false) {
+    public function render_gradenow($passagehelper,$language, $collapsespaces=false) {
         $actionheader = $this->render_attempt_scoresheader($passagehelper);
         $ret = $this->render_attempt_header($passagehelper->attemptdetails('userfullname'));
         $ret .= $actionheader;
-        $ret .= $this->render_passage($passagehelper->attemptdetails('passage'),false,$collapsespaces);
+        $ret .= $this->render_passage($passagehelper->attemptdetails('passagesegments'),$language,false,$collapsespaces);
         $ret .= $this->render_passageactions();
 
         return $ret;
     }
 
-    public function render_userreview($passagehelper, $collapsespaces=false,$nograde=false) {
+    public function render_userreview($passagehelper,$language, $collapsespaces=false,$nograde=false) {
         $actionheader = $this->render_attempt_scoresheader($passagehelper,$nograde);
         $ret = $actionheader;
 
@@ -66,20 +66,20 @@ class passage_renderer extends \plugin_renderer_base {
         if($collapsespaces){
             $extraclasses .= ' collapsespaces';
         }
-        $thepassage = $this->render_passage($passagehelper->attemptdetails('passage'),false,$extraclasses);
+        $thepassage = $this->render_passage($passagehelper->attemptdetails('passagesegments'),$language, false,$extraclasses);
         $ret .= \html_writer::div($thepassage, constants::M_CLASS . '_postattempt');
         return $ret;
     }
 
-    public function render_machinereview($passagehelper, $debug = false) {
+    public function render_machinereview($passagehelper, $language, $debug = false) {
         $actionheader = $this->render_attempt_scoresheader($passagehelper);
         $ret = $this->render_machinegrade_attempt_header($passagehelper->attemptdetails('userfullname'));
         $ret .= $actionheader;
         if ($debug) {
-            $passage = $this->render_passage($passagehelper->attemptdetails('passage'),false,false);
+            $passage = $this->render_passage($passagehelper->attemptdetails('passagesegments'),$language, false,false);
             $ret .= \html_writer::tag('span', $passage, array('class' => constants::M_CLASS . '_debug'));
         } else {
-            $ret .= $this->render_passage($passagehelper->attemptdetails('passage'),false,false);
+            $ret .= $this->render_passage($passagehelper->attemptdetails('passagesegments'),$language,false,false);
         }
         return $ret;
     }
@@ -149,7 +149,8 @@ class passage_renderer extends \plugin_renderer_base {
         return $ret;
     }
 
-    public function render_passage($passage, $containerclass=false, $extraclasses=false) {
+    public function render_passage($passage,$language,  $containerclass=false, $extraclasses=false) {
+
         // load the HTML document
         $doc = new \DOMDocument;
         // it will assume ISO-8859-1  encoding, so we need to hint it:

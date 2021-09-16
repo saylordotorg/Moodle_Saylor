@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of the Accredible Certificate module for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -27,8 +26,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $logs = array(
-    array('module'=>'accredible', 'action'=>'view', 'mtable'=>'accredible', 'field'=>'name'),
-    array('module'=>'accredible', 'action'=>'add', 'mtable'=>'accredible', 'field'=>'name'),
-     array('module'=>'accredible', 'action'=>'update', 'mtable'=>'accredible', 'field'=>'name'),
-    array('module'=>'accredible', 'action'=>'received', 'mtable'=>'accredible', 'field'=>'name'),
+    array('module' => 'accredible', 'action' => 'view', 'mtable' => 'accredible', 'field' => 'name'),
+    array('module' => 'accredible', 'action' => 'add', 'mtable' => 'accredible', 'field' => 'name'),
+    array('module' => 'accredible', 'action' => 'update', 'mtable' => 'accredible', 'field' => 'name'),
+    array('module' => 'accredible', 'action' => 'received', 'mtable' => 'accredible', 'field' => 'name'),
 );

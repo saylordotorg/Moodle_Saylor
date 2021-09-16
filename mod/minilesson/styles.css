@@ -1183,8 +1183,6 @@ div.mod_minilesson_feedback_cont.mod_minilesson_postattempt {
 .minilesson_dictate_player_box {
   border: 1px solid darkgray;
   position: relative;
-  /* overflow: hidden;*/
-  /*max-width: 400px;*/
   margin: auto;
 }
 
@@ -1201,7 +1199,7 @@ div.mod_minilesson_feedback_cont.mod_minilesson_postattempt {
 .dictate_error {}
 
 .minilesson_dictate_player_box .dictate_game {
-  min-height: 400px;
+  min-height: 250px;
   padding: 10px;
   border-top: 1px solid darkgray;
   border-bottom: 1px solid darkgray;
@@ -1269,7 +1267,7 @@ div.mod_minilesson_feedback_cont.mod_minilesson_postattempt {
 }
 
 .minilesson_dictate_player_box .dictate_mainmenu {
-  min-height: 400px;
+  min-height: 250px;
   background-color: #f5f5f5;
   font-size: 20px;
   padding: 10px;
@@ -1339,8 +1337,6 @@ div.mod_minilesson_feedback_cont.mod_minilesson_postattempt {
 .minilesson_landr_player_box {
   border: 1px solid darkgray;
   position: relative;
-  /* overflow: hidden; */
-  /*max-width: 400px;*/
   margin: auto;
 }
 
@@ -1357,7 +1353,7 @@ div.mod_minilesson_feedback_cont.mod_minilesson_postattempt {
 .minilesson_landr_player_box .landr_error {}
 
 .minilesson_landr_player_box .landr_game {
-  min-height: 400px;
+  min-height: 250px;
   padding: 10px;
   border-top: 1px solid darkgray;
   border-bottom: 1px solid darkgray;
@@ -1425,7 +1421,7 @@ div.mod_minilesson_feedback_cont.mod_minilesson_postattempt {
 }
 
 .minilesson_landr_player_box .landr_mainmenu {
-  height: 400px;
+  height: 250px;
   background-color: #f5f5f5;
   font-size: 20px;
   padding: 10px;
@@ -1737,12 +1733,10 @@ div.mod_minilesson_feedback_cont.mod_minilesson_postattempt {
   margin: auto;
 }
 .minilesson_questionheader_contents {
-  text-align: center;
   margin-bottom: 10px;
   margin-top: 10px;
 }
 .mod_minilesson_itemimage_cont,
-.mod_minilesson_itemtextarea_cont,
 .mod_minilesson_itemvideo_cont,
 .mod_minilesson_itemaudio_cont,
 .mod_minilesson_itemiframe_cont,
@@ -1750,6 +1744,10 @@ div.mod_minilesson_feedback_cont.mod_minilesson_postattempt {
   width: 100%;
   margin-top: 10px;
   text-align: center;
+}
+.mod_minilesson_itemtextarea_cont {
+  width: 100%;
+  margin-top: 10px;
 }
 
 .mod_minilesson_iframe_responsive {
@@ -1842,4 +1840,18 @@ div.mod_minilesson_feedback_cont.mod_minilesson_postattempt {
   float: right;
 }
 
+.minilesson_reportsmenu_box {
+  text-align: center;
+  display: flex;
+}
 
+.minilesson_reportsmenu_item {
+  height: 80px;
+  width: 150px;
+  margin: 10px;
+}
+
+.minilesson_reportsmenu_itembutton button{
+  height: 80px;
+  width: 150px;
+}

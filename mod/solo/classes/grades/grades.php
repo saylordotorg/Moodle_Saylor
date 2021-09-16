@@ -21,10 +21,44 @@ class grades {
      * @return array
      * @throws dml_exception
      */
-    public function getGrades(int $courseid, int $coursemoduleid, int $moduleinstance) : array {
+    public function getGrades($courseid, $coursemoduleid, $moduleinstance, $groupid) {
         global $DB;
-        $results=false;
-        $sql = "select pa.id as attemptid,
+        $results=[];
+        if($groupid>0){
+            list($groupswhere, $groupparams) = $DB->get_in_or_equal($groupid);
+            $sql = "select pa.id as attemptid,
+                    u.lastname,
+                    u.firstname,
+                    p.name,
+                    p.transcriber,
+                    pat.words,
+                    pat.targetwords,
+                    pat.totaltargetwords,
+                    pat.turns,
+                    pat.avturn,
+                    par.accuracy,
+                    pa.solo,
+                    pat.aiaccuracy,
+                    pa.manualgraded,
+                    pa.grade,
+                    pa.userid
+                from {solo} as p
+                    inner join {solo_attempts} pa on p.id = pa.solo
+                    inner join {course_modules} as cm on cm.course = p.course and cm.id = ?
+                    inner join {groups_members} gm ON pa.userid=gm.userid
+                    inner join {user} as u on pa.userid = u.id
+                    inner join {solo_attemptstats} as pat on pat.attemptid = pa.id and pat.userid = u.id
+                    left outer join {solo_ai_result} as par on par.attemptid = pa.id and par.courseid = p.course
+                where p.course = ?
+                    AND pa.solo = ?
+                    AND gm.groupid $groupswhere 
+                order by pa.id DESC";
+
+            $alldata = $DB->get_records_sql($sql, array_merge([$coursemoduleid, $courseid, $moduleinstance] , $groupparams));
+
+        //not groups
+        }else {
+            $sql = "select pa.id as attemptid,
                     u.lastname,
                     u.firstname,
                     p.name,
@@ -50,7 +84,10 @@ class grades {
                     AND pa.solo = ?
                 order by pa.id DESC";
 
-        $alldata = $DB->get_records_sql($sql, [$coursemoduleid, $courseid, $moduleinstance]);
+            $alldata = $DB->get_records_sql($sql, [$coursemoduleid, $courseid, $moduleinstance]);
+        }
+
+
 
         //loop through data getting most recent attempt
         if ($alldata) {

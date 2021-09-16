@@ -68,7 +68,8 @@ if ($ADMIN->fulltree) {
 
     $regions = \mod_readaloud\utils::get_region_options();
     $settings->add(new admin_setting_configselect(constants::M_COMPONENT . '/awsregion',
-            get_string('awsregion', constants::M_COMPONENT), '', 'useast1', $regions));
+            get_string('awsregion', constants::M_COMPONENT),
+            get_string('awsregion_details',constants::M_COMPONENT), 'useast1', $regions));
 
     $expiredays = \mod_readaloud\utils::get_expiredays_options();
     $settings->add(new admin_setting_configselect(constants::M_COMPONENT . '/expiredays',

@@ -1,3 +1,31 @@
+2.0.64 (Build 2021091200)
+- Added more neural voices and NZ and SA English to polly and transcribe
+- Added internal flag to turn off Chrome speech rec
+- fixed model audio sync issue
+
+2.0.63 (Build 2021090100)
+- Added questions for an embedded quiz (not finished)
+- Added phonetic for more clever word comparisons especially in Japanese
+
+2.0.62 (Build 2021081600)
+- removed clonepermissionsfrom entry on view and submit capabilities in access.php
+- fix for array_key_exists on php 8
+- simple number to word converter
+
+2.0.61 (Build 2021053100)
+- Internal flag for iframe use
+
+2.0.60 (Build 2021052900)
+- Added lang models for FR and ES
+
+2.0.59 (Build 2021052500)
+- added selection of group for report
+
+2.0.58 (Build 2021052200)
+- added capetown/bahrain
+- fixed bug in grading if target WPM was not set (or set to 0)
+- fixed bug in grading when only machine eval was selected
+
 2.0.57 (Build 2021040500)
 -added speechmark generation to setup.php
 

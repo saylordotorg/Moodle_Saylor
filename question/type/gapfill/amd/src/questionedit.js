@@ -191,6 +191,7 @@ define(['jquery', 'qtype_gapfill/Item'], function($, Item) {
               buttons: [
                 {
                   text: 'OK',
+                  id: 'SaveItemFeedback',
                   click: function() {
                     var JSONstr = item.updateJson(e);
                     $('[class^=atto_]').removeAttr('disabled');

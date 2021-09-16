@@ -24,6 +24,7 @@ define(['jquery', 'core/log', 'core/ajax', 'mod_minilesson/definitions', 'mod_mi
                     self.getComparison(
                         self.items[self.game.pointer].target,
                         message.capturedspeech,
+                        self.items[self.game.pointer].phonetic,
                         function(comparison) {
                             self.gotComparison(comparison, message);
                         }
@@ -95,7 +96,8 @@ define(['jquery', 'core/log', 'core/ajax', 'mod_minilesson/definitions', 'mod_mi
       });
       
     },
-    spliton: new RegExp('([,.!?:;" ])', 'g'),
+    
+
     game: {
       pointer: 0
     },
@@ -112,11 +114,12 @@ define(['jquery', 'core/log', 'core/ajax', 'mod_minilesson/definitions', 'mod_mi
 
       self.items = text_items.map(function(target) {
         return {
-          landr_targetWords: target.sentence.trim().split(self.spliton).filter(function(e) {
+          landr_targetWords: target.sentence.trim().split(self.quizhelper.spliton_regexp).filter(function(e) {
             return e !== "";
           }),
           target: target.sentence,
           prompt: target.displaysentence,
+          phonetic: target.phonetic,
           typed: "",
           answered: false,
           correct: false,
@@ -126,17 +129,20 @@ define(['jquery', 'core/log', 'core/ajax', 'mod_minilesson/definitions', 'mod_mi
         return e.target !== "";
       });
 
+
       $.each(self.items, function(index, item) {
         polly.fetch_polly_url(item.prompt,  self.voiceoption, self.usevoice).then(function(audiourl) {
           item.audio = new Audio();
           item.audio.src = audiourl;
           if (self.items.filter(function(e) {
-              return e.audio == null
-            }).length == 0) {
+              return e.audio === null
+            }).length === 0) {
             self.appReady();
           }
         });
       });
+
+
 
     },
     appReady: function() {
@@ -206,41 +212,29 @@ define(['jquery', 'core/log', 'core/ajax', 'mod_minilesson/definitions', 'mod_mi
       if (checkcase == 'false') {
         thetext = thetext.toLowerCase();
       }
-      var chunks = thetext.split(self.spliton).filter(function(e) {
+      var chunks = thetext.split(self.quizhelper.spliton_regexp).filter(function(e) {
         return e !== "";
       });
       var words = [];
       for (var i = 0; i < chunks.length; i++) {
-        if (!chunks[i].match(self.spliton)) {
+        if (!chunks[i].match(self.quizhelper.spliton_regexp)) {
           words.push(chunks[i]);
         }
       }
       return words;
     },
-    getComparison: function(passage, transcript, callback) {
+    getComparison: function(passage, transcript, phonetic, callback) {
       var self = this;
       
       $(".landr_ctrl-btn").prop("disabled", true);
-      ajax.call([{
-        methodname: 'mod_minilesson_compare_passage_to_transcript',
-        args: {
-          passage: passage,
-          transcript: transcript,
-          alternatives: '',
-          language: self.itemdata.language
-        },
-        done: function(ajaxresult) {
-          var payloadobject = JSON.parse(ajaxresult);
-          if (payloadobject) {
-            callback(payloadobject);
-          } else {
-            callback(false);
-          }
-        },
-        fail: function(err) {
-          console.log(err);
-        }
-      }]);
+      self.quizhelper.comparePassageToTranscript(passage,transcript,phonetic,self.itemdata.language).then(function(ajaxresult) {
+            var payloadobject = JSON.parse(ajaxresult);
+            if (payloadobject) {
+                callback(payloadobject);
+            } else {
+                callback(false);
+            }
+       });
 
     },
     end: function() {
@@ -295,8 +289,8 @@ define(['jquery', 'core/log', 'core/ajax', 'mod_minilesson/definitions', 'mod_mi
       code += "<i class='fa fa-graduation-cap landr_speech-icon-left'></i>";
       code += "<div style='margin-left:90px;' class='landr_speech landr_teacher_left'>";
       if(!showText){
-        var nopunc = target.replace(/['!"#$%&\\'()\*+,\-\.\/:;<=>?@\[\\\]\^_`{|}~']/g,"");
-        var dots = nopunc.replace(/[^ ]/g, '•');
+        var nopunc = target.replace(self.quizhelper.nopunc_regexp,"");
+        var dots = nopunc.replace(self.quizhelper.nonspaces_regexp, '•');
         code += dots;
       } else{
         code += target;
@@ -335,7 +329,7 @@ define(['jquery', 'core/log', 'core/ajax', 'mod_minilesson/definitions', 'mod_mi
       var landr_targetWordsCode = "";
       var idx = 1;
       self.items[self.game.pointer].landr_targetWords.forEach(function(word, realidx) {
-        if (!word.match(self.spliton)) {
+        if (!word.match(self.quizhelper.spliton_regexp)) {
           landr_targetWordsCode += "<ruby><input disabled type='text' maxlength='" + word.length + "' size='" + (word.length + 1) + "' class='landr_targetWord' data-realidx='" + realidx + "' data-idx='" + idx + "'><rt><i data-idx='" + idx + "' class='landr_feedback'></i></rt></ruby>";
           idx++;
 

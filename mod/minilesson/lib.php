@@ -174,7 +174,7 @@ function minilesson_grade_item_update($moduleinstance, $grades=null) {
         require_once($CFG->libdir.'/gradelib.php');
     }
 
-    if (array_key_exists('cmidnumber', $moduleinstance)) { //it may not be always present
+    if (array_key_exists('cmidnumber', (array) $moduleinstance)) { //it may not be always present
         $params = array('itemname'=>$moduleinstance->name, 'idnumber'=>$moduleinstance->cmidnumber);
     } else {
         $params = array('itemname'=>$moduleinstance->name);
@@ -427,8 +427,20 @@ function minilesson_update_instance(stdClass $minilesson, mod_minilesson_mod_for
     $params = array('id' => $minilesson->instance);
     $oldgradefield = $DB->get_field(constants::M_TABLE, 'grade', $params);
 
+    //if region has changed we will need a new scorer. So lets flag that if necessary
+    $oldrecord = $DB->get_record(constants::M_TABLE,array('id'=>$minilesson->id));
+    $needs_new_langmodels=false;
+    if($minilesson->region!=$oldrecord->region) {
+        $needs_new_langmodels=true;
+    }
 
+    //perform our update
     $success = $DB->update_record(constants::M_TABLE, $minilesson);
+
+    //update lang models if required
+    if($needs_new_langmodels) {
+        \mod_minilesson\local\rsquestion\helper::update_all_langmodels($minilesson);
+    }
 
     if(!isset($minilesson->cmidnumber)){
         $minilesson->cmidnumber=null;
@@ -761,6 +773,9 @@ function minilesson_output_fragment_mform($args) {
                     $data->addiframe = 0;
                 }
                 if(!empty($data->{constants::QUESTIONTEXTAREA})){
+                    $edoptions = constants::ITEMTEXTAREA_EDOPTIONS;
+                    $data = file_prepare_standard_editor($data, constants::QUESTIONTEXTAREA, $edoptions, $context, constants::M_COMPONENT,
+                            constants::TEXTQUESTION_FILEAREA, $data->itemid);
                     $data->addtextarea = 1;
                 }else{
                     $data->addtextarea = 0;
@@ -840,8 +855,8 @@ function minilesson_output_fragment_mform($args) {
             );
             break;
 
-        case constants::TYPE_TEACHERTOOLS:
-            $mform = new \mod_minilesson\local\rsquestion\teachertoolsform(null,
+        case constants::TYPE_SMARTFRAME:
+            $mform = new \mod_minilesson\local\rsquestion\smartframeform(null,
                     array('editoroptions'=>$editoroptions,
                             'filemanageroptions'=>$filemanageroptions,
                             'moduleinstance'=>$moduleinstance)

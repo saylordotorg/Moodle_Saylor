@@ -138,6 +138,7 @@ class helper
         $theitem->itemorder = $data->itemorder;
         $theitem->type = $data->type;
         $theitem->name = $data->name;
+        $theitem->phonetic = $data->phonetic;
         $theitem->passagehash = $data->passagehash;
         $theitem->modifiedby = $USER->id;
         $theitem->timemodified = time();
@@ -208,10 +209,12 @@ class helper
         }
 
         //Item Text Area
-        if (property_exists($data, constants::QUESTIONTEXTAREA)) {
-            $theitem->{constants::QUESTIONTEXTAREA} = $data->{constants::QUESTIONTEXTAREA};
+        $edoptions = constants::ITEMTEXTAREA_EDOPTIONS;
+        if (property_exists($data, constants::QUESTIONTEXTAREA . '_editor')) {
+            $data = file_postupdate_standard_editor($data, constants::QUESTIONTEXTAREA, $edoptions, $context,
+                    constants::M_COMPONENT, constants::TEXTQUESTION_FILEAREA, $theitem->id);
+            $theitem->{constants::QUESTIONTEXTAREA} = trim($data->{constants::QUESTIONTEXTAREA});
         }
-
 
         //save correct answer if we have one
         if (property_exists($data, constants::CORRECTANSWER)) {
@@ -272,6 +275,49 @@ class helper
         }
     }//end of edit_insert_question
 
+    /*
+     *  If we change AWS region we will need a new lang model for all the items
+     *
+     *
+     */
+    public static function update_all_langmodels($moduleinstance){
+      global $DB;
+        $updates=0;
+        $items = $DB->get_records(constants:: M_QTABLE,array('minilesson'=>$moduleinstance->id));
+        foreach($items as $olditem) {
+            $newitem = new \stdClass();
+            //items for speech rec are in the custom text fields
+            $newitem->customtext1 = $olditem->customtext1;
+            $newitem->customtext2 = $olditem->customtext2;
+            $newitem->customtext3 = $olditem->customtext3;
+            $newitem->customtext4 = $olditem->customtext4;
+            $newitem->type = $olditem->type;
+            $passagehash = \mod_minilesson\local\rsquestion\helper::update_create_langmodel($moduleinstance, $olditem, $newitem);
+            if(!empty($passagehash)){
+                $DB->update_record(constants::M_QTABLE,array('id'=>$olditem->id,'passagehash'=>$passagehash));
+                $updates++;
+            }
+        }
+    }
+
+    /*
+     *  We want to upgrade all the phonetic models on occasion
+     *
+     */
+    public static function update_all_phonetic($moduleinstance){
+        global $DB;
+        $updates=0;
+        $items = $DB->get_records(constants:: M_QTABLE,array('minilesson'=>$moduleinstance->id));
+        foreach($items as $newitem) {
+            $olditem = false;
+            $phonetic = \mod_minilesson\local\rsquestion\helper::update_create_phonetic($moduleinstance, $olditem, $newitem);
+            if(!empty($phonetic)){
+                $DB->update_record(constants::M_QTABLE,array('id'=>$newitem->id,'phonetic'=>$phonetic));
+                $updates++;
+            }
+        }
+    }
+
     public static function update_create_langmodel($moduleinstance, $olditem, $newitem){
         //if we need to generate a DeepSpeech model for this, then lets do that now:
         //we want to process the hashcode and lang model if it makes sense
@@ -279,7 +325,14 @@ class helper
         switch($newitem->type) {
             case constants::TYPE_SPEECHCARDS:
             case constants::TYPE_LISTENREPEAT:
+            case constants::TYPE_MULTIAUDIO:
+
                 $passage = $newitem->customtext1;
+                if($newitem->type == constants::TYPE_MULTIAUDIO){
+                    $passage .= ' ' . $newitem->customtext2;
+                    $passage .= ' ' . $newitem->customtext3;
+                    $passage .= ' ' . $newitem->customtext4;
+                }
                 if (utils::needs_lang_model($moduleinstance,$passage)) {
                     $newpassagehash = utils::fetch_passagehash($passage);
                     if ($newpassagehash) {
@@ -303,5 +356,62 @@ class helper
                 }
         }
         return $thepassagehash;
+    }
+
+    //we want to generate a phonetics if this is phonetic'able
+    public static function update_create_phonetic($moduleinstance, $olditem, $newitem){
+        //if we have an old item, set the default return value to the current phonetic value
+        //we will update it if the text has changed
+        if($olditem) {
+            $thephonetics = $olditem->phonetic;
+        }else{
+            $thephonetics ='';
+        }
+
+        switch($newitem->type) {
+            case constants::TYPE_SPEECHCARDS:
+            case constants::TYPE_LISTENREPEAT:
+            case constants::TYPE_MULTIAUDIO:
+
+
+                    $newpassage = $newitem->customtext1;
+                    if ($newitem->type == constants::TYPE_MULTIAUDIO) {
+                        $newpassage .= PHP_EOL . $newitem->customtext2;
+                        $newpassage .= PHP_EOL . $newitem->customtext3;
+                        $newpassage .= PHP_EOL . $newitem->customtext4;
+                    }
+
+                    if($olditem!==false) {
+                        $oldpassage = $olditem->customtext1;
+                        if ($newitem->type == constants::TYPE_MULTIAUDIO) {
+                            $oldpassage .= PHP_EOL . $olditem->customtext2;
+                            $oldpassage .= PHP_EOL . $olditem->customtext3;
+                            $oldpassage .= PHP_EOL . $olditem->customtext4;
+                        }
+                    }else{
+                        $oldpassage='';
+                    }
+
+
+                if ($newpassage !== $oldpassage) {
+
+                    $segmented=true;
+                    $sentences=explode(PHP_EOL,$newpassage);
+                    $allphonetics =[];
+                    foreach($sentences as $sentence) {
+                        $thephones  = utils::convert_to_phonetic($sentence, $moduleinstance->ttslanguage, 'tokyo', $segmented);
+                        if(!empty($thephones)) {
+                            $allphonetics[] = $thephones;
+                        }
+                    }
+
+                    //build the final phonetics
+                    if(count($allphonetics)>0) {
+                        $thephonetics = implode(PHP_EOL, $allphonetics);
+                    }
+                }
+
+        }
+        return $thephonetics;
     }
 }

@@ -460,7 +460,9 @@ class utils{
           "london" => get_string("london",constants::M_COMPONENT),
           "saopaulo" => get_string("saopaulo",constants::M_COMPONENT),
           "singapore" => get_string("singapore",constants::M_COMPONENT),
-          "mumbai" => get_string("mumbai",constants::M_COMPONENT)
+          "mumbai" => get_string("mumbai",constants::M_COMPONENT),
+          "capetown" => get_string("capetown",constants::M_COMPONENT),
+          "bahrain" => get_string("bahrain",constants::M_COMPONENT)
       );
   }
 
@@ -469,13 +471,15 @@ class utils{
             case "useast1": return "us-east-1";
             case "tokyo": return "ap-northeast-1";
             case "sydney": return "ap-southeast-2";
-            case "dublin": return "eu-east-1";
-            case "ottawa": return "us-east-1";
-            case "frankfurt": return "eu-central-2";
-            case "london": return "us-east-1";
+            case "dublin": return "eu-west-1";
+            case "ottawa": return "ca-central-1";
+            case "frankfurt": return "eu-central-1";
+            case "london": return "eu-west-2";
             case "saopaulo": return "sa-east-1";
-            case "singapore": return "us-east-1";
-            case "mumbai": return "us-east-1";
+            case "singapore": return "ap-southeast-1";
+            case "mumbai": return "ap-south-1";
+            case "capetown": return "af-south-1";
+            case "bahrain": return "me-south-1";
         }
     }
 
@@ -737,6 +741,12 @@ class utils{
       return $options;
   }
 
+  public static function fetch_options_fontfaceflip(){
+      return array(
+              constants::M_FRONTFACEFLIP_TERM=> get_string('term', constants::M_COMPONENT),
+              constants::M_FRONTFACEFLIP_DEF => get_string('definition', constants::M_COMPONENT));
+  }
+
    public static function get_lang_options() {
        return array(
                constants::M_LANG_ARAE => get_string('ar-ae', constants::M_COMPONENT),
@@ -784,10 +794,11 @@ class utils{
             case 'useast1':
             case 'dublin':
             case 'sydney':
-                return substr($mod->get_mod()->ttslanguage,0,2)=='en' && self::fetch_passagehash($mod);
-                break;
             default:
-                return false;
+            return (substr($mod->get_mod()->ttslanguage,0,2)=='en' ||
+                            substr($mod->get_mod()->ttslanguage,0,2)=='de' ||
+                            substr($mod->get_mod()->ttslanguage,0,2)=='fr' ||
+                            substr($mod->get_mod()->ttslanguage,0,2)=='es') && $mod->get_terms();
         }
     }
 
@@ -1025,6 +1036,14 @@ class utils{
         $mform->addElement('editor', 'completedmsg_editor', get_string('completedmsg', 'mod_wordcards'));
         $mform->setDefault('completedmsg_editor', array('text' => get_string('congratsitsover', 'mod_wordcards')));
         $mform->addHelpButton('completedmsg_editor', 'completedmsg', 'mod_wordcards');
+
+        //Show images on task flip screen
+        $mform->addElement('selectyesno', 'showimageflip', get_string('showimagesonflipscreen', 'mod_wordcards'));
+        $mform->setDefault('showimageflip', $config->showimageflip);
+
+        $frontfaceoptions = self::fetch_options_fontfaceflip();
+        $mform->addElement('select', 'frontfaceflip', get_string('frontfaceflip', 'mod_wordcards'),
+                $frontfaceoptions, $config->frontfaceflip);
 
 
     } //end of add_mform_elements

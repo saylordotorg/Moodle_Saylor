@@ -81,7 +81,10 @@ class TinySegmenter
         } elseif (Analyzer::hasLatinLetters($str)) {
             $type = 'A';
         } elseif (Analyzer::hasWesternNumerals($str)) {
-            $type = 'N';
+            //there is probably a good reason why each digit gets a split by default
+            //but here at Poodll that gets in the way, so we piggyback on latin letters which are not split on each char
+            $type = 'A';
+           // $type = 'N';
         }
         return $type;
     }

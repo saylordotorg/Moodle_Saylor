@@ -260,13 +260,14 @@ class mod_wordcards_module {
         return $terms;
     }
 
-    public function get_learn_terms() {
+    public function get_learn_terms($step) {
         $records = $this->get_terms();
         if (!$records) {
             return [];
         }
         shuffle($records);
-        $selected_records = array_slice($records, 0, $this->mod->step1termcount);
+        $maxterms = $this->fetch_step_termcount($step);
+        $selected_records = array_slice($records, 0, $maxterms);
         return $this->insert_media_urls($selected_records);
     }
 

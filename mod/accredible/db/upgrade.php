@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of the Accredible Certificate module for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -23,6 +22,8 @@
  * @copyright  Accredible <dev@accredible.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+defined('MOODLE_INTERNAL') || die();
 
 function xmldb_accredible_upgrade($oldversion=0) {
 
@@ -70,9 +71,9 @@ function xmldb_accredible_upgrade($oldversion=0) {
             $dbman->add_field($table, $field);
         }
 
-        // Set the certificate names to equal the Activity name
-        if ($accredible_activities = $DB->get_records('accredible')) {
-            foreach ($accredible_activities as $activity) {
+        // Set the certificate names to equal the Activity name.
+        if ($accredibleactivities = $DB->get_records('accredible')) {
+            foreach ($accredibleactivities as $activity) {
                 $activity->certificatename = $activity->name;
                 $DB->update_record('accredible', $activity);
             }

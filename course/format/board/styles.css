@@ -1,0 +1,179 @@
+/*
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+/**
+ * format_board
+ *
+ * @package    format_board
+ * @author     Rodrigo Brandão (rodrigobrandao.com.br)
+ * @copyright  2017 Rodrigo Brandão
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+.course-content ul.board {
+    margin: 0 !important;
+    padding: 0 !important;
+    display: inline-block;
+    vertical-align: top;
+    border: 0 !important;
+}
+.course-content ul.board.width100 {
+    width: 100%;
+}
+.course-content ul.board.width75 {
+    width: 75%;
+}
+.course-content ul.board.width66 {
+    width: 66.666666666%;
+}
+.course-content ul.board.width50 {
+    width: 50%;
+}
+.course-content ul.board.width33 {
+    width: 33.333333333%;
+}
+.course-content ul.board.width25 {
+    width: 25%;
+}
+.course-content ul.board .path-course-view .completionprogress {
+    display: none !important;
+}
+.course-content ul.board .section .side.left, .course-content ul.board .section .side.right {
+    display: none;
+}
+.editing .course-content ul.board .section .side.left, .editing .course-content ul.board .section .side.right {
+    display: inline-block;
+}
+.course-content ul.board .section li.activity {
+    padding: 5px 0 !important;
+}
+.course-content ul.board .section .activity .mod-indent-outer {
+    padding: 0 !important;
+}
+.course-content ul.board li.section.main {
+    border: 0;
+    padding: 0;
+    margin: 20px 20px 50px 20px;
+    display: inline-block;
+    list-style: none;
+    width: calc(100% - 40px);
+}
+.course-content ul.board li#section-0 {
+    margin: 0;
+}
+.course-content ul.board li.section.main h3.sectionname {
+    padding: 0 0 5px 0;
+    margin: 0;
+    color: #0070a8;
+    font-size: 17px;
+    line-height: 21px;
+    border-bottom: 1px solid #dfdfdf;
+}
+.course-content ul.board li.section ul.section {
+    margin: 15px 0 0 0;
+}
+.course-content ul.board li.section.main.current {
+    background: none;
+}
+
+/* blocks - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+.course-content ul.board.blocks li.section.main {
+    background-color: #fff;
+    border-style: solid;
+    border-width: 1px !important;
+    border-color: #dfdfdf;
+    padding: 0;
+    margin: 8px;
+    display: inline-block;
+    list-style: none;
+    width: calc(100% - 16px);
+}
+.course-content ul.board.blocks li.section.main.current {
+    border-width: 3px !important;
+    border-color: #0070a8;
+    width: calc(100% - 21px);
+}
+.course-content ul.board.blocks li.section ul.section {
+    margin: 0;
+    padding: 15px;
+}
+.course-content ul.board.blocks #section-0 ul.section {
+    margin: 0;
+    padding: 0;
+}
+.course-content ul.board.blocks #section-0 {
+    border: 0;
+    background: none;
+}
+.course-content ul.board.blocks .summary h4 {
+    font-size: 16px;
+    padding: 0;
+    margin: 0;
+}
+.course-content ul.board.blocks li.section.main h3.sectionname {
+    padding: 5px 10px 7px 10px;
+    background: #f5f5f5;
+    color: #0070a8;
+    font-size: 16px;
+    line-height: 19px;
+    border-bottom: 1px solid #dfdfdf;
+}
+.course-content ul.board.blocks li.section.main.current h3.sectionname {
+    background: #0070a8;
+    color: #fff;
+}
+.course-content ul.board.blocks li.section.main.hidden h3.sectionname {
+    color: #999;
+}
+
+/* editing - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+.editing .course-content ul.board .section .side.left {
+    display: inline-block;
+    margin-left: -9px;
+    margin-top: -10px;
+}
+.editing .course-content ul.board .section .side.right {
+    display: inline-block;
+}
+.editing .course-content ul.board .section .activity .contentwithoutlink,
+.editing .course-content ul.board .section .activity .activityinstance {
+    padding-right: 70px;
+}
+.editing .course-content ul.board .section .activity .editing_move {
+    left: -22px;
+}
+
+/* mobile - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+@media (max-width: 767px) {
+    .course-content ul.board.width75,
+    .course-content ul.board.width66,
+    .course-content ul.board.width50,
+    .course-content ul.board.width33,
+    .course-content ul.board.width25 {
+        width: 100%;
+    }
+    .course-content ul.board.blocks li.section.main,
+    .course-content ul.board li.section.main,
+    .course-content ul.board.blocks li.section.main.current {
+        margin-left: 0;
+        margin-right: 0;
+        width: calc(100% - 2px);
+    }
+    .course-content ul.board.blocks li.section.main.current {
+        width: calc(100% - 6px);
+    }
+}

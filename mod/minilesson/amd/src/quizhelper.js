@@ -1,8 +1,8 @@
 define(['jquery', 'core/log', 'mod_minilesson/definitions', 'core/templates', 'core/ajax',
     'mod_minilesson/dictation', 'mod_minilesson/dictationchat', 'mod_minilesson/multichoice','mod_minilesson/multiaudio',
         'mod_minilesson/speechcards', 'mod_minilesson/listenrepeat',
-        'mod_minilesson/page','mod_minilesson/teachertools','mod_minilesson/shortanswer'],
-  function($, log, def, templates, Ajax, dictation, dictationchat, multichoice, multiaudio, speechcards, listenrepeat, page, teachertools, shortanswer) {
+        'mod_minilesson/page','mod_minilesson/smartframe','mod_minilesson/shortanswer'],
+  function($, log, def, templates, Ajax, dictation, dictationchat, multichoice, multiaudio, speechcards, listenrepeat, page, smartframe, shortanswer) {
     "use strict"; // jshint ;_;
 
     /*
@@ -12,7 +12,12 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'core/templates', 'c
     log.debug('MiniLesson Quiz helper: initialising');
 
     return {
-      
+
+      //original spliton_regexp: new RegExp(/([,.!?:;" ])/, 'g'),
+      spliton_regexp: new RegExp(/([!"# $%&'()。「」、*+,-.\/:;<=>?@[\]^_`{|}~])/, 'g'),
+      //nopunc is diff to split on because it does not match on spaces
+      nopunc_regexp: new RegExp(/[!"#$%&'()。「」、*+,-.\/:;<=>?@[\]^_`{|}~]/,'g'),
+      nonspaces_regexp: new RegExp(/[^ ]/,'g'),
 
       controls: {},
       submitbuttonclass: 'mod_minilesson_quizsubmitbutton',
@@ -70,8 +75,8 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'core/templates', 'c
                   page.clone().init(index, item, dd);
                   break;
 
-              case def.qtype_teachertools:
-                  teachertools.clone().init(index, item, dd);
+              case def.qtype_smartframe:
+                  smartframe.clone().init(index, item, dd);
                   break;
 
               case def.qtype_shortanswer:
@@ -166,7 +171,7 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'core/templates', 'c
               case def.qtype_multichoice:
               case def.qtype_multiaudio:
               case def.qtype_listenrepeat:
-              case def.qtype_teachertools:
+              case def.qtype_smartframe:
               case def.qtype_shortanswer:
               default:
           }//end of nextitem switch
@@ -249,27 +254,35 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'core/templates', 'c
             }
         },
 
-        //this will always be true if region is ok or chrome, but should it be false the old push recorder will show
+        //this will always be true these days
         use_ttrecorder: function(){
+            return true;
+            /*
             var ret =false;
             var chromeuser = this.chrome_user();
-            //check if region is ok
             switch(this.region){
                 case 'tokyo':
                 case 'useast1':
                 case 'dublin':
                 case 'sydney':
+                case 'bahrain':
+                case 'capetown':
                     ret =true;
                     break;
                 default:
                     ret = chromeuser;
             }
             return ret;
+            */
         },
 
         //text comparison functions follow===============
 
         similarity: function(s1, s2) {
+            //we remove spaces because JP transcript and passage might be different. And who cares about spaces anyway?
+            s1 = s1.replace(/\s+/g, '');
+            s2 = s2.replace(/\s+/g, '');
+
             var longer = s1;
             var shorter = s2;
             if (s1.length < s2.length) {
@@ -278,9 +291,9 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'core/templates', 'c
             }
             var longerLength = longer.length;
             if (longerLength == 0) {
-                return 1.0;
+                return 100;
             }
-            return (longerLength - this.editDistance(longer, shorter)) / parseFloat(longerLength);
+            return 100 * ((longerLength - this.editDistance(longer, shorter)) / parseFloat(longerLength));
         },
         editDistance: function(s1, s2) {
             s1 = s1.toLowerCase();
@@ -311,22 +324,40 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'core/templates', 'c
 
         cleanText: function(text) {
             var lowertext = text.toLowerCase();
-            var punctuationless = lowertext.replace(/['!"#$%&\\'()\*+,\-\.\/:;<=>?@\[\\\]\^_`{|}~']/g,"");
+            var punctuationless = lowertext.replace(this.nopunc_regexp,"");
             var ret = punctuationless.replace(/\s+/g, " ").trim();
             return ret;
         },
 
         //this will return the promise, the result of which is an integer 100 being perfect match, 0 being no match
-        checkByPhonetic: function(spoken, correct, language) {
+        checkByPhonetic: function(passage, transcript, passagephonetic, language) {
             return Ajax.call([{
                 'methodname': 'mod_minilesson_check_by_phonetic',
                 'args': {
-                    'spoken': spoken,
-                    'correct': correct,
+                    'spoken': transcript,
+                    'correct': passage,
                     'language': language,
+                    'phonetic': passagephonetic,
+                    'region': this.region,
+                    'cmid': this.cmid
                 }
             }])[0];
 
         },
+
+       comparePassageToTranscript: function (passage,transcript,passagephonetic, language){
+          return Ajax.call([{
+               methodname: 'mod_minilesson_compare_passage_to_transcript',
+               args: {
+                   passage: passage,
+                   transcript: transcript,
+                   alternatives: '',
+                   phonetic: passagephonetic,
+                   language: language,
+                   region: this.region,
+                   cmid: this.cmid
+               }
+           }])[0];
+       }
     }; //end of return value
   });

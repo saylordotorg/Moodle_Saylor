@@ -32,17 +32,31 @@ use \mod_solo\utils;
  */
 class attempt_renderer extends \plugin_renderer_base {
 
+    /**
+     * Show the introduction text is as set in the activity description
+     */
+    public function show_intro($readaloud, $cm) {
+        $ret = "";
+        if (trim(strip_tags($readaloud->intro))) {
+            $ret .= $this->output->box_start(constants::M_INTRO_CONTAINER . ' ' . constants::M_CLASS . '_center ');
+            $ret .= format_module_intro('readaloud', $readaloud, $cm->id);
+            $ret .= $this->output->box_end();
+        }
+        return $ret;
+    }
+
  /**
  * Return HTML to display add first page links
  * @param lesson $lesson
  * @return string
  */
- public function add_edit_page_links($solo, $latestattempt=false, $thisstep) {
+ public function add_edit_page_links($solo, $latestattempt, $thisstep, $cm) {
 		global $CFG;
 
-
-        //$output = $this->output->heading(get_string("letsgetstarted", "solo"), 3);
+     //instructions /intro
         $output = '';
+     echo $this->show_intro($solo, $cm);
+
         $parts = array();
         $buttonclass = 'btn ' . constants::M_COMPONENT .'_menubutton ' . constants::M_COMPONENT;
 

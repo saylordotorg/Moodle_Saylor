@@ -60,6 +60,9 @@ foreach($mis as $moduleinstance){
         $newitem = new \stdClass();
         //most of the sentences for speech recognition are in customtext1, so we use that to generate lang model
         $newitem->customtext1 = $olditem->customtext1;
+        $newitem->customtext2 = $olditem->customtext2;
+        $newitem->customtext3 = $olditem->customtext3;
+        $newitem->customtext4 = $olditem->customtext4;
         $newitem->type = $olditem->type;
         $passagehash = \mod_minilesson\local\rsquestion\helper::update_create_langmodel($moduleinstance, $olditem, $newitem);
         if(!empty($passagehash)){

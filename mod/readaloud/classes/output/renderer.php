@@ -39,6 +39,13 @@ class renderer extends \plugin_renderer_base {
         $this->page->set_title($title);
         $this->page->set_heading($this->page->course->fullname);
         $output = $this->output->header();
+        if(!$moduleinstance->foriframe) {
+            $thetitle = $this->output->heading($activityname, 3, 'main');
+            $displaytext = \html_writer::div($thetitle, constants::M_CLASS . '_center');
+            $output .= $displaytext;
+
+        }
+
 
         if (has_capability('mod/readaloud:viewreports', $context)) {
             //   $output .= $this->output->heading_with_help($activityname, 'overview', constants::M_COMPONENT);
@@ -49,19 +56,11 @@ class renderer extends \plugin_renderer_base {
                 $output .= ob_get_contents();
                 ob_end_clean();
             }
-        } else {
-            $output .= $this->output->heading($activityname);
         }
 
         return $output;
     }
 
-    /**
-     * Return HTML to display limited header
-     */
-    public function notabsheader() {
-        return $this->output->header();
-    }
 
     public function show_no_content($cm, $showsetup){
         $displaytext = $this->output->box_start();
@@ -188,56 +187,30 @@ class renderer extends \plugin_renderer_base {
 
       $hasaudiobreaks = !empty($moduleinstance->modelaudiobreaks);
 
-        $ret='<div class="'.constants::M_MENUBUTTONS_CONTAINER.'">';
-
-        //Preview button
-        if($moduleinstance->enablepreview){
-            $tabstop_class = "tabindex='0' class='mode-chooser preview'";
-        }else{
-            $tabstop_class = "class='mode-chooser preview no-show'";
+        $data=[];
+        //are we previewing?
+        if(!$moduleinstance->enablepreview) {
+            $data['nopreview'] = 1;
         }
-        $ret.="<div><div id='".constants::M_STARTPREVIEW. "' " . $tabstop_class ."><div class='mode-chooser-label'>".
-                "<b>".get_string("previewreading", constants::M_COMPONENT)."</b>: ".
-                get_string("previewhelp", constants::M_COMPONENT)."</div></div></div>";
 
-        //Listen and Repeat button
-        $modelaudiowarning='';
-        if($moduleinstance->enablelandr  &&  $hasaudiobreaks){
-            $tabstop_class = "tabindex='0' class='mode-chooser landr'";
-        }elseif($moduleinstance->enablelandr  &&  !$hasaudiobreaks ){
-            $tabstop_class = "class='mode-chooser landr no-click'";
-            $modelaudiowarning = get_string("modelaudiowarning", constants::M_COMPONENT);
-        }else{
-            $tabstop_class = "class='mode-chooser landr no-show'";
+        //do we have audio breaks ?
+        if(!$hasaudiobreaks) {
+            $data['noaudiobreaks'] = 1;
         }
-        $ret.="<div><div id='".constants::M_STARTLANDR. "' " . $tabstop_class ."><div class='mode-chooser-label'>".
-                "<b>".get_string("landrreading", constants::M_COMPONENT)."</b>: ".
-                get_string("landrhelp", constants::M_COMPONENT). $modelaudiowarning . "</div></div></div>";
-      
-        //shadow attempt button
-        if($moduleinstance->enableshadow){
-            $tabstop_class = "tabindex='0' class='mode-chooser readaloudshadow'";
-        }else{
-            $tabstop_class = "class='mode-chooser readaloudshadow no-show'";
+        //is listen and repeat enabled?
+        if(!$moduleinstance->enablelandr) {
+            $data['nolandr'] = 1;
         }
-        $ret.="<div><div  id='".constants::M_STARTSHADOW. "' " . $tabstop_class ."><div class='mode-chooser-label'>".
-                "<b>".get_string("startshadowreading", constants::M_COMPONENT)."</b>: ".
-                get_string("shadowhelp", constants::M_COMPONENT)."</div></div></div>";
-
-        //attempt button
-        if($canattempt){
-            $tabstop_class = "tabindex='0' class='mode-chooser readaloud'";
-        }else{
-            $tabstop_class = "class='mode-chooser readaloud no-click'";
+        //is shadow enabled
+        if(!$moduleinstance->enableshadow) {
+            $data['noshadow'] = 1;
         }
-        $ret.= "<div><div id='".constants::M_STARTNOSHADOW. "' " .  $tabstop_class . "'><div class='mode-chooser-label'>".
-                "<b>".get_string("startreading", constants::M_COMPONENT)."</b>: ".
-                get_string("normalhelp", constants::M_COMPONENT)."</div></div></div>";
-
-
-        $ret.="</div>";
-      
-        return $ret;
+        //can we attempt this activity
+        if(!$canattempt) {
+            $data['cantattempt'] = 1;
+        }
+        //finally render template and return
+        return $this->render_from_template('mod_readaloud/bigbuttonmenu', $data);
 
     }
 
@@ -248,52 +221,38 @@ class renderer extends \plugin_renderer_base {
     public function show_smallreport ($moduleinstance, $attempt=false, $aigrade=false) {
         global $CFG;
 
+        //template data for small report
+        $tdata = Array();
+        $tdata['src']='';
         //filename
         if($attempt && $attempt->filename){
-            $src= $attempt->filename;
-        }else{
-            $src="";
+            $tdata['src']= $attempt->filename;
         }
-        $audioplayer = \html_writer::tag('audio', '',
-                array('src' => $src, 'controls' => 1, 'class'=>constants::M_CLASS . '_smallreport_player nomediaplugin nopoodll',
-                        'crossorigin'=>'anonymous'));
 
         //star rating
         if($attempt) {
             $rating = utils::fetch_rating($attempt, $aigrade); // 0,1,2,3,4 or 5
             $ready = $rating > -1;
+            $stars=[];
+            for ($star = 0; $star < 5; $star++) {
+                $stars[] = $rating > $star ? 'fa-star' : 'fa-star-o';
+            }
+            $tdata['stars']=$stars;
         }else{
             $ready = false;
-            $rating =-1;
         }
-        //if we have no rating yet, lets show dots only
-        if(!$ready){
-            $stars = '. . . . .';
-        }else {
-            $emptystar = '<i class="fa fa-lg fa-star-o"></i>';
-            $solidstar = '<i class="fa fa-lg fa-star"></i>';
-            $stars = '';
-            for ($star = 0; $star < 5; $star++) {
-                $stars .= $rating > $star ? $solidstar : $emptystar;
-            }
+        if($ready) {
+            $tdata['ready']=true;
         }
-        $starrating =  \html_writer::div($stars,constants::M_CLASS . '_smallreport_rating');
-
-        //heading
-        $headingtext = $ready ? get_string('evaluatedmessage',constants::M_COMPONENT) :
-                get_string('notgradedyet',constants::M_COMPONENT) ;
-        $heading = \html_writer::div($headingtext,constants::M_CLASS . '_smallreport_heading');
-
-        //status display
-        $showtext = $ready ? '' : '-- waiting --';
-        $status = \html_writer::div($showtext,constants::M_CLASS . '_smallreport_status');
 
         //full report button
-        $thebutton = $this->output->single_button(new \moodle_url(constants::M_URL . '/view.php',
-                array('n' => $moduleinstance->id, 'reviewattempts' => 1)), get_string('fullreport', constants::M_COMPONENT),'get');
-        $showhide = $ready ? '': ' hide';
-        $fullreportbutton = \html_writer::div($thebutton,constants::M_CLASS . '_smallreport_fullreportbutton' . $showhide);
-        $ret = \html_writer::div($heading . $audioplayer . $starrating . $status . $fullreportbutton, constants::M_CLASS . '_smallreport_cont ' . constants::M_CLASS . '_center');
+        $fullreportbutton = $this->output->single_button(new \moodle_url(constants::M_URL . '/view.php',
+                array('n' => $moduleinstance->id, 'reviewattempts' => 1)), get_string('fullreport', constants::M_COMPONENT));
+        $tdata['fullreportbutton']=$fullreportbutton;
+
+        //finally render template
+        $ret = $this->render_from_template('mod_readaloud/smallreport', $tdata);
+
 
         //If there is no remote transcriber
         //we do not want to get users hopes up by trying to fetch a transcript with ajax
@@ -321,7 +280,7 @@ class renderer extends \plugin_renderer_base {
 
     public function show_returntomenu_button(){
         $returnbutton =  \html_writer::tag('button', "<i class='fa fa-arrow-left'></i> ".get_string("returnmenu", constants::M_COMPONENT),
-                array('class'=>constants::M_CLASS . '_center btn-block btn btn-secondary ' . constants::M_RETURNMENU,'type'=>'button','id'=>constants::M_RETURNMENU));
+                array('class'=>constants::M_CLASS . '_center btn-block btn btn-secondary ' . constants::M_RETURNMENU,'type'=>'button','style'=>'display: none','id'=>constants::M_RETURNMENU));
         return $returnbutton;
     }
 
@@ -540,24 +499,9 @@ class renderer extends \plugin_renderer_base {
                 $data['passagehash']  = $hashbits[1];
             }
         }
-        switch($moduleinstance->region) {
-            case 'tokyo':
-                $data['asrurl'] = 'https://tokyo.ls.poodll.com/transcribe';
-                //$data['asrurl'] = 'https://dstokyo.poodll.com:3000/transcribe';
-                break;
-            case 'sydney':
-                $data['asrurl'] = 'https://sydney.ls.poodll.com/transcribe';
-                //$data['asrurl'] = 'https://dssydney.poodll.com:3000/transcribe';
-                break;
-            case 'dublin':
-                $data['asrurl'] = 'https://dublin.ls.poodll.com/transcribe';
-                //$data['asrurl'] = 'https://dsdublin.poodll.com:3000/transcribe';
-                break;
-            case 'useast1':
-            default:
-              $data['asrurl'] = 'https://useast.ls.poodll.com/transcribe';
-            //$data['asrurl'] = 'https://dsuseast.poodll.com:3000/transcribe';
-        }
+
+        //fetch lang services url
+        $data['asrurl'] = utils::fetch_lang_server_url($moduleinstance->region,'transcribe');
 
         $content =  $this->render_from_template('mod_readaloud/listenandrepeat', $data);
         $containertag = 'landr_container';
@@ -592,12 +536,6 @@ class renderer extends \plugin_renderer_base {
         $displaytext .= $this->output->box_end();
         $ret = \html_writer::div($displaytext);
         return $ret;
-    }
-
-    public function show_title($title){
-        $thetitle = $this->output->heading($title, 3, 'main');
-        $displaytext = \html_writer::div($thetitle, constants::M_CLASS . '_center');
-        return $displaytext;
     }
 
     /**
@@ -881,10 +819,12 @@ class renderer extends \plugin_renderer_base {
         $recopts['smallreportcontainer'] = constants::M_SMALLREPORT_CONTAINER;
         $recopts['modelaudioplayer'] = constants::M_MODELAUDIO_PLAYER;
         $recopts['enablelandr'] = $moduleinstance->enablelandr ? true : false;
+        $recopts['ds_only'] = false; //if false, chrome will use its own speech rec. if true chrome wont be used (server may yet decide not to use DS)
         $recopts['enablepreview'] = $moduleinstance->enablepreview ? true : false;
         $recopts['enableshadow'] = $moduleinstance->enableshadow ? true : false;
         $recopts['allowearlyexit'] = $moduleinstance->allowearlyexit ? true : false;
         $recopts['breaks'] = $moduleinstance->modelaudiobreaks;
+
         $recopts['audioplayerclass'] = constants::M_MODELAUDIO_PLAYER;
         $recopts['startlandrbutton'] = constants::M_STARTLANDR;
         $recopts['startpreviewbutton'] = constants::M_STARTPREVIEW;
@@ -894,6 +834,11 @@ class renderer extends \plugin_renderer_base {
         $recopts['stopandplay'] = constants::M_STOPANDPLAY;
         $recopts['stopbutton'] = constants::M_STOP_BTN;
         $recopts['playbutton'] = constants::M_PLAY_BTN;
+
+        $recopts['phonetics'] = '';
+        if($moduleinstance->phonetic && !empty($moduleinstance->phonetic)) {
+            $recopts['phonetics'] = explode(' ',$moduleinstance->phonetic);
+        }
       
         //streaming transcriber: we do not want to use it anymore.
         if($moduleinstance->transcriber == constants::TRANSCRIBER_AMAZONSTREAMING){

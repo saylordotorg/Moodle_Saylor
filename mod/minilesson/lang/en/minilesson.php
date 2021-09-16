@@ -15,36 +15,36 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['modulename'] = 'Mini Lesson';
-$string['modulenameplural'] = 'Mini Lessons';
-$string['modulename_help'] = 'Mini Lesson combines several auto-graded language learning activities into a simple self guided online lesson.';
+$string['modulename'] = 'Poodll MiniLesson';
+$string['modulenameplural'] = 'Poodll MiniLessons';
+$string['modulename_help'] = 'MiniLesson combines several auto-graded language learning activities into a simple self guided online lesson.';
 $string['minilessonfieldset'] = 'Custom example fieldset';
-$string['minilessonname'] = 'Mini Lesson';
+$string['minilessonname'] = 'Poodll MiniLesson';
 $string['minilessonname_help'] = 'This is the content of the help tooltip associated with the Mini Lesson name field. Markdown syntax is supported.';
-$string['minilesson'] = 'Mini Lesson';
+$string['minilesson'] = 'Poodll MiniLesson';
 $string['activitylink'] = 'Link to next activity';
 $string['activitylink_help'] = 'To provide a link after the attempt to another activity in the course, select the activity from the dropdown list.';
 $string['activitylinkname'] = 'Continue to next activity: {$a}';
 $string['pluginadministration'] = 'Mini Lesson Administration';
-$string['pluginname'] = 'Mini Lesson Activity';
+$string['pluginname'] = 'Poodll MiniLesson';
 $string['someadminsetting'] = 'Some Admin Setting';
 $string['someadminsetting_details'] = 'More info about Some Admin Setting';
 $string['someinstancesetting'] = 'Some Instance Setting';
 $string['someinstancesetting_details'] = 'More infor about Some Instance Setting';
-$string['minilessonsettings'] = 'Mini Lesson settings';
+$string['minilessonsettings'] = 'MiniLesson settings';
 $string['minilesson:addinstance'] = 'Add a new Mini Lesson';
-$string['minilesson:view'] = 'View Mini Lesson';
-$string['minilesson:view'] = 'Preview Mini Lesson';
+$string['minilesson:view'] = 'View MiniLesson';
+$string['minilesson:view'] = 'Preview MiniLesson';
 $string['minilesson:itemview'] = 'View lesson items';
 $string['minilesson:itemedit'] = 'Edit lesson ittems';
 $string['minilesson:tts'] = 'Can use Text To Speech(tts)';
 $string['minilesson:managequestions'] = 'Can manage lesson items';
-$string['minilesson:canmanageattempts'] = 'Can manage Mini Lesson attempts';
-$string['minilesson:manage'] = 'Can manage Mini Lesson instances';
-$string['minilesson:canpreview'] = 'Can preview Mini Lesson activities';
-$string['minilesson:evaluate'] = 'Can evaluate student Mini Lesson attempts';
-$string['minilesson:submit'] = 'Can submit Mini Lesson attempts';
-$string['privacy:metadata'] = 'The Poodll Mini Lesson plugin does store personal data.';
+$string['minilesson:canmanageattempts'] = 'Can manage MiniLesson attempts';
+$string['minilesson:manage'] = 'Can manage MiniLesson instances';
+$string['minilesson:canpreview'] = 'Can preview MiniLesson activities';
+$string['minilesson:evaluate'] = 'Can evaluate student MiniLesson attempts';
+$string['minilesson:submit'] = 'Can submit MiniLesson attempts';
+$string['privacy:metadata'] = 'The Poodll MiniLesson plugin does store personal data.';
 $string['tryagain'] = 'Try again';
 
 $string['id']='ID';
@@ -53,6 +53,7 @@ $string['timecreated']='Time Created';
 $string['basicheading']='Basic Report';
 $string['attemptsheading']='Attempts Report';
 $string['gradereport']='Grade Report';
+$string['gradereport_explanation']='A list of grades';
 $string['gradereportheading']='Grade Report';
 $string['attemptsbyuserheading']='User Attempts Report';
 $string['gradingheading']='Grades for each user latest attempts.';
@@ -69,6 +70,8 @@ $string['grading']='Grades';
 $string['showingattempt']='Showing attempt for: {$a}';
 $string['showingmachinegradedattempt']='Machine evaluated attempt for: {$a}';
 $string['basicreport']='Basic Report';
+$string['basicreport_explanation']='A Basic Report';
+
 $string['returntoreports']='Return to Reports';
 $string['returntogradinghome']='Return to Grades Top';
 $string['exportexcel']='Export to CSV';
@@ -105,6 +108,7 @@ $string['beginreading'] = 'Begin Reading';
 $string['errorheader'] = 'Error';
 $string['uploadconverterror'] = 'An error occured while posting your file to the server. Your submission has NOT been received. Please refresh the page and try again.';
 $string['attemptsreport'] = 'Attempts Report';
+$string['attemptsreport_explanation']='A list of attempts';
 $string['submitted'] = 'submitted';
 $string['id'] = 'ID';
 $string['username'] = 'User';
@@ -145,12 +149,16 @@ $string['london'] = 'London, U.K';
 $string['saopaulo'] = 'Sao Paulo, Brazil';
 $string['singapore'] = 'Singapore';
 $string['mumbai'] = 'Mumbai, India';
+$string['capetown'] = 'Capetown, South Africa';
+$string['bahrain'] = 'Bahrain';
 
 $string['forever'] = 'Never expire';
 
 $string['en-us'] = 'English (US)';
 $string['es-us'] = 'Spanish (US)';
 $string['en-au'] = 'English (Aus.)';
+$string['en-nz'] = 'English (NZ)';
+$string['en-za'] = 'English (S.Africa)';
 $string['en-gb'] = 'English (GB)';
 $string['fr-ca'] = 'French (Can.)';
 $string['fr-fr'] = 'French (FR)';
@@ -291,6 +299,7 @@ $string['addingitem'] = 'Adding a new lesson item';
 $string['editingitem'] = 'Editing a lesson item';
 $string['createaitem'] = 'Create a lesson item';
 $string['item'] = 'Item';
+$string['newitem'] = 'Item: untitled';
 $string['itemtitle'] = 'Item Title';
 $string['itemcontents'] = 'Item Text';
 $string['answer'] = 'Answer';
@@ -344,7 +353,7 @@ $string['adddictationitem']='Dictation';
 $string['addlistenrepeatitem']='Listen and Speak';
 $string['addspeechcardsitem']='Speech Cards';
 $string['addpageitem']='Content Page';
-$string['addteachertoolsitem']='TeacherTools';
+$string['addsmartframeitem']='SmartFrame';
 $string['addshortansweritem']='Short Answer';
 
 
@@ -356,7 +365,7 @@ $string['dictationchat']='Dictation Chat';
 $string['speechcards']='Speech Cards';
 $string['listenrepeat']='Listen and Speak';
 $string['page']='Content Page';
-$string['teachertools']='TeacherTools';
+$string['smartframe']='SmartFrame';
 $string['shortanswer']='Short Answer';
 
 $string['transcriber'] = 'Transcriber';
@@ -393,13 +402,15 @@ $string['start'] = 'Start';
 $string['next'] = 'Next';
 $string['nextlessonitem'] = 'Next Page';
 $string['loading'] = 'Loading...';
-$string['dc_instructions1'] = 'Listen and type the sentences you hear';
+$string['dictation_instructions1'] = 'Listen and type each sentence that you hear.';
+$string['sc_instructions1'] = 'Read the phrase on each card aloud.';
+$string['dc_instructions1'] = 'Listen and type the sentences you hear.';
 $string['dc_instructions2'] = 'Click \'Start\' to begin!';
 //dictation
 $string['d_question'] = 'Item';
 //listen and repeat
 $string['listenandrepeat'] = 'Listen and Speak';
-$string['lr_instructions1'] = 'Listen and respond to the sentences you hear';
+$string['lr_instructions1'] = 'Listen and respond to the sentences you hear.';
 $string['lr_instructions2'] = 'Click \'Start\' to begin!';
 
 $string['choosevoice'] = "Choose the prompt speaker's voice";
@@ -427,7 +438,7 @@ $string['additems'] ='Add Items';
 $string['showqtitles'] ='Show item titles in lesson';
 $string['previewitem'] ='Preview Item';
 $string['showitemscores'] ='See All Results';
-$string['ttshorturl'] = 'TeacherTools Activity Short URL:';
+$string['ttshorturl'] = 'SmartFrame URL:';
 $string['reattempt'] ='Try Again';
 $string['attemptresultsheading']='{$a->username}: Attempt({$a->attemptid}): Score: {$a->sessionscore}% : - {$a->date} ';
 $string['result'] ='Result';
@@ -441,8 +452,8 @@ $string['phraseresponses'] ='Enter a list of speaking prompts in the text area b
 $string['phrases'] ='Phrases';
 
 $string['itemmedia'] ='Image, audio or video to show';
-$string['itemttsquestion'] ='Text to be read';
-$string['itemttsquestionvoice'] ='Speaker\'s voice';
+$string['itemttsquestion'] ='TTS prompt text';
+$string['itemttsquestionvoice'] ='TTS prompt speaker';
 $string['itemiframe'] ='iFrame embed code';
 $string['itemtextarea'] = 'Text Block';
 $string['prompt-separate'] ='Text and media separate (recommended)';
@@ -470,7 +481,7 @@ $string['addtextarea'] = 'Add Text Block';
 //showtextprompt
 $string['showtextprompt'] = 'Show text prompt';
 $string['enablesetuptab']="Enable setup tab";
-$string['enablesetuptab_details']="Show a tab containing the activity instance settings to admins. Not super useful in most cases.";
+$string['enablesetuptab_details']="Probably don't check this. It will show a tab containing the activity instance settings to admins. This is for a special use case and minilesson pages will show without headers,footers or blocks.";
 $string['setup']="Setup";
 
 //TTS options
@@ -478,5 +489,8 @@ $string['ttsnormal']='Normal';
 $string['ttsslow']='Slow';
 $string['ttsveryslow']='Very Slow';
 $string['ttsssml']='SSML';
-$string['choosevoiceoption']='Voice Options';
+$string['choosevoiceoption']='TTS prompt options';
 
+$string['reportsmenutoptext'] = "Review grade and attempts details using the report buttons below.";
+
+$string['mediaprompts']="Media Prompts";

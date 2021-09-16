@@ -192,13 +192,12 @@ class grading extends basereport {
         $context = empty($cm) ? \context_course::instance($course->id) : \context_module::instance($cm->id);
         $supergrouper = has_capability('moodle/site:accessallgroups', $context, $USER->id);
 
-        //if we need to show  groups
-        if(!$supergrouper && $groupsmode ==SEPARATEGROUPS) {
-            $groups = groups_get_user_groups($course->id);
-            if (!$groups || empty($groups[0])) {
-                return false;
-            }
-            list($groupswhere, $allparams) = $DB->get_in_or_equal(array_values($groups[0]));
+
+
+        //if we need to show just one groups
+        if($formdata->groupid > 0){
+
+            list($groupswhere, $allparams) = $DB->get_in_or_equal($formdata->groupid);
 
             //if we are not machine grading the SQL is simpler
             $human_sql = "SELECT tu.*, false as fulltranscript  FROM {" . constants::M_USERTABLE . "} tu " .
@@ -216,7 +215,7 @@ class grading extends basereport {
                     " WHERE gm.groupid $groupswhere AND tu.readaloudid=?" .
                     " ORDER BY u.lastnamephonetic,u.firstnamephonetic,u.lastname,u.firstname,u.middlename,u.alternatename,tu.id DESC";
 
-            //if we are not doing groups its easier
+        //if we are not doing groups its easier. Show it all
         }else {
             //init empty params for later
             $allparams = array();

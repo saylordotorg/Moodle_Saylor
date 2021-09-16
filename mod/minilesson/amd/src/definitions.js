@@ -68,7 +68,7 @@ This file contains class and ID definitions.
         qtype_dictation: 'dictation',
         qtype_speechcards: 'speechcards',
         qtype_listenrepeat: 'listenrepeat',
-        qtype_teachertools: 'teachertools',
+        qtype_smartframe: 'smartframe',
         qtype_shortanswer: 'shortanswer',
 
         //running records features
@@ -112,17 +112,19 @@ This file contains class and ID definitions.
             'de-DE': ['Hans','Marlene','Vicki'],
             'en-US': ['Joey','Justin','Matthew','Ivy','Joanna','Kendra','Kimberly','Salli'],
             'en-GB': ['Brian','Amy', 'Emma'],
-            'en-AU': ['Russell','Nicole'],
+            'en-AU': ['Russell','Nicole','Olivia'],
+            'en-NZ': ['Aria'],
+            'en-ZA': ['Ayanda'],
             'en-IN': ['Aditi','Raveena'],
             'en-WL': ["Geraint"],
             'es-US': ['Miguel','Penelope'],
             'es-ES': [ 'Enrique','Conchita','Lucia'],
-            'fr-CA': ['Chantal'],
+            'fr-CA': ['Chantal','Gabrielle'],
             'fr-FR': ['Mathieu','Celine','Léa'],
             'hi-IN': ["Aditi"],
             'it-IT': ['Carla','Bianca','Giorgio'],
             'ja-JP': ['Takumi','Mizuki','Mizuki'],
-            'ko-KR': ['Seoyan'],
+            'ko-KR': ['Seoyeon'],
             'nl-NL': ["Ruben","Lotte"],
             'pt-BR': ['Ricardo','Vitoria'],
             'pt-PT': ["Ines",'Cristiano'],
@@ -130,6 +132,9 @@ This file contains class and ID definitions.
             'tr-TR': ['Filiz'],
             'zh-CN': ['Zhiyu']
         },
+
+        neural_voices: ["Amy","Emma","Brian","Olivia","Aria","Ayanda","Ivy","Joanna","Kendra","Kimberly",
+            "Salli","Joey","Justin","Kevin","Matthew","Camila","Lupe", "Gabrielle", "Vicki", "Seoyeon"]
 
     };//end of return value
 });

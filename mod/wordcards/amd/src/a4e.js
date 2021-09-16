@@ -86,7 +86,7 @@ define([
       return a4e.str_pad_left(minutes, '0', 2) + ':' + a4e.str_pad_left(seconds, '0', 2);
     },
 
-    list_vocab: function(target, terms) {
+    list_vocab: function(target, terms, frontfaceflip) {
 
       //template data
       var tdata = [];
@@ -97,6 +97,7 @@ define([
 
           var cards = $(".a4e-flashcards-container .a4e-card");
           var faces = $(".front,.back");
+
           setTimeout(function() {
             cards.flip({axis:'x'});
             textFit(faces, {

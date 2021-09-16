@@ -240,7 +240,7 @@ class diff {
     // so we could have another go at this if needed
     //
     //returns array of sequences
-    public static function fetchSequences($passage, $transcript, $alternatives, $language) {
+    public static function fetchSequences($passage, $transcript, $alternatives, $language,$transcriptphones=false, $passagephones=false) {
         $p_length = count($passage);
         $t_length = count($transcript);
         $sequences = array();
@@ -260,6 +260,18 @@ class diff {
                 //get words to compare
                 $passageword = $passage[$p_slength + $pstart];
                 $transcriptword = $transcript[$t_slength + $tstart];
+
+                //if we have phones do those here
+                if($passagephones && $transcriptphones &&
+                    isset($passagephones[$p_slength + $pstart]) &&
+                    isset($transcriptphones[$t_slength + $tstart])){
+                    $tphoneword = $transcriptphones[$t_slength + $tstart];
+                    $pphoneword = $passagephones[$p_slength + $pstart];
+                }else{
+                    $tphoneword = false;
+                    $pphoneword = false;
+                }
+
                 $match = false;
 
                 //check for a forward match
@@ -287,7 +299,15 @@ class diff {
                         $forwardmatch = $altsearch_result->forwardmatch;
                         $alt_positions[] = ($p_slength + $pstart);
                     }
-                }//end of if no direct match
+                }//end of alternatives match
+
+                //do a phonetics match .. only JP currently
+                if(!$match && $tphoneword && $pphoneword){
+                    $phone_result= self::phonetics_match($tphoneword,$pphoneword,$language);
+                    if($phone_result){
+                        $match= true;
+                    }
+                } //phonetics match
 
                 //else check for a generous match(eg for english +s and +ed we give it to them)
                 if (!$match) {
@@ -388,6 +408,14 @@ class diff {
         }
         echo $printpassage;
         echo $printtranscript;
+    }
+
+    public static function phonetics_match($pphoneword,$tphoneword,$language) {
+        if(self::mb_strequals($pphoneword,$tphoneword)){
+            return true;
+        }else{
+            return false;
+        }
     }
 
     /*

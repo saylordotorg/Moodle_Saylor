@@ -51,6 +51,8 @@ class awstools {
     const REGION_EUW1 = 'eu-west-1'; //EU (Ireland)
     const REGION_EUW2 = 'eu-west-2'; //EU (London)
     const REGION_SAE1 = 'sa-east-1'; //South America (São Paulo)
+    const REGION_AFS1 = 'af-south-1'; //South Africa
+    const REGION_MES1 = 'me-south-1'; //Middle East (Bahrain)
 
     const URLSTUB_POLLYFILE = 'https://pollyfile.poodll.net';
     const BUCKET_NAME_POLLYFILE = 'amazon-cloudfront-secure-static-site-s3bucketroot-1dw3pilpa7ci3';
@@ -152,6 +154,8 @@ class awstools {
             case self::REGION_EUW2:
             case self::REGION_SAE1:
             case self::REGION_EUC1:
+            case self::REGION_AFS1:
+            case self::REGION_MES1:
             default:
                 $this->pipeline_video ='ffmpegtranscoder';
                 $this->pipeline_audio ='ffmpegtranscoder';
@@ -209,6 +213,12 @@ class awstools {
                 break;
             case 'tokyo':
                 $ret = self::REGION_APN1;
+                break;
+            case 'capetown':
+                $ret = self::REGION_AFS1;
+                break;
+            case 'bahrain':
+                $ret = self::REGION_MES1;
                 break;
             default:
                 //the region might already be good
@@ -496,6 +506,12 @@ class awstools {
         //we will use accelerated uploads for video in eu-west-1 ap-northeast-1 us-east-1 and ap-southeast-2
         if($mediatype=='video'){
             switch($this->region){
+                //some regions do not support accelerated upload ...sad
+                case self::REGION_AFS1:
+                case self::REGION_MES1:
+                    $options['@use_accelerate_endpoint'] = false;
+                    break;
+
                 case self::REGION_EUW1:
                 case self::REGION_EUW2:
                 case self::REGION_APN1:

@@ -39,6 +39,7 @@ $returnurl = optional_param('returnurl', false, PARAM_URL); //returnurl
 $debug  = optional_param('debug', 0, PARAM_INT);
 
 
+
 //paging details
 $paging = new stdClass();
 $paging->perpage = optional_param('perpage',-1, PARAM_INT);
@@ -84,23 +85,26 @@ $event->trigger();
 
 
 $PAGE->set_url(constants::M_URL . '/grading.php',
-    array('id' => $cm->id,'format'=>$format,'action'=>$action,'userid'=>$userid,'attemptid'=>$attemptid,'returnurl'=>$returnurl));
+    array('id' => $cm->id,'format'=>$format,'action'=>$action,
+            'userid'=>$userid,'attemptid'=>$attemptid,'returnurl'=>$returnurl));
 
 /// Set up the page header
 $PAGE->set_title(format_string($moduleinstance->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($modulecontext);
 
-if($config->enablesetuptab){
+if($moduleinstance->foriframe==1) {
     $PAGE->set_pagelayout('embedded');
+}elseif($config->enablesetuptab){
+    $PAGE->set_pagelayout('popup');
 }else{
     $PAGE->set_pagelayout('course');
 }
 
 
 
-
-$PAGE->requires->jquery();
+//20210601 - we probably dont need this ... delete soon
+//$PAGE->requires->jquery();
 
 //This puts all our display logic into the renderer.php files in this plugin
 $renderer = $PAGE->get_renderer(constants::M_COMPONENT);
@@ -120,6 +124,7 @@ switch ($action){
 		$formdata = new stdClass();
 		$formdata->moduleid = $moduleinstance->id;
 		$formdata->modulecontextid = $modulecontext->id;
+        $formdata->groupmenu = true;
 		break;
 
     //list view of attempts and grades and action links for a particular user
@@ -153,6 +158,20 @@ switch ($action){
 5) call $reportrenderer->render_section_html($sectiontitle, $report->name, $report->get_head, $rows, $report->fields);
 */
 
+$groupmenu = '';
+if(isset($formdata->groupmenu)){
+    // fetch groupmode/menu/id for this activity
+    if ($groupmode = groups_get_activity_groupmode($cm)) {
+        $groupmenu = groups_print_activity_menu($cm, $PAGE->url, true);
+        $groupmenu .= ' ';
+        $formdata->groupid = groups_get_activity_group($cm);
+    }else{
+        $formdata->groupid  = 0;
+    }
+}else{
+    $formdata->groupid  = 0;
+}
+
 $report->process_raw_data($formdata, $moduleinstance);
 $reportheading = $report->fetch_formatted_heading();
 
@@ -171,6 +190,7 @@ switch($format){
 
 		echo $renderer->header($moduleinstance, $cm, $mode, null, get_string('grading', constants::M_COMPONENT));
 		echo $extraheader;
+        echo $groupmenu;
 		echo $pagingbar;
 		echo $perpage_selector;
 		echo $reportrenderer->render_section_html($reportheading, $report->fetch_name(), $report->fetch_head(), $reportrows, $report->fetch_fields());

@@ -41,44 +41,58 @@
     <li class="list-group-item course-listitem"
         data-region="course-content"
         data-course-id="{{{id}}}">
-        <div class="row-fluid">
-            <div class="{{#hasprogress}}col-md-6{{/hasprogress}}{{^hasprogress}}col-md-11 col-md-11{{/hasprogress}} d-flex align-items-center">
-                <div>
-                    <div class="text-muted muted d-flex flex-wrap">
-                        <span class="sr-only">
-                            {{#str}}aria:coursecategory, core_course{{/str}}
-                        </span>
-                        <span class="categoryname">
-                            {{{coursecategory}}}
-                        </span>
-                        {{#showshortname}}
-                        <div class="pl-1 pr-1">|</div>
-                        <span class="sr-only">
-                            {{#str}}aria:courseshortname, core_course{{/str}}
-                        </span>
-                        <div>{{{shortname}}}</div>
-                        {{/showshortname}}
+        <div class="d-flex flex-column flex-sm-row">
+            <div class="pl-sm-0 pr-sm-3 py-sm-3 px-3 py-0 flex-grow-1 flex-sm-grow-0 flex-sm-shrink-1">
+                {{! Course thumbnail image }}
+                <a href="{{viewurl}}" tabindex="-1">
+                    <div class="summaryimage rounded-circle mx-auto" style='background-image: url("{{{courseimage}}}");'>
+                        <span class="sr-only">{{#str}}aria:courseimage, core_course{{/str}}</span>
                     </div>
-                    <a href="{{viewurl}}" class="coursename">
-                        <span class="sr-only">
-                            {{#str}}aria:coursename, core_course{{/str}}
-                        </span>
-                        <h3 class="course-title">{{> core_course/favouriteicon }}{{{fullname}}}</h3>
-                    </a>
-                    {{^visible}}
-                        <div class="d-flex flex-wrap">
-                            <span class="tag tag-info">{{#str}} hiddenfromstudents {{/str}}</span>
+                </a>
+            </div>
+            <div class="row-fluid flex-grow-1">
+                <div class="d-flex align-items-center">
+                    <div class="w-100">
+                        <div class="d-flex flex-row justify-content-between">
+                            <div class="text-muted muted d-flex pt-3">
+                                <span class="sr-only">
+                                    {{#str}}aria:coursecategory, core_course{{/str}}
+                                </span>
+                                <span class="categoryname">
+                                    {{{coursecategory}}}
+                                </span>
+                                {{#showshortname}}
+                                <div class="pl-1 pr-1">|</div>
+                                <span class="sr-only">
+                                    {{#str}}aria:courseshortname, core_course{{/str}}
+                                </span>
+                                <div>{{{shortname}}}</div>
+                                {{/showshortname}}
+                            </div>
+                            <div class="pl-2">
+                                {{> block_myoverview/course-action-menu }}
+                            </div>
                         </div>
-                    {{/visible}}
+                        <div class="d-flex flex-nowrap">
+                            <a href="{{viewurl}}" class="coursename">
+                                <span class="sr-only">
+                                    {{#str}}aria:coursename, core_course{{/str}}
+                                </span>
+                                <h3 class="course-title">{{> core_course/favouriteicon }}{{{fullname}}}</h3>
+                            </a>
+                            {{^visible}}
+                                <div class="d-flex flex-wrap">
+                                    <span class="tag tag-info">{{#str}} hiddenfromstudents {{/str}}</span>
+                                </div>
+                            {{/visible}}
+                        </div>
+                    </div>
                 </div>
-            </div>
-            {{#hasprogress}}
-            <div class="col-md-5 pt-1">
-                {{> block_myoverview/progress-bar}}
-            </div>
-            {{/hasprogress}}
-            <div class="col-md-1 p-0 d-flex">
-                {{> block_myoverview/course-action-menu }}
+                {{#hasprogress}}
+                <div class="row-fluid pt-1">
+                    {{> block_myoverview/progress-bar}}
+                </div>
+                {{/hasprogress}}
             </div>
         </div>
     </li>

@@ -25,10 +25,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2020102200;
+$plugin->version   = 2021052000;
 $plugin->requires  = 2016052300;//moodle 3.1.0
 $plugin->component = 'qtype_poodllrecording';
 $plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = '3.1.05(Build 2020102200)';
+$plugin->release   = '3.1.06 (Build 2021052000)';
 $plugin->dependencies = array('filter_poodll' => 2016081401);
 

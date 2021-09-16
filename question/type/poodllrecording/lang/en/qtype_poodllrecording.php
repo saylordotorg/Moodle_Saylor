@@ -54,3 +54,5 @@ $string['timelimit'] = 'Recording time limit';
 $string['privacy:metadata'] = 'The Poodll Recording Question plugin does store personal data.';
 $string['allowedrecorders'] = 'Recorders to enable';
 $string['allowedrecordersdetails'] = '';
+$string['safesave'] = 'SafeSave';
+$string['safesave_details'] = 'Enable Safe Save - disables next-page/finish button until Poodll audio/video recording upload is complete.';

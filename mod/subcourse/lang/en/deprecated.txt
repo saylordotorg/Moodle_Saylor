@@ -1,1 +1,0 @@
-gotocoursename,mod_subcourse

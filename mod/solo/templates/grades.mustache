@@ -55,11 +55,11 @@
         <tr data-history-id="{{id}}" class="history-row">
             <td>{{lastname}}</td>
             <td>{{firstname}}</td>
-            <td class="text-center">{{aiaccuracy}}</td>
-            <td class="text-center">{{words}}</td>
-            <td class="text-center">{{targetwords}}/{{totaltargetwords}}</td>
-            <td class="text-center">{{grader}}</td>
-            <td class="m-0 text-center">{{grade}}</td>
+            <td>{{aiaccuracy}}</td>
+            <td>{{words}}</td>
+            <td>{{targetwords}}/{{totaltargetwords}}</td>
+            <td>{{grader}}</td>
+            <td class="m-0">{{grade}}</td>
             <td>
                 {{#methodrubric}}
                 <a href="gradesubmissions.php?id={{cmid}}&userid={{userid}}&grademethod=rubric">
@@ -73,6 +73,10 @@
                             {{# str }} gradesgrade, mod_solo {{/ str }}
                         </button>&nbsp;</a>
                 {{/methodsimple}}
+                <a href="reports.php?id={{cmid}}&attemptid={{attemptid}}&format=html&report=singleattempt">
+                    <button type="button" class="btn btn-primary">
+                        {{# str }} viewattempt, mod_solo {{/ str }}
+                    </button>&nbsp;</a>
             </td>
         </tr>
     {{/data}}

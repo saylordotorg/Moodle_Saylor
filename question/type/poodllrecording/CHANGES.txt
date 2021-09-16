@@ -1,5 +1,8 @@
 Change List
 =========
+Version 3.1.06 (Build 2021052000)
+- Implemented SafeSave
+
 Version 3.1.05(Build 2020102200)
 -Fixed broken filename save with attempt (bug introduced in v3.1.04 Build 2020101700 )
 

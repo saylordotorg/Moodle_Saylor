@@ -446,7 +446,7 @@ function xmldb_readaloud_upgrade($oldversion) {
     if ($oldversion < 2020121400) {
         $table = new xmldb_table('readaloud');
 
-        //This allows the activity admin to submit raw audio (as opposed to recording). Usually for some sort of disaster recovery
+        //This forces the activity to use AWS transcription (not Poodll transcription). It results in slower but stricter transcription, ie more errors
         $field = new xmldb_field('stricttranscribe', XMLDB_TYPE_INTEGER, '2', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0');
 
         // add field to readaloud table
@@ -499,12 +499,12 @@ function xmldb_readaloud_upgrade($oldversion) {
 
                 //if successful create a set of 'matches' (internal doc matching audio/passage/transcript positions)
                 if($speechmarks) {
-                    $matches = utils::speechmarks_to_matches($readaloud->passage,$speechmarks);
+                    $matches = utils::speechmarks_to_matches($readaloud->passage,$speechmarks,$readaloud->ttslanguage);
                     //from matches create or sync an existing phrase breaks array with audio/word locations
                     if(!empty($readaloud->modelaudiobreaks)){
                         $breaks = utils::sync_modelaudio_breaks(json_decode($readaloud->modelaudiobreaks,true),$matches);
                     }else {
-                        $breaks = utils::guess_modelaudio_breaks($readaloud->passage, $matches);
+                        $breaks = utils::guess_modelaudio_breaks($readaloud->passage, $matches,$readaloud->ttslanguage);
                     }
                     //save it
                     $updatereadaloud = new stdClass();
@@ -538,6 +538,98 @@ function xmldb_readaloud_upgrade($oldversion) {
             }
         }
         upgrade_mod_savepoint(true, 2021033000, 'readaloud');
+    }
+
+    // Add foriframe option to readaloud table
+    if ($oldversion < 2021053100) {
+        $table = new xmldb_table(constants::M_TABLE);
+
+
+        // Define field forframe to be added to readaloud
+        $field= new xmldb_field('foriframe', XMLDB_TYPE_INTEGER, '2', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0);
+
+        // add richtextprompt field to minilesson table
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_mod_savepoint(true, 2021053100, 'readaloud');
+    }
+
+
+    if ($oldversion < 2021061100) {
+        $table = new xmldb_table('readaloud_rsquestions');
+
+        // Adding fields to table tool_dataprivacy_contextlist.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('readaloudid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('name', XMLDB_TYPE_CHAR, '255', XMLDB_UNSIGNED, null, null);
+        $table->add_field('itemorder', XMLDB_TYPE_INTEGER, '10', null, false, null, '0');
+        $table->add_field('type', XMLDB_TYPE_CHAR, '20', XMLDB_UNSIGNED, null, null);
+        $table->add_field('visible', XMLDB_TYPE_INTEGER, '2', null, false, null, '1');
+        $table->add_field('itemtext', XMLDB_TYPE_TEXT, null, null, null, null);
+        $table->add_field('itemtextformat', XMLDB_TYPE_INTEGER, '2', null, false, null, '0');
+        $table->add_field('itemaudiofname', XMLDB_TYPE_TEXT, null, null, null, null);
+        $table->add_field('customtext1', XMLDB_TYPE_TEXT, null, null, null, null);
+        $table->add_field('customtext1format', XMLDB_TYPE_INTEGER, '2', null, false, null);
+        $table->add_field('customtext2', XMLDB_TYPE_TEXT, null, null, null, null);
+        $table->add_field('customtext2format', XMLDB_TYPE_INTEGER, '2', null, false, null);
+        $table->add_field('customtext3', XMLDB_TYPE_TEXT, null, null, null, null);
+        $table->add_field('customtext3format', XMLDB_TYPE_INTEGER, '2', null, false, null);
+        $table->add_field('customtext4', XMLDB_TYPE_TEXT, null, null, null, null);
+        $table->add_field('customtext4format', XMLDB_TYPE_INTEGER, '2', null, false, null);
+        $table->add_field('correctanswer', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('rsquestionkey', XMLDB_TYPE_TEXT, null, null, null, null);
+        $table->add_field('createdby', XMLDB_TYPE_INTEGER, '10', null, null, null);
+        $table->add_field('modifiedby', XMLDB_TYPE_INTEGER, '10', null, null, null);
+
+        // Adding keys to table tool_dataprivacy_contextlist.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+
+        // Conditionally launch create table for tool_dataprivacy_contextlist.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+        upgrade_mod_savepoint(true, 2021061100, 'readaloud');
+    }
+
+    // Add alternatives  to minilesson table
+    if ($oldversion < 2021090100) {
+        $table = new xmldb_table(constants::M_TABLE);
+
+        // Define alternatives field to be added to minilesson
+        $fields=[];
+        $fields[] = new xmldb_field('phonetic', XMLDB_TYPE_TEXT, null, null, null, null);
+
+        // Add fields
+        foreach ($fields as $field) {
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+
+        upgrade_mod_savepoint(true, 2021090100, 'readaloud');
+    }
+
+    // Add alternatives  to minilesson table
+    if ($oldversion < 2021090300) {
+        $table = new xmldb_table(constants::M_TABLE);
+
+        // Define alternatives field to be added to minilesson
+        $fields=[];
+        $fields[] = new xmldb_field('passagesegments', XMLDB_TYPE_TEXT, null, null, null, null);
+
+        // Add fields
+        foreach ($fields as $field) {
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+
+        //create a phonetic for each readaloud instance
+        utils::update_all_phonetic_segments();
+
+        upgrade_mod_savepoint(true, 2021090300, 'readaloud');
     }
 
     // Final return of upgrade result (true, all went good) to Moodle.

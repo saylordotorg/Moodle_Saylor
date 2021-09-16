@@ -23,6 +23,7 @@ const M_AITABLE='solo_ai_result';
 const M_MODNAME='solo';
 const M_URL='/mod/solo';
 const M_CLASS='mod_solo';
+const M_INTRO_CONTAINER = 'mod_intro_box';
 const M_CLASS_ITEMTABLE='mod_solo_attempttable';
 const M_CLASS_TOPICSCONTAINER ='topicscontainer';
 const M_CLASS_TOPICSCHECKBOX = 'topicscheckbox';

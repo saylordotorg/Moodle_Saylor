@@ -1,0 +1,8 @@
+version: '2'
+services:
+  moodle:
+    environment:
+      - ACCREDIBLE_DEV_API_ENDPOINT=http://host.docker.internal:3000/v1/
+    volumes:
+      # Install Accredible plugin by default
+      - '.:/bitnami/moodle/mod/accredible'

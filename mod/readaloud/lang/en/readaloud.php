@@ -13,12 +13,12 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['modulename'] = 'Read Aloud';
-$string['modulenameplural'] = 'Read Alouds';
+$string['modulename'] = 'Poodll ReadAloud';
+$string['modulenameplural'] = 'Poodll ReadAlouds';
 $string['modulename_help'] =
         'ReadAloud is an activity designed to assist teachers in evaluating their students reading fluency. Students read a passage, set by the teacher, into a microphone. Later the teacher can mark words as incorrect and get the student WCPM(Words Correct Per Minute) scores.';
 $string['readaloudfieldset'] = 'Custom example fieldset';
-$string['readaloudname'] = 'Read Aloud';
+$string['readaloudname'] = 'Poodll ReadAloud';
 $string['readaloudname_help'] =
         'This is the content of the help tooltip associated with the readaloudname field. Markdown syntax is supported.';
 $string['readaloud'] = 'readaloud';
@@ -26,8 +26,8 @@ $string['activitylink'] = 'Link to next activity';
 $string['activitylink_help'] =
         'To provide a link after the attempt to another activity in the course, select the activity from the dropdown list.';
 $string['activitylinkname'] = 'Continue to next activity: {$a}';
-$string['pluginadministration'] = 'Read Aloud Administration';
-$string['pluginname'] = 'Read Aloud Activity';
+$string['pluginadministration'] = 'ReadAloud Administration';
+$string['pluginname'] = 'Poodll ReadAloud';
 $string['someadminsetting'] = 'Some Admin Setting';
 $string['someadminsetting_details'] = 'More info about Some Admin Setting';
 $string['someinstancesetting'] = 'Some Instance Setting';
@@ -199,6 +199,8 @@ $string['useast1'] = 'US East';
 $string['tokyo'] = 'Tokyo, Japan';
 $string['sydney'] = 'Sydney, Australia';
 $string['dublin'] = 'Dublin, Ireland';
+$string['capetown'] = 'Capetown, South Africa';
+$string['bahrain'] = 'Bahrain';
 $string['ottawa'] = 'Ottawa, Canada';
 $string['frankfurt'] = 'Frankfurt, Germany';
 $string['london'] = 'London, U.K';
@@ -229,6 +231,8 @@ $string['nl-nl'] = 'Dutch';
 $string['en-ie'] = 'English (Ireland)';
 $string['en-wl'] = 'English (Wales)';
 $string['en-ab'] = 'English (Scotland)';
+$string['en-nz'] = 'English (New Zealand)';
+$string['en-za'] = 'English (South Africa)';
 $string['fa-ir'] = 'Farsi';
 $string['de-ch'] = 'German (Swiss)';
 $string['he-il'] = 'Hebrew';
@@ -243,6 +247,7 @@ $string['tr-tr'] = 'Turkish';
 
 $string['awsregion'] = 'AWS Region';
 $string['region'] = 'AWS Region';
+$string['awsregion_details']='Choose the region closest to you. Your data will stay within that region. Capetown region only supports English and German.';
 $string['expiredays'] = 'Days to keep file';
 $string['aigradenow'] = 'AI Grade';
 
@@ -374,7 +379,7 @@ $string['transcriber_amazontranscribe'] = 'Regular Transcription(AWS): recommend
 $string['transcriber_googlecloud'] = 'Quick Transcription(Google)(audio length < 60s only)';
 
 $string['stricttranscribe'] = 'Strict Transcription';
-$string['stricttranscribemode_details'] = 'By default ReadAloud transcribes generously, particularly in English. Set to strict to get more speech mistakes.';
+$string['stricttranscribemode_details'] = 'By default ReadAloud transcribes generously in English and German. Set to strict to get more speech mistakes for full passage readings in those languages.';
 
 $string['submitrawaudio'] = 'Submit uncompressed audio';
 $string['submitrawaudio_details'] = 'Submitting uncompressed audio may increase transcription accuracy, but at the expense of upload speed and reliability.';
@@ -453,3 +458,59 @@ $string['nopassage']="No Reading Passage";
 $string['addpassage']="Setup Activity";
 $string['waitforpassage']="There is no reading passage set yet for this activity. You will not be able to do the activity until your teacher adds one";
 $string['letsaddpassage']="There is no reading passage set yet for this activity. Lets add one.";
+
+$string['readaloud:itemview'] = 'View questions';
+$string['readaloud:itemedit'] = 'Edit questions';
+
+//rsquestions
+$string['durationgradesettings'] = 'Grade Settings ';
+$string['durationboundary']='{$a}: Completion time less than (seconds)';
+$string['boundarygrade']='{$a}: points ';
+$string['numeric']='Must be numeric ';
+$string['iteminuse']= 'This item is part of users attempt history. It cannot be deleted.';
+$string['moveitemup']='Up';
+$string['moveitemdown']='Down';
+
+//questions
+$string['rsquestions'] ='Questions';
+$string['managersquestions'] ='Manage Questions';
+$string['correctanswer'] ='Correct answer';
+$string['whatdonow'] = 'What would you like to do?';
+$string['addnewitem'] = 'Add a New question';
+$string['addingitem'] = 'Adding a New question';
+$string['editingitem'] = 'Editing a question';
+$string['addtextpromptshortitem']='Add item';
+$string['createaitem'] = 'Create a question';
+$string['edit'] = 'Edit';
+$string['item'] = 'Item';
+$string['itemtitle'] = 'Question Title';
+$string['itemcontents'] = 'Question Description';
+$string['answer'] = 'Answer';
+$string['saveitem'] = 'Save item';
+$string['audioitemfile'] = 'item Audio(MP3)';
+$string['itemname'] = 'Question Name';
+$string['itemorder'] = 'Item Order';
+$string['correct'] = 'Correct';
+$string['itemtype'] = 'Item Type';
+$string['actions'] = 'Actions';
+$string['edititem'] = 'Edit item';
+$string['previewitem'] = 'Preview item';
+$string['deleteitem'] = 'Delete item';
+$string['confirmitemdelete'] = 'Are you sure you want to <i>DELETE</i> item? : {$a}';
+$string['confirmitemdeletetitle'] = 'Really Delete item?';
+$string['noitems'] = 'This quiz contains no questions';
+$string['itemdetails'] = 'item Details: {$a}';
+$string['itemsummary'] = 'item Summary: {$a}';
+$string['iscorrectlabel'] = 'Correct/Incorrect';
+$string['textchoice'] = 'Text Area Choice';
+$string['textboxchoice'] = 'Text Box Choice';
+$string['audioresponse'] = 'Audio response';
+$string['correcttranslationtitle'] = 'Correct Translation';
+$string['shuffleanswers'] = 'Shuffle Answers';
+$string['shufflequestions'] = 'Shuffle Questions';
+$string['correct'] = 'Correct';
+$string['avgcorrect'] = 'Av. Correct';
+$string['avgtotaltime'] = 'Av. Duration';
+$string['nodataavailable'] = 'No data available';
+$string['quiz'] = 'Quiz';
+$string['waiting']='-- waiting --';

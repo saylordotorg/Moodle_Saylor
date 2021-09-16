@@ -45,6 +45,7 @@ class attempthelper
     public function fetch_attempts($userid=false)
     {
         global $DB,$USER;
+
         if(!$userid){
             $userid= $USER->id;
         }
@@ -58,16 +59,51 @@ class attempthelper
         }
     }
 
-    public function fetch_latest_attempt($userid){
-        global $DB;
+    public function fetch_latest_complete_attempt($userid=false){
+        global $DB, $USER;
 
-        $attempts = $DB->get_records(constants::M_ATTEMPTSTABLE,array(constants::M_MODNAME => $this->mod->id,'userid'=>$userid),'id DESC');
+        if(!$userid){
+            $userid = $USER->id;
+        }
+
+        $attempts = $DB->get_records(constants::M_ATTEMPTSTABLE,
+                array(constants::M_MODNAME => $this->mod->id,'userid'=>$userid, 'completedsteps'=>constants::STEP_SELFTRANSCRIBE),
+                'id DESC');
         if($attempts){
             $attempt = array_shift($attempts);
             return $attempt;
         }else{
             return false;
         }
+    }
+
+    public function fetch_latest_attempt($userid=false){
+        global $DB, $USER;
+
+        if(!$userid){
+            $userid = $USER->id;
+        }
+
+        $attempts = $DB->get_records(constants::M_ATTEMPTSTABLE,
+                array(constants::M_MODNAME => $this->mod->id,'userid'=>$userid),
+                'id DESC');
+        if($attempts){
+            $attempt = array_shift($attempts);
+            return $attempt;
+        }else{
+            return false;
+        }
+    }
+
+
+    //fetch a specific attempt
+    public function fetch_specific_attempt($attemptid) {
+        global $DB;
+
+        $attempt = $DB->get_record(constants::M_ATTEMPTSTABLE,
+                array('id'=>$attemptid, 'solo'=>$this->mod->id,'completedsteps'=>constants::STEP_SELFTRANSCRIBE),
+                'timemodified DESC');
+        return $attempt;
     }
 
 

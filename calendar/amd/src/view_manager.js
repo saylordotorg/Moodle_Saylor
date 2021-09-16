@@ -17,7 +17,6 @@
  * A javascript module to handler calendar view changes.
  *
  * @module     core_calendar/view_manager
- * @package    core_calendar
  * @copyright  2017 Andrew Nicols <andrew@nicols.co.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -235,7 +234,9 @@ export const reloadCurrentMonth = (root, courseId = 0, categoryId = 0) => {
 export const refreshDayContent = (root, year, month, day, courseId, categoryId, target = null, template = '') => {
     startLoading(root);
 
-    target = target || root.find(CalendarSelectors.wrapper);
+    if (!target || target.length == 0){
+        target = root.find(CalendarSelectors.wrapper);
+    }
     template = template || root.attr('data-template');
     M.util.js_pending([root.get('id'), year, month, day, courseId, categoryId].join('-'));
     const includenavigation = root.data('includenavigation');

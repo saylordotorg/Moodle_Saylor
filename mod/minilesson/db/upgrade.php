@@ -125,10 +125,11 @@ function xmldb_minilesson_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2021031500, 'minilesson');
     }
     // Add Question TextArea item  to minilesson table
-    if ($oldversion < 2021041500) {
+    if ($oldversion < 2021052200) {
         $table = new xmldb_table(constants::M_QTABLE);
 
         // Define fields itemtts and itemtts voice to be added to minilesson
+        //Item text area was added in 2021041500, but it was missed from install.xml ... so we double check it in this version
         $fields=[];
         $fields[] = new xmldb_field('itemtextarea', XMLDB_TYPE_TEXT, null, null, null, null);
 
@@ -138,7 +139,62 @@ function xmldb_minilesson_upgrade($oldversion) {
                 $dbman->add_field($table, $field);
             }
         }
-        upgrade_mod_savepoint(true, 2021041500, 'minilesson');
+
+       //Some passage hashs seem to be empty. This script will search for empty (and wrong) ones and update them
+        $instances = $DB->get_records(constants::M_TABLE);
+        if($instances){
+            foreach ($instances as $moduleinstance){
+                \mod_minilesson\local\rsquestion\helper::update_all_langmodels($moduleinstance);
+            }
+        }
+        upgrade_mod_savepoint(true, 2021052200, 'minilesson');
+    }
+
+    // Add foriframe option to minilesson table
+    if ($oldversion < 2021053100) {
+        $table = new xmldb_table(constants::M_TABLE);
+
+
+        // Define field itemtts to be added to minilesson
+        $field= new xmldb_field('foriframe', XMLDB_TYPE_INTEGER, '2', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0);
+
+        // add richtextprompt field to minilesson table
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_mod_savepoint(true, 2021053100, 'minilesson');
+    }
+
+    // Add alternatives  to minilesson table
+    if ($oldversion < 2021081801) {
+        $table = new xmldb_table(constants::M_QTABLE);
+
+        // Define alternatives field to be added to minilesson
+        $fields=[];
+        $fields[] = new xmldb_field('alternatives', XMLDB_TYPE_TEXT, null, null, null, null);
+        $fields[] = new xmldb_field('phonetic', XMLDB_TYPE_TEXT, null, null, null, null);
+
+        // Add fields
+        foreach ($fields as $field) {
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+        upgrade_mod_savepoint(true, 2021081801, 'minilesson');
+    }
+
+    // Update all the phonetic fields in minilesson
+    if ($oldversion < 2021082701) {
+
+        //this will add phonetic info for speechy items that have none currently
+        $instances = $DB->get_records(constants::M_TABLE);
+        if($instances){
+            foreach ($instances as $moduleinstance){
+                \mod_minilesson\local\rsquestion\helper::update_all_phonetic($moduleinstance);
+            }
+        }
+
+        upgrade_mod_savepoint(true, 2021082701, 'minilesson');
     }
 
     // Final return of upgrade result (true, all went good) to Moodle.

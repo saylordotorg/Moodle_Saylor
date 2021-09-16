@@ -55,7 +55,8 @@ if ($id) {
 }
 
 $PAGE->set_url(constants::M_URL . '/reports.php',
-        array('id' => $cm->id, 'report' => $showreport, 'format' => $format, 'userid' => $userid, 'attemptid' => $attemptid));
+        array('id' => $cm->id, 'report' => $showreport, 'format' => $format,
+                'userid' => $userid, 'attemptid' => $attemptid));
 require_login($course, true, $cm);
 $modulecontext = context_module::instance($cm->id);
 
@@ -74,10 +75,16 @@ $mod = mod_wordcards_module::get_by_cmid($cm->id);
 $mod->register_module_viewed();
 
 /// Set up the page header
-$PAGE->set_title(format_string($moduleinstance->name));
+$pagetitle = format_string($mod->get_mod()->name, true, $mod->get_course());
+$pagetitle .= ': ' . get_string('reports', constants::M_COMPONENT);
+$PAGE->set_title($pagetitle);
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($modulecontext);
-$PAGE->set_pagelayout('course');
+if($config->enablesetuptab){
+    $PAGE->set_pagelayout('popup');
+}else{
+    $PAGE->set_pagelayout('course');
+}
 $PAGE->requires->jquery();
 
 
@@ -95,7 +102,6 @@ switch ($showreport) {
     //not a true report, separate implementation in renderer
     case 'menu':
         echo $renderer->header();
-        $pagetitle =get_string('reports', constants::M_COMPONENT);
         echo $renderer->heading($pagetitle);
         echo $renderer->navigation($wordcardsmodule , 'reports');
         echo get_string('reportsmenutop', constants::M_COMPONENT);
@@ -117,6 +123,7 @@ switch ($showreport) {
 
         $formdata->modid = $moduleinstance->id;
         $formdata->modulecontextid = $modulecontext->id;
+        $formdata->groupmenu = true;
         break;
 
     case 'userattempts':
@@ -136,6 +143,7 @@ switch ($showreport) {
         $formdata = new stdClass();
         $formdata->modid = $moduleinstance->id;
         $formdata->modulecontextid = $modulecontext->id;
+        $formdata->groupmenu = true;
         break;
 
     default:
@@ -154,6 +162,20 @@ switch ($showreport) {
 3) call $rows=report->fetch_formatted_records($withlinks=true(html) false(print/excel))
 5) call $reportrenderer->render_section_html($sectiontitle, $report->name, $report->get_head, $rows, $report->fields);
 */
+
+$groupmenu = '';
+if(isset($formdata->groupmenu)){
+    // fetch groupmode/menu/id for this activity
+    if ($groupmode = groups_get_activity_groupmode($cm)) {
+        $groupmenu = groups_print_activity_menu($cm, $PAGE->url, true);
+        $groupmenu .= ' ';
+        $formdata->groupid = groups_get_activity_group($cm);
+    }else{
+        $formdata->groupid  = 0;
+    }
+}else{
+    $formdata->groupid  = 0;
+}
 
 $report->process_raw_data($formdata);
 $reportheading = $report->fetch_formatted_heading();
@@ -174,6 +196,7 @@ switch ($format) {
         echo $renderer->heading($pagetitle);
         echo $renderer->navigation($wordcardsmodule, 'reports');
         echo $extraheader;
+        echo $groupmenu;
         echo $pagingbar;
         echo $reportrenderer->render_section_html($reportheading, $report->fetch_name(), $report->fetch_head(), $reportrows,
                 $report->fetch_fields());

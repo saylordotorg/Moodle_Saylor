@@ -75,6 +75,21 @@ if ($ADMIN->fulltree) {
             get_string('enablesetuptab', constants::M_COMPONENT), get_string('enablesetuptab_details',constants::M_COMPONENT), 0));
 
 
+    //show images on flip screen
+    $name = 'showimageflip';
+    $label = get_string('showimagesonflipscreen', constants::M_COMPONENT);
+    $details ="";
+    $default = 1;
+    $settings->add(new admin_setting_configcheckbox(constants::M_COMPONENT . "/$name",
+            $label, $details, $default));
 
+    //front face flip
+    $name = 'frontfaceflip';
+    $label = get_string($name, constants::M_COMPONENT);
+    get_string($name . '_details', constants::M_COMPONENT);
+    $default = constants::M_FRONTFACEFLIP_DEF;
+    $options = utils::fetch_options_fontfaceflip();
+    $settings->add(new admin_setting_configselect(constants::M_COMPONENT . "/$name",
+            $label, $details, $default, $options));
 
 }

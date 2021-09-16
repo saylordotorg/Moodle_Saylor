@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of the Accredible Certificate module for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -32,6 +31,8 @@ $string['additionalactivitiesthree'] = 'This is the name that will appear on the
 $string['autoissueheader'] = 'Automatic issuing criteria';
 $string['apikeylabel'] = 'API key';
 $string['apikeyhelp'] = 'Enter your API key from accredible.com';
+$string['eulabel'] = 'EU (Frankfurt) Server';
+$string['euhelp'] = 'Select if you would like to host data in the EU (Frankfurt) instead of the USA';
 $string['accredible:addinstance'] = 'Add a certificate/badge instance';
 $string['accredible:manage'] = 'Manage a certificate/badge instance';
 $string['accredible:student'] = 'Retrieve a certificate or badge';

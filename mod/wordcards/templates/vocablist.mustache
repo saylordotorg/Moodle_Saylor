@@ -10,16 +10,33 @@
   
     <div class="a4e-card a4e-noselect">
 
-      <div style="background-image: url('{{image}}'); background-repeat: no-repeat; background-position: center;" class="front">
+    {{#frontfacedef}}
+      <div {{#showimageflip}}style="background-image: url('{{image}}'); background-repeat: no-repeat; background-position: center;"{{/showimageflip}}
+              class="wordcards_defcard front">
         {{definition}}
       </div>
-      
-      <div class="back">
-        <button class="play-tts btn btn-secondary btn-sm" data-modelaudio="{{audio}}" data-tts="{{term}}" data-ttsvoice="{{ttsvoice}}">
-          <i class="fa fa-volume-up"></i>
-        </button>
-        {{term}}
+        <div class="wordcards_termcard back">
+            <button class="play-tts btn btn-secondary btn-sm" data-modelaudio="{{audio}}" data-tts="{{term}}" data-ttsvoice="{{ttsvoice}}">
+                <i class="fa fa-volume-up"></i>
+            </button>
+            {{term}}
+        </div>
+    {{/frontfacedef}}
+  {{^frontfacedef}}
+      <div class="wordcards_termcard front">
+          <button class="play-tts btn btn-secondary btn-sm" data-modelaudio="{{audio}}" data-tts="{{term}}" data-ttsvoice="{{ttsvoice}}">
+              <i class="fa fa-volume-up"></i>
+          </button>
+          {{term}}
       </div>
+      <div {{#showimageflip}}style="background-image: url('{{image}}'); background-repeat: no-repeat; background-position: center;"{{/showimageflip}}
+           class="wordcards_defcard back">
+          {{definition}}
+      </div>
+
+  {{/frontfacedef}}
+      
+
       
     </div>
   

@@ -11,6 +11,11 @@ Feature: Checklists export without warnings or errors
       | fullname | shortname |
       | Course 1 | C1        |
       | Course 2 | C2        |
+    And the following "activities" exist:
+      | activity  | name             | course | section | idnumber |
+      | checklist | Test checklist 1 | C1     | 1       | CHK001   |
+      | checklist | Test checklist 2 | C1     | 1       | CHK002   |
+      | checklist | Test checklist 3 | C2     | 1       | CHK003   |
     And the following "course enrolments" exist:
       | course | user     | role           |
       | C1     | student1 | student        |
@@ -18,16 +23,6 @@ Feature: Checklists export without warnings or errors
       | C1     | teacher1 | editingteacher |
       | C2     | student1 | student        |
       | C2     | teacher1 | editingteacher |
-    And I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I turn editing mode on
-    And I add a "Checklist" to section "1" and I fill the form with:
-      | Checklist | Test checklist 1 |
-    And I add a "Checklist" to section "1" and I fill the form with:
-      | Checklist | Test checklist 2 |
-    And I am on "Course 2" course homepage
-    And I add a "Checklist" to section "1" and I fill the form with:
-      | Checklist | Test checklist 3 |
     And the following items exist in checklist "Test checklist 1":
       | text   |
       | Item 1 |
@@ -61,6 +56,7 @@ Feature: Checklists export without warnings or errors
       | Item 8   | yes         |
 
   Scenario: The teacher exports the checklist
+    Given I log in as "teacher1"
     When I am on "Course 1" course homepage
     And I navigate to "Export > Checklist" in the course gradebook
     And I set the following fields to these values:

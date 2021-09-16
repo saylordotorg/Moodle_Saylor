@@ -15,22 +15,30 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Language strings.
  * @package   atto_linkadv
  * @author    Mark Sharp <m.sharp@chi.ac.uk>
- * @copyright 2017 University of Chichester {@link www.chi.ac.uk}
+ * @copyright 2017 University of Chichester {@link https://www.chi.ac.uk}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['browserepositories'] = 'Browse repositories...';
-$string['createlink'] = 'Create link';
-$string['enterurl'] = 'Enter a URL';
-$string['openinnewwindow'] = 'Open in new window';
-$string['pluginname'] = 'LinkAdv';
-$string['unlink'] = 'Unlink';
-$string['enterid'] = 'Enter an ID';
-$string['enterclass'] = 'Enter a class';
-$string['link'] = 'Link';
 $string['advanced'] = 'Advanced';
+
+$string['browserepositories'] = 'Browse repositories...';
+
+$string['createlink'] = 'Create link';
+
+$string['enterclass'] = 'Enter a class';
+$string['enterid'] = 'Enter an ID';
+$string['enterurl'] = 'Enter a URL';
+
+$string['link'] = 'Link';
+
+$string['openinnewwindow'] = 'Open in new window';
+
+$string['pluginname'] = 'LinkAdv';
 $string['privacy:metadata'] = 'The atto_linkadv plugin does not store any personal data.';
+
+$string['unlink'] = 'Unlink';

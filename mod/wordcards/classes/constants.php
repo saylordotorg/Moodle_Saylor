@@ -24,6 +24,10 @@ const M_PLUGINSETTINGS ='/admin/settings.php?section=modsettingwordcards';
 //  const CLOUDPOODLL = 'http://localhost/moodle';
 const CLOUDPOODLL = 'https://cloud.poodll.com';
 
+const M_FRONTFACEFLIP_DEF = 0;
+const M_FRONTFACEFLIP_TERM = 1;
+
+
 //grading options
 const M_GRADEHIGHEST= 0;
 const M_GRADELOWEST= 1;

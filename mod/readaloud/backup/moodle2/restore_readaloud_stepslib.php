@@ -46,6 +46,11 @@ class restore_readaloud_activity_structure_step extends restore_activity_structu
         $oneactivity = new restore_path_element(constants::M_MODNAME, '/activity/readaloud');
         $paths[] = $oneactivity;
 
+        //rsquestions
+        $rsquestions = new restore_path_element(constants::M_QTABLE,
+                '/activity/readaloud/rsquestions/rsquestion');
+        $paths[] = $rsquestions;
+
         // End here if no-user data has been selected
         if (!$userinfo) {
             return $this->prepare_activity_structure($paths);
@@ -82,6 +87,20 @@ class restore_readaloud_activity_structure_step extends restore_activity_structu
         $newitemid = $DB->insert_record(constants::M_TABLE, $data);
         // immediately after inserting "activity" record, call this
         $this->apply_activity_instance($newitemid);
+    }
+
+    protected function process_readaloud_rsquestions($data) {
+        global $DB;
+
+        $data = (object)$data;
+        $oldid = $data->id;
+
+        $data->timemodified = $this->apply_date_offset($data->timemodified);
+
+
+        $data->{constants::M_MODNAME .'id'} = $this->get_new_parentid(constants::M_MODNAME);
+        $newquestionid = $DB->insert_record(constants::M_QTABLE, $data);
+        $this->set_mapping(constants::M_QTABLE, $oldid, $newquestionid, true); // Mapping with files
     }
 
     protected function process_readaloud_attempt($data) {
@@ -129,9 +148,19 @@ class restore_readaloud_activity_structure_step extends restore_activity_structu
         $this->add_related_files(constants::M_COMPONENT, 'passage', null);
         $this->add_related_files(constants::M_COMPONENT, 'feedback', null);
 
+        //question stuff
+        //do question areas
+        $this->add_related_files(constants::M_COMPONENT, constants::TEXTQUESTION_FILEAREA, constants::M_QTABLE);
+
+        //do answer areas
+        for($anumber=1;$anumber<=constants::MAXANSWERS;$anumber++) {
+            $this->add_related_files(constants::M_COMPONENT, constants::TEXTANSWER_FILEAREA . $anumber, constants::M_QTABLE);
+        }
+
+
         $userinfo = $this->get_setting_value('userinfo'); // are we including userinfo?
         if ($userinfo) {
-            $this->add_related_files(constants::M_COMPONENT, constants::M_FILEAREA_SUBMISSIONS, constants::M_USERTABLE);
+           // $this->add_related_files(constants::M_COMPONENT, constants::M_FILEAREA_SUBMISSIONS, constants::M_USERTABLE);
         }
     }
 }

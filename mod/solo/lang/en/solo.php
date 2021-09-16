@@ -17,7 +17,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['modulename'] = 'Poodll Solo';
 $string['modulenameplural'] = 'Poodll Solo';
-$string['modulename_help'] = 'Poodll Solo is an activity designed to give students conversation practice and feedback. Students record their conversation, transcribe their own speech and receive feedback on their work.';
+$string['modulename_help'] = 'Poodll Solo is an activity designed to give students speaking practice. Students record themselves speaking about a topic, transcribe their own speech and receive feedback on their work.';
 $string['solofieldset'] = 'Custom example fieldset';
 $string['soloname'] = 'Poodll Solo';
 $string['soloname_help'] = 'This is the content of the help tooltip associated with the soloname field. Markdown syntax is supported.';
@@ -26,7 +26,7 @@ $string['activitylink'] = 'Link to next activity';
 $string['activitylink_help'] = 'To provide a link after the attempt to another activity in the course, select the activity from the dropdown list.';
 $string['activitylinkname'] = 'Continue to next activity: {$a}';
 $string['pluginadministration'] = 'Poodll Solo Administration';
-$string['pluginname'] = 'Poodll Solo Activity';
+$string['pluginname'] = 'Poodll Solo';
 $string['someadminsetting'] = 'Some Admin Setting';
 $string['someadminsetting_details'] = 'More info about Some Admin Setting';
 $string['someinstancesetting'] = 'Some Instance Setting';
@@ -118,6 +118,8 @@ $string['london'] = 'London, U.K';
 $string['saopaulo'] = 'Sao Paulo, Brazil';
 $string['singapore'] = 'Singapore';
 $string['mumbai'] = 'Mumbai, India';
+$string['capetown'] = 'Capetown, South Africa';
+$string['bahrain'] = 'Bahrain';
 
 $string['forever'] = 'Never expire';
 
@@ -217,7 +219,6 @@ $string['moveattemptdown']='Down';
 $string['attempts'] ='Attempts';
 $string['manageattempts'] ='Manage Attempts';
 $string['correctanswer'] ='Correct answer';
-$string['letsgetstarted'] = 'Lets have a conversation';
 $string['addnewattempt'] = 'Add a New attempt';
 $string['addingattempt'] = 'Adding a New attempt';
 $string['editingattempt'] = 'Editing a attempt';
@@ -246,7 +247,7 @@ $string['attemptdetails'] = 'attempt Details: {$a}';
 $string['attemptsummary'] = 'attempt Summary: {$a}';
 $string['viewreport'] = 'view report';
 
-$string['addrecordconversation'] = 'Record Conversation';
+$string['addrecordconversation'] = 'Record your speech';
 $string['adduserselections'] = 'User Selections';
 $string['addselftranscribe'] = 'Self Transcribe';
 
@@ -314,7 +315,7 @@ $string['choosetopic'] = 'Choose Topic';
 $string['topicinstructions']='Add or edit topics. Custom topics will only be available here. Course level topics will be available course wide. Selected topics will be available for students to choose from in this activity. ';
 
 $string['userselections'] = 'User Selection';
-$string['selftranscribe'] = 'Transcribe Conversation';
+$string['selftranscribe'] = 'Transcribe your speech';
 $string['transcriptscompare'] = 'Compare Transcriptions';
 $string['comparetranscripts'] = 'Compare Transcriptions';
 $string['saveitem'] = 'Save';
@@ -335,13 +336,13 @@ $string['attempt_partone_title'] = '1: Prepare to Speak';
 $string['attempt_parttwo'] = '2: Record';
 $string['attempt_partthree'] = '3: Transcribe';
 $string['attempt_partfour'] = '4: Review';
-$string['attempt_partone_instructions'] = 'Choose your partners, topic, target words and target speaking time from the options below. When you are ready, move to the next page and begin your conversation';
-$string['attempt_parttwo_instructions'] = 'Use the recorder below to record your conversation. Try to use the target words. Good luck.';
-$string['attempt_partthree_instructions'] = 'Listen to your conversation and enter what you said into the conversation editor below. Do not change what you said, when you type it.';
-$string['attempt_partfour_instructions'] = 'Compare your conversation transcript, to the automatically generated transcript. Are there many differences? Could you improve your speaking? Enter your self review in the text fields below.';
+$string['attempt_partone_instructions'] = 'Choose your partners, topic, target words and target speaking time from the options below. When you are ready, move to the next page and begin speaking';
+$string['attempt_parttwo_instructions'] = 'Use the recorder below to record yourself. Try to use the target words. Good luck.';
+$string['attempt_partthree_instructions'] = 'Listen to your recording and enter what you said in the editor below. Do not change what you said, when you type it.';
+$string['attempt_partfour_instructions'] = 'Compare the transcript you entered, to the automatically generated transcript. Are there many differences? Could you improve your speaking? Enter your self review in the text fields below.';
 
-$string['savesubtitles'] = 'Save Conversation';
-$string['removesubtitles'] = 'Remove Conversation';
+$string['savesubtitles'] = 'Save Speech';
+$string['removesubtitles'] = 'Remove Speech';
 $string['addnew'] = 'Add new';
 $string['stepback'] = 'Step back';
 $string['stepahead'] = 'Step ahead';
@@ -373,10 +374,10 @@ $string['idnumber']= 'ID-number';
 
 
 $string['audiorecording']= 'Audio Recording';
-$string['summaryuserattemptheadertitle']= '(Attempt: {$a}) Conversation Details';
+$string['summaryuserattemptheadertitle']= '(Attempt: {$a}) Speech Details';
 $string['summaryuserattemptheaderintro']= '';
-$string['summaryheadertitle']= 'Your Conversation Details';
-$string['summaryheaderintro']= 'Check the details and the results of your conversation below. How do you think? You should be getting better each time.';
+$string['summaryheadertitle']= 'Your Speech Details';
+$string['summaryheaderintro']= 'Check the details and the results of your speech below. What do you think? You should be getting better each time.';
 $string['leaveedittopic']= 'Edit (diff. activity)';
 $string['fonticonexplanation']= 'Add an icon graphic to represent the topic. Use FontAwesome for this. The pattern is fa-xxx where xxx is the icon name. Search for icons at: <a href="https://fontawesome.com/v4.7.0/icons">https://fontawesome.com/v4.7.0/icons</a>';
 
@@ -573,3 +574,7 @@ $string['nosetup']="Activity is Not Ready";
 $string['addsetup']="Setup Activity";
 $string['waitforsetup']="There is no topic set yet for this activity. You will not be able to do the activity until your teacher adds one";
 $string['letsaddsetup']="There is no topic set yet for this activity. Lets add one.";
+$string['noattemptfound']= "That attempt could be found";
+$string['viewattempt']= "View";
+$string['attemptfor']= 'Attempt: {$a}';
+$string['audioandstats']="Audio and Stats";

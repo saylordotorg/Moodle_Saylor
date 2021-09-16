@@ -165,8 +165,8 @@ switch($type){
         );
         break;
 
-    case constants::TYPE_TEACHERTOOLS:
-        $mform = new \mod_minilesson\local\rsquestion\teachertoolsform(null,
+    case constants::TYPE_SMARTFRAME:
+        $mform = new \mod_minilesson\local\rsquestion\smartframeform(null,
                 array('editoroptions'=>$editoroptions,
                         'filemanageroptions'=>$filemanageroptions,
                         'moduleinstance'=>$minilesson)
@@ -203,8 +203,10 @@ if ($data = $mform->get_data()) {
         }else{
             $olditem=false;
         }
-        $data->passagehash = \mod_minilesson\local\rsquestion\helper::update_create_langmodel($moduleinstance,$olditem,$data);
+        $data->passagehash = \mod_minilesson\local\rsquestion\helper::update_create_langmodel($minilesson,$olditem,$data);
 
+        //lets update the phonetics
+        $data->phonetic = \mod_minilesson\local\rsquestion\helper::update_create_phonetic($minilesson,$olditem,$data);
 
 		$result = \mod_minilesson\local\rsquestion\helper::update_insert_question($minilesson,$data,$edit,$context,$cm,$editoroptions,$filemanageroptions);
 		if($result->error==true){
@@ -253,6 +255,9 @@ if ($edit) {
             $data->addiframe = 0;
         }
         if(!empty($data->{constants::QUESTIONTEXTAREA})){
+            $edoptions = constants::ITEMTEXTAREA_EDOPTIONS;
+            $data = file_prepare_standard_editor($data, constants::QUESTIONTEXTAREA, $edoptions, $context, constants::M_COMPONENT,
+                    constants::TEXTQUESTION_FILEAREA, $data->itemid);
             $data->addtextarea = 1;
         }else{
             $data->addtextarea = 0;
@@ -288,7 +293,7 @@ if ($edit) {
         case constants::TYPE_SPEECHCARDS:
         case constants::TYPE_LISTENREPEAT:
         case constants::TYPE_PAGE:
-        case constants::TYPE_TEACHERTOOLS:
+        case constants::TYPE_SMARTFRAME:
         case constants::TYPE_SHORTANSWER:
 		default:
 	}

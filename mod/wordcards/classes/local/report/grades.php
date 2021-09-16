@@ -123,17 +123,10 @@ class grades extends basereport {
         $supergrouper = has_capability('moodle/site:accessallgroups', $context, $USER->id);
 
 
-        //if no groups, or can see all groups then the SQL is simple
-        if($supergrouper || $groupsmode !=SEPARATEGROUPS) {
-            $alldata = $DB->get_records(constants::M_ATTEMPTSTABLE, array('modid' => $formdata->modid), 'timecreated DESC');
+        //if need to partition to groups, SQL for groups
+        if($formdata->groupid > 0){
 
-         //if need to partition to groups, SQL for groups
-        }else{
-            $groups = groups_get_user_groups($course->id);
-            if (!$groups || empty($groups[0])) {
-                return false;
-            }
-            list($groupswhere, $allparams) = $DB->get_in_or_equal(array_values($groups[0]));
+            list($groupswhere, $allparams) = $DB->get_in_or_equal($formdata->groupid);
 
             $allsql ="SELECT att.* FROM {".constants::M_ATTEMPTSTABLE ."} att " .
               "INNER JOIN {groups_members} gm ON att.userid=gm.userid " .
@@ -141,6 +134,10 @@ class grades extends basereport {
               "ORDER BY timecreated DESC";
             $allparams[]=$formdata->modid;
             $alldata = $DB->get_records_sql($allsql, $allparams);
+        }else{
+            //if no groups, or can see all groups then the SQL is simple
+            $alldata = $DB->get_records(constants::M_ATTEMPTSTABLE, array('modid' => $formdata->modid), 'timecreated DESC');
+
         }
 
         //loop through data an attemptcount and latestattempts

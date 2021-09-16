@@ -1,4 +1,6 @@
-define(['jquery', 'jqueryui', 'core/log', 'filter_poodll/utils_amd', 'filter_poodll/anim_progress_bar', 'filter_poodll/speech_poodll', 'filter_poodll/dlg_devicesettings', 'filter_poodll/upskin_bar'], function ($, jqui, log, utils, anim_progress_bar, browserrecognition, settings, upskin_bar) {
+define(['jquery', 'jqueryui', 'core/log', 'filter_poodll/utils_amd', 'filter_poodll/anim_progress_bar',
+    'filter_poodll/speech_poodll', 'filter_poodll/dlg_devicesettings', 'filter_poodll/upskin_bar'],
+    function ($, jqui, log, utils, anim_progress_bar, browserrecognition, settings, upskin_bar) {
     /* jshint ignore:start */
 
     "use strict"; // jshint ;_;
@@ -278,15 +280,16 @@ define(['jquery', 'jqueryui', 'core/log', 'filter_poodll/utils_amd', 'filter_poo
             controls += '<div class="modal-box poodll_mediarecorderbox_onetwothree one-two-three-wrap" id="' + controlbarid + '">';
             controls += '<div class="style-holder ' + skin_style + '">';
             var status = this.fetch_status_bar('onetwothree');
-            controls += status,
-                controls += '<div class="hp_slide" id="slide_' + controlbarid + '">';
+            controls += status;
+            controls += '<div class="hp_slide" id="slide_' + controlbarid + '">';
             controls += '<div class="hp_timer"></div><canvas class="hp_range"></canvas></div>';
-            controls += preview,
-                controls += '<div class="settingsicon" id="settingsicon_' + controlbarid + '"><button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal"><i class="fa fa-cogs" aria-hidden="true"></i></button></div>';
-            controls += '<button type="button" class="poodll_mediarecorder_button_onetwothree poodll_start-recording_onetwothree"><i class="fa fa-microphone" aria-hidden="true"></i></button> ';
+            controls += preview;
+            controls += '<div class="settingsicon" id="settingsicon_' + controlbarid + '"><button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal"><i class="fa fa-cogs" aria-hidden="true"></i></button></div>';
+            if(mediatype == 'video'){var recicon='video-camera';}else{recicon='microphone';}
+            controls += '<button type="button" class="poodll_mediarecorder_button_onetwothree poodll_start-recording_onetwothree"><i class="fa fa-'+ recicon +'" aria-hidden="true"></i></button> ';
             controls += '<button type="button" class="poodll_mediarecorder_button_onetwothree poodll_stop-recording_onetwothree pmr_disabled" style="display: none;" disabled><i class="fa fa-stop" aria-hidden="true"></i></button>';
             controls += '<button type="button" class="poodll_mediarecorder_button_onetwothree poodll_pause-recording_onetwothree pmr_disabled" style="display: none;" disabled><i class="fa fa-pause" aria-hidden="true"></i></button>';
-            controls += ' <button type="button" class="poodll_mediarecorder_button_onetwothree poodll_resume-recording_onetwothree pmr_disabled" style="display: none;" disabled><i class="fa fa-microphone" aria-hidden="true"></i></button>';
+            controls += ' <button type="button" class="poodll_mediarecorder_button_onetwothree poodll_resume-recording_onetwothree pmr_disabled" style="display: none;" disabled><i class="fa fa-'+ recicon +'" aria-hidden="true"></i></button>';
             controls += '<button type="button" class="poodll_mediarecorder_button_onetwothree poodll_play-recording_onetwothree pmr_disabled" disabled><i class="fa fa-play" aria-hidden="true"></i></button> ';
             controls += '<button type="button" class="poodll_mediarecorder_button_onetwothree poodll_stop-playing_onetwothree pmr_disabled" style="display: none;" disabled><i class="fa fa-stop" aria-hidden="true"></i></button>';
             controls += '<button type="button" class="poodll_mediarecorder_button_onetwothree poodll_save-recording_onetwothree pmr_disabled" disabled><i class="fa fa-upload" aria-hidden="true"></i></button>';

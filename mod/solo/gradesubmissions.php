@@ -33,10 +33,6 @@ use mod_solo\grades\gradesubmissions as gradesubmissions;
 
 global $DB;
 
-// Page level constants
-// Min and max number of grades to display on a page; 0 based.
-define('MIN_GRADE_DISPLAY', 0);
-define('MAX_GRADE_DISPLAY', 3);
 
 // Page classes
 $gradesubmissions = new gradesubmissions();
@@ -45,6 +41,7 @@ $gradesubmissions = new gradesubmissions();
 $id = required_param('id', PARAM_INT);
 $userid = required_param('userid', PARAM_INT);
 $grademethod = required_param('grademethod', PARAM_TEXT);
+
 // Course and course module data.
 $cm = get_coursemodule_from_id(constants::M_MODNAME, $id, 0, false, IGNORE_MISSING);
 $course = $DB->get_record('course', array('id' => $cm->course), '*', IGNORE_MISSING);
@@ -56,16 +53,41 @@ require_capability('mod/solo:grades', $modulecontext);
 $PAGE->set_url(constants::M_URL . '/gradesubmissions.php',array('id'=>$id,'userid'=>$userid,'grademethod'=>$grademethod));
 require_login($course, true, $cm);
 
+// fetch groupmode/menu/id for this activity
+$groupmenu = '';
+if ($groupmode = groups_get_activity_groupmode($cm)) {
+    $groupmenu = groups_print_activity_menu($cm, $PAGE->url, true);
+    $groupmenu .= ' ';
+    $groupid = groups_get_activity_group($cm);
+}else{
+    $groupid  = 0;
+}
+
+
 // Get student grade data - all students who completed an attempt
-$studentlist = $gradesubmissions->getStudentsToGrade($moduleinstance);
+$studentlist = $gradesubmissions->getStudentsToGrade($moduleinstance,$groupid);
 //get pages of 3 students (array of 3 userids) and the current students page number
-list($pagesofstudents,$currentstudentpage) = $gradesubmissions->getPageOfStudents($studentlist,$userid);
+$perpage=1;
+list($pagesofstudents,$currentstudentpage) = $gradesubmissions->getPageOfStudents($studentlist,$userid,$perpage);
+
 //get the page of students (array od f 3 student ids) for current student
-$students = $pagesofstudents[$currentstudentpage];
+$students=[];
+if(count($pagesofstudents)>0){
+    if(array_key_exists($currentstudentpage,$pagesofstudents)) {
+        $students = $pagesofstudents[$currentstudentpage];
+    }else{
+        $students = $pagesofstudents[0];
+    }
+}
+
 //if there are fewer than 3 students, pad the array with X empty strings
-$studentsToGrade = new ArrayIterator(array_pad($students, MAX_GRADE_DISPLAY, ''));
+$studentsToGrade = new ArrayIterator(array_pad($students, $perpage, ''));
 //get all enroled students for the course
-$submissionCandidates = get_enrolled_users($modulecontext, 'mod/solo:submit');
+if($groupid>0) {
+    $submissionCandidates =  groups_get_members($groupid);
+}else{
+    $submissionCandidates = get_enrolled_users($modulecontext, 'mod/solo:submit');
+}
 // Select students in page in drop down list.
 array_walk($submissionCandidates, function ($candidate) use ($studentlist) {
     if (in_array($candidate->id, $studentlist, true)) {
@@ -77,7 +99,17 @@ $submissionCandidates = new ArrayIterator($submissionCandidates);
 $PAGE->set_title(format_string($moduleinstance->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($modulecontext);
-$PAGE->set_pagelayout('course');
+
+//Get an admin settings
+$config = get_config(constants::M_COMPONENT);
+if($config->enablesetuptab){
+    $PAGE->set_pagelayout('popup');
+}else{
+    $PAGE->set_pagelayout('course');
+}
+
+
+
 $PAGE->requires->jquery();
 
 // Render template and display page.
@@ -99,5 +131,6 @@ $gradesrenderer =
     );
 
 echo $renderer->header($moduleinstance, $cm, "gradesubmissions");
+echo $groupmenu;
 echo $gradesrenderer;
 echo $renderer->footer();

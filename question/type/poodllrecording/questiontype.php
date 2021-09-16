@@ -89,6 +89,9 @@ class qtype_poodllrecording extends question_type {
 		}else{
 			$options->timelimit=0;
 		}
+
+		//quiz safe save
+        $options->safesave = $formdata->safesave;
 	
         $options->responseformat = $formdata->responseformat;
 		$options->graderinfo = $this->import_or_save_files($formdata->graderinfo,
@@ -190,7 +193,7 @@ class qtype_poodllrecording extends question_type {
     		"responseformat",
     		"responsefieldlines","attachments",
     		"graderinfo","graderinfoformat",
-    		"qresource","boardsize", "timelimit");
+    		"qresource","boardsize", "timelimit","safesave");
     		
         return $tableinfo;
     }
@@ -276,6 +279,8 @@ class qtype_poodllrecording extends question_type {
                 array('#', 'boardsize', 0, '#'), '320x320');
 		$qo->timelimit = $format->getpath($q,
                 array('#', 'timelimit', 0, '#'), 0);
+        $qo->safesave = $format->getpath($q,
+                array('#', 'safesave', 0, '#'), 0);
         
 
         return $qo;

@@ -157,7 +157,7 @@ class aigrade {
     //transcripts become ready in their own time, if they're ready update data and DB,
     // if not just report that back
     public function fetch_transcripts() {
-        global $DB;
+        global $DB, $CFG;
         $success = false;
         $transcript = false;
         $fulltranscript = false;
@@ -178,11 +178,30 @@ class aigrade {
         if ($fulltranscript) {
             $record = new \stdClass();
             $record->id = $this->recordid;
-            $record->transcript = diff::cleanText($transcript);
+            $cleantranscript = diff::cleanText($transcript);
+
+            switch (substr($this->activitydata->ttslanguage,0,2)){
+                case 'en':
+                    //find digits in original passage, and convert number words to digits in the target passage
+                    $cleantranscript=alphabetconverter::words_to_numbers_convert($this->activitydata->passagesegments,$cleantranscript );
+                    break;
+                case 'de':
+                    //find eszetts in original passage, and convert ss words to eszetts in the target passage
+                    $cleantranscript=alphabetconverter::ss_to_eszett_convert($this->activitydata->passagesegments,$cleantranscript );
+                    break;
+
+                case 'ja':
+                    //probably needs segmented transcript, more testing needed here and from external
+                    $cleantranscript=alphabetconverter::words_to_suji_convert($this->activitydata->passagesegments,$transcript);
+                    break;
+
+            }
+
+            $record->transcript = $cleantranscript;
             $record->fulltranscript = $fulltranscript;
             $success = $DB->update_record(constants::M_AITABLE, $record);
 
-            $this->aidata->transcript = $transcript;
+            $this->aidata->transcript = $cleantranscript;
             $this->aidata->fulltranscript = $fulltranscript;
         }
         return $success;
@@ -201,10 +220,12 @@ class aigrade {
         *
         */
         list($sessionmatches,$sessionendword,$sessionerrors,$errorcount,$debugsequences) =
-                utils::fetch_diff($this->activitydata->passage,
+                utils::fetch_diff($this->activitydata->passagesegments,
                         $this->activitydata->alternatives,
                         $this->aidata->transcript,
                         $this->aidata->fulltranscript,
+                        $this->activitydata->ttslanguage,
+                        $this->activitydata->phonetic,
                         $debug);
 
         //session time

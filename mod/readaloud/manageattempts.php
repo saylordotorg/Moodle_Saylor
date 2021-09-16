@@ -48,14 +48,6 @@ require_login($course, false, $cm);
 $context = context_module::instance($cm->id);
 require_capability('mod/readaloud:manageattempts', $context);
 
-//set up the page object
-/*
-$PAGE->set_title(format_string($moduleinstance->name));
-$PAGE->set_heading(format_string($course->fullname));
-$PAGE->set_context($context);
-$PAGE->set_pagelayout('course');
-*/
-
 //is the attempt if OK?
 if ($action == 'delete' && $attemptid > 0) {
     $attempt = $DB->get_record(constants::M_USERTABLE, array('id' => $attemptid, 'readaloudid' => $cm->instance), '*', MUST_EXIST);

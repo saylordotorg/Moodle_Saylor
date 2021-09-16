@@ -42,7 +42,9 @@ class renderer extends \plugin_renderer_base {
         $this->page->set_heading($this->page->course->fullname);
         $output = $this->output->header();
 
-        $output .= $this->output->heading($activityname);
+        //show (or not) title
+        $output .= $this->fetch_title($moduleinstance, $activityname);
+
         if (has_capability('mod/minilesson:evaluate', $context)) {
             //   $output .= $this->output->heading_with_help($activityname, 'overview', constants::M_COMPONENT);
 
@@ -56,6 +58,16 @@ class renderer extends \plugin_renderer_base {
 
 
         return $output;
+    }
+
+    public function fetch_title($moduleinstance, $title){
+        $displaytext='';
+        //dont show the heading in an iframe, it will be outside this anyway
+        if(!$moduleinstance->foriframe) {
+            $thetitle = $this->output->heading($title, 3, 'main');
+            $displaytext = \html_writer::div($thetitle, constants::M_CLASS . '_center');
+        }
+        return $displaytext;
     }
 
     /**
@@ -85,7 +97,8 @@ class renderer extends \plugin_renderer_base {
         $this->page->set_heading($this->page->course->fullname);
         $output = $this->output->header();
 
-        $output .= $this->output->heading($activityname);
+        //show (or not) title
+        $output .= $this->fetch_title($moduleinstance, $activityname);
 
         return $output;
     }
@@ -93,8 +106,13 @@ class renderer extends \plugin_renderer_base {
     /**
      * Return HTML to display limited header
      */
-    public function notabsheader(){
-        return $this->output->header();
+    public function notabsheader($moduleinstance){
+        $activityname = format_string($moduleinstance->name, true, $moduleinstance->course);
+        $output = $this->output->header();
+        //show (or not) title
+        $output .= $this->fetch_title($moduleinstance, $activityname);
+
+        return $output;
     }
     /**
      * Return a message that something is not right

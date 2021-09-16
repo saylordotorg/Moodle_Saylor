@@ -114,6 +114,7 @@ define(['jquery', 'core/log', 'mod_readaloud/definitions'], function($, log, def
           var wordnumber = parseInt($(this).attr('data-wordnumber'));
           var nearest_start_break = false;
           for (var i = 0; i < that.breaks.length; i++) {
+            debugger;
             if (that.breaks[i].wordnumber < wordnumber) {
               nearest_start_break = that.breaks[i];
             } else {

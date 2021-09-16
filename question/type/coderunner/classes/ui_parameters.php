@@ -111,15 +111,16 @@ class qtype_coderunner_ui_parameters {
      * already have a key, ignore it. Otherwise an exception is raised.
      */
     public function merge_json($json, $ignorebad=false) {
-        if (!empty($json)) {
-            $newvalues = json_decode($json);
+        $newvalues = json_decode($json);
+        if ($newvalues !== null) {  // If $json is valid.
             foreach ($newvalues as $key => $value) {
                 $matchingkey = $this->find_key($key);
                 if ($matchingkey === null) {
                     if ($ignorebad) {
                         continue;
                     } else {
-                        throw new qtype_coderunner_exception('Unexpected key value when merging json');
+                        throw new qtype_coderunner_exception(
+                            "Unexpected key value ($key) when merging json for ui {$this->uiname}");
                     }
                 }
                 $this->params[$matchingkey]->value = $value;

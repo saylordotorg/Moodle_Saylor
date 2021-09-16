@@ -1,0 +1,14 @@
+<div class='mod_readaloud_smallreport_cont mod_readaloud_center'>
+    <div class='mod_readaloud_smallreport_heading'>
+        {{#ready}}{{#str}}evaluatedmessage , mod_readaloud{{/str}}{{/ready}}
+        {{^ready}}{{#str}}notgradedyet , mod_readaloud{{/str}}{{/ready}}
+    </div>
+    {{> mod_readaloud/smallreportplayer}}
+    {{> mod_readaloud/smallreportstars}}
+    <div class='mod_readaloud_smallreport_status'>
+        {{^ready}}{{#str}}waiting , mod_readaloud{{/str}}{{/ready}}
+    </div>
+    <div class='mod_readaloud_smallreport_fullreportbutton {{^ready}}hide{{/ready}}'>
+        {{{fullreportbutton}}}
+    </div>
+</div>

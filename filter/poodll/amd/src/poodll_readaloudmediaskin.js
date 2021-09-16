@@ -122,8 +122,18 @@ define(['jquery', 'jqueryui', 'core/log', 'filter_poodll/utils_amd', 'filter_poo
                         ip.controlbar.status.hide();
                         self.disable_button(ip.controlbar.startbutton);
                         self.enable_button(ip.controlbar.testbutton);
+                        self.disable_button(ip.controlbar.placeholderbutton);
                         self.disable_button(ip.controlbar.stopbutton);
                         self.therecanim.clear();
+                        break;
+
+                    case 'testingmode':
+
+                        ip.controlbar.status.hide();
+                        self.disable_button(ip.controlbar.startbutton);
+                        self.disable_button(ip.controlbar.testbutton);
+                        self.enable_button(ip.controlbar.placeholderbutton);
+                        self.disable_button(ip.controlbar.stopbutton);
                         break;
 
                     case 'readymode':
@@ -131,6 +141,7 @@ define(['jquery', 'jqueryui', 'core/log', 'filter_poodll/utils_amd', 'filter_poo
                         ip.controlbar.status.hide();
                         self.enable_button(ip.controlbar.startbutton);
                         self.disable_button(ip.controlbar.testbutton);
+                        self.disable_button(ip.controlbar.placeholderbutton);
                         self.disable_button(ip.controlbar.stopbutton);
                         self.therecanim.clear();
                         break;
@@ -139,6 +150,8 @@ define(['jquery', 'jqueryui', 'core/log', 'filter_poodll/utils_amd', 'filter_poo
                         //when testing(timer off) we do not want the stop button. Just really recording and allowearlyexit
                         if (ip.config.allowearlyexit == "1" && ip.timer.enabled) {
                             self.enable_button(ip.controlbar.stopbutton);
+                        }else{
+                            self.enable_button(ip.controlbar.placeholderbutton);
                         }
                         self.disable_button(ip.controlbar.startbutton);
                         ip.controlbar.status.hide();
@@ -147,6 +160,7 @@ define(['jquery', 'jqueryui', 'core/log', 'filter_poodll/utils_amd', 'filter_poo
                     case 'aftermode':
                         self.disable_button(ip.controlbar.startbutton);
                         self.disable_button(ip.controlbar.stopbutton);
+                        self.disable_button(ip.controlbar.placeholderbutton);
                         ip.controlbar.status.show();
 
                         break;
@@ -192,6 +206,7 @@ define(['jquery', 'jqueryui', 'core/log', 'filter_poodll/utils_amd', 'filter_poo
                 controls += '<canvas id="' + controlbarid + '_playcanvas" width="250" height="120"></canvas>';
                 controls += '<button type="button" class="poodll_mediarecorder_button_readaloud poodll_start-recording_readaloud">' + ss_startlabel + '</button>';
                 controls += '<button type="button" class="poodll_mediarecorder_button_readaloud poodll_test-recording_readaloud">' + ss_testlabel + '</button>';
+                controls += '<button type="button" class="poodll_mediarecorder_button_readaloud poodll_testing-placeholder_readaloud" style="background-color: #CCCCCC;">' + ss_testlabel  + '</button>';
                 controls += '<button type="button" class="poodll_mediarecorder_button_readaloud poodll_stop-recording_readaloud">' + ss_stoplabel + '</button>';
                 controls += status,
                     controls += '</div></div></div>';
@@ -206,6 +221,7 @@ define(['jquery', 'jqueryui', 'core/log', 'filter_poodll/utils_amd', 'filter_poo
                     preview: $('#' + controlbarid + ' .poodll_preview_readaloud'),
                     startbutton: $('#' + controlbarid + ' .poodll_start-recording_readaloud'),
                     testbutton: $('#' + controlbarid + ' .poodll_test-recording_readaloud'),
+                    placeholderbutton: $('#' + controlbarid + ' .poodll_testing-placeholder_readaloud'),
                     stopbutton: $('#' + controlbarid + ' .poodll_stop-recording_readaloud'),
                     playcanvas: $('#' + controlbarid + '_playcanvas')
                 };
@@ -246,6 +262,8 @@ define(['jquery', 'jqueryui', 'core/log', 'filter_poodll/utils_amd', 'filter_poo
                     ip.config.hermes.disable();
                     ip.timer.disable();
 
+
+
                     var testover = function () {
                         //stop recording
                         pmr.do_stop_audio(ip);
@@ -254,8 +272,9 @@ define(['jquery', 'jqueryui', 'core/log', 'filter_poodll/utils_amd', 'filter_poo
                         if (recanim.sounddetected) {
                             self.set_visual_mode('readymode', controlbarid);
                         }
-                    }
+                    };
                     pmr.do_start_audio(ip, onMediaSuccess);
+                    self.set_visual_mode('testingmode', controlbarid);
                     setTimeout(testover, 4000);
                 });
 

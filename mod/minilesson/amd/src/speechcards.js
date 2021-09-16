@@ -26,13 +26,14 @@ define(['jquery', 'jqueryui', 'core/log', 'core/ajax', 'mod_minilesson/definitio
       console.log(itemdata);
 
       var app = {
-        passmark: 85,
+        passmark: 90,
         pointer: 1,
         jsondata: null,
         props: null,
         dryRun: false,
         language: 'en-US',
         terms: [],
+        phonetics: [],
         displayterms: [],
         results: [],
         controls: {},
@@ -42,6 +43,7 @@ define(['jquery', 'jqueryui', 'core/log', 'core/ajax', 'mod_minilesson/definitio
           //init terms
           for (var i = 0; i < itemdata.sentences.length; i++) {
             app.terms[i] = itemdata.sentences[i].sentence;
+            app.phonetics[i] = itemdata.sentences[i].phonetic;
             app.displayterms[i] = itemdata.sentences[i].displaysentence;
           }
           log.debug("app terms", app.terms);
@@ -103,35 +105,38 @@ define(['jquery', 'jqueryui', 'core/log', 'core/ajax', 'mod_minilesson/definitio
               case 'speech':
                 log.debug("speech at speechcards");
                 var speechtext = message.capturedspeech;
-                var cleanspeechtext = quizhelper.cleanText(speechtext);
-
-                var spoken = cleanspeechtext;
-                var correct = app.terms[app.pointer - 1];
+                var spoken_clean  = quizhelper.cleanText(speechtext);
+                var correct_clean = quizhelper.cleanText(app.terms[app.pointer - 1]);
+                var correctphonetic = app.phonetics[app.pointer - 1];
 log.debug('speechtext:',speechtext);
-log.debug('spoken:',spoken);
-log.debug('correct:',correct);
+log.debug('spoken:',spoken_clean);
+log.debug('correct:',correct_clean);
                 //Similarity check by character matching
-                var similarity = quizhelper.similarity(spoken, correct);
-                log.debug('JS similarity: ' + spoken + ':' + correct + ':' + similarity);
+                var similarity_js = quizhelper.similarity(spoken_clean, correct_clean);
+                log.debug('JS similarity: ' + spoken_clean + ':' + correct_clean + ':' + similarity_js);
 
                 //Similarity check by direct-match/acceptable-mistranscription
-                if (similarity >= app.passmark ||
-                  app.wordsDoMatch(cleanspeechtext, app.terms[app.pointer - 1])) {
-                  log.debug('local match:' + ':' + spoken + ':' + correct);
+                if (similarity_js >= app.passmark ||
+                  app.wordsDoMatch(spoken_clean, correct_clean)) {
+                  log.debug('local match:' + ':' + spoken_clean + ':' + correct_clean);
                   app.showStarRating(100);
                   app.flagCorrectAndTransition();
                   return;
                 }
 
                 //Similarity check by phonetics(ajax)
-                quizhelper.checkByPhonetic(spoken, correct, app.language).then(function(similarity) {
-                  if (similarity === false) {
+                quizhelper.checkByPhonetic(correct_clean, spoken_clean, correctphonetic, app.language).then(function(similarity_php) {
+                  if (similarity_php === false) {
                     return $.Deferred().reject();
                   } else {
-                    log.debug('PHP similarity: ' + spoken + ':' + correct + ':' + similarity);
-                    app.showStarRating(similarity);
-                    if (similarity >= app.passmark) {
-                      app.flagCorrectAndTransition();
+                    log.debug('PHP similarity: ' + spoken_clean + ':' + correct_clean + ':' + similarity_php);
+
+                    if (similarity_php >= app.passmark) {
+                        app.showStarRating(similarity_php);
+                        app.flagCorrectAndTransition();
+                    }else{
+                        //show the greater of the ratings
+                        app.showStarRating(Math.max(similarity_js,similarity_php));
                     }
                   } //end of if check_by_phonetic result
                 }); //end of check by phonetic
@@ -204,10 +209,10 @@ log.debug('correct:',correct);
         showStarRating: function(similarity) {
           //how many stars code
           var stars = [true, true, true];
-          if (similarity < 1) {
+          if (similarity < app.passmark) {
             stars = [true, true, false];
           }
-          if (similarity < app.passmark) {
+          if (similarity < .75) {
             stars = [true, false, false];
           }
           if (similarity < 0.5) {

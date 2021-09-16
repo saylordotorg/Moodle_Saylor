@@ -319,5 +319,54 @@ function xmldb_wordcards_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020111001, 'wordcards');
     }
 
+    // Add foriframe option to wordcards table
+    if ($oldversion < 2021053100) {
+        $table = new xmldb_table('wordcards');
+
+
+        // Define field foriframe to be added to wordcards
+        $field= new xmldb_field('foriframe', XMLDB_TYPE_INTEGER, '2', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0);
+
+        // add foriframe field to wordcards table
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_mod_savepoint(true, 2021053100, 'wordcards');
+    }
+
+    // Add showimagesonflip option to wordcards table, and phonetics to terms table
+    if ($oldversion < 2021083100) {
+        $table = new xmldb_table('wordcards');
+
+        // Define field showimagesonflip to be added to wordcards
+        $fields=[];
+        $fields[]= new xmldb_field('showimageflip', XMLDB_TYPE_INTEGER, '2', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 1);
+        $fields[]= new xmldb_field('frontfaceflip', XMLDB_TYPE_INTEGER, '2', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0);
+
+        // add showimagesonflip field to wordcards table
+        // Add fields
+        foreach ($fields as $field) {
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+
+        $table = new xmldb_table('wordcards_terms');
+
+        //  Define fields phonetic and phoneticms to be added to wordcards
+        $fields=[];
+        $fields[] = new xmldb_field('phonetic', XMLDB_TYPE_TEXT, null, null, null, null);
+        $fields[] = new xmldb_field('phoneticms', XMLDB_TYPE_TEXT, null, null, null, null);
+
+        // Add fields
+        foreach ($fields as $field) {
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+
+        upgrade_mod_savepoint(true, 2021083100, 'wordcards');
+    }
+
     return true;
 }

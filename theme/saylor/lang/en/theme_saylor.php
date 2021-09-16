@@ -24,6 +24,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['activitynavnext'] = 'Next';
+$string['activitynavprev'] = 'Previous';
 $string['advancedsettings'] = 'User Alerts';
 $string['bannerdescription'] = 'Build new skills or work toward a degree at your own pace with free Saylor Academy college courses.';
 $string['backgroundimage'] = 'Background image';
@@ -54,6 +56,7 @@ $string['privacy:metadata:preference:draweropennav'] = 'The user\'s preference f
 $string['privacy:drawernavclosed'] = 'The current preference for the navigation drawer is closed.';
 $string['privacy:drawernavopen'] = 'The current preference for the navigation drawer is open.';
 $string['tab-alerts'] = 'User Alerts';
+$string['togglecompletion'] = 'Mark as complete:';
 $string['totop'] = 'Go to top';
 $string['signupidps'] = 'Create a new account using:';
 $string['logintext'] = 'Log in or Sign up';

@@ -535,7 +535,7 @@ function solo_grade_item_update($moduleinstance, $grades=null) {
     require_once($CFG->dirroot.'/lib/gradelib.php');
 
     $params = array('itemname' => $moduleinstance->name);
-    if (array_key_exists('cmidnumber', $moduleinstance)) {
+    if (array_key_exists('cmidnumber', (array)$moduleinstance)) {
         $params['idnumber'] = $moduleinstance->cmidnumber;
     }
 
@@ -845,10 +845,11 @@ function solo_get_completion_state($course,$cm,$userid,$type) {
 
     // Get  module details
     $moduleinstance = $DB->get_record(constants::M_TABLE, array('id' => $cm->instance), '*', MUST_EXIST);
+    $attempthelper = new \mod_solo\attempthelper($cm);
 
     // If completion option is enabled, evaluate it and return true/false
     if($moduleinstance->completionallsteps) {
-        $latestattempt = utils::fetch_latest_attempt($moduleinstance);
+        $latestattempt = $attempthelper->fetch_latest_attempt();
         if ($latestattempt && $latestattempt->completedsteps == constants::STEP_SELFTRANSCRIBE){
             return true;
         }else{

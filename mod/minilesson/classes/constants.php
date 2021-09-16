@@ -19,6 +19,7 @@ const M_TABLE='minilesson';
 const M_ATTEMPTSTABLE='minilesson_attempt';
 const M_AITABLE='minilesson_ai_result';
 const M_QTABLE='minilesson_rsquestions';
+const M_CORRECTPHONES_TABLE = 'minilesson_correctphones';
 const M_MODNAME='minilesson';
 const M_URL='/mod/minilesson';
 const M_PATH='/mod/minilesson';
@@ -30,6 +31,9 @@ const M_STATE_INCOMPLETE=0;
 const M_NOITEMS_CONT= 'mod_minilesson_noitems_cont';
 const M_ITEMS_CONT= 'mod_minilesson_items_cont';
 const M_ITEMS_TABLE= 'mod_minilesson_qpanel';
+
+const M_NEURALVOICES = array("Amy","Emma","Brian","Olivia","Aria","Ayanda","Ivy","Joanna","Kendra","Kimberly",
+        "Salli","Joey","Justin","Kevin","Matthew","Camila","Lupe", "Gabrielle", "Vicki", "Seoyeon");
 
 
 //grading options
@@ -60,7 +64,7 @@ const TYPE_DICTATIONCHAT = 'dictationchat';
 const TYPE_DICTATION = 'dictation';
 const TYPE_SPEECHCARDS = 'speechcards';
 const TYPE_LISTENREPEAT = 'listenrepeat';
-const TYPE_TEACHERTOOLS = 'teachertools';
+const TYPE_SMARTFRAME = 'smartframe';
 const TYPE_SHORTANSWER = 'shortanswer';
 
 const AUDIOFNAME = 'itemaudiofname';
@@ -91,6 +95,8 @@ const MAXANSWERS=4;
 const MAXCUSTOMTEXT=5;
 const MAXCUSTOMDATA=5;
 const MAXCUSTOMINT=5;
+
+const ITEMTEXTAREA_EDOPTIONS =array('trusttext' => 0,'noclean'=>1, 'maxfiles' => 0);
 
 const SHOWTEXTPROMPT = 'customint1';
 const TEXTPROMPT_WORDS = 1;
@@ -179,6 +185,8 @@ const M_NOITEMS_MSG='mod_minilesson_noitems_msg';
 const M_LANG_ENUS = 'en-US';
 const M_LANG_ENGB = 'en-GB';
 const M_LANG_ENAU = 'en-AU';
+const M_LANG_ENNZ = 'en-NZ';
+const M_LANG_ENZA = 'en-ZA';
 const M_LANG_ENIN = 'en-IN';
 const M_LANG_ESUS = 'es-US';
 const M_LANG_ESES = 'es-ES';

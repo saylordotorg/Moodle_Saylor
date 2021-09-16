@@ -17,13 +17,14 @@ class constants {
     const M_TABLE = 'readaloud';
     const M_USERTABLE = 'readaloud_attempt';
     const M_AITABLE = 'readaloud_ai_result';
+    const M_QTABLE = 'readaloud_rsquestions';
     const M_MODNAME = 'readaloud';
     const M_URL = '/mod/readaloud';
 
     const M_PLUGINSETTINGS = '/admin/settings.php?section=modsettingreadaloud';
 
-    const M_NEURALVOICES = array("Amy","Emma","Brian","Ivy","Joanna","Kendra","Kimberly",
-            "Salli","Joey","Justin","Kevin","Matthew","Camila","Lupe");
+    const M_NEURALVOICES = array("Amy","Emma","Brian","Olivia","Aria","Ayanda","Ivy","Joanna","Kendra","Kimberly",
+            "Salli","Joey","Justin","Kevin","Matthew","Camila","Lupe", "Gabrielle", "Vicki", "Seoyeon");
 
     //classes for use in CSS
     const M_CLASS = 'mod_readaloud';
@@ -32,6 +33,23 @@ class constants {
     const REC_READALOUD = 'readaloud';
     const REC_ONCE = 'once';
     const REC_UPLOAD = 'upload';
+
+    //Constants for RS Questions
+    const NONE=0;
+    const MAXANSWERS=4;
+    const TEXTQUESTION = 'itemtext';
+    const TEXTANSWER = 'customtext';
+    const TEXTQUESTION_FILEAREA = 'itemarea';
+    const TEXTANSWER_FILEAREA ='answerarea';
+    const TEXTPROMPT_FILEAREA = 'textitem';
+    const TYPE_TEXTPROMPT_LONG = 4;
+    const TYPE_TEXTPROMPT_SHORT = 5;
+    const TYPE_TEXTPROMPT_AUDIO = 6;
+    const TYPE_INSTRUCTIONS = 7;
+    const TEXTCHOICE = 'textchoice';
+    const TEXTBOXCHOICE = 'textboxchoice';
+    const CORRECTANSWER = 'correctanswer';
+
 
 
     //grading options
@@ -145,6 +163,8 @@ class constants {
     const M_LANG_ENUS = 'en-US';
     const M_LANG_ENGB = 'en-GB';
     const M_LANG_ENAU = 'en-AU';
+    const M_LANG_ENNZ = 'en-NZ';
+    const M_LANG_ENZA = 'en-ZA';
     const M_LANG_ENIN = 'en-IN';
     const M_LANG_ESUS = 'es-US';
     const M_LANG_ESES = 'es-ES';
