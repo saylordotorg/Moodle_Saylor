@@ -139,7 +139,7 @@ class restore_minilesson_activity_structure_step extends restore_activity_struct
 		
 		 $userinfo = $this->get_setting_value('userinfo'); // are we including userinfo?
 		 if($userinfo){
-			//$this->add_related_files(constants::M_COMPONENT, constants::M_FILEAREA_SUBMISSIONS, constants::M_ATTEMPTSTABLE);
+			$this->add_related_files(constants::M_COMPONENT, constants::M_FILEAREA_SUBMISSIONS, constants::M_ATTEMPTSTABLE);
 
          }
     }

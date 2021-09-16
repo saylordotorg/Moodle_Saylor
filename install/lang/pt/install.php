@@ -36,6 +36,7 @@ $string['chooselanguagesub'] = 'Selecione o idioma a utilizar durante a instala�
 $string['clialreadyconfigured'] = 'O ficheiro config.php já existe. Use \'admin/cli/install_database.php\' para instalar o Moodle para este site.';
 $string['clialreadyinstalled'] = 'O ficheiro config.php já existe, use admin/cli/install_database.php para atualizar o Moodle para este site.';
 $string['cliinstallheader'] = 'Programa para instalação do Moodle <b>{$a}</b> através da linha de comandos';
+$string['clitablesexist'] = 'A instalação através da linha de comandos (CLI) não pode continuar porque a base de dados já contém as tabelas a criar.';
 $string['databasehost'] = 'Servidor da base de dados';
 $string['databasename'] = 'Nome da base de dados';
 $string['databasetypehead'] = 'Escolha o <i>driver</i> da base de dados';
@@ -54,7 +55,7 @@ $string['pathserrcreatedataroot'] = 'O programa de instalação não conseguiu c
 $string['pathshead'] = 'Confirmar caminhos';
 $string['pathsrodataroot'] = 'A pasta de dados não tem permissões de escrita.';
 $string['pathsroparentdataroot'] = 'A pasta ascendente <b>{$a->parent}</b> não tem permissões de escrita. O programa de instalação não conseguiu criar a pasta <b>{$a->dataroot}</b>.';
-$string['pathssubadmindir'] = 'Alguns servidores Web utilizam a pasta <strong>admin</strong> em URLs especiais de acesso a funcionalidades especiais, como é o caso de painéis de controlo. Algumas situações podem criar conflitos com a localização normal das páginas de administração do Moodle. Estes problemas podem ser resolvidos renomeando a pasta <strong>admin</strong> na instalação do Moodle e indicando aqui o novo nome a utilizar. Por exemplo:<br /><br /><b>moodleadmin</b><br /><br />Esta ação resolverá os problemas de acesso das hiperligações para as funcionalidades de administração do Moodle.';
+$string['pathssubadmindir'] = 'Alguns servidores Web utilizam a pasta <strong>admin</strong> em URLs especiais de acesso a funcionalidades especiais, como é o caso de painéis de controlo. Algumas situações podem criar conflitos com a localização normal das páginas de administração do Moodle. Estes problemas podem ser resolvidos renomeando a pasta <strong>admin</strong> na instalação do Moodle e indicando aqui o novo nome a utilizar. Exemplo:<br /><br /><b>moodleadmin</b><br /><br />Esta ação resolverá os problemas de acesso das hiperligações para as funcionalidades de administração do Moodle.';
 $string['pathssubdataroot'] = '<p>Pasta onde o Moodle irá armazenar todo o conteúdo de ficheiros enviados pelos utilizadores.</p>
 <p>Esta pasta deve ser legível e gravável pelo utilizador do servidor web (geralmente \'www-data\', \'nobody\', ou \'apache\').</p>
 <p>Não deve ser acessível diretamente através da web.</p>

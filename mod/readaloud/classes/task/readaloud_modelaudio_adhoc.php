@@ -91,6 +91,8 @@ class readaloud_modelaudio_adhoc extends \core\task\adhoc_task {
                             $activity->alternatives,
                             $transcript,
                             $fulltranscript,
+                            $activity->ttslanguage,
+                            $activity->phonetic,
                             $debug);
 
 
@@ -99,7 +101,7 @@ class readaloud_modelaudio_adhoc extends \core\task\adhoc_task {
             $transcript_update->modelaudiotrans = diff::cleanText($transcript);
             $transcript_update->modelaudiofulltrans = $fulltranscript;
             $transcript_update->modelaudiomatches = json_encode($ma_matches);
-            $breaks = utils::guess_modelaudio_breaks($activity->passage,$ma_matches);
+            $breaks = utils::guess_modelaudio_breaks($activity->passage,$ma_matches,$activity->ttslanguage);
             $transcript_update->modelaudiobreaks = json_encode($breaks);
             $success = $DB->update_record(constants::M_TABLE, $transcript_update);
             return;

@@ -172,6 +172,7 @@ $expand-green-900:     #009400 !default;
 // Theme variables
 $primary:       $primary-light-blue;
 $secondary:     $primary-orange !default;
+$tertiary:      $primary-dark-blue !default;
 $success:       $expand-green-900 !default;
 $info:          $expand-teal-700 !default;
 $warning:       $expand-yellow-700 !default;
@@ -236,6 +237,7 @@ $theme-colors: () !default;
 $theme-colors: map-merge((
     primary: $primary,
     secondary: $secondary,
+    tertiary: $tertiary,
     success: $success,
     info: $info,
     warning: $warning,

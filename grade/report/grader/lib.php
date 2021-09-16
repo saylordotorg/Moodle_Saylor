@@ -684,7 +684,10 @@ class grade_report_grader extends grade_report {
         $headerrow->attributes['class'] = 'heading';
 
         $studentheader = new html_table_cell();
-        $studentheader->attributes['class'] = 'header';
+        // The browser's scrollbar may partly cover (in certain operative systems) the content in the student header
+        // when horizontally scrolling through the table contents (most noticeable when in RTL mode).
+        // Therefore, add slight padding on the left or right when using RTL mode.
+        $studentheader->attributes['class'] = "header pl-3";
         $studentheader->scope = 'col';
         $studentheader->header = true;
         $studentheader->id = 'studentheader';
@@ -745,6 +748,10 @@ class grade_report_grader extends grade_report {
                 $icon = $OUTPUT->pix_icon('i/enrolmentsuspended', $suspendedstring);
                 $usercell->text .= html_writer::tag('span', $icon, array('class'=>'usersuspendedicon'));
             }
+            // The browser's scrollbar may partly cover (in certain operative systems) the content in the user cells
+            // when horizontally scrolling through the table contents (most noticeable when in RTL mode).
+            // Therefore, add slight padding on the left or right when using RTL mode.
+            $usercell->attributes['class'] .= ' pl-3';
 
             $userrow->cells[] = $usercell;
 
@@ -1662,9 +1669,10 @@ class grade_report_grader extends grade_report {
         }
 
         $name = $element['object']->get_name();
+        $nameunescaped = $element['object']->get_name(false);
         $describedbyid = uniqid();
         $courseheader = html_writer::tag('span', $name, [
-            'title' => $name,
+            'title' => $nameunescaped,
             'class' => 'gradeitemheader',
             'aria-describedby' => $describedbyid
         ]);

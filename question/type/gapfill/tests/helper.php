@@ -146,9 +146,17 @@ class qtype_gapfill_test_helper extends question_test_helper {
      * @param array $poptions
      * @return qtype_gapfill
      */
-    public static function make_question($questiontext = "The [cat] sat on the [mat]",
-        $poptions = ['noduplicates' => 0,
-            'disableregex' => 0, 'delimitchars' => '[]']) {
+    public static function make_question($questiontext = "The [cat] sat on the [mat]", array $poptions =[]) {
+
+        $options = [
+            'noduplicates' => $poptions['noduplicates'] ?? 0,
+            'disableregex' => $poptions['disableregex'] ?? 0,
+            'optionsaftertext' => $poptions['optionsaftertext'] ?? false,
+            'delimitchars' => $poptions['delimitchars'] ?? '[]',
+            'singleuse' => $poptions['singleuse'] ?? false,
+            'answerdisplay' => $poptions['answerdisplay'] ?? 'dragdrop'
+        ];
+
         $type = 'gapfill';
         question_bank::load_question_definition_classes($type);
         $question = new qtype_gapfill_question();
@@ -156,7 +164,7 @@ class qtype_gapfill_test_helper extends question_test_helper {
         test_question_maker::initialise_a_question($question);
 
         $question->qtype = question_bank::get_qtype('gapfill');
-        $answerwords = $question->qtype->get_gaps($poptions['delimitchars'], $questiontext);
+        $answerwords = $question->qtype->get_gaps($options['delimitchars'], $questiontext);
 
         $question->places = array();
 
@@ -173,15 +181,15 @@ class qtype_gapfill_test_helper extends question_test_helper {
                 'id' => $id,
             );
         }
-        $options = (object) [
+        $questionoptions = (object) [
             'id' => '117',
             'question' => '163',
             'layout' => '0',
-            'answerdisplay' => 'dragdrop',
+            'answerdisplay' => $options['answerdisplay'],
             'delimitchars' => '[]',
             'casesensitive' => false,
             'noduplicates' => '1',
-            'disableregex' => $poptions['disableregex'],
+            'disableregex' => $options['disableregex'],
             'fixedgapsize' => '0',
             'optionaftertext' => '',
             'letterhints' => '1',
@@ -191,8 +199,8 @@ class qtype_gapfill_test_helper extends question_test_helper {
             'partiallycorrectfeedbackformat' => '0',
             'incorrectfeedback' => 'Incorrect Feedback',
             'incorrectfeedbackformat' => '0',
-            'optionsaftertext' => false,
-            'singleuse' => false,
+            'optionsaftertext' => $options['optionsaftertext'],
+            'singleuse' => $options['singleuse'],
             'answers' => $answers,
         ];
 
@@ -219,13 +227,11 @@ class qtype_gapfill_test_helper extends question_test_helper {
             'defaultmark' => '1.0000000',
             'penalty' => '0.3333333',
             'maxmark' => '1.00000',
-            'options' => $options,
+            'options' => $questionoptions
         ];
 
         $question = $question->qtype->make_question($questiondata);
         $question->gapstofill = count($answerwords);
-        $question->disableregex = $poptions['disableregex'];
-        $question->noduplicates = $poptions['noduplicates'];
         return $question;
     }
 

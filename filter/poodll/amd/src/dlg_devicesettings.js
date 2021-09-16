@@ -32,6 +32,11 @@ define(['jquery', 'core/log', 'filter_poodll/dlg_poodll'], function ($, log, dia
             this.dlg.set_dialogue_box(dlgbox);
 
         },
+        set_media_type: function (mediatype) {
+            //used by screen recorder skin to overide default media type in order to not show video
+            this.mediatype = mediatype;
+
+        },
         open: function () {
             var self = this;
             var ip = this.instanceprops;
@@ -67,7 +72,7 @@ define(['jquery', 'core/log', 'filter_poodll/dlg_poodll'], function ($, log, dia
                     //register events for the select boxes
                     self.registerEvents();
 
-                    if (self.instanceprops.config.mediatype == 'video') {
+                    if (self.mediatype == 'video') {
                         self.dlg.onclose = function () {
                             self.resetVideoUserInterface();
                         };

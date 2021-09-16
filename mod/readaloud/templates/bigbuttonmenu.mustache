@@ -1,0 +1,35 @@
+<div class="mod_readaloud_menubuttons_cont">
+    <div>
+        <div id='mod_readaloud_button_startpreview' class='mode-chooser preview {{#nopreview}}no-show{{/nopreview}}' {{^nopreview}}tabindex='0'{{/nopreview}}>
+            <div class='mode-chooser-label'>
+            <b>{{#str}}previewreading , mod_readaloud{{/str}}</b>:
+                {{#str}}previewhelp , mod_readaloud{{/str}}
+            </div>
+        </div>
+    </div>
+    <div>
+        <div id='mod_readaloud_button_startlandr' class='mode-chooser landr {{#noaudiobreaks}}no-click{{/noaudiobreaks}} {{#nolandr}}no-show{{/nolandr}}' {{^nolandr}}tabindex='0'{{/nolandr}}>
+            <div class='mode-chooser-label'>
+                <b>{{#str}}landrreading , mod_readaloud{{/str}}</b>:
+                {{#str}}landrhelp , mod_readaloud{{/str}}
+                {{#noaudiobreaks}}{{#str}}modelaudiowarning , mod_readaloud{{/str}}{{/noaudiobreaks}}
+            </div>
+        </div>
+    </div>
+    <div>
+        <div id='mod_readaloud_button_startshadow' class='mode-chooser readaloudshadow {{#noshadow}}no-show{{/noshadow}}' {{^noshadow}}tabindex='0'{{/noshadow}}>
+            <div class='mode-chooser-label'>
+                <b>{{#str}}startshadowreading , mod_readaloud{{/str}}</b>:
+                {{#str}}shadowhelp , mod_readaloud{{/str}}
+            </div>
+        </div>
+    </div>
+    <div>
+        <div id='mod_readaloud_button_startnoshadow' class='mode-chooser readaloud {{#cantattempt}}no-click{{/cantattempt}}' {{^cantattempt}}tabindex='0'{{/cantattempt}}>
+            <div class='mode-chooser-label'>
+                <b>{{#str}}startreading , mod_readaloud{{/str}}</b>:
+                {{#str}}normalhelp , mod_readaloud{{/str}}
+            </div>
+        </div>
+    </div>
+</div>

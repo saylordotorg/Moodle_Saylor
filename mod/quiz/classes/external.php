@@ -413,10 +413,21 @@ class mod_quiz_external extends external_api {
             require_capability('mod/quiz:viewreports', $context);
         }
 
+        // Update quiz with override information.
+        $quiz = quiz_update_effective_access($quiz, $params['userid']);
         $attempts = quiz_get_user_attempts($quiz->id, $user->id, $params['status'], $params['includepreviews']);
-
+        $attemptresponse = [];
+        foreach ($attempts as $attempt) {
+            $reviewoptions = quiz_get_review_options($quiz, $attempt, $context);
+            if (!has_capability('mod/quiz:viewreports', $context) &&
+                    ($reviewoptions->marks < question_display_options::MARK_AND_MAX || $attempt->state != quiz_attempt::FINISHED)) {
+                // Blank the mark if the teacher does not allow it.
+                $attempt->sumgrades = null;
+            }
+            $attemptresponse[] = $attempt;
+        }
         $result = array();
-        $result['attempts'] = $attempts;
+        $result['attempts'] = $attemptresponse;
         $result['warnings'] = $warnings;
         return $result;
     }
@@ -521,7 +532,23 @@ class mod_quiz_external extends external_api {
         }
 
         $result = array();
-        $grade = quiz_get_best_grade($quiz, $user->id);
+
+        // This code was mostly copied from mod/quiz/view.php. We need to make the web service logic consistent.
+        // Get this user's attempts.
+        $attempts = quiz_get_user_attempts($quiz->id, $user->id, 'all');
+        $canviewgrade = false;
+        if ($attempts) {
+            if ($USER->id != $user->id) {
+                // No need to check the permission here. We did it at by require_capability('mod/quiz:viewreports', $context).
+                $canviewgrade = true;
+            } else {
+                // Work out which columns we need, taking account what data is available in each attempt.
+                [$notused, $alloptions] = quiz_get_combined_reviewoptions($quiz, $attempts);
+                $canviewgrade = $alloptions->marks >= question_display_options::MARK_AND_MAX;
+            }
+        }
+
+        $grade = $canviewgrade ? quiz_get_best_grade($quiz, $user->id) : null;
 
         if ($grade === null) {
             $result['hasgrade'] = false;

@@ -1,3 +1,33 @@
+Version 1.0.29(Build 202109xxxx)
+- Added neural voices
+
+Version 1.0.28 (Build 2021082700)
+- Better phonetic comparisons
+
+Version 1.0.27 (Build 2021081800)
+- Fixed array key exists on php8
+
+Version 1.0.26 (Build 2021063000)
+- Fixed media prompt html editor that would not hide
+
+Version 1.0.25 (Build 2021053100)
+- Set internal flag for iframe use
+
+Version 1.0.24 (Build 2021052901)
+- Fixed problem with lang file generation
+
+Version 1.0.23 (Build 2021052900)
+- Added lang models for FR and ES
+
+Version 1.0.22 (Build 2021052500)
+- Added ability to view reports by group
+
+Version 1.0.21 (Build 2021052200)
+- Added an update script to fix up any broken scorer paths
+
+Version 1.0.20 (Build 2021052000)
+- added capetown and bahrain
+
 Version 1.0.19 (Build 2021042500)
 - Added multichoice with audio options
 - layout improvements for multichoice

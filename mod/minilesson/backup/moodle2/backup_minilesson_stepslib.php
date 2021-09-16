@@ -53,7 +53,7 @@ class backup_minilesson_activity_structure_step extends backup_activity_structur
             'course','name','intro','introformat','timelimit',
                 //'welcome','welcomeformat',
             'grade','gradeoptions','maxattempts','mingrade','richtextprompt',
-            'ttslanguage','transcriber','region','activitylink','pagelayout','showqtitles','timecreated','timemodified'
+            'ttslanguage','transcriber','region','activitylink','pagelayout','showqtitles','foriframe','timecreated','timemodified'
 			));
 
 		
@@ -75,7 +75,7 @@ class backup_minilesson_activity_structure_step extends backup_activity_structur
             'customtext3format','customtext4', 'customtext4format','customtext5', 'customtext5format',
                 'customdata1','customdata2', 'customdata3','customdata4', 'customdata5',
                 'customint1','customint2', 'customint3','customint4', 'customint5','correctanswer',
-            'timemodified','rsquestionkey','passagehash','createdby','modifiedby'));
+            'timemodified','rsquestionkey','passagehash','alternatives','phonetic','createdby','modifiedby'));
 
 		
 		// Build the tree.

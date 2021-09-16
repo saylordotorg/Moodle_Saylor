@@ -21,7 +21,14 @@ define(['jquery', 'core/log'], function ($, log) {
         },
 
         will_work_ok: function(opts){
-            return 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
+            var brave = typeof navigator.brave !== 'undefined';
+            if(brave){return false;}
+
+            var edge = navigator.userAgent.toLowerCase().indexOf("edg/") > -1;
+            if(edge){return false;}
+
+            return ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window);
+
         },
 
         init: function (lang,waveheight,uniqueid) {
@@ -103,7 +110,7 @@ define(['jquery', 'core/log'], function ($, log) {
                         log.debug('info_denied');
                     }
                 }
-                that.onerror();
+                that.onerror({error: {name: event.error}});
             };
 
             recognition.onend = function () {

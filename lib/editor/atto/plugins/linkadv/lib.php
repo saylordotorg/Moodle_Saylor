@@ -15,29 +15,31 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Advanced link editing buttons.
  * @package   atto_linkadv
  * @author    Mark Sharp <m.sharp@chi.ac.uk>
- * @copyright 2017 University of Chichester {@link www.chi.ac.uk}
+ * @copyright 2017 University of Chichester {@link https://www.chi.ac.uk}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Initialise this plugin
- * @param string $elementid
+ * Initialise language strings.
  */
 function atto_linkadv_strings_for_js() {
     global $PAGE;
 
-    $PAGE->requires->strings_for_js(array('createlink',
-                                          'unlink',
-                                          'enterurl',
-                                          'browserepositories',
-                                          'openinnewwindow',
-                                          'enterid',
-                                          'enterclass',
-                                        'link',
-                                        'advanced'),
-                                    'atto_linkadv');
+    $PAGE->requires->strings_for_js(
+      [
+        'createlink',
+        'unlink',
+        'enterurl',
+        'browserepositories',
+        'openinnewwindow',
+        'enterid',
+        'enterclass',
+        'link',
+        'advanced'
+      ], 'atto_linkadv');
 }

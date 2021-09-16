@@ -13,36 +13,6 @@ use mod_solo\constants;
  * @package mod_solo\grades
  */
 class gradesubmissions {
-    /**
-     * Gets assignment data for a specific student.
-     *
-     * @param int $courseid Course ID of chat.
-     * @param int $studentid Moodle student ID
-     * @param int $moduleinstance
-     * @return array
-     * @throws dml_exception
-     */
-    public function getGradeData(int $courseid, int $studentid, int $moduleinstance): array {
-        global $DB;
-
-        $sql = "select pa.id, u.lastname, u.firstname, p.name, p.transcriber, pat.words, pat.avturn, pat.longestturn, pat.targetwords, 
-              pat.totaltargetwords, pat.autogrammarscore,pat.autospellscore, pat.aiaccuracy, pat.uniquewords, pat.longwords
-                from {" . constants::M_TABLE . "} as p
-                    inner join  (select max(mpa.id) as id, mpa.userid, mpa.solo
-                            from {" . constants::M_ATTEMPTSTABLE . "} mpa
-                            group by mpa.userid, mpa.solo
-                        ) as pa on p.id = pa.solo
-                    inner join {course_modules} as cm on cm.course = p.course and cm.id = ?
-                    inner join {user} as u on pa.userid = u.id
-                    inner join {" . constants::M_STATSTABLE . "} as pat on pat.attemptid = pa.id and pat.userid = u.id
-                    left outer join {" . constants::M_AITABLE . "} as par on par.attemptid = pa.id and par.courseid = p.course
-                where u.id = ?
-                    AND pa.solo = ?
-                    AND p.course = ?
-                order by u.lastname";
-
-        return $DB->get_records_sql($sql, [$studentid, $moduleinstance, $courseid]);
-    }
 
     /**
      * Gets full submission data for a student's entry.
@@ -52,22 +22,22 @@ class gradesubmissions {
      * @return array
      * @throws dml_exception
      */
-    public function getSubmissionData(int $userid, int $cmid): array {
+    public function getSubmissionData($userid, $cmid) {
         global $DB;
         $cm = get_coursemodule_from_id(constants::M_MODNAME, $cmid, 0, false, MUST_EXIST);
         $moduleinstance = $DB->get_record(constants::M_TABLE, array('id' => $cm->instance), '*', MUST_EXIST);
-        $sql = "select pa.id,
-                   u.lastname,
-                   u.firstname,
-                   p.name,
-                   p.transcriber,
-                   p.id,
-                   pa.solo,
-                   pat.solo,
-                   ca.filename,
-                   ca.selftranscript,
-                    ca.transcript,
-                    ca.jsontranscript,
+
+
+        $sql = "SELECT pa.id AS attemptid,
+                    u.lastname,
+                    u.firstname,
+                    p.name,
+                    p.transcriber,
+                    p.id,
+                    pa.filename,
+                    pa.selftranscript,
+                    pa.transcript,
+                    pa.jsontranscript,
                     pat.turns,
                     pat.words,
                     pat.avturn,
@@ -79,24 +49,27 @@ class gradesubmissions {
                     pat.autogrammarscore,
                     pat.autospellscore,
                     pat.aiaccuracy,
-                    ca.grade as grade,
-                    pa.feedback
-            from {" . constants::M_TABLE . "} as p
-                inner join (select max(mpa.id) as id, mpa.userid, mpa.solo, mpa.feedback
-                 from {" . constants::M_ATTEMPTSTABLE . "} mpa group by  mpa.userid, mpa.solo, mpa.feedback) as pa
-            on p.id = pa.solo
-                inner join {course_modules} as cm on cm.course = p.course
-                inner join {user} as u on pa.userid = u.id
-                inner join {" . constants::M_STATSTABLE . "} as pat on pat.attemptid = pa.id and pat.userid = u.id
-                left outer join  {" . constants::M_AITABLE . "} as par on par.attemptid = pa.id and par.courseid = p.course
-                left outer join {" . constants::M_ATTEMPTSTABLE . "} as ca on ca.solo = pa.solo and ca.userid = u.id
-            where u.id = ?
-            and cm.id = ?
-            and p.id = ?;";
+                    pa.manualgraded,
+                    pa.grade,
+                    pa.feedback,
+                    pa.userid
+                FROM {solo} AS p
+                    INNER JOIN {solo_attempts} pa ON p.id = pa.solo
+                    INNER JOIN {course_modules} AS cm ON cm.course = p.course AND cm.id = ?
+                    INNER JOIN {user} AS u ON pa.userid = u.id
+                    INNER JOIN {solo_attemptstats} AS pat ON pat.attemptid = pa.id AND pat.userid = u.id
+                    left outer join {solo_ai_result} AS par ON par.attemptid = pa.id AND par.courseid = p.course
+                WHERE pa.userid = ?
+                    AND pa.solo = ?
+                    AND pa.completedsteps = ?
+                order by pa.id DESC";
 
-        $alldata = $DB->get_records_sql($sql, [$userid, $cmid,$moduleinstance->id]);
-
-        return $alldata;
+        $alldata = $DB->get_records_sql($sql, [$cmid, $userid, $moduleinstance->id, constants::STEP_SELFTRANSCRIBE]);
+        if($alldata){
+            return [reset($alldata)];
+        }else{
+            return [];
+        }
 
     }
 
@@ -107,16 +80,28 @@ class gradesubmissions {
      * @return array
      * @throws dml_exception
      */
-    public function getStudentsToGrade($moduleinstance) {
+    public function getStudentsToGrade($moduleinstance,$groupid) {
         global $DB;
 
         //fetch all finished attempts
-        $sql = "select pa.id as id, userid
-                    from {solo_attempts} pa
-                    where pa.solo = ? AND pa.completedsteps = " . constants::STEP_SELFTRANSCRIBE .
-                    " order by pa.id DESC";
+        if($groupid>0) {
+            list($groupswhere, $groupparams) = $DB->get_in_or_equal($groupid);
+            $sql = "SELECT pa.id AS id, pa.userid as userid
+                    FROM {solo_attempts} pa                    
+                     INNER JOIN {groups_members} gm ON pa.userid=gm.userid
+                     WHERE pa.solo = ? AND pa.completedsteps = " . constants::STEP_SELFTRANSCRIBE .
+                     " AND gm.groupid $groupswhere 
+                      ORDER BY pa.id DESC";
+            $results = $DB->get_records_sql($sql, array_merge([$moduleinstance->id],$groupparams));
+        }else{
+            $sql = "SELECT pa.id AS id, pa.userid AS userid
+                    FROM {solo_attempts} pa
+                    WHERE pa.solo = ? AND pa.completedsteps = " . constants::STEP_SELFTRANSCRIBE .
+                    " ORDER BY pa.id DESC";
+            $results = $DB->get_records_sql($sql, [$moduleinstance->id]);
+        }
 
-        $results = $DB->get_records_sql($sql, [$moduleinstance->id]);
+
 
         //if we do not have results just return
         if(!$results){return $results;}
@@ -144,13 +129,13 @@ class gradesubmissions {
      * @return array
      * @throws dml_exception
      */
-    public function getPageOfStudents($students, $studentid=0) {
+    public function getPageOfStudents($students, $studentid=0,$perpage=1) {
         $currentpagemembers=[];
         $pages=[];
         $studentpage=-1;
         //build array of 3 student pages
         foreach($students as $student){
-            if(count($currentpagemembers)>2){
+            if(count($currentpagemembers)>=$perpage){
                 $pages[]=$currentpagemembers;
                 $currentpagemembers=[];
             }

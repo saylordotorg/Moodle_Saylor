@@ -143,7 +143,7 @@ define(['jquery', 'core/log', 'filter_poodll/utils_amd', 'filter_poodll/uploader
                         function () {
                             var cvs = utils.getCvs(recid, opts.lc, opts);
                             utils.pokeVectorData(recid, opts.lc, opts);
-                            opts.uploader.uploadFile(cvs.toDataURL(), 'image');
+                            opts.uploader.uploadFile(cvs.toDataURL(), 'image/png');
                         });
                 }
             }

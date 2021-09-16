@@ -33,7 +33,7 @@ class mod_wordcards_form_import extends moodleform {
         $mform->addRule('delimiter', null, 'required', null, 'client');
 
         
-        $mform->addElement('textarea', 'importdata', get_string('importdata', 'mod_wordcards'), array('style'=>'width: 100%'));
+        $mform->addElement('textarea', 'importdata', get_string('importdata', 'mod_wordcards'), array('style'=>'width: 100%; max-width: 1200px;'));
         $mform->setDefault('importdata', $leftover_rows);
         $mform->setType('importdata', PARAM_NOTAGS);
         $mform->addRule('importdata', null, 'required', null, 'client');

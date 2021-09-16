@@ -53,7 +53,8 @@ class backup_solo_activity_structure_step extends backup_activity_structure_step
             'course','name','intro','introformat','grade','gradeoptions','manualgraded','mingrade',
                 'convlength','maxconvlength','speakingtopic','topictts','topicttsvoice','topiciframe','targetwords','tips','tipsformat',
             'ttslanguage','recorderskin','recordertype','enableai','enabletranscribe','expiredays','region','transcriber','multiattempts',
-                'enabletranscription','enablesharing','enableautograde','gradewordgoal','autogradeoptions','completionallsteps','postattemptedit','timecreated','timemodified'
+                'enabletranscription','enablesharing','enableautograde','gradewordgoal','autogradeoptions','completionallsteps',
+                'postattemptedit','foriframe','timecreated','timemodified'
 			));
 
         // attempt

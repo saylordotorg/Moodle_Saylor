@@ -75,20 +75,27 @@ $PAGE->set_title(format_string($moduleinstance->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($modulecontext);
 
+//20210601 - we probably dont need this ... delete soon
 //load glide
-$PAGE->requires->css(new moodle_url('https://cdn.jsdelivr.net/npm/glidejs@2.1.0/dist/css/glide.core.min.css'));
+//$PAGE->requires->css(new moodle_url('https://cdn.jsdelivr.net/npm/glidejs@2.1.0/dist/css/glide.core.min.css'));
 
-
-//if admin allow around site and to see edit stuff
-//if(has_capability('mod/' . constants::M_MODNAME . ':' . 'canmanageattempts',$modulecontext)) {
-if(has_capability('mod/' . constants::M_MODNAME . ':' . 'manage',$modulecontext)) {
-    $PAGE->set_pagelayout('standard');
-}else{
-    $PAGE->set_pagelayout($moduleinstance->pagelayout);
-}
 
 //Get an admin settings 
 $config = get_config(constants::M_COMPONENT);
+
+
+if($moduleinstance->foriframe==1) {
+    $PAGE->set_pagelayout('embedded');
+}elseif($config->enablesetuptab){
+    $PAGE->set_pagelayout('popup');
+}else{
+    if(has_capability('mod/' . constants::M_MODNAME . ':' . 'manage',$modulecontext)) {
+        $PAGE->set_pagelayout('course');
+    }else{
+        $PAGE->set_pagelayout($moduleinstance->pagelayout);
+    }
+}
+
 
 //Get our renderers
 $renderer = $PAGE->get_renderer('mod_minilesson');
@@ -119,7 +126,7 @@ if(!$attempts || ($canattempt && $retake==1)){
 if(has_capability('mod/minilesson:evaluate',$modulecontext)){
 	echo $renderer->header($moduleinstance, $cm, $mode, null, get_string('view', constants::M_COMPONENT));
 }else{
-	echo $renderer->notabsheader();
+	echo $renderer->notabsheader($moduleinstance);
 }
 
 $comp_test =  new \mod_minilesson\comprehensiontest($cm);

@@ -30,7 +30,7 @@ $courseid = required_param('id', PARAM_INT);
 
 $PAGE->set_url(new moodle_url('/grade/export/checklist/index.php', array('id' => $courseid)));
 if (!$course = $DB->get_record('course', array('id' => $courseid))) {
-    print_error('nocourseid');
+    throw new moodle_exception('nocourseid');
 }
 
 require_login($course->id);
@@ -41,7 +41,7 @@ require_capability('gradeexport/checklist:view', $context);
 $viewall = has_capability('gradeexport/checklist:viewall', $context);
 $viewdistrict = has_capability('gradeexport/checklist:viewdistrict', $context);
 if (!$viewall && !$viewdistrict) {
-    print_error('nopermission', 'gradeexport_checklist');
+    throw new moodle_exception('nopermission', 'gradeexport_checklist');
 }
 
 // Build navigation.

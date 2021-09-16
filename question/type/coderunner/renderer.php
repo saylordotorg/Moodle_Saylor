@@ -306,7 +306,7 @@ class qtype_coderunner_renderer extends qtype_renderer {
         global $CFG;
         $fb = $outcome->get_prologue();
         $testresults = $outcome->get_test_results($question);
-        if (is_array($testresults) && count($testresults) > 0) {
+        if (is_array($testresults) && count($testresults) > 1) {
             $table = new html_table();
             $table->attributes['class'] = 'coderunner-test-results';
             $headers = $testresults[0];
@@ -503,8 +503,8 @@ class qtype_coderunner_renderer extends qtype_renderer {
             // if given or the first language listed, whichever comes first.
             list($languages, $default) = qtype_coderunner_util::extract_languages($question->acelang);
             $params = $question->parameters;
-            if (array_key_exists('answer_language', $params)) {
-                $currentlanguage = $params['answer_language'];
+            if (property_exists($params, 'answer_language')) {
+                $currentlanguage = $params->answer_language;
             } else if (!empty($default)) {
                 $currentlanguage = $default;
             } else {

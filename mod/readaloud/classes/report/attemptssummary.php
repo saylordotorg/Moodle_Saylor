@@ -116,12 +116,9 @@ class attemptssummary extends basereport {
         $supergrouper = has_capability('moodle/site:accessallgroups', $context, $USER->id);
 
         //if we need to show  groups
-        if(!$supergrouper && $groupsmode ==SEPARATEGROUPS) {
-            $groups = groups_get_user_groups($course->id);
-            if (!$groups || empty($groups[0])) {
-                return false;
-            }
-            list($groupswhere, $sqlparams) = $DB->get_in_or_equal(array_values($groups[0]));
+        if($formdata->groupid > 0){
+
+            list($groupswhere, $sqlparams) = $DB->get_in_or_equal($formdata->groupid);
 
             //if we are not machine grading the SQL is simpler
             $human_sql = "SELECT tu.*, false as fulltranscript  FROM {" . constants::M_USERTABLE .

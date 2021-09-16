@@ -34,6 +34,9 @@
         <FIELD NAME="passagehash" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="The hash of the words and sentences"/>
         <FIELD NAME="hashisold" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="ttslanguage" TYPE="char" LENGTH="255" NOTNULL="true" DEFAULT="en-US" SEQUENCE="false"/>
+        <FIELD NAME="foriframe" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="intended to be iframed"/>
+        <FIELD NAME="showimageflip" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="true" DEFAULT="1" SEQUENCE="false" COMMENT="show images on flipscreen"/>
+        <FIELD NAME="frontfaceflip" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="true" DEFAULT="1" SEQUENCE="false" COMMENT="front face on flipscreen"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -55,6 +58,8 @@
         <FIELD NAME="ttsvoice" TYPE="char" LENGTH="255" NOTNULL="true" DEFAULT="Kendra" SEQUENCE="false"/>
         <FIELD NAME="alternates" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="deleted" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="phonetic" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Phonetic"/>
+        <FIELD NAME="phoneticms" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Phonetic"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

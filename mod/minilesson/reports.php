@@ -37,6 +37,7 @@ $showreport = optional_param('report', 'menu', PARAM_TEXT); // report type
 $userid = optional_param('userid', 0, PARAM_INT); // report type
 $attemptid = optional_param('attemptid', 0, PARAM_INT); // report type
 
+
 //paging details
 $paging = new stdClass();
 $paging->perpage = optional_param('perpage',-1, PARAM_INT);
@@ -84,19 +85,21 @@ $event->add_record_snapshot(constants::M_MODNAME, $moduleinstance);
 $event->trigger();
 
 
-
 /// Set up the page header
 $PAGE->set_title(format_string($moduleinstance->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($modulecontext);
 
-if($config->enablesetuptab){
+if($moduleinstance->foriframe==1) {
     $PAGE->set_pagelayout('embedded');
+}elseif($config->enablesetuptab){
+    $PAGE->set_pagelayout('popup');
 }else{
     $PAGE->set_pagelayout('course');
 }
 
-$PAGE->requires->jquery();
+//20210601 - we probably dont need this ... delete soon
+//$PAGE->requires->jquery();
 
 
 //This puts all our display logic into the renderer.php files in this plugin
@@ -113,9 +116,13 @@ switch ($showreport){
 	case 'menu':
 		echo $renderer->header($moduleinstance, $cm, $mode, null, get_string('reports', constants::M_COMPONENT));
 		echo $reportrenderer->render_reportmenu($moduleinstance,$cm);
-        //backtotop
-        echo $renderer->backtotopbutton($course->id);
-		// Finish the page
+
+		//show backtotop button in most cases
+        if(!$config->enablesetuptab) {
+            echo $renderer->backtotopbutton($course->id);
+        }
+
+        // Finish the page
 		echo $renderer->footer();
 		return;
 
@@ -132,6 +139,7 @@ switch ($showreport){
         $formdata = new stdClass();
         $formdata->moduleid = $moduleinstance->id;
         $formdata->modulecontextid = $modulecontext->id;
+        $formdata->groupmenu = true;
         break;
 
 
@@ -142,6 +150,7 @@ switch ($showreport){
         $formdata->moduleid = $moduleinstance->id;
         $formdata->attemptid = $attemptid;
         $formdata->modulecontextid = $modulecontext->id;
+        $formdata->groupmenu = true;
         break;
 
 
@@ -152,6 +161,7 @@ switch ($showreport){
 		$formdata = new stdClass();
 		$formdata->moduleid = $moduleinstance->id;
 		$formdata->modulecontextid = $modulecontext->id;
+        $formdata->groupmenu = true;
 		break;
 
     //list view of attempts and grades and action links
@@ -162,6 +172,7 @@ switch ($showreport){
         $formdata = new stdClass();
         $formdata->moduleid = $moduleinstance->id;
         $formdata->modulecontextid = $modulecontext->id;
+        $formdata->groupmenu = true;
         break;
 
 
@@ -181,6 +192,19 @@ switch ($showreport){
 3) call $rows=report->fetch_formatted_records($withlinks=true(html) false(print/excel))
 5) call $reportrenderer->render_section_html($sectiontitle, $report->name, $report->get_head, $rows, $report->fields);
 */
+$groupmenu = '';
+if(isset($formdata->groupmenu)){
+    // fetch groupmode/menu/id for this activity
+    if ($groupmode = groups_get_activity_groupmode($cm)) {
+        $groupmenu = groups_print_activity_menu($cm, $PAGE->url, true);
+        $groupmenu .= ' ';
+        $formdata->groupid = groups_get_activity_group($cm);
+    }else{
+        $formdata->groupid  = 0;
+    }
+}else{
+    $formdata->groupid  = 0;
+}
 
 $report->process_raw_data($formdata);
 $reportheading = $report->fetch_formatted_heading();
@@ -198,6 +222,7 @@ switch($format){
 		$pagingbar = $reportrenderer->show_paging_bar($allrowscount, $paging,$PAGE->url);
 		echo $renderer->header($moduleinstance, $cm, $mode, null, get_string('reports', constants::M_COMPONENT));
 		echo $extraheader;
+        echo $groupmenu;
 		echo $pagingbar;
 		echo $reportrenderer->render_section_html($reportheading, $report->fetch_name(), $report->fetch_head(), $reportrows, $report->fetch_fields());
 		echo $pagingbar;

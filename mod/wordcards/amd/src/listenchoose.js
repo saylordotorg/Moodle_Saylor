@@ -90,9 +90,7 @@ define([
     },
 
     process: function(json) {
-
       app.terms = json.terms;
-      app.has_images = json.has_images;
       a4e.list_vocab("#vocab-list-inner", app.terms);
     },
     start: function() {

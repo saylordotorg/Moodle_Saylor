@@ -1,3 +1,16 @@
+.dashboard-card {
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: .25rem !important;
+    margin-bottom: .25rem !important;
+    max-width: 350px;
+    min-width: 250px;
+}
+
+.card-deck {
+    justify-content: center;
+}
+
 $chart-size: 70px;
 $doughnut-border-size: 15px;
 $doughnut-dasharray: 173;
@@ -136,3 +149,5 @@ $doughnut-fill-colour: $brand-warning;
         }
     }
 }
+
+

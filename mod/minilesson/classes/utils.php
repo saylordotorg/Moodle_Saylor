@@ -64,10 +64,15 @@ class utils{
             case 'useast1':
             case 'dublin':
             case 'sydney':
-                return substr($moduleinstance->ttslanguage,0,2)=='en' && trim($passage)!=="";
-                break;
+            case 'capetown':
+            case 'bahrain':
             default:
-                return false;
+                return (substr($moduleinstance->ttslanguage,0,2)=='en' ||
+                                substr($moduleinstance->ttslanguage,0,2)=='de' ||
+                                substr($moduleinstance->ttslanguage,0,2)=='fr' ||
+                                substr($moduleinstance->ttslanguage,0,2)=='es') && trim($passage)!=="";
+
+                break;
         }
     }
 
@@ -311,14 +316,18 @@ class utils{
 
     //we use curl to fetch transcripts from AWS and Tokens from cloudpoodll
     //this is our helper
-    public static function curl_fetch($url,$postdata=false)
+    public static function curl_fetch($url,$postdata=false,$method='get')
     {
         global $CFG;
 
         require_once($CFG->libdir.'/filelib.php');
         $curl = new \curl();
 
-        $result = $curl->get($url, $postdata);
+        if($method=='get') {
+            $result = $curl->get($url, $postdata);
+        }else{
+            $result = $curl->post($url, $postdata);
+        }
         return $result;
     }
 
@@ -568,12 +577,14 @@ class utils{
           "tokyo" => get_string("tokyo",constants::M_COMPONENT),
           "sydney" => get_string("sydney",constants::M_COMPONENT),
           "dublin" => get_string("dublin",constants::M_COMPONENT),
-         // "ottawa" => get_string("ottawa",constants::M_COMPONENT),
-         // "frankfurt" => get_string("frankfurt",constants::M_COMPONENT),
-         // "london" => get_string("london",constants::M_COMPONENT),
-         // "saopaulo" => get_string("saopaulo",constants::M_COMPONENT),
-         // "singapore" => get_string("singapore",constants::M_COMPONENT),
-         // "mumbai" => get_string("mumbai",constants::M_COMPONENT)
+          "capetown" => get_string("capetown",constants::M_COMPONENT),
+          "bahrain" => get_string("bahrain",constants::M_COMPONENT),
+           "ottawa" => get_string("ottawa",constants::M_COMPONENT),
+           "frankfurt" => get_string("frankfurt",constants::M_COMPONENT),
+           "london" => get_string("london",constants::M_COMPONENT),
+           "saopaulo" => get_string("saopaulo",constants::M_COMPONENT),
+           "singapore" => get_string("singapore",constants::M_COMPONENT),
+            "mumbai" => get_string("mumbai",constants::M_COMPONENT)
       );
   }
 
@@ -600,35 +611,114 @@ class utils{
 
 
     //convert a phrase or word to a series of phonetic characters that we can use to compare text/spoken
-    public static function convert_to_phonetic($phrase,$language){
+    public static function convert_to_phonetic($phrase,$language,$region='tokyo',$segmented=true){
         global $CFG;
 
         switch($language){
-            case 'en':
-                $phonetic = metaphone($phrase);
+            case constants::M_LANG_ENUS:
+            case constants::M_LANG_ENAB:
+            case constants::M_LANG_ENAU:
+            case constants::M_LANG_ENIN:
+            case constants::M_LANG_ENIE:
+            case constants::M_LANG_ENWL:
+            case constants::M_LANG_ENGB:
+                $phrasebits = explode(' ',$phrase);
+                $phonebits=[];
+                foreach($phrasebits as $phrasebit){
+                    $phonebits[] = metaphone($phrasebit);
+                }
+                if($segmented) {
+                    $phonetic = implode(' ', $phonebits);
+                }else {
+                    $phonetic = implode('', $phonebits);
+                }
+                //the resulting phonetic string will look like this: 0S IS A TK IT IS A KT WN TW 0T IS A MNK
+                // but "one" and "won" result in diff phonetic strings and non english support is not there so
+                //really we want to put an IPA database on services server and poll as we do for katakanify
+                //see: https://github.com/open-dict-data/ipa-dict
+                //and command line searchable dictionaries https://github.com/open-dsl-dict/ipa-dict-dsl based on those
+                // gdcl :    https://github.com/dohliam/gdcl
                 break;
-            case 'ja':
-                //gettting phonetics for JP requires php-mecab library doc'd here
-                //https://github.com/nihongodera/php-mecab-documentation
-                if(extension_loaded('mecab')){
-                    $mecab = new \MeCab\Tagger();
-                    $nodes=$mecab->parseToNode($phrase);
-                    $katakanaarray=[];
-                    foreach ($nodes as $n) {
-                        $f =  $n->getFeature();
-                        $reading = explode(',',$f)[8];
-                        if($reading!='*'){
-                            $katakanaarray[] =$reading;
+            case constants::M_LANG_JAJP:
+
+                //fetch katakana/hiragana if the JP
+                $katakanify_url = utils::fetch_lang_server_url($region,'katakanify');
+
+                //results look like this:
+
+                /*
+                    {
+                        "status": true,
+                        "message": "Katakanify complete.",
+                        "data": {
+                            "status": true,
+                            "results": [
+                                "元気な\t形容詞,*,ナ形容詞,ダ列基本連体形,元気だ,げんきな,代表表記:元気だ/げんきだ",
+                                "男の子\t名詞,普通名詞,*,*,男の子,おとこのこ,代表表記:男の子/おとこのこ カテゴリ:人 ドメイン:家庭・暮らし",
+                                "は\t助詞,副助詞,*,*,は,は,連語",
+                                "いい\t動詞,*,子音動詞ワ行,基本連用形,いう,いい,連語",
+                                "こ\t接尾辞,動詞性接尾辞,カ変動詞,未然形,くる,こ,連語",
+                                "です\t判定詞,*,判定詞,デス列基本形,だ,です,連語",
+                                "。\t特殊,句点,*,*,。,。,連語",
+                                "EOS",
+                                ""
+                            ]
                         }
                     }
-                    $phonetic=implode($katakanaarray,'');
-                    break;
+                */
+
+                $postdata =array('passage'=>$phrase);
+                $results = self::curl_fetch($katakanify_url,$postdata,'post');
+                if(!self::is_json($results)){return false;}
+
+                $jsonresults = json_decode($results);
+                $nodes=[];
+                if($jsonresults && $jsonresults->status==true){
+                    foreach($jsonresults->data->results as $result){
+                        $bits = preg_split("/\t+/", $result);
+                        if(count($bits)>1) {
+                            $nodes[] = $bits[1];
+                        }
+                    }
                 }
 
+                //process nodes
+                $katakanaarray=[];
+                foreach ($nodes as $n) {
+                    $analysis = explode(',',$n);
+                    if(count($analysis) > 7) {
+                        if($analysis[0]!=='記号') {
+                            $reading = $analysis[7];
+                            if ($reading != '*') {
+                                $katakanaarray[] = $reading;
+                            }
+                        }
+                    }
+                }
+                if($segmented) {
+                    $phonetic = implode(' ',$katakanaarray);
+                }else {
+                    $phonetic = implode('',$katakanaarray);
+                }
+                break;
+
             default:
-                $phonetic = $phrase;
+                $phonetic = '';
         }
         return $phonetic;
+
+    }
+
+    //fetch lang server url, services incl. 'transcribe' , 'lm', 'lt', 'spellcheck', 'katakanify'
+    public static function fetch_lang_server_url($region,$service='transcribe'){
+        switch($region) {
+            case 'useast1':
+                $ret = 'https://useast.ls.poodll.com/';
+                break;
+            default:
+                $ret = 'https://' . $region . '.ls.poodll.com/';
+        }
+        return $ret . $service;
     }
 
     public static function fetch_options_transcribers() {
@@ -668,6 +758,32 @@ class utils{
         return $voices[$autoindex];
     }
 
+    //can speak neural?
+    public static function can_speak_neural($voice,$region){
+        //check if the region is supported
+        switch($region){
+            case "useast1":
+            case "tokyo":
+            case "sydney":
+            case "dublin":
+            case "ottawa":
+            case "frankfurt":
+            case "london":
+            case "singapore":
+                //ok
+                break;
+            default:
+                return false;
+        }
+
+        //check if the voice is supported
+        if(in_array($voice,constants::M_NEURALVOICES)){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
     public static function get_tts_options(){
         return array(constants::TTS_NORMAL=>get_string('ttsnormal',constants::M_COMPONENT),
                 constants::TTS_SLOW=>get_string('ttsslow',constants::M_COMPONENT),
@@ -685,7 +801,9 @@ class utils{
                 constants::M_LANG_ENUS => ['Joey'=>'Joey','Justin'=>'Justin','Matthew'=>'Matthew','Ivy'=>'Ivy',
                         'Joanna'=>'Joanna','Kendra'=>'Kendra','Kimberly'=>'Kimberly','Salli'=>'Salli'],
                 constants::M_LANG_ENGB => ['Brian'=>'Brian','Amy'=>'Amy', 'Emma'=>'Emma'],
-                constants::M_LANG_ENAU => ['Russell'=>'Russell','Nicole'=>'Nicole'],
+                constants::M_LANG_ENAU => ['Russell'=>'Russell','Nicole'=>'Nicole','Olivia'=>'Olivia'],
+                constants::M_LANG_ENNZ => ['Aria'=>'Aria'],
+                constants::M_LANG_ENZA => ['Ayanda'=>'Ayanda'],
                 constants::M_LANG_ENIN => ['Aditi'=>'Aditi', 'Raveena'=>'Raveena'],
             // constants::M_LANG_ENIE => [],
                 constants::M_LANG_ENWL => ["Geraint"=>"Geraint"],
@@ -693,14 +811,14 @@ class utils{
                 constants::M_LANG_ESUS => ['Miguel'=>'Miguel','Penelope'=>'Penelope'],
                 constants::M_LANG_ESES => [ 'Enrique'=>'Enrique', 'Conchita'=>'Conchita', 'Lucia'=>'Lucia'],
             //constants::M_LANG_FAIR => [],
-                constants::M_LANG_FRCA => ['Chantal'=>'Chantal'],
+                constants::M_LANG_FRCA => ['Chantal'=>'Chantal', 'Gabrielle'=>'Gabrielle'],
                 constants::M_LANG_FRFR => ['Mathieu'=>'Mathieu','Celine'=>'Celine', 'Léa'=>'Léa'],
                 constants::M_LANG_HIIN => ["Aditi"=>"Aditi"],
             //constants::M_LANG_HEIL => [],
             //constants::M_LANG_IDID => [],
                 constants::M_LANG_ITIT => ['Carla'=>'Carla',  'Bianca'=>'Bianca', 'Giorgio'=>'Giorgio'],
                 constants::M_LANG_JAJP => ['Takumi'=>'Takumi','Mizuki'=>'Mizuki'],
-                constants::M_LANG_KOKR => ['Seoyan'=>'Seoyan'],
+                constants::M_LANG_KOKR => ['Seoyeon'=>'Seoyeon'],
             //constants::M_LANG_MSMY => [],
                 constants::M_LANG_NLNL => ["Ruben"=>"Ruben","Lotte"=>"Lotte"],
                 constants::M_LANG_PTBR => ['Ricardo'=>'Ricardo', 'Vitoria'=>'Vitoria'],
@@ -718,50 +836,22 @@ class utils{
 
             //add current language first
             foreach($alllang[$langcode] as $v=>$thevoice){
-                $usearray[$thevoice] = get_string(strtolower($langcode), constants::M_COMPONENT) . ': ' . $thevoice;
+                $neuraltag = in_array($thevoice,constants::M_NEURALVOICES) ? ' (+)' : '';
+                $usearray[$thevoice] = get_string(strtolower($langcode), constants::M_COMPONENT) . ': ' . $thevoice . $neuraltag;
             }
             //then all the rest
             foreach($alllang as $lang=>$voices){
                 if($lang==$langcode){continue;}
                 foreach($voices as $v=>$thevoice){
-                    $usearray[$thevoice] = get_string(strtolower($lang), constants::M_COMPONENT) . ': ' . $thevoice;
+                    $neuraltag = in_array($thevoice,constants::M_NEURALVOICES) ? ' (+)' : '';
+                    $usearray[$thevoice] = get_string(strtolower($lang), constants::M_COMPONENT) . ': ' . $thevoice . $neuraltag;
                 }
             }
             return $usearray;
         }else{
                 return $alllang[constants::M_LANG_ENUS];
         }
-        /*
-            To add more voices choose from these
-          {"lang": "English(US)", "voices":  [{name: 'Joey', mf: 'm'},{name: 'Justin', mf: 'm'},{name: 'Matthew', mf: 'm'},{name: 'Ivy', mf: 'f'},{name: 'Joanna', mf: 'f'},{name: 'Kendra', mf: 'f'},{name: 'Kimberly', mf: 'f'},{name: 'Salli', mf: 'f'}]},
-          {"lang": "English(GB)", "voices":  [{name: 'Brian', mf: 'm'},{name: 'Amy', mf: 'f'},{name: 'Emma', mf: 'f'}]},
-          {"lang": "English(AU)", "voices": [{name: 'Russell', mf: 'm'},{name: 'Nicole', mf: 'f'}]},
-          {"lang": "English(IN)", "voices":  [{name: 'Aditi', mf: 'm'},{name: 'Raveena', mf: 'f'}]},
-          {"lang": "English(WELSH)", "voices":  [{name: 'Geraint', mf: 'm'}]},
-          {"lang": "Danish", "voices":  [{name: 'Mads', mf: 'm'},{name: 'Naja', mf: 'f'}]},
-          {"lang": "Dutch", "voices":  [{name: 'Ruben', mf: 'm'},{name: 'Lotte', mf: 'f'}]},
-          {"lang": "French(FR)", "voices":  [{name: 'Mathieu', mf: 'm'},{name: 'Celine', mf: 'f'},{name: 'Léa', mf: 'f'}]},
-          {"lang": "French(CA)", "voices":  [{name: 'Chantal', mf: 'm'}]},
-          {"lang": "German", "voices":  [{name: 'Hans', mf: 'm'},{name: 'Marlene', mf: 'f'},{name: 'Vicki', mf: 'f'}]},
-          {"lang": "Icelandic", "voices":  [{name: 'Karl', mf: 'm'},{name: 'Dora', mf: 'f'}]},
-          {"lang": "Italian", "voices":  [{name: 'Carla', mf: 'f'},{name: 'Bianca', mf: 'f'},{name: 'Giorgio', mf: 'm'}]},
-          {"lang": "Japanese", "voices":  [{name: 'Takumi', mf: 'm'},{name: 'Mizuki', mf: 'f'}]},
-          {"lang": "Korean", "voices":  [{name: 'Seoyan', mf: 'f'}]},
-          {"lang": "Norwegian", "voices":  [{name: 'Liv', mf: 'f'}]},
-          {"lang": "Polish", "voices":  [{name: 'Jacek', mf: 'm'},{name: 'Jan', mf: 'm'},{name: 'Maja', mf: 'f'},{name: 'Ewa', mf: 'f'}]},
-          {"lang": "Portugese(BR)", "voices":  [{name: 'Ricardo', mf: 'm'},{name: 'Vitoria', mf: 'f'}]},
-          {"lang": "Portugese(PT)", "voices":  [{name: 'Cristiano', mf: 'm'},{name: 'Ines', mf: 'f'}]},
-          {"lang": "Romanian", "voices":  [{name: 'Carmen', mf: 'f'}]},
-          {"lang": "Russian", "voices":  [{name: 'Maxim', mf: 'm'},{name: 'Tatyana', mf: 'f'}]},
-          {"lang": "Spanish(ES)", "voices":  [{name: 'Enrique', mf: 'm'},{name: 'Conchita', mf: 'f'},{name: 'Lucia', mf: 'f'}]},
-          {"lang": "Spanish(US)", "voices":  [{name: 'Miguel', mf: 'm'},{name: 'Penelope', mf: 'f'}]},
-          {"lang": "Swedish", "voices":  [{name: 'Astrid', mf: 'f'}]},
-          {"lang": "Turkish", "voices":  [{name: 'Filiz', mf: 'f'}]},
-          {"lang": "Welsh", "voices":  [{name: 'Gwyneth', mf: 'f'}]},
-        */
-
     }
-
 
     public static function get_lang_options(){
        return array(
@@ -773,6 +863,8 @@ class utils{
                constants::M_LANG_ENUS => get_string('en-us', constants::M_COMPONENT),
                constants::M_LANG_ENGB => get_string('en-gb', constants::M_COMPONENT),
                constants::M_LANG_ENAU => get_string('en-au', constants::M_COMPONENT),
+               constants::M_LANG_ENNZ => get_string('en-nz', constants::M_COMPONENT),
+               constants::M_LANG_ENZA => get_string('en-za', constants::M_COMPONENT),
                constants::M_LANG_ENIN => get_string('en-in', constants::M_COMPONENT),
                constants::M_LANG_ENIE => get_string('en-ie', constants::M_COMPONENT),
                constants::M_LANG_ENWL => get_string('en-wl', constants::M_COMPONENT),

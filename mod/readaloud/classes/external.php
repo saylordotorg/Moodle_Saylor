@@ -10,6 +10,7 @@
 
 use \mod_readaloud\utils;
 use \mod_readaloud\diff;
+use \mod_readaloud\alphabetconverter;
 use \mod_readaloud\constants;
 
 class mod_readaloud_external extends external_api {
@@ -37,7 +38,7 @@ class mod_readaloud_external extends external_api {
         $attempt = $DB->get_record(constants::M_USERTABLE, array('userid' => $USER->id, 'id' => $attemptid));
         if($attempt) {
             $readaloud = $DB->get_record('readaloud', array('id' => $attempt->readaloudid), '*', MUST_EXIST);
-            $cm = get_coursemodule_from_instance('readaloud', $readaloud->id, $readaloud->courseid, false, MUST_EXIST);
+            $cm = get_coursemodule_from_instance('readaloud', $readaloud->id, $readaloud->course, false, MUST_EXIST);
 
             if (\mod_readaloud\utils::can_transcribe($readaloud)) {
                 $aigrade = new \mod_readaloud\aigrade($attempt->id, $cm->id);
@@ -125,38 +126,60 @@ class mod_readaloud_external extends external_api {
                 'cmid' => new external_value(PARAM_INT),
                 'language' => new external_value(PARAM_TEXT),
                 'passage' => new external_value(PARAM_TEXT),
-                'transcript' => new external_value(PARAM_TEXT)
+                'transcript' => new external_value(PARAM_TEXT),
+                'passagephonetic' => new external_value(PARAM_TEXT),
         ]);
     }
 
-    public static function compare_passage_to_transcript($cmid, $language,$passage,$transcript) {
-        global $DB;
+    public static function compare_passage_to_transcript($cmid, $language,$passage,$transcript, $passagephonetic) {
+        global $DB,$CFG;
 
         if($cmid > 0){
             $cm = get_coursemodule_from_id('readaloud', $cmid, 0, false, MUST_EXIST);
             $readaloud = $DB->get_record('readaloud', array('id' => $cm->instance), '*', MUST_EXIST);
             $alternatives = diff::fetchAlternativesArray($readaloud->alternatives);
+            $region = $readaloud->region;
         }else {
             $alternatives = diff::fetchAlternativesArray('');
+            $region ='tokyo';
         }
 
 
-        //If this is Japanese we want to segment it into "words"
-        if($language == constants::M_LANG_JAJP) {
-            ///$passage = utils::segment_japanese($passage);
-            $transcript = utils::segment_japanese($transcript);
+        //Fetch phonetics and segments
+        list($transcript_phonetic,$transcript) = utils::fetch_phones_and_segments($transcript,$language,$region);
+
+        //EXPERIMENTAL
+        switch (substr($language,0,2)){
+            case 'en':
+                //find digits in original passage, and convert number words to digits in the target passage
+                $transcript=alphabetconverter::words_to_numbers_convert($passage,$transcript);
+                break;
+            case 'de':
+                //find eszetts in original passage, and convert ss words to eszetts in the target passage
+                $transcript=alphabetconverter::ss_to_eszett_convert($passage,$transcript );
+                break;
+            case 'ja':
+                //find digits in original passage, and convert number words to digits in the target passage
+                //this works but segmented digits are a bit messed up, not sure its worthwhile. more testing needed
+                //from here and aigrade
+                $transcript=alphabetconverter::words_to_suji_convert($passage,$transcript);
+                break;
+
+
         }
 
         //turn the passage and transcript into an array of words
         $passagebits = diff::fetchWordArray($passage);
         $transcriptbits = diff::fetchWordArray($transcript);
         $wildcards = diff::fetchWildcardsArray($alternatives);
+        $transcriptphonetic_bits = diff::fetchWordArray($transcript_phonetic);
+        $passagephonetic_bits = diff::fetchWordArray($passagephonetic);
 
         //fetch sequences of transcript/passage matched words
         // then prepare an array of "differences"
         $passagecount = count($passagebits);
         $transcriptcount = count($transcriptbits);
-        $sequences = diff::fetchSequences($passagebits, $transcriptbits, $alternatives, $language);
+        $sequences = diff::fetchSequences($passagebits, $transcriptbits, $alternatives, $language,$transcriptphonetic_bits,$passagephonetic_bits);
         //fetch diffs
         $debug=false;
         $diffs = diff::fetchDiffs($sequences, $passagecount, $transcriptcount, $debug);

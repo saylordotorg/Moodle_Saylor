@@ -119,7 +119,7 @@ class renderer extends \plugin_renderer_base {
     }
 
 
-    private function make_json_string($definitions){
+    private function make_json_string($definitions,$mod){
 
         $defs = array();
         foreach ($definitions as $definition){
@@ -131,6 +131,13 @@ class renderer extends \plugin_renderer_base {
             $def->id=$definition->id;
             $def->term =$definition->term;
             $def->definition =$definition->definition;
+            if($mod->get_mod()->showimageflip){
+                $def->showimageflip=true;
+            }
+            //which face to tag as front and which as back
+            if($mod->get_mod()->frontfaceflip == constants::M_FRONTFACEFLIP_DEF) {
+                $def->frontfacedef = true;
+            }
             $defs[]=$def;
         }
         $defs_object = new \stdClass();
@@ -152,7 +159,7 @@ class renderer extends \plugin_renderer_base {
         if($wordpool == \mod_wordcards_module::WORDPOOL_REVIEW) {
             $definitions = $mod->get_review_terms($currentstep);
         }else{
-            $definitions = $mod->get_learn_terms();
+            $definitions = $mod->get_learn_terms($currentstep);
         }
 
         //make sure each definition has a voice
@@ -163,7 +170,7 @@ class renderer extends \plugin_renderer_base {
         }
 
         $widgetid = \html_writer::random_id();
-        $jsonstring=$this->make_json_string($definitions);
+        $jsonstring=$this->make_json_string($definitions, $mod);
         $opts_html = \html_writer::tag('input', '', array('id' => $widgetid, 'type' => 'hidden', 'value' => $jsonstring));
 
 
@@ -259,7 +266,7 @@ class renderer extends \plugin_renderer_base {
         if($wordpool == \mod_wordcards_module::WORDPOOL_REVIEW) {
             $definitions = $mod->get_review_terms($currentstep);
         }else{
-            $definitions = $mod->get_learn_terms();
+            $definitions = $mod->get_learn_terms($currentstep);
 
         }
 
@@ -270,7 +277,7 @@ class renderer extends \plugin_renderer_base {
             }
         }
 
-        $jsonstring=$this->make_json_string($definitions);
+        $jsonstring=$this->make_json_string($definitions,$mod);
         $opts_html = \html_writer::tag('input', '', array('id' => $widgetid, 'type' => 'hidden', 'value' => $jsonstring));
 
 
@@ -316,25 +323,14 @@ class renderer extends \plugin_renderer_base {
             }
         }
         switch($region) {
-            case 'tokyo':
-                $data['asrurl'] = 'https://tokyo.ls.poodll.com/transcribe';
-                //$data['asrurl'] = 'https://dstokyo.poodll.com:3000/transcribe';
-                break;
-            case 'sydney':
-                $data['asrurl'] = 'https://sydney.ls.poodll.com/transcribe';
-                //$data['asrurl'] = 'https://dssydney.poodll.com:3000/transcribe';
-                break;
-            case 'dublin':
-                $data['asrurl'] = 'https://dublin.ls.poodll.com/transcribe';
-                //$data['asrurl'] = 'https://dsdublin.poodll.com:3000/transcribe';
-                break;
-            case 'useast1':
-            default:
-                $data['asrurl'] = 'https://useast.ls.poodll.com/transcribe';
-            //$data['asrurl'] = 'https://dsuseast.poodll.com:3000/transcribe';
-        }
-        //---------------
 
+            case 'useast1':
+                $data['asrurl'] = 'https://useast.ls.poodll.com/transcribe';
+                break;
+            default:
+                $data['asrurl'] = 'https://' . $region . '.ls.poodll.com/transcribe';
+
+        }
 
 
         $speechcards = $this->render_from_template('mod_wordcards/speechcards_page', $data);
@@ -352,7 +348,7 @@ class renderer extends \plugin_renderer_base {
         if($wordpool == \mod_wordcards_module::WORDPOOL_REVIEW) {
             $definitions = $mod->get_review_terms($currentstep);
         }else{
-            $definitions = $mod->get_learn_terms();
+            $definitions = $mod->get_learn_terms($currentstep);
         }
 
         //make sure each definition has a voice

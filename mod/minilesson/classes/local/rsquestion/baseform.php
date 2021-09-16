@@ -135,6 +135,7 @@ abstract class baseform extends \moodleform {
             $mform->addElement('text', 'name', get_string('itemtitle', constants::M_COMPONENT), array('size'=>70));
             $mform->setType('name', PARAM_TEXT);
             $mform->addRule('name', get_string('required'), 'required', null, 'client');
+            $mform->setDefault('name', get_string('newitem',constants::M_COMPONENT));
 
 
             if($this->moduleinstance->richtextprompt==constants::M_PROMPT_RICHTEXT) {
@@ -149,13 +150,31 @@ abstract class baseform extends \moodleform {
                 //Question text
                 $mform->addElement('textarea', constants::TEXTQUESTION, get_string('itemcontents', constants::M_COMPONENT), array('wrap'=>'virtual','style'=>'width: 100%;'));
                 $mform->setType(constants::TEXTQUESTION, PARAM_RAW);
+                switch($this->type) {
+                    case constants::TYPE_LISTENREPEAT:
+                        $mform->setDefault(constants::TEXTQUESTION,
+                                get_string('lr_instructions1', constants::M_COMPONENT));
+                        break;
+                    case constants::TYPE_DICTATIONCHAT:
+                        $mform->setDefault(constants::TEXTQUESTION,
+                                get_string('dc_instructions1', constants::M_COMPONENT));
+                        break;
+                    case constants::TYPE_SPEECHCARDS:
+                        $mform->setDefault(constants::TEXTQUESTION,
+                                get_string('sc_instructions1', constants::M_COMPONENT));
+                        break;
+                     case constants::TYPE_DICTATION:
+                         $mform->setDefault(constants::TEXTQUESTION,
+                                 get_string('dictation_instructions1', constants::M_COMPONENT));
+                         break;
+                }
 
                 $togglearray=array();
                 $togglearray[] =& $mform->createElement('advcheckbox','addmedia',get_string('addmedia',constants::M_COMPONENT),'');
                 $togglearray[] =& $mform->createElement('advcheckbox','addiframe',get_string('addiframe',constants::M_COMPONENT),'');
                 $togglearray[] =& $mform->createElement('advcheckbox','addttsaudio',get_string('addttsaudio',constants::M_COMPONENT),'');
                 $togglearray[] =& $mform->createElement('advcheckbox','addtextarea',get_string('addtextarea',constants::M_COMPONENT),'');
-                $mform->addGroup($togglearray, 'togglearray', '', array(' '), false);
+                $mform->addGroup($togglearray, 'togglearray', get_string('mediaprompts', constants::M_COMPONENT), array(' '), false);
                 //in the case of page we assume they will want to use some media
                 if($this->type== constants::TYPE_PAGE) {
                     $mform->setDefault('addmedia', 1);
@@ -194,16 +213,25 @@ abstract class baseform extends \moodleform {
                     $mform->disabledIf(constants::TTSQUESTIONVOICE, 'addttsaudio', 'neq', 1);
                     $mform->disabledIf(constants::TTSQUESTIONOPTION, 'addttsaudio', 'neq', 1);
                 }
-                //Question textarea
-                $mform->addElement('textarea', constants::QUESTIONTEXTAREA, get_string('itemtextarea', constants::M_COMPONENT), array('wrap'=>'virtual','style'=>'width: 100%;'));
+                //Question itemtextarea
+                $someid = \html_writer::random_id();
+                $edoptions = constants::ITEMTEXTAREA_EDOPTIONS;
+                //a bug prevents hideif working, but putting it in a group works dandy
+                $groupelements= [];
+                $groupelements[] = &$mform->createElement('editor', constants::QUESTIONTEXTAREA . '_editor',
+                        get_string('itemtextarea', constants::M_COMPONENT),
+                        array('id' => $someid, 'wrap' => 'virtual', 'style' => 'width: 100%;', 'rows' => '5'),
+                        $edoptions);
+                $this->_form->setDefault(constants::QUESTIONTEXTAREA . '_editor', array('text' => '', 'format' => FORMAT_HTML));
                 $mform->setType(constants::QUESTIONTEXTAREA, PARAM_RAW);
+                $mform->addGroup($groupelements, 'groupelements', get_string('itemtextarea', constants::M_COMPONENT), array(' '), false);
                 if($m35){
-                    $mform->hideIf(constants::QUESTIONTEXTAREA, 'addtextarea', 'neq', 1);
+                    $mform->hideIf('groupelements', 'addtextarea', 'neq', 1);
+                   // $mform->hideIf(constants::QUESTIONTEXTAREA. '_editor', 'addtextarea', 'neq', 1);
                 }else {
-                    $mform->disabledIf(constants::QUESTIONTEXTAREA, 'addtextarea', 'neq', 1);
+                    $mform->disabledIf('groupelements', 'addtextarea', 'neq', 1);
+                   // $mform->disabledIf(constants::QUESTIONTEXTAREA. '_editor', 'addtextarea', 'neq', 1);
                 }
-
-
             }
 
         }

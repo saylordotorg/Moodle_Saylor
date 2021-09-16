@@ -23,11 +23,6 @@ a:visited {
   color: $link-color-visited;
 }
 
-// Rounded user pictures
-.userpicture {
-    border-radius: 50%;
-}
-
 h1,
 .h1,
 h2,
@@ -63,7 +58,7 @@ h6,
 
 // Rounded user pictures
 .userpicture {
-    border-radius: 50%;
+    border-radius: 50% !important;
 }
 
 // Increase font size for user log in/sign up top-right header.
@@ -182,3 +177,18 @@ h6,
     padding: 0.5rem 0.25rem 0 0.75rem;
   };
 }
+
+/** Progress Bars */
+.progress-bar {
+    @extend .bg-tertiary, .border, .border-primary, .rounded-left;
+}
+
+.progress-bar[aria-valuenow="0"] {
+    border: 0px !important;
+}
+
+.progress-bar[aria-valuenow="100"] {
+    @extend .rounded-right;
+}
+
+

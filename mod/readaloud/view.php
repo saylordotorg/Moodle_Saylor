@@ -69,17 +69,24 @@ $completion->set_module_viewed($cm);
 //are we a teacher or a student?
 $mode = "view";
 
+
+//Get an admin settings
+$config = get_config(constants::M_COMPONENT);
+
 /// Set up the page header
 $PAGE->set_title(format_string($moduleinstance->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($modulecontext);
-$PAGE->set_pagelayout('course');
+
+if($config->enablesetuptab){
+    $PAGE->set_pagelayout('popup');
+}else{
+    $PAGE->set_pagelayout('course');
+}
 
 //we need to load jquery for some old themes (Essential mainly)
 $PAGE->requires->jquery();
 
-//Get an admin settings
-$config = get_config(constants::M_COMPONENT);
 
 //Get our renderers
 $renderer = $PAGE->get_renderer('mod_readaloud');
@@ -151,11 +158,8 @@ if($attempts) {
 //From here we actually display the page.
 
 //if we are teacher we see tabs. If student we just see the activity
-if (has_capability('mod/readaloud:viewreports', $modulecontext)) {
-    echo $renderer->header($moduleinstance, $cm, $mode, null, get_string('view', constants::M_COMPONENT));
-} else {
-    echo $renderer->notabsheader();
-}
+echo $renderer->header($moduleinstance, $cm, $mode, null, get_string('view', constants::M_COMPONENT));
+
 
 if($config->enablesetuptab && empty($moduleinstance->passage)) {
     if (has_capability('mod/readaloud:manage', $modulecontext)) {
@@ -166,11 +170,6 @@ if($config->enablesetuptab && empty($moduleinstance->passage)) {
     echo $renderer->footer();
     return;
 }
-
-
-
-//Show the title
-echo $renderer->show_title($moduleinstance->name);
 
 //If we are reviewing attempts we do that here and return.
 //If we are going to the dashboard we output that below
@@ -214,7 +213,7 @@ if ($attempts && $reviewattempts) {
                 if($collapsespaces){
                     $extraclasses = ' collapsespaces';
                 }
-                echo $passagerenderer->render_passage($moduleinstance->passage,constants::M_PASSAGE_CONTAINER, $extraclasses);
+                echo $passagerenderer->render_passage($moduleinstance->passagesegments,$moduleinstance->ttslanguage,constants::M_PASSAGE_CONTAINER, $extraclasses);
                 echo $renderer->fetch_clicktohear_amd($moduleinstance,$token);
                 echo $renderer->render_hiddenaudioplayer();
                 break;
@@ -232,7 +231,7 @@ if ($attempts && $reviewattempts) {
                 echo $passagehelper->prepare_javascript($reviewmode, $force_aidata, $readonly);
                 echo $renderer->fetch_clicktohear_amd($moduleinstance,$token);
                 echo $renderer->render_hiddenaudioplayer();
-                echo $passagerenderer->render_userreview($passagehelper,$collapsespaces);
+                echo $passagerenderer->render_userreview($passagehelper,$moduleinstance->ttslanguage,$collapsespaces);
 
                 break;
 
@@ -250,7 +249,7 @@ if ($attempts && $reviewattempts) {
                 echo $passagehelper->prepare_javascript($reviewmode, $force_aidata, $readonly);
                 echo $renderer->fetch_clicktohear_amd($moduleinstance,$token);
                 echo $renderer->render_hiddenaudioplayer();
-                echo $passagerenderer->render_userreview($passagehelper,$collapsespaces);
+                echo $passagerenderer->render_userreview($passagehelper,$moduleinstance->ttslanguage,$collapsespaces);
                 break;
 
             case constants::POSTATTEMPT_EVALERRORSNOGRADE:
@@ -268,7 +267,7 @@ if ($attempts && $reviewattempts) {
                 echo $renderer->fetch_clicktohear_amd($moduleinstance,$token);
                 echo $renderer->render_hiddenaudioplayer();
                 $nograde=true;
-                echo $passagerenderer->render_userreview($passagehelper,$collapsespaces,$nograde);
+                echo $passagerenderer->render_userreview($passagehelper,$moduleinstance->ttslanguage,$collapsespaces,$nograde);
                 break;
         }
     } else {
@@ -281,7 +280,7 @@ if ($attempts && $reviewattempts) {
         if($collapsespaces){
             $extraclasses = ' collapsespaces';
         }
-        echo $passagerenderer->render_passage($moduleinstance->passage,constants::M_PASSAGE_CONTAINER, $extraclasses);
+        echo $passagerenderer->render_passage($moduleinstance->passagesegments,$moduleinstance->ttslanguage,constants::M_PASSAGE_CONTAINER, $extraclasses);
 
     }
 
@@ -351,7 +350,7 @@ if($collapsespaces){
 
 //hide on load, and we can show from ajax
 $extraclasses .= ' hide';
-echo $passagerenderer->render_passage($moduleinstance->passage,constants::M_PASSAGE_CONTAINER, $extraclasses);
+echo $passagerenderer->render_passage($moduleinstance->passagesegments,$moduleinstance->ttslanguage, constants::M_PASSAGE_CONTAINER, $extraclasses);
 
 //lets fetch recorder
 echo $renderer->show_recorder($moduleinstance, $token, $debug);

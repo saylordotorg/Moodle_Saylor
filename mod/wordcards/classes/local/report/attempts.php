@@ -90,17 +90,11 @@ class attempts extends basereport {
         $context = empty($cm) ? \context_course::instance($course->id) : \context_module::instance($cm->id);
         $supergrouper = has_capability('moodle/site:accessallgroups', $context, $USER->id);
 
-        //if no groups or can see all groups, simple SQL
-        if($supergrouper || $groupsmode !=SEPARATEGROUPS) {
-            $alldata = $DB->get_records(constants::M_ATTEMPTSTABLE, array('modid' => $formdata->modid), 'timecreated DESC');
-
         //if need to partition to groups, SQL for groups
-        }else{
-            $groups = groups_get_user_groups($course->id);
-            if (!$groups || empty($groups[0])) {
-                return false;
-            }
-            list($groupswhere, $allparams) = $DB->get_in_or_equal(array_values($groups[0]));
+        if($formdata->groupid > 0){
+
+             list($groupswhere, $allparams) = $DB->get_in_or_equal($formdata->groupid);
+
 
             $allsql ="SELECT att.* FROM {".constants::M_ATTEMPTSTABLE ."} att " .
                     "INNER JOIN {groups_members} gm ON att.userid=gm.userid " .
@@ -108,6 +102,8 @@ class attempts extends basereport {
                     "ORDER BY timecreated DESC";
             $allparams[]=$formdata->modid;
             $alldata = $DB->get_records_sql($allsql, $allparams);
+        }else{
+            $alldata = $DB->get_records(constants::M_ATTEMPTSTABLE, array('modid' => $formdata->modid), 'timecreated DESC');
         }
 
         if ($alldata) {

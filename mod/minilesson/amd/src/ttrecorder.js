@@ -51,6 +51,69 @@ define(['jquery', 'core/log','core/notification', 'mod_minilesson/ttaudiohelper'
             this.register_events();
 
 
+            //callbacks
+            var on_error = function(error) {
+                switch (error.name) {
+                    case 'PermissionDeniedError':
+                    case 'NotAllowedError':
+                        notification.alert("Error",'Please allow access to your microphone!', "OK");
+                        break;
+                    case 'DevicesNotFoundError':
+                    case 'NotFoundError':
+                        notification.alert("Error",'No microphone detected!', "OK");
+                        break;
+                    default:
+                        //other errors, like from Edge can fire repeatedly so a notification is not a good idea
+                        //notification.alert("Error", error.name, "OK");
+                        log.debug("Error", error.name);
+                }
+            };
+
+            var on_stopped = function(blob) {
+                clearInterval(that.interval);
+
+                //if ds recc
+                var newaudio = {
+                    blob: blob,
+                    dataURI: URL.createObjectURL(blob),
+                    end: new Date(),
+                    isRecording: false,
+                    length: Math.round((that.audio.end - that.audio.start) / 1000),
+                };
+                that.update_audio(newaudio);
+
+                that.deepSpeech2(that.audio.blob, function(response){
+                    log.debug(response);
+                    that.update_audio('isRecognizing',false);
+                    if(response.data.result==="success" && response.data.transcript){
+                        that.gotRecognition(response.data.transcript.trim());
+                    } else {
+                        notification.alert("Information","We could not recognize your speech.", "OK");
+                    }
+                });
+
+            };
+
+            //set up events
+            var on_gotstream=  function(stream) {
+
+                var newaudio={stream: stream, isRecording: true};
+                that.update_audio(newaudio);
+                that.currentTime = 0;
+
+                that.interval = setInterval(function() {
+                    if (that.currentTime < that.maxTime) {
+                        that.currentTime += 10;
+                    } else {
+                        that.update_audio('isRecognizing',true);
+                        // vm.isRecognizing = true;
+                        that.audiohelper.stop();
+                    }
+                }, 10);
+
+            };
+
+
 
             //If browser rec (Chrome Speech Rec) (and ds is optiona)
             if(browserRec.will_work_ok() && ! this.ds_only){
@@ -80,64 +143,6 @@ define(['jquery', 'core/log','core/notification', 'mod_minilesson/ttaudiohelper'
                 log.debug("using ds rec");
                 this.audiohelper =  audioHelper.clone();
                 this.audiohelper.init(this.waveHeight,this.uniqueid,this);
-
-                //set up events
-                var on_gotstream=  function(stream) {
-
-                    var newaudio={stream: stream, isRecording: true};
-                    that.update_audio(newaudio);
-                    that.currentTime = 0;
-
-                    that.interval = setInterval(function() {
-                        if (that.currentTime < that.maxTime) {
-                            that.currentTime += 10;
-                        } else {
-                            that.update_audio('isRecognizing',true);
-                            // vm.isRecognizing = true;
-                            that.audiohelper.stop();
-                        }
-                    }, 10);
-
-                };
-
-                var on_error = function(error) {
-                    switch (error.name) {
-                        case 'PermissionDeniedError':
-                        case 'NotAllowedError':
-                            notification.alert("Error",'Please allow access to your microphone!', "OK");
-                            break;
-                        case 'DevicesNotFoundError':
-                        case 'NotFoundError':
-                            notification.alert("Error",'No microphone detected!', "OK");
-                            break;
-                    }
-                };
-
-                var on_stopped = function(blob) {
-                    clearInterval(that.interval);
-
-                    //if ds recc
-                    var newaudio = {
-                        blob: blob,
-                        dataURI: URL.createObjectURL(blob),
-                        end: new Date(),
-                        isRecording: false,
-                        length: Math.round((that.audio.end - that.audio.start) / 1000),
-                    };
-                    that.update_audio(newaudio);
-
-                    that.deepSpeech2(that.audio.blob, function(response){
-                        log.debug(response);
-                        that.update_audio('isRecognizing',false);
-                        if(response.data.result==="success" && response.data.transcript){
-                            that.gotRecognition(response.data.transcript.trim());
-                        } else {
-                            notification.alert("Information","We could not recognize your speech.", "OK");
-                        }
-                    });
-
-                };
-
 
                 that.audiohelper.onError = on_error;
                 that.audiohelper.onStop = on_stopped;
@@ -306,10 +311,16 @@ define(['jquery', 'core/log','core/notification', 'mod_minilesson/ttaudiohelper'
                 if (oReq.status === 200) {
                     callback(JSON.parse(oReq.response));
                 } else {
+                    callback({data: {result: "error"}});
                     console.error(oReq.error);
                 }
             };
-            oReq.send(bodyFormData);
+            try {
+                oReq.send(bodyFormData);
+            }catch(err){
+                callback({data: {result: "error"}});
+                console.error(err);
+            }
         },
 
     };//end of return value

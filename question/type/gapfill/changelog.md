@@ -1,7 +1,27 @@
+### Version 2.133 of the Moodle Gapfill question type
+Fix renderer.php so the output complies with the validator at https://validator.w3.org/
+Thanks to t-schroeder for raising this issue
+https://github.com/marcusgreen/moodle-qtype_gapfill/pull/77
+Which gave me the idea of validating the output.
+Fix for layout in optionsaftertext mode
+Bump to version of Moodle required from 3.3 to 3.7, to make support easier
+
+### Version 2.132 of the Moodle Gapfill question type Jul 2021
+Fix for https://github.com/marcusgreen/moodle-qtype_gapfill/issues/76
+where spurious div broke display of quiz blocks.
+Thanks to Serge Fleussu for reporting this.
+
+### Version 2.131 of the Moodle Gapfill question type June 2021
+Fix for Mobile App/ionic5, long text questions were cutting off instead of wrapping.
+More english language example questions. Moved from travis ci to github actions and
+moodle-ci
+
 ### Version 2.12 of the Moodle Gapfill question type May 2021
 Fix for iOS (e.g. iPads/iPhones). Thanks to  Deny Supanji  for reporting this. The text entry field now has the  spellchecker = false which stops it changing apostrophes into right quote marks.
 
-Refactored get attributes into separate function for clarity in renderer.php
+Refactored get attributes into separate function for clarity in renderer.php (a developer thing)
+
+Adapted to support ionic5 for the mobile app while keeping backwards compatibility for ionic3. See https://docs.moodle.org/dev/Adapt_your_Mobile_plugins_to_Ionic_5
 
 ### Version 2.11 of the Moodle Gapfill question type Jan 2021
 Fix for https://github.com/marcusgreen/moodle-qtype_gapfill/issues/64.

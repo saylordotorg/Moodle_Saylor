@@ -68,7 +68,7 @@ define(['jquery', 'jqueryui', 'core/log', 'mod_readaloud/definitions',
             dd.enablelandr =dd.activitydata.enablelandr;
             dd.setupmodelaudio();
 
-            //set up lsten an repeat
+            //set up listen an repeat
             dd.setuplandr();
 
 
@@ -92,7 +92,8 @@ define(['jquery', 'jqueryui', 'core/log', 'mod_readaloud/definitions',
         },
 
         setuplandr: function(){
-            var landr_opts={modelaudiokaraoke: modelaudiokaraoke, cmid: this.cmid, language: this.activitydata.language, region: this.activitydata.region};
+            var landr_opts={modelaudiokaraoke: modelaudiokaraoke, cmid: this.cmid, language: this.activitydata.language,
+                region: this.activitydata.region, phonetics: this.activitydata.phonetics, ds_only: this.activitydata.ds_only};
             landr.init(landr_opts);
         },
 

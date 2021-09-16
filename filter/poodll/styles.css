@@ -108,6 +108,184 @@ Base Media skin Setting Integration
 .poodll_dialogue_box .poodll_dialogue_content h6 {
     margin-bottom: 0px;
 }
+/* Screen Recorder */
+.screen-main-wrapper {
+    position: relative;
+}
+
+.screen-main-wrapper .settingsicon {
+    position: absolute;
+    right: -3px;
+    bottom: -13px;
+}
+
+.screen-main-wrapper .settingsicon button {
+    border: none;
+    background: transparent;
+}
+
+.screen-main-wrapper .settingsicon button i {
+    font-size: 18px !important;
+    color: brown;
+}
+
+.screen-main-wrapper .settingsicon button:focus {
+    border: none;
+    background: transparent;
+}
+
+.screen-main-wrapper .settingsicon button i:hover {
+    cursor: pointer;
+}
+
+.poodll_mediarecorder_size_small .screen-wrap button {
+    height: 60px !important;
+    width: 25% !important;
+}
+
+.poodll_mediarecorder_size_small .screen-wrap button i.fa {
+    font-size: 35px;
+    color: #333;
+}
+
+@media (max-width: 768px) {
+
+    .video_preview_screen {
+        height: 150px;
+    }
+}
+
+.screen-main-wrapper .screen-wrap {
+    text-align: center;
+}
+
+.screen-main-wrapper {
+    width: 320px;
+}
+
+.screen-main-wrapper .screen-wrap button {
+    height: 60px !important;
+    width: 30% !important;
+}
+
+.screen-main-wrapper .task-helper {
+    display: inline-flex;
+    width: 100%;
+}
+
+.screen-main-wrapper .task-helper p {
+    width: 33%;
+    float: left;
+    font-size: 18px;
+    margin-bottom: 0px;
+}
+
+.screen-main-wrapper .task-helper i.fa {
+    color: green;
+    font-size: 45px;
+}
+
+.screen-main-wrapper .task-helper p.step-1 {
+    margin-left: 5px;
+}
+
+.screen-main-wrapper .task-helper p.step-3 {
+    margin-right: 5px;
+}
+
+.screen-main-wrapper .screen-wrap button i.fa {
+    font-size: 45px;
+    color: #333;
+}
+
+
+.poodll_mediarecorderbox_standard .poodll_mediarecorderholder_screen .pmr_disabled {
+    background: rgba(194, 194, 194, 0.7);
+    color: #333 !important;
+    opacity: 1 !important;
+}
+
+.poodll_mediarecorderholder_screen {
+    width: 300px;
+    padding: 20px;
+    border: 3px solid #333;
+}
+
+.poodll_mediarecorder_button_screen {
+    width: 83% !important;
+    margin: 5px auto;
+    border: 3px solid #333;
+    background: none !important;
+    color: #333 !important;
+    text-shadow: 1px 2px 1px #c2c2c2;
+}
+
+.poodll_mediarecorderbox_screen .poodll_preview_screen {
+    border: 3px solid #333;
+    background-color: transparent;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.poodll_mediarecorderbox_screen .poodll_status_screen {
+    text-align: center;
+    margin-bottom: 10px;
+    width: 100%;
+    border: 3px solid #333;
+}
+
+.poodll_mediarecorderholder_screen input[type="checkbox"] {
+    width: 30px;
+    height: 15px;
+    margin-top: 10px;
+
+}
+
+.poodll_mediarecorderbox_screen .poodll_status_standard {
+    background-color: rgba(0, 0, 0, 0.4);
+    height: 40px;
+    width: 100%;
+    border-radius: 20px;
+    color: #fff;
+    border: 2px solid seagreen;
+    font-weight: 900;
+    text-shadow: 1px 2px 1px #ccc;
+    font-size: 20px;
+    line-height: 35px;
+}
+
+.poodll_mediarecorderbox_screen .poodll_mediarecorder_button_standard {
+    padding: 0px 10px;
+    border: none;
+    background-color: #fff;
+    border-radius: 0px !important;
+    color: red;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    height: 40px;
+}
+
+.poodll_mediarecorderbox_screen .poodll_save-recording_standard {
+    height: 40px;
+    background-color: #fff;
+    border: none;
+    width: 100% !important;
+}
+
+.poodll_mediarecorderbox_screen button.pmr_disabled {
+    color: #BBB;
+}
+
+.poodll_mediarecorderbox_screen .poodll_mediarecorderbox_standard {
+    width: 280px !important;
+}
+
+.poodll_mediarecorderbox_screen .poodll_preview_standard {
+    width: 100% !important;
+}
+
+
+/* One Two Three Recorder */
 
 .one-two-three-main-wrapper {
     position: relative;
@@ -3965,6 +4143,7 @@ audio.poodll_preview_bmr {
     .video_preview_123 {
         height: 150px;
     }
+
 }
 
 .one-two-three-main-wrapper .one-two-three-wrap {

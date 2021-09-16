@@ -60,7 +60,9 @@ $string['confirm_delete'] = 'Are you sure you want to delete?';
 $string['confirm_delete_selected'] = 'Are you sure you want to delete all selected items?';
 $string['inprogess_pleasewait'] = 'Please wait…';
 $string['copy_section'] = 'Copy section';
+$string['copy_section_title'] = 'Copy selected section';
 $string['label_image_replaced_text'] = ' (Label: Image)';
+$string['uninstalled_plugin_warning_title'] = 'This plugin is uninstalled. Trying to recover this without reinstalling the plugin: {$a} will cause errors. Restoration is disabled';
 
 $string['settings:userdata_copyable_modtypes'] = 'User data copyable module types';
 $string['settings:userdata_copyable_modtypes_desc'] = 'While copying an activity into the Sharing Cart,
@@ -94,7 +96,7 @@ $string['conflict_submit'] = 'Continue';
 
 $string['folder_string'] = 'Folder:';
 $string['activity_string'] = 'Activity:';
-$string['delete_folder'] = ' and all it\'s content';
+$string['delete_folder'] = ' and all its content';
 $string['modal_checkbox'] = 'Do you want to copy user data? (Eg. glossary/wiki/database entries)';
 $string['modal_confirm_backup'] = 'Confirm';
 $string['modal_confirm_delete'] = 'Delete';

@@ -39,16 +39,19 @@ class mobile {
 
     /**
      * Returns the gapfill question type for the quiz in the mobile app.
-     *
+     * @param array $args
      * @return void
      */
-    public static function mobile_get_gapfill() {
+    public static function mobile_get_gapfill($args) {
         global $CFG;
+        $args = (object) $args;
+        $folder = $args->appversioncode >= 3950 ? 'latest' : 'ionic3';
+        $templatepath = $CFG->dirroot."/question/type/gapfill/mobile/$folder/addon-qtype-gapfill.html";
         return [
             'templates' => [
                 [
                     'id' => 'main',
-                    'html' => file_get_contents($CFG->dirroot .'/question/type/gapfill/mobile/addon-qtype-gapfill.html')
+                    'html' => file_get_contents($templatepath)
                     ]
             ],
             'javascript' => file_get_contents($CFG->dirroot . '/question/type/gapfill/mobile/mobile.js')

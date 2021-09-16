@@ -73,7 +73,6 @@ $string['checklist:updateother'] = 'Update students\' checklist marks';
 $string['checklist:updateown'] = 'Update your checklist marks';
 $string['checklist:viewmenteereports'] = 'View mentee progress (only)';
 $string['checklist:viewreports'] = 'View students\' progress';
-
 $string['checklistautoupdate'] = 'Allow checklists to automatically update';
 
 $string['checklistfor'] = 'Checklist for';
@@ -85,6 +84,8 @@ $string['checks'] = 'Check marks';
 $string['choosecourse'] = 'Choose course...';
 $string['comments'] = 'Comments';
 
+$string['completiondetail:percent'] = 'Check-off items: {$a}%';
+$string['completiondetail:items'] = 'Check-off items: {$a}';
 $string['completionpercentgroup'] = 'Require checked-off';
 $string['completionpercentgroup_help'] = 'If \'percent of items\' is selected, then users must check-off at least the specified percentage of the checklist items to be considered \'complete\'. If \'items\' is selected, then the user must check-off at least that many individual items in the list. Note if you specify a number of items here that is greater than the number of items in the checklist, then it will never be marked as complete.';
 $string['completionpercent'] = 'Amount of items that should be checked-off:';
@@ -212,6 +213,8 @@ $string['showhidechecked'] = 'Show/hide selected items';
 $string['showupdateablemymoodle'] = 'Show only updatable Checklists on \'My Moodle\' page';
 $string['showmymoodle'] = 'Show Checklists on \'My Moodle\' page';
 $string['showprogressbars'] = 'Show progress bars';
+$string['showcolorchooser'] = 'Display color chooser';
+$string['showcolorchooserdesc'] = 'Displays the color chooser of the list elements in edit.php';
 
 $string['teachercomments'] = 'Teachers can add comments';
 $string['teacherdate'] = 'Date a teacher last updated this item';

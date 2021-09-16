@@ -16,6 +16,7 @@
       	<FIELD NAME="qresource" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" COMMENT="The URL of an image file to be be used as whiteboard background." PREVIOUS="graderinfoformat" NEXT="boardsize"  />
 		<FIELD NAME="boardsize" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" COMMENT="The size of the whiteboard drawing area." PREVIOUS="qresource" NEXT="timelimit" />
 		<FIELD NAME="timelimit" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="boardsize"  />
+        <FIELD NAME="safesave" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="if true disable submit button till uploaded "/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="questionid"/>

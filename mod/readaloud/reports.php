@@ -83,7 +83,13 @@ $event->trigger();
 $PAGE->set_title(format_string($moduleinstance->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($modulecontext);
-$PAGE->set_pagelayout('course');
+
+if($config->enablesetuptab){
+    $PAGE->set_pagelayout('popup');
+}else{
+    $PAGE->set_pagelayout('course');
+}
+
 $PAGE->requires->jquery();
 
 $aph_opts = Array();
@@ -124,6 +130,7 @@ switch ($showreport) {
         $formdata = new stdClass();
         $formdata->readaloudid = $moduleinstance->id;
         $formdata->modulecontextid = $modulecontext->id;
+        $formdata->groupmenu = true;
         break;
 
     case 'attemptssummary':
@@ -131,6 +138,7 @@ switch ($showreport) {
         $formdata = new stdClass();
         $formdata->readaloudid = $moduleinstance->id;
         $formdata->modulecontextid = $modulecontext->id;
+        $formdata->groupmenu = true;
         break;
 
     case 'grading':
@@ -139,6 +147,7 @@ switch ($showreport) {
         $formdata = new stdClass();
         $formdata->readaloudid = $moduleinstance->id;
         $formdata->modulecontextid = $modulecontext->id;
+        $formdata->groupmenu = true;
         break;
 
     default:
@@ -154,6 +163,21 @@ switch ($showreport) {
 3) call $rows=report->fetch_formatted_records($withlinks=true(html) false(print/excel))
 5) call $reportrenderer->render_section_html($sectiontitle, $report->name, $report->get_head, $rows, $report->fields);
 */
+
+
+$groupmenu = '';
+if(isset($formdata->groupmenu)){
+    // fetch groupmode/menu/id for this activity
+    if ($groupmode = groups_get_activity_groupmode($cm)) {
+        $groupmenu = groups_print_activity_menu($cm, $PAGE->url, true);
+        $groupmenu .= ' ';
+        $formdata->groupid = groups_get_activity_group($cm);
+    }else{
+        $formdata->groupid  = 0;
+    }
+}else{
+    $formdata->groupid  = 0;
+}
 
 $report->process_raw_data($formdata);
 $reportheading = $report->fetch_formatted_heading();
@@ -171,6 +195,7 @@ switch ($format) {
         $pagingbar = $reportrenderer->show_paging_bar($allrowscount, $paging, $PAGE->url);
         echo $renderer->header($moduleinstance, $cm, $mode, null, get_string('reports', constants::M_COMPONENT));
         echo $extraheader;
+        echo $groupmenu;
         echo $pagingbar;
         echo $reportrenderer->render_section_html($reportheading, $report->fetch_name(), $report->fetch_head(), $reportrows,
                 $report->fetch_fields());

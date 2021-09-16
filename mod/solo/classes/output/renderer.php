@@ -40,6 +40,7 @@ class renderer extends \plugin_renderer_base {
         $this->page->set_title($title);
         $this->page->set_heading($this->page->course->fullname);
         $output = $this->output->header();
+        $output .= $this->fetch_title($moduleinstance,$activityname);
 
         if (has_capability('mod/solo:selecttopics', $context) || has_capability('mod/solo:viewreports', $context)) {
 
@@ -50,15 +51,20 @@ class renderer extends \plugin_renderer_base {
                 $output .= ob_get_contents();
                 ob_end_clean();
             }
-        } else {
-            $output .= $this->output->heading($activityname);
         }
-
 
         return $output;
     }
 
-
+    public function fetch_title($moduleinstance, $title){
+        $displaytext='';
+        //dont show the heading in an iframe, it will be outside this anyway
+        if(!$moduleinstance->foriframe) {
+            $thetitle = $this->output->heading($title, 3, 'main');
+            $displaytext = \html_writer::div($thetitle, '');
+        }
+        return $displaytext;
+    }
 
     /**
      * Show the introduction text is as set in the activity description

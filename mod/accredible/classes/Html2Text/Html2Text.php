@@ -1,4 +1,18 @@
 <?php
+// This file is part of the Accredible Certificate module for Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace mod_accredible\Html2Text;
 
@@ -19,14 +33,14 @@ class Html2Text {
      * @throws Html2TextException if the HTML could not be loaded as a {@link DOMDocument}
      */
     public static function convert($html, $ignore_error = false) {
-        // replace &nbsp; with spaces
+        // Replace &nbsp; with spaces.
         $html = str_replace("&nbsp;", " ", $html);
         $html = str_replace("\xc2\xa0", " ", $html);
 
         $is_office_document = static::isOfficeDocument($html);
 
         if ($is_office_document) {
-            // remove office namespace
+            // Remove office namespace.
             $html = str_replace(array("<o:p>", "</o:p>"), "", $html);
         }
 
@@ -39,17 +53,17 @@ class Html2Text {
 
         $output = static::iterateOverNode($doc, null, false, $is_office_document);
 
-        // remove leading and trailing spaces on each line
+        // Remove leading and trailing spaces on each line.
         $output = preg_replace("/[ \t]*\n[ \t]*/im", "\n", $output);
         $output = preg_replace("/ *\t */im", "\t", $output);
 
-        // unarmor pre blocks
+        // Unarmor pre blocks.
         $output = str_replace("\r", "\n", $output);
 
-        // remove unnecessary empty lines
+        // Remove unnecessary empty lines.
         $output = preg_replace("/\n\n\n*/im", "\n\n", $output);
 
-        // remove leading and trailing whitespace
+        // Remove leading and trailing whitespace.
         $output = trim($output);
 
         return $output;
@@ -64,9 +78,9 @@ class Html2Text {
      * @return string the fixed text
      */
     static function fixNewlines($text) {
-        // replace \r\n to \n
+        // Replace \r\n to \n.
         $text = str_replace("\r\n", "\n", $text);
-        // remove \rs
+        // Remove \rs.
         $text = str_replace("\r", "\n", $text);
 
         return $text;
@@ -86,8 +100,8 @@ class Html2Text {
         $html = trim($html);
 
         if (!$html) {
-            // DOMDocument doesn't support empty value and throws an error
-            // Return empty document instead
+            // DOMDocument doesn't support empty value and throws an error.
+            // Return empty document instead.
             return $doc;
         }
 
@@ -129,7 +143,7 @@ class Html2Text {
     }
 
     static function nextChildName($node) {
-        // get the next child
+        // Get the next child.
         $nextNode = $node->nextSibling;
         while ($nextNode != null) {
             if ($nextNode instanceof \DOMText) {
@@ -153,12 +167,12 @@ class Html2Text {
     static function iterateOverNode($node, $prevName = null, $in_pre = false, $is_office_document = false) {
 
         if ($node instanceof \DOMText) {
-            // Replace whitespace characters with a space (equivilant to \s)
+            // Replace whitespace characters with a space (equivilant to \s).
             if ($in_pre) {
                 $text = "\n" . trim($node->wholeText, "\n\r\t ") . "\n";
-                // Remove trailing whitespace only
+                // Remove trailing whitespace only.
                 $text = preg_replace("/[ \t]*\n/im", "\n", $text);
-                // armor newlines with \r.
+                // Armor newlines with \r.
                 return str_replace("\n", "\r", $text);
             } else {
                 $text = preg_replace("/[\\t\\n\\f\\r ]+/im", " ", $node->wholeText);
@@ -169,18 +183,18 @@ class Html2Text {
             }
         }
         if ($node instanceof \DOMDocumentType) {
-            // ignore
+            // Ignore.
             return "";
         }
         if ($node instanceof \DOMProcessingInstruction) {
-            // ignore
+            // Ignore.
             return "";
         }
 
         $name = strtolower($node->nodeName);
         $nextName = static::nextChildName($node);
 
-        // start whitespace
+        // Start whitespace.
         switch ($name) {
             case "hr":
                 $prefix = '';
@@ -194,7 +208,7 @@ class Html2Text {
             case "title":
             case "meta":
             case "script":
-                // ignore these tags
+                // ignore these tags.
                 return "";
 
             case "h1":
@@ -205,13 +219,13 @@ class Html2Text {
             case "h6":
             case "ol":
             case "ul":
-                // add two newlines, second line is added below
+                // add two newlines, second line is added below.
                 $output = "\n";
                 break;
 
             case "td":
             case "th":
-                // add tab char to separate table fields
+                // add tab char to separate table fields.
                 $output = "\t";
                 break;
 
@@ -248,39 +262,35 @@ class Html2Text {
                 break;
         }
 
-        // debug
-        //$output .= "[$name,$nextName]";
-
         if (isset($node->childNodes)) {
 
             $n = $node->childNodes->item(0);
             $previousSiblingName = null;
 
-            while($n != null) {
+            while ($n != null) {
 
                 $text = static::iterateOverNode($n, $previousSiblingName, $in_pre || $name == 'pre', $is_office_document);
 
-                // Pass current node name to next child, as previousSibling does not appear to get populated
+                // Pass current node name to next child, as previousSibling does not appear to get populated.
                 if ($n instanceof \DOMDocumentType
                     || $n instanceof \DOMProcessingInstruction
                     || ($n instanceof \DOMText && static::isWhitespace($text))) {
-                    // Keep current previousSiblingName, these are invisible
-                }
-                else {
+                    // Keep current previousSiblingName, these are invisible.
+                } else {
                     $previousSiblingName = strtolower($n->nodeName);
                 }
 
                 $node->removeChild($n);
                 $n = $node->childNodes->item(0);
 
-                // suppress last br tag inside a node list
+                // Suppress last br tag inside a node list.
                 if ($n != null || $previousSiblingName != 'br') {
                     $output .= $text;
                 }
             }
         }
 
-        // end whitespace
+        // End whitespace.
         switch ($name) {
             case "h1":
             case "h2":
@@ -292,13 +302,11 @@ class Html2Text {
                 break;
 
             case "p":
-                // add two lines
                 $output .= "\n\n";
                 break;
 
             case "pre":
             case "br":
-                // add one line
                 $output .= "\n";
                 break;
 
@@ -306,47 +314,47 @@ class Html2Text {
                 break;
 
             case "a":
-                // links are returned in [text](link) format
+                // Links are returned in [text](link) format.
                 $href = $node->getAttribute("href");
 
                 $output = trim($output);
 
-                // remove double [[ ]] s from linking images
+                // Remove double [[ ]] s from linking images.
                 if (substr($output, 0, 1) == "[" && substr($output, -1) == "]") {
                     $output = substr($output, 1, strlen($output) - 2);
 
-                    // for linking images, the title of the <a> overrides the title of the <img>
+                    // For linking images, the title of the <a> overrides the title of the <img>.
                     if ($node->getAttribute("title")) {
                         $output = $node->getAttribute("title");
                     }
                 }
 
-                // if there is no link text, but a title attr
+                // If there is no link text, but a title attr.
                 if (!$output && $node->getAttribute("title")) {
                     $output = $node->getAttribute("title");
                 }
 
                 if ($href == null) {
-                    // it doesn't link anywhere
+                    // It doesn't link anywhere.
                     if ($node->getAttribute("name") != null) {
                         $output = "[$output]";
                     }
                 } else {
                     if ($href == $output || $href == "mailto:$output" || $href == "http://$output" || $href == "https://$output") {
-                        // link to the same address: just use link
+                        // Link to the same address: just use link.
                         $output;
                     } else {
-                        // replace it
+                        // Replace it.
                         if ($output) {
                             $output = "[$output]($href)";
                         } else {
-                            // empty string
+                            // Empty string.
                             $output = $href;
                         }
                     }
                 }
 
-                // does the next node require additional whitespace?
+                // Does the next node require additional whitespace?
                 switch ($nextName) {
                     case "h1": case "h2": case "h3": case "h4": case "h5": case "h6":
                     $output .= "\n";
@@ -369,7 +377,7 @@ class Html2Text {
                 break;
 
             default:
-                // do nothing
+                // Do nothing.
         }
 
         return $output;

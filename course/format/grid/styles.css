@@ -34,6 +34,7 @@
     padding: 0;
     padding-bottom: 5px;
 }
+
 .course-content ul.gtopics-0 #section-0 {
     background: transparent;
     border: 0 none;
@@ -141,7 +142,9 @@ div#gridmiddle-column > ul {
     text-overflow: inherit;
     white-space: pre-wrap;
     word-wrap: break-word;
+    z-index: 1;
 }
+
 .course-content ul.gridicons li .icon_content.content_inside.top {
     left: 0;
     right: 0;
@@ -194,12 +197,14 @@ div#gridmiddle-column > ul {
             box-sizing: content-box;
     overflow: visible;
     position: relative;
-    text-align: center;
-    vertical-align: middle;
 }
 
-.course-content ul.gridicons li img {
-    margin-top: 0;
+.course-content ul.gridicons li .image_holder img {
+    /*rtl:ignore*/
+    left: 50%;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .course-content ul.gridicons li img.info {
@@ -500,6 +505,6 @@ body.jsenabled #gridshadebox_content.hide_content {
 }
 
 .gfcolourpopupsel {
-    position:absolute;
+    position: absolute;
     z-index: 500;
 }

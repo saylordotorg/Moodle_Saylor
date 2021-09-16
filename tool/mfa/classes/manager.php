@@ -225,6 +225,9 @@ class manager {
         // Check for any instant fail states.
         $factors = \tool_mfa\plugininfo\factor::get_active_user_factor_types();
         foreach ($factors as $factor) {
+
+            $factor->load_locked_state();
+
             if ($factor->get_state() == \tool_mfa\plugininfo\factor::STATE_FAIL) {
                 return \tool_mfa\plugininfo\factor::STATE_FAIL;
             }
@@ -564,17 +567,17 @@ class manager {
     public static function sleep_timer() {
         global $USER;
 
-        $currentduration = get_user_preferences('mfa_sleep_duration', null, $USER);
-        if (!empty($currentduration)) {
+        $duration = get_user_preferences('mfa_sleep_duration', null, $USER);
+        if (!empty($duration)) {
             // Double current time.
-            set_user_preference('mfa_sleep_duration', $currentduration * 2, $USER);
+            $duration *= 2;
+            $duration = min(2, $duration);
         } else {
             // No duration set.
-            $currentduration = 0.05;
-            set_user_preference('mfa_sleep_duration', $currentduration, $USER);
+            $duration = 0.05;
         }
-
-        sleep($currentduration);
+        set_user_preference('mfa_sleep_duration', $duration, $USER);
+        sleep($duration);
     }
 
     /*

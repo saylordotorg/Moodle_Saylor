@@ -123,12 +123,12 @@ switch ($action) {
             $slowpassage = utils::fetch_speech_ssml($moduleinstance->passage,$moduleinstance->ttsspeed);
             $speechmarks = utils::fetch_polly_speechmarks($token,$moduleinstance->region,
                     $slowpassage,'ssml',$moduleinstance->ttsvoice);
-            $matches = utils::speechmarks_to_matches($moduleinstance->passage,$speechmarks);
+            $matches = utils::speechmarks_to_matches($moduleinstance->passagesegments,$speechmarks,$moduleinstance->ttslanguage);
 
             if(!empty($moduleinstance->modelaudiobreaks)){
                 $breaks = utils::sync_modelaudio_breaks(json_decode($moduleinstance->modelaudiobreaks),$matches);
             }else{
-                $breaks = utils::guess_modelaudio_breaks($moduleinstance->passage,$matches);
+                $breaks = utils::guess_modelaudio_breaks($moduleinstance->passagesegments,$matches,$moduleinstance->ttslanguage);
             }
 
             $DB->update_record(constants::M_TABLE, array('id' => $moduleinstance->id,
@@ -147,7 +147,12 @@ switch ($action) {
 $PAGE->set_title(format_string($moduleinstance->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($modulecontext);
-$PAGE->set_pagelayout('course');
+
+if($config->enablesetuptab){
+    $PAGE->set_pagelayout('popup');
+}else{
+    $PAGE->set_pagelayout('course');
+}
 
 
 //This puts all our display logic into the renderer.php files in this plugin
@@ -216,7 +221,7 @@ echo $modelaudiorenderer->render_sectiontop(
         get_string('modelaudio_breakstitle',constants::M_COMPONENT),
         get_string('modelaudio_breaksinstructions',constants::M_COMPONENT));
 echo $modelaudiorenderer->render_manualbreaktiming_checkbox();
-echo $passagerenderer->render_passage($moduleinstance->passage);
+echo $passagerenderer->render_passage($moduleinstance->passagesegments,$moduleinstance->ttslanguage);
 
 
 //show the breaks form

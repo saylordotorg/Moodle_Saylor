@@ -70,6 +70,11 @@ require_capability('mod/solo:view', $context);
 
 //Get an admin settings
 $config = get_config(constants::M_COMPONENT);
+if($config->enablesetuptab){
+    $PAGE->set_pagelayout('popup');
+}else{
+    $PAGE->set_pagelayout('course');
+}
 
 if($config->enablesetuptab && empty($moduleinstance->speakingtopic)){
     echo $renderer->header($moduleinstance, $cm, $mode, null, get_string('attempts', constants::M_COMPONENT));
@@ -93,7 +98,7 @@ if(count($attempts)==0){
     $nextstep = constants::STEP_USERSELECTIONS;
     $attemptid = 0;
 }else{
-    $latestattempt = utils::fetch_latest_attempt($moduleinstance);
+    $latestattempt = $attempt = $attempthelper->fetch_latest_attempt();
     if ($latestattempt && $latestattempt->completedsteps < constants::STEP_SELFTRANSCRIBE){
         $start_or_continue=true;
         $nextstep=$latestattempt->completedsteps+1;
@@ -119,7 +124,7 @@ if($start_or_continue) {
     echo $renderer->header($moduleinstance, $cm, $mode, null, get_string('attempts', constants::M_COMPONENT));
 
 
-    $attempt = utils::fetch_latest_finishedattempt($moduleinstance);
+    $attempt = $attempthelper->fetch_latest_complete_attempt();
     $stats=false;
     if($attempt) {
         $requiresgrading = ($attempt->grade==0 && $attempt->manualgraded==0);
@@ -134,7 +139,7 @@ if($start_or_continue) {
                         $context->id, $attempt->selftranscript,
                         $attempt_with_transcripts->transcript,
                         $attempt_with_transcripts->jsontranscript);
-                $attempt = utils::fetch_latest_finishedattempt($moduleinstance);
+                $attempt = $attempthelper->fetch_latest_complete_attempt();
             }
         }
 

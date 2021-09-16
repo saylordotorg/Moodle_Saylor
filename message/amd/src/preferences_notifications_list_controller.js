@@ -18,8 +18,6 @@
  * message preference page
  *
  * @module     core_message/preferences_notifications_list_controller
- * @class      preferences_notifications_list_controller
- * @package    message
  * @copyright  2016 Ryan Wyllie <ryan@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -53,6 +51,7 @@ define(['jquery',
     /**
      * Constructor for the PreferencesController.
      *
+     * @class
      * @param {object} element jQuery object root element of the preference
      */
     var PreferencesController = function(element) {
@@ -161,10 +160,11 @@ define(['jquery',
             type: NotificationProcessorSettings.TYPE,
         });
 
-        this.root.on(CustomEvents.events.activate, SELECTORS.PROCESSOR_SETTING, function(e) {
+        this.root.on(CustomEvents.events.activate, SELECTORS.PROCESSOR_SETTING, function(e, data) {
             var element = $(e.target).closest(SELECTORS.PROCESSOR_SETTING);
 
-            e.preventDefault();
+            data.originalEvent.preventDefault();
+
             eventFormPromise.then(function(modal) {
                 // Configure modal with element settings.
                 modal.setUserId($(element).attr('data-user-id'));

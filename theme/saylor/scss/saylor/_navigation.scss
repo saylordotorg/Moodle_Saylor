@@ -98,15 +98,27 @@
   border-bottom-right-radius: .25rem;
 }
 
+// Hide the dashboard link.
+.list-group-item.list-group-item-action[data-key="myhome"] {
+    display: none;
+}
+
+// Since hiding the dashboard link removes the upper rounded corners, have to set the next element to have rounded corners.
+// That next element is currently the link to Saylor.org, with data key 'localboostnavigationcustomrootadmins1'.
+
+.list-group-item.list-group-item-action[data-key="localboostnavigationcustomrootadmins1"] {
+  border-top-left-radius: .25rem;
+  border-top-right-radius: .25rem;
+}
+
 /** Resources */
 // Hide the resource navigation at the bottom of the resources.
 // It's confusing students.
 // Eventually, override the renderer to go to next unit.
 
-.activity-navigation {
- display: none;
+.activity-navigation .row {
+    align-items: normal;
 }
-
 /** Navigation Menu */
 
 .list-group-item.localboostnavigationfirstcustombuttomusers {

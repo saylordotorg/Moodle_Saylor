@@ -182,13 +182,39 @@ class detailedattempts extends basereport
         $this->headingdata = new \stdClass();
         $this->headingdata->activityname = $formdata->activityname;
 
-        $emptydata = array();
-        $sql = 'SELECT at.id, at.grade, at.userid, at.filename, st.turns, st.words,
+
+        //if we need to show just one group
+        if($formdata->groupid > 0){
+
+            list($groupswhere, $allparams) = $DB->get_in_or_equal($formdata->groupid);
+
+            $emptydata = array();
+            $sql = 'SELECT at.id, at.grade, at.userid, at.filename, st.turns, st.words,
         st.avturn, st.longestturn, st.targetwords, st.totaltargetwords,st.autospellscore,st.aiaccuracy,at.selftranscript,at.transcript, at.timemodified ';
-        $sql .= '  FROM {' . constants::M_ATTEMPTSTABLE . '} at INNER JOIN {' . constants::M_STATSTABLE .  '} st ON at.id = st.attemptid ';
-        $sql .= ' WHERE at.solo = :soloid';
-        $sql .= ' ORDER BY at.userid ASC';
-        $alldata = $DB->get_records_sql($sql,array('soloid'=>$formdata->soloid));
+            $sql .= '  FROM {' . constants::M_ATTEMPTSTABLE . '} at INNER JOIN {' . constants::M_STATSTABLE .  '} st ON at.id = st.attemptid ';
+            $sql .= ' INNER JOIN {groups_members} gm ON at.userid=gm.userid';
+            $sql .= ' WHERE gm.groupid ' . $groupswhere . ' AND at.solo = ?';
+            $sql .= ' ORDER BY at.userid ASC';
+            $allparams[]=$formdata->soloid;
+            $alldata = $DB->get_records_sql($sql,$allparams);
+
+
+            //if no groups, or can see all groups then the SQL is simple
+        }else{
+
+
+            $emptydata = array();
+            $sql = 'SELECT at.id, at.grade, at.userid, at.filename, st.turns, st.words,
+        st.avturn, st.longestturn, st.targetwords, st.totaltargetwords,st.autospellscore,st.aiaccuracy,at.selftranscript,at.transcript, at.timemodified ';
+            $sql .= '  FROM {' . constants::M_ATTEMPTSTABLE . '} at INNER JOIN {' . constants::M_STATSTABLE .  '} st ON at.id = st.attemptid ';
+            $sql .= ' WHERE at.solo = :soloid';
+            $sql .= ' ORDER BY at.userid ASC';
+            $alldata = $DB->get_records_sql($sql,array('soloid'=>$formdata->soloid));
+
+        }
+
+
+
 
         if($alldata){
             foreach($alldata as $thedata){

@@ -18,26 +18,32 @@ class report_renderer extends \plugin_renderer_base
 
         $reports =[];
         //basic report
+        /*
         $basicreport = new \single_button(
             new \moodle_url(constants::M_URL . '/reports.php', array('report' => 'basic', 'id' => $cm->id, 'n' => $moduleinstance->id)),
             get_string('basicreport', constants::M_COMPONENT), 'get');
-        $reports[] = $this->render($basicreport) ;
+        $reports[] = array('button'=>$this->render($basicreport),
+                'text'=>get_string('basicreport_explanation', constants::M_COMPONENT));
+        */
 
         //grades report
         $gradesreport = new \single_button(
             new \moodle_url(constants::M_URL . '/reports.php', array('report' => 'gradereport', 'id' => $cm->id, 'n' => $moduleinstance->id)),
             get_string('gradereport', constants::M_COMPONENT), 'get');
-        $reports[] = $this->render($gradesreport) ;
+        $reports[] =array('button'=>$this->render($gradesreport),
+                'text'=>get_string('gradereport_explanation', constants::M_COMPONENT));
 
         //attempts report
         $attemptsreport= new \single_button(
                 new \moodle_url(constants::M_URL . '/reports.php', array('report' => 'attempts', 'id' => $cm->id, 'n' => $moduleinstance->id)),
                 get_string('attemptsreport', constants::M_COMPONENT), 'get');
-        $reports[] = $this->render($attemptsreport) ;
+        $reports[] = array('button'=>$this->render($attemptsreport),
+                'text'=>get_string('attemptsreport_explanation', constants::M_COMPONENT));
 
 
 
-        $ret = \html_writer::div(implode('<br />', $reports), constants::M_CLASS . '_listbuttons');
+        $data=['reports' => $reports];
+        $ret= $this->render_from_template('mod_minilesson/reportsmenu', $data);
 
         return $ret;
     }

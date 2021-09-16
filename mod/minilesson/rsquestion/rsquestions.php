@@ -28,7 +28,6 @@ require_once($CFG->dirroot.'/mod/minilesson/lib.php');
 
 use \mod_minilesson\constants;
 
-
 $id = required_param('id', PARAM_INT);
 
 $cm = get_coursemodule_from_id('minilesson', $id, 0, false, MUST_EXIST);
@@ -44,9 +43,22 @@ $mode='rsquestions';
 //Set page url before require login, so post login will return here
 $PAGE->set_url('/mod/minilesson/rsquestion/rsquestions.php', array('id'=>$cm->id,'mode'=>$mode));
 
+
 //require login for this page
 require_login($course, false, $cm);
 $context = context_module::instance($cm->id);
+
+//Get an admin settings
+$config = get_config(constants::M_COMPONENT);
+
+if($minilesson->foriframe==1) {
+    $PAGE->set_pagelayout('embedded');
+}elseif($config->enablesetuptab){
+    $PAGE->set_pagelayout('popup');
+}else{
+    $PAGE->set_pagelayout('course');
+}
+
 
 $renderer = $PAGE->get_renderer('mod_minilesson');
 $rsquestion_renderer = $PAGE->get_renderer('mod_minilesson','rsquestion');

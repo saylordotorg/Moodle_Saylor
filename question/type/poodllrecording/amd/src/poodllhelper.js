@@ -8,35 +8,56 @@ define(["jquery", "core/log"], function ($, log) {
 
         init: function (opts) {
             var prquestion = function (evt) {
-                if(evt && evt[1]=='filesubmitted'){
-                    var filename = evt[2];
-                    var updatecontrol = evt[3];
-                    // post a custom event that a filter template might be interested in
-                    var prquestionUploaded = new CustomEvent("prquestionUploaded", {details: evt});
-                    document.dispatchEvent(prquestionUploaded);
 
-                    //poke the filename
-                    var upc = '';
-                    if (typeof updatecontrol !== 'undefined' && updatecontrol !== '') {
-                        upc = $('[id="' + updatecontrol + '"]');
-                        //the code below used to work until odd chars in question id annoyed jquery 3
-                        //upc = $('#' + uploader.config.updatecontrol);
+                if(evt){
+                    switch(evt[1]) {
+                        case 'filesubmitted':
+                            var filename = evt[2];
+                            var updatecontrol = evt[3];
+                            // post a custom event that a filter template might be interested in
+                            var prquestionUploaded = new CustomEvent("prquestionUploaded", {details: evt});
+                            document.dispatchEvent(prquestionUploaded);
+
+                            //if opts safe save
+                            if(opts.safesave==1) {
+                                var nextbtn = $('.submitbtns .mod_quiz-next-nav');
+                                nextbtn.removeClass('qtype_poodllrecording_disabledbtn');
+                                nextbtn.removeAttr('disabled', 'disabled');
+                            }
+
+                            //poke the filename
+                            var upc = '';
+                            if (typeof updatecontrol !== 'undefined' && updatecontrol !== '') {
+                                upc = $('[id="' + updatecontrol + '"]');
+                                //the code below used to work until odd chars in question id annoyed jquery 3
+                                //upc = $('#' + uploader.config.updatecontrol);
+                            }
+                            if (upc.length < 1) {
+                                upc = $('[id="' + updatecontrol + '"]', window.parent.document);
+                            }
+                            if (upc.length > 0) {
+                                upc.get(0).value = filename;
+                            } else {
+                                log.debug('upload failed #2');
+                                return false;
+                            }
+                            upc.trigger('change');
+                            break;
+                        case 'started':
+                            //if opts safe save
+                            if(opts.safesave==1) {
+                                var savebtn = $('.submitbtns .mod_quiz-next-nav');
+                                savebtn.addClass('qtype_poodllrecording_disabledbtn');
+                                savebtn.attr('disabled', 'disabled');
+                            }
+
+                            break;
                     }
-                    if (upc.length < 1) {
-                        upc = $('[id="' + updatecontrol + '"]', window.parent.document);
-                    }
-                    if (upc.length > 0) {
-                        upc.get(0).value = filename;
-                    } else {
-                        log.debug('upload failed #2');
-                        return false;
-                    }
-                    upc.trigger('change');
                 }
             }; //end of callback function
             window.prquestion = prquestion;
 
-        } //end of cp init
+        } //end of init
 
     };//end of return object
 });

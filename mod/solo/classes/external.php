@@ -162,15 +162,10 @@ class external extends external_api {
 
         $data = array();
         parse_str($serialiseddata, $data);
-
-        $sql = "select  pa.solo, pa.feedback, pa.id as attemptid
-        from {" . constants::M_ATTEMPTSTABLE . "} pa
-        inner join {" . constants::M_TABLE . "} pc on pa.solo = pc.id
-        inner join {course_modules} cm on cm.instance = pc.id and pc.course = cm.course and pa.userid = ?
-        where cm.id = ?";
-
         $modulecontext = context_module::instance($cmid);
-        $attempt = $DB->get_record_sql($sql, array($studentid, $cmid));
+        $cm = get_coursemodule_from_id(constants::M_MODNAME, $cmid, 0, false, MUST_EXIST);
+        $attempthelper = new \mod_solo\attempthelper($cm);
+        $attempt= $attempthelper->fetch_latest_complete_attempt($studentid);
 
         if (!$attempt) { return 0; }
 
@@ -194,7 +189,7 @@ class external extends external_api {
                 }
             }
             $feedbackobject = new \stdClass();
-            $feedbackobject->id = $attempt->attemptid;
+            $feedbackobject->id = $attempt->id;
             $feedbackobject->feedback = $validateddata->feedback;
             $feedbackobject->manualgraded = 1;
             $feedbackobject->grade = $thegrade;
@@ -239,7 +234,7 @@ class external extends external_api {
     }
 
     /**
-     * Submit the rubric grade form.
+     * Submit the simple grade form.
      *
      * @param int $contextid The context id for the course.
      * @param string $jsonformdata The data from the form, encoded as a json array.
@@ -275,13 +270,10 @@ class external extends external_api {
         $data = array();
         parse_str($serialiseddata, $data);
 
-        $sql = "select  pa.solo, pa.feedback, pa.id as attemptid
-        from {" . constants::M_ATTEMPTSTABLE . "} pa
-        inner join {" . constants::M_TABLE . "} pc on pa.solo = pc.id
-        inner join {course_modules} cm on cm.instance = pc.id and pc.course = cm.course and pa.userid = ?
-        where cm.id = ?";
+        $cm = get_coursemodule_from_id(constants::M_MODNAME, $cmid, 0, false, MUST_EXIST);
+        $attempthelper = new \mod_solo\attempthelper($cm);
+        $attempt= $attempthelper->fetch_latest_complete_attempt($studentid);
 
-        $attempt = $DB->get_record_sql($sql, array($studentid, $cmid));
         if (!$attempt) { return 0; }
 
         $moduleinstance = $DB->get_record(constants::M_TABLE, array('id'=>$attempt->solo));
@@ -292,7 +284,7 @@ class external extends external_api {
 
         if ($validateddata) {
             $feedbackobject = new \stdClass();
-            $feedbackobject->id = $attempt->attemptid;
+            $feedbackobject->id = $attempt->id;
             $feedbackobject->feedback = $validateddata->feedback;
             $feedbackobject->manualgraded = 1;
             $feedbackobject->grade = $validateddata->grade;

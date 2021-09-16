@@ -131,7 +131,7 @@ class comprehensiontest
                 case constants::TYPE_MULTICHOICE:
                 case constants::TYPE_MULTIAUDIO:
                 case constants::TYPE_PAGE:
-                case constants::TYPE_TEACHERTOOLS:
+                case constants::TYPE_SMARTFRAME:
                 case constants::TYPE_SHORTANSWER:
 
                     //Question Text
@@ -242,6 +242,14 @@ class comprehensiontest
                 case constants::TYPE_LISTENREPEAT:
                 case constants::TYPE_MULTIAUDIO:
 
+                    //phonetic
+                    $testitem->phonetic=$item->phonetic;
+                    if(!empty($testitem->phonetic)) {
+                        $phonetics = explode(PHP_EOL, $testitem->phonetic);
+                    }else{
+                        $phonetics=[];
+                    }
+
                     //multi audio stores answers differently, and
                    // at least for now there should be no difference between display and sentence
                     if($testitem->type === constants::TYPE_MULTIAUDIO) {
@@ -299,6 +307,14 @@ class comprehensiontest
                         $s->sentence = $sentence;
                         $s->displaysentence = $displaysentence;
                         $s->length = \core_text::strlen($s->sentence);
+
+                        //add phonetics if we have them
+                        if(isset($phonetics[$index]) && !empty($phonetics[$index])){
+                            $s->phonetic=$phonetics[$index];
+                        }else{
+                            $s->phonetic='';
+                        }
+
                         $index++;
                         $testitem->sentences[] = $s;
                     }
@@ -327,20 +343,10 @@ class comprehensiontest
                         }
                     }
 
-                   switch($this->mod->region) {
-                       case 'tokyo':
-                           $testitem->asrurl = 'https://tokyo.ls.poodll.com/transcribe';
-                           break;
-                       case 'dublin':
-                           $testitem->asrurl = 'https://dublin.ls.poodll.com/transcribe';
-                           break;
-                       case 'sydney':
-                           $testitem->asrurl = 'https://sydney.ls.poodll.com/transcribe';
-                           break;
-                       case 'useast1':
-                       default:
-                           $testitem->asrurl = 'https://useast.ls.poodll.com/transcribe';
-                   }
+                    //API gateway URL
+                   $testitem->asrurl = utils::fetch_lang_server_url($this->mod->region,'transcribe');
+
+
                    $testitem->maxtime = 15000;
                     break;
 
@@ -372,12 +378,27 @@ class comprehensiontest
 
                     break;
                 case constants::TYPE_PAGE:
-                case constants::TYPE_TEACHERTOOLS:
+                case constants::TYPE_SMARTFRAME:
                 case constants::TYPE_SHORTANSWER:
             }
 
+            //if its a smart frame set the host name so we can pass data around
+            if($testitem->type==constants::TYPE_SMARTFRAME){
+                $testitem->smartframehost='';
+                if(!empty($testitem->customtext1)) {
+                    $hostbits = parse_url($testitem->customtext1);
+                    if($hostbits) {
+                        $testitem->smartframehost = $hostbits['scheme'] . "://" . $hostbits['host'];
+                    }
+                }
+            }
+
+            //add out item to test
             $testitems[]=$testitem;
-        }
+
+        }//end of loop
+
+
 
         return $testitems;
     }

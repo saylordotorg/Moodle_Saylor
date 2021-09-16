@@ -754,14 +754,15 @@ class mod_assign_external extends external_api {
             $placeholders = array('assignid1' => $assign->get_instance()->id,
                                   'assignid2' => $assign->get_instance()->id);
 
-            $submissionmaxattempt = 'SELECT mxs.userid, MAX(mxs.attemptnumber) AS maxattempt
+            $submissionmaxattempt = 'SELECT mxs.userid, mxs.groupid, MAX(mxs.attemptnumber) AS maxattempt
                                      FROM {assign_submission} mxs
-                                     WHERE mxs.assignment = :assignid1 GROUP BY mxs.userid';
+                                     WHERE mxs.assignment = :assignid1 GROUP BY mxs.userid, mxs.groupid';
 
             $sql = "SELECT mas.id, mas.assignment,mas.userid,".
                    "mas.timecreated,mas.timemodified,mas.status,mas.groupid,mas.attemptnumber ".
                    "FROM {assign_submission} mas ".
                    "JOIN ( " . $submissionmaxattempt . " ) smx ON mas.userid = smx.userid ".
+                   "AND mas.groupid = smx.groupid ".
                    "WHERE mas.assignment = :assignid2 AND mas.attemptnumber = smx.maxattempt";
 
             if (!empty($params['status'])) {
@@ -2315,7 +2316,7 @@ class mod_assign_external extends external_api {
                 'assignid' => new external_value(PARAM_INT, 'assignment instance id'),
                 'userid' => new external_value(PARAM_INT, 'user id (empty for current user)', VALUE_DEFAULT, 0),
                 'groupid' => new external_value(PARAM_INT, 'filter by users in group (used for generating the grading summary).
-                    Empty or 0 for all groups information.', VALUE_DEFAULT, 0),
+                    0 for all groups information, any other empty value will calculate currrent group.', VALUE_DEFAULT, 0),
             )
         );
     }
@@ -2367,16 +2368,17 @@ class mod_assign_external extends external_api {
                 throw new moodle_exception('notingroup');
             }
         } else {
-            // A null gorups means that following functions will calculate the current group.
-            $groupid = null;
+            // A null group means that following functions will calculate the current group.
+            // A groupid set to 0 means all groups.
+            $groupid = ($params['groupid'] == 0) ? 0 : null;
         }
         if ($assign->can_view_grades($groupid)) {
             $gradingsummary = $assign->get_assign_grading_summary_renderable($groupid);
         }
 
         // Retrieve the rest of the renderable objects.
-        $cansubmit = has_capability('mod/assign:submit', $context, $user, false);
-        if ($cansubmit || $assign->get_user_submission($user->id, false) !== false) {
+        if (has_capability('mod/assign:viewownsubmissionsummary', $context, $user, false)) {
+            // The user can view the submission summary.
             $lastattempt = $assign->get_assign_submission_status_renderable($user, true);
         }
 
@@ -2432,8 +2434,8 @@ class mod_assign_external extends external_api {
             }
 
             // Can edit its own submission?
-            $lastattempt->caneditowner = $cansubmit && $assign->submissions_open($user->id)
-                && $assign->is_any_submission_plugin_enabled();
+            $lastattempt->caneditowner = has_capability('mod/assign:submit', $context, $user, false)
+                && $assign->submissions_open($user->id) && $assign->is_any_submission_plugin_enabled();
 
             $result['lastattempt'] = $lastattempt;
         }

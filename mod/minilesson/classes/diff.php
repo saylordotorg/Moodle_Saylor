@@ -202,7 +202,7 @@ public static function fetchAlternativesArray($thealternates)
     // so we could have another go at this if needed
     //
     //returns array of sequences
-    public static function fetchSequences($passage, $transcript, $alternatives, $language)
+    public static function fetchSequences($passage, $transcript, $alternatives, $language,$transcriptphones=false, $passagephones=false)
     {
         $p_length = count($passage);
         $t_length = count($transcript);
@@ -224,6 +224,19 @@ public static function fetchAlternativesArray($thealternates)
                 //get words to compare
                 $passageword= $passage[$p_slength + $pstart];
                 $transcriptword =$transcript[$t_slength + $tstart];
+
+                //if we have phones do those here
+                if($passagephones && $transcriptphones &&
+                        isset($passagephones[$p_slength + $pstart]) &&
+                        isset($transcriptphones[$t_slength + $tstart])){
+                    $tphoneword = $transcriptphones[$t_slength + $tstart];
+                    $pphoneword = $passagephones[$p_slength + $pstart];
+                }else{
+                    $tphoneword = false;
+                    $pphoneword = false;
+                }
+
+
                 $match=false;
 
                 //check for a forward match
@@ -243,15 +256,23 @@ public static function fetchAlternativesArray($thealternates)
                 
                 //if no direct match is there an alternates match
                 if(!$match && $alternatives){
-                    $altsearch_result = self::check_alternatives_for_match($passageword,
+                    $alt_result = self::check_alternatives_for_match($passageword,
                         $transcriptword,
                         $alternatives);
-                    if($altsearch_result->match){
-                        $match= true;
-                        $forwardmatch=$altsearch_result->forwardmatch;
-                        $alt_positions[]=($p_slength + $pstart);
+                    if($alt_result->match) {
+                        $match = true;
+                        $forwardmatch = $alt_result->forwardmatch;
+                        $alt_positions[] = ($p_slength + $pstart);
                     }
-                }//end of if no direct match
+                }//end of if alternatives match
+
+                //do a phonetics match .. only JP currently
+                if(!$match && $tphoneword && $pphoneword){
+                    $phone_result= self::phonetics_match($tphoneword,$pphoneword,$language);
+                    if($phone_result){
+                        $match= true;
+                    }
+                }
 
                 //else check for a generous match(eg for english +s and +ed we give it to them)
                 if(!$match){
@@ -352,6 +373,14 @@ public static function fetchAlternativesArray($thealternates)
 		}   
 		echo $printpassage;
 		echo $printtranscript;  
+    }
+
+    public static function phonetics_match($pphoneword,$tphoneword,$language) {
+        if(self::mb_strequals($pphoneword,$tphoneword)){
+            return true;
+        }else{
+            return false;
+        }
     }
 
     /*

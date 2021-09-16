@@ -1,3 +1,18 @@
+1.0.10 (Build 2021081600)
+- fixed issue with array_key_exists on php 8
+- fixed some bad instructions and missing description text
+
+1.0.9 (Build 2021061400)
+- Fixed issue with Group grading
+- Added view attempt button to grades page
+- Added options to how many students to show on grading page
+
+1.0.8 (Build 2021053100)
+- Internal flag for iframe use
+
+1.0.7 (Build 2021053500)
+- Added ability to view reports by group
+
 1.0.6 (Build 2021041100)
 - Fixed a bug in the teacher eval section of reports (thanks Hideto)
 

@@ -55,17 +55,25 @@ if ($id) {
 $modulecontext = context_module::instance($cm->id);
 require_capability('mod/minilesson:manage', $modulecontext);
 
+//Get an admin settings
+$config = get_config(constants::M_COMPONENT);
+
 // Set page login data.
 $PAGE->set_url(constants::M_URL . '/setup.php',array('id'=>$id));
 require_login($course, true, $cm);
-
 
 // Set page meta data.
 $PAGE->set_title(format_string($moduleinstance->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($modulecontext);
-$PAGE->set_pagelayout('course');
 
+if($moduleinstance->foriframe==1) {
+    $PAGE->set_pagelayout('embedded');
+}elseif($config->enablesetuptab){
+    $PAGE->set_pagelayout('popup');
+}else{
+    $PAGE->set_pagelayout('course');
+}
 
 
 

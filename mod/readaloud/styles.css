@@ -123,6 +123,9 @@ span.mod_readaloud_debugsequence {
   padding: 3px;
   border-color: gold;
   margin-top: 15px;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .mod_readaloud_grading_action_cont {
@@ -198,6 +201,8 @@ div.mod_readaloud_postattempt .mod_readaloud_grading_unreadspace {
 .mod_readaloud_smallreport_cont {
   padding: 5px;
   border: 1px grey solid;
+  max-width: 920px;
+  margin: auto;
 }
 
 .mod_readaloud_feedback_cont {
@@ -238,19 +243,31 @@ div.mod_readaloud_feedback_cont.mod_readaloud_postattempt {
 
 .mod_readaloud_grading_player_cont {
   color: blue;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 #mod_readaloud_grading_player {
-  width: 100% !important;
+  width: 100%;
   margin-top: 10px;
+}
+
+.mod_readaloud_scorestable {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .mod_readaloud_hidden_player {
   display: none;
 }
 
-#mod_readaloud_button_returnmenu {
+.mod_readaloud_button_returnmenu {
   display: none;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .mod_readaloud_menubuttons_cont {
@@ -469,6 +486,9 @@ div.mod_readaloud_attemptsummarytable {
 .collapsespaces .mod_readaloud_grading_passagespace:not(.mod_readaloud_grading_endspace) {
   display: none;
 }
+.collapsespaces .mod_readaloud_grading_passageword {
+  padding: 1.5px;
+}
 
 .mod_readaloud_modeltranscript {
   background-color: #ddd;
@@ -544,6 +564,9 @@ div.mod_readaloud_attemptsummarytable {
   height: 40px;
   border: 1px solid transparent;
   display: none;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .mod_readaloud_modal_target_word {
@@ -638,4 +661,9 @@ div.mod_readaloud_attemptsummarytable {
   justify-content: center;
   cursor: pointer;
   background-color: red;
+}
+
+.mod_intro_box.mod_readaloud_center {
+  max-width: 920px;
+  margin: auto;
 }

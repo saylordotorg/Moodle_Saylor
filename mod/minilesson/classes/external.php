@@ -23,17 +23,31 @@ class mod_minilesson_external extends external_api {
         return new external_function_parameters(
                  array('spoken' => new external_value(PARAM_TEXT, 'The spoken phrase'),
                        'correct' => new external_value(PARAM_TEXT, 'The correct phrase'),
-                       'language' => new external_value(PARAM_TEXT, 'The language eg en-US')
+                       'phonetic' => new external_value(PARAM_TEXT, 'The correct phonetic'),
+                       'language' => new external_value(PARAM_TEXT, 'The language eg en-US'),
+                       'region' => new external_value(PARAM_TEXT, 'The region'),
+                       'cmid' => new external_value(PARAM_INT, 'The cmid'),
                  )
         );
 
     }
-    public static function check_by_phonetic($spoken, $correct, $language){
-        $language = substr($language,0,2);
-        $spokenphonetic = utils::convert_to_phonetic($spoken,$language);
-        $correctphonetic = utils::convert_to_phonetic($correct,$language);
+    public static function check_by_phonetic($spoken, $correct, $phonetic, $language,$region, $cmid){
+        $segmented = true;
+        $spokenphonetic = utils::convert_to_phonetic($spoken,$language,$region,$segmented);
         $similar_percent = 0;
-        $similar_chars = similar_text($correctphonetic,$spokenphonetic,$similar_percent);
+
+        //if our convert_to_phonetic returned false(error) then its hopeless, return 0
+        if($spokenphonetic===false){
+            return 0;
+        }
+
+        //if one of our phonetics is just empty, it is also hopeless
+        if(empty($spokenphonetic) || empty($phonetic)){
+            return 0;
+        }
+
+        //similar_percent calc'd by reference
+        $similar_chars = similar_text($phonetic,$spokenphonetic,$similar_percent);
         return round($similar_percent,0);
 
     }
@@ -65,32 +79,42 @@ class mod_minilesson_external extends external_api {
                 array('transcript' => new external_value(PARAM_TEXT, 'The spoken phrase'),
                         'passage' => new external_value(PARAM_TEXT, 'The correct phrase'),
                         'language' => new external_value(PARAM_TEXT, 'The language eg en-US'),
-                        'alternatives' => new external_value(PARAM_TEXT, 'list of alternatives',false,'')
+                        'alternatives' => new external_value(PARAM_TEXT, 'list of alternatives',false,''),
+                        'phonetic' => new external_value(PARAM_TEXT, 'phonetic reading',false,''),
+                        'region' => new external_value(PARAM_TEXT, 'The region',false,'tokyo'),
+                        'cmid' => new external_value(PARAM_INT, 'The cmid')
                 )
         );
 
     }
 
-    public static function compare_passage_to_transcript($transcript,$passage,$language,$alternatives) {
+    public static function compare_passage_to_transcript($transcript,$passage,$language,$alternatives,$phonetic,$region, $cmid) {
         global $DB;
 
         //If this is Japanese, and the passage has been segmented, we want to segment it into "words"
         if($language == constants::M_LANG_JAJP) {
             $transcript = utils::segment_japanese($transcript);
             $passage = utils::segment_japanese($passage);
+            $segmented=true;
+            $transcript_phonetic = utils::convert_to_phonetic($transcript,constants::M_LANG_JAJP,$region,$segmented);
+        }else{
+            $transcript_phonetic ='';
         }
 
         //turn the passage and transcript into an array of words
         $passagebits = diff::fetchWordArray($passage);
         $alternatives = diff::fetchAlternativesArray($alternatives);
         $transcriptbits = diff::fetchWordArray($transcript);
+        $transcriptphonetic_bits = diff::fetchWordArray($transcript_phonetic);
+        $passagephonetic_bits = diff::fetchWordArray($phonetic);
         $wildcards = diff::fetchWildcardsArray($alternatives);
 
         //fetch sequences of transcript/passage matched words
         // then prepare an array of "differences"
         $passagecount = count($passagebits);
         $transcriptcount = count($transcriptbits);
-        $sequences = diff::fetchSequences($passagebits, $transcriptbits, $alternatives, $language);
+        $sequences = diff::fetchSequences($passagebits, $transcriptbits, $alternatives, $language,
+                $transcriptphonetic_bits , $passagephonetic_bits);
         //fetch diffs
         $debug=false;
         $diffs = diff::fetchDiffs($sequences, $passagecount, $transcriptcount, $debug);
@@ -256,8 +280,8 @@ class mod_minilesson_external extends external_api {
                 );
                 break;
 
-            case constants::TYPE_TEACHERTOOLS:
-                $mform = new \mod_minilesson\local\rsquestion\teachertoolsform(null,
+            case constants::TYPE_SMARTFRAME:
+                $mform = new \mod_minilesson\local\rsquestion\smartframeform(null,
                         array('editoroptions'=>$editoroptions,
                                 'filemanageroptions'=>$filemanageroptions,
                                 'moduleinstance'=>$moduleinstance),
@@ -296,6 +320,9 @@ class mod_minilesson_external extends external_api {
                 $olditem=false;
             }
             $data->passagehash = \mod_minilesson\local\rsquestion\helper::update_create_langmodel($moduleinstance,$olditem,$data);
+
+            //lets update the phonetics
+            $data->phonetic = \mod_minilesson\local\rsquestion\helper::update_create_phonetic($moduleinstance,$olditem,$data);
 
             $result = \mod_minilesson\local\rsquestion\helper::update_insert_question($moduleinstance,$data,$edit,$context,$cm,$editoroptions,$filemanageroptions);
             if($result->error==true){

@@ -8,12 +8,14 @@ define(['jquery', 'core/log', 'core/ajax', 'mod_readaloud/definitions', 'mod_rea
 
     activated: false,
     currentSentence: "",
+    currentPhonetic: "",
     language: "en-US",
     currentAudioStart: 0,
     currentAudioStop: 0,
     mak: null,
     controls: {},
     results: [],
+    phonetics: [],
     cmid: 0,
 
     init: function(props) {
@@ -23,6 +25,8 @@ define(['jquery', 'core/log', 'core/ajax', 'mod_readaloud/definitions', 'mod_rea
       self.mak = props.modelaudiokaraoke;
       self.language = props.language;
       self.region = props.region;
+      self.phonetics = props.phonetics;
+      self.ds_only = props.ds_only;
 
       //recorder stuff
       var recid = 'readaloud_pushrecorder';
@@ -32,10 +36,12 @@ define(['jquery', 'core/log', 'core/ajax', 'mod_readaloud/definitions', 'mod_rea
                   break;
 
               case 'speech':
+
                   self.getComparison(
                       self.cmid,
                       self.currentSentence,
                       message.capturedspeech,
+                      self.currentPhonetic,
                       function(comparison) {
                           self.gotComparison(comparison, message);
                       }
@@ -48,6 +54,7 @@ define(['jquery', 'core/log', 'core/ajax', 'mod_readaloud/definitions', 'mod_rea
             //init tt recorder
             var opts = {};
             opts.uniqueid = recid;
+            opts.ds_only = self.ds_only;
             opts.callback = theCallback;
             ttrecorder.clone().init(opts);
       }else{
@@ -105,6 +112,26 @@ define(['jquery', 'core/log', 'core/ajax', 'mod_readaloud/definitions', 'mod_rea
         self.currentSentence = sentence;
         self.currentAudioStart = oldbreak.audiotime;
         self.currentAudioEnd = newbreak.audiotime;
+
+          log.debug("phonetics",self.phonetics);
+          log.debug(oldbreak);
+          log.debug(newbreak);
+
+          if(self.phonetics.length>newbreak.wordnumber-1){
+              var startpos = oldbreak.wordnumber;
+              if(startpos<0){startpos=0;}
+              var endpos = newbreak.wordnumber;
+
+              /*
+              * break=0: wordnumber 0 start = 0, end = 9: jssplit returns 0-8
+              * break=1: wordnumber 9 start = 9, end = 18: jssplit returns 9-17
+              * break=2: wordnumber 18 start = 18, end = 99: jssplit returns 18-98
+               */
+              self.currentPhonetic = self.phonetics.slice(startpos,endpos).join(' ');
+          }else{
+              self.currentPhonetic  = '';
+          }
+
 
         log.debug(sentence);
         log.debug(oldbreak);
@@ -164,7 +191,8 @@ define(['jquery', 'core/log', 'core/ajax', 'mod_readaloud/definitions', 'mod_rea
 
     },
 
-    spliton: new RegExp('([,.!?:;" ])', 'g'),
+   // spliton: new RegExp('([,.!?:;" ])', 'g'),
+      spliton: new RegExp(/([!"# $%&'()。「」、*+,-.\/:;<=>?@[\]^_`{|}~])/, 'g'),
 
     gotComparison: function(comparison, typed) {
      if(!comparison){return;}
@@ -188,7 +216,7 @@ define(['jquery', 'core/log', 'core/ajax', 'mod_readaloud/definitions', 'mod_rea
       })
 
     },
-    getComparison: function(cmid, passage, transcript, callback) {
+    getComparison: function(cmid, passage, transcript,passagephonetic, callback) {
       var self = this;
 
       ajax.call([{
@@ -197,6 +225,7 @@ define(['jquery', 'core/log', 'core/ajax', 'mod_readaloud/definitions', 'mod_rea
           cmid: cmid,
           passage: passage,
           transcript: transcript,
+          passagephonetic: passagephonetic,
           language: self.language
         },
         done: function(ajaxresult) {
@@ -232,11 +261,13 @@ define(['jquery', 'core/log', 'core/ajax', 'mod_readaloud/definitions', 'mod_rea
       },
 
       use_ttrecorder: function(){
+          //currently we always use TT recorder.
+          return true;
+       /*
           var ret =false;
-
-
-          //check if language and region are ok
           switch(this.region){
+              case 'bahrain':
+              case 'capetown':
               case 'tokyo':
               case 'useast1':
               case 'dublin':
@@ -248,6 +279,7 @@ define(['jquery', 'core/log', 'core/ajax', 'mod_readaloud/definitions', 'mod_rea
                   ret = this.chrome_user();
           }
           return ret;
+          */
       },
 
 

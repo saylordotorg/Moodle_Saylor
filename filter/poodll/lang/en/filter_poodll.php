@@ -304,6 +304,7 @@ $string['shadow_recorder'] = "Shadow";
 $string['split_recorder'] = "Split";
 $string['readaloud_recorder'] = "Read Aloud";
 $string['fresh_recorder'] = "Fresh";
+$string['screen_recorder'] = "Screen Recorder";
 $string['fluencybuilder_recorder'] = "Fluency Builder";
 $string['html5recorder_skin_audio'] = "HTML5 Recorder Skin(Audio)";
 $string['html5recorder_skin_video'] = "HTML5 Recorder Skin(Video)";
@@ -370,6 +371,8 @@ $string['REGION_EUC1'] = 'EU (Frankfurt)';
 $string['REGION_EUW1'] = 'EU (Ireland)';
 $string['REGION_EUW2'] = 'EU (London)';
 $string['REGION_SAE1'] = 'South America (São Paulo)';
+$string['REGION_AFS1'] = 'Africa (Capetown)';
+$string['REGION_MES1'] = 'Middle East (Bahrain)';
 
 //updated templates message
 $string['templateupdated'] = '{$a} Poodll Templates Updated.';

@@ -181,8 +181,8 @@ class qtype_poodllrecording_format_audio_renderer extends plugin_renderer_base {
         $hints = array();
         $hints['modulecontextid'] =  $context->id;
         $callback="prquestion";
-        $opts = array();
-        $PAGE->requires->js_call_amd('qtype_poodllrecording/poodllhelper', 'init', $opts);
+        $opts = array('safesave' => $q->safesave);
+        $PAGE->requires->js_call_amd('qtype_poodllrecording/poodllhelper', 'init', array($opts));
 		return $ret . \filter_poodll\poodlltools::fetchAudioRecorderForSubmission('swf','question',$inputid, $usercontextid ,'user','draft',$draftitemid,$q->timelimit,$callback,$hints);
 
     }
@@ -319,10 +319,9 @@ class qtype_poodllrecording_format_video_renderer extends qtype_poodllrecording_
         $hints = array();
         $hints['modulecontextid'] =  $context->id;
         $callback="prquestion";
-        $opts = array();
-        $PAGE->requires->js_call_amd('qtype_poodllrecording/poodllhelper', 'init', $opts);
+        $opts = array('safesave' => $q->safesave);
+        $PAGE->requires->js_call_amd('qtype_poodllrecording/poodllhelper', 'init', array($opts));
 		return $ret . \filter_poodll\poodlltools::fetchVideoRecorderForSubmission('swf','question',$inputid, $usercontextid ,'user','draft',$draftitemid,$q->timelimit,$callback,$hints);
-		
     }
 }
 

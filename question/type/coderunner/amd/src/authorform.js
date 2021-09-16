@@ -31,6 +31,7 @@ define(['jquery', 'qtype_coderunner/userinterfacewrapper', 'core/str'], function
     // the element property to be set; a default value if the JSON field is
     // empty and an optional filter function to apply to the field value before
     // setting the property with it.
+    var BEHAT_TESTING = false;  // Suppress alerts (necessary until UnexpectedAlertOpens can be caught).
     var JSON_TO_FORM_MAP = {
         template:            ['#id_template', 'value', ''],
         iscombinatortemplate:['#id_iscombinatortemplate', 'checked', '',
@@ -63,7 +64,7 @@ define(['jquery', 'qtype_coderunner/userinterfacewrapper', 'core/str'], function
     function initEditForm() {
         var typeCombo = $('#id_coderunnertype'),
             template = $('#id_template'),
-            templateParamsLang = $('#id_templateparamslang'),
+            evaluatePerStudent = $('#id_templateparamsevalpertry'),
             globalextra = $('#id_globalextra'),
             useace = $('#id_useace'),
             language = $('#id_language'),
@@ -82,7 +83,7 @@ define(['jquery', 'qtype_coderunner/userinterfacewrapper', 'core/str'], function
             questiontypeHelpDiv = $('#qtype-help'),
             precheck = $('select#id_precheck'),
             testtypedivs = $('div.testtype'),
-            missingPrototype = $('#id_missing_prototype'),
+            brokenQuestion = $('#id_broken_question'),
             uiplugin = $('#id_uiplugin'),
             uiparameters = $('#id_uiparameters');
 
@@ -248,8 +249,11 @@ define(['jquery', 'qtype_coderunner/userinterfacewrapper', 'core/str'], function
         // Raise an alert with the given language string and possible additional
         // extra text.
         function langStringAlert(key, extra) {
+            if (BEHAT_TESTING) {
+                return;
+            }
             str.get_string(key, 'qtype_coderunner').then(function(s) {
-                var message = s;
+                var message = s.replace(/\n/g, " ");
                 if (extra) {
                     message += '\n' + extra;
                 }
@@ -402,13 +406,13 @@ define(['jquery', 'qtype_coderunner/userinterfacewrapper', 'core/str'], function
             }
         }
 
-        // If the missingPrototype hidden element is not empty, insert the
+        // If the brokenquestionmessage hidden element is not empty, insert the
         // given message as an error at the top of the question.
-        function checkForMissingPrototype() {
-            var missingPrototypeMessage = missingPrototype.prop('value'),
+        function checkForBrokenQuestion() {
+            var brokenQuestionMessage = brokenQuestion.prop('value'),
                 messagePara = null;
-            if (missingPrototypeMessage !== '') {
-                messagePara = $('<p>' + missingPrototype.prop('value') + '</p>');
+            if (brokenQuestionMessage !== '') {
+                messagePara = $('<p>' + brokenQuestion.prop('value') + '</p>');
                 $('#id_qtype_coderunner_error_div').append(messagePara);
             }
         }
@@ -429,7 +433,7 @@ define(['jquery', 'qtype_coderunner/userinterfacewrapper', 'core/str'], function
             customise.prop('disabled', true);
         }
 
-        checkForMissingPrototype();
+        checkForBrokenQuestion();
 
         setCustomisationVisibility(isCustomised);
         if (!isCustomised) {
@@ -501,9 +505,8 @@ define(['jquery', 'qtype_coderunner/userinterfacewrapper', 'core/str'], function
             }
         });
 
-        templateParamsLang.on('change', function() {
-            var newLang = templateParamsLang.val();
-            if (newLang !== 'None' && newLang !== 'twig') {
+        evaluatePerStudent.on('change', function() {
+            if (evaluatePerStudent.is(':checked')) {
                 langStringAlert('templateparamsusingsandbox');
             }
         });

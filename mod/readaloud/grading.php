@@ -33,6 +33,7 @@ $n = optional_param('n', 0, PARAM_INT);  // readaloud instance ID
 $format = optional_param('format', 'html', PARAM_TEXT); //export format csv or html
 $action = optional_param('action', 'grading', PARAM_TEXT); // report type
 $userid = optional_param('userid', 0, PARAM_INT); // user id
+
 $attemptid = optional_param('attemptid', 0, PARAM_INT); // attemptid
 $saveandnext = optional_param('submitbutton2', 'false', PARAM_TEXT); //Is this a savebutton2
 $debug = optional_param('debug', 0, PARAM_INT);
@@ -125,7 +126,13 @@ $PAGE->set_url(constants::M_URL . '/grading.php',
 $PAGE->set_title(format_string($moduleinstance->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($modulecontext);
-$PAGE->set_pagelayout('course');
+
+if($config->enablesetuptab){
+    $PAGE->set_pagelayout('popup');
+}else{
+    $PAGE->set_pagelayout('course');
+}
+
 $PAGE->requires->jquery();
 
 //This puts all our display logic into the renderer.php files in this plugin
@@ -167,7 +174,7 @@ switch ($action) {
         $gradenowform->set_data($setdata);
         echo $renderer->header($moduleinstance, $cm, $mode, null, get_string('grading', constants::M_COMPONENT));
         echo $passagehelper->prepare_javascript($reviewmode, $force_aidata);
-        echo $passagerenderer->render_gradenow($passagehelper,$collapsespaces);
+        echo $passagerenderer->render_gradenow($passagehelper,$moduleinstance->ttslanguage,$collapsespaces);
         $gradenowform->display();
         echo $reportrenderer->show_grading_footer($moduleinstance, $cm, $mode);
         echo $renderer->footer();
@@ -202,7 +209,7 @@ switch ($action) {
 
         echo $renderer->header($moduleinstance, $cm, $mode, null, get_string('grading', constants::M_COMPONENT));
         echo $passagehelper->prepare_javascript($reviewmode, $force_aidata);
-        echo $passagerenderer->render_machinereview($passagehelper, $debug);
+        echo $passagerenderer->render_machinereview($passagehelper,$moduleinstance->ttslanguage, $debug);
         //if we can grade and manage attempts show the gradenow button
         if (has_capability('mod/readaloud:manageattempts', $modulecontext)) {
             echo $passagerenderer->render_machinereview_buttons($passagehelper);
@@ -275,6 +282,7 @@ switch ($action) {
         $formdata = new stdClass();
         $formdata->readaloudid = $moduleinstance->id;
         $formdata->modulecontextid = $modulecontext->id;
+        $formdata->groupmenu = true;
         break;
 
     //list view of attempts and grades and action links for a particular user
@@ -355,6 +363,20 @@ $PAGE->requires->js_call_amd("mod_readaloud/hiddenplayerhelper", 'init', array($
 5) call $reportrenderer->render_section_html($sectiontitle, $report->name, $report->get_head, $rows, $report->fields);
 */
 
+$groupmenu = '';
+if(isset($formdata->groupmenu)){
+    // fetch groupmode/menu/id for this activity
+    if ($groupmode = groups_get_activity_groupmode($cm)) {
+        $groupmenu = groups_print_activity_menu($cm, $PAGE->url, true);
+        $groupmenu .= ' ';
+        $formdata->groupid = groups_get_activity_group($cm);
+    }else{
+        $formdata->groupid  = 0;
+    }
+}else{
+    $formdata->groupid  = 0;
+}
+
 $report->process_raw_data($formdata, $moduleinstance);
 $reportheading = $report->fetch_formatted_heading();
 
@@ -368,12 +390,14 @@ switch ($format) {
     default:
         $reportrows = $report->fetch_formatted_rows(true, $paging);
         $allrowscount = $report->fetch_all_rows_count();
+
         $pagingbar = $reportrenderer->show_paging_bar($allrowscount, $paging, $PAGE->url);
         $perpage_selector = $reportrenderer->show_perpage_selector($PAGE->url, $paging);
 
         echo $renderer->header($moduleinstance, $cm, $mode, null, get_string('grading', constants::M_COMPONENT));
         echo $renderer->render_hiddenaudioplayer();
         echo $extraheader;
+        echo $groupmenu;
         echo $pagingbar;
         echo $perpage_selector;
         echo $reportrenderer->render_section_html($reportheading, $report->fetch_name(), $report->fetch_head(), $reportrows,

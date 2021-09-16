@@ -8,6 +8,8 @@
 
 require_once(__DIR__ . '/../../config.php');
 
+use \mod_wordcards\constants;
+
 $cmid = required_param('id', PARAM_INT);
 //the step that the user is requesting
 $nextstep = optional_param('nextstep',mod_wordcards_module::STATE_STEP1, PARAM_TEXT);
@@ -72,11 +74,13 @@ if($wordpool==mod_wordcards_module::WORDPOOL_REVIEW) {
 }
 
 //depending on wordpool set page title
+$pagetitle = format_string($mod->get_mod()->name, true, $mod->get_course());
 if($wordpool==mod_wordcards_module::WORDPOOL_REVIEW) {
-    $pagetitle = get_string('reviewactivity', 'mod_wordcards');
+    $pagetitle .= ': ' . get_string('reviewactivity', 'mod_wordcards');
 }else{
-    $pagetitle = get_string('learnactivity', 'mod_wordcards');
+    $pagetitle .= ': ' .  get_string('learnactivity', 'mod_wordcards');
 }
+
 
 //iif it looks like we have had some vocab updates, request an update of the lang speech model
 if($mod->get_mod()->hashisold) {
@@ -87,6 +91,14 @@ if($mod->get_mod()->hashisold) {
 $PAGE->navbar->add($pagetitle, $PAGE->url);
 $PAGE->set_heading(format_string($course->fullname, true, [context_course::instance($course->id)]));
 $PAGE->set_title($pagetitle);
+
+$config = get_config(constants::M_COMPONENT);
+if($config->enablesetuptab){
+    $PAGE->set_pagelayout('popup');
+}else{
+    $PAGE->set_pagelayout('course');
+}
+
 //load glide
 $PAGE->requires->css(new moodle_url('https://cdn.jsdelivr.net/npm/glidejs@2.1.0/dist/css/glide.core.min.css'));
 //load google font never works ... why?
@@ -95,7 +107,9 @@ $PAGE->requires->css(new moodle_url('https://cdn.jsdelivr.net/npm/glidejs@2.1.0/
 $renderer = $PAGE->get_renderer('mod_wordcards');
 
 echo $renderer->header();
-echo $renderer->heading($pagetitle);
+$heading = $renderer->heading($pagetitle, 3, 'main');
+$displaytext = \html_writer::div($heading, constants::M_CLASS . '_center');
+echo $displaytext;
 
 if (!empty($mod->get_mod()->intro)) {
     echo $renderer->box(format_module_intro('wordcards', $mod->get_mod(), $cm->id), 'generalbox', 'intro');

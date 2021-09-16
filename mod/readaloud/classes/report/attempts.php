@@ -111,12 +111,10 @@ class attempts extends basereport {
         $supergrouper = has_capability('moodle/site:accessallgroups', $context, $USER->id);
 
         //if we need to show  groups
-        if(!$supergrouper && $groupsmode ==SEPARATEGROUPS) {
-            $groups = groups_get_user_groups($course->id);
-            if (!$groups || empty($groups[0])) {
-                return false;
-            }
-            list($groupswhere, $allparams) = $DB->get_in_or_equal(array_values($groups[0]));
+        //if we need to show just one groups
+        if($formdata->groupid > 0){
+
+            list($groupswhere, $allparams) = $DB->get_in_or_equal($formdata->groupid);
 
             $alldatasql = "SELECT tu.* FROM {" . constants::M_USERTABLE . "} tu " .
                     " INNER JOIN {groups_members} gm ON tu.userid=gm.userid " .

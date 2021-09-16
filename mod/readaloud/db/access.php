@@ -112,7 +112,6 @@ $capabilities = array(
                         'editingteacher' => CAP_ALLOW,
                         'manager' => CAP_ALLOW
                 ),
-                'clonepermissionsfrom' => 'mod/page:view'
         ),
         'mod/readaloud:submit' => array(
                 'riskbitmask' => RISK_SPAM,
@@ -121,7 +120,28 @@ $capabilities = array(
                 'archetypes' => array(
                         'student' => CAP_ALLOW
                 ),
-                'clonepermissionsfrom' => 'mod/quiz:attempt'
+        ),
+        'mod/readaloud:itemedit' => array(
+                'riskbitmask' => RISK_XSS,
+                'captype' => 'write',
+                'contextlevel' => CONTEXT_COURSE,
+                'archetypes' => array(
+                        'editingteacher' => CAP_ALLOW,
+                        'manager' => CAP_ALLOW
+                ),
+                'clonepermissionsfrom' => 'moodle/course:manageactivities'
+        ),
+
+        'mod/readaloud:itemview' => array(
+                'riskbitmask' => RISK_XSS,
+                'captype' => 'write',
+                'contextlevel' => CONTEXT_COURSE,
+                'archetypes' => array(
+                        'editingteacher' => CAP_ALLOW,
+                        'teacher' => CAP_ALLOW,
+                        'manager' => CAP_ALLOW
+                ),
+                'clonepermissionsfrom' => 'moodle/course:manageactivities'
         )
 );
 

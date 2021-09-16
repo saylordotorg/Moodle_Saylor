@@ -1,20 +1,20 @@
-@mod @mod_quiz @qtype @qtype_gapfill $gapfill_import @javascript
+@mod @mod_quiz @qtype @qtype_gapfill @gapfill_import @javascript
 
 Feature: Test importing Gapfill questions
-  As a teacher
-  In order to reuse Gapfill questions
-  I need to import them
+    As a teacher
+    In order to reuse Gapfill questions
+    I need to import them
 
   Background:
     Given the following "users" exist:
-      | username | firstname | lastname | email                |
-      | teacher1 | T1        | Teacher1 | teacher1@example.com |
+        | username | firstname | lastname | email                |
+        | teacher1 | T1        | Teacher1 | teacher1@example.com |
     And the following "courses" exist:
-      | fullname | shortname | category |
-      | Course 1 | C1        | 0        |
+        | fullname | shortname | category |
+        | Course 1 | C1        | 0        |
     And the following "course enrolments" exist:
-      | user     | course | role           |
-      | teacher1 | C1     | editingteacher |
+        | user     | course | role           |
+        | teacher1 | C1     | editingteacher |
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
 

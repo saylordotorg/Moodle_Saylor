@@ -91,8 +91,12 @@ $event->trigger();
 $PAGE->set_title(format_string($moduleinstance->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($modulecontext);
-$PAGE->set_pagelayout('course');
-$PAGE->requires->jquery();
+
+if($config->enablesetuptab){
+    $PAGE->set_pagelayout('popup');
+}else{
+    $PAGE->set_pagelayout('course');
+}
 
 	
 
@@ -132,6 +136,7 @@ switch ($showreport){
 		$formdata = new stdClass();
 		$formdata->soloid = $moduleinstance->id;
         $formdata->activityname = $moduleinstance->name;
+        $formdata->groupmenu = true;
 		break;
 
     case 'detailedattempts':
@@ -139,7 +144,7 @@ switch ($showreport){
         $formdata = new stdClass();
         $formdata->soloid = $moduleinstance->id;
         $formdata->activityname = $moduleinstance->name;
-        //$formdata->modulecontextid = $modulecontext->id;
+        $formdata->groupmenu = true;
         break;
 
     case 'classprogress':
@@ -181,7 +186,12 @@ switch ($showreport){
                 $stats = utils::fetch_stats($attempt,$moduleinstance);
                 $aidata = $DB->get_record(constants::M_AITABLE, array('attemptid' => $attemptid));
                 $attempt_renderer = $PAGE->get_renderer(constants::M_COMPONENT,'attempt');
+                $attemptuser=$DB->get_record('user',array('id'=>$attempt->userid));
+                echo $renderer->heading(get_string('attemptfor',constants::M_COMPONENT,fullname($attemptuser)),3);
                 echo $attempt_renderer->show_userattemptsummary($moduleinstance, $attempt, $aidata, $stats);
+
+                //open the summary results div
+                echo html_writer::start_div('mod_solo_summaryresults');
 
                 //grade info
                 //necessary for M3.3
@@ -196,8 +206,12 @@ switch ($showreport){
                         $evaluator = get_string("autoeval", constants::M_COMPONENT);
                     }
                     echo $attempt_renderer->show_teachereval( $rubricresults,$feedback, $evaluator);
+                    $autotranscriptready=true;
+                    echo $attempt_renderer->show_summarypassageandstats($attempt,$aidata, $stats,$autotranscriptready);
 
                 }
+                //close the summary results div
+                echo '</div>';
 
                 $link = new \moodle_url(constants::M_URL . '/reports.php', array('report' => 'menu', 'id' => $cm->id, 'n' => $moduleinstance->id));
                 echo  \html_writer::link($link, get_string('returntoreports', constants::M_COMPONENT));
@@ -220,6 +234,22 @@ switch ($showreport){
 3) call $rows=report->fetch_formatted_records($withlinks=true(html) false(print/excel))
 5) call $reportrenderer->render_section_html($sectiontitle, $report->name, $report->get_head, $rows, $report->fields);
 */
+
+
+// fetch groupmode/menu/id for this activity
+$groupmenu = '';
+if(isset($formdata->groupmenu)){
+    // fetch groupmode/menu/id for this activity
+    if ($groupmode = groups_get_activity_groupmode($cm)) {
+        $groupmenu = groups_print_activity_menu($cm, $PAGE->url, true);
+        $groupmenu .= ' ';
+        $formdata->groupid = groups_get_activity_group($cm);
+    }else{
+        $formdata->groupid  = 0;
+    }
+}else{
+    $formdata->groupid  = 0;
+}
 
 $report->process_raw_data($formdata);
 $reportheading = $report->fetch_formatted_heading();
@@ -251,6 +281,7 @@ switch($format){
         }else{
             echo $renderer->header($moduleinstance, $cm, $mode, null, get_string('reports', constants::M_COMPONENT));
             echo $extraheader;
+            echo $groupmenu;
             echo $reportrenderer->heading($reportheading, 4);
             echo $reportrenderer->render_empty_section_html($reportheading, 4);
             $showexport =false;
@@ -263,6 +294,7 @@ switch($format){
 
         echo $renderer->header($moduleinstance, $cm, $mode, null, get_string('reports', constants::M_COMPONENT));
         echo $extraheader;
+        echo $groupmenu;
         echo $reportrenderer->heading($reportheading, 4);
 
         //first check if we actually have some data, if not we just show an "empty" message
@@ -308,6 +340,7 @@ switch($format){
             $PAGE->requires->css( new \moodle_url('https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css'));
             echo $renderer->header($moduleinstance, $cm, $mode, null, get_string('reports', constants::M_COMPONENT));
             echo $extraheader;
+            echo $groupmenu;
             echo $reportrenderer->render_hiddenaudioplayer();
             echo $reportrenderer->render_section_html($reportheading, $report->fetch_name(), $report->fetch_head(), $reportrows,
                     $report->fetch_fields());
@@ -317,6 +350,7 @@ switch($format){
             $pagingbar = $reportrenderer->show_paging_bar($allrowscount, $paging, $PAGE->url);
             echo $renderer->header($moduleinstance, $cm, $mode, null, get_string('reports', constants::M_COMPONENT));
             echo $extraheader;
+            echo $groupmenu;
             echo $reportrenderer->render_hiddenaudioplayer();
             echo $pagingbar;
             echo $reportrenderer->render_section_html($reportheading, $report->fetch_name(), $report->fetch_head(), $reportrows,

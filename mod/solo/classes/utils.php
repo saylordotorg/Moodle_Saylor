@@ -39,37 +39,6 @@ class utils{
     //  const CLOUDPOODLL = 'http://localhost/moodle';
     const CLOUDPOODLL = 'https://cloud.poodll.com';
 
-    //fetch the latest compeleted state
-    public static function fetch_latest_finishedattempt($solo,$userid=false) {
-        global $DB, $USER;
-        if(!$userid){
-            $userid = $USER->id;
-        }
-        $attempts = $DB->get_records(constants::M_ATTEMPTSTABLE,
-                array('solo'=>$solo->id,'userid'=>$userid,'completedsteps'=>constants::STEP_SELFTRANSCRIBE),'timemodified DESC','*',0,1);
-        if($attempts){
-            $attempt=  array_shift($attempts);
-        }else {
-            $attempt = false;
-        }
-        return $attempt;
-    }
-
-    //Fetch latest attempt regardless of its completed state
-    public static function fetch_latest_attempt($solo,$userid=false) {
-        global $DB, $USER;
-        if(!$userid){
-            $userid = $USER->id;
-        }
-        $attempts = $DB->get_records(constants::M_ATTEMPTSTABLE,
-                array('solo'=>$solo->id,'userid'=>$userid),'timemodified DESC','*',0,1);
-        if($attempts){
-            $attempt=  array_shift($attempts);
-        }else {
-            $attempt = false;
-        }
-        return $attempt;
-    }
 
 
     //are we willing and able to transcribe submissions?
@@ -257,18 +226,11 @@ class utils{
     //fetch lang server url, services incl. 'transcribe' , 'lm', 'lt', 'spellcheck'
     public static function fetch_lang_server_url($region,$service='transcribe'){
         switch($region) {
-            case 'tokyo':
-                $ret = 'https://tokyo.ls.poodll.com/';
-                break;
-            case 'sydney':
-                $ret = 'https://sydney.ls.poodll.com/';
-                break;
-            case 'dublin':
-                $ret = 'https://dublin.ls.poodll.com/';
-                break;
             case 'useast1':
-            default:
                 $ret = 'https://useast.ls.poodll.com/';
+                break;
+            default:
+                $ret = 'https://' . $region . '.ls.poodll.com/';
         }
         return $ret . $service;
     }
@@ -1113,7 +1075,9 @@ class utils{
           "london" => get_string("london",constants::M_COMPONENT),
           "saopaulo" => get_string("saopaulo",constants::M_COMPONENT),
           "singapore" => get_string("singapore",constants::M_COMPONENT),
-          "mumbai" => get_string("mumbai",constants::M_COMPONENT)
+          "mumbai" => get_string("mumbai",constants::M_COMPONENT),
+           "capetown" => get_string("capetown",constants::M_COMPONENT),
+          "bahrain" => get_string("bahrain",constants::M_COMPONENT)
       );
   }
 

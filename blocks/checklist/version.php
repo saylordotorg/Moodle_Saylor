@@ -24,9 +24,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2021041000;
+$plugin->version = 2021051500;
 $plugin->requires = 2017111300; // Moodle 3.4+.
-$plugin->release = '3.4+ (Build: 2021041000)';
+$plugin->release = '3.4+ (Build: 2021051500)';
 $plugin->component = 'block_checklist';
 $plugin->maturity = MATURITY_STABLE;
 $plugin->dependencies = ['mod_checklist' => 2019061900]; // Must have checklist activity module installed.

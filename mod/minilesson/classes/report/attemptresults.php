@@ -97,21 +97,9 @@ class attemptresults extends basereport
         $context = empty($cm) ? \context_course::instance($course->id) : \context_module::instance($cm->id);
         $supergrouper = has_capability('moodle/site:accessallgroups', $context, $USER->id);
 
+        if($formdata->groupid > 0){
 
-        //if no groups, or can see all groups then the SQL is simple
-        if($supergrouper || $groupsmode !=SEPARATEGROUPS) {
-
-            //we just need the  individual recoen
-            $record =$DB->get_record(constants::M_ATTEMPTSTABLE,
-                    array('id'=>$formdata->attemptid,'moduleid'=>$formdata->moduleid));
-
-        //if need to partition to groups, SQL for groups
-        }else{
-            $groups = groups_get_user_groups($course->id);
-            if (!$groups || empty($groups[0])) {
-                return false;
-            }
-            list($groupswhere, $allparams) = $DB->get_in_or_equal(array_values($groups[0]));
+            list($groupswhere, $allparams) = $DB->get_in_or_equal($formdata->groupid);
 
             $allsql ="SELECT tu.* FROM {".constants::M_ATTEMPTSTABLE ."} tu " .
                     " INNER JOIN {groups_members} gm ON tu.userid=gm.userid " .
@@ -125,6 +113,11 @@ class attemptresults extends basereport
             }else{
                 $record =false;
             }
+        }else{
+            //we just need the  individual recoen
+            $record =$DB->get_record(constants::M_ATTEMPTSTABLE,
+                    array('id'=>$formdata->attemptid,'moduleid'=>$formdata->moduleid));
+
         }
 
 

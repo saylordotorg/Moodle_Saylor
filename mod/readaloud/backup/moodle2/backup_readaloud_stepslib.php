@@ -51,12 +51,12 @@ class backup_readaloud_activity_structure_step extends backup_activity_structure
         // root element describing readaloud instance
         $oneactivity = new backup_nested_element(constants::M_MODNAME, array('id'), array(
                 'course', 'name', 'intro', 'introformat', 'timelimit', 'passage','passagehash', 'passageformat', 'alternatives', 'welcome',
-                'welcomeformat',
+                'welcomeformat','phonetic','passagesegments',
                 'feedback', 'feedbackformat', 'targetwpm', 'accadjustmethod', 'accadjust', 'humanpostattempt', 'machinepostattempt',
                 'grade', 'gradeoptions', 'machgrademethod','sessionscoremethod', 'maxattempts', 'mingrade',
                 'ttslanguage','ttsvoice','ttsspeed','enablepreview','enableshadow','enablelandr' ,'transcriber', 'modelaudiourl','modelaudiobreaks',
                 'modelaudiotrans','modelaudiofulltrans','modelaudiomatches',
-                'enableai', 'allowearlyexit','expiredays' ,'region', 'activitylink','submitrawaudio','stricttranscribe','recorder','timecreated', 'timemodified'
+                'enableai', 'allowearlyexit','expiredays' ,'region', 'activitylink','submitrawaudio','stricttranscribe','recorder','foriframe','timecreated', 'timemodified'
         ));
 
         //attempts
@@ -74,14 +74,28 @@ class backup_readaloud_activity_structure_step extends backup_activity_structure
                 "timemodified"
         ));
 
+        // rsquestion
+        $rsquestions = new backup_nested_element('rsquestions');
+        $rsquestion = new backup_nested_element('rsquestion', array('id'),array(
+                constants::M_MODNAME .'id', 'name','itemorder', 'type','visible','itemtext', 'itemformat','itemaudiofname',
+                'customtext1', 'customtext1format','customtext2', 'customtext2format','customtext3',
+                'customtext3format','customtext4', 'customtext4format','correctanswer',
+                'timemodified','rsquestionkey','createdby','modifiedby'));
+
         // Build the tree.
         $oneactivity->add_child($attempts);
         $attempts->add_child($attempt);
         $attempt->add_child($airesults);
         $airesults->add_child($airesult);
 
+        //questions
+        $oneactivity->add_child($rsquestions);
+        $rsquestions->add_child($rsquestion);
+
         // Define sources.
         $oneactivity->set_source_table(constants::M_TABLE, array('id' => backup::VAR_ACTIVITYID));
+        $rsquestion->set_source_table(constants::M_QTABLE,
+                array(constants::M_MODNAME . 'id'  => backup::VAR_PARENTID));
 
         //sources if including user info
         if ($userinfo) {
@@ -101,6 +115,12 @@ class backup_readaloud_activity_structure_step extends backup_activity_structure
         $oneactivity->annotate_files(constants::M_COMPONENT, 'welcome', null);
         $oneactivity->annotate_files(constants::M_COMPONENT, 'passage', null);
         $oneactivity->annotate_files(constants::M_COMPONENT, 'feedback', null);
+        //question stuff
+        $oneactivity->annotate_files(constants::M_COMPONENT, constants::TEXTQUESTION_FILEAREA, 'id');
+
+        for($anumber=1;$anumber<=constants::MAXANSWERS;$anumber++) {
+            $oneactivity->annotate_files(constants::M_COMPONENT, constants::TEXTANSWER_FILEAREA . $anumber, 'id');
+        }
 
         //file annotation if including user info
         if ($userinfo) {

@@ -64,6 +64,13 @@ class qtype_poodllrecording_edit_form extends question_edit_form {
         $mform->addElement('select', 'responseformat',
                 get_string('responseformat', constants::M_COMP), $recorderoptions);
         $mform->setDefault('responseformat', 'audio');
+
+        // safesave
+        $name = 'safesave';
+        $label = get_string($name, constants::M_COMP);
+        $text = get_string('safesave_details', constants::M_COMP);
+        $mform->addElement('advcheckbox', $name, $label, $text);
+        $mform->setDefault($name, 0);
 				
 		//Add a place to set a maximum recording time.
 	   $mform->addElement('duration', 'timelimit', get_string('timelimit', constants::M_COMP));

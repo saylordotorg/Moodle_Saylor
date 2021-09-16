@@ -1,9 +1,9 @@
 # CODE RUNNER
 
-Version: 4.0.0 February 2021
+Version: 4.1.0 August 2021
 
 Authors: Richard Lobb, University of Canterbury, New Zealand.
-         Tim Hunt, The Open University, UK
+         Tim Hunt, The Open University, UK.
 
 NOTE: A few sample quizzes containing example CodeRunner questions
 are available at [coderunner.org.nz](http://coderunner.org.nz). There's also
@@ -18,10 +18,8 @@ unusual question type.
 
 - [Introduction](#introduction)
 - [Installation](#installation)
-  - [Upgrading from a CodeRunner version earlier than 2.4.0](#upgrading-from-a-coderunner-version-earlier-than-240)
-  - [Upgrading from CodeRunner versions between 2.4 and 3.0](#upgrading-from-coderunner-versions-between-24-and-30)
-    - [Note for enthusiasts only.](#note-for-enthusiasts-only)
-  - [Installing CodeRunner from scratch](#installing-coderunner-from-scratch)
+  - [Installing CodeRunner](#installing-coderunner)
+  - [Upgrading from earlier versions of CodeRunner](#upgrading-from-earlier-versions-of-coderunner)
   - [Preliminary testing of the CodeRunner question type](#preliminary-testing-of-the-coderunner-question-type)
   - [Setting the quiz review options](#setting-the-quiz-review-options)
   - [Sandbox Configuration](#sandbox-configuration)
@@ -43,6 +41,8 @@ unusual question type.
   - [Preprocessing of template parameters](#preprocessing-of-template-parameters)
     - [Preprocessing with Twig](#preprocessing-with-twig)
     - [Preprocessing with other languages](#preprocessing-with-other-languages)
+    - [The template parameter preprocessor program](#the-template-parameter-preprocessor-program)
+    - [The Evaluate per run option](#the-evaluate-per-run-option)
   - [The Twig TEST variable](#the-twig-test-variable)
   - [The Twig TESTCASES variable](#the-twig-testcases-variable)
   - [The Twig QUESTION variable](#the-twig-question-variable)
@@ -69,8 +69,9 @@ unusual question type.
   - [The Graph UI](#the-graph-ui)
   - [The Table UI](#the-table-ui)
   - [The Gap Filler UI](#the-gap-filler-ui)
+  - [The Ace Gap Filler UI](#the-ace-gap-filler-ui)
   - [The Html UI](#the-html-ui)
-    - [The textareaId macro](#the-textareaId-macro)
+    - [The textareaId macro](#the-textareaid-macro)
   - [Other UI plugins](#other-ui-plugins)
 - [User-defined question types](#user-defined-question-types)
   - [Prototype template parameters](#prototype-template-parameters)
@@ -104,7 +105,7 @@ The mark for a set of questions in a quiz is then determined primarily by
 which questions the student is able to solve successfully and then secondarily
 by how many submissions the student makes on each question.
 However, it is also possible to configure CodeRunner questions so
-that the mark is determined by how many of the tests the code successfully passes.
+that the mark is determined by how many of the tests the code successfully passed.
 
 CodeRunner has been in use at the University of Canterbury for over ten years
 running many millions of student quiz question submissions in Python, C , JavaScript,
@@ -115,10 +116,10 @@ world and as of January 2021 is installed on over 1800 Moodle sites worldwide
 at least some of its language strings translated into 19 other languages (see
 [here](https://moodle.org/plugins/translations.php?plugin=qtype_coderunner])).
 
-CodeRunner currently natively upports Python2 (considered obsolescent), Python3,
-C, C++, Java, PHP, Pascal, JavaScript (NodeJS), Octave and Matlab.
+CodeRunner supports the following languages: Python2 (considered obsolete),
+Python3, C, C++, Java, PHP, Pascal, JavaScript (NodeJS), Octave and Matlab.
 However, other languages are easily supported without altering the source
-code of either CodeRunner just by scripting
+code of either CodeRunner or the Jobe server just by scripting
 the execution of the new language within a Python-based question.
 
 CodeRunner can safely be used on an institutional Moodle server,
@@ -135,21 +136,21 @@ should work with older versions of Moodle 3.0 or later, too, provided they are
 running PHP V7.2 or later. CodeRunner is developed
 and tested on Linux only, but Windows-based Moodle sites have also used it.
 
-For security reasons
-submitted jobs are run on a separate Linux-based machine called the
-[Jobe server](https://github.com/trampgeek/jobe). CodeRunner is initially
-configured to use a small
-outward-facing Jobe server at the University of Canterbury, and this can
-be used for initial testing.  However, this is not suitable for production
-use, for which institutions will need to install their own Jobe server.
-Instructions for installing a Jobe server are given in the Jobe documentation.
+Submitted jobs are run on a separate Linux-based machine, called the
+[Jobe server](https://github.com/trampgeek/jobe), for security purposes.
+CodeRunner is initially configured to use a small, outward-facing Jobe server
+at the University of Canterbury, and this server can
+be used for initial testing; however, the Canterbury server is not suitable
+for production use. Institutions will need to install and operate their own Jobe server
+when using CodeRunner in a production capacity.
+Instructions for installing a Jobe server are provided in the Jobe documentation.
 Once Jobe is installed, use the Moodle administrator interface for the
-CodeRunner plug-in to specify the Jobe host name and perhaps port number.
+CodeRunner plug-in to specify the Jobe host name and port number.
 A [Docker Jobe server image](https://hub.docker.com/r/trampgeek/jobeinabox) is also available.
 
 A modern 8-core Moodle server can handle an average quiz question
 submission rate of well over 1000 Python quiz questions per minute while maintaining
-a response time of less than about 3 - 4 seconds, assuming the student code
+a response time of less than 3 - 4 seconds, assuming the student code
 itself runs in a fraction of a second. We have run CodeRunner-based exams
 with nearly 500 students and experienced only light to moderate load factors
 on our 8-core Moodle server. The Jobe server, which runs student submissions
@@ -308,7 +309,7 @@ result table; if you wish to have the quiz review options control when it is
 shown you must change the *Feedback* drop-down in the question author form from
 its default *Force show* to *Set by quiz*.
 
-Some recommended setting in the "During the attempt column" of the quiz review
+Some recommended setting in the "During the attempt" column of the quiz review
 options are:
 
  1. Right answer. This should be unchecked, at least in the "During the attempt"
@@ -399,7 +400,7 @@ or
 If you're on a Red Hat or similar system in which the web server runs as
 *apache*, you should replace *www-data* with *apache.
 
-TThe unit tests will almost certainly show lots of skipped or failed tests relating
+The unit tests will almost certainly show lots of skipped or failed tests relating
 to the various sandboxes and languages that you have not installed, e.g.
 the LiuSandbox, Matlab, Octave and Java. These can all be ignored unless you plan to use
 those capabilities. The name of the failing tests should be sufficient to
@@ -759,7 +760,7 @@ the template to be rendered and a set of pre-defined variables that we will
 call the *Twig Context*. The default set of context variables is:
 
  * STUDENT\_ANSWER, which is the text that the student entered into the answer box.
- * TEST, which is a record containing the testcase. See [The Twig TEST variable)(#the-twig-test-variable).
+ * TEST, which is a record containing the testcase. See [The Twig TEST variable](#the-twig-test-variable).
  * IS\_PRECHECK, which has the value 1 (True) if the template is being evaluated asY
 a result of a student clicking the *Precheck* button or 0 (False) otherwise.
  * ANSWER\_LANGUAGE, which is meaningful only for multilanguage questions, for
@@ -783,7 +784,7 @@ field, which is the "test" field of the testcase. It is usually
 a bit of code to be run to test the student's answer.
 
 When Twig processes the template, it replaces any occurrences of
-strings of the form `{{ TWIG\_VARIABLE }}` with the value of the given
+strings of the form `{{ TWIG_VARIABLE }}` with the value of the given
 TWIG_VARIABLE (e.g. STUDENT\_ANSWER). As an example,
 the question type *c\_function*, which asks students to write a C function,
 might have the following template (if it used a per-test template):
@@ -1088,7 +1089,7 @@ attributes of the question including its question text, sample answer and
 As explained above, the Twig syntax {{ STUDENT\_ANSWER | e('py') }} results
 in the student's submission
 being filtered by a Python escape function that escapes all
-all double quote and backslash characters with an added backslash. The
+double quote and backslash characters with an added backslash. The
 python escaper e('py') is just one of the available escapers. Others are:
 
  1. e('java'). This prefixes single and double quote characters with a backslash
@@ -1244,8 +1245,8 @@ the template parameters field being passed through Twig to yield the JSON
 template parameter string. That string is decoded from JSON to PHP,
 to yield the Twig context
 for all subsequent Twig operations on the question. When evaluating the
-template parameters with Twig the only context is the [STUDENT variable] 
-(#the-twig-student-variable). The output of that initial
+template parameters with Twig the only context is the
+[STUDENT variable](#the-twig-student-variable). The output of that initial
 Twig run thus provides the context for subsequent evaluations of the question's
 template, text, test cases, etc.
 
@@ -1347,17 +1348,20 @@ a preprocessor, as the job is more easily and more efficiently done in Twig,
 as explained in the section [Randomising questions](#randomising-questions).
 Note, too, that *Twig All* must be set.
 
-#### The Evaluate per student option
+#### The Evaluate per run option
 When you select a preprocessor other than Twig, a checkbox 'Evaluate per
-student' is shown, and is initially checked. This controls when the preprocessor
-gets called. Usually this capability is being used for randomisation or for
-per-student customisation, so the preprocessor must be invoked for each 
+run' is shown, and is initially unchecked. This controls when the preprocessor
+gets called. If you are using the template preprocessor for randomisation or
+for per-student customisation, 
+you must check this option so that the preprocessor is invoked for each 
 student when they start their attempt. As explained above, this can have serious 
-load implications. However, there are some situations where you might wish to
-perform a template parameter computation for other purposes, e.g. to compute a
-value within the question text in a non-randomised question without using
-an offline program. In that case, you can uncheck the *Evaluate per student*
-option and the template parameters will be computed only once, when the
+load implications. 
+
+However, if you are using the template preprocessor for other purposes,
+e.g. to compute values within the question text in a non-randomised question
+without using
+an offline program you can leave *Evaluate per run* unchecked. In this case
+the template parameters will be computed only once, when the
 question is saved.
 
 Although clumsy, this approach can also be used to compute the expected output
@@ -1954,11 +1958,11 @@ A template grader for this situation might be the following
                 else:
                     comment += "Line {} wrong\n".format(i)
 
-        print(json.dumps({'got': got, 'comment': comment, 'fraction': mark / 5}))
+        print(json.dumps({'got': got, 'comment': comment, 'fraction': mark / 5, 'awarded': mark}))
 
 Note that in the above program the Python *dictionary*
 
-    {'got': got, 'comment': comment, 'fraction': mark / 5}
+    {'got': got, 'comment': comment, 'fraction': mark / 5, 'awarded': mark}
 
 gets converted by the call to json.dumps to a JSON object string, which looks
 syntactically similar but is in fact a different sort of entity altogether.
@@ -1966,9 +1970,9 @@ You should always use json.dumps, or its equivalent in other languages, to
 generate a valid JSON string, handling details like escaping of embedded
 newlines.
 
-In order to display the *comment* in the output JSON, the
+In order to display the *comment* and *awarded* columns in the output JSON,
 the 'Result columns' field of the question (in the 'customisation' part of
-the question authoring form) should include that field and its column header, e.g.
+the question authoring form) should include those field and their column headers, e.g.
 
         [["Expected", "expected"], ["Got", "got"], ["Comment", "comment"], ["Mark", "awarded"]]
 
@@ -2273,20 +2277,22 @@ HTML *textarea* elements. The question author can enable *Add row* and
 of the table is set by the following template parameters, where the first two
 are required and the rest are optional.
 
- * `table_num_rows` (required): sets the (initial) number of table rows, excluding the header.
- * `table_num_columns` (required): sets the number of table columns.
+ * `num_rows` (required): sets the (initial) number of table rows, excluding the header.
+ * `num_columns` (required): sets the number of table columns.
  * `table_column_headers` (optional): a list of strings used for column headers. By default
    no column headers are used.
- * `table_row_labels` (optional): a list of strings used for row labels. By
+ * `row_labels` (optional): a list of strings used for row labels. By
    default no row labels are used.
- * `table_column_width_percents` (optional): a list of numeric percentage widths of the different
+ * `lines_per_cell` (optional): the initial number of rows for each of the
+   table text-area cells. Default 2.
+ * `column_width_percents` (optional): a list of numeric percentage widths of the different
    columns. For example, if there are two columns, and the first one is to
    occupy one-quarter of the available width, the list should be \[25, 75\].
    By default all columns have the same width.
- * `table_dynamic_rows` (optional): set `true` to enable the addition of *Add row*
+ * `dynamic_rows` (optional): set `true` to enable the addition of *Add row*
    and *Delete row* buttons through which the student can alter the number of
    rows. The number of rows can never be less than the initial `table_num_rows` value.
- * `table_locked_cells` (optional): an array of 2-element [row, column] cell specifiers.
+ * `locked_cells` (optional): an array of 2-element [row, column] cell specifiers.
    The specified cells are rendered to HTML with the *disabled* attribute, so
    cannot be changed by the user. For example
 
@@ -2300,13 +2306,13 @@ are required and the rest are optional.
    the required values in the first place.
 
 For example, the `python3\_program\_testing` question type uses the following
-template parameter setting:
+UI parameter setting:
 
     {
-        "table_num_rows": 3,
-        "table_num_columns": 2,
-        "table_column_headers": ["Test", "Result"],
-        "table_dynamic_rows": true
+        "num_rows": 3,
+        "num_columns": 2,
+        "column_headers": ["Test", "Result"],
+        "dynamic_rows": true
     }
 
  The table serialisation is simply a JSON array of arrays containing all the
@@ -2324,7 +2330,7 @@ An example of the use of this UI type can be seen in the
 This plugin replaces the usual textarea answer box with a div
 consisting of pre-formatted text supplied by the question author in either the
 "globalextra" field or the testcode field of the first test case, according
-to the template parameter gapfiller_ui_source (default: globalextra).  HTML
+to the ui parameter ui_source (default: globalextra).  HTML
 entry or textarea elements are then inserted at
 specified points. It is intended primarily for use with coding questions
 where the answerbox presents the students with code that has smallish bits
@@ -2355,16 +2361,26 @@ As a special case of the serialisation, if the value list is empty, the
 serialisation itself is the empty string.
 
 The delimiters for the input element insertion tags are by default '{[' and
-']}', but can be changed by an optional template parameter gap_filler_delimiters,
+']}', but can be changed by an optional UI parameter delimiters,
 which must be a 2-element array of strings. For example:
 
-    {"gap_filler_delimiters": ["{{", "}}"]}
+    {"delimiters": ["{{", "}}"]}
 
 Note that the double-brace delimiters in that example are the same as those
 used by Twig, so using them instead of the default would prevent you from
 ever adding Twig expansion (e.g. for randomisation) to the question. This is
 not recommended.
 
+
+### The Ace Gap Filler UI
+
+This is a new and still experimental variant on the Gap Filler UI in which
+the text is rendered by the Ace editor with all usual syntax highlighting
+but the user can edit only the text in the gaps. 
+
+It behaves exactly like the Gap Filler UI, above, except that it does not
+currently support the {[ rows, columns ]} syntax for multiline gaps. Only
+in-line gaps are supported.
 
 ### The Html UI
 

@@ -17,7 +17,7 @@ define(['jquery', 'core/log'], function ($, log) {
             //call the file upload
             var cvs = this.getCvs(recid, wboard, opts);
             this.pokeVectorData(recid, wboard, opts);
-            theuploader.uploadFile(cvs.toDataURL(), 'image');
+            theuploader.uploadFile(cvs.toDataURL(), 'image/png');
         },
         getCvs: function (recid, wboard) {
             if (recid.indexOf('drawingboard_') == 0) {

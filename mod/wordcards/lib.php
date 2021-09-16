@@ -312,7 +312,7 @@ function wordcards_grade_item_update($moduleinstance, $grades=null) {
     require_once($CFG->dirroot.'/lib/gradelib.php');
 
     $params = array('itemname' => $moduleinstance->name);
-    if (array_key_exists('cmidnumber', $moduleinstance)) {
+    if (array_key_exists('cmidnumber', (array)$moduleinstance)) {
         $params['idnumber'] = $moduleinstance->cmidnumber;
     }
 

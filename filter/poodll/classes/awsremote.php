@@ -47,6 +47,8 @@ class awsremote {
     const REGION_EUW1 = 'eu-west-1'; //EU (Ireland)
     const REGION_EUW2 = 'eu-west-2'; //EU (London)
     const REGION_SAE1 = 'sa-east-1'; //South America (São Paulo)
+    const REGION_AFS1 = 'af-south-1'; //South Africa
+    const REGION_MES1 = 'me-south-1'; //Middle East (Bahrain)
 
 
 
@@ -96,6 +98,12 @@ class awsremote {
                 break;
             case 'tokyo':
                 $ret = self::REGION_APN1;
+                break;
+            case 'capetown':
+                $ret = self::REGION_AFS1;
+                break;
+            case 'bahrain':
+                $ret = self::REGION_MES1;
                 break;
             default:
                 //the region might already be good

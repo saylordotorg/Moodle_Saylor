@@ -15,17 +15,17 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Version file for atto_linkadv
  * @package   atto_linkadv
  * @author    Mark Sharp <m.sharp@chi.ac.uk>
- * @copyright 2017 University of Chichester {@link www.chi.ac.uk}
+ * @copyright 2017 University of Chichester {@link https://www.chi.ac.uk}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-
-$plugin->version   = 2020041400;        // The current plugin version (Date: YYYYMMDDXX).
-$plugin->requires  = 2017111302;        // Requires this Moodle version.
-$plugin->component = 'atto_linkadv';  // Full name of the plugin (used for diagnostics).
+$plugin->version   = 2020041402;
+$plugin->requires  = 2017111302;
+$plugin->component = 'atto_linkadv';
 $plugin->release = '3.8.0';
 $plugin->maturity = MATURITY_STABLE;

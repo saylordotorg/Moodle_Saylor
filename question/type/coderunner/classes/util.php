@@ -38,7 +38,7 @@ class qtype_coderunner_util {
         $uiplugin = $question->uiplugin === null ? 'ace' : strtolower($question->uiplugin);
         if ($uiplugin !== '' && $uiplugin !== 'none') {
             $params = array($uiplugin, $textareaid);  // Params to plugin's init function.
-            if ($uiplugin === 'ace') {
+            if (strpos($uiplugin, 'ace') !== false) {
                 self::load_ace();
             }
             $PAGE->requires->js_call_amd('qtype_coderunner/userinterfacewrapper', 'newUiWrapper', $params);
@@ -53,6 +53,7 @@ class qtype_coderunner_util {
         $PAGE->requires->js($plugindirrel . '/ace/ace.js');
         $PAGE->requires->js($plugindirrel . '/ace/ext-language_tools.js');
         $PAGE->requires->js($plugindirrel . '/ace/ext-modelist.js');
+        $PAGE->requires->js($plugindirrel . '/ace/ext-static_highlight.js');
     }
 
 

@@ -240,6 +240,8 @@ function filter_poodll_uploadfile($filedata, $fileextension, $mediatype, $action
         case "3g2":
         case "aac":
         case "wma":
+        case "m4a":
+        case "m4v":
         case "wmv":
         case "smf":
         case "amr":
@@ -328,7 +330,7 @@ function filter_poodll_uploadfile($filedata, $fileextension, $mediatype, $action
         //we remove it, there must be a better way of course ...
         //$metapos = strPos($filedata,";base64,");
         $metapos = strPos($filedata, ",");
-        if ($metapos > 10 && $metapos < 30) {
+        if ($metapos !==false && $metapos <100) {
             //$trunced = substr($filedata,0,$metapos+8);
             $filedata = substr($filedata, $metapos + 1);
 

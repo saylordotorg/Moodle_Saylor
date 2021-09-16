@@ -163,6 +163,21 @@ function xmldb_solo_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2021022200, 'solo');
     }
 
+    // Add foriframe option to solo table
+    if ($oldversion < 2021053100) {
+        $table = new xmldb_table('solo');
+
+
+        // Define field foriframe to be added to solo
+        $field= new xmldb_field('foriframe', XMLDB_TYPE_INTEGER, '2', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0);
+
+        // add richtextprompt field to minilesson table
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_mod_savepoint(true, 2021053100, 'solo');
+    }
+
     // Final return of upgrade result (true, all went good) to Moodle.
     return true;
 }

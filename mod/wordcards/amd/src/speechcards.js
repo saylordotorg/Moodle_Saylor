@@ -139,7 +139,6 @@ define([
     process: function(jsondata) {
 
       app.terms = jsondata.terms;
-      app.has_images = jsondata.has_images;
       a4e.list_vocab("#vocab-list-inner", app.terms);
 
       //init components
