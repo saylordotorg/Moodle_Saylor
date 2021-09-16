@@ -405,7 +405,7 @@ def StashPlugins(plugins) {
             deleteDir()
             try {
                 //git([url: (plugins[x].get("url")), branch: (plugins[x].get("branch"))])
-                checkout changelog: false, poll: true, scm: [$class: 'GitSCM', branches: [[name: plugins[x].get("branch")]], repoUrl: plugins[x].get("url")], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'SubmoduleOption', disableSubmodules: false, parentCredentials: true, recursiveSubmodules: true, reference: '', trackingSubmodules: false]], submoduleCfg: []
+                checkout changelog: false, poll: true, scm: [$class: 'GitSCM', branches: [[name: plugins[x].get("branch")]], url: plugins[x].get("url")], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'SubmoduleOption', disableSubmodules: false, parentCredentials: true, recursiveSubmodules: true, reference: '', trackingSubmodules: false]], submoduleCfg: []
             }
             catch(err) {
                 def failmessage = "Unable to retrieve plugin ${plugins[x].get('name')}: ${err}"
