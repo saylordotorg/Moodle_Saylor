@@ -417,7 +417,7 @@ def StashPlugins(plugins) {
                     doGenerateSubmoduleConfigurations: false,
                     extensions: [[$class: 'CleanBeforeCheckout'],
                                 [$class: 'CloneOption',
-                                    depth: 0,
+                                    depth: 1,
                                     shallow: true
                                 ],
                                 [$class: 'SubmoduleOption',
