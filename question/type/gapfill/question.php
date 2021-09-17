@@ -586,6 +586,9 @@ class qtype_gapfill_question extends question_graded_automatically_with_countbac
 
     /**
      * Compare the answer given with the correct answer, does it match?
+     * To normalise white spaces add
+     * $answergiven = preg_replace('/\s+/', ' ', $answergiven);
+     *  before if($disableregex etc etc
      *
      * @param string $answergiven
      * @param string $answer

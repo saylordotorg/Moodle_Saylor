@@ -51,7 +51,6 @@ class qtype_coderunner_edit_form extends question_edit_form {
     // Define the CodeRunner question edit form.
     protected function definition() {
         global $PAGE;
-
         $mform = $this->_form;
         
         if (!empty($this->question->options->language)) {
@@ -112,7 +111,7 @@ class qtype_coderunner_edit_form extends question_edit_form {
 
         // Add the option to attach runtime support files, all of which are
         // copied into the working directory when the expanded template is
-        // executed.The file context is that of the current course.
+        // executed. The file context is that of the current course.
         $options = $this->fileoptions;
         $options['subdirs'] = false;
         $mform->addElement('header', 'fileheader',
@@ -358,14 +357,16 @@ class qtype_coderunner_edit_form extends question_edit_form {
         // calling question_bank::loadquestion($question->id).
         global $COURSE;
 
-        $question->missingprototypemessage = ''; // The optimistic assumption
+        if (!isset($question->brokenquestionmessage)) {
+            $question->brokenquestionmessage = '';
+        }
         if (isset($question->options->testcases)) { // Reloading a saved question?
 
             // Firstly check if we're editing a question with a missing prototype.
-            // Set missing_prototype if so.
+            // Set the broken_question message if so.
             $q = $this->make_question_from_form_data($question);
             if ($q->prototype === null) {
-                $question->missingprototypemessage = get_string(
+                $question->brokenquestionmessage = get_string(
                         'missingprototype', 'qtype_coderunner', array('crtype' => $question->coderunnertype));
             }
             
@@ -439,7 +440,7 @@ class qtype_coderunner_edit_form extends question_edit_form {
             $draftid = file_get_submitted_draft_itemid($fileset);
             $options = $this->fileoptions;
             $options['subdirs'] = false;
-
+            
             file_prepare_draft_area($draftid, $this->context->id,
                     'qtype_coderunner', $filearea,
                     empty($question->id) ? null : (int) $question->id,
@@ -480,9 +481,9 @@ class qtype_coderunner_edit_form extends question_edit_form {
         $mform->addElement('header', 'questiontypeheader', get_string('type_header', 'qtype_coderunner'));
         // Insert the (possible) missing prototype message as a hidden field. JavaScript
         // will be used to show it if non-empty.
-        $mform->addElement('hidden', 'missingprototypemessage', '',
-                array('id' => 'id_missing_prototype', 'class' => 'missingprototypeerror'));
-        $mform->setType('missingprototypemessage', PARAM_RAW);
+        $mform->addElement('hidden', 'brokenquestionmessage', '',
+                array('id' => 'id_broken_question', 'class' => 'brokenquestionerror'));
+        $mform->setType('brokenquestionmessage', PARAM_RAW);
         
         // The Question Type controls (a group with just a single member).
         $typeselectorelements = array();
@@ -593,7 +594,7 @@ class qtype_coderunner_edit_form extends question_edit_form {
         $mform->addElement('group', 'twigcontrols', get_string('twigcontrols', 'qtype_coderunner'),
                 $twigelements, null, false);
         $mform->setDefault('templateparamslang', 'None');
-        $mform->setDefault('templateparamsevalpertry', true);
+        $mform->setDefault('templateparamsevalpertry', false);
         $mform->setDefault('twigall', false);
         $mform->$hidemethod('templateparamsevalpertry', 'templateparamslang', 'eq', 'None');
         $mform->$hidemethod('templateparamsevalpertry', 'templateparamslang', 'eq', 'twig');
@@ -796,6 +797,7 @@ class qtype_coderunner_edit_form extends question_edit_form {
         $this->formquestion = $this->make_question_from_form_data($data);
         if ($data['coderunnertype'] == 'Undefined') {
             $errors['coderunner_type_group'] = get_string('questiontype_required', 'qtype_coderunner');
+            return $errors;  // Don't continue checking in this case. Template param validation breaks.
         }
         if ($data['cputimelimitsecs'] != '' &&
              (!ctype_digit($data['cputimelimitsecs']) || intval($data['cputimelimitsecs']) <= 0)) {
@@ -818,6 +820,7 @@ class qtype_coderunner_edit_form extends question_edit_form {
         list($templateerrors, $json) = $this->validate_template_params();
         if (!$templateerrors) {
             $this->formquestion->templateparamsevald = $json;
+            $this->formquestion->parameters = json_decode($json, true);
         } else {
             $errors['templateparams'] = $templateerrors;
             $this->formquestion->templateparamsevald = '{}';
@@ -946,7 +949,7 @@ class qtype_coderunner_edit_form extends question_edit_form {
             // Check for legacy case of ui parameters defined within the template params.
             $uiplugin = $this->formquestion->uiplugin;
             $uiparams = new qtype_coderunner_ui_parameters($uiplugin);
-            $templateparamsnoprototype = json_decode($this->formquestion->template_params_json(), true);
+            $templateparamsnoprototype = json_decode($this->formquestion->template_params_json($seed), true);
             $alluiparamnames = $uiparams->all_names();
             $badparams = array();
             foreach (array_keys($templateparamsnoprototype) as $paramname) {
@@ -1152,7 +1155,6 @@ class qtype_coderunner_edit_form extends question_edit_form {
     // or if the sample answer passes all the tests.
     // Otherwise return a suitable error message for display in the form.
     private function validate_sample_answer() {
-        assert(!empty($this->formquestion->parameters));
         $attachmentssaver = $this->get_sample_answer_file_saver();
         $files = $attachmentssaver ? $attachmentssaver->get_files() : array();
         $answer = $this->formquestion->answer;
@@ -1312,15 +1314,20 @@ class qtype_coderunner_edit_form extends question_edit_form {
         $q = $this->question;
         if (isset($q->options)) {
             // Editing an existing question
-            $qfromdb = question_bank::load_question($q->id);
-            $qfromdb->student = new qtype_coderunner_student($USER);
-            $seed = 1;
-            $qfromdb->evaluate_question_for_display($seed, null);
-            if ($qfromdb->mergeduiparameters) {
-                $json = json_encode($qfromdb->mergeduiparameters);
-            } else {
-                $json = '{}';
-            }
+            try {
+                $qfromdb = question_bank::load_question($q->id);
+                $qfromdb->student = new qtype_coderunner_student($USER);
+                $seed = 1;
+                $qfromdb->evaluate_question_for_display($seed, null);
+                if ($qfromdb->mergeduiparameters) {
+                    $json = json_encode($qfromdb->mergeduiparameters);
+                } else {
+                    $json = '{}';
+                }
+            } catch (Throwable $e) {
+                $json = '{}';  // This shouldn't happen, but has been known to.
+                $q->brokenquestionmessage = get_string('corruptuiparams', 'qtype_coderunner');
+            };
             $this->cacheduiparamsjson = $json;
             return $json;
         } else {

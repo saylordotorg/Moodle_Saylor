@@ -23,6 +23,7 @@
  */
 
 $string['aborted'] = 'Testing was aborted due to error.';
+$string['ace_gapfillerui_ui_source_descr'] = '"globalextra" to take the code to display from the globalextra field or "test0" to take it from the testcode field of the first test';
 $string['ace_ui_notready'] = 'Ace editor not ready. Perhaps reload page?';
 $string['addingcoderunner'] = 'Adding a new CodeRunner Question';
 $string['ajax_error'] = '*** AJAX ERROR. DON\'T SAVE THIS! ***';
@@ -113,6 +114,7 @@ $string['columncontrols_help'] = 'The checkboxes select which columns of the res
 
 $string['confirm_proceed'] = 'If you save this question with \'Customise\' unchecked, any customisations made will be lost. Proceed?';
 $string['confirmreset'] = 'Discard all your work on this question and reset answer box to original preloaded value?';
+$string['corruptuiparams'] = 'The UI parameters for this question or its prototype are broken. Proceed with caution.';
 $string['cputime'] = 'TimeLimit (secs)';
 $string['customisationcontrols'] = 'Customisation';
 $string['customise'] = 'Customise';
@@ -378,7 +380,7 @@ $string['maxfilesize'] = 'Max allowed file size (bytes)';
 $string['maxfilesize_help'] = 'Select the maximum file upload size (bytes). Allowing large file uploads with large classes can impact performance and and disk space on both Moodle and Jobe servers.';
 $string['memorylimit'] = 'MemLimit (MB)';
 $string['missinganswers'] = 'missing answers';
-$string['missingorbadfraction'] = 'Bad or missing fraction in output from combinator grader output. Output was: {$a->output}';
+$string['missingorbadfraction'] = 'Bad or missing fraction in output from template grader. Output was: {$a->output}';
 $string['missingoutput'] = 'You must supply the expected output from this test case.';
 $string['missingprototype'] = 'This question was defined to be of type \'{$a->crtype}\' but the prototype does not exist, or is non-unique, or is unavailable in this context. You should Cancel and try to (re)install the prototype.
 Proceed to edit only if you know what you are doing!';
@@ -1032,10 +1034,11 @@ for each sandbox run will be displayed in the output.';
 $string['templateparams'] = 'Template params';
 $string['templateparamsevalpertry'] = 'Evaluate per student';
 $string['templateparamslang'] = 'Preprocessor';
-$string['templateparamsusingsandbox'] = str_replace("\n", ' ',
-'Preprocessors other than Twig use the sandbox server. When a student starts a
-quiz all such questions initiate a sandbox run before the question can even be
-displayed. In a test or exam, this can overload the sandbox server. Caveat emptor!');
+$string['templateparamsusingsandbox'] = 'Preprocessors other than Twig use
+the sandbox server. If "Evaluate per student" is also set, then when a student
+starts a quiz all such questions initiate
+a sandbox run before the question can even be displayed. In a test or exam,
+this can overload the sandbox server. Caveat emptor!';
 $string['templateparams_help'] = 'If non-blank, the template parameters field must
 evaluate to a JSON-format record. In its simplest form the field <i>is</i> just a JSON
 record defining a set of variables that are added to the environment for the Twig
@@ -1047,7 +1050,7 @@ to yield a JSON record. See <a href="https://coderunner.org.nz/mod/url/view.php?
 the documentation</a> for details.
 
 <b>Warning:</b> use of a preprocessor other than Twig can have drastic performance
-implications if the Evaluate-on-each-attempt checkbox is
+implications if the Evaluate-per-student checkbox is
 checked, which it has to be if used for randomisation or for per-student question
 customisation. Preprocessing must be done before a question
 can be displayed to a student and, except for Twig, takes place on the Jobe sandbox

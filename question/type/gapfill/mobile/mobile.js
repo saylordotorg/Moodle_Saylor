@@ -81,7 +81,7 @@ var result = {
         };
 
         if (!this.question) {
-            console.warn('Aborting because of no question received.');
+            logger.warn('Aborting because of no question received.');
             return that.CoreQuestionHelperProvider.showComponentError(that.onAbort);
         }
         var div = document.createElement('div');

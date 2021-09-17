@@ -1,6 +1,21 @@
 <?php
+// This file is part of the Accredible Certificate module for Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace mod_accredible\apiRest;
+defined('MOODLE_INTERNAL') || die();
 
 use mod_accredible\client\client;
 
@@ -20,6 +35,12 @@ class apiRest {
 
         if(empty($url)) {
             $this->url = "https://staging.accredible.com/v1/";
+        }
+
+        $dev_api_endpoint = getenv("ACCREDIBLE_DEV_API_ENDPOINT");
+        if($dev_api_endpoint) {
+            $this->api_endpoint = $dev_api_endpoint;
+            $this->url = $dev_api_endpoint;
         }
 
         $this->token = $token;
@@ -146,7 +167,7 @@ class apiRest {
      * @param stdObject $evidence_item
      * @return stdObject
      */
-     function create_evidence_item($evidence_item, $credential_id) {
+    function create_evidence_item($evidence_item, $credential_id) {
 
         $data = json_encode($evidence_item);
 
@@ -162,13 +183,13 @@ class apiRest {
     function create_evidence_item_duration($start_date, $end_date, $credential_id, $hidden = false) {
 
         $duration_info = array(
-            'start_date' =>  date("Y-m-d", strtotime($start_date)),
+            'start_date' => date("Y-m-d", strtotime($start_date)),
             'end_date' => date("Y-m-d", strtotime($end_date)),
             'duration_in_days' => floor( (strtotime($end_date) - strtotime($start_date)) / 86400)
         );
 
         // multi day duration
-        if($duration_info['duration_in_days'] && $duration_info['duration_in_days'] != 0){
+        if ($duration_info['duration_in_days'] && $duration_info['duration_in_days'] != 0) {
 
             $evidence_item = array(
                 "evidence_item" => array(
@@ -183,7 +204,7 @@ class apiRest {
 
             return $result;
             // it may be completed in one day
-        } else if($duration_info['start_date'] != $duration_info['end_date']){
+        } else if ($duration_info['start_date'] != $duration_info['end_date']) {
             $duration_info['duration_in_days'] = 1;
 
             $evidence_item = array(
@@ -269,7 +290,7 @@ class apiRest {
      */
     function create_evidence_item_grade($grade, $description, $credential_id, $hidden = false) {
 
-        if(is_numeric($grade) && intval($grade) >= 0 && intval($grade) <= 100) {
+        if (is_numeric($grade) && intval($grade) >= 0 && intval($grade) <= 100) {
 
             $evidence_item = array(
                 "evidence_item" => array(

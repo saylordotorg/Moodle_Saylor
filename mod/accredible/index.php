@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of the Accredible Certificate module for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -27,26 +26,26 @@
 require_once('../../config.php');
 require_once('lib.php');
 
-$id = required_param('id', PARAM_INT);           // Course Module ID
+$id = required_param('id', PARAM_INT); // Course Module ID.
 
-// Ensure that the course specified is valid
-$course = $DB->get_record('course', array('id'=> $id), '*', MUST_EXIST);
+// Ensure that the course specified is valid.
+$course = $DB->get_record('course', array('id' => $id), '*', MUST_EXIST);
 
-// Requires a login
+// Requires a login.
 require_course_login($course);
 
-// Strings used multiple times
+// Strings used multiple times.
 $strcertificates = get_string('modulenameplural', 'accredible');
 $strname  = get_string("name");
 
-// Print the header
+// Print the header.
 $PAGE->set_pagelayout('incourse');
-$PAGE->set_url('/mod/accredible/index.php', array('id'=>$course->id));
+$PAGE->set_url('/mod/accredible/index.php', array('id' => $course->id));
 $PAGE->navbar->add($strcertificates);
 $PAGE->set_title($strcertificates);
 $PAGE->set_heading($course->fullname);
 
-// Get the certificates, if there are none display a notice
+// Get the certificates, if there are none display a notice.
 if (!$certificates = get_all_instances_in_course('accredible', $course)) {
     echo $OUTPUT->header();
     notice(get_string('nocertificates', 'accredible'), "$CFG->wwwroot/course/view.php?id=$course->id");
@@ -59,9 +58,11 @@ $table = new html_table();
 $table->head  = array ($strname, get_string('datecreated', 'accredible'));
 
 foreach ($certificates as $certificate) {
-  $link = html_writer::tag('a', $certificate->name, array('href' => $CFG->wwwroot . '/mod/accredible/view.php?id=' . $certificate->coursemodule));
-  $issued = date("M d, Y",$certificate->timecreated);
-  $table->data[] = array ($link, $issued);
+    $link = html_writer::tag('a',
+                             $certificate->name,
+                             array('href' => $CFG->wwwroot . '/mod/accredible/view.php?id=' . $certificate->coursemodule));
+    $issued = date("M d, Y", $certificate->timecreated);
+    $table->data[] = array ($link, $issued);
 }
 
 echo $OUTPUT->header();

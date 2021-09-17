@@ -119,8 +119,6 @@ class question_test extends advanced_testcase {
     public function test_discard_duplicates() {
         $options = [
             "noduplicates" => 1,
-            'disableregex' => 0,
-            'delimitchars' => '[]',
         ];
         $questiontext = 'The [cat] sat on the [cat]';
         $question = qtype_gapfill_test_helper::make_question($questiontext, $options);
