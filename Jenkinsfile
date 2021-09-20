@@ -397,6 +397,12 @@ def plugins = [
       "url" : 'https://github.com/gjb2048/moodle-format_grid.git',
       "branch" : 'master',
       "dest" : 'course/format/grid'
+    ],
+    [
+      "name" : 'format_buttons',
+      "url" : 'https://github.com/brandaorodrigo/moodle-format_buttons.git',
+      "branch" : 'master',
+      "dest" : 'course/format/buttons'
     ]
 ]
 
