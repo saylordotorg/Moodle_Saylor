@@ -391,6 +391,12 @@ def plugins = [
       "url" : 'https://github.com/davidherney/moodle-format_onetopic.git',
       "branch" : 'master',
       "dest" : 'course/format/onetopic'
+    ],
+    [
+      "name" : 'format_grid',
+      "url" : 'https://github.com/gjb2048/moodle-format_grid.git',
+      "branch" : 'master',
+      "dest" : 'course/format/grid'
     ]
 ]
 
