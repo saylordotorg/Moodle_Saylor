@@ -37,7 +37,6 @@ Feature: Using the activity grade form element
     And I am on the "Test forum name" "forum activity editing" page logged in as teacher1
     And I set the following fields to these values:
       | Forum type | Standard forum for general use |
-      | Description | Test forum description |
       | Aggregate type | Average of ratings  |
       | scale[modgrade_type] | Point |
       | scale[modgrade_point] | 100 |

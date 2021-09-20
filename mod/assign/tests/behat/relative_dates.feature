@@ -33,6 +33,28 @@ I should be able to create an assignment with a due date relative to the course 
     And I am on the "Test assignment name" Activity page logged in as student2
     And I should not see "Assignment is overdue by:" in the "Time remaining" "table_row"
 
+  Scenario: As a student the due date I see for submitting my assignment is relative to my course start date
+    Given the following config values are set as admin:
+      | enablecourserelativedates | 1 |
+    And the following "courses" exist:
+    # A course with start date set to 1 Jan 2021.
+      | fullname | shortname  | category  | groupmode | relativedatesmode | startdate   |
+      | Course 1 | C1         | 0         | 1         | 1                 | 1609459200  |
+    And the following "users" exist:
+      | username | firstname  | lastname  | email                 |
+      | student1 | Student    | 1         | student1@example.com  |
+    And the following "course enrolments" exist:
+    # User's enrolment starts from 5 Jan 2021.
+      | user      | course  | role    | timestart   |
+      | student1  | C1      | student | 1609804800  |
+    And the following "activities" exist:
+    # The assignment's due date is 3 Jan 2021.
+      | activity  | name                  | course  | assignsubmission_onlinetext_enabled | duedate     |
+      | assign    | Test assignment name  | C1      | 1                                   | 1609632000  |
+
+    When I am on the "Test assignment name" Activity page logged in as student1
+    Then the activity date in "Test assignment name" should contain "Due: Thursday, 7 January 2021, 8:00"
+
   Scenario: As a teacher, I should see the relative dates when reviewing assignment submissions
     Given the following config values are set as admin:
       | enablecourserelativedates | 1 |
@@ -56,7 +78,7 @@ I should be able to create an assignment with a due date relative to the course 
       | assign    | Test assignment name  | C1      | 1                                    | ##first day of 4 months ago##  | ##last day of 3 months ago##  |
 
     And I am on the "Test assignment name" Activity page logged in as teacher1
-    And I should see "after course start" in the "Due date" "table_row"
+    And the activity date in "Test assignment name" should contain "after course start"
     And I should see "Calculated for each student" in the "Time remaining" "table_row"
     When I navigate to "View all submissions" in current page administration
     Then I should see "No submission" in the "Student 1" "table_row"

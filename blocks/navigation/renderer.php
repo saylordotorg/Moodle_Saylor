@@ -91,7 +91,7 @@ class block_navigation_renderer extends plugin_renderer_base {
             $content = $item->get_content();
             $title = $item->get_title();
             $ulattr = ['id' => $id . '_group', 'role' => 'group'];
-            $liattr = ['class' => [$item->get_css_type(), 'depth_' . $depth], 'role' => 'treeitem'];
+            $liattr = ['class' => [$item->get_css_type(), 'depth_'.$depth], 'role' => 'treeitem'];
             $pattr = ['class' => ['tree_item']];
             $pattr += !empty($item->id) ? ['id' => $item->id] : [];
             $isbranch = $isexpandable && ($item->children->count() > 0 || ($item->has_children() && (isloggedin() || $item->type <= navigation_node::TYPE_CATEGORY)));

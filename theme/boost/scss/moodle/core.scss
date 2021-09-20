@@ -2347,7 +2347,8 @@ $footer-link-color: $bg-inverse-link-color !default;
     &:focus,
     &:focus-within {
         outline: 0;
-        background-color: $dropdown-link-hover-bg;
+        background-color: $dropdown-link-active-bg;
+        color: $dropdown-link-active-color;
         a {
             color: $dropdown-link-active-color;
         }
@@ -2467,6 +2468,10 @@ body.h5p-embed {
     .h5pmessages {
         min-height: 230px; // This should be the same height as default core_h5p iframes.
     }
+}
+
+#h5pcontenttypes td {
+    vertical-align: middle;
 }
 
 .text-decoration-none {

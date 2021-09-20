@@ -26,7 +26,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version      = 2020090800;      // The current plugin version (Date: YYYYMMDDXX).
+$plugin->version      = 2021081300;      // The current plugin version (Date: YYYYMMDDXX).
 $plugin->requires     = 2017051500.00;   // Support back to 3.3 - Totara 12. Patches required.
 $plugin->component    = 'factor_sms';
 $plugin->release      = 'v0.1';

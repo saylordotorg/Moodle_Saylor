@@ -2432,7 +2432,7 @@ class core_calendar_rrule_manager_testcase extends advanced_testcase {
             $this->assertEquals($expecteddate->format('Y-m-d H:i:s'), date('Y-m-d H:i:s', $record->timestart));
 
             // Assert that the record is either the 7th, 8th, 9th, ... 13th day of the month.
-            $this->assertContains(date('j', $record->timestart), $bymonthdays);
+            $this->assertContainsEquals(date('j', $record->timestart), $bymonthdays);
         }
     }
 
@@ -2489,7 +2489,7 @@ class core_calendar_rrule_manager_testcase extends advanced_testcase {
             $this->assertEquals($expecteddate->format('Y-m-d H:i:s'), date('Y-m-d H:i:s', $record->timestart));
 
             // Assert that the record is either the 2nd, 3rd, 4th ... 8th day of the month.
-            $this->assertContains(date('j', $record->timestart), $bymonthdays);
+            $this->assertContainsEquals(date('j', $record->timestart), $bymonthdays);
         }
     }
 
@@ -2520,7 +2520,8 @@ class core_calendar_rrule_manager_testcase extends advanced_testcase {
             (new DateTime('1997-11-06 09:00:00 EST'))->getTimestamp()
         ];
         foreach ($records as $record) {
-            $this->assertContains($record->timestart, $expecteddates, date('Y-m-d H:i:s', $record->timestart) . ' is not found.');
+            $this->assertContainsEquals($record->timestart, $expecteddates,
+                date('Y-m-d H:i:s', $record->timestart) . ' is not found.');
         }
     }
 
@@ -2598,7 +2599,8 @@ class core_calendar_rrule_manager_testcase extends advanced_testcase {
             (new DateTime('1997-09-02 15:00:00 EDT'))->getTimestamp(),
         ];
         foreach ($records as $record) {
-            $this->assertContains($record->timestart, $expecteddates, date('Y-m-d H:i:s', $record->timestart) . ' is not found.');
+            $this->assertContainsEquals($record->timestart, $expecteddates,
+                date('Y-m-d H:i:s', $record->timestart) . ' is not found.');
         }
     }
 
@@ -2629,7 +2631,8 @@ class core_calendar_rrule_manager_testcase extends advanced_testcase {
             (new DateTime('1997-09-02 10:15:00 EDT'))->getTimestamp(),
         ];
         foreach ($records as $record) {
-            $this->assertContains($record->timestart, $expecteddates, date('Y-m-d H:i:s', $record->timestart) . ' is not found.');
+            $this->assertContainsEquals($record->timestart, $expecteddates,
+                date('Y-m-d H:i:s', $record->timestart) . ' is not found.');
         }
     }
 
@@ -2658,7 +2661,8 @@ class core_calendar_rrule_manager_testcase extends advanced_testcase {
             (new DateTime('1997-09-02 13:30:00 EDT'))->getTimestamp(),
         ];
         foreach ($records as $record) {
-            $this->assertContains($record->timestart, $expecteddates, date('Y-m-d H:i:s', $record->timestart) . ' is not found.');
+            $this->assertContainsEquals($record->timestart, $expecteddates,
+                date('Y-m-d H:i:s', $record->timestart) . ' is not found.');
         }
     }
 
@@ -2702,7 +2706,8 @@ class core_calendar_rrule_manager_testcase extends advanced_testcase {
         $this->assertCount($count, $records);
 
         foreach ($records as $record) {
-            $this->assertContains($record->timestart, $expecteddates, date('Y-m-d H:i:s', $record->timestart) . ' is not found.');
+            $this->assertContainsEquals($record->timestart, $expecteddates,
+                date('Y-m-d H:i:s', $record->timestart) . ' is not found.');
         }
     }
 
@@ -2746,7 +2751,8 @@ class core_calendar_rrule_manager_testcase extends advanced_testcase {
         $this->assertCount($count, $records);
 
         foreach ($records as $record) {
-            $this->assertContains($record->timestart, $expecteddates, date('Y-m-d H:i:s', $record->timestart) . ' is not found.');
+            $this->assertContainsEquals($record->timestart, $expecteddates,
+                date('Y-m-d H:i:s', $record->timestart) . ' is not found.');
         }
     }
 
@@ -2777,7 +2783,8 @@ class core_calendar_rrule_manager_testcase extends advanced_testcase {
             (new DateTime('1997-08-24 09:00:00 EDT'))->getTimestamp(),
         ];
         foreach ($records as $record) {
-            $this->assertContains($record->timestart, $expecteddates, date('Y-m-d H:i:s', $record->timestart) . ' is not found.');
+            $this->assertContainsEquals($record->timestart, $expecteddates,
+                date('Y-m-d H:i:s', $record->timestart) . ' is not found.');
         }
     }
 
@@ -2810,7 +2817,8 @@ class core_calendar_rrule_manager_testcase extends advanced_testcase {
         ];
 
         foreach ($records as $record) {
-            $this->assertContains($record->timestart, $expecteddates, date('Y-m-d H:i:s', $record->timestart) . ' is not found.');
+            $this->assertContainsEquals($record->timestart, $expecteddates,
+                date('Y-m-d H:i:s', $record->timestart) . ' is not found.');
         }
     }
 

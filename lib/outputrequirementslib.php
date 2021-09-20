@@ -319,20 +319,21 @@ class page_requirements_manager {
             }
 
             $this->M_cfg = array(
-                'wwwroot'             => $CFG->wwwroot,
-                'sesskey'             => sesskey(),
-                'sessiontimeout'      => $CFG->sessiontimeout,
-                'themerev'            => theme_get_revision(),
-                'slasharguments'      => (int)(!empty($CFG->slasharguments)),
-                'theme'               => $page->theme->name,
-                'iconsystemmodule'    => $iconsystem->get_amd_name(),
-                'jsrev'               => $this->get_jsrev(),
-                'admin'               => $CFG->admin,
-                'svgicons'            => $page->theme->use_svg_icons(),
-                'usertimezone'        => usertimezone(),
-                'contextid'           => $contextid,
-                'langrev'             => get_string_manager()->get_revision(),
-                'templaterev'         => $this->get_templaterev()
+                'wwwroot'               => $CFG->wwwroot,
+                'sesskey'               => sesskey(),
+                'sessiontimeout'        => $CFG->sessiontimeout,
+                'sessiontimeoutwarning' => $CFG->sessiontimeoutwarning,
+                'themerev'              => theme_get_revision(),
+                'slasharguments'        => (int)(!empty($CFG->slasharguments)),
+                'theme'                 => $page->theme->name,
+                'iconsystemmodule'      => $iconsystem->get_amd_name(),
+                'jsrev'                 => $this->get_jsrev(),
+                'admin'                 => $CFG->admin,
+                'svgicons'              => $page->theme->use_svg_icons(),
+                'usertimezone'          => usertimezone(),
+                'contextid'             => $contextid,
+                'langrev'               => get_string_manager()->get_revision(),
+                'templaterev'           => $this->get_templaterev()
             );
             if ($CFG->debugdeveloper) {
                 $this->M_cfg['developerdebug'] = true;
@@ -786,8 +787,6 @@ class page_requirements_manager {
                                     'requires' => array('node', 'cookie'));
                     break;
                 case 'core_completion':
-                    $module = array('name'     => 'core_completion',
-                                    'fullpath' => '/course/completion.js');
                     break;
                 case 'core_message':
                     $module = array('name'     => 'core_message',
@@ -1697,6 +1696,9 @@ EOF;
             'error',
             'file',
             'url',
+            // TODO MDL-70830 shortforms should preload the collapseall/expandall strings properly.
+            'collapseall',
+            'expandall',
         ), 'moodle');
         $this->strings_for_js(array(
             'debuginfo',
