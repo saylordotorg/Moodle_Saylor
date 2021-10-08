@@ -65,16 +65,17 @@
     }
 }}
 <div class="mt-5 mb-1 activity-navigation container-fluid">
-    <div id="togglecompletionwrapper" class="container-fluid py-3 d-inline-flex flex-wrap align-items-center justify-content-center">
-        {{#togglecompletion}}
-            <div class="text-nowrap px-1">
-                {{#str}}togglecompletion, theme_saylor{{/str}} 
+    {{#hascompletion}}
+        {{#uservisible}}
+            <div data-region="completion-info" class="container-fluid py-3 d-inline-flex flex-wrap align-items-center justify-content-center">
+                {{^isautomatic}}
+                    {{#showmanualcompletion}}
+                        {{> core_course/completion_manual }}
+                    {{/showmanualcompletion}}
+                {{/isautomatic}}
             </div>
-            <div class="actions">
-                {{& togglecompletion}}
-            </div>
-        {{/togglecompletion}}
-    </div>
+        {{/uservisible}}
+    {{/hascompletion}}
     <div class="container-fluid d-flex flex-column flex-sm-row flex-wrap flex-sm-nowrap align-items-center justify-content-center justify-content-md-around">
         <div id="activitynavprev" class="py-1 px-1 text-nowrap">
             {{#prevlink}}<a class="btn btn-primary" href="{{ prevlink.url }}" role="button"><i class="icon fa fa-long-arrow-left fa-fw m-0 pr-1" aria-hidden="true"></i>{{#str}}activitynavprev, theme_saylor{{/str}}</a>{{/prevlink}}

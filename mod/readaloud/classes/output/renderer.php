@@ -907,4 +907,33 @@ class renderer extends \plugin_renderer_base {
         return $output;
     }
 
+    public function push_buttons_menu($cm){
+        $templateitems=[];
+        $pushthings = ['passage','ttsmodelaudio','timelimit','targetwpm','questions','alternatives','modes', 'gradesettings'];
+
+        foreach($pushthings as $pushthing){
+            switch($pushthing){
+                case 'passage': $action=constants::M_PUSH_PASSAGE;break;
+                case 'ttsmodelaudio': $action=constants::M_PUSH_TTSMODELAUDIO;break;
+                case 'timelimit': $action=constants::M_PUSH_TIMELIMIT;break;
+                case 'targetwpm': $action=constants::M_PUSH_TARGETWPM;break;
+                case 'questions': $action=constants::M_PUSH_QUESTIONS;break;
+                case 'alternatives': $action=constants::M_PUSH_ALTERNATIVES;break;
+                case 'modes': $action=constants::M_PUSH_MODES;break;
+                case 'gradesettings': $action=constants::M_PUSH_GRADESETTINGS;break;
+            }
+            $templateitems[] = ['title'=>get_string('push' . $pushthing, constants::M_COMPONENT),
+                'description'=>get_string('push' . $pushthing .'_desc', constants::M_COMPONENT),
+                'content'=>$this->output->single_button(new \moodle_url( constants::M_URL . '/push.php',
+                    array('id'=>$cm->id,'action'=>$action)),get_string('push' . $pushthing,constants::M_COMPONENT))];
+        }
+
+        //Generate and return menu
+        $ret = $this->output->render_from_template( constants::M_COMPONENT . '/manybuttonsmenu', ['items'=>$templateitems]);
+
+        return $ret;
+
+    }
+
+
 }

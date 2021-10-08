@@ -2296,6 +2296,11 @@ if(true){
         $mform->setDefault('machgrademethod', $config->machinegrademethod);
         $mform->addHelpButton('machgrademethod', 'machinegrademethod', constants::M_COMPONENT);
 
+        //master instance or not
+        $mform->addElement('advcheckbox', 'masterinstance', get_string('masterinstance', constants::M_COMPONENT),
+            get_string('masterinstance_details', constants::M_COMPONENT));
+        $mform->setDefault('masterinstance', 0);
+
         // Appearance.
         $mform->addElement('header', 'recordingaiheader', get_string('recordingaiheader', constants::M_COMPONENT));
 

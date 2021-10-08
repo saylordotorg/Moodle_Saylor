@@ -63,6 +63,20 @@ $string['logintext'] = 'Log in or Sign up';
 $string['loggedingreeting'] = 'Hi, {$a}!';
 $string['loggedinnotgreeting'] = '';
 
+$string['aria:allcoursesexcepthidden'] = 'Show all courses except courses removed from view';
+
+$string['completion_automatic:done'] = 'Completed:';
+$string['completion_automatic:failed'] = 'Failed:';
+$string['completion_automatic:todo'] = 'To do:';
+$string['completion_manual:aria:done'] = '{$a} is marked as completed. Press to undo.';
+$string['completion_manual:aria:markdone'] = 'Mark {$a} as completed';
+$string['completion_manual:done'] = 'Completed';
+$string['completion_manual:markdone'] = 'Mark as completed';
+$string['completion_setby:auto:done'] = 'Completed: {$a->condition} (set by {$a->setby})';
+$string['completion_setby:auto:todo'] = 'To do: {$a->condition} (set by {$a->setby})';
+$string['completion_setby:manual:done'] = '{$a->activityname} is marked by {$a->setby} as completed. Press to undo.';
+$string['completion_setby:manual:markdone'] = '{$a->activityname} is marked by {$a->setby} as not completed. Press to mark as completed.';
+
 // Alerts.
 $string['tab-alert-title'] = '';
 $string['alertsheadingsub'] = 'Display important messages to your users on the front page';

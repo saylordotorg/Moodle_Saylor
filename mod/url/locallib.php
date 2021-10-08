@@ -380,8 +380,9 @@ function url_get_final_display_type($url) {
         }
     }
 
-    static $download = array('application/zip', 'application/x-tar', 'application/g-zip',     // binary formats
-                             'application/pdf', 'text/html');  // these are known to cause trouble for external links, sorry
+    // Binaries and other formats that are known to cause trouble for external links.
+    static $download = ['application/zip', 'application/x-tar', 'application/g-zip',
+                        'application/pdf', 'text/html', 'document/unknown'];
     static $embed    = array('image/gif', 'image/jpeg', 'image/png', 'image/svg+xml',         // images
                              'application/x-shockwave-flash', 'video/x-flv', 'video/x-ms-wm', // video formats
                              'video/quicktime', 'video/mpeg', 'video/mp4',
@@ -570,6 +571,8 @@ function url_guess_icon($fullurl, $size = null) {
         return null;
     }
 
+    $moodleurl = new moodle_url($fullurl);
+    $fullurl = $moodleurl->out_omit_querystring();
     $icon = file_extension_icon($fullurl, $size);
     $htmlicon = file_extension_icon('.htm', $size);
     $unknownicon = file_extension_icon('', $size);

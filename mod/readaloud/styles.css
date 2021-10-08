@@ -667,3 +667,7 @@ div.mod_readaloud_attemptsummarytable {
   max-width: 920px;
   margin: auto;
 }
+
+.mod_readaloud_manybuttonsmenu_item {
+  max-width: 800px;
+}

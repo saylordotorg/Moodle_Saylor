@@ -73,6 +73,10 @@ if (has_capability('mod/readaloud:manage', $context)) {
     $row[] = new tabobject('modelaudio', "$CFG->wwwroot/mod/readaloud/modelaudio.php?id=$cm->id", get_string('modelaudio', constants::M_COMPONENT), get_string('modelaudio', constants::M_COMPONENT));
 }
 
+if (has_capability('mod/readaloud:pushtoclones', $context) && $moduleinstance->masterinstance) {
+    $row[] = new tabobject('push', "$CFG->wwwroot/mod/readaloud/push.php?id=$cm->id", get_string('push', constants::M_COMPONENT), get_string('push', constants::M_COMPONENT));
+}
+
 
 $tabs[] = $row;
 

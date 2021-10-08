@@ -145,6 +145,8 @@ FilterCodes are meant to be entered as regular text in the Moodle WYSIWYG editor
 * {courserequest} : Displays a Request a Course link.
 * {label type}{/label} : Display text over background colour. The Boost theme supports the following types: **info**, **important**, **secondary**, **success** and **warning**. Other themes may also support **primary**, **danger**, **light**, **dark** and more. Example: {label info}For your information{/label}. Actual foreground and background colours vary depending on the theme. If the type is not specified, it will default to **info**. If the type specified is not supported by your theme, it may default to secondary.
 * {button URL}Label{/button} : Create a clickable button link formatted like a primary button.
+* {chart radial x} (ALPHA): Create a radial (circle) chart giving it a value of x between 0 and 100.
+* {chart progressbar x} (ALPHA): Create a horizontal progress bar chart giving it a value of x between 0 and 100.
 
 ### For use in courses
 
@@ -167,6 +169,7 @@ FilterCodes are meant to be entered as regular text in the Moodle WYSIWYG editor
 * {sectionid} or %7Bsectionid%7D : Display the section ID (not to be confused with the section number).
 * {sectionname} : Display the section name in which the activity is located.
 * {courseteachers}: (ALPHA) List of course teachers linked to their profiles.
+* {coursegradepercent}: Displays the current accumulated course grade of the student.
 
 Also see Courses section below.
 
@@ -813,6 +816,24 @@ When requesting a new tag, please provide:
 
 Be sure to check back on your issue as we may have further questions for you.
 
+### Why does the {button} tag not work?
+
+It works just fine. Here are 3 examples:
+
+{button https://www.tngconsulting.ca}TNG Consulting Inc.{/button}
+
+This one just creates a button called **TNG Consulting Inc.** that will take you to the website when clicked.
+
+{button https://google.ca" target="_blank}Google{/button}
+
+This one will create a button called "Google" which will open a new tab in your browser and then take you to the website.
+
+{button {wwwroot}/my}{getstring}myhome{/getstring}{/button}
+
+The last one will create a button called "Dashboard", using the Moodle language strings ({getstrings} is a FilterCode too). When clicked, it will take the user to your Moodle site's dashboard, regardless of where Moodle is installed (webroot or subdirectory).
+
+The trick is to make sure that Moodle doesn't convert the URL to a link in the editor. If it does (probably blue, underlined), you will need to use the Unlink tool to turn it back into plain text. Once saved, it will appear as a button. Alternatively, disable the **Convert URLs into links and images** filter in Site Administration > Plugins > Filters > Manage Filters and then re-enter the {button} FilterCode.
+
 ### Do you have examples, samples and ways to which tags are working in my version of FilterCodes?
 
 Create a Page on your Moodle site, preferably in a course, so that those tags work too, and include the following code:
@@ -871,6 +892,7 @@ Create a Page on your Moodle site, preferably in a course, so that those tags wo
 * Section ID (encoded) [%7Bsectionid%7D]: %7Bsectionid%7D
 * Section Name [{sectionname}] : [{sectionname}]
 * Teachers in this course [{courseteachers}]: {courseteachers}
+* You current grade in this course is [{coursegradepercent}]: {coursegradepercent}
 * Available free application disk space [{diskfreespace}]: {diskfreespace}
 * Available free moodledata disk space [{diskfreespacedata}]: {diskfreespacedata}
 * My Enrolled Courses [{mycourses}]: {mycourses}
@@ -879,7 +901,9 @@ Create a Page on your Moodle site, preferably in a course, so that those tags wo
 * Request a course / Course request in top level menu [{courserequestmenu0}]: {courserequestmenu0}
 * Request a course / Course request in submenu [{courserequestmenu}]: {courserequestmenu}
 * Label [{label info}]Criteria for completion[{/label}]: {label info}Criteria for completion{/label}
-* Button [{button https://moodle.org}]Go to Moodle.org{/button}]: [{button https://moodle.org.org}]Go to Moodle[{/button}]
+* Button [{button https://moodle.org}]Go to Moodle.org{/button}]: {button https://moodle.org.org}Go to Moodle{/button}
+* 80% radial chart [{chart radial 80}]: {chart radial 80}
+* 75% progressbar chart [{chart progressbar 75}]: {chart radial 75}
 * Moodle Dev custom menu items [{menudev}]: {menudev}
 * Course category ID (0 if not in a course or category list of course) [{categoryid}]: {categoryid}
 * Course category name (blank if not in a course) [{categoryname}]: {categoryname}

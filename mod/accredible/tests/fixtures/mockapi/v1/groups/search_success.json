@@ -1,0 +1,56 @@
+{
+    "groups": [
+      {
+        "id": 12472,
+        "name": "new group1",
+        "course_description": "Desscription of course",
+        "course_name": "Intro to Programming",
+        "learning_outcomes": null,
+        "attach_pdf": true,
+        "course_link": "http://www.example.com",
+        "language": "en",
+        "design_name": "test",
+        "updated_at": "2016-08-29T07:03:25.000Z",
+        "created_at": "2016-08-29T06:14:18.000Z",
+        "design_id": 23,
+        "blockchain": false,
+        "certificate_design_id": 23,
+        "badge_design_id": null,
+        "department_id": 123,
+        "meta_data": {
+          "course_id": "TK764"
+        }
+      },
+      {
+        "id": 12473,
+        "name": "new group2",
+        "course_description": "Desscription of course",
+        "course_name": "Intro to Programming",
+        "learning_outcomes": [
+          "skill one",
+          "skill two"
+        ],
+        "attach_pdf": false,
+        "course_link": "http://www.example.com",
+        "language": "en",
+        "design_name": "test",
+        "updated_at": "2016-08-29T07:03:25.000Z",
+        "created_at": "2016-08-29T06:14:18.000Z",
+        "blockchain": true,
+        "design_id": null,
+        "certificate_design_id": null,
+        "badge_design_id": 345,
+        "department_id": 123,
+        "meta_data": {
+          "course_id": "TK765"
+        }
+      }
+    ],
+    "meta": {
+      "current_page": 1,
+      "next_page": 2,
+      "prev_page": null,
+      "total_pages": 119,
+      "total_count": 238
+    }
+  }

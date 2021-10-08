@@ -514,3 +514,44 @@ $string['avgtotaltime'] = 'Av. Duration';
 $string['nodataavailable'] = 'No data available';
 $string['quiz'] = 'Quiz';
 $string['waiting']='-- waiting --';
+
+
+$string['notmasterinstance']='You can not push passage or alternatives unless master instance is checked in activity settings.';
+$string['push']='Push';
+$string['pushpage']='Push Page';
+$string['pushalternatives']='Push Alternatives';
+$string['pushalternatives_desc']='Push alternatives field to all clone instances.';
+$string['pushalternatives_done']='Alternatives have been pushed';
+
+$string['pushpassage']='Push Passage (and related settings)';
+$string['pushpassage_desc']='Push passage and phonetics and segments and other elements that are unique to the passage, to clones. ';
+$string['pushpassage_done']='Passage has been pushed';
+
+$string['pushquestions']='Push Questions';
+$string['pushquestions_desc']='You could push comprehension questions from here if there were any. They will be implemented soon.';
+$string['pushquestions_done']='Questions have been pushed';
+
+$string['pushtargetwpm']='Target WPM';
+$string['pushtargetwpm_desc']='Push the Target WPM setting to all clone instances.';
+$string['pushtargetwpm_done']='Target WPM has been pushed';
+
+$string['pushtimelimit']='Time Limit';
+$string['pushtimelimit_desc']='Push the Time Limit setting to all clone instances.';
+$string['pushtimelimit_done']='Time limit has been pushed';
+
+$string['pushmodes']='Modes';
+$string['pushmodes_desc']='Push the optional activity mode settings (preview, listen and repeat and shadow) from this instance to clone instances.';
+$string['pushmodes_done']='Modes have been pushed';
+
+$string['pushgradesettings']='Grade Settings';
+$string['pushgradesettings_desc']='Push some of grade settings (completion cond. min grade, grade calculation, human/machine grading, highest/latest attempt) from this instance to clone instances. This wont update the max grade or other settings that affect the gradebook setup nor will it force a regrade of existing attempts. It is best to only use this on not yet attempted clones.';
+$string['pushgradesettings_done']='Grade Settings have been pushed';
+
+$string['pushttsmodelaudio']='Push TTS and Model Audio';
+$string['pushttsmodelaudio_desc']='Push TTS and Model Audio related settings, this will not push any uploaded/recorded audio. It will push TTS audio and meta data including audio breaks.';
+$string['pushttsmodelaudio_done']='TTS and Model Audio have been pushed';
+
+$string['masterinstance']='Master Instance';
+$string['masterinstance_details']='Master instance allows the author to push the individual settings of one ReadAloud to existing copies of the same activity. Contact Poodll Support if you wish to use this.';
+
+$string['pushpage_explanation']= "Use the buttons on this page to push settings from this ReadAloud instance to clones of it (ie activities with the same name). Be careful there is no going back so be sure of your intention before using.";

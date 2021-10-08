@@ -20,30 +20,39 @@ defined('MOODLE_INTERNAL') || die();
 use mod_accredible\client\client;
 
 class apiRest {
-    private $api_endpoint;
+    /**
+     * API base URL.
+     * Use `public` to make unit testing possible.
+     * @var string
+     */
+    public $api_endpoint;
 
-    private $token;
+    /**
+     * HTTP request client.
+     * @var client
+     */
+    private $client;
 
-    public function __construct($token, $url = null) {
+    public function __construct($client = null) {
         global $CFG;
 
-        $this->api_endpoint = "https://api.accredible.com/v1/";
+        $this->api_endpoint = 'https://api.accredible.com/v1/';
 
         if($CFG->is_eu) {
-            $this->api_endpoint = "https://eu.api.accredible.com/v1/";
+            $this->api_endpoint = 'https://eu.api.accredible.com/v1/';
         }
 
-        if(empty($url)) {
-            $this->url = "https://staging.accredible.com/v1/";
-        }
-
-        $dev_api_endpoint = getenv("ACCREDIBLE_DEV_API_ENDPOINT");
+        $dev_api_endpoint = getenv('ACCREDIBLE_DEV_API_ENDPOINT');
         if($dev_api_endpoint) {
             $this->api_endpoint = $dev_api_endpoint;
-            $this->url = $dev_api_endpoint;
         }
 
-        $this->token = $token;
+        // A mock client is passed when unit testing.
+        if($client) {
+            $this->client = $client;
+        } else {
+            $this->client = new client();
+        }
     }
 
     /**
@@ -55,7 +64,16 @@ class apiRest {
      * @return stdObject
      */
     function get_credentials($group_id = null, $email = null, $page_size = null, $page = 1) {
-        return client::get("{$this->api_endpoint}all_credentials?group_id={$group_id}&email=" . rawurlencode($email) . "&page_size={$page_size}&page={$page}", $this->token);
+        return $this->client->get("{$this->api_endpoint}all_credentials?group_id={$group_id}&email=" . rawurlencode($email) . "&page_size={$page_size}&page={$page}");
+    }
+
+    /**
+     * Get a Credential with EnvidenceItems
+     * @param Integer $credential_id
+     * @return stdObject
+     */
+    function get_credential($credential_id) {
+        return $this->client->get("{$this->api_endpoint}credentials/{$credential_id}");
     }
 
     /**
@@ -77,7 +95,7 @@ class apiRest {
 
         $data = json_encode($data);
 
-        return client::post("{$this->api_endpoint}sso/generate_link", $this->token, $data);
+        return $this->client->post("{$this->api_endpoint}sso/generate_link", $data);
     }
 
     /**
@@ -105,7 +123,7 @@ class apiRest {
 
         $data = json_encode($data);
 
-        return client::put("{$this->api_endpoint}issuer/groups/{$id}", $this->token, $data);
+        return $this->client->put("{$this->api_endpoint}issuer/groups/{$id}", $data);
     }
 
     /**
@@ -129,7 +147,7 @@ class apiRest {
 
         $data = json_encode($data);
 
-        return client::post("{$this->api_endpoint}issuer/groups", $this->token, $data);
+        return $this->client->post("{$this->api_endpoint}issuer/groups", $data);
     }
 
     /**
@@ -159,7 +177,7 @@ class apiRest {
 
         $data = json_encode($data);
 
-        return client::post("{$this->api_endpoint}credentials", $this->token, $data);
+        return $this->client->post("{$this->api_endpoint}credentials", $data);
     }
 
     /**
@@ -167,11 +185,15 @@ class apiRest {
      * @param stdObject $evidence_item
      * @return stdObject
      */
-    function create_evidence_item($evidence_item, $credential_id) {
-
+    function create_evidence_item($evidence_item, $credential_id, $throw_error = false) {
         $data = json_encode($evidence_item);
-
-        return client::post("{$this->api_endpoint}credentials/{$credential_id}/evidence_items", $this->token, $data);
+        $result = $this->client->post("{$this->api_endpoint}credentials/{$credential_id}/evidence_items", $data);
+        if($throw_error && $this->client->error) {
+            throw new \moodle_exception(
+                'evidenceadderror', 'accredible', 'https://help.accredible.com/hc/en-us', $credential_id, $this->client->error
+            );
+        }
+        return $result;
     }
 
     /**
@@ -255,7 +277,7 @@ class apiRest {
 
         $data = json_encode($data);
 
-        return client::post("{$this->api_endpoint}credentials", $this->token, $data);
+        return $this->client->post("{$this->api_endpoint}credentials", $data);
     }
 
     /**
@@ -265,22 +287,18 @@ class apiRest {
      * @return stdObject
      */
     function get_groups($page_size = nil, $page = 1) {
-        return client::get($this->api_endpoint.'issuer/all_groups?page_size=' . $page_size . '&page=' . $page, $this->token);
+        return $this->client->get($this->api_endpoint.'issuer/all_groups?page_size=' . $page_size . '&page=' . $page);
     }
 
-
     /**
-     * Strip out keys with a null value from an object http://stackoverflow.com/a/15953991
-     * @param stdObject $object
+     * Get all Groups
+     * @param Integer $page_size
+     * @param Integer $page
      * @return stdObject
      */
-    function strip_empty_keys($object) {
-
-        $json = json_encode($object);
-        $json = preg_replace('/,\s*"[^"]+":null|"[^"]+":null,?/', '', $json);
-        $object = json_decode($json);
-
-        return $object;
+    function search_groups($page_size = 50, $page = 1) {
+        $data = json_encode(array('page' => $page, 'page_size' => $page_size));
+        return $this->client->post("{$this->api_endpoint}issuer/groups/search", $data);
     }
 
     /**
@@ -305,5 +323,37 @@ class apiRest {
         } else {
             throw new \InvalidArgumentException("$grade must be a numeric value between 0 and 100.");
         }
+    }
+
+    /**
+     * Updates an evidence item on a given credential.
+     * @param Integer $credential_id
+     * @param Integer $evidence_item_id
+     * @param String $grade - value must be between 0 and 100
+     * @return stdObject
+     */
+    function update_evidence_item_grade($credential_id, $evidence_item_id, $grade) {
+        if (is_numeric($grade) && intval($grade) >= 0 && intval($grade) <= 100) {
+            $evidence_item = array('evidence_item' => array('string_object' => $grade));
+            $data = json_encode($evidence_item);
+            $url = "{$this->api_endpoint}credentials/{$credential_id}/evidence_items/{$evidence_item_id}";
+            return $this->client->put($url, $data);
+        } else {
+            throw new \InvalidArgumentException("$grade must be a numeric value between 0 and 100.");
+        }
+    }
+
+    /**
+     * Strip out keys with a null value from an object http://stackoverflow.com/a/15953991
+     * @param stdObject $object
+     * @return stdObject
+     */
+    private function strip_empty_keys($object) {
+
+        $json = json_encode($object);
+        $json = preg_replace('/,\s*"[^"]+":null|"[^"]+":null,?/', '', $json);
+        $object = json_decode($json);
+
+        return $object;
     }
 }

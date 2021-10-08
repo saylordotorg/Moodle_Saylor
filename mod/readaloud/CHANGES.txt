@@ -1,3 +1,10 @@
+
+2.0.66 (Build 2021100100)
+- Added grades settings to push feature
+
+2.0.65 (Build 2021093000)
+- Added Push feature
+
 2.0.64 (Build 2021091200)
 - Added more neural voices and NZ and SA English to polly and transcribe
 - Added internal flag to turn off Chrome speech rec

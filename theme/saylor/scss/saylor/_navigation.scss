@@ -31,6 +31,15 @@
 	display: none;
 }
 
+// Set list items as link color to match.
+#nav-drawer .list-group-item-action {
+  color: $link-color;
+}
+
+#nav-drawer .list-group-item.active {
+  color: $white;
+}
+
 /** Nav Bar */
 .navbar {
    box-shadow: 0 3px 0 $primary;
@@ -111,16 +120,28 @@
   border-top-right-radius: .25rem;
 }
 
-/** Resources */
-// Hide the resource navigation at the bottom of the resources.
-// It's confusing students.
-// Eventually, override the renderer to go to next unit.
-
+/** Activity Navigation */
 .activity-navigation .row {
     align-items: normal;
 }
+
+// Hide activity navigation during quiz attempts.
+#page-mod-quiz-attempt .activity-navigation, #page-mod-quiz-summary .activity-navigation {
+  display: none;
+}
+
 /** Navigation Menu */
 
 .list-group-item.localboostnavigationfirstcustombuttomusers {
   margin-top: inherit;
+}
+
+/** Activity Info */
+[role=main]>.activity-information .activity-info-manual-completion-toggle {
+  display: none;
+}
+
+[role=main]>.activity-information {
+  padding: 0 !important;
+  border: none !important;
 }

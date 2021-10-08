@@ -18,9 +18,9 @@ namespace theme_saylor\output\core_course;
 
 use core_course;
 
-defined('MOODLE_INTERNAL') || die;
-
 require_once($CFG->dirroot . "/theme/saylor/classes/output/course_renderer.php");
+
+defined('MOODLE_INTERNAL') || die;
 
 class activity_navigation extends \core_course\output\activity_navigation {
     /**
@@ -30,7 +30,7 @@ class activity_navigation extends \core_course\output\activity_navigation {
      * @return \stdClass
      */
     public function export_for_template(\renderer_base $output) {
-        global $DB, $PAGE;
+        global $DB, $PAGE, $USER;
         $data = new \stdClass();
         if ($this->prevlink) {
             $data->prevlink = $this->prevlink->export_for_template($output);
@@ -44,17 +44,15 @@ class activity_navigation extends \core_course\output\activity_navigation {
             $data->activitylist = $this->activitylist->export_for_template($output);
         }
 
-        // Add completion toggle.
-        $course = $PAGE->course;
-        $completioninfo = new \completion_info($course);
-        $cm = $PAGE->cm;
-        $backto = $PAGE->url->out(false) . "#togglecompletionwrapper";
+        // Add completion button.
+        $cm = $PAGE->cm;//new cm_info($this, null, $PAGE->cm, null);
+        $cmcompletion = \core_completion\cm_completion_details::get_instance($cm, $USER->id);
+        $activitydates = \core\activity_dates::get_dates_for_module($cm, $USER->id);
 
-        $courserenderer = $PAGE->get_renderer('theme_saylor', 'core_course\core_course');
+        $activityinfo = new \core_course\output\activity_information($cm, $cmcompletion, $activitydates);
 
-        $toggle = $courserenderer->course_section_cm_completion($course, $completioninfo, $cm, array(), $backto);
-        $data->togglecompletion = $toggle;
- 
+        $data = (object) array_merge_recursive((array) $data, (array) $activityinfo->export_for_template($output));
+
         return $data;
     }
 }

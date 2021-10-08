@@ -23,6 +23,7 @@ use stdClass;
 use action_menu_filler;
 use action_menu;
 use pix_icon;
+use core_text;
 use action_menu_link_secondary;
 use theme_saylor\output;
 use core_course;

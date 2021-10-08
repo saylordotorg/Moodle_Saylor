@@ -890,6 +890,20 @@ class filter_filtercodes extends moodle_text_filter {
         // Any {course*} or %7Bcourse*%7D tags.
         if (stripos($text, '{course') !== false || stripos($text, '%7Bcourse') !== false) {
 
+            // Tag: {coursegradepercent} - Calculate and display current overall course grade as a percentage.
+            if (stripos($text, '{coursegradepercent}') !== false) {
+                require_once($CFG->libdir . '/gradelib.php');
+                require_once($CFG->dirroot . '/grade/querylib.php');
+                $gradeobj = grade_get_course_grade($USER->id, $PAGE->course->id);
+                if (!empty($grademax = floatval($gradeobj->item->grademax))) {
+                    // Avoid divide by 0 error if no grades have been defined.
+                    $grade = (int) ($gradeobj->grade / floatval($grademax) * 100) ?? 0;
+                } else {
+                    $grade = 0;
+                }
+                $replace['/\{coursegradepercent\}/i'] = $grade;
+            }
+
             // Custom Course Fields - First implemented in Moodle 3.7.
             if ($CFG->branch >= 37) {
                 // Tag: {course_field_shortname}.
@@ -1342,6 +1356,34 @@ class filter_filtercodes extends moodle_text_filter {
                     $replace['/\{courserequestmenu\}/i'] = '';
                 }
 
+            }
+        }
+
+        // Tag: {chart *} - Easily display a chart in one of several styles.
+        if (stripos($text, '{chart ') !== false && $CFG->branch >= 32) {
+            global $OUTPUT;
+            $value = 40;$title = 'Test';
+            // Tag: {chart radial} - Display a radial (circle) chart.
+            if (stripos($text, '{chart radial ') !== false) {
+                $chart = new \core\chart_pie();
+                $chart->set_doughnut(true); // Calling set_doughnut(true) we display the chart as a doughnut.
+                $chart->set_title($title);
+                $series = new \core\chart_series('Percentage', [min($value, 100), 100 - min($value, 100)]);
+                $chart->add_series($series);
+                $chart->set_labels(['Completed', 'Remaining']);
+                if ($CFG->branch >= 39) {
+                    $chart->set_legend_options(['display' => false]);  // Hide chart legend.
+                }
+                $replace['/\{chart radial ([0-9]+)\}/i'] =  $OUTPUT->render_chart($chart, false);
+            }
+            // Tag: {chart progress} - Display a horizontal progres bar.
+            if (stripos($text, '{chart progress ') !== false) {
+                $replace['/\{chart progress ([0-9]+)\}/i'] = '
+                <div class="progress">
+                    <div class="fc-progress progress-bar bar" role="progressbar" aria-valuenow="' . $value
+                        . '" style="width: ' . $value . '%" aria-valuemin="0" aria-valuemax="100">
+                    </div>
+                </div>';
             }
         }
 

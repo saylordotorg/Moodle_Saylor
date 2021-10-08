@@ -1,10 +1,12 @@
 ﻿Version Information
 ===================
-Version 3.10.1.3 - TBR
+Version 3.10.1.3 - 30/09/2021
 -----------------------------
   1. Add 'aria-controls' (https://www.w3.org/TR/wai-aria-practices/examples/disclosure/disclosure-faq.html) - CONTRIB-8637.
   2. Add caching to activity meta information in the hope of improving performance.
   3. Add 'aria-live=polite' to the section content and 'aria-controls' to the open / close all buttons - CONTRIB-8637.
+  4. Add support for Forums in "Course page further information" - #105.
+  5. Fix 'Collapsed topics rollover settings aren't accessible' - #111.
 
 Version 3.10.1.2 - 02/07/2021
 -----------------------------

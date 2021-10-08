@@ -137,7 +137,7 @@ class format_grid extends format_base {
     public function get_section_name($section) {
         $section = $this->get_section($section);
         if (!empty($section->name)) {
-            return format_string($section->name, true, array('context' => $this->get_context()));
+            return format_string($section->name, true, array('context' => self::get_context($this)));
         } if ($section->section == 0) {
             return get_string('topic0', 'format_grid');
         } else {
@@ -418,7 +418,7 @@ class format_grid extends format_base {
             /* Note: Because 'admin_setting_configcolourpicker' in 'settings.php' needs to use a prefixing '#'
               this needs to be stripped off here if it's there for the format's specific colour picker. */
             $defaults = $this->get_course_format_colour_defaults();
-            $context = $this->get_context();
+            $context = self::get_context($this);
 
             if (is_null($courseconfig)) {
                 $courseconfig = get_config('moodlecourse');
@@ -1057,7 +1057,7 @@ class format_grid extends format_base {
                 }
             }
         }
-        $context = $this->get_context();
+        $context = self::get_context($this);
 
         $changeimagecontaineralignment = has_capability('format/grid:changeimagecontaineralignment', $context);
         $changeimagecontainernavigation = has_capability('format/grid:changeimagecontainernavigation', $context);
@@ -1615,7 +1615,7 @@ class format_grid extends format_base {
             return false;
         }
         if (parent::delete_section($section, $forcedeleteifnotempty)) {
-            \format_grid\toolbox::delete_image($section->id, $this->get_contextid(), $this->get_courseid());
+            \format_grid\toolbox::delete_image($section->id, self::get_contextid($this), $this->get_courseid());
             return true;
         }
         return false;
@@ -1654,7 +1654,7 @@ class format_grid extends format_base {
             global $DB;
             $DB->set_field('format_grid_icon', 'displayedimageindex', 0, array('sectionid' => $sectionimage->sectionid));
             // We know the file is normally deleted, but just in case...
-            $contextid = $this->get_contextid();
+            $contextid = self::get_contextid($this);
             $fs = get_file_storage();
             $gridimagepath = \format_grid\toolbox::get_image_path();
             \format_grid\toolbox::delete_displayed_image($contextid, $sectionimage, $gridimagepath, $fs);
@@ -1684,7 +1684,7 @@ class format_grid extends format_base {
         $sectiontitleoptionsreset, $newactivityreset, $singlepagesummaryimagereset, $fitpopupreset, $greyouthidden) {
         global $DB, $USER;
 
-        $context = $this->get_context();
+        $context = self::get_context($this);
 
         if ($courseid == 0) {
             $records = $DB->get_records('course', array('format' => $this->format), '', 'id');
@@ -1910,20 +1910,20 @@ class format_grid extends format_base {
         $this->update_course_format_options($data);
     }
 
-    public function get_context() {
+    public static function get_context($us) {
         global $SITE;
 
-        if ($SITE->id == $this->courseid) {
+        if ($SITE->id == $us->courseid) {
             // Use the context of the page which should be the course category.
             global $PAGE;
             return $PAGE->context;
         } else {
-            return context_course::instance($this->courseid);
+            return context_course::instance($us->courseid);
         }
     }
 
-    public function get_contextid() {
-        return $this->get_context()->id;
+    public static function get_contextid($us) {
+        return self::get_context($us)->id;
     }
 }
 

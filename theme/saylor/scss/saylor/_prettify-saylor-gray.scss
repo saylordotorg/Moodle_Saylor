@@ -12,6 +12,12 @@
   padding-right: .5rem;
 }
 
+pre.prettyprint.prettyprinted {
+  border-color: $gray-300;
+  border-style: solid;
+  border-width: thin;
+}
+
 .prettyprint .pln {
   color: inherit;
 }

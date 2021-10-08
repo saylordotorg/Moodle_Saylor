@@ -1,0 +1,12 @@
+{ 
+    "id": 1,
+    "description": "Quiz",
+    "preview_image_url": null,
+    "link_url": null,
+    "type": "grade",
+    "string_object": {
+        "grade": 100.0
+    },
+    "supplemental": false,
+    "position": 1 
+}

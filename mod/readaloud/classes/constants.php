@@ -212,5 +212,15 @@ class constants {
     const M_BACKTOTOP= 'mod_readaloud_button_backtotop';
     const M_STOP_BTN = 'mod_readaloud_button_stop';
     const M_PLAY_BTN = 'mod_readaloud_button_play';
+
+    const M_PUSH_NONE =0;
+    const M_PUSH_PASSAGE =1;
+    const M_PUSH_ALTERNATIVES =2;
+    const M_PUSH_QUESTIONS =3;
+    const M_PUSH_TARGETWPM =4;
+    const M_PUSH_TTSMODELAUDIO = 5;
+    const M_PUSH_TIMELIMIT = 6;
+    const M_PUSH_MODES = 7;
+    const M_PUSH_GRADESETTINGS = 8;
   
 }
