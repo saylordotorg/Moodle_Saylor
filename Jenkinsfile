@@ -365,7 +365,7 @@ def plugins = [
     [
         "name" : 'availability_mobileapp',
         "url" : 'https://github.com/moodlehq/moodle-availability_mobileapp.git',
-        "branch" : 'master',
+        "branch" : 'MOODLE_32_STABLE',
         "dest" : 'availability/condition/mobileapp'
     ],
     [
