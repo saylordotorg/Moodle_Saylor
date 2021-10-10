@@ -159,12 +159,6 @@ def plugins = [
         "dest" : 'auth/mcae'
     ],
     [
-        "name" : 'mod_reengagement',
-        "url" : 'https://github.com/catalyst/moodle-mod_reengagement.git',
-        "branch" : 'master',
-        "dest" : 'mod/reengagement'
-    ],
-    [
         "name" : 'local_discoursesso',
         "url" : 'https://github.com/saylordotorg/moodle-local_discoursesso.git',
         "branch" : 'master',
