@@ -71,7 +71,7 @@ def plugins = [
     [
         "name" : 'mod_accredible',
         "url" : 'https://github.com/accredible/moodle-mod_accredible.git',
-        "branch" : 'master',
+        "branch" : 'v1.7.4',
         "dest" : 'mod/accredible'
     ],
     [
