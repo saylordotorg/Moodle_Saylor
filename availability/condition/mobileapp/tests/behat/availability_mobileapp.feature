@@ -16,11 +16,12 @@ Feature: availability_mobileapp
       | user     | course | role           |
       | teacher1 | C1     | editingteacher |
       | student1 | C1     | student        |
+    And the following config values are set as admin:
+      | enableavailability | 1 |
+      | enablewebservices | 1 |
+      | enablemobilewebservice | 1 |
     And I log in as "admin"
-    And I set the following administration settings values:
-      | Enable conditional access  | 1 |
-      | Enable web services                    | 1 |
-    And I navigate to "Mobile" node in "Site administration > Plugins > Web services"
+    And I navigate to "Mobile settings" node in "Site administration > Mobile app"
     And I click on "Enable web services for mobile devices" "checkbox"
     And I click on "Save changes" "button"
     And I log out
@@ -29,8 +30,7 @@ Feature: availability_mobileapp
   Scenario: Test condition
     # Basic setup.
     Given I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
 
     # Add a Page with a Mobile app condition that does not match.
     And I add a "Page" to section "1"
@@ -61,6 +61,7 @@ Feature: availability_mobileapp
     # Log back in as student.
     When I log out
     And I log in as "student1"
+    And I am on site homepage
     And I follow "Course 1"
 
     # Page 1 should appear, but page 2 does not.

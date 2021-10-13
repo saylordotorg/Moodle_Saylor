@@ -25,7 +25,7 @@
 $string['description'] = 'Require students to access (or not access) using the Mobile app.';
 $string['pluginname'] = 'Restriction by Mobile app access';
 $string['label_access'] = 'Type of access:';
-$string['privacy:metadata'] = 'The mobile app availability condition does not store any data.';
+$string['privacy:metadata'] = 'Restriction by Mobile app access does not store any personal data';
 $string['requires_app'] = 'Access using the Mobile app';
 $string['requires_notapp'] = 'Access NOT using the Mobile app';
 $string['title'] = 'Mobile app';

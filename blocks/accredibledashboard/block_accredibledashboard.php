@@ -47,10 +47,12 @@ class block_accredibledashboard extends block_list {
 				$this->content->items[] = '<div class="d-flex flex-row align-items-center py-1">'.html_writer::empty_tag('img', array('src' => "/blocks/accredibledashboard/assets/icon/certificate_seal.png", 'class' => 'icon float-left')).html_writer::tag('a', $credential->name, array('href' => $credential->sso_url, 'target' => '_blank', 'rel' => 'noopener noreferrer')).'</div>';
 			}
 			// Add footer button to credential wallet.
+			// Some users don't have a wallet url returned, so don't show the button in that case.
 			reset($credentials);
 			$credential = current($credentials);
-			$this->content->items[] = '<div class="d-flex flex-row align-items-center py-1">'.html_writer::tag('a', get_string('viewall', 'block_accredibledashboard'), array('class' => 'btn btn-primary btn-lg text-white mx-auto', 'href' => $credential->wallet_url, 'target' => '_blank', 'rel' => 'noopener noreferrer')).'</div>';
-		
+			if (isset($credential->wallet_url)) {
+				$this->content->items[] = '<div class="d-flex flex-row align-items-center py-1">'.html_writer::tag('a', get_string('viewall', 'block_accredibledashboard'), array('class' => 'btn btn-primary btn-lg text-white mx-auto', 'href' => $credential->wallet_url, 'target' => '_blank', 'rel' => 'noopener noreferrer')).'</div>';
+			}
 
 			return $this->content;
 		}

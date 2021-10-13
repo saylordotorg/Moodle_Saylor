@@ -15,11 +15,12 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Privacy subsystem implementation.
+ * Defines {@link \availability_mobileapp\privacy\provider} class.
  *
- * @package availability_mobileapp
- * @copyright 2019 The Open University
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     availability_mobileapp
+ * @category    privacy
+ * @copyright   2018 Sara Arjona <sara@moodle.com>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace availability_mobileapp\privacy;
@@ -27,20 +28,21 @@ namespace availability_mobileapp\privacy;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Privacy subsystem implementation (null provider).
+ * Privacy API implementation for the Restriction by Mobile app access plugin.
  *
- * @package availability_mobileapp
- * @copyright 2019 The Open University
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2018 Sara Arjona <sara@moodle.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class provider implements \core_privacy\local\metadata\null_provider {
+
+    use \core_privacy\local\legacy_polyfill;
+
     /**
-     * Get the language string identifier with the component's language
-     * file to explain why this plugin stores no data.
+     * Returns stringid of a text explaining that this plugin stores no personal data.
      *
      * @return string
      */
-    public static function get_reason() : string {
+    public static function _get_reason() {
         return 'privacy:metadata';
     }
 }

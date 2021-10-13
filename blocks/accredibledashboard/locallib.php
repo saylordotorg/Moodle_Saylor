@@ -40,8 +40,13 @@ function accredibledashboard_get_credentials($group_id, $email= null, $limit = 5
     // Maximum number of pages to request to avoid possible infinite loop.
     $loop_limit = 100;
     $redirecturl = $CFG->wwwroot.'/my/';
+    // Add a timeout so students don't wait if there is an issue with the Accredible API.
+    // Or if the API is slow.
+    // Set timeout to 15 seconds.
+    $timeout = 15;
+    $starttime = time();
 
-    $api = new apiRest($CFG->accredible_api_key);
+    $api = new apiRest();
 
     try {
 
@@ -50,7 +55,8 @@ function accredibledashboard_get_credentials($group_id, $email= null, $limit = 5
         $credentials = array();
         $allcredentials = array();
         // Query the Accredible API and loop until it returns that there is no next page.
-        while ($loop === true) {
+        // Once the timeout is hit, we work with what we have.
+        while ($loop === true && time() <= ($starttime + $timeout)) {
             $credentials_page = $api->get_credentials($group_id, $email, $page_size, $page);
 
             foreach ($credentials_page->credentials as $credential) {

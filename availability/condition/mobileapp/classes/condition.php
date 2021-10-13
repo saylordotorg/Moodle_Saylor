@@ -94,7 +94,7 @@ class condition extends \core_availability\condition {
         }
 
         // Check rare cases, like webservice/pluginfile.php.
-        if (strpos($ME, "webservice/") !== false) {
+        if (strpos($ME, "webservice/") !== false || strpos($ME, "tokenpluginfile.php") !== false) {
             $token = optional_param('token', '', PARAM_ALPHANUM);
             if ($token) {
                 return true;
