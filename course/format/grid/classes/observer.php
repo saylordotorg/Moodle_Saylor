@@ -51,13 +51,14 @@ class format_grid_observer {
     /**
      * Observer for the event course_restored.
      *
-     * Deletes the settings entry for the given course upon course deletion.
+     * Deletes the settings entry for the given course upon course restoration.
      *
      * @param \core\event\course_restored $event
      */
     public static function course_restored(\core\event\course_restored $event) {
         global $DB;
         $format = $DB->get_field('course', 'format', array('id' => $event->objectid));
+        // If not in the grid format, then don't need the images etc.
         if ($format != 'grid') {
             // Then delete the images and any summary.
             self::delete_images_and_summary($event->objectid);

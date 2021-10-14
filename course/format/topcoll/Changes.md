@@ -1,22 +1,31 @@
 ﻿Version Information
 ===================
-Version 3.10.1.3 - TBR
+
+Version 3.11.0.3 - 30/09/2021
+-----------------------------
+  1. Add support for Forums in "Course page further information" - #105.
+  2. Fix 'Collapsed topics rollover settings aren't accessible' - #111.
+
+Version 3.11.0.2 - 20/08/2021
 -----------------------------
   1. Add 'aria-controls' (https://www.w3.org/TR/wai-aria-practices/examples/disclosure/disclosure-faq.html) - CONTRIB-8637.
   2. Add caching to activity meta information in the hope of improving performance.
   3. Add 'aria-live=polite' to the section content and 'aria-controls' to the open / close all buttons - CONTRIB-8637.
 
-Version 3.10.1.2 - 02/07/2021
+Version 3.11.0.1 - 02/07/2021
 -----------------------------
   1. Fix 'PHP Notice:  Trying to access array offset on value of type null' when accessing a single section page on PHP 7.4.
   2. Reset language improvements in line with global default tracking as implemented in 3.10.0.2.
   3. Improved backup restore with numsections.
   4. Added 'Toggle blocks location' functionality, thanks to John Joubert (https://github.com/John-Joubert) for the patch - #100.
-  5. Fix 'Section content is in a column when using horizontal columns on a single section page'.
-  6. Fix 'Column orientation combo box strings'.
-  7. Improve activity meta from information gained on #101.
-  8. No longer need 'config.php' because of #100.
-  9. New 'Accessible back to main course link' - #66.
+  5. Fix 'Deprecation warning for 3.11' - #99.
+  6. Fix 'Section content is in a column when using horizontal columns on a single section page'.
+  7. Fix 'Column orientation combo box strings'.
+  8. Improve activity meta from information gained on #101.
+  9. No longer need 'config.php' because of #100.
+ 10. New 'Accessible back to main course link' - #66.
+ 11. Apply MDL-71634.
+ 12. Removed conflicting activity meta information that is now in core.
 
 Version 3.10.1.1 - 07/03/2021
 -----------------------------

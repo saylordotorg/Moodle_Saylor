@@ -1,7 +1,7 @@
 This files describes API changes in /dataformat/ download system,
 information provided here is intended especially for developers.
 
-=== 3.10.5 ===
+=== 3.11.1 ===
 * Optional $callback for the following \core\dataformat methods now receive a second argument to define
   whether the current format writer supports HTML:
   - download_data()

@@ -31,6 +31,7 @@ Feature: Assignment with no calendar capabilites
       | Due date               | ##1 February 2017##         |
       | Cut-off date           | ##2 February 2017##         |
       | Remind me to grade by  | ##1 March 2017##            |
+    And I press "Save and return to course"
     And I log out
 
     When I am on the "Test assignment name" Activity page logged in as teacher1

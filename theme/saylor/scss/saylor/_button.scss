@@ -22,6 +22,18 @@
     @include button-outline-variant($button-bg-orange, #222222, lighten($button-bg-orange,5%), $button-bg-orange);
 }
 
+.btn-success {
+  @include button-variant($success, darken($success, 7.5%), darken($success, 10%), lighten($success,5%), lighten($success, 10%), darken($success,30%));
+  color: $white !important;
+  margin: .25rem;
+}
+
+.btn-info {
+  @include button-variant($info, darken($info, 7.5%), darken($info, 10%), lighten($info,5%), lighten($info, 10%), darken($info,30%));
+  color: $white !important;
+  margin: .25rem;
+}
+
 // Button primary and secondary text should always be white.
 // Sometimes it was showing up as the secondary color.
 .btn .btn-primary, .btn .btn-secondary {
@@ -82,4 +94,26 @@
 }
 .bookprev::after {
   content: "Previous page ";
+}
+
+// Remove the book exit arrow since it's superfluous.
+.bookexit {
+    display: none;
+}
+
+/** Quizzes */
+
+// Style the quiz nav buttons.
+.mod_quiz-prev-nav, .mod_quiz-next-nav {
+  @extend .btn, .btn-secondary, .btn-sm;
+}
+
+// Add bottom padding.
+#page-mod-quiz-attempt .submitbtns, #page-mod-quiz-summary .submitbtns, #page-mod-quiz-review .submitbtns {
+  padding-bottom: 2em;
+}
+
+/** Questionnaire */
+.mod_questionnaire_completepage .buttons>input {
+  @extend .btn-sm;
 }

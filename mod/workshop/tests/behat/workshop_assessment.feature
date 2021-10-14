@@ -138,6 +138,12 @@ Feature: Workshop submission and assessment
     And I press "Re-calculate grades"
     And I should see "32" in the "//table/tbody/tr[td[contains(concat(' ', normalize-space(@class), ' '), ' participant ') and contains(.,'Sam1')]]/td[contains(concat(' ', normalize-space(@class), ' '), ' submissiongrade ')]" "xpath_element"
     And I should see "16" in the "//table/tbody/tr[td[contains(concat(' ', normalize-space(@class), ' '), ' participant ') and contains(.,'Sam1')]]/td[contains(concat(' ', normalize-space(@class), ' '), ' gradinggrade ')]" "xpath_element"
+    And I change phase in workshop "TestWorkshop" to "Closed"
+    And I log out
+
+    # student1 looks at the activity
+    And I am on the TestWorkshop "workshop activity" page logged in as student1
+    Then I should see "Your submission with assessments"
 
   @javascript
   Scenario: Add and assess submissions in workshop with javascript enabled

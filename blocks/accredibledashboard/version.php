@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die;
 
 $plugin->component = 'block_accredibledashboard';
-$plugin->version   = 2021071300;
+$plugin->version   = 2021101100;
 $plugin->maturity = MATURITY_BETA;
-$plugin->requires  = 2018120301.00; // Moodle 3.6.1 (Build: 20181205).
-$plugin->dependencies = ['mod_accredible' => '2020020301'];
+$plugin->requires  = 2021051703; // Moodle 3.11
+$plugin->dependencies = ['mod_accredible' => '2021100800']; //Accredible v1.7.4

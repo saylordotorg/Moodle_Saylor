@@ -1501,7 +1501,7 @@ class grade_item extends grade_object {
             }
 
         } else {
-            return get_string('grade');
+            return get_string('gradenoun');
         }
     }
 

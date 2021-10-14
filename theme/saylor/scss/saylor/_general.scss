@@ -42,6 +42,20 @@ h6,
     font-family: $font-family-buttons;
 }
 
+.badge {
+  font-family: $font-family-buttons;
+}
+
+// Remove the right margin from the course page i icons.
+.info>.moreinfo>a>.icon {
+  margin-right: 0px;
+}
+
+// Search boxes - fix top padding on button
+.input-group-append {
+  margin-top: -4px;
+}
+
 /* Can't find extend yet */
 
 .filemanager-container,
@@ -88,6 +102,15 @@ h6,
  border: 1px solid $primary-dark-blue;
  border-radius: .25rem;
  margin: .25rem 0 0 .25rem;
+}
+
+.block_completion_progress .progressBarCell.completed {
+  background-color: $success !important;
+}
+
+.block_completion_progress .progressBarCell.futureNotCompleted {
+  background-color: $info !important;
+  opacity: 20%;
 }
 
 /** Honesty Check */
@@ -191,4 +214,64 @@ h6,
     @extend .rounded-right;
 }
 
+
+// Focused link styling
+.aalink.focus, .aalink:focus, #page-footer a:not([class]).focus, #page-footer a:not([class]):focus, .arrow_link.focus, .arrow_link:focus, a:not([class]).focus, a:not([class]):focus, .activityinstance>a.focus, .activityinstance>a:focus {
+  /* outline: .2rem solid transparent; */
+  color: $tertiary;
+  background-color: $expand-light-blue-200 !important;
+  box-shadow: none;
+  outline: none !important;
+  border-radius: .25rem;
+  border: 5px solid transparent;
+  border-bottom-width: 3px;
+  border-bottom-color: $tertiary;
+}
+
+/** Questionnaire */
+.qn-info {
+  border-radius: .25rem;
+  background: $gray-100;
+  border-color: $gray-300;
+  border-style: solid;
+}
+
+.qn-question {
+  border-radius: .25rem;
+  background: $gray-100;
+  border-color: $gray-300;
+  border-style: solid;
+  border-width: thin;
+  padding-left: .5rem;
+}
+
+.qn-question p {
+  margin-bottom: .1em;
+}
+
+.qn-question>label {
+  margin-bottom: 0;
+}
+
+.qn-answer>input {
+  max-width: 100%;
+  border-radius: .25rem;
+  border-width: thin;
+}
+
+.qn-content {
+  margin-bottom: 2rem;
+}
+
+.mod_questionnaire_completepage .surveyPage {
+  border-radius: .25rem;
+  background: $gray-100;
+  border-color: $gray-300;
+  border-style: solid;
+  border-width: thin;
+}
+
+#page-mod-questionnaire-complete .message, #page-mod-questionnaire-preview .message, #page-mod-questionnaire-complete .thankbody, #page-mod-questionnaire-complete .thankhead {
+  border: none;
+}
 

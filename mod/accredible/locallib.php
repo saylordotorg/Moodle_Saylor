@@ -39,7 +39,7 @@ use mod_accredible\Html2Text\Html2Text;
 function sync_course_with_accredible($course, $instance_id = null, $group_id = null) {
     global $DB, $CFG;
 
-    $apiRest = new apiRest($CFG->accredible_api_key);
+    $apiRest = new apiRest();
 
     $description = Html2Text::convert($course->summary);
     if (empty($description)) {
@@ -98,7 +98,7 @@ function accredible_get_credentials($group_id, $email= null) {
     // Maximum number of pages to request to avoid possible infinite loop.
     $loop_limit = 100;
 
-    $apiRest = new apiRest($CFG->accredible_api_key);
+    $apiRest = new apiRest();
 
     try {
 
@@ -145,7 +145,7 @@ function accredible_get_credentials($group_id, $email= null) {
 function accredible_check_for_existing_credential($group_id, $email) {
     global $CFG;
 
-    $apiRest = new apiRest($CFG->accredible_api_key);
+    $apiRest = new apiRest();
     try {
         $credentials = $apiRest->get_credentials($group_id, $email);
 
@@ -244,7 +244,7 @@ function accredible_check_if_cert_earned($record, $course, $user) {
 function create_credential($user, $group_id, $event = null, $issued_on = null) {
     global $CFG;
 
-    $apiRest = new apiRest($CFG->accredible_api_key);
+    $apiRest = new apiRest();
 
     try {
         $credential = $apiRest->create_credential(fullname($user), $user->email, $group_id, $issued_on);
@@ -280,7 +280,7 @@ function create_credential($user, $group_id, $event = null, $issued_on = null) {
 function create_credential_legacy($user, $achievement_name, $course_name, $course_description, $course_link, $issued_on, $event = null){
     global $CFG;
 
-    $apiRest = new apiRest($CFG->accredible_api_key);
+    $apiRest = new apiRest();
 
     try {
         $credential = $apiRest->create_credential_legacy(fullname($user), $user->email, $achievement_name, $issued_on, null, $course_name, $course_description, $course_link);
@@ -312,7 +312,7 @@ function create_credential_legacy($user, $achievement_name, $course_name, $cours
 function accredible_get_groups() {
     global $CFG;
 
-    $apiRest = new apiRest($CFG->accredible_api_key);
+    $apiRest = new apiRest();
     try {
         $response = $apiRest->get_groups(10000, 1);
 
@@ -338,7 +338,7 @@ function accredible_get_groups() {
 function accredible_get_recipient_sso_linik($group_id, $email) {
     global $CFG;
 
-    $apiRest = new apiRest($CFG->accredible_api_key);
+    $apiRest = new apiRest();
 
     try {
         $response = $apiRest->recipient_sso_link(null, null, $email, null, $group_id, null);
@@ -355,26 +355,26 @@ function accredible_get_recipient_sso_linik($group_id, $email) {
 /**
  * List all of the issuer's templates
  *
+ * @param apiRest $apiRest
  * @return array[stdClass] $templates
  */
-function accredible_get_templates() {
-    global $CFG;
-
-    $curl = curl_init(get_api_endpoint().'issuer/templates');
-    curl_setopt( $curl, CURLOPT_HTTPHEADER, array( 'Authorization: Token token="'.$CFG->accredible_api_key.'"' ) );
-    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-    if (!$result = json_decode( curl_exec($curl) )) {
+function accredible_get_templates($apiRest = null) {
+    // An apiRest with a mock client is passed when unit testing.
+    if(!$apiRest) {
+        $apiRest = new apiRest();
+    }
+    $response = $apiRest->search_groups(10000, 1);
+    if (!isset($response->groups)) {
         // Throw API exception.
         // Include the achievement id that triggered the error.
         // Direct the user to accredible's support.
         // Dump the achievement id to debug_info.
         throw new moodle_exception('gettemplateserror', 'accredible', 'https://help.accredible.com/hc/en-us');
     }
-    curl_close($curl);
+
+    $groups = $response->groups;
     $templates = array();
-    for ($i = 0, $size = count($result->templates); $i < $size; ++$i) {
-        $templates[$result->templates[$i]->name] = $result->templates[$i]->name;
-    }
+    foreach ($groups as $group) { $templates[$group->name] = $group->name; }
     return $templates;
 }
 
@@ -396,7 +396,7 @@ function accredible_issue_default_certificate($user_id, $certificate_id, $name, 
     $course_url = new moodle_url('/course/view.php', array('id' => $accredible_certificate->course));
     $course_link = $course_url->__toString();
 
-    $restApi = new apiRest($CFG->accredible_api_key);
+    $restApi = new apiRest();
     $credential = $restApi->create_credential_legacy($name, $email, $accredible_certificate->achievementid, $issued_on, null, $accredible_certificate->certificatename, $accredible_certificate->description, $course_link);
 
     // Evidence item posts.
@@ -453,6 +453,8 @@ function accredible_quiz_submission_handler($event) {
     global $DB, $CFG;
     require_once($CFG->dirroot . '/mod/quiz/lib.php');
 
+    $api = new apiRest();
+
     $attempt = $event->get_record_snapshot('quiz_attempts', $event->objectid);
 
     $quiz = $event->get_record_snapshot('quiz', $attempt->quiz);
@@ -461,7 +463,6 @@ function accredible_quiz_submission_handler($event) {
         foreach ($accredible_certificate_records as $record) {
             // Check for the existence of an activity instance and an auto-issue rule.
             if ( $record and ($record->finalquiz or $record->completionactivities) ) {
-
                 // Check if we have a group mapping - if not use the old logic.
                 if ($record->groupid) {
                     // Check which quiz is used as the deciding factor in this course.
@@ -481,12 +482,13 @@ function accredible_quiz_submission_handler($event) {
                             }
                         } else {
                             // Check the existing grade to see if this one is higher and update the credential if so.                   
-                            foreach ($existing_certificate->evidence_items as $evidence_item) {
+                            $credential = $api->get_credential($existing_certificate->id)->credential;
+                            foreach ($credential->evidence_items as $evidence_item) {
                                 if ($evidence_item->type == "grade") {
                                     $highest_grade = min( ( quiz_get_best_grade($quiz, $user->id) / $quiz->grade ) * 100, 100);
-                                    // Only update if higher.
-                                    if ($evidence_item->string_object->grade < $highest_grade) {
-                                        accredible_update_certificate_grade($existing_certificate->id, $evidence_item->id, $highest_grade);
+                                    $api_grade = intval($evidence_item->string_object->grade);
+                                    if ($api_grade < $highest_grade) {
+                                        $api->update_evidence_item_grade($existing_certificate->id, $evidence_item->id, $highest_grade);
                                     }
                                 }
                             }
@@ -552,12 +554,13 @@ function accredible_quiz_submission_handler($event) {
                             }
                         } else {
                             // Check the existing grade to see if this one is higher.
-                            foreach ($existing_certificate->evidence_items as $evidence_item) {
+                            $credential = $api->get_credential($existing_certificate->id)->credential;
+                            foreach ($credential->evidence_items as $evidence_item) {
                                 if ($evidence_item->type == "grade") {
                                     $highest_grade = min( ( quiz_get_best_grade($quiz, $user->id) / $quiz->grade ) * 100, 100);
-                                    // only update if higher
-                                    if ($evidence_item->string_object->grade < $highest_grade) {
-                                        accredible_update_certificate_grade($existing_certificate->id, $evidence_item->id, $highest_grade);
+                                    $api_grade = intval($evidence_item->string_object->grade);
+                                    if ($api_grade < $highest_grade) {
+                                        $api->update_evidence_item_grade($existing_certificate->id, $evidence_item->id, $highest_grade);
                                     }
                                 }
                             }
@@ -650,20 +653,6 @@ function accredible_course_completed_handler($event) {
     }
 }
 
-
-function accredible_update_certificate_grade($certificate_id, $evidence_item_id, $grade) {
-    global $CFG;
-
-    $curl = curl_init(get_api_endpoint() . 'credentials/' . $certificate_id . '/evidence_items/'.$evidence_item_id);
-    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "PUT");
-    curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query(array('evidence_item' => array('string_object' => $grade)), '', '&'));
-    curl_setopt( $curl, CURLOPT_HTTPHEADER, array( 'Authorization: Token token="'.$CFG->accredible_api_key.'"' ) );
-
-    $result = curl_exec($curl);
-    return $result;
-}
-
 function accredible_get_transcript($course_id, $user_id, $final_quiz_id) {
     global $DB, $CFG;
 
@@ -691,7 +680,7 @@ function accredible_get_transcript($course_id, $user_id, $final_quiz_id) {
 
     // if they've completed over 2/3 of items
     // and have a passing average, make a transcript
-    if ( $items_completed / $total_items >= 0.66 && $total_score / $items_completed > 50 ) {
+    if ( $total_items !== 0 && $items_completed !== 0 && $items_completed / $total_items >= 0.66 && $total_score / $items_completed > 50 ) {
         return array(
                 'description' => 'Course Transcript',
                 'string_object' => json_encode($transcript_items),
@@ -704,24 +693,9 @@ function accredible_get_transcript($course_id, $user_id, $final_quiz_id) {
     }
 }
 
-function accredible_post_evidence($credential_id, $evidence_item, $allow_exceptions) {
-    global $CFG;
-
-    $curl = curl_init(get_api_endpoint() . 'credentials/' . $credential_id . '/evidence_items');
-    curl_setopt($curl, CURLOPT_POST, true);
-    curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query(array('evidence_item' => $evidence_item), '', '&'));
-    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($curl, CURLOPT_FAILONERROR, true);
-    curl_setopt( $curl, CURLOPT_HTTPHEADER, array( 'Authorization: Token token="'.$CFG->accredible_api_key.'"' ) );
-    $result = curl_exec($curl);
-    if (!$result && $allow_exceptions) {
-        // throw API exception
-        // include the user id that triggered the error
-        // direct the user to accredible's support
-        // dump the post to debug_info
-        throw new moodle_exception('evidenceadderror', 'accredible', 'https://help.accredible.com/hc/en-us', $credential_id, curl_error($curl));
-    }
-    curl_close($curl);
+function accredible_post_evidence($credential_id, $evidence_item, $throw_error = false) {
+    $api = new apiRest();
+    $api->create_evidence_item(array('evidence_item' => $evidence_item), $credential_id, $throw_error);
 }
 
 function accredible_check_for_existing_certificate($achievement_id, $user) {
@@ -814,7 +788,7 @@ function accredible_course_duration_evidence($user_id, $course_id, $credential_i
     }
 
     if ($enrolment_timestamp && $enrolment_timestamp != 0 && (strtotime($enrolment_timestamp) < strtotime($completed_timestamp))) {
-        $apiRest = new apiRest($CFG->accredible_api_key);
+        $apiRest = new apiRest();
 
         $apiRest->create_evidence_item_duration($enrolment_timestamp, $completed_timestamp, $credential_id, true);
     }
@@ -893,20 +867,4 @@ function seconds_to_str ($seconds) {
         return $minutes . ' minute' . number_ending($minutes);
     }
     return $seconds . ' second' . number_ending($seconds);
-}
-
-function get_api_endpoint() {
-    global $CFG;
-
-    $api_endpoint = "https://api.accredible.com/v1/";
-    if ($CFG->is_eu) {
-        $api_endpoint = "https://eu.api.accredible.com/v1/";
-    }
-
-	$dev_api_endpoint = getenv("ACCREDIBLE_DEV_API_ENDPOINT");
-	if($dev_api_endpoint) {
-		$api_endpoint = $dev_api_endpoint;
-	}
-
-    return $api_endpoint;
 }

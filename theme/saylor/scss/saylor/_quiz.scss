@@ -1,8 +1,45 @@
 /** Quiz **/
 
+.que .outcome, .que .comment {
+  /* color: black; */
+  background-color: transparent;
+  border-color: $gray-300;
+  border-style: solid;
+  border-width: thin;
+}
+
+// code runner
+.que.coderunner div.coderunner-test-results.bad, .que.coderunner div.pre_syntax_error, .que.coderunner div.pre_question_error {
+  background-color: $expand-red-100;
+  border-radius: .25rem;
+}
+
+.que.coderunner div.coderunner-test-results.good, #page-question-type-coderunner tr.coderunner-failed-test.fixed {
+  background-color: $expand-pastel-green-100;
+  border-radius: .25rem;
+}
+
+#page-question-type-coderunner div.ui_wrapper, .que.coderunner div.ui_wrapper {
+  max-width: 100%;
+  box-sizing: border-box;
+  background-color: $gray-300;
+  border-radius: .25rem;
+}
+
+// code runner pre area word wrap
+.que.coderunner div.coderunner-test-results pre, .que.coderunner div.coderunner-examples pre {
+  white-space: pre-wrap;       /* Since CSS 2.1 */
+  white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+  white-space: -pre-wrap;      /* Opera 4-6 */
+  white-space: -o-pre-wrap;    /* Opera 7 */
+  word-wrap: break-word;       /* Internet Explorer 5.5+ */
+}
+
+// nav block
+
 .path-mod-quiz #mod_quiz_navblock {
    .qnbutton {
-     color: $primary;
+     color: $tertiary;
  }
 }
 
@@ -46,6 +83,7 @@
   padding-top: .5rem;
 }
 
-.qnbutton .trafficlight {
-    margin-top: 30px !important;
+.path-mod-quiz #mod_quiz_navblock .qnbutton .trafficlight {
+  height: 10px;
+  margin-top: 30px;
 }

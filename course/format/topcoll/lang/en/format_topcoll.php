@@ -378,48 +378,34 @@ $string['resetdisplayinstructions_help'] = 'Resets the display instructions to f
 $string['resetalldisplayinstructions_help'] = 'Resets the display instructions to follow the site default value.';
 
 // Activity display *********************************.
-$string['answered'] = 'Answered';
-$string['attempted'] = 'Attempted';
-$string['contributed'] = 'Contributed';
-$string['draft'] = 'Not published to students';
-$string['due'] = 'Due {$a}';
-$string['expired'] = 'Expired';
 $string['feedbackavailable'] = 'Feedback available';
-$string['notanswered'] = 'Not answered';
-$string['notattempted'] = 'Not attempted';
-$string['notcontributed'] = 'Not contributed';
-$string['notopen'] = 'Not open';
-$string['notsubmitted'] = 'Not submitted';
-$string['overdue'] = 'Overdue';
-$string['reopened'] = 'Reopened';
-$string['submitted'] = 'Submitted';
-
 $string['xofyanswered'] = '{$a->completed} of {$a->participants} answered';
 $string['xofyattempted'] = '{$a->completed} of {$a->participants} attempted';
 $string['xofycontributed'] = '{$a->completed} of {$a->participants} contributed';
+$string['xofyposted'] = '{$a->completed} of {$a->participants} posted';
 $string['xofysubmitted'] = '{$a->completed} of {$a->participants} submitted';
 $string['xanswered'] = '{$a->completed} answered';
 $string['xattempted'] = '{$a->completed} attempted';
 $string['xcontributed'] = '{$a->completed} contributed';
+$string['xposted'] = '{$a->completed} posted';
 $string['xsubmitted'] = '{$a->completed} submitted';
 $string['xungraded'] = '{$a} ungraded';
 
-$string['checked'] = 'Checked';
-$string['warning'] = 'Warning';
-
 $string['coursesectionactivityfurtherinformation'] = 'Course page further information';
 $string['coursesectionactivityfurtherinformationassign'] = 'Show assignment information';
-$string['coursesectionactivityfurtherinformationassigndesc'] = 'Show assignment information, such as due date, submission status.  For teachers / admins, show number of submissions.';
+$string['coursesectionactivityfurtherinformationassigndesc'] = 'Show assignment information.  For teachers / admins, show number of submissions.';
 $string['coursesectionactivityfurtherinformationquiz'] = 'Show quiz information';
-$string['coursesectionactivityfurtherinformationquizdesc'] = 'Show quiz information, such as submission status.  For teachers / admins, show number of submissions.';
+$string['coursesectionactivityfurtherinformationquizdesc'] = 'Show quiz information.  For teachers / admins, show number of submissions.';
 $string['coursesectionactivityfurtherinformationchoice'] = 'Show choice information';
-$string['coursesectionactivityfurtherinformationchoicedesc'] = 'Show choice information, such as submission status.  For teachers / admins, show number of submissions.';
+$string['coursesectionactivityfurtherinformationchoicedesc'] = 'Show choice information.  For teachers / admins, show number of submissions.';
 $string['coursesectionactivityfurtherinformationfeedback'] = 'Show feedback information';
-$string['coursesectionactivityfurtherinformationfeedbackdesc'] = 'Show feedback information, such as submission status.  For teachers / admins, show number of submissions.';
+$string['coursesectionactivityfurtherinformationfeedbackdesc'] = 'Show feedback information.  For teachers / admins, show number of submissions.';
+$string['coursesectionactivityfurtherinformationforum'] = 'Show forum information';
+$string['coursesectionactivityfurtherinformationforumdesc'] = 'Show forum information.  For teachers / admins, show number of contributions when whole forum grading is on.';
 $string['coursesectionactivityfurtherinformationlesson'] = 'Show lesson information';
-$string['coursesectionactivityfurtherinformationlessondesc'] = 'Show lesson information, such as submission status.  For teachers / admins, show number of submissions.';
+$string['coursesectionactivityfurtherinformationlessondesc'] = 'Show lesson information.  For teachers / admins, show number of submissions.';
 $string['coursesectionactivityfurtherinformationdata'] = 'Show database information';
-$string['coursesectionactivityfurtherinformationdatadesc'] = 'Show data information, such as submission status.  For teachers / admins, show number of submissions.';
+$string['coursesectionactivityfurtherinformationdatadesc'] = 'Show data information.  For teachers / admins, show number of submissions.';
 
 $string['cachedef_activitystudentrolescache'] = 'Caches the student roles.';
 $string['cachedef_activitymodulecountcache'] = 'Caches the number of students who can access a given module on a given course.';

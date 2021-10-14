@@ -24,7 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2021070816;
+$plugin->version   = 2021090800;
 $plugin->maturity = MATURITY_STABLE;
-$plugin->requires  = 2020110300;
+$plugin->requires  = 2021051703;
 $plugin->component = 'theme_saylor';

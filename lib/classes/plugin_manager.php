@@ -1002,9 +1002,10 @@ class core_plugin_manager {
      * @param string $component
      * @param int $version version number
      * @param string $reason returned code of the reason why it is not
+     * @param bool $checkremote check this version availability on moodle server
      * @return boolean
      */
-    public function is_remote_plugin_installable($component, $version, &$reason=null) {
+    public function is_remote_plugin_installable($component, $version, &$reason = null, $checkremote = true) {
         global $CFG;
 
         // Make sure the feature is not disabled.
@@ -1014,7 +1015,7 @@ class core_plugin_manager {
         }
 
         // Make sure the version is available.
-        if (!$this->is_remote_plugin_available($component, $version, true)) {
+        if ($checkremote && !$this->is_remote_plugin_available($component, $version, true)) {
             $reason = 'remoteunavailable';
             return false;
         }
@@ -1026,12 +1027,17 @@ class core_plugin_manager {
             return false;
         }
 
-        $remoteinfo = $this->get_remote_plugin_info($component, $version, true);
+        if (!$checkremote) {
+            $remoteversion = $version;
+        } else {
+            $remoteinfo = $this->get_remote_plugin_info($component, $version, true);
+            $remoteversion = $remoteinfo->version->version;
+        }
         $localinfo = $this->get_plugin_info($component);
 
         if ($localinfo) {
             // If the plugin is already present, prevent downgrade.
-            if ($localinfo->versiondb > $remoteinfo->version->version) {
+            if ($localinfo->versiondb > $remoteversion) {
                 $reason = 'cannotdowngrade';
                 return false;
             }
@@ -1788,7 +1794,7 @@ class core_plugin_manager {
             ),
 
             'block' => array(
-                'activity_modules', 'activity_results', 'admin_bookmarks', 'badges',
+                'accessreview', 'activity_modules', 'activity_results', 'admin_bookmarks', 'badges',
                 'blog_menu', 'blog_recent', 'blog_tags', 'calendar_month',
                 'calendar_upcoming', 'comments',
                 'completionstatus', 'course_list', 'course_summary',
@@ -1935,7 +1941,7 @@ class core_plugin_manager {
             ),
 
             'profilefield' => array(
-                'checkbox', 'datetime', 'menu', 'text', 'textarea'
+                'checkbox', 'datetime', 'menu', 'social', 'text', 'textarea'
             ),
 
             'qbehaviour' => array(
@@ -2002,7 +2008,7 @@ class core_plugin_manager {
             ),
 
             'tool' => array(
-                'analytics', 'availabilityconditions', 'behat', 'capability', 'cohortroles', 'customlang',
+                'analytics', 'availabilityconditions', 'behat', 'brickfield', 'capability', 'cohortroles', 'customlang',
                 'dataprivacy', 'dbtransfer', 'filetypes', 'generator', 'health', 'httpsreplace', 'innodb',
                 'installaddon', 'langimport', 'licensemanager', 'log', 'lp', 'lpimportcsv', 'lpmigrate', 'messageinbound',
                 'mobile', 'moodlenet', 'multilangupgrade', 'monitor', 'oauth2', 'phpunit', 'policy', 'profiling', 'recyclebin',

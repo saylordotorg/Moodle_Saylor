@@ -45,14 +45,13 @@ Feature: Scorm multi-sco completion
   @javascript
   Scenario: Test completion with all scos and correct sco load on re-entry.
     Given the following "activity" exists:
-      | activity                 | scorm                                                    |
-      | course                   | C1                                                       |
-      | name                     | ADV Multi-sco SCORM package                              |
-      | packagefilepath          | mod/scorm/tests/packages/RuntimeMinimumCalls_SCORM12.zip |
+      | activity                | scorm                                                    |
+      | course                  | C1                                                       |
+      | name                    | ADV Multi-sco SCORM package                              |
+      | completion              | 2                                                        |
       # Show activity as complete when conditions are met
-      | completion               | 2                                                        |
-      | completionstatusallscos  | 1                                                        |
-      | completionstatusrequired | 4                                                        |
+      | packagefilepath         | mod/scorm/tests/packages/RuntimeMinimumCalls_SCORM12.zip |
+      | completionstatusallscos | 1                                                        |
     And I am on the "ADV Multi-sco SCORM package" "scorm activity" page logged in as student1
     And I should see "Normal"
     And I press "Enter"

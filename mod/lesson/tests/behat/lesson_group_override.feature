@@ -191,7 +191,7 @@ Feature: Lesson group override
     And I should see "Lesson closes"
     And I log out
     And I am on the "Test lesson name" "lesson activity" page logged in as student2
-    Then I should see "This lesson closed on Saturday, 1 January 2000, 8:00"
+    Then the activity date in "Test lesson name" should contain "Closed: Saturday, 1 January 2000, 8:00"
     And I should not see "Cat is an amphibian"
     And I log out
     And I am on the "Test lesson name" "lesson activity" page logged in as student1
@@ -221,7 +221,7 @@ Feature: Lesson group override
     And I should see "Lesson opens"
     And I log out
     And I am on the "Test lesson name" "lesson activity" page logged in as student2
-    Then  I should see "This lesson will be open on Tuesday, 1 January 2030, 8:00"
+    Then the activity date in "Test lesson name" should contain "Opens: Tuesday, 1 January 2030, 8:00"
     And I should not see "Cat is an amphibian"
     And I log out
     And I am on the "Test lesson name" "lesson activity" page logged in as student1
@@ -300,13 +300,13 @@ Feature: Lesson group override
     And I should see "Wednesday, 1 January 2031, 8:00"
     And I log out
     And I am on the "Test lesson name" "lesson activity" page logged in as student1
-    And I should see "This lesson will be open on Wednesday, 1 January 2031, 8:00"
+    And the activity date in "Test lesson name" should contain "Opens: Wednesday, 1 January 2031, 8:00"
     And I log out
     And I am on the "Test lesson name" "lesson activity" page logged in as student2
-    And I should see "This lesson will be open on Sunday, 1 January 2040, 8:00"
+    And the activity date in "Test lesson name" should contain "Opens: Sunday, 1 January 2040, 8:00"
     And I log out
     And I am on the "Test lesson name" "lesson activity" page logged in as student3
-    And I should see "This lesson will be open on Tuesday, 1 January 2030, 8:00"
+    And the activity date in "Test lesson name" should contain "Opens: Tuesday, 1 January 2030, 8:00"
 
   Scenario: Override a group when teacher is in no group, and does not have accessallgroups permission, and the activity's group mode is 'separate groups'
     Given the following "permission overrides" exist:

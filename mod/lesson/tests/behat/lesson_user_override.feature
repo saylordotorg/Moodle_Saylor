@@ -186,7 +186,7 @@ Feature: Lesson user override
     And I log out
     And I am on the "Test lesson name" "lesson activity" page logged in as student2
     And I wait until the page is ready
-    Then I should see "This lesson closed on Saturday, 1 January 2000, 8:00"
+    Then the activity date in "Test lesson name" should contain "Closed: Saturday, 1 January 2000, 8:00"
     And I should not see "Cat is an amphibian"
     And I log out
     And I am on the "Test lesson name" "lesson activity" page logged in as student1
@@ -218,7 +218,7 @@ Feature: Lesson user override
     And I log out
     And I am on the "Test lesson name" "lesson activity" page logged in as student2
     And I wait until the page is ready
-    Then I should see "This lesson will be open on Tuesday, 1 January 2030, 8:00"
+    Then the activity date in "Test lesson name" should contain "Opens: Tuesday, 1 January 2030, 8:00"
     And I should not see "Cat is an amphibian"
     And I log out
     And I am on the "Test lesson name" "lesson activity" page logged in as student1

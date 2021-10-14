@@ -1,0 +1,48 @@
+// Board format for MBA Program
+
+.course-content ul.board li.section.main {
+  margin: 20px 0 50px 0;
+  width: 100%;
+}
+
+// This gets rid of the bottom border
+
+.section li.activity.hasinfo {
+  border-bottom: none;
+}
+
+.text-truncate {
+  white-space: normal;
+}
+
+// Canvas size for board format
+
+@media (min-width: 751px) and (max-width: 1183px) {
+  .course-content ul.board.width25 {
+    width: 50%;
+  }
+}
+
+@media (min-width: 1184px) and (max-width: 1360px) {
+  .course-content ul.board.width25 {
+    width: 100%;
+  }
+}
+
+@media (max-width: 1307px)
+#region-main-settings-menu.has-blocks, #region-main.has-blocks {
+  display: block;
+  width: 100%;
+}
+
+@media (min-width: 1361px) and (max-width: 1699px) {
+  .course-content ul.board.width25 {
+    width: 50%;
+  }
+}
+
+@media (min-width: 1700px) and (max-width: 1986px) {
+  .course-content ul.board.width25 {
+    width: 33%;
+  }
+}

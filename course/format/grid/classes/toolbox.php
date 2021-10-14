@@ -635,7 +635,7 @@ class toolbox {
 
         if (is_array($sectionimages)) {
             global $DB;
-            $contextid = $courseformat->get_contextid();
+            $contextid = \format_grid::get_contextid($courseformat);
             $fs = get_file_storage();
             $gridimagepath = self::get_image_path();
             $t = $DB->start_delegated_transaction();
@@ -932,7 +932,7 @@ class toolbox {
             require_once($CFG->dirroot . '/course/format/lib.php'); // For 'course_get_format()'.
             $courseformat = course_get_format($courseid);
 
-            $contextid = $courseformat->get_contextid();
+            $contextid = \format_grid::get_contextid($courseformat);
             $fs = get_file_storage();
             $gridimagepath = self::get_image_path();
 

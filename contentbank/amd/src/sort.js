@@ -34,7 +34,7 @@ import Notification from 'core/notification';
  */
 export const init = () => {
     const contentBank = document.querySelector(selectors.regions.contentbank);
-    Prefetch.prefetchStrings('contentbank', ['contentname', 'lastmodified', 'size', 'type', 'author']);
+    Prefetch.prefetchStrings('contentbank', ['contentname', 'uses', 'lastmodified', 'size', 'type', 'author']);
     Prefetch.prefetchStrings('moodle', ['sortbyx', 'sortbyxreverse']);
     registerListenerEvents(contentBank);
 };
@@ -84,6 +84,14 @@ const registerListenerEvents = (contentBank) => {
             if (sortByName) {
                 const ascending = updateSortButtons(contentBank, sortByName);
                 updateSortOrder(fileArea, shownItems, 'data-file', ascending);
+                return;
+            }
+
+            // Sort by uses.
+            const sortByUses = e.target.closest(selectors.actions.sortuses);
+            if (sortByUses) {
+                const ascending = updateSortButtons(contentBank, sortByUses);
+                updateSortOrder(fileArea, shownItems, 'data-uses', ascending);
                 return;
             }
 

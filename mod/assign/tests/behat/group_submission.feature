@@ -238,10 +238,10 @@ Feature: Group assignment submissions
       | submissiondrafts                     | 0                            |
 
     And the following "mod_assign > submissions" exist:
-      | assign                | user      | onlinetext                      |
-      | Test assignment name  | student1  | I'm the student's 1 submission  |
-      | Test assignment name  | student3  | I'm the student's 3 submission  |
-      | Test assignment name  | student5  | I'm the student's 5 submission  |
+      | assign                | user      | onlinetext                          |
+      | Test assignment name  | student1  | I'm the student's first submission  |
+      | Test assignment name  | student3  | I'm the student's first submission  |
+      | Test assignment name  | student5  | I'm the student's first submission  |
 
     And I am on the "Test assignment name" Activity page logged in as admin
     And I should see "3" in the "Groups" "table_row"

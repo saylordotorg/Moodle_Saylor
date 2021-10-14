@@ -17,8 +17,8 @@ Feature: A user can control their default discussion subscription settings
       | student1 | C1 | student |
       | student2 | C1 | student |
     And the following "activities" exist:
-      | activity   | name                   | intro                  | course | type    | section |
-      | forum      | Test forum name        | Test forum description | C1     | general | 1       |
+      | activity   | name                   | intro                  | course | idnumber | type    | section |
+      | forum      | Test forum name        | Test forum description | C1     | forump1  | general | 1       |
     And I am on the "Test forum name" "forum activity editing" page logged in as admin
     And I set the following fields to these values:
       | Subscription mode | Optional subscription |
