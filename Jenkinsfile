@@ -35,7 +35,7 @@ def plugins = [
     [
         "name" : 'format_topcoll',
         "url" : 'https://github.com/gjb2048/moodle-format_topcoll.git',
-        "branch" : 'MOODLE_310',
+        "branch" : 'master',
         "dest" : 'course/format/topcoll'
     ],
     [
@@ -71,7 +71,7 @@ def plugins = [
     [
         "name" : 'mod_accredible',
         "url" : 'https://github.com/accredible/moodle-mod_accredible.git',
-        "branch" : 'master',
+        "branch" : 'v1.7.4',
         "dest" : 'mod/accredible'
     ],
     [
