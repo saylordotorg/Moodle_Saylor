@@ -332,6 +332,8 @@ def StashPlugins(plugins) {
                 def failmessage = "Unable to retrieve plugin ${plugins[x].get('name')}: ${err}"
                 NotifyOnFail(failmessage)
             }
+            sh "rm -rf .git"
+            sh "rm -rf .github"
             echo("Stashing: ${plugins[x].get("name")}")
             stash([name: (plugins[x].get("name"))])
         }
