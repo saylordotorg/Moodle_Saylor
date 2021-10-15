@@ -397,6 +397,12 @@ def plugins = [
       "url" : 'https://github.com/brandaorodrigo/moodle-format_buttons.git',
       "branch" : 'master',
       "dest" : 'course/format/buttons'
+    ],
+    [
+      "name" : 'availability_role',
+      "url" : 'https://github.com/moodleuulm/moodle-availability_role.git',
+      "branch" : 'master',
+      "dest" : 'availability/condition/role'
     ]
 ]
 
@@ -423,7 +429,7 @@ def StashPlugins(plugins) {
             deleteDir()
             try {
                 //git([url: (plugins[x].get("url")), branch: (plugins[x].get("branch"))])
-                checkout([$class: 'GitSCM', 
+                checkout([$class: 'GitSCM',
                     branches: [[name: plugins[x].get("branch")]],
                     userRemoteConfigs: [[url: plugins[x].get("url")]],
                     doGenerateSubmoduleConfigurations: false,
@@ -439,7 +445,7 @@ def StashPlugins(plugins) {
                                 reference: '',
                                 trackingSubmodules: false
                                 ]
-                                ], 
+                                ],
                     submoduleCfg: []
                 ])
             }
