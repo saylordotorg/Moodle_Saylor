@@ -403,11 +403,7 @@ def plugins = [
       "url" : 'https://github.com/learningworks/moodle-block_advnotifications.git',
       "branch" : 'master',
       "dest" : 'blocks/advnotifications'
-<<<<<<< HEAD
     ],
-=======
-    ]
->>>>>>> 4047e0f2cffd7a1e4638309062d29640b77d5266
     [
       "name" : 'availability_role',
       "url" : 'https://github.com/moodleuulm/moodle-availability_role.git',
