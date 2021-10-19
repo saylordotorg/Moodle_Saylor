@@ -399,6 +399,12 @@ def plugins = [
       "dest" : 'course/format/buttons'
     ],
     [
+      "name" : 'block_advnotifications',
+      "url" : 'https://github.com/learningworks/moodle-block_advnotifications.git',
+      "branch" : 'master',
+      "dest" : 'blocks/advnotifications'
+    ],
+    [
       "name" : 'availability_role',
       "url" : 'https://github.com/moodleuulm/moodle-availability_role.git',
       "branch" : 'master',
