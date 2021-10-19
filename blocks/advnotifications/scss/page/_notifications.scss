@@ -1,0 +1,167 @@
+// Managing the notifications.
+body {
+    #advnotifications_table_wrapper,
+    #advnotifications_restore_table_wrapper {
+        td {
+            > form {
+                display: inline;
+
+                button {
+                    border: none;
+                    background: none;
+                    transform: scale(1.1);
+                    transition: 100ms;
+
+                    &[class*="restore"],
+                    &[class*="edit"] {
+                        color: color(green--dark); /* stylelint-disable-line csstree/validator */
+                    }
+
+                    &[class*="delete"] {
+                        color: color(red--dark); /* stylelint-disable-line csstree/validator */
+                    }
+
+                    &:hover,
+                    &:focus {
+                        outline: none;
+                        transform: scale(1.25);
+                        transition: 100ms;
+                    }
+                }
+            }
+        }
+    }
+
+
+    #add_notification_wrapper_id {
+        margin-top: 1.5em;
+        .alert.preview-alert {
+            position: relative;
+            padding-right: 14px;
+            &.aicon {
+                padding-left: 3em;
+            }
+            &.dismissible {
+                padding-right: 2em;
+            }
+
+            > * {
+                display: inline;
+            }
+            > .preview-aicon {
+                display: block;
+                img {
+                    height: 1.5em;
+                    position: absolute;
+                    top: calc(50% - 0.75em);
+                    margin-left: -2em;
+                    opacity: 0.5;
+                }
+            }
+            > .preview-alert-dismissible {
+                position: absolute;
+                font-size: 1em;
+                line-height: 1em;
+                top: calc(50% - 0.5em);
+                right: 1em;
+
+                > * {
+                    cursor: pointer;
+                }
+            }
+        }
+        .add_notification_form_wrapper {
+            #add_notification_form {
+                .row {
+                    margin-left: 0;
+                    margin-right: 0;
+                }
+
+                .text-muted {
+                    width: 100%;
+                }
+
+                #add_notification_title {
+                    margin-top: 1.5em;
+                }
+                #add_notification_message {
+                    width: 100%;
+                    margin-bottom: 1.5em;
+                    resize: both;
+                    min-width: 50px;
+                    min-height: 1.5em;
+                }
+                .requiredfield {
+                    background-color: color(required_background); /* stylelint-disable-line csstree/validator */
+                    border: 1px solid color(red); /* stylelint-disable-line csstree/validator */
+                }
+                strong.requiredfield {
+                    padding: 0.25em;
+                    border-color: transparent;
+                    border-radius: 5px;
+                    color: color(required); /* stylelint-disable-line csstree/validator */
+                }
+
+                strong.required {
+                    color: color(required); /* stylelint-disable-line csstree/validator */
+                    font-size: 1.25em;
+                    padding: 0 5px;
+                    vertical-align: top;
+                }
+
+                input[type="date"] {
+                    width: calc(100% / 12 * 7); // Fix Bootstrap.
+                }
+
+                .btn {
+                    margin-top: 0.5em;
+                    margin-bottom: 0;
+                }
+
+                #add_notification_status {
+                    display: none;
+                    position: relative;
+                    margin-top: 10px;
+                    .signal {
+                        border: 5px solid #333;
+                        border-radius: 30px;
+                        height: 30px;
+                        left: 10px;
+                        margin: -15px 0 0 -15px;
+                        opacity: 0;
+                        position: absolute;
+                        top: 15px;
+                        width: 30px;
+                        animation: pulsate 1s ease-out;
+                        animation-iteration-count: infinite;
+                        animation-direction: reverse;
+                    }
+                    .saving {
+                        padding-top: 5px;
+                        margin-left: 40px;
+                    }
+                    .done {
+                        display: none;
+                        padding-top: 5px;
+                        margin-left: 40px;
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Animations.
+@keyframes pulsate {
+    0% {
+        transform: scale(.1);
+        opacity: 0.0;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1.2);
+        opacity: 0;
+    }
+}
