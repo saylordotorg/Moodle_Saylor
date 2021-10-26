@@ -415,6 +415,12 @@ def plugins = [
       "url" : 'https://github.com/catalyst/moodle-tool_trigger.git',
       "branch" : 'master',
       "dest" : 'admin/tool/trigger'
+    ],
+    [
+      "name" : 'mod_vpl',
+      "url" : 'https://github.com/jcrodriguez-dis/moodle-mod_vpl.git',
+      "branch" : 'master',
+      "dest" : 'mod/vpl'
     ]
 ]
 
