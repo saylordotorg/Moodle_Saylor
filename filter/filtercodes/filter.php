@@ -496,14 +496,17 @@ class filter_filtercodes extends moodle_text_filter {
             }
             $menu .= '-{getstring}phpinfo{/getstring}|/admin/phpinfo.php' . PHP_EOL;
             $menu .= '-###' . PHP_EOL;
-            $menu .= '-{getstring:filter_filtercodes}pagebuilder{/getstring}|{getstring:filtercodes}pagebuilderlink{/getstring}"'
-                    . ' target="popup" onclick="window.open(\'{getstring:filtercodes}pagebuilderlink{/getstring}\''
+            $menu .= '-{getstring:filter_filtercodes}pagebuilder{/getstring}|'
+                    . '{getstring:filter_filtercodes}pagebuilderlink{/getstring}"'
+                    . ' target="popup" onclick="window.open(\'{getstring:filter_filtercodes}pagebuilderlink{/getstring}\''
                     . ',\'popup\',\'width=1340,height=700\'); return false;' . PHP_EOL;
-            $menu .= '-{getstring:filter_filtercodes}photoeditor{/getstring}|{getstring:filtercodes}photoeditorlink{/getstring}"'
-                    . ' target="popup" onclick="window.open(\'{getstring:filtercodes}photoeditorlink{/getstring}\''
+            $menu .= '-{getstring:filter_filtercodes}photoeditor{/getstring}|'
+                    . '{getstring:filter_filtercodes}photoeditorlink{/getstring}"'
+                    . ' target="popup" onclick="window.open(\'{getstring:filter_filtercodes}photoeditorlink{/getstring}\''
                     . ',\'popup\',\'width=1340,height=700\'); return false;' . PHP_EOL;
-            $menu .= '-{getstring:filter_filtercodes}screenrec{/getstring}|{getstring:filtercodes}screenreclink{/getstring}"'
-                    . ' target="popup" onclick="window.open(\'{getstring:filtercodes}screenreclink{/getstring}\''
+            $menu .= '-{getstring:filter_filtercodes}screenrec{/getstring}|'
+                    . '{getstring:filter_filtercodes}screenreclink{/getstring}"'
+                    . ' target="popup" onclick="window.open(\'{getstring:filter_filtercodes}screenreclink{/getstring}\''
                     . ',\'popup\',\'width=1340,height=700\'); return false;' . PHP_EOL;
             $menu .= '-###' . PHP_EOL;
             $menu .= '-MoodleDev docs|https://moodle.org/development|Moodle.org ({getstring}english{/getstring})' . PHP_EOL;
@@ -515,7 +518,7 @@ class filter_filtercodes extends moodle_text_filter {
             $menu .= '-###' . PHP_EOL;
             $menu .= '-DevTuts|https://www.youtube.com/watch?v=UY_pcs4HdDM|{getstring}english{/getstring}' . PHP_EOL;
             $menu .= '-Moodle Development School|https://moodledev.moodle.school/|{getstring}english{/getstring}' . PHP_EOL;
-            $menu .= '-Learn Moodle|https://learn.moodle.org/|{getstring}english{/getstring}' . PHP_EOL;
+            $menu .= '-Moodle Academy|https://moodle.academy/|{getstring}english{/getstring}' . PHP_EOL;
             $replace['/\{menudev\}/i'] = $menu;
         }
 
@@ -1376,9 +1379,9 @@ class filter_filtercodes extends moodle_text_filter {
                 }
                 $replace['/\{chart radial ([0-9]+)\}/i'] =  $OUTPUT->render_chart($chart, false);
             }
-            // Tag: {chart progress} - Display a horizontal progres bar.
-            if (stripos($text, '{chart progress ') !== false) {
-                $replace['/\{chart progress ([0-9]+)\}/i'] = '
+            // Tag: {chart progressbar} - Display a horizontal progres bar.
+            if (stripos($text, '{chart progressbar ') !== false) {
+                $replace['/\{chart progressbar ([0-9]+)\}/i'] = '
                 <div class="progress">
                     <div class="fc-progress progress-bar bar" role="progressbar" aria-valuenow="' . $value
                         . '" style="width: ' . $value . '%" aria-valuemin="0" aria-valuemax="100">

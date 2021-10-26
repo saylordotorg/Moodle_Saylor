@@ -42,6 +42,8 @@
 defined('MOODLE_INTERNAL') || die();
 define('PRECHECK', true);
 
+use qtype_coderunner\constants;
+
 require_once($CFG->dirroot . '/question/behaviour/adaptive/behaviour.php');
 
 class qbehaviour_adaptive_adapted_for_coderunner extends qbehaviour_adaptive {
@@ -50,6 +52,10 @@ class qbehaviour_adaptive_adapted_for_coderunner extends qbehaviour_adaptive {
         parent::__construct($qa, $preferredbehaviour);
         $this->penaltiesenabled = $preferredbehaviour !== 'adaptivenopenalty';
         $this->preferredbehaviour = $preferredbehaviour;
+    }
+
+    public function can_finish_during_attempt() {
+        return $this->question->giveupallowed != constants::GIVEUP_NEVER;
     }
 
     public function is_compatible_question(question_definition $question) {
@@ -62,6 +68,9 @@ class qbehaviour_adaptive_adapted_for_coderunner extends qbehaviour_adaptive {
         $vars = parent::get_expected_data();
         if (!$this->qa->get_state()->is_finished() && !empty($this->question->precheck)) {
             $vars['precheck'] = PARAM_BOOL;
+        }
+        if ($this->is_give_up_avaiable_now()) {
+            $vars['finish'] = PARAM_BOOL;
         }
         return $vars;
     }
@@ -213,6 +222,30 @@ class qbehaviour_adaptive_adapted_for_coderunner extends qbehaviour_adaptive {
         }
     }
 
+    /**
+     * In the current state of the question attempt, should the 'Give up' button be shown now?
+     *
+     * @return bool true if it should.
+     */
+    public function is_give_up_avaiable_now(): bool {
+        if ($this->qa->get_state()->is_finished()) {
+            return false;
+        }
+        return $this->question->giveupallowed == constants::GIVEUP_ALWAYS ||
+                ($this->question->giveupallowed == constants::GIVEUP_AFTER_MAX_MARKS &&
+                        !$this->is_improvement_possible());
+    }
+
+    /**
+     * Work out if it is possible for the student to make any further improvement in their score.
+     *
+     * @param question_attempt $qa the current attempt.
+     * @return bool true if it is.
+     */
+    public function is_improvement_possible(): bool {
+        $gradedstep = $this->get_graded_step();
+        return !$gradedstep || $this->is_state_improvable($gradedstep->get_state());
+    }
 
     // Override usual adaptive mark details to handle penalty regime.
     // This is messy. Is there a better way?

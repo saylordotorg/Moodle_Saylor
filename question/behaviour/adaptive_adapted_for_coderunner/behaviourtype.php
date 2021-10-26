@@ -36,4 +36,8 @@ class qbehaviour_adaptive_adapted_for_coderunner_type extends qbehaviour_adaptiv
     public function is_archetypal() {
         return false;
     }
+
+    public function can_questions_finish_during_the_attempt() {
+        return true;
+    }
 }

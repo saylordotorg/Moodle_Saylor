@@ -23,6 +23,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$string['giveup'] = 'Stop and read final feedback';
 $string['notcomplete'] = 'Not complete';
 $string['pluginname'] = 'Adaptive adapted for coderunner';
 $string['precheck'] = 'Precheck';

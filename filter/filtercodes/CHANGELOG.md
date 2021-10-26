@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [2.2.5] 2021-10-02 (DEV)
+## [2.2.5] 2021-10-22 (DEV)
 ### Added
 - New {chart progressbar x} tag (ALPHA).
 - New {chart radial x} tag (ALPHA).
@@ -15,7 +15,12 @@ All notable changes to this project will be documented in this file.
 - New {hr} tag.
 - New {coursecardsbyenrol} tag.
 - New {userscountrycount} tag.
+- Added known limitation in README.md regarding Moodle's 'Download course content' feature.
 ### Updated
+- Replaced Learn Moodle link with Moodle Academy in menudev.
+- Page Builder link now works in menudev.
+- Photo Editor link now works in menudev.
+- Screen Recorder link now works in menudev.
 - Fixed undefined COMPLETION_ENABLED error on Dashboard.
 - Full name now supports RTL languages.
 - Refactored the {coursecards} code. No longer displays empty list.
