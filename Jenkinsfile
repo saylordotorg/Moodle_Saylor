@@ -421,6 +421,12 @@ def plugins = [
       "url" : 'https://github.com/jcrodriguez-dis/moodle-mod_vpl.git',
       "branch" : 'master',
       "dest" : 'mod/vpl'
+    ],
+    [
+      "name" : 'qtype_stack',
+      "url" : 'https://github.com/maths/moodle-qtype_stack.git',
+      "branch" : 'master',
+      "dest" : 'question/type/stack'
     ]
 ]
 
