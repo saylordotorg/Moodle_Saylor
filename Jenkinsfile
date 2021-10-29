@@ -427,6 +427,24 @@ def plugins = [
       "url" : 'https://github.com/maths/moodle-qtype_stack.git',
       "branch" : 'master',
       "dest" : 'question/type/stack'
+    ],
+    [
+      "name" : 'qbehaviour_dfcbmexplicitvaildate',
+      "url" : 'https://github.com/maths/moodle-qbehaviour_dfcbmexplicitvaildate.git',
+      "branch" : 'master',
+      "dest" : 'question/behaviour/dfcbmexplicitvaildate'
+    ],
+    [
+      "name" : 'qbehaviour_dfexplicitvaildate',
+      "url" : 'https://github.com/maths/moodle-qbehaviour_dfexplicitvaildate.git',
+      "branch" : 'master',
+      "dest" : 'question/behaviour/dfexplicitvaildate'
+    ],
+    [
+      "name" : 'qbehaviour_adaptivemultipart',
+      "url" : 'https://github.com/maths/moodle-qbehaviour_adaptivemultipart.git',
+      "branch" : 'master',
+      "dest" : 'question/behaviour/adaptivemultipart'
     ]
 ]
 
