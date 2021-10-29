@@ -47,7 +47,7 @@ use qtype_coderunner\constants;
 require_once($CFG->dirroot . '/question/behaviour/adaptive/behaviour.php');
 
 class qbehaviour_adaptive_adapted_for_coderunner extends qbehaviour_adaptive {
-    
+
     public function __construct(question_attempt $qa, $preferredbehaviour) {
         parent::__construct($qa, $preferredbehaviour);
         $this->penaltiesenabled = $preferredbehaviour !== 'adaptivenopenalty';
@@ -244,7 +244,13 @@ class qbehaviour_adaptive_adapted_for_coderunner extends qbehaviour_adaptive {
      */
     public function is_improvement_possible(): bool {
         $gradedstep = $this->get_graded_step();
-        return !$gradedstep || $this->is_state_improvable($gradedstep->get_state());
+        if (!$gradedstep) {
+            return true; // They have not submitted anything yet. Doing better is certainly possible!
+        }
+
+        $prevtries = $this->qa->get_last_behaviour_var('_try', 0);
+        $fract = $this->adjusted_fraction(1.0, $prevtries);
+        return $gradedstep->get_fraction() < $fract - qtype_coderunner_testing_outcome::TOLERANCE;
     }
 
     // Override usual adaptive mark details to handle penalty regime.

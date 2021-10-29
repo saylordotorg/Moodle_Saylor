@@ -269,19 +269,16 @@ class manager {
     public static function resolve_mfa_status($shouldreload = false) {
         global $SESSION;
 
-        $authurl = new \moodle_url('/admin/tool/mfa/auth.php');
-
-        if (empty($SESSION->wantsurl)) {
-            $wantsurl = '/';
-        } else {
-            $wantsurl = $SESSION->wantsurl;
-        }
-
         $state = self::get_status();
         if ($state == \tool_mfa\plugininfo\factor::STATE_PASS) {
             self::set_pass_state();
             // Check if user even had to reach auth page.
             if (isset($SESSION->tool_mfa_has_been_redirected)) {
+                if (empty($SESSION->wantsurl)) {
+                    $wantsurl = '/';
+                } else {
+                    $wantsurl = $SESSION->wantsurl;
+                }
                 unset($SESSION->wantsurl);
                 redirect(new \moodle_url($wantsurl));
             } else {
@@ -293,6 +290,7 @@ class manager {
         } else if ($shouldreload) {
             // Set a session variable to track whether user is where they want to be.
             $SESSION->tool_mfa_has_been_redirected = true;
+            $authurl = new \moodle_url('/admin/tool/mfa/auth.php');
             redirect($authurl);
         }
     }
@@ -544,9 +542,11 @@ class manager {
      * @return array
      */
     public static function get_no_redirect_urls() {
-        global $CFG;
         $factors = \tool_mfa\plugininfo\factor::get_factors();
-        $urls = [new \moodle_url('/login/logout.php')];
+        $urls = [
+            new \moodle_url('/login/logout.php'),
+            new \moodle_url('/admin/tool/mfa/guide.php')
+        ];
         foreach ($factors as $factor) {
             $urls = array_merge($urls, $factor->get_no_redirect_urls());
         }

@@ -65,28 +65,28 @@ if ($form->is_submitted()) {
         // Increment the fail counter for the factor,
         // And let the factor handle locking logic.
         $factor->increment_lock_counter();
-        \tool_mfa\manager::resolve_mfa_status(true);
-    }
-
-    // Set state from user actions.
-    if ($form->is_cancelled()) {
-        $factor->process_cancel_action();
-        // Move to next factor.
-        \tool_mfa\manager::resolve_mfa_status(true);
+        \tool_mfa\manager::resolve_mfa_status(false);
     } else {
-        if ($data = $form->get_data()) {
-            // Did user submit something that causes a fail state?
-            if ($factor->get_state() == \tool_mfa\plugininfo\factor::STATE_FAIL) {
-                \tool_mfa\manager::resolve_mfa_status(true);
-            }
-
-            $factor->set_state(\tool_mfa\plugininfo\factor::STATE_PASS);
+        // Set state from user actions.
+        if ($form->is_cancelled()) {
+            $factor->process_cancel_action();
             // Move to next factor.
             \tool_mfa\manager::resolve_mfa_status(true);
+        } else {
+            if ($data = $form->get_data()) {
+                // Did user submit something that causes a fail state?
+                if ($factor->get_state() == \tool_mfa\plugininfo\factor::STATE_FAIL) {
+                    \tool_mfa\manager::resolve_mfa_status(true);
+                }
+
+                $factor->set_state(\tool_mfa\plugininfo\factor::STATE_PASS);
+                // Move to next factor.
+                \tool_mfa\manager::resolve_mfa_status(true);
+            }
         }
     }
 }
-
+$renderer = $PAGE->get_renderer('tool_mfa');
 echo $OUTPUT->header();
 
 \tool_mfa\manager::display_debug_notification();
@@ -98,4 +98,6 @@ if ($remattempts < get_config('tool_mfa', 'lockout')) {
     echo $OUTPUT->notification(get_string('lockoutnotification', 'tool_mfa', $remattempts), 'notifyerror');
 }
 $form->display();
+
+echo $renderer->guide_link();
 echo $OUTPUT->footer();
