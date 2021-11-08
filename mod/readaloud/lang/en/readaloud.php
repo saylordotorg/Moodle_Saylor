@@ -44,6 +44,7 @@ $string['readaloud:manage'] = 'Can manage Read Aloud instances';
 $string['readaloud:preview'] = 'Can preview Read Aloud activities';
 $string['readaloud:submit'] = 'Can submit Read Aloud attempts';
 $string['readaloud:viewreports'] = 'Can view Read Aloud grades and reports';
+$string['readaloud:pushtoclones'] = 'Can push settings to clones';
 $string['privacy:metadata'] = 'The Poodll Read Aloud plugin does store personal data.';
 
 $string['id'] = 'ID';
@@ -84,6 +85,8 @@ $string['unlimited'] = 'unlimited';
 $string['gradeoptions'] = 'Grade Options';
 $string['gradeoptions_help'] =
         'When there are multiple attempts by a user on a reading, this setting determines which attempt to use when grading';
+$string['gradeoptions_details'] =
+    'NB This determines the gradebook entry. The ReadAloud grading page is not affected and will display the latest attempt.';
 $string['gradenone'] = 'No grade';
 $string['gradelowest'] = 'lowest scoring attempt';
 $string['gradehighest'] = 'highest scoring attempt';
@@ -91,6 +94,7 @@ $string['gradelatest'] = 'score of latest attempt';
 $string['gradeaverage'] = 'average score of all attempts';
 $string['defaultsettings'] = 'Default Settings';
 $string['exceededattempts'] = 'You have completed the maximum {$a} attempts.';
+$string['exceededallattempts'] = "You have used all of your attempts.";
 $string['readaloudtask'] = 'Read Aloud Task';
 $string['passagelabel'] = 'Reading Passage';
 $string['welcomelabel'] = 'Default instructions';
@@ -162,9 +166,9 @@ $string['targetwpm_details'] =
         'The default target WPM. A students grade is calculated for the gradebook using this value as the maximum score. If their WPM score is equal to, or greater than the target WPM, they will score 100%. The target WPM can also be set at the activity instance level. ';
 $string['targetwpm_help'] =
         'The target WPM score. A students grade is calculated for the gradebook using this value as the maximum score. If their WPM score is equal to, or greater than the target WPM, they will score 100%.';
-$string['passage_editor'] = 'Reading Passage';
-$string['passage_editor_help'] = "The passage that will be shown to the student to read. Numbers should be written as words, or a wildcard entry added to alternatives. eg 1986|* . Plain text with no formatting is safer.";
-$string['passage_help'] = "The passage that will be shown to the student to read. Numbers should be written as words, or a wildcard entry added to alternatives. eg 1986|* . Plain text with no formatting is safer.";
+$string['passage'] = 'Reading Passage';
+$string['passage_help'] = "The passage that will be shown to the student to read.";
+$string['passage_descr'] = "Enter the reading passage above. It should not be longer than 3000 characters if you wish audio to be generated for it.";
 $string['timelimit_help'] = "Sets a time limit on the reading. Reading time is used in the WPM calculation. Consider also checking - Allow Early Exit";
 $string['ttslanguage_help'] = "This value is used for speech recognition and text to speech.";
 $string['ttsvoice_help'] = "The machine voice used to read the passage aloud. You should select a voice that matches the language famly of the passage language. Use the model audio tab to record or upload an alternative model audio.";
@@ -299,7 +303,7 @@ $string['machinegrademachineonly'] = "Always use machine eval. grade";
 $string['gradesadmin'] = "Alternatives Admin";
 $string['viewgradesadmin'] = 'Grades Admin';
 $string['machineregradeall'] = 'Save and re-evaluate all attempts';
-$string['pushmachinegrades'] = 'Push machine evaluations to gradebook';
+$string['pushalltogradebook'] = 'Re-push evaluations to gradebook';
 $string['currenterrorestimate'] = 'Current error estimate: {$a}';
 $string['gradesadmintitle'] = 'Alternatives Administration';
 $string['gradesadmininstructions'] =
@@ -372,14 +376,15 @@ $string['startshadowreading'] = 'Shadow Practice';
 $string['landrreading'] = 'Practice';
 
 
-$string['transcriber'] = 'Transcriber';
-$string['transcriber_details'] = 'The transcription engine to use. AWS works best with ReadAloud.';
+$string['transcriber'] = 'Line Transcriber';
+$string['transcriber_details'] = 'The transcription engine to use for line by line reading.';
 $string['transcriber_none'] = 'No transcription';
-$string['transcriber_amazontranscribe'] = 'Regular Transcription(AWS): recommended';
-$string['transcriber_googlecloud'] = 'Quick Transcription(Google)(audio length < 60s only)';
+$string['transcriber_auto'] = 'Default (recommended)';
+$string['transcriber_poodll'] = 'Use Poodll STT';
+$string['transcriber_strict'] = 'Use Strict STT';
 
-$string['stricttranscribe'] = 'Strict Transcription';
-$string['stricttranscribemode_details'] = 'By default ReadAloud transcribes generously in English and German. Set to strict to get more speech mistakes for full passage readings in those languages.';
+$string['stricttranscribe'] = 'Passage Transcriber';
+$string['stricttranscribe_details'] = 'The transcriber to use for full passage readings.';
 
 $string['submitrawaudio'] = 'Submit uncompressed audio';
 $string['submitrawaudio_details'] = 'Submitting uncompressed audio may increase transcription accuracy, but at the expense of upload speed and reliability.';
@@ -445,7 +450,7 @@ $string['rec_upload']='Upload (for devs/admins)';
 $string['transcriber_warning']='You have selected instant transcription. Note that this will <strong>only work if passage language and region are correct</strong>.';
 
 $string['close']='Close';
-$string['modelaudiowarning']="<span style='color: red'>Model audio not marked up.</span>";
+$string['modelaudiowarning']="Model audio not marked up.";
 $string['modelaudiobreaksclear']=' Clear model audio markup';
 $string['savemodelaudiomarkup']=' Save model audio markup';
 $string['enablesetuptab']="Enable setup tab";

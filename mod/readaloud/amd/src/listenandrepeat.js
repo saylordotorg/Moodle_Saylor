@@ -29,7 +29,6 @@ define(['jquery', 'core/log', 'core/ajax', 'mod_readaloud/definitions', 'mod_rea
       self.ds_only = props.ds_only;
 
       //recorder stuff
-      var recid = 'readaloud_pushrecorder';
       var theCallback =function(message) {
           switch (message.type) {
               case 'recording':
@@ -50,19 +49,12 @@ define(['jquery', 'core/log', 'core/ajax', 'mod_readaloud/definitions', 'mod_rea
           }
       };
 
-      if(self.use_ttrecorder()) {
-            //init tt recorder
-            var opts = {};
-            opts.uniqueid = recid;
-            opts.ds_only = self.ds_only;
-            opts.callback = theCallback;
-            ttrecorder.clone().init(opts);
-      }else{
-            //init cloudpoodll push recorder
-            cloudpoodll.init(recid, theCallback);
-      }
-
-
+        //init tt recorder
+      var opts = {};
+      opts.uniqueid = 'readaloud_ttrecorder';
+      opts.ds_only = self.ds_only;
+      opts.callback = theCallback;
+      ttrecorder.clone().init(opts);
 
       self.prepare_controls();
       self.register_events();
@@ -85,6 +77,7 @@ define(['jquery', 'core/log', 'core/ajax', 'mod_readaloud/definitions', 'mod_rea
       self.controls.container = $('#' + def.landrcontainer);
       self.controls.hiddenplayer = $('#mod_readaloud_landr_hiddenplayer');
       self.controls.playbutton = $('#mod_readaloud_landr_modalplay');
+      self.controls.shadowplaybutton = $('#mod_readaloud_landr_modalshadowplay');
       self.controls.skipbutton = $('#mod_readaloud_landr_modalskip');
       self.controls.finishedbutton = $("#mod_readaloud_landr_modalfinished");
       self.audiourl = self.mak.fetch_audio_url();
@@ -261,25 +254,8 @@ define(['jquery', 'core/log', 'core/ajax', 'mod_readaloud/definitions', 'mod_rea
       },
 
       use_ttrecorder: function(){
-          //currently we always use TT recorder.
+          // we always use TT recorder.
           return true;
-       /*
-          var ret =false;
-          switch(this.region){
-              case 'bahrain':
-              case 'capetown':
-              case 'tokyo':
-              case 'useast1':
-              case 'dublin':
-              case 'sydney':
-                  //ret = this.language.substr(0,2)==='en';
-                  ret =true;
-                  break;
-              default:
-                  ret = this.chrome_user();
-          }
-          return ret;
-          */
       },
 
 

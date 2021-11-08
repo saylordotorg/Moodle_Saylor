@@ -124,17 +124,17 @@ class report_renderer extends \plugin_renderer_base {
 
         //set up our table and head attributes
         $tableattributes = array('class' => 'generaltable ' . constants::M_CLASS . '_table');
-        $headrow_attributes = array('class' => constants::M_CLASS . '_headrow');
 
         $htmltable = new \html_table();
+        $tableid = \html_writer::random_id(constants::M_COMPONENT);
+        $htmltable->id = $tableid;
         $htmltable->attributes = $tableattributes;
 
-        $htr = new \html_table_row();
-        $htr->attributes = $headrow_attributes;
+        $headcells=[];
         foreach ($head as $headcell) {
-            $htr->cells[] = new \html_table_cell($headcell);
+            $headcells[] = new \html_table_cell($headcell);
         }
-        $htmltable->data[] = $htr;
+        $htmltable->head = $head;
 
         foreach ($rows as $row) {
             $htr = new \html_table_row();
@@ -150,6 +150,17 @@ class report_renderer extends \plugin_renderer_base {
         }
         $html = $this->output->heading($sectiontitle, 4);
         $html .= \html_writer::table($htmltable);
+
+        //if datatables set up datatables
+        if(constants::M_USE_DATATABLES) {
+            $tableprops = [];
+            $tableprops['paging']=true;
+            $tableprops['pageLength']=10;
+            $opts = Array();
+            $opts['tableid'] = $tableid;
+            $opts['tableprops'] = $tableprops;
+            $this->page->requires->js_call_amd(constants::M_COMPONENT . "/datatables", 'init', array($opts));
+        }
         return $html;
 
     }

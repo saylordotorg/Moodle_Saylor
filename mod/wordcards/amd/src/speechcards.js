@@ -207,16 +207,13 @@ define([
 
       //init the recorder
         var recid= 'wordcards-speechcards_pushrecorder';
-        if(this.use_ttrecorder()) {
-            //init tt recorder
-            var opts = {};
-            opts.uniqueid = recid;
-            opts.callback = theCallback;
-            ttrecorder.clone().init(opts);
-        }else{
-            //init cloudpoodll push recorder
-            cloudpoodll.init(recid, theCallback);
-        }
+        //init tt recorder
+        var opts = {};
+        opts.uniqueid = recid;
+        opts.ds_only = that.props.ds_only;
+        opts.callback = theCallback;
+        ttrecorder.clone().init(opts);
+
 
     },
 
@@ -512,26 +509,7 @@ define([
           }else{
               return false;
           }
-      },
-
-      use_ttrecorder: function(){
-          var ret =false;
-
-
-          //check if language and region are ok
-          switch(this.region){
-              case 'tokyo':
-              case 'useast1':
-              case 'dublin':
-              case 'sydney':
-                  //ret = this.language.substr(0,2)==='en';
-                  ret =true;
-                  break;
-              default:
-                  ret = this.chrome_user();
-          }
-          return ret;
-      },
+      }
 
   };
 

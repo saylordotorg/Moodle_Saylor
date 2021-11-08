@@ -156,11 +156,10 @@ if($attempts) {
 }
 
 //From here we actually display the page.
-
 //if we are teacher we see tabs. If student we just see the activity
 echo $renderer->header($moduleinstance, $cm, $mode, null, get_string('view', constants::M_COMPONENT));
 
-
+//if we have no content, and its setup tab, we send to setup tab
 if($config->enablesetuptab && empty($moduleinstance->passage)) {
     if (has_capability('mod/readaloud:manage', $modulecontext)) {
         echo $renderer->show_no_content($cm,true);
@@ -174,129 +173,16 @@ if($config->enablesetuptab && empty($moduleinstance->passage)) {
 //If we are reviewing attempts we do that here and return.
 //If we are going to the dashboard we output that below
 if ($attempts && $reviewattempts) {
-
-    //show an attempt summary if we have more than one attempt
-    if(count($attempts)>1) {
-        $showgradesinchart=true;
-        switch ($moduleinstance->humanpostattempt) {
-            case constants::POSTATTEMPT_NONE:
-                //no progress charts if not showing errors
-                break;
-
-            case constants::POSTATTEMPT_EVALERRORSNOGRADE:
-                $showgradesinchart=false;
-            case constants::POSTATTEMPT_EVAL:
-            case constants::POSTATTEMPT_EVALERRORS:
-                $attemptsummary = utils::fetch_attempt_summary($moduleinstance);
-                echo $renderer->show_attempt_summary($attemptsummary,$showgradesinchart);
-                $chartdata = utils::fetch_attempt_chartdata($moduleinstance);
-                echo $renderer->show_progress_chart($chartdata,$showgradesinchart);
-        }
-    }
-
-    //show feedback summary
-    echo $renderer->show_feedback_postattempt($moduleinstance);
-
-    //if we have token problems show them here
-    if(!empty($problembox)) {
-        echo $problembox;
-    }
-
-    if ($have_humaneval || $have_aieval) {
-        //we useed to distingush between humanpostattempt and machinepostattempt but we simplified it,
-        // /and just use the human value for all
-        switch ($moduleinstance->humanpostattempt) {
-            case constants::POSTATTEMPT_NONE:
-                //we need more control over passage display than a word dump allows so we user gradenow renderer
-                //echo $renderer->show_passage_postattempt($moduleinstance,$collapsespaces);
-                $extraclasses = 'readmode';
-                if($collapsespaces){
-                    $extraclasses = ' collapsespaces';
-                }
-                echo $passagerenderer->render_passage($moduleinstance->passagesegments,$moduleinstance->ttslanguage,constants::M_PASSAGE_CONTAINER, $extraclasses);
-                echo $renderer->fetch_clicktohear_amd($moduleinstance,$token);
-                echo $renderer->render_hiddenaudioplayer();
-                break;
-            case constants::POSTATTEMPT_EVAL:
-                echo $renderer->show_evaluated_message();
-                if ($have_humaneval) {
-                    $force_aidata = false;
-                } else {
-                    $force_aidata = true;
-                }
-                $passagehelper = new \mod_readaloud\passagehelper($latestattempt->id, $modulecontext->id);
-                $reviewmode = constants::REVIEWMODE_SCORESONLY;
-
-                $readonly = true;
-                echo $passagehelper->prepare_javascript($reviewmode, $force_aidata, $readonly);
-                echo $renderer->fetch_clicktohear_amd($moduleinstance,$token);
-                echo $renderer->render_hiddenaudioplayer();
-                echo $passagerenderer->render_userreview($passagehelper,$moduleinstance->ttslanguage,$collapsespaces);
-
-                break;
-
-            case constants::POSTATTEMPT_EVALERRORS:
-                echo $renderer->show_evaluated_message();
-                if ($have_humaneval) {
-                    $reviewmode = constants::REVIEWMODE_HUMAN;
-                    $force_aidata = false;
-                } else {
-                    $reviewmode = constants::REVIEWMODE_MACHINE;
-                    $force_aidata = true;
-                }
-                $passagehelper = new \mod_readaloud\passagehelper($latestattempt->id, $modulecontext->id);
-                $readonly = true;
-                echo $passagehelper->prepare_javascript($reviewmode, $force_aidata, $readonly);
-                echo $renderer->fetch_clicktohear_amd($moduleinstance,$token);
-                echo $renderer->render_hiddenaudioplayer();
-                echo $passagerenderer->render_userreview($passagehelper,$moduleinstance->ttslanguage,$collapsespaces);
-                break;
-
-            case constants::POSTATTEMPT_EVALERRORSNOGRADE:
-                echo $renderer->show_evaluated_message();
-                if ($have_humaneval) {
-                    $reviewmode = constants::REVIEWMODE_HUMAN;
-                    $force_aidata = false;
-                } else {
-                    $reviewmode = constants::REVIEWMODE_MACHINE;
-                    $force_aidata = true;
-                }
-                $passagehelper = new \mod_readaloud\passagehelper($latestattempt->id, $modulecontext->id);
-                $readonly = true;
-                echo $passagehelper->prepare_javascript($reviewmode, $force_aidata, $readonly);
-                echo $renderer->fetch_clicktohear_amd($moduleinstance,$token);
-                echo $renderer->render_hiddenaudioplayer();
-                $nograde=true;
-                echo $passagerenderer->render_userreview($passagehelper,$moduleinstance->ttslanguage,$collapsespaces,$nograde);
-                break;
-        }
-    } else {
-        echo $renderer->show_ungradedyet();
-        echo $renderer->fetch_clicktohear_amd($moduleinstance,$token);
-        echo $renderer->render_hiddenaudioplayer();
-        //we need more control over passage display than a word dump allows so we user gradenow renderer
-        //echo $renderer->show_passage_postattempt($moduleinstance,$collapsespaces);
-        $extraclasses = 'readmode';
-        if($collapsespaces){
-            $extraclasses = ' collapsespaces';
-        }
-        echo $passagerenderer->render_passage($moduleinstance->passagesegments,$moduleinstance->ttslanguage,constants::M_PASSAGE_CONTAINER, $extraclasses);
-
-    }
-
-    //TO DO move logic to menu dashboard
-    //show  button or a label depending on of can retake
-    /*
-    if ($canattempt) {
-        echo $renderer->reattemptbutton($moduleinstance);
-    } else {
-        echo $renderer->exceededattempts($moduleinstance);
-    }
-    */
-    echo $renderer->jump_tomenubutton($moduleinstance);
-    echo $renderer->footer();
+    $attemptreview_html = $renderer->show_attempt_for_review($moduleinstance, $attempts,
+            $have_humaneval, $have_aieval, $collapsespaces,$latestattempt, $token, $modulecontext, $passagerenderer);
+    echo $attemptreview_html;
     return;
 }
+
+
+//show all the main parts. Many will be hidden and displayed by JS
+// so here we just put them on the page in the correct sequenc
+
 
 //show activity description
 echo $renderer->show_intro($moduleinstance, $cm);
@@ -307,14 +193,14 @@ if($attempts) {
     echo $renderer->show_smallreport($moduleinstance, $latestattempt, $latest_aigrade);
 }
 
-//show all the main parts. Many will be hidden and displayed by JS
+//welcome message
 $welcomemessage = get_string('welcomemenu',constants::M_COMPONENT);
-
 if (!$canattempt) {
    $welcomemessage .= '<br>' . get_string("exceededattempts", constants::M_COMPONENT, $moduleinstance->maxattempts);
 }
-
 echo $renderer->show_welcome_menu($welcomemessage);
+
+//if we have a problem (usually with auth/token) we display and return
 if(!empty($problembox)){
     echo $problembox;
     // Finish the page
@@ -323,10 +209,12 @@ if(!empty($problembox)){
 }
 
 
+//activity instructions
 echo $renderer->show_instructions($moduleinstance->welcome);
 echo $renderer->show_previewinstructions(get_string('previewhelp',constants::M_COMPONENT));
 echo $renderer->show_landrinstructions(get_string('landrhelp',constants::M_COMPONENT));
 
+//feedback or errors
 echo $renderer->show_feedback($moduleinstance);
 echo $renderer->show_error($moduleinstance, $cm);
 

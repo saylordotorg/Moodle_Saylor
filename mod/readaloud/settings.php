@@ -83,7 +83,7 @@ if ($ADMIN->fulltree) {
             get_string('submitrawaudio', constants::M_COMPONENT), get_string('submitrawaudio_details', constants::M_COMPONENT), 0));
 
     $settings->add(new admin_setting_configcheckbox(constants::M_COMPONENT . '/stricttranscribe',
-            get_string('stricttranscribe', constants::M_COMPONENT), get_string('stricttranscribemode_details', constants::M_COMPONENT), 0));
+            get_string('stricttranscribe', constants::M_COMPONENT), get_string('stricttranscribe_details', constants::M_COMPONENT), 0));
 
     $settings->add(new admin_setting_configcheckbox(constants::M_COMPONENT . '/enablepreview',
             get_string('enablepreview', constants::M_COMPONENT),
@@ -166,7 +166,7 @@ if ($ADMIN->fulltree) {
     $name = 'transcriber';
     $label = get_string($name, constants::M_COMPONENT);
     $details = get_string($name . '_details', constants::M_COMPONENT);
-    $default = constants::TRANSCRIBER_AMAZONTRANSCRIBE;
+    $default = constants::TRANSCRIBER_AUTO;
     $options = utils::fetch_options_transcribers();
     $settings->add(new admin_setting_configselect(constants::M_COMPONENT . "/$name",
             $label, $details, $default, $options));

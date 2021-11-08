@@ -68,6 +68,12 @@ $config = get_config(constants::M_COMPONENT);
 if ($paging->perpage == -1) {
     $paging->perpage = $config->itemsperpage;
 }
+if(constants::M_USE_DATATABLES){
+    $paging=false;
+}elseif($paging->perpage==-1){
+    $paging->perpage = $config->attemptsperpage;
+}
+
 
 // Trigger module viewed event.
 $event = \mod_readaloud\event\course_module_viewed::create(array(
@@ -192,14 +198,26 @@ switch ($format) {
 
         $reportrows = $report->fetch_formatted_rows(true, $paging);
         $allrowscount = $report->fetch_all_rows_count();
-        $pagingbar = $reportrenderer->show_paging_bar($allrowscount, $paging, $PAGE->url);
-        echo $renderer->header($moduleinstance, $cm, $mode, null, get_string('reports', constants::M_COMPONENT));
-        echo $extraheader;
-        echo $groupmenu;
-        echo $pagingbar;
-        echo $reportrenderer->render_section_html($reportheading, $report->fetch_name(), $report->fetch_head(), $reportrows,
+        if(constants::M_USE_DATATABLES){
+
+            //css must be required before header sent out
+            $PAGE->requires->css( new \moodle_url('https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css'));
+            echo $renderer->header($moduleinstance, $cm, $mode, null, get_string('reports', constants::M_COMPONENT));
+            echo $extraheader;
+            echo $groupmenu;
+            echo $reportrenderer->render_section_html($reportheading, $report->fetch_name(), $report->fetch_head(), $reportrows,
                 $report->fetch_fields());
-        echo $pagingbar;
+
+        }else {
+            $pagingbar = $reportrenderer->show_paging_bar($allrowscount, $paging, $PAGE->url);
+            echo $renderer->header($moduleinstance, $cm, $mode, null, get_string('reports', constants::M_COMPONENT));
+            echo $extraheader;
+            echo $groupmenu;
+            echo $pagingbar;
+            echo $reportrenderer->render_section_html($reportheading, $report->fetch_name(), $report->fetch_head(), $reportrows,
+                $report->fetch_fields());
+            echo $pagingbar;
+        }
         echo $reportrenderer->show_reports_footer($moduleinstance, $cm, $formdata, $showreport);
         echo $renderer->footer();
 }

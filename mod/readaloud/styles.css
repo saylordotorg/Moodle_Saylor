@@ -671,3 +671,7 @@ div.mod_readaloud_attemptsummarytable {
 .mod_readaloud_manybuttonsmenu_item {
   max-width: 800px;
 }
+.mod_readaloud_menubutton_warning {
+  color: red;
+  display: block;
+}

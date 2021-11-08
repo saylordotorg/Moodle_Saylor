@@ -198,10 +198,9 @@ class constants {
     const M_LANG_TRTR ='tr-TR';
 
     const TRANSCRIBER_NONE = 0;
-    const TRANSCRIBER_AMAZONTRANSCRIBE = 1;
-    const TRANSCRIBER_GOOGLECLOUDSPEECH = 2;
+    const TRANSCRIBER_AUTO = 1;
+    const TRANSCRIBER_POODLL = 2;
     const TRANSCRIBER_AMAZONSTREAMING =4;
-    const TRANSCRIBER_GOOGLECHROME = 3;
 
     const M_STARTPREVIEW= 'mod_readaloud_button_startpreview';
     const M_STARTLANDR= 'mod_readaloud_button_startlandr';
@@ -222,5 +221,7 @@ class constants {
     const M_PUSH_TIMELIMIT = 6;
     const M_PUSH_MODES = 7;
     const M_PUSH_GRADESETTINGS = 8;
+
+    const M_USE_DATATABLES=true;
   
 }

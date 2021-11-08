@@ -391,18 +391,30 @@ switch ($format) {
         $reportrows = $report->fetch_formatted_rows(true, $paging);
         $allrowscount = $report->fetch_all_rows_count();
 
-        $pagingbar = $reportrenderer->show_paging_bar($allrowscount, $paging, $PAGE->url);
-        $perpage_selector = $reportrenderer->show_perpage_selector($PAGE->url, $paging);
-
-        echo $renderer->header($moduleinstance, $cm, $mode, null, get_string('grading', constants::M_COMPONENT));
-        echo $renderer->render_hiddenaudioplayer();
-        echo $extraheader;
-        echo $groupmenu;
-        echo $pagingbar;
-        echo $perpage_selector;
-        echo $reportrenderer->render_section_html($reportheading, $report->fetch_name(), $report->fetch_head(), $reportrows,
+        if(constants::M_USE_DATATABLES) {
+            //css must be required before header sent out
+            $PAGE->requires->css( new \moodle_url('https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css'));
+            echo $renderer->header($moduleinstance, $cm, $mode, null, get_string('grading', constants::M_COMPONENT));
+            echo $renderer->render_hiddenaudioplayer();
+            echo $extraheader;
+            echo $groupmenu;
+            echo $reportrenderer->render_section_html($reportheading, $report->fetch_name(), $report->fetch_head(), $reportrows,
                 $report->fetch_fields());
-        echo $pagingbar;
+        }else{
+            $pagingbar = $reportrenderer->show_paging_bar($allrowscount, $paging, $PAGE->url);
+            $perpage_selector = $reportrenderer->show_perpage_selector($PAGE->url, $paging);
+
+            echo $renderer->header($moduleinstance, $cm, $mode, null, get_string('grading', constants::M_COMPONENT));
+            echo $renderer->render_hiddenaudioplayer();
+            echo $extraheader;
+            echo $groupmenu;
+            echo $pagingbar;
+            echo $perpage_selector;
+            echo $reportrenderer->render_section_html($reportheading, $report->fetch_name(), $report->fetch_head(), $reportrows,
+                $report->fetch_fields());
+            echo $pagingbar;
+        }
+
         echo $reportrenderer->show_grading_footer($moduleinstance, $cm, $mode);
         echo $reportrenderer->show_export_buttons($cm, $formdata, $action);
         echo $renderer->footer();

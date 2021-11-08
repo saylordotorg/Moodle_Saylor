@@ -547,8 +547,6 @@ function xmldb_readaloud_upgrade($oldversion) {
 
         // Define field forframe to be added to readaloud
         $field= new xmldb_field('foriframe', XMLDB_TYPE_INTEGER, '2', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0);
-
-        // add richtextprompt field to minilesson table
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
@@ -559,7 +557,7 @@ function xmldb_readaloud_upgrade($oldversion) {
     if ($oldversion < 2021061100) {
         $table = new xmldb_table('readaloud_rsquestions');
 
-        // Adding fields to table tool_dataprivacy_contextlist.
+        // Adding fields to table rsquestions
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
         $table->add_field('readaloudid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
         $table->add_field('name', XMLDB_TYPE_CHAR, '255', XMLDB_UNSIGNED, null, null);
@@ -583,7 +581,7 @@ function xmldb_readaloud_upgrade($oldversion) {
         $table->add_field('createdby', XMLDB_TYPE_INTEGER, '10', null, null, null);
         $table->add_field('modifiedby', XMLDB_TYPE_INTEGER, '10', null, null, null);
 
-        // Adding keys to table tool_dataprivacy_contextlist.
+        // Adding keys to table rsquestions
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
 
         // Conditionally launch create table for tool_dataprivacy_contextlist.
@@ -597,7 +595,6 @@ function xmldb_readaloud_upgrade($oldversion) {
     if ($oldversion < 2021090100) {
         $table = new xmldb_table(constants::M_TABLE);
 
-        // Define alternatives field to be added to minilesson
         $fields=[];
         $fields[] = new xmldb_field('phonetic', XMLDB_TYPE_TEXT, null, null, null, null);
 
@@ -629,18 +626,9 @@ function xmldb_readaloud_upgrade($oldversion) {
         //create a phonetic for each readaloud instance
         utils::update_all_phonetic_segments();
 
-        upgrade_mod_savepoint(true, 2021090300, 'readaloud');
-    }
-
-    // Add Master Instance option to readaloud table
-    if ($oldversion < 2021093000) {
         $table = new xmldb_table(constants::M_TABLE);
 
-
-        // Define field forframe to be added to readaloud
         $field= new xmldb_field('masterinstance', XMLDB_TYPE_INTEGER, '2', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0);
-
-        // add richtextprompt field to minilesson table
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }

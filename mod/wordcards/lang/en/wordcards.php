@@ -157,9 +157,8 @@ $string['nosubscriptions'] = "There is no current subscription for this site/plu
 
 $string['transcriber'] = 'Transcriber';
 $string['transcriber_details'] = 'The transcription engine to use';
-$string['transcriber_none'] = 'No transcription';
-$string['transcriber_amazontranscribe'] = 'Regular Transcription';
-$string['transcriber_googlecloud'] = 'Fast Transcription (< 60s only)';
+$string['transcriber_auto'] = 'Hybrid STT (Browser STT + Poodll STT))';
+$string['transcriber_poodll'] = 'Use Poodll STT';
 $string['enabletts_details'] = 'TTS is currently not implemented';
 $string['ttslanguage'] = 'Target Language';
 $string['ttsvoice'] = 'TTS Voice';
@@ -273,4 +272,9 @@ $string['showimagesonflipscreen']="Show images on flip cards";
 $string['showimagesonflipscreen_desc']="If the wordcards set has images, and this property is true, the image will be displayed under the word on the flip cards screen before a practice activity.";
 $string['frontfaceflip']="Front face on flip cards";
 $string['frontfaceflip_details']="Show the term or definition on the front face of the wordcards.";
+$string['pushalltogradebook']="Re-push grades to gradebook";
+$string['gradespushed']="Grades pushed to gradebook";
+$string['gradesadmin']="Grades Administration";
+
+
 

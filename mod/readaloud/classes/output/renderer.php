@@ -350,9 +350,9 @@ class renderer extends \plugin_renderer_base {
     /**
      *
      */
-    public function show_pushmachinegrades($moduleinstance) {
+    public function show_pushalltogradebook($moduleinstance) {
 
-        $sectiontitle = get_string("pushmachinegrades", constants::M_COMPONENT);
+        $sectiontitle = get_string("pushalltogradebook", constants::M_COMPONENT);
         $heading = $this->output->heading($sectiontitle, 4);
 
         if (utils::can_transcribe($moduleinstance) &&
@@ -363,8 +363,8 @@ class renderer extends \plugin_renderer_base {
             $options = array('disabled' => 'disabled');
         }
         $button = $this->output->single_button(new \moodle_url(constants::M_URL . '/gradesadmin.php',
-                array('n' => $moduleinstance->id, 'action' => 'pushmachinegrades')),
-                get_string('pushmachinegrades', constants::M_COMPONENT), 'post', $options);
+                array('n' => $moduleinstance->id, 'action' => 'pushalltogradebook')),
+                get_string('pushalltogradebook', constants::M_COMPONENT), 'post', $options);
 
         $ret = \html_writer::div($heading . $button, constants::M_GRADESADMIN_CONTAINER);
         return $ret;
@@ -475,21 +475,15 @@ class renderer extends \plugin_renderer_base {
         }
         $string_hints = base64_encode(json_encode($hints));
 
-        //the original poodll pushrecorder
-        $data=array( 'data-id' => 'readaloud_pushrecorder',
-                        'data-parent' => $CFG->wwwroot,
-                        'data-localloading' => 'auto',
-                        'data-localloader' => '/mod/readaloud/poodllloader.html',
-                        'data-media' => "audio",
+        //the recorder config
+        $data=array( 'data-id' => 'readaloud_ttrecorder',
                         'data-language' => $moduleinstance->ttslanguage,
                         'data-region' => $moduleinstance->region,
-                        'data-owner' => hash('md5',$USER->username),
-                        'data-hints' => $string_hints,
-                        'data-token' => $token);
+                        'waveheight' => 75,
+                        'maxtime' => 15000
+                );
 
-        //the TT recorder
-        $data['waveheight']= 75;
-        $data['maxtime']= 15000;
+
         //passagehash if not empty will be region|hash eg tokyo|2353531453415134545
         //but we only send the hash up so we strip the region
         $data['passagehash']="";
@@ -503,6 +497,7 @@ class renderer extends \plugin_renderer_base {
         //fetch lang services url
         $data['asrurl'] = utils::fetch_lang_server_url($moduleinstance->region,'transcribe');
 
+        //this will set some opts for the recorder, but others are set by fetch_activity_amd and it is applied in listen and repeat.js
         $content =  $this->render_from_template('mod_readaloud/listenandrepeat', $data);
         $containertag = 'landr_container';
         $amodalcontainer = $this->fetch_modalcontainer($title,$content,$containertag);
@@ -705,26 +700,20 @@ class renderer extends \plugin_renderer_base {
         $hints = new \stdClass();
         $hints->allowearlyexit = $moduleinstance->allowearlyexit;
 
-        //perhaps we want to force stereoaudio
-        if ($moduleinstance->transcriber == constants::TRANSCRIBER_GOOGLECLOUDSPEECH ||
-                $moduleinstance->submitrawaudio) {
-            $hints->encoder = 'stereoaudio';
-        }
-
 
         $can_transcribe = \mod_readaloud\utils::can_transcribe($moduleinstance);
 
         //We no longer want to use AWS streaming transcription.
         switch ($moduleinstance->transcriber){
             case constants::TRANSCRIBER_AMAZONSTREAMING :
-                $moduleinstance->transcriber = constants::TRANSCRIBER_AMAZONTRANSCRIBE;
+                $moduleinstance->transcriber = constants::TRANSCRIBER_AUTO;
                 //this flag tells AWS not to send to amazon transcribe
                // $transcribe = "0";
                // $hints->streamingtranscriber = 'aws';
                // $speechevents = '1';
                // break;
-            case constants::TRANSCRIBER_AMAZONTRANSCRIBE:
-            case constants::TRANSCRIBER_GOOGLECLOUDSPEECH:
+            case constants::TRANSCRIBER_AUTO:
+            case constants::TRANSCRIBER_POODLL:
             case constants::TRANSCRIBER_NONE:
             default:
                 $transcribe = $can_transcribe ? $moduleinstance->transcriber : "0";
@@ -819,7 +808,6 @@ class renderer extends \plugin_renderer_base {
         $recopts['smallreportcontainer'] = constants::M_SMALLREPORT_CONTAINER;
         $recopts['modelaudioplayer'] = constants::M_MODELAUDIO_PLAYER;
         $recopts['enablelandr'] = $moduleinstance->enablelandr ? true : false;
-        $recopts['ds_only'] = false; //if false, chrome will use its own speech rec. if true chrome wont be used (server may yet decide not to use DS)
         $recopts['enablepreview'] = $moduleinstance->enablepreview ? true : false;
         $recopts['enableshadow'] = $moduleinstance->enableshadow ? true : false;
         $recopts['allowearlyexit'] = $moduleinstance->allowearlyexit ? true : false;
@@ -839,12 +827,15 @@ class renderer extends \plugin_renderer_base {
         if($moduleinstance->phonetic && !empty($moduleinstance->phonetic)) {
             $recopts['phonetics'] = explode(' ',$moduleinstance->phonetic);
         }
-      
-        //streaming transcriber: we do not want to use it anymore.
-        if($moduleinstance->transcriber == constants::TRANSCRIBER_AMAZONSTREAMING){
-            $moduleinstance->transcriber=constants::TRANSCRIBER_AMAZONTRANSCRIBE;
-        }
+
         $recopts['transcriber']=$moduleinstance->transcriber;
+        //this will force browser recognition to use Poodll (not chrome or other browser speech)
+        if($recopts['transcriber']==constants::TRANSCRIBER_POODLL){
+            $recopts['ds_only'] = true;
+        }else {
+            $recopts['ds_only'] = false;
+        }
+
         $recopts['language']=$moduleinstance->ttslanguage;
         $recopts['region']= $moduleinstance->region;
         $recopts['token']=$token;
@@ -852,7 +843,6 @@ class renderer extends \plugin_renderer_base {
         $recopts['owner']=hash('md5',$USER->username);
         $recopts['appid']=constants::M_COMPONENT;
         $recopts['expiretime']=300;//max expire time is 300 seconds
-
 
         //we need an update control tp hold the recorded filename, and one for draft item id
         $ret_html = $ret_html . \html_writer::tag('input', '', array('id' => constants::M_UPDATE_CONTROL, 'type' => 'hidden'));
@@ -933,6 +923,141 @@ class renderer extends \plugin_renderer_base {
 
         return $ret;
 
+    }
+    
+    
+    /*
+     * Show attempt for review by student. called from view php
+     *  
+     * 
+     */
+    public function show_attempt_for_review($moduleinstance, $attempts, 
+            $have_humaneval, $have_aieval, $collapsespaces,$latestattempt, $token, $modulecontext,$passagerenderer){
+        
+        $ret = '';
+
+        //show an attempt summary if we have more than one attempt
+        if(count($attempts)>1) {
+            $showgradesinchart=true;
+            switch ($moduleinstance->humanpostattempt) {
+                case constants::POSTATTEMPT_NONE:
+                    //no progress charts if not showing errors
+                    break;
+
+                case constants::POSTATTEMPT_EVALERRORSNOGRADE:
+                    $showgradesinchart=false;
+                //no break here .. we want to flow on
+                case constants::POSTATTEMPT_EVAL:
+                case constants::POSTATTEMPT_EVALERRORS:
+                    $attemptsummary = utils::fetch_attempt_summary($moduleinstance);
+                    $ret .= $this->show_attempt_summary($attemptsummary,$showgradesinchart);
+                    $chartdata = utils::fetch_attempt_chartdata($moduleinstance);
+                    $ret .= $this->show_progress_chart($chartdata,$showgradesinchart);
+            }
+        }
+
+        //show feedback summary
+        $ret .= $this->show_feedback_postattempt($moduleinstance);
+
+        //if we have token problems show them here
+        if(!empty($problembox)) {
+            $ret .= $problembox;
+        }
+
+        if ($have_humaneval || $have_aieval) {
+            //we useed to distingush between humanpostattempt and machinepostattempt but we simplified it,
+            // /and just use the human value for all
+            switch ($moduleinstance->humanpostattempt) {
+                case constants::POSTATTEMPT_NONE:
+                    //we need more control over passage display than a word dump allows so we user gradenow renderer
+                    //$ret .= $this->show_passage_postattempt($moduleinstance,$collapsespaces);
+                    $extraclasses = 'readmode';
+                    if($collapsespaces){
+                        $extraclasses = ' collapsespaces';
+                    }
+                    $ret .= $passagerenderer->render_passage($moduleinstance->passagesegments,$moduleinstance->ttslanguage,constants::M_PASSAGE_CONTAINER, $extraclasses);
+                    $ret .= $this->fetch_clicktohear_amd($moduleinstance,$token);
+                    $ret .= $this->render_hiddenaudioplayer();
+                    break;
+                case constants::POSTATTEMPT_EVAL:
+                    $ret .= $this->show_evaluated_message();
+                    if ($have_humaneval) {
+                        $force_aidata = false;
+                    } else {
+                        $force_aidata = true;
+                    }
+                    $passagehelper = new \mod_readaloud\passagehelper($latestattempt->id, $modulecontext->id);
+                    $reviewmode = constants::REVIEWMODE_SCORESONLY;
+
+                    $readonly = true;
+                    $ret .= $passagehelper->prepare_javascript($reviewmode, $force_aidata, $readonly);
+                    $ret .= $this->fetch_clicktohear_amd($moduleinstance,$token);
+                    $ret .= $this->render_hiddenaudioplayer();
+                    $ret .= $passagerenderer->render_userreview($passagehelper,$moduleinstance->ttslanguage,$collapsespaces);
+
+                    break;
+
+                case constants::POSTATTEMPT_EVALERRORS:
+                    $ret .= $this->show_evaluated_message();
+                    if ($have_humaneval) {
+                        $reviewmode = constants::REVIEWMODE_HUMAN;
+                        $force_aidata = false;
+                    } else {
+                        $reviewmode = constants::REVIEWMODE_MACHINE;
+                        $force_aidata = true;
+                    }
+                    $passagehelper = new \mod_readaloud\passagehelper($latestattempt->id, $modulecontext->id);
+                    $readonly = true;
+                    $ret .= $passagehelper->prepare_javascript($reviewmode, $force_aidata, $readonly);
+                    $ret .= $this->fetch_clicktohear_amd($moduleinstance,$token);
+                    $ret .= $this->render_hiddenaudioplayer();
+                    $ret .= $passagerenderer->render_userreview($passagehelper,$moduleinstance->ttslanguage,$collapsespaces);
+                    break;
+
+                case constants::POSTATTEMPT_EVALERRORSNOGRADE:
+                    $ret .= $this->show_evaluated_message();
+                    if ($have_humaneval) {
+                        $reviewmode = constants::REVIEWMODE_HUMAN;
+                        $force_aidata = false;
+                    } else {
+                        $reviewmode = constants::REVIEWMODE_MACHINE;
+                        $force_aidata = true;
+                    }
+                    $passagehelper = new \mod_readaloud\passagehelper($latestattempt->id, $modulecontext->id);
+                    $readonly = true;
+                    $ret .= $passagehelper->prepare_javascript($reviewmode, $force_aidata, $readonly);
+                    $ret .= $this->fetch_clicktohear_amd($moduleinstance,$token);
+                    $ret .= $this->render_hiddenaudioplayer();
+                    $nograde=true;
+                    $ret .= $passagerenderer->render_userreview($passagehelper,$moduleinstance->ttslanguage,$collapsespaces,$nograde);
+                    break;
+            }
+        } else {
+            $ret .= $this->show_ungradedyet();
+            $ret .= $this->fetch_clicktohear_amd($moduleinstance,$token);
+            $ret .= $this->render_hiddenaudioplayer();
+            //we need more control over passage display than a word dump allows so we user gradenow renderer
+            //$ret .= $this->show_passage_postattempt($moduleinstance,$collapsespaces);
+            $extraclasses = 'readmode';
+            if($collapsespaces){
+                $extraclasses = ' collapsespaces';
+            }
+            $ret .= $passagerenderer->render_passage($moduleinstance->passagesegments,$moduleinstance->ttslanguage,constants::M_PASSAGE_CONTAINER, $extraclasses);
+
+        }
+
+        //TO DO move logic to menu dashboard
+        //show  button or a label depending on of can retake
+        /*
+        if ($canattempt) {
+            $ret .= $this->reattemptbutton($moduleinstance);
+        } else {
+            $ret .= $this->exceededattempts($moduleinstance);
+        }
+        */
+        $ret .= $this->jump_tomenubutton($moduleinstance);
+        $ret .= $this->footer();
+        return $ret;
     }
 
 

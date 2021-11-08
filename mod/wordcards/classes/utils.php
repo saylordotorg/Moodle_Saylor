@@ -134,60 +134,84 @@ class utils{
         return true;
     }
 
-    public static function update_finalgrade($modid){
+    //recalculate all final grades
+    public static function recalculate_final_grades($moduleinstance){
+        global $DB;
+
+        $records = $DB->get_records(constants::M_ATTEMPTSTABLE, ['modid' => $moduleinstance->id]);
+        foreach($records as $record){
+            self::update_finalgrade($moduleinstance->id,$record->userid);
+        }
+    }
+
+    //calc and update final grade of a single user
+    public static function update_finalgrade($modid, $userid=0){
         global $DB,$USER;
 
+        if($userid == 0){
+            $userid = $USER->id;
+            $regrading = false;
+        }else{
+            $regrading = true;
+        }
+
         $mod = \mod_wordcards_module::get_by_modid($modid);
-        $records = $DB->get_records(constants::M_ATTEMPTSTABLE, ['modid' => $modid, 'userid' => $USER->id],'timecreated DESC');
+        $moduleinstance = $mod->get_mod();
+
+        $records = $DB->get_records(constants::M_ATTEMPTSTABLE, ['modid' => $modid, 'userid' => $userid],'timecreated DESC');
 
         if (!$records) {return false;}
         $record = array_shift($records);
         if (!$record) {return false;}
 
-        if ($record->totalgrade > 0 ) {return true;}
+        ///dont redo grading unless that is what we are ding (ie from recalculate final grades)
+        if ($record->totalgrade > 0 && $regrading==false) {return true;}
         $states = array(\mod_wordcards_module::STATE_STEP1,\mod_wordcards_module::STATE_STEP2,\mod_wordcards_module::STATE_STEP3,
                 \mod_wordcards_module::STATE_STEP4,\mod_wordcards_module::STATE_STEP5);
 
         $totalgrade=0;
         $totalsteps=0;
         foreach($states as $state) {
-            switch ($state) {
-                case \mod_wordcards_module::STATE_STEP1:
-                    $termcount = $mod->get_mod()->step1termcount;
-                    $grade= $record->grade1;
-                    break;
-                case \mod_wordcards_module::STATE_STEP2:
-                    $termcount = $mod->get_mod()->step2termcount;
-                    $grade= $record->grade2;
-                    break;
-                case \mod_wordcards_module::STATE_STEP3:
-                    $termcount = $mod->get_mod()->step3termcount;
-                    $grade= $record->grade3;
-                    break;
-                case \mod_wordcards_module::STATE_STEP4:
-                    $termcount = $mod->get_mod()->step4termcount;
-                    $grade= $record->grade4;
-                    break;
-                case \mod_wordcards_module::STATE_STEP5:
-                    $termcount = $mod->get_mod()->step5termcount;
-                    $grade= $record->grade5;
-                    break;
-                case \mod_wordcards_module::STATE_END:
-                case \mod_wordcards_module::STATE_TERMS:
-                default:
-                    $grade=0;
-                    $termcount=0;
-                    break;
-            }
-            if($termcount>0){
-                $totalsteps ++;
-                $totalgrade += $grade;
+            //if we have a practice type for the step and it has terms, then tally the grade
+            if($moduleinstance->{$state} != \mod_wordcards_module::PRACTICETYPE_NONE) {
+                switch ($state) {
+                    case \mod_wordcards_module::STATE_STEP1:
+                        $termcount = $moduleinstance->step1termcount;
+                        $grade = $record->grade1;
+                        break;
+                    case \mod_wordcards_module::STATE_STEP2:
+                        $termcount = $moduleinstance->step2termcount;
+                        $grade = $record->grade2;
+                        break;
+                    case \mod_wordcards_module::STATE_STEP3:
+                        $termcount = $moduleinstance->step3termcount;
+                        $grade = $record->grade3;
+                        break;
+                    case \mod_wordcards_module::STATE_STEP4:
+                        $termcount = $moduleinstance->step4termcount;
+                        $grade = $record->grade4;
+                        break;
+                    case \mod_wordcards_module::STATE_STEP5:
+                        $termcount = $moduleinstance->step5termcount;
+                        $grade = $record->grade5;
+                        break;
+                    case \mod_wordcards_module::STATE_END:
+                    case \mod_wordcards_module::STATE_TERMS:
+                    default:
+                        $grade = 0;
+                        $termcount = 0;
+                        break;
+                }
+                if ($termcount > 0) {
+                    $totalsteps++;
+                    $totalgrade += $grade;
+                }
             }
         }
         if($totalsteps>0) {
             $grade = ROUND(($totalgrade / $totalsteps), 0);
             $DB->set_field(constants::M_ATTEMPTSTABLE, 'totalgrade', $grade,array('id'=>$record->id));
-            wordcards_update_grades($mod->get_mod(), $USER->id, false);
+            wordcards_update_grades($moduleinstance, $userid, false);
         }
         return true;
     }
@@ -512,8 +536,8 @@ class utils{
   }
 
     public static function fetch_options_transcribers() {
-        $options = array(constants::TRANSCRIBER_AMAZONTRANSCRIBE => get_string("transcriber_amazontranscribe", constants::M_COMPONENT),
-                constants::TRANSCRIBER_GOOGLECLOUDSPEECH => get_string("transcriber_googlecloud", constants::M_COMPONENT));
+        $options = array(constants::TRANSCRIBER_AUTO => get_string("transcriber_auto", constants::M_COMPONENT),
+                constants::TRANSCRIBER_POODLL => get_string("transcriber_poodll", constants::M_COMPONENT));
         return $options;
     }
 
@@ -1022,6 +1046,9 @@ class utils{
                 1 => '1', 2 => '2', 3 => '3', 4 => '4', 5 => '5',);
         $mform->addElement('select', 'maxattempts', get_string('maxattempts', constants::M_COMPONENT), $attemptoptions);
 
+        $t_options = utils::fetch_options_transcribers();
+        $mform->addElement('select', 'transcriber', get_string('transcriber', 'mod_wordcards'),
+                $t_options,$config->ttslanguage);
 
         $mform->addElement('hidden', 'skipreview',0);
         $mform->setType('skipreview',PARAM_INT);

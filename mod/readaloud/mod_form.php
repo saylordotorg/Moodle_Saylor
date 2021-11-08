@@ -89,6 +89,8 @@ class mod_readaloud_mod_form extends moodleform_mod {
         $mform->addElement('select', 'gradeoptions', get_string('gradeoptions', constants::M_COMPONENT), $gradeoptions);
         $mform->setDefault('gradeoptions', constants::M_GRADELATEST);
         $mform->addHelpButton('gradeoptions', 'gradeoptions', constants::M_COMPONENT);
+        $mform->addElement('static', 'gradeoptions_details', '',
+            get_string('gradeoptions_details', constants::M_COMPONENT));
 
         // add standard elements, common to all modules
         $this->standard_coursemodule_elements();

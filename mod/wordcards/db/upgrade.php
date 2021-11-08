@@ -37,6 +37,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 use \mod_wordcards\utils;
+use \mod_wordcards\constants;
 
 function xmldb_wordcards_upgrade($oldversion) {
     global $CFG, $DB;
@@ -366,6 +367,25 @@ function xmldb_wordcards_upgrade($oldversion) {
         }
 
         upgrade_mod_savepoint(true, 2021083100, 'wordcards');
+    }
+
+
+    if ($oldversion < 2021110500) {
+
+        $table = new xmldb_table('wordcards');
+
+        //  Define field trancriber to be added to wordcards
+        $fields=[];
+        $fields[]= new xmldb_field('transcriber', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 1);
+
+        // Add fields
+        foreach ($fields as $field) {
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+
+        upgrade_mod_savepoint(true, 2021110500, 'wordcards');
     }
 
     return true;

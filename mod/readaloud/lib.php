@@ -454,7 +454,8 @@ function readaloud_dotask(progress_trace $trace) {
 }
 
 function readaloud_get_editornames() {
-    return array('passage', 'welcome', 'feedback');
+    //we removed "passage" to force plain text 30/10/2021
+    return array('welcome', 'feedback');
 }
 
 function readaloud_process_editors(stdClass $readaloud, mod_readaloud_mod_form $mform = null) {
@@ -584,8 +585,6 @@ function readaloud_update_instance(stdClass $readaloud, mod_readaloud_mod_form $
             }//end of if lang model
         }//end of if passage hash chaned
     }//end of if newpassagehash
-
-
 
     //we want to create a polly record and speechmarks, if (!human_modelaudio && passage) && (passage change || voice change || speed change)
     $needspeechmarks =false;

@@ -12,15 +12,16 @@
             <div class='mode-chooser-label'>
                 <b>{{#str}}landrreading , mod_readaloud{{/str}}</b>:
                 {{#str}}landrhelp , mod_readaloud{{/str}}
-                {{#noaudiobreaks}}{{#str}}modelaudiowarning , mod_readaloud{{/str}}{{/noaudiobreaks}}
+                {{#noaudiobreaks}}<span class="mod_readaloud_menubutton_warning">{{#str}}modelaudiowarning , mod_readaloud{{/str}}</span>{{/noaudiobreaks}}
             </div>
         </div>
     </div>
     <div>
-        <div id='mod_readaloud_button_startshadow' class='mode-chooser readaloudshadow {{#noshadow}}no-show{{/noshadow}}' {{^noshadow}}tabindex='0'{{/noshadow}}>
+        <div id='mod_readaloud_button_startshadow' class='mode-chooser readaloudshadow {{#cantattempt}}no-click{{/cantattempt}} {{#noshadow}}no-show{{/noshadow}}' {{^noshadow}}{{^cantattempt}}tabindex='0'{{/cantattempt}}{{/noshadow}}>
             <div class='mode-chooser-label'>
                 <b>{{#str}}startshadowreading , mod_readaloud{{/str}}</b>:
                 {{#str}}shadowhelp , mod_readaloud{{/str}}
+                {{#cantattempt}}<span class="mod_readaloud_menubutton_warning">{{#str}}exceededallattempts , mod_readaloud{{/str}}</span>{{/cantattempt}}
             </div>
         </div>
     </div>
@@ -29,6 +30,7 @@
             <div class='mode-chooser-label'>
                 <b>{{#str}}startreading , mod_readaloud{{/str}}</b>:
                 {{#str}}normalhelp , mod_readaloud{{/str}}
+                {{#cantattempt}}<span class="mod_readaloud_menubutton_warning">{{#str}}exceededallattempts , mod_readaloud{{/str}}</span>{{/cantattempt}}
             </div>
         </div>
     </div>

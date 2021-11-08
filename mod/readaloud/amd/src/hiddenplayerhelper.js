@@ -37,7 +37,6 @@ define(['jquery', 'core/log', 'mod_readaloud/definitions'], function ($, log, de
 
         },
 
-
         dohiddenplay: function (audiosrc) {
             var m = this;
             var audioplayer = m.controls.hiddenplayer;
@@ -70,8 +69,8 @@ define(['jquery', 'core/log', 'mod_readaloud/definitions'], function ($, log, de
             m.controls.hiddenplayerbutton.each(function (index) {
                 var audiosrc = $(this).attr('data-audiosource');
                 if (audiosrc === theaudiosrc) {
-                    $(this).addClass(m.activebutton);
-                    if (audioplayer.prop('paused')) {
+                    $(this).addClass(m.hiddenplayerbuttonactive);
+                    if ($(audioplayer).prop('paused')) {
                         $(this).removeClass(m.hiddenplayerbuttonplaying);
                         $(this).addClass(m.hiddenplayerbuttonpaused);
                         //for now we make it look like no button is selected

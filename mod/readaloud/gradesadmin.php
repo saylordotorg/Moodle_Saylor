@@ -88,7 +88,7 @@ switch ($action) {
             redirect($url, get_string('machineregraded', constants::M_COMPONENT, $results), 5);
         }
         break;
-    case 'pushmachinegrades':
+    case 'pushalltogradebook':
         $url = new \moodle_url(constants::M_URL . '/gradesadmin.php',
                 array('id' => $cm->id,
                         'action' => 'menu'));
@@ -144,7 +144,7 @@ $mform->display();
 echo $table_of_mistranscriptions;
 
 //This shows button that pushes all updated machine grades to gradebook
-echo $renderer->show_pushmachinegrades($moduleinstance);
+echo $renderer->show_pushalltogradebook($moduleinstance);
 
 echo $renderer->footer();
 return;

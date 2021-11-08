@@ -108,6 +108,7 @@ class utils {
     public static function update_create_phonetic_segments($moduleinstance, $olditem){
         //if we have an old item, set the default return value to the current phonetic value
         //we will update it if the text has changed
+
         if($olditem) {
             $thephonetics = $olditem->phonetic;
             $thesegments =$olditem->passagesegments;
@@ -119,13 +120,7 @@ class utils {
         $dophonetic = true;
         if($dophonetic) {
             //make sure the passage has really changed before doing an expensive call to create phonetics
-            $cleannewpassage = diff::cleanText($moduleinstance->passage);
-            if($olditem!==false) {
-                $cleanoldpassage =  diff::cleanText($olditem->passage);
-            }else{
-                $cleanoldpassage='';
-            }
-            if ($cleannewpassage !== $cleanoldpassage) {
+            if (!$olditem || $moduleinstance->passage !== $olditem->passage || empty($thesegments)) {
                 $segmented = true;
                 //build a phonetics string
                list($thephonetics,$thesegments) = utils::fetch_phones_and_segments($moduleinstance->passage, $moduleinstance->ttslanguage, 'tokyo', $segmented);
@@ -1930,8 +1925,8 @@ if(true){
 
     public static function fetch_options_transcribers() {
         $options =
-                array(constants::TRANSCRIBER_AMAZONTRANSCRIBE => get_string("transcriber_amazontranscribe", constants::M_COMPONENT),
-                        constants::TRANSCRIBER_GOOGLECLOUDSPEECH => get_string("transcriber_googlecloud", constants::M_COMPONENT));
+                array(constants::TRANSCRIBER_AUTO => get_string("transcriber_auto", constants::M_COMPONENT),
+                        constants::TRANSCRIBER_POODLL => get_string("transcriber_poodll", constants::M_COMPONENT));
         return $options;
     }
     
@@ -2201,11 +2196,21 @@ if(true){
         $config = get_config(constants::M_COMPONENT);
 
         //The passage
-        //$edfileoptions = readaloud_editor_with_files_options($context);
+        //we stopped allowing rich text. It does not show anyway.
+        /*
         $ednofileoptions = readaloud_editor_no_files_options($context);
         $opts = array('rows' => '15', 'columns' => '80');
         $mform->addElement('editor', 'passage_editor', get_string('passagelabel', constants::M_COMPONENT), $opts, $ednofileoptions);
         $mform->addHelpButton('passage_editor', 'passage_editor', constants::M_COMPONENT);
+        */
+        //The alternatives declaration
+        $mform->addElement('textarea', 'passage', get_string("passagelabel", constants::M_COMPONENT),
+            'wrap="virtual" rows="15" cols="100"');
+        $mform->setDefault('passage', '');
+        $mform->setType('passage', PARAM_RAW);
+        $mform->addElement('static', 'passagedescr', '',
+            get_string('passage_descr', constants::M_COMPONENT));
+        $mform->addHelpButton('passage', 'passage', constants::M_COMPONENT);
 
         //tts options
         $langoptions = \mod_readaloud\utils::get_lang_options();
@@ -2234,6 +2239,7 @@ if(true){
         $mform->addHelpButton('alternatives', 'alternatives', constants::M_COMPONENT);
 
         //welcome and feedback
+        $ednofileoptions = readaloud_editor_no_files_options($context);
         $opts = array('rows' => '6', 'columns' => '80');
         $mform->addElement('editor', 'welcome_editor', get_string('welcomelabel', constants::M_COMPONENT), $opts, $ednofileoptions);
         $mform->addElement('editor', 'feedback_editor', get_string('feedbacklabel', constants::M_COMPONENT), $opts,
@@ -2316,7 +2322,7 @@ if(true){
                 get_string('enableai_details', constants::M_COMPONENT));
         $mform->setDefault('enableai', $config->enableai);
 
-        //transcriber options
+        //line transcriber options
         $name = 'transcriber';
         $label = get_string($name, constants::M_COMPONENT);
         $options = \mod_readaloud\utils::fetch_options_transcribers();
@@ -2324,6 +2330,17 @@ if(true){
         $mform->setDefault($name, $config->{$name});
         $mform->addElement('static', 'transcriber_details', '',
                 get_string('transcriber_details', constants::M_COMPONENT));
+
+        //passage transcriber options
+        $name = 'stricttranscribe';
+        $label = get_string($name, constants::M_COMPONENT);
+        $options = array(0=>get_string('transcriber_poodll',constants::M_COMPONENT),
+            1=>get_string('transcriber_strict',constants::M_COMPONENT));
+        $mform->addElement('select', $name, $label, $options);
+        $mform->setDefault($name, $config->{$name});
+        $mform->addElement('static', 'stricttranscribe_details', '',
+            get_string('stricttranscribe_details', constants::M_COMPONENT));
+
 
         //region
         $regionoptions = \mod_readaloud\utils::get_region_options();
@@ -2357,11 +2374,6 @@ if(true){
         $mform->addElement('advcheckbox', 'submitrawaudio', get_string('submitrawaudio', constants::M_COMPONENT),
                 get_string('submitrawaudio_details', constants::M_COMPONENT));
         $mform->setDefault('submitrawaudio', $config->submitrawaudio);
-
-        //Strict Transcribe Mode
-        $mform->addElement('advcheckbox', 'stricttranscribe', get_string('stricttranscribe', constants::M_COMPONENT),
-                get_string('stricttranscribemode_details', constants::M_COMPONENT));
-        $mform->setDefault('stricttranscribe', $config->stricttranscribe);
 
         // Post attempt
         $mform->addElement('header', 'postattemptheader', get_string('postattemptheader', constants::M_COMPONENT));

@@ -1,4 +1,21 @@
 
+2.0.XX (Build 20211105xx)
+- renamed button to push all grades to gradebook
+
+2.0.69 (Build 2021103101)
+- fixed broken upgrade script
+
+2.0.68 (Build 2021103100)
+-fixed issue with broken recorder on listen and repeat on chrome (from previous release)
+- added max attempts display to shadow tile button
+- refactor of some code
+
+2.0.67 (Build 2021103000)
+- re organised transcriber options (UI) and allowed user to prefer Poodll STT
+- improved display of max attempts reached status
+- removed rich text/html editing option from passage text area
+- added datatables to reports and grading pages to make it easier with large numbers of students
+
 2.0.66 (Build 2021100100)
 - Added grades settings to push feature
 

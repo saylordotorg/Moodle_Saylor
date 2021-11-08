@@ -33,6 +33,28 @@ class report_renderer extends \plugin_renderer_base {
 
         $ret = \html_writer::div(implode('<br />',$reports), constants::M_CLASS . '_listbuttons');
 
+        //
+
+        //This shows button that pushes all updated machine grades to gradebook
+        $ret .= $this->show_pushalltogradebook($moduleinstance);
+
+
+        return $ret;
+    }
+
+    /**
+     *
+     */
+    public function show_pushalltogradebook($moduleinstance) {
+
+        $sectiontitle = get_string("gradesadmin", constants::M_COMPONENT);
+        $heading = '<hr>' . $this->output->heading($sectiontitle, 3);
+        $options = [];
+        $button = $this->output->single_button(new \moodle_url(constants::M_URL . '/reports.php',
+                array('n' => $moduleinstance->id, 'action' => 'pushalltogradebook')),
+                get_string('pushalltogradebook', constants::M_COMPONENT), 'post', $options);
+
+        $ret = \html_writer::div($heading . $button, constants::M_CLASS . '_gradesadmin');
         return $ret;
     }
 

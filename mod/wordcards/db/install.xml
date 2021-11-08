@@ -25,6 +25,7 @@
         <FIELD NAME="step4practicetype" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="step5practicetype" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="completionwhenfinish" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="transcriber" TYPE="int" LENGTH="10" NOTNULL="true"  DEFAULT="1" SEQUENCE="false"/>
         <FIELD NAME="maxattempts" TYPE="int" LENGTH="10" NOTNULL="true"  DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>

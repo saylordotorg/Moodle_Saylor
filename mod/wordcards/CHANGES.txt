@@ -1,3 +1,7 @@
+1.3.14 (Build 2021110500)
+- Fixed grading bug where nopractice stages could be counted in grade
+- Added ability to use Poodll STT exclusively
+
 1.3.13 (Build 2021090700)
 - Fixed bug "too few arguments" in speech cards introduced in 1.3.12
 

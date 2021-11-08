@@ -32,6 +32,7 @@ use \mod_wordcards\utils;
 $id = optional_param('id', 0, PARAM_INT); // course_module ID, or
 $n = optional_param('n', 0, PARAM_INT);  // wordcards instance ID
 $format = optional_param('format', 'html', PARAM_TEXT); //export format csv or html
+$action = optional_param('action', 'none', PARAM_TEXT); //export format csv or html
 $showreport = optional_param('report', 'menu', PARAM_TEXT); // report type
 $userid = optional_param('userid', 0, PARAM_INT); // user id
 $attemptid = optional_param('attemptid', 0, PARAM_INT); // attempt id
@@ -73,6 +74,25 @@ if ($paging->perpage == -1) {
 // Trigger module viewed event.
 $mod = mod_wordcards_module::get_by_cmid($cm->id);
 $mod->register_module_viewed();
+
+
+switch ($action) {
+
+    case 'pushalltogradebook':
+        $url = new \moodle_url(constants::M_URL . '/reports.php',
+                array('id' => $cm->id,
+                        'action' => 'menu'));
+
+        utils::recalculate_final_grades($moduleinstance);
+
+        redirect($url, get_string('gradespushed', constants::M_COMPONENT), 5);
+        break;
+
+    case 'menu':
+    default:
+
+}
+
 
 /// Set up the page header
 $pagetitle = format_string($mod->get_mod()->name, true, $mod->get_course());
