@@ -491,7 +491,7 @@ function readaloud_add_instance(stdClass $readaloud, mod_readaloud_mod_form $mfo
     $readaloud = readaloud_process_editors($readaloud, $mform);
 
     //do phonetics
-    [$thephonetic,$thepassagesegments] = utils::update_create_phonetic_segments($readaloud,false);
+    list($thephonetic,$thepassagesegments) = utils::update_create_phonetic_segments($readaloud,false);
     $readaloud->phonetic = $thephonetic;
     $readaloud->passagesegments = $thepassagesegments;
 
@@ -567,7 +567,7 @@ function readaloud_update_instance(stdClass $readaloud, mod_readaloud_mod_form $
     $oldrecord = $DB->get_record(constants::M_TABLE,array('id'=>$readaloud->id));
 
     //update the phonetic if it has changed
-    [$thephonetic,$thepassagesegments] = utils::update_create_phonetic_segments($readaloud,$oldrecord);
+    list($thephonetic,$thepassagesegments) = utils::update_create_phonetic_segments($readaloud,$oldrecord);
     $readaloud->phonetic = $thephonetic;
     $readaloud->passagesegments = $thepassagesegments;
 

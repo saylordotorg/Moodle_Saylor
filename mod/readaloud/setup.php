@@ -104,7 +104,7 @@ if ($mform->is_cancelled()) {
     }
 
     //update the phonetic if it has changed
-    [$thephonetic,$thepassagesegments] = utils::update_create_phonetic_segments($data,$oldrecord);
+    list($thephonetic,$thepassagesegments) = utils::update_create_phonetic_segments($data,$oldrecord);
     $data->phonetic = $thephonetic;
     $data->passagesegments = $thepassagesegments;
 

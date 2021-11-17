@@ -184,7 +184,7 @@ class external extends external_api {
                 if (!$gradingdisabled) {
                     if ($gradinginstance) {
                         $thegrade = $gradinginstance->submit_and_get_grade($validateddata->advancedgrading,
-                            $attempt->attemptid);
+                            $attempt->id);
                     }
                 }
             }

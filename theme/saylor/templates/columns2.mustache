@@ -65,6 +65,11 @@
 
         <div id="page-content" class="row pb-3 d-print-block">
             <div id="region-main-box" class="col-12">
+                {{#hastopblocks}}
+                <section id="region-top" data-region="blocks-row" class="d-print-none">
+                    {{{ topblocks }}}
+                </section>
+                {{/hastopblocks}}
                 {{#hasregionmainsettingsmenu}}
                 <div id="region-main-settings-menu" class="d-print-none {{#hasblocks}}has-blocks{{/hasblocks}}">
                     <div> {{{ output.region_main_settings_menu }}} </div>

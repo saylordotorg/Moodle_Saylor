@@ -54,6 +54,7 @@ require_login($course, true, $cm);
 $modulecontext = context_module::instance($cm->id);
 
 require_capability('mod/readaloud:manage', $modulecontext);
+require_capability('mod/readaloud:pushtoclones', $modulecontext);
 
 //Get an admin settings 
 $config = get_config(constants::M_COMPONENT);

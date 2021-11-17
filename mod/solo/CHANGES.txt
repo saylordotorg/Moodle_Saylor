@@ -1,3 +1,9 @@
+1.0.12 (Build 2021111000)
+- Made self-transcript required
+
+1.0.10 (Build 2021081600)
+- fixed rubric grading
+
 1.0.10 (Build 2021081600)
 - fixed issue with array_key_exists on php 8
 - fixed some bad instructions and missing description text

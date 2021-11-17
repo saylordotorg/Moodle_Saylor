@@ -1,6 +1,8 @@
 
 2.0.XX (Build 20211105xx)
 - renamed button to push all grades to gradebook
+- added a CFG switch to hide push feature
+- removed PHP 7.1+ only syntax (list unpacking)
 
 2.0.69 (Build 2021103101)
 - fixed broken upgrade script

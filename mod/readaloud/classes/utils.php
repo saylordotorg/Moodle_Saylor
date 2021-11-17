@@ -139,7 +139,7 @@ class utils {
         $items = $DB->get_records(constants::M_TABLE);
         foreach($items as $moduleinstance) {
             $olditem = false;
-            [$thephonetic,$thepassagesegments] = self::update_create_phonetic_segments($moduleinstance,$olditem);
+            list($thephonetic,$thepassagesegments) = self::update_create_phonetic_segments($moduleinstance,$olditem);
             if(!empty($thephonetic)){
                 $DB->update_record(constants::M_TABLE,array('id'=>$moduleinstance->id,'phonetic'=>$thephonetic, 'passagesegments'=>$thepassagesegments));
                 $updates++;
@@ -2303,8 +2303,13 @@ if(true){
         $mform->addHelpButton('machgrademethod', 'machinegrademethod', constants::M_COMPONENT);
 
         //master instance or not
-        $mform->addElement('advcheckbox', 'masterinstance', get_string('masterinstance', constants::M_COMPONENT),
-            get_string('masterinstance_details', constants::M_COMPONENT));
+        if(!has_capability('mod/readaloud:pushtoclones', $context)){
+            $mform->addElement('hidden','masterinstance');
+            $mform->setType('masterinstance', PARAM_INT);
+        }else {
+            $mform->addElement('advcheckbox', 'masterinstance', get_string('masterinstance', constants::M_COMPONENT),
+                    get_string('masterinstance_details', constants::M_COMPONENT));
+        }
         $mform->setDefault('masterinstance', 0);
 
         // Appearance.

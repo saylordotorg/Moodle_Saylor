@@ -190,8 +190,6 @@ class attempts extends basereport
                 $alldata = $DB->get_records_sql($sql, array('soloid' => $formdata->soloid));
          }
 
-
-
         if($alldata){
             foreach($alldata as $thedata){
                 //do any processing here

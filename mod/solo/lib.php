@@ -56,6 +56,8 @@ function solo_supports($feature) {
         case FEATURE_ADVANCED_GRADING:        return true;
         case FEATURE_GRADE_OUTCOMES:          return false;
         case FEATURE_BACKUP_MOODLE2:          return true;
+        case FEATURE_GROUPS:
+            return true;
         default:                        return null;
     }
 }

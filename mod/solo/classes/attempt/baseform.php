@@ -393,6 +393,7 @@ abstract class baseform extends \moodleform {
         $opts= array('rows'=>'5', 'cols'=>'80');
         $this->_form->addElement('textarea', $name, '', $opts);
         $this->_form->setType($name, PARAM_TEXT);
+        $this->_form->addRule($name, null, 'required', null, 'client');
     }
 
     protected final function fetch_markedpassage() {

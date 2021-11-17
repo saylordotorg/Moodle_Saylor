@@ -474,6 +474,60 @@ class filter_filtercodes extends moodle_text_filter {
             $replace['/\{coursesummary\}/i'] = $PAGE->course->summary;
         }
 
+        // This tag: {menuadmin}.
+        if (stripos($text, '{menuadmin}') !== false) {
+            $theme = $PAGE->theme->name;
+            $menu = '';
+            $menu .= '{ifminteacher}' . PHP_EOL;
+            $menu .= '{fa fa-wrench} {getstring}admin{/getstring}' . PHP_EOL;
+            $menu .= '{/ifminteacher}' . PHP_EOL;
+            $menu .= '{ifmincreator}' . PHP_EOL;
+            $menu .= '-{getstring}administrationsite{/getstring}|/admin/search.php' . PHP_EOL;
+            $menu .= '-{toggleeditingmenu}' . PHP_EOL;
+            $menu .= '-Learn Moodle|https://learn.moodle.org/" target="_blank' . PHP_EOL;
+            $menu .= '-Moodle Academy|https://moodle.academy/" target="_blank' . PHP_EOL;
+            $menu .= '-###' . PHP_EOL;
+            $menu .= '{/ifmincreator}' . PHP_EOL;
+            $menu .= '{ifminmanager}' . PHP_EOL;
+            $menu .= '-{getstring}user{/getstring}: {getstring:admin}usermanagement{/getstring}|/admin/user.php' . PHP_EOL;
+            $menu .= '{ifminsitemanager}' . PHP_EOL;
+            $menu .= '-{getstring}user{/getstring}: {getstring:mnet}profilefields{/getstring}|/user/profile/index.php' . PHP_EOL;
+            $menu .= '-###' . PHP_EOL;
+            $menu .= '{/ifminsitemanager}' . PHP_EOL;
+            $menu .= '-{getstring}course{/getstring}: {getstring:admin}coursemgmt{/getstring}|/course/management.php' . PHP_EOL;
+            $menu .= '-{getstring}course{/getstring}: {getstring}new{/getstring}|/course/edit.php?category={coursecategoryid}&returnto=topcat' . PHP_EOL;
+            $menu .= '-{getstring}course{/getstring}: {getstring}searchcourses{/getstring}|/course/search.php' . PHP_EOL;
+            $menu .= '{/ifminmanager}' . PHP_EOL;
+            $menu .= '{ifminteacher}' . PHP_EOL;
+            $menu .= '-{getstring}course{/getstring}: {getstring}restore{/getstring}|/backup/restorefile.php?contextid={coursecontextid}' . PHP_EOL;
+            $menu .= '{ifincourse}' . PHP_EOL;
+            $menu .= '-{getstring}course{/getstring}: {getstring}backup{/getstring}|/backup/backup.php?id={courseid}' . PHP_EOL;
+            $menu .= '-{getstring}course{/getstring}: {getstring}participants{/getstring}|/user/index.php?id={courseid}' . PHP_EOL;
+            $menu .= '-{getstring}course{/getstring}: {getstring:badges}badges{/getstring}|/badges/index.php?type={courseid}' . PHP_EOL;
+            $menu .= '-{getstring}course{/getstring}: {getstring}reports{/getstring}|/course/admin.php?courseid={courseid}#linkcoursereports' . PHP_EOL;
+            $menu .= '-{getstring}course{/getstring}: {getstring:enrol}enrolmentinstances{/getstring}|/enrol/instances.php?id={courseid}' . PHP_EOL;
+            $menu .= '-{getstring}course{/getstring}: {getstring}reset{/getstring}|/course/reset.php?id={courseid}' . PHP_EOL;
+            $menu .= '-Course: Layoutit|https://www.layoutit.com/build" target="popup" onclick="window.open(\'https://www.layoutit.com/build\',\'popup\',\'width=1340,height=700\'); return false;|Bootstrap Page Builder' . PHP_EOL;
+            $menu .= '{/ifincourse}' . PHP_EOL;
+            $menu .= '-###' . PHP_EOL;
+            $menu .= '{/ifminteacher}' . PHP_EOL;
+            $menu .= '{ifminmanager}' . PHP_EOL;
+            $menu .= '-{getstring}site{/getstring}: {getstring}reports{/getstring}|/admin/category.php?category=reports' . PHP_EOL;
+            $menu .= '{/ifminmanager}' . PHP_EOL;
+            $menu .= '{ifadmin}' . PHP_EOL;
+            $menu .= '-{getstring}site{/getstring}: {getstring:admin}additionalhtml{/getstring}|/admin/settings.php?section=additionalhtml' . PHP_EOL;
+            $menu .= '-{getstring}site{/getstring}: {getstring:admin}frontpage{/getstring}|/admin/settings.php?section=frontpagesettings|Including site name' . PHP_EOL;
+            $menu .= '-{getstring}site{/getstring}: {getstring:admin}plugins{/getstring}|/admin/search.php#linkmodules' . PHP_EOL;
+            $menu .= '-{getstring}site{/getstring}: {getstring:admin}supportcontact{/getstring}|/admin/settings.php?section=supportcontact' . PHP_EOL;
+            $menu .= '-{getstring}site{/getstring}: {getstring:admin}themesettings{/getstring}|/admin/settings.php?section=themesettings|Including custom menus, designer mode, theme in URL' . PHP_EOL;
+            if (file_exists($CFG->dirroot . '/theme/' . $theme . '/settings.php')) {
+                $menu .= '-{getstring}site{/getstring}: {getstring:admin}currenttheme{/getstring}|/admin/settings.php?section=themesetting' . $theme . PHP_EOL;
+            }
+            $menu .= '-{getstring}site{/getstring}: {getstring}notifications{/getstring} ({getstring}admin{/getstring})|/admin/index.php' . PHP_EOL;
+            $menu .= '{/ifadmin}' . PHP_EOL;
+            $replace['/\{menuadmin\}/i'] = $menu;
+        }
+
         // This tag: {menudev}.
         if (stripos($text, '{menudev}') !== false) {
             $menu = '';
@@ -949,57 +1003,87 @@ class filter_filtercodes extends moodle_text_filter {
 
             }
 
-            // Tag: {courseteachers}.
-            if (stripos($text, '{courseteachers') !== false) {
-                $teachers = '';
-                if ($PAGE->course->id) { // Courses, not site pages.
-                    $contextid = $DB->get_field('context', 'id', ['instanceid' => $PAGE->course->id, 'contextlevel' => 50],
-                            $strictness = IGNORE_MULTIPLE);
-                    $userids = $DB->get_records('role_assignments', ['roleid' => '3', 'contextid' => $contextid]);
-                    $teachershowpic = get_config('filter_filtercodes', 'courseteachershowpic');
-                    $teacherlinktype = get_config('filter_filtercodes', 'courseteacherlinktype');
-                    $linksr = ['' => '', 'email' => get_string('issueremail', 'badges'),
-                            'message' => get_string('message', 'message'), 'profile' => get_string('profile')];
-                    $iconclass = ['' => '',
-                            'email' => 'fa fa-envelope-o',
-                            'message' => 'fa fa-comment',
-                            'profile' => 'fa fa-info-circle'];
-                    $iconclass = '<i class="' . $iconclass[$teacherlinktype] . '" aria-hidden="true"></i> ';
+            // Tag: {coursecontacts}.
+            if (stripos($text, '{coursecontacts') !== false) {
+                $contacts = '';
+                // If course (not site pages) with contacts.
+                if ($PAGE->course->id) {
 
-                    foreach ($userids as $teacher) {
-                        $user = $DB->get_record('user', ['id' => $teacher->userid], $fields = '*', $strictness = IGNORE_MULTIPLE);
-                        $url = str_replace('$1', '3', $this->getprofilepictureurl($user));
-                        $fullname = get_string('fullnamedisplay', null, $user);
-                        if ($teachershowpic) {
-                            $teachers .= '<img src="' . $url . '" alt="' . $fullname . '" class="img-fluid img-thumbnail"><br>';
+                    $course = new core_course_list_element($PAGE->course);
+                    if ($course->has_course_contacts()) {
+
+                        // Get tag settings.
+                        $cshowpic = get_config('filter_filtercodes', 'coursecontactshowpic');
+                        $clinktype = get_config('filter_filtercodes', 'coursecontactlinktype');
+
+                        // Prepare some strings.
+                        $linksr = ['' => '',
+                                'email' => get_string('issueremail', 'badges'),
+                                'message' => get_string('message', 'message'),
+                                'profile' => get_string('profile')];
+                        $iconclass = ['' => '',
+                                'email' => 'fa fa-envelope-o',
+                                'message' => 'fa fa-comment',
+                                'profile' => 'fa fa-info-circle'];
+                        $iconclass = '<i class="' . $iconclass[$clinktype] . '" aria-hidden="true"></i> ';
+
+                        foreach ($course->get_course_contacts() as $coursecontact) {
+                            $contacts .= '<li class="mb-4">';
+
+                            // Get list of course contacts based on settings in Site Administration > Appearances > Courses.
+                            // Get liset of user's roles in the course.
+                            $rolenames = array_map(function ($role) {
+                                return $role->displayname;
+                            }, $coursecontact['roles']);
+
+                            // Retrieve contact's profile information.
+                            $user = $DB->get_record('user', ['id' => $coursecontact['user']->id],
+                                    $fields = '*', $strictness = IGNORE_MULTIPLE);
+                            $imgurl = str_replace('$1', '3', $this->getprofilepictureurl($user));
+                            $fullname = get_string('fullnamedisplay', null, $user);
+                            if ($cshowpic) {
+                                $contacts .= '<img src="' . $imgurl . '" alt="' . $fullname . '" class="img-fluid img-thumbnail">';
+                            }
+
+                            $contactsclose = '<span class="sr-only">' . $linksr[$clinktype] . ': </span>';
+                            $contactsclose .= $fullname . '</a>';
+
+                            $contacts .= '<span class="fc-coursecontactroles">' . implode(", ", $rolenames) . ': </span>';
+                            switch ($clinktype) {
+                                case 'email':
+                                    $contacts .= $iconclass . '<a href="mailto:' . $user->email . '">';
+                                    $contacts .= $contactsclose;
+                                    break;
+                                case 'message':
+                                    $contacts .= $iconclass . '<a href="' . new moodle_url('/message/index.php',
+                                            ['id' => $coursecontact['user']->id]
+                                            ) . '">';
+                                    $contacts .= $contactsclose;
+                                    break;
+                                case 'profile':
+                                    $contacts .= $iconclass . '<a href="' . new moodle_url('/user/profile.php',
+                                            ['id' => $coursecontact['user']->id, 'course' => $PAGE->course->id]
+                                            ) . '">';
+                                    $contacts .= $contactsclose;
+                                    break;
+                                default: // Default is no-link.
+                                    $contacts .= $fullname;
+                                    break;
+
+                            }
+                            $contacts .= '</li>';
+
                         }
-                        $teachers .= '<li class="mb-4">';
-                        $teacherclose = '<span class="sr-only">' . $linksr[$teacherlinktype] . ' : </span>'
-                                . $fullname . '</a><li>';
-                        switch ($teacherlinktype) {
-                            case 'email':
-                                $teachers .= $iconclass . '<a href="mailto:' . $user->email . '">';
-                                $teachers .= $teacherclose;
-                                break;
-                            case 'message':
-                                $teachers .= $iconclass . '<a href="' . $CFG->wwwroot . '/message/index.php?id=' . $user->id . '">';
-                                $teachers .= $teacherclose;
-                                break;
-                            case 'profile':
-                                $teachers .= $iconclass . '<a href="' . $CFG->wwwroot . '/user/profile.php?id=' . $user->id . '">';
-                                $teachers .= $teacherclose;
-                                break;
-                            default: // Default is no-link.
-                                $teachers .= $fullname . '</li>';
-                                break;
-                        }
+
                     }
+
                 }
-                if (empty($teachers)) {
-                    $replace['/\{courseteachers\}/i'] = get_string('noteachersyet');
+                if (empty($contacts)) {
+                    $replace['/\{coursecontacts\}/i'] = get_string('nocontacts', 'message');
                 } else {
-                    $replace['/\{courseteachers\}/i'] = '<ul class="fc-teachers list-unstyled ml-0 pl-0">' . $teachers . '</ul>';
+                    $replace['/\{coursecontacts\}/i'] = '<ul class="fc-coursecontacts list-unstyled ml-0 pl-0">' . $contacts . '</ul>';
                 }
+                unset($contacts, $contactsclose, $fullname, $url, $user, $rolenames, $iconclass, $linksr, $clinktype, $cshowpic);
             }
 
             // Tag: {courseparticipantcount}.
