@@ -23,7 +23,7 @@ define(['jquery', 'jqueryui', 'core/log', 'mod_readaloud/definitions',
         enablepreview: false,
         enablelandr: false,
         letsshadow: false,
-        streamingresults: false,
+
 
         //CSS in this file
         passagefinished: def.passagefinished,
@@ -151,10 +151,6 @@ define(['jquery', 'jqueryui', 'core/log', 'mod_readaloud/definitions',
             var on_speech = function (eventdata) {
                 var speech = eventdata.capturedspeech;
                 var speechresults = eventdata.speechresults;
-                if(dd.activitydata.transcriber == def.transcriber_amazonstreaming) {
-                    dd.streamingresults.push(speechresults);
-                    log.debug(dd.streamingresults);
-                }
             };
 
             //originates from the recording:started event
@@ -164,12 +160,6 @@ define(['jquery', 'jqueryui', 'core/log', 'mod_readaloud/definitions',
                 dd.rec_time_start = new Date().getTime();
                 dd.dopassagelayout();
                 dd.controls.passagecontainer.show(1000, beginall);
-
-                //start streaming transcriber
-                if(dd.activitydata.transcriber == def.transcriber_amazonstreaming) {
-                    //init our streamingresults
-                    dd.streamingresults = [];
-                }//end of if amazonstreaming
             };
 
             //originates from the recording:ended event
@@ -200,18 +190,9 @@ define(['jquery', 'jqueryui', 'core/log', 'mod_readaloud/definitions',
                     rectime = Math.ceil(rectime / 1000);
                 }
 
-                if(dd.activitydata.transcriber == def.transcriber_amazonstreaming &&
-                    dd.streamingresults &&
-                    dd.streamingresults.length > 0){
-                    //wait a few seconds for the final recognition to come back
-                    setTimeout(dd.send_streaming_submission,1500,dd, eventdata.mediaurl, rectime);
-                    //dd.send_streaming_submission(eventdata.mediaurl, rectime, dd.streamingresults);
-                }else {
-                    dd.send_submission(eventdata.mediaurl, rectime);
-                    //and let the user know that they are all done
-                    dd.dofinishedlayout();
-                }
-
+                dd.send_submission(eventdata.mediaurl, rectime);
+                //and let the user know that they are all done
+                dd.dofinishedlayout();
             };
 
             //init the recorder
@@ -237,10 +218,12 @@ define(['jquery', 'jqueryui', 'core/log', 'mod_readaloud/definitions',
             });
             dd.controls.startlandrbutton.click(function(e){
                 dd.dolandrlayout();
+                landr.shadow=false;
             });
             dd.controls.startlandrbutton.keypress(function(e){
                 if (e.which == 32 || e.which == 13 ) {
                     dd.dolandrlayout();
+                    landr.shadow=false;
                     e.preventDefault();
                 }
             });
@@ -256,11 +239,18 @@ define(['jquery', 'jqueryui', 'core/log', 'mod_readaloud/definitions',
                 }
             });
             dd.controls.startshadowbutton.click(function(e){
+                //landr shadowing
+                //dd.dolandrlayout();
+                // landr.shadow=true;
+
                 dd.letsshadow=true;
                 dd.doreadinglayout();
             });
             dd.controls.startshadowbutton.keypress(function(e){
                 if (e.which == 32 || e.which == 13) {
+                    //dd.dolandrlayout();
+                    //landr.shadow=true;
+
                     dd.letsshadow=true;
                     dd.doreadinglayout();
                     e.preventDefault();
@@ -278,50 +268,16 @@ define(['jquery', 'jqueryui', 'core/log', 'mod_readaloud/definitions',
             });
         },
 
-
-        send_streaming_submission: function (that, filename, rectime) {
-            //var that = this;
-            var streamingresults=that.streamingresults;
-            Ajax.call([{
-                methodname: 'mod_readaloud_submit_streaming_attempt',
-                args: {
-                    cmid: that.cmid,
-                    filename: filename,//encodeURIComponent(filename),
-                    rectime: rectime,
-                    awsresults: JSON.stringify(streamingresults)
-                },
-                done: function (ajaxresult) {
-                    var payloadobject = JSON.parse(ajaxresult);
-                    if (payloadobject) {
-                        switch (payloadobject.success) {
-                            case true:
-                                log.debug('attempted submission accepted');
-
-                                break;
-
-                            case false:
-                            default:
-                                log.debug('attempted item evaluation failure');
-                                if (payloadobject.message) {
-                                    log.debug('message: ' + payloadobject.message);
-                                }
-                        }
-                    }
-                    //and let the user know that they are all done
-                    that.dofinishedlayout();
-                },
-                fail: notification.exception
-            }]);
-        },
-
         send_submission: function (filename, rectime) {
             var that = this;
+            var shadowing = (that.enableshadow && that.letsshadow) ? 1 : 0;
             Ajax.call([{
                 methodname: 'mod_readaloud_submit_regular_attempt',
                 args: {
                     cmid: that.cmid,
                     filename:  filename,//encodeURIComponent(filename),
-                    rectime: rectime
+                    rectime: rectime,
+                    shadowing: shadowing
                 },
                 done: function(ajaxresult){
                     var payloadobject = JSON.parse(ajaxresult);
@@ -329,9 +285,7 @@ define(['jquery', 'jqueryui', 'core/log', 'mod_readaloud/definitions',
                         switch (payloadobject.success) {
                             case true:
                                 log.debug('attempted submission accepted');
-
                                 break;
-
                             case false:
                             default:
                                 log.debug('attempted item evaluation failure');

@@ -308,13 +308,13 @@ function readaloud_get_user_grades($moduleinstance, $userid = 0) {
             //aigrades sql
             $ai_sql = "SELECT u.id, u.id AS userid,MAX(ai.sessionscore) AS rawgrade
                   FROM {user} u, {" . constants::M_AITABLE . "} ai INNER JOIN {" . constants::M_USERTABLE . "} attempt ON ai.attemptid = attempt.id
-                 WHERE  u.id = attempt.userid AND ai.readaloudid = :moduleid
+                 WHERE  u.id = attempt.userid AND ai.readaloudid = :moduleid AND attempt.dontgrade = 0
                        $user
               GROUP BY u.id";
 
             $human_sql = "SELECT u.id, u.id AS userid,MAX(a.sessionscore) AS rawgrade
                   FROM {user} u,  {" . constants::M_USERTABLE . "} a 
-                 WHERE  u.id = a.userid AND a.readaloudid = :moduleid
+                 WHERE  u.id = a.userid AND a.readaloudid = :moduleid AND a.dontgrade = 0
                        $user
               GROUP BY u.id";
 
@@ -348,21 +348,21 @@ function readaloud_get_user_grades($moduleinstance, $userid = 0) {
             //aigrades sql
             $ai_sql = "SELECT u.id, u.id AS userid, MAX(ai.sessionscore) AS rawgrade
                       FROM {user} u, {" . constants::M_AITABLE . "} ai INNER JOIN {" . constants::M_USERTABLE . "} attempt ON ai.attemptid = attempt.id
-                     WHERE attempt.id= (SELECT max(id) FROM {" . constants::M_USERTABLE . "} iattempt WHERE iattempt.userid=u.id AND iattempt.readaloudid = ai.readaloudid)  AND u.id = attempt.userid AND ai.readaloudid = :moduleid
+                     WHERE attempt.id= (SELECT max(id) FROM {" . constants::M_USERTABLE . "} iattempt WHERE iattempt.userid=u.id AND iattempt.readaloudid = ai.readaloudid AND iattempt.dontgrade = 0)  AND u.id = attempt.userid AND ai.readaloudid = :moduleid
                            $user
                   GROUP BY u.id, ai.sessionscore";
 
             //human_sql
             $human_sql = "SELECT u.id, u.id AS userid, MAX(a.sessionscore) AS rawgrade
                           FROM {user} u, {" . constants::M_USERTABLE . "} a
-                         WHERE a.id= (SELECT max(id) FROM {" . constants::M_USERTABLE . "} ia WHERE ia.userid=u.id AND ia.readaloudid = a.readaloudid)  AND u.id = a.userid AND a.readaloudid = :moduleid
+                         WHERE a.id= (SELECT max(id) FROM {" . constants::M_USERTABLE . "} ia WHERE ia.userid=u.id AND ia.readaloudid = a.readaloudid AND ia.dontgrade = 0)  AND u.id = a.userid AND a.readaloudid = :moduleid
                                $user
                       GROUP BY u.id";
 
             //hybrid sql
             $hybrid_sql = "SELECT u.id, MAX(attempt.sessiontime) as sessiontime, MAX(attempt.sessionscore) as humangrade, u.id AS userid, MAX(ai.sessionscore) AS aigrade
                       FROM {user} u, {" . constants::M_AITABLE . "} ai INNER JOIN {" . constants::M_USERTABLE . "} attempt ON ai.attemptid = attempt.id
-                     WHERE attempt.id= (SELECT max(id) FROM {" . constants::M_USERTABLE . "} iattempt WHERE iattempt.userid=u.id AND iattempt.readaloudid = ai.readaloudid)  AND u.id = attempt.userid AND ai.readaloudid = :moduleid
+                     WHERE attempt.id= (SELECT max(id) FROM {" . constants::M_USERTABLE . "} iattempt WHERE iattempt.userid=u.id AND iattempt.readaloudid = ai.readaloudid AND iattempt.dontgrade = 0)  AND u.id = attempt.userid AND ai.readaloudid = :moduleid
                            $user
                   GROUP BY u.id";
 

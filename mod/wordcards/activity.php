@@ -18,6 +18,8 @@ $oldstep = optional_param('oldstep',mod_wordcards_module::STATE_TERMS, PARAM_TEX
 
 //request a reattempt
 $reattempt = optional_param('reattempt',0, PARAM_INT);
+//cancel an attempt
+$cancelattempt = optional_param('cancelattempt',0, PARAM_INT);
 
 $mod = mod_wordcards_module::get_by_cmid($cmid);
 $course = $mod->get_course();
@@ -32,12 +34,29 @@ if($mod->can_attempt() && $reattempt){
     $mod->create_reattempt();
 }
 
+//fetch current step
+list($currentstate) = $mod->get_state();
+
+//is teacher?
+$isteacher = ($mod->can_manage() || $mod->can_viewreports());
+
+//cancel attempt?
+//must be not a reattempt (url fiddling by someone) and not on END or TERM. But a teacher is always on END so we let teachers through
+//because they may be in "switch role to student" mode
+// There is an issue currently, if a user is on their first attempt and "quits" their latest stare will be terms and since all terms are seen
+// they wil "resume" to step 1. First attempt users can not quit basically 2021-12-02
+if(!$reattempt
+    && $cancelattempt
+    && ($currentstate!==mod_wordcards_module::STATE_END  && $currentstate!== mod_wordcards_module::STATE_TERMS)
+    ){
+    $mod->remove_attempt();
+    redirect(new moodle_url('/mod/wordcards/view.php', ['id' => $cm->id]));
+}
 
 //we use the suggested step if they are finished or a teacher
 //otherwsie we use their currentstate (the step they are up to)
 //$currentstate = the latest step they have acccess to
 //$currentstep = the step we have agreed to display
-list($currentstate) = $mod->get_state();
 if($currentstate==mod_wordcards_module::STATE_END){
     //we have endded, but we can go wherever we need to
     $currentstep=$nextstep;
@@ -139,5 +158,5 @@ switch ($practicetype){
     default:
         echo $renderer->scatter_page($mod, $wordpool,$currentstep);
 }
-
+echo $renderer->cancel_attempt_button($mod);
 echo $renderer->footer();

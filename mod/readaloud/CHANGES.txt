@@ -1,8 +1,16 @@
+2.0.72 (Build 2021112700)
+- Added a skeleton placeholder for loading audio
 
-2.0.XX (Build 20211105xx)
+2.0.71 (Build 2021112600)
+- Fixed broken spot check Ok/Not ok buttons
+- Fixed problem with human/hybrid grading pushed in last update
+
+2.0.70 (Build 2021112100)
+- Fixed browser speech recognition on Safari
 - renamed button to push all grades to gradebook
 - added a CFG switch to hide push feature
 - removed PHP 7.1+ only syntax (list unpacking)
+- added option to prevent shadow mode posting grades to grading and appearingin reports
 
 2.0.69 (Build 2021103101)
 - fixed broken upgrade script

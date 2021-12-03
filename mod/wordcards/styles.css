@@ -365,6 +365,15 @@
     margin-left: auto;
     margin-right: auto;
 }
+.mod_wordcards_cancelattempt_cont {
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+.mod_wordcards_cancelattempt_cont .cancel_attempt_button {
+    max-width: 250px;
+    /* float: right; */
+}
 
 #wordcards-answer-input {
     width: 100%;

@@ -560,3 +560,7 @@ $string['masterinstance']='Master Instance';
 $string['masterinstance_details']='Master instance allows the author to push the individual settings of one ReadAloud to existing copies of the same activity. They must have exactly the same name.';
 
 $string['pushpage_explanation']= "Use the buttons on this page to push settings from this ReadAloud instance to clones of it (ie activities with the same name). Be careful there is no going back so be sure of your intention before using.";
+
+$string['disableshadowgrading'] = "Disable Shadow Mode Grading";
+$string['disableshadowgrading_details'] = "If checked, attempts made in shadow mode will be evaluated, but no entry passed to the gradebook.";
+$string['gradeable'] = "Gradeable";

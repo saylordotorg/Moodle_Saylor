@@ -148,6 +148,7 @@ class utils{
     public static function update_finalgrade($modid, $userid=0){
         global $DB,$USER;
 
+        //if we arrive off the finished page, we are just grading, not regrading..
         if($userid == 0){
             $userid = $USER->id;
             $regrading = false;
@@ -157,60 +158,69 @@ class utils{
 
         $mod = \mod_wordcards_module::get_by_modid($modid);
         $moduleinstance = $mod->get_mod();
+        $updateusergradebook = false; //post new grades to gradebook, set to true if find something gradeable
 
-        $records = $DB->get_records(constants::M_ATTEMPTSTABLE, ['modid' => $modid, 'userid' => $userid],'timecreated DESC');
+        $states = array(\mod_wordcards_module::STATE_STEP1, \mod_wordcards_module::STATE_STEP2, \mod_wordcards_module::STATE_STEP3,
+            \mod_wordcards_module::STATE_STEP4, \mod_wordcards_module::STATE_STEP5);
+
+        $records = $DB->get_records(constants::M_ATTEMPTSTABLE,
+            ['modid' => $modid, 'userid' => $userid, 'state'=>\mod_wordcards_module::STATE_END]);
 
         if (!$records) {return false;}
-        $record = array_shift($records);
-        if (!$record) {return false;}
+        foreach($records as $record) {
 
-        ///dont redo grading unless that is what we are ding (ie from recalculate final grades)
-        if ($record->totalgrade > 0 && $regrading==false) {return true;}
-        $states = array(\mod_wordcards_module::STATE_STEP1,\mod_wordcards_module::STATE_STEP2,\mod_wordcards_module::STATE_STEP3,
-                \mod_wordcards_module::STATE_STEP4,\mod_wordcards_module::STATE_STEP5);
+            ///dont redo grading unless that is what we are ding (ie from recalculate final grades)
+            if ($record->totalgrade > 0 && $regrading == false) {
+                continue;
+            }
 
-        $totalgrade=0;
-        $totalsteps=0;
-        foreach($states as $state) {
-            //if we have a practice type for the step and it has terms, then tally the grade
-            if($moduleinstance->{$state} != \mod_wordcards_module::PRACTICETYPE_NONE) {
-                switch ($state) {
-                    case \mod_wordcards_module::STATE_STEP1:
-                        $termcount = $moduleinstance->step1termcount;
-                        $grade = $record->grade1;
-                        break;
-                    case \mod_wordcards_module::STATE_STEP2:
-                        $termcount = $moduleinstance->step2termcount;
-                        $grade = $record->grade2;
-                        break;
-                    case \mod_wordcards_module::STATE_STEP3:
-                        $termcount = $moduleinstance->step3termcount;
-                        $grade = $record->grade3;
-                        break;
-                    case \mod_wordcards_module::STATE_STEP4:
-                        $termcount = $moduleinstance->step4termcount;
-                        $grade = $record->grade4;
-                        break;
-                    case \mod_wordcards_module::STATE_STEP5:
-                        $termcount = $moduleinstance->step5termcount;
-                        $grade = $record->grade5;
-                        break;
-                    case \mod_wordcards_module::STATE_END:
-                    case \mod_wordcards_module::STATE_TERMS:
-                    default:
-                        $grade = 0;
-                        $termcount = 0;
-                        break;
-                }
-                if ($termcount > 0) {
-                    $totalsteps++;
-                    $totalgrade += $grade;
+            $totalgrade = 0;
+            $totalsteps = 0;
+            foreach ($states as $state) {
+                //if we have a practice type for the step and it has terms, then tally the grade
+                if ($moduleinstance->{$state} != \mod_wordcards_module::PRACTICETYPE_NONE) {
+                    switch ($state) {
+                        case \mod_wordcards_module::STATE_STEP1:
+                            $termcount = $moduleinstance->step1termcount;
+                            $grade = $record->grade1;
+                            break;
+                        case \mod_wordcards_module::STATE_STEP2:
+                            $termcount = $moduleinstance->step2termcount;
+                            $grade = $record->grade2;
+                            break;
+                        case \mod_wordcards_module::STATE_STEP3:
+                            $termcount = $moduleinstance->step3termcount;
+                            $grade = $record->grade3;
+                            break;
+                        case \mod_wordcards_module::STATE_STEP4:
+                            $termcount = $moduleinstance->step4termcount;
+                            $grade = $record->grade4;
+                            break;
+                        case \mod_wordcards_module::STATE_STEP5:
+                            $termcount = $moduleinstance->step5termcount;
+                            $grade = $record->grade5;
+                            break;
+                        case \mod_wordcards_module::STATE_END:
+                        case \mod_wordcards_module::STATE_TERMS:
+                        default:
+                            $grade = 0;
+                            $termcount = 0;
+                            break;
+                    }
+                    if ($termcount > 0) {
+                        $totalsteps++;
+                        $totalgrade += $grade;
+                    }
                 }
             }
+            if ($totalsteps > 0) {
+                $grade = ROUND(($totalgrade / $totalsteps), 0);
+                $DB->set_field(constants::M_ATTEMPTSTABLE, 'totalgrade', $grade, array('id' => $record->id));
+                $updateusergradebook= true;
+            }
         }
-        if($totalsteps>0) {
-            $grade = ROUND(($totalgrade / $totalsteps), 0);
-            $DB->set_field(constants::M_ATTEMPTSTABLE, 'totalgrade', $grade,array('id'=>$record->id));
+        //if we have something to update, do the re-grade
+        if( $updateusergradebook) {
             wordcards_update_grades($moduleinstance, $userid, false);
         }
         return true;
@@ -1048,7 +1058,7 @@ class utils{
 
         $t_options = utils::fetch_options_transcribers();
         $mform->addElement('select', 'transcriber', get_string('transcriber', 'mod_wordcards'),
-                $t_options,$config->ttslanguage);
+                $t_options,$config->transcriber);
 
         $mform->addElement('hidden', 'skipreview',0);
         $mform->setType('skipreview',PARAM_INT);
@@ -1082,6 +1092,14 @@ class utils{
         return $moduleinstance;
 
     }//end of prepare_file_and_json_stuff
+
+    //What multi-attempt grading approach
+    public static function get_grade_options() {
+        return array(
+            constants::M_GRADELATEST => get_string("gradelatest", constants::M_COMPONENT),
+            constants::M_GRADEHIGHEST => get_string("gradehighest", constants::M_COMPONENT)
+        );
+    }
 
 
 }

@@ -5,7 +5,7 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'mod_minilesson/poll
   This file is to manage the quiz stage
    */
 
-  log.debug('MiniLesson Quiz helper: initialising');
+  log.debug('MiniLesson dictation: initialising');
 
   return {
 
@@ -48,7 +48,15 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'mod_minilesson/poll
         var index = $(this).data("index");
         var correct = itemdata.sentences[index].sentence.trim().toLowerCase();
         var typed = $(this).val().trim().toLowerCase();
+
+        //update char count
         $("#"+itemdata.uniqueid+"_container .dictationplayer_"+index+"_chars").html(typed.length);
+        //trim punctuation before comparing, if ignore punctuation is set
+        if(itemdata.ignorepunctuation){
+            correct = quizhelper.cleanText(correct);
+            typed = quizhelper.cleanText(typed);
+        }
+
         if (correct == typed) {
           $("#"+itemdata.uniqueid+"_container .dictate-feedback[data-index='" + index + "']").removeClass("fa-times").addClass("fa-check").css("color","green").show();
         } else {

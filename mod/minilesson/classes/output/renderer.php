@@ -418,6 +418,7 @@ class renderer extends \plugin_renderer_base {
         $recopts['owner']=hash('md5',$USER->username);
         $recopts['region']=$moduleinstance->region;
         $recopts['ttslanguage']=$moduleinstance->ttslanguage;
+        $recopts['ds_only']=$moduleinstance->transcriber==constants::TRANSCRIBER_POODLL;
 
 
         $recopts['courseurl']=$CFG->wwwroot . '/course/view.php?id=' . $moduleinstance->course ;

@@ -1531,7 +1531,7 @@ if(true){
                 "SELECT tu.*,tai.accuracy as aiaccuracy,tai.wpm as aiwpm, tai.sessionscore as aisessionscore,tai.fulltranscript as fulltranscript FROM {" .
                 constants::M_USERTABLE . "} tu INNER JOIN {user} u ON tu.userid=u.id " .
                 "INNER JOIN {" . constants::M_AITABLE . "} tai ON tai.attemptid=tu.id " .
-                "WHERE tu.readaloudid=? AND u.id=?" .
+                "WHERE tu.readaloudid=? AND u.id=? AND tu.dontgrade = 0 " .
                 " ORDER BY u.lastnamephonetic,u.firstnamephonetic,u.lastname,u.firstname,u.middlename,u.alternatename,tu.id DESC";
 
         $alldata = $DB->get_records_sql($sql, array($moduleinstance->id, $userid));
@@ -1579,7 +1579,7 @@ if(true){
     }
 
     //save the data to Moodle.
-    public static function create_attempt($filename, $rectime, $readaloud) {
+    public static function create_attempt($filename, $rectime, $readaloud,$gradeable) {
         global $USER, $DB;
 
         //correct filename which has probably been massaged to get through mod_security
@@ -1597,6 +1597,7 @@ if(true){
         $newattempt->sessionerrors = '';
         $newattempt->errorcount = 0;
         $newattempt->wpm = 0;
+        $newattempt->dontgrade = $gradeable ? 0 : 1 ;
         $newattempt->timecreated = time();
         $newattempt->timemodified = time();
         $attemptid = $DB->insert_record(constants::M_USERTABLE, $newattempt);

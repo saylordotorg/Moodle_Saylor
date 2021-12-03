@@ -675,3 +675,18 @@ div.mod_readaloud_attemptsummarytable {
   color: red;
   display: block;
 }
+
+.mod_readaloud_skeleton_box {
+  background-color: #DDDBDD;
+  color: grey;
+  -webkit-mask: linear-gradient(-60deg,#000 30%,#0005,#000 70%) right/300% 100%;
+  background-repeat: no-repeat;
+  animation: readaloudshimmer 2.5s infinite;
+
+}
+@keyframes readaloudshimmer {
+  100% {-webkit-mask-position:left}
+}
+
+
+

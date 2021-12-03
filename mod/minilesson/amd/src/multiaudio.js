@@ -214,6 +214,7 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'mod_minilesson/poll
             var opts = {};
             opts.uniqueid = itemdata.uniqueid;
             opts.callback = theCallback;
+            opts.ds_only=quizhelper.is_ds_only();
             ttrecorder.clone().init(opts);
         }else{
             //init cloudpoodll push recorder

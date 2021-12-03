@@ -141,7 +141,6 @@ class mod_wordcards_module {
                 //do nothing
                 break;
         }
-
         return $termcount;
     }
 
@@ -149,12 +148,19 @@ class mod_wordcards_module {
         return self::$states;
     }
 
-
-
     public function get_allowed_states() {
+        //if we are an admin/teacher kind of person we can see all the steps
+        if ($this->can_manage() || $this->can_viewreports()) {
+            return self::$states;
+        }
+
         list($state) = $this->get_state();
         if ($state == self::STATE_END) {
-            return self::$states;
+            //we used to allow people to retry the different states
+            // but they got confused and thought they were re-attempting
+            //so now they can not
+            //return self::$states;
+            return [self::STATE_TERMS];
         }
         return [$state];
     }
@@ -607,7 +613,19 @@ class mod_wordcards_module {
         }
     }
 
-    //force a reattemot that will then start them off on step1 (it will bump them up from terms step)
+    //remove a partial attempt if the user selects "cancel_attempt"
+    public function remove_attempt() {
+        global $DB;
+
+        //only cancel if we have a current attempt going
+        $latestattempt = $this->get_latest_attempt();
+        if(!$latestattempt){return false;}
+        if($latestattempt->state == self::STATE_END){return false;}
+        $ret = $DB->delete_records(constants::M_ATTEMPTSTABLE,array('id'=>$latestattempt->id));
+        return $ret;
+    }
+
+    //force a reattempt that will then start them off on step1 (it will bump them up from terms step)
     public function create_reattempt() {
         global $DB, $USER;
 
@@ -622,7 +640,7 @@ class mod_wordcards_module {
         $record->state = self::STATE_TERMS;
         $record->statedata = '{}';
         $record->timecreated = time();
-        $ret = $DB->insert_record('wordcards_progress', $record);
+        $ret = $DB->insert_record(constants::M_ATTEMPTSTABLE, $record);
         return $ret;
 
     }
@@ -639,10 +657,10 @@ class mod_wordcards_module {
         $record->state = $state;
         $record->statedata = json_encode($statedata);
         if (!empty($record->id)) {
-            $DB->update_record('wordcards_progress', $record);
+            $DB->update_record(constants::M_ATTEMPTSTABLE, $record);
         } else {
             $record->timecreated = time();
-            $DB->insert_record('wordcards_progress', $record);
+            $DB->insert_record(constants::M_ATTEMPTSTABLE, $record);
         }
 
         // The user finished the activity, notify the completion API.
@@ -671,7 +689,7 @@ class mod_wordcards_module {
             return;
 
         } else if ($state == self::STATE_TERMS) {
-            if ($this->has_seen_all_terms()) {
+            if ( $this->has_seen_all_terms()) {
                     $next_step = $this->get_next_step(self::STATE_TERMS);
                     $this->set_state($next_step);
             }

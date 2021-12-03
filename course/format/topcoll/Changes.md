@@ -1,6 +1,10 @@
 ﻿Version Information
 ===================
 
+Version 3.10.1.5 - 28/11/2021
+-----------------------------
+  1. Fix 'Lesson activity causes DB error' - https://moodle.org/mod/forum/discuss.php?d=429093#p1727967.
+
 Version 3.10.1.4 - 15/11/2021
 -----------------------------
   1. Add 'enableadditionalmoddata' setting to turn on / off additional information at a site level.  Default is 'off'!

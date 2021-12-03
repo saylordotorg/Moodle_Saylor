@@ -63,7 +63,7 @@ class backup_readaloud_activity_structure_step extends backup_activity_structure
         $attempts = new backup_nested_element('attempts');
         $attempt = new backup_nested_element('attempt', array('id'), array(
                 constants::M_MODNAME . "id", "courseid", "userid", "status", "filename", "wpm", "accuracy",
-                "sessionscore", "sessiontime", "sessionerrors", "sessionendword", "errorcount", "timecreated", "timemodified"
+                "sessionscore", "sessiontime", "sessionerrors", "sessionendword", "errorcount","dontgrade", "timecreated", "timemodified"
         ));
 
         //ai results

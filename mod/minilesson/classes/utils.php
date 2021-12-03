@@ -722,8 +722,8 @@ class utils{
     }
 
     public static function fetch_options_transcribers() {
-        $options = array(constants::TRANSCRIBER_AMAZONTRANSCRIBE => get_string("transcriber_amazontranscribe", constants::M_COMPONENT),
-                constants::TRANSCRIBER_GOOGLECLOUDSPEECH => get_string("transcriber_googlecloud", constants::M_COMPONENT));
+        $options = array(constants::TRANSCRIBER_AUTO => get_string("transcriber_auto", constants::M_COMPONENT),
+            constants::TRANSCRIBER_POODLL => get_string("transcriber_poodll", constants::M_COMPONENT));
         return $options;
     }
 
@@ -731,6 +731,11 @@ class utils{
         $options = array(constants::TEXTPROMPT_DOTS => get_string("textprompt_dots", constants::M_COMPONENT),
                 constants::TEXTPROMPT_WORDS => get_string("textprompt_words", constants::M_COMPONENT));
         return $options;
+    }
+
+    public static function fetch_options_yesno() {
+        $yesnooptions = array(1 => get_string('yes'), 0 => get_string('no'));
+        return $yesnooptions;
     }
 
     public static function fetch_options_listenorread() {
@@ -984,6 +989,11 @@ class utils{
             $langoptions = \mod_minilesson\utils::get_lang_options();
             $mform->addElement('select', 'ttslanguage', get_string('ttslanguage', constants::M_COMPONENT), $langoptions);
             $mform->setDefault('ttslanguage',$config->ttslanguage);
+
+            //transcriber
+            $t_options =  \mod_minilesson\utils::fetch_options_transcribers();
+            $mform->addElement('select', 'transcriber', get_string('transcriber', constants::M_COMPONENT),
+                $t_options,$config->transcriber);
 
             //region
             $regionoptions = \mod_minilesson\utils::get_region_options();

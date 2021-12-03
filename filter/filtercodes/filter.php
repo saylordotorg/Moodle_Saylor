@@ -1014,21 +1014,25 @@ class filter_filtercodes extends moodle_text_filter {
 
                         // Get tag settings.
                         $cshowpic = get_config('filter_filtercodes', 'coursecontactshowpic');
+                        $cshowdesc = get_config('filter_filtercodes', 'coursecontactshowdesc');
                         $clinktype = get_config('filter_filtercodes', 'coursecontactlinktype');
 
                         // Prepare some strings.
                         $linksr = ['' => '',
                                 'email' => get_string('issueremail', 'badges'),
                                 'message' => get_string('message', 'message'),
-                                'profile' => get_string('profile')];
+                                'profile' => get_string('profile'),
+                                'phone' => get_string('phone')];
                         $iconclass = ['' => '',
                                 'email' => 'fa fa-envelope-o',
                                 'message' => 'fa fa-comment',
-                                'profile' => 'fa fa-info-circle'];
+                                'profile' => 'fa fa-info-circle',
+                                'phone' => 'fa fa-mobile'];
                         $iconclass = '<i class="' . $iconclass[$clinktype] . '" aria-hidden="true"></i> ';
 
+                        $cnt = 0;
                         foreach ($course->get_course_contacts() as $coursecontact) {
-                            $contacts .= '<li class="mb-4">';
+                            $contacts .= '<li>';
 
                             // Get list of course contacts based on settings in Site Administration > Appearances > Courses.
                             // Get liset of user's roles in the course.
@@ -1042,7 +1046,9 @@ class filter_filtercodes extends moodle_text_filter {
                             $imgurl = str_replace('$1', '3', $this->getprofilepictureurl($user));
                             $fullname = get_string('fullnamedisplay', null, $user);
                             if ($cshowpic) {
-                                $contacts .= '<img src="' . $imgurl . '" alt="' . $fullname . '" class="img-fluid img-thumbnail">';
+                                $contacts .= '<img src="' . $imgurl . '" alt="' . $fullname
+                                    . '" class="img-fluid img-thumbnail' . (!empty($cnt) ? ' mt-4' : '') . '">';
+                                $cnt++;
                             }
 
                             $contactsclose = '<span class="sr-only">' . $linksr[$clinktype] . ': </span>';
@@ -1066,10 +1072,18 @@ class filter_filtercodes extends moodle_text_filter {
                                             ) . '">';
                                     $contacts .= $contactsclose;
                                     break;
+                                case 'phone' && !empty($user->phone):
+                                    $contacts .= $iconclass . '<a href="tel:' . $user->phone . '">';
+                                    $contacts .= $contactsclose;
+                                    break;
                                 default: // Default is no-link.
                                     $contacts .= $fullname;
                                     break;
 
+                            }
+
+                            if ($cshowdesc && !empty($user->description)) {
+                                $contacts .= '<div' . (empty($cshowpic) ? ' class="mb-4"' : '') . '>' . $user->description . '</div>';
                             }
                             $contacts .= '</li>';
 
@@ -1474,7 +1488,7 @@ class filter_filtercodes extends moodle_text_filter {
             }
         }
 
-        // These tags: {mycourses} and {mycoursesmenu}.
+        // These tags: {mycourses} and {mycoursesmenu} and {mycoursescards}.
         if (stripos($text, '{mycourses') !== false) {
             if (isloggedin() && !isguestuser()) {
 
@@ -1487,6 +1501,18 @@ class filter_filtercodes extends moodle_text_filter {
                 // Append the chosen sortorder.
                 $sortorder = $sortorder . ',' . $CFG->navsortmycoursessort . ' ASC';
                 $mycourses = enrol_get_my_courses('fullname,id', $sortorder);
+
+                // Remove completed courses from the list.
+                if (isset($CFG->enablecompletion) && $CFG->enablecompletion == 1 // COMPLETION_ENABLED.
+                        && get_config('filter_filtercodes', 'hidecompletedcourses')) {
+                    foreach ($mycourses as $key => $mycourse) {
+                        $ccompletion = new completion_completion(['userid' => $USER->id, 'course' => $mycourse->id]);
+                        if (!empty($ccompletion->timecompleted)) {
+                            // Remove completed course from the list.
+                            unset($mycourses[$key]);
+                        }
+                    }
+                }
 
                 // Tag: {mycourses}. An unordered list of links to enrolled course.
                 if (stripos($text, '{mycourses}') !== false) {
@@ -1503,18 +1529,6 @@ class filter_filtercodes extends moodle_text_filter {
                     unset($list);
                 }
 
-                // Remove completed courses from the list.
-                if (isset($CFG->enablecompletion) && $CFG->enablecompletion == 1 // COMPLETION_ENABLED.
-                        && get_config('filter_filtercodes', 'hidecompletedcourses')) {
-                    foreach ($mycourses as $key => $mycourse) {
-                        $ccompletion = new completion_completion(['userid' => $USER->id, 'course' => $mycourse->id]);
-                        if (!empty($ccompletion->timecompleted)) {
-                            // Remove completed course from the list.
-                            unset($mycourses[$key]);
-                        }
-                    }
-                }
-
                 // Tag: {mycoursesmenu}. A custom menu list of enrolled course names with links.
                 if (stripos($text, '{mycoursesmenu}') !== false) {
                     $list = '';
@@ -1529,11 +1543,28 @@ class filter_filtercodes extends moodle_text_filter {
                     $replace['/\{mycoursesmenu\}/i'] = $list;
                     unset($list);
                 }
+
+                // Tag: {mycoursescards}. Generates course cards for each enrolled course.
+                if (stripos($text, '{mycoursescards}') !== false) {
+                    $courseids = [];
+                    foreach ($mycourses as $mycourse) {
+                        $courseids[] = $mycourse->id;
+                    }
+                    // If not enrolled in any courses.
+                    if (empty($courseids)) {
+                        $list = '';
+                    } else { // Otherwise, generate cards.
+                        $list = '<div class="card-deck mr-0 fc-mycoursescards">' . $this->rendercoursecards($courseids) . '</div>';
+                    }
+                    $replace['/\{mycoursescards\}/i'] = $list;
+                    unset($list);
+                }
                 unset($mycourses);
             } else { // Not logged in.
                 // Replace tags with message indicating that you need to be logged in.
                 $replace['/\{mycourses\}/i'] = '<ul class="mycourseslist"><li>' . get_string('loggedinnot') . '</li></ul>';
                 $replace['/\{mycoursesmenu\}/i'] = '-' . get_string('loggedinnot') . PHP_EOL;
+                $replace['/\{mycoursescards\}/i'] = '';
             }
         }
 

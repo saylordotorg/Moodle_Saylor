@@ -30,8 +30,9 @@ const M_FRONTFACEFLIP_TERM = 1;
 
 //grading options
 const M_GRADEHIGHEST= 0;
+const M_GRADELATEST= 2;
+
 const M_GRADELOWEST= 1;
-const M_GRADELATEST= 2; // we only use this one currently
 const M_GRADEAVERAGE= 3;
 const M_GRADENONE= 4;
 
@@ -72,6 +73,8 @@ const M_LANG_TRTR ='tr-TR';
 const TRANSCRIBER_NONE = 0;
 const TRANSCRIBER_AUTO = 1;
 const TRANSCRIBER_POODLL = 2;
+
+const M_USE_DATATABLES=true;
 
 
 }

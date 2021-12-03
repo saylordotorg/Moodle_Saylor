@@ -142,6 +142,7 @@ FilterCodes are meant to be entered as regular text in the Moodle WYSIWYG editor
 * {courseprogressbar}: (ALPHA) Displays course progress status as a status bar. Only works within a course.
 * {categorycards}: (ALPHA) Display top level categories as cards using the current location as the top level category. For example, on the Front Page, it will display all top level categories. However, if you are inside the Miscellaneous category (e.g., in Miscellaneous > Your Course) , it will only display the next level of categories under the Miscellaneous category.
 * {mycourses} : Display an unordered list of links to all my enrolled courses.
+* {mycoursescards} : Displays a series of cards for my enrolled courses.
 * {courserequest} : Displays a Request a Course link.
 * {label type}{/label} : Display text over background colour. The Boost theme supports the following types: **info**, **important**, **secondary**, **success** and **warning**. Other themes may also support **primary**, **danger**, **light**, **dark** and more. Example: {label info}For your information{/label}. Actual foreground and background colours vary depending on the theme. If the type is not specified, it will default to **info**. If the type specified is not supported by your theme, it may default to secondary.
 * {button URL}Label{/button} : Create a clickable button link formatted like a primary button.
@@ -168,7 +169,7 @@ FilterCodes are meant to be entered as regular text in the Moodle WYSIWYG editor
 * {courseidnumber} : Display a course's ID number.
 * {sectionid} or %7Bsectionid%7D : Display the section ID (not to be confused with the section number).
 * {sectionname} : Display the section name in which the activity is located.
-* {coursecontacts}: List of course contacts with links to their profiles, email address or messaging (there is a setting for this). Note: This tag was formerly called {courseteachers} in its ALPHA state.
+* {coursecontacts}: List of course contacts with links to their profiles, email address or messaging or phone number, and their user description (there are settings for these). Note: This tag was formerly called {courseteachers}.
 * {coursegradepercent}: Displays the current accumulated course grade of the student.
 
 Also see Courses section below.
@@ -840,6 +841,28 @@ The last one will create a button called "Dashboard", using the Moodle language 
 
 The trick is to make sure that Moodle doesn't convert the URL to a link in the editor. If it does (probably blue, underlined), you will need to use the Unlink tool to turn it back into plain text. Once saved, it will appear as a button. Alternatively, disable the **Convert URLs into links and images** filter in Site Administration > Plugins > Filters > Manage Filters and then re-enter the {button} FilterCode.
 
+### How can I style the {coursecontacts} tag?
+
+Here is an example that reduces the image and places the information next to it. Just add this CSS to your site:
+
+    .fc-coursecontacts li {
+        clear:both;
+        font-size: 1.3rem;
+        line-height: initial;
+    }
+    .fc-coursecontacts img {
+        width: 40%;
+        float: left;
+    }
+    .fc-coursecontactroles {
+        display: block;
+    }
+    .fc-coursecontacts div {
+    border-top: 1px solid lightgrey;
+    margin-top: 5px;
+    padding-top: 5px
+    }
+
 ### Do you have examples, samples and ways to which tags are working in my version of FilterCodes?
 
 Create a Page on your Moodle site, preferably in a course, so that those tags work too, and include the following code:
@@ -903,6 +926,7 @@ Create a Page on your Moodle site, preferably in a course, so that those tags wo
 * Available free moodledata disk space [{diskfreespacedata}]: {diskfreespacedata}
 * My Enrolled Courses [{mycourses}]: {mycourses}
 * My Enrolled Courses menu [{mycoursesmenu}]: {mycoursesmenu}
+* My Enrolled Courses as cards [{mycoursescards}]: {mycoursescards}
 * Link to the request a course page (blank if not enabled) [{courserequest}]: {courserequest}
 * Request a course / Course request in top level menu [{courserequestmenu0}]: {courserequestmenu0}
 * Request a course / Course request in submenu [{courserequestmenu}]: {courserequestmenu}

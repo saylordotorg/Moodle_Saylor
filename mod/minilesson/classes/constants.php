@@ -98,6 +98,7 @@ const MAXCUSTOMINT=5;
 
 const ITEMTEXTAREA_EDOPTIONS =array('trusttext' => 0,'noclean'=>1, 'maxfiles' => 0);
 
+const IGNOREPUNCTUATION = 'customint2';
 const SHOWTEXTPROMPT = 'customint1';
 const TEXTPROMPT_WORDS = 1;
 const TEXTPROMPT_DOTS = 0;
@@ -223,9 +224,8 @@ const M_PROMPT_SEPARATE=0;
 const M_PROMPT_RICHTEXT=1;
 
 const TRANSCRIBER_NONE = 0;
-const TRANSCRIBER_AMAZONTRANSCRIBE = 1;
-const TRANSCRIBER_GOOGLECLOUDSPEECH = 2;
-const TRANSCRIBER_GOOGLECHROME = 3;
+const TRANSCRIBER_AUTO = 1;
+const TRANSCRIBER_POODLL = 2;
 
 
 const M_PUSH_NONE =0;

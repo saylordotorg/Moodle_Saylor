@@ -219,6 +219,7 @@ class passagehelper {
         $gradingopts['targetwpm'] = $this->activitydata->targetwpm;
         $gradingopts['sesskey'] = sesskey();
         $gradingopts['attemptid'] = $this->attemptdata->id;
+        $gradingopts['dontgrade'] = $this->attemptdata->dontgrade;
         $gradingopts['readonly'] = $readonly;
         $gradingopts['sessionscoremethod'] = $this->activitydata->sessionscoremethod;
         if ($loading_aidata) {

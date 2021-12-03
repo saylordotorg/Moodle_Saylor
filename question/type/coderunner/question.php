@@ -111,15 +111,16 @@ class qtype_coderunner_question extends question_graded_automatically {
         $this->initialisationerrormessage = '';
         try {
             $this->templateparamsjson = $this->evaluate_merged_parameters($seed, $step);
+            $this->parameters = json_decode($this->templateparamsjson);
         } catch (Exception $e) {
             $error = $e->getMessage();
-            $this->templateparamsjson = '{"initerror": "' . $error . '"}';
+            $this->parameters = array("initerror"=>"' . $error . '");
+            $this->templateparamsjson = json_encode($this->parameters);
             $erroroninit = get_string('erroroninit', 'qtype_coderunner', array('error'=>$error));
             $this->initialisationerrormessage = $erroroninit;
         }
         // ** TODO ** Consider implications of adding the parameter true to
         // the following, so that the parameters are PHP arrays for Twig.
-        $this->parameters = json_decode($this->templateparamsjson);
         if ($this->twigall) {
             $this->twig_all();
         }
@@ -282,9 +283,9 @@ class qtype_coderunner_question extends question_graded_automatically {
     private function twig_render_with_seed($text, $seed) {
         mt_srand($seed);
         return qtype_coderunner_twig::render($text, $this->student);
-        }
-    
-    
+    }
+
+
     // Get the default ui parameters for the ui plugin and merge in
     // both the prototypes and this questions parameters.
     // In order to support the legacy method of including ui parameters
@@ -306,8 +307,8 @@ class qtype_coderunner_question extends question_graded_automatically {
         $uiparams->merge_json($this->uiparameters);
         return $uiparams->updated_params();
     }
-    
-    
+
+
     /**
      * Override default behaviour so that we can use a specialised behaviour
      * that caches test results returned by the call to grade_response().
@@ -547,6 +548,11 @@ class qtype_coderunner_question extends question_graded_automatically {
             $testcases = $this->filter_testcases($isprecheck, $this->precheck);
             $runner = new qtype_coderunner_jobrunner();
             $this->stepinfo = self::step_info($response);
+            if (isset($response['graderstate'])) {
+                $this->stepinfo->graderstate = $response['graderstate'];
+            } else {
+                $this->stepinfo->graderstate = '';
+            }
             $testoutcome = $runner->run_tests($this, $code, $attachments, $testcases, $isprecheck, $language);
             $testoutcomeserial = serialize($testoutcome);
         }
@@ -596,6 +602,7 @@ class qtype_coderunner_question extends question_graded_automatically {
             $value = isset($response[$key]) ? $response[$key] : 0;
             $stepinfo->$key = $value;
         }
+        $stepinfo->coderunnerversion = get_config('qtype_coderunner')->version;
         return $stepinfo;
     }
 
@@ -876,7 +883,9 @@ class qtype_coderunner_question extends question_graded_automatically {
      * Load the prototype for this question and store in $this->prototype
      */
     public function get_prototype() {
-        assert(!isset($this->prototype));
+        if (isset($this->prototype)) {
+            return;  // Nothing to do.
+        }
         if ($this->prototypetype == 0) {
             $context = qtype_coderunner::question_context($this);
             $this->prototype = qtype_coderunner::get_prototype($this->coderunnertype, $context);

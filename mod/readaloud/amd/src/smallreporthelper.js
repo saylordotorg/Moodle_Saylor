@@ -22,10 +22,15 @@ define(['jquery', 'core/log','mod_readaloud/definitions','core/str','core/ajax',
             this.attemptid=opts['attemptid'];
             this.ready=opts['ready'];
             this.remotetranscribe=opts['remotetranscribe'];
+            this.filename=opts['filename'];
             this.register_controls();
             this.register_events();
+
             if(!this.ready && this.remotetranscribe && this.attemptid){
+                //check for ai results
                 this.check_for_results(this,15);
+                //check for audio audio
+                this.check_for_audio(0);
             }
         },
 
@@ -41,6 +46,7 @@ define(['jquery', 'core/log','mod_readaloud/definitions','core/str','core/ajax',
         register_controls: function(){
             this.controls.heading = $('.' + def.smallreportheading);
             this.controls.player = $('.' + def.smallreportplayer);
+            this.controls.dummyplayer = $('.' + def.smallreportdummyplayer);
             this.controls.rating = $('.' + def.smallreportrating);
             this.controls.status = $('.' + def.smallreportstatus);
             this.controls.fullreportbutton = $('.' + def.fullreportbutton);
@@ -50,6 +56,38 @@ define(['jquery', 'core/log','mod_readaloud/definitions','core/str','core/ajax',
         register_events: function() {
             var that = this;
         },//end of register events
+
+        check_for_audio: function(waitms){
+            //we commence a series of ping and retries until the recorded file is available
+            var that = this;
+            $.ajax({
+                url: that.filename,
+                method: 'HEAD',
+                cache: false,
+                error: function () {
+                    //We get here if its a 404 or 403. So settimout here and wait for file to arrive
+                    //we increment the timeout period each time to prevent bottlenecks
+                    log.debug('403 errors are normal here, till the audio file arrives back from conversion');
+                    setTimeout(function () {
+                        that.check_for_audio( waitms + 500);
+                    }, waitms);
+                },
+                success: function (data, textStatus, xhr) {
+                    switch (xhr.status) {
+                        case 200:
+                            that.controls.player.attr('src',that.filename);
+                            that.controls.player.show();
+                            that.controls.dummyplayer.hide();
+                            break;
+                        default:
+                            setTimeout(function () {
+                                that.check_for_audio( waitms + 500);
+                            }, waitms);
+                    }
+
+                }
+            });
+        },
 
         check_for_results: function (that, seconds) {
 

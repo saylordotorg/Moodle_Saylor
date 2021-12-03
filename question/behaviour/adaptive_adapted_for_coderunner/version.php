@@ -22,11 +22,11 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2021111000;
+$plugin->version  = 2021112300;
 $plugin->requires = 2019111800;
 $plugin->cron = 0;
 $plugin->component = 'qbehaviour_adaptive_adapted_for_coderunner';
 $plugin->maturity = MATURITY_STABLE;
-$plugin->release = '1.3.9';
+$plugin->release = '1.4.1';
 
 $plugin->dependencies = array();

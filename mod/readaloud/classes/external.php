@@ -70,15 +70,16 @@ class mod_readaloud_external extends external_api {
         return new external_function_parameters([
                 'cmid' => new external_value(PARAM_INT),
                 'filename' => new external_value(PARAM_TEXT),
-                'rectime' => new external_value(PARAM_INT)
+                'rectime' => new external_value(PARAM_INT),
+                 'shadowing' => new external_value(PARAM_INT)
         ]);
     }
 
-    public static function submit_regular_attempt($cmid,$filename,$rectime) {
-        global $DB;
+    public static function submit_regular_attempt($cmid,$filename,$rectime, $shadowing) {
+        global $DB, $CFG;
 
         $params = self::validate_parameters(self::submit_regular_attempt_parameters(),
-                array('cmid'=>$cmid,'filename'=>$filename,'rectime'=>$rectime));
+                array('cmid'=>$cmid,'filename'=>$filename,'rectime'=>$rectime, 'shadowing'=>$shadowing));
 
 
         $cm = get_coursemodule_from_id('readaloud', $cmid, 0, false, MUST_EXIST);
@@ -89,7 +90,16 @@ class mod_readaloud_external extends external_api {
         //make database items and adhoc tasks
         $success = false;
         $message = '';
-        $attemptid = utils::create_attempt($filename, $rectime, $readaloud);
+
+        //by default we are gradeable unless its shadowing and they turned of shadow grading
+        $gradeable=true;
+        if($shadowing) {
+            $config = get_config(constants::M_COMPONENT);
+            if($config->disableshadowgrading){
+                $gradeable=false;
+            }
+        }
+        $attemptid = utils::create_attempt($filename, $rectime, $readaloud, $gradeable);
         if ($attemptid) {
             if (\mod_readaloud\utils::can_transcribe($readaloud)) {
                 $success = utils::register_aws_task($readaloud->id, $attemptid, $modulecontext->id);
@@ -231,7 +241,7 @@ class mod_readaloud_external extends external_api {
                 'cmid' => new external_value(PARAM_INT),
                 'filename' => new external_value(PARAM_TEXT),
                 'rectime' => new external_value(PARAM_INT),
-                'awsresults' => new external_value(PARAM_RAW),
+                'awsresults' => new external_value(PARAM_RAW)
         ]);
     }
 
@@ -250,7 +260,8 @@ class mod_readaloud_external extends external_api {
         //make database items and adhoc tasks
         $success = false;
         $message = '';
-        $attemptid = utils::create_attempt($filename, $rectime, $readaloud);
+        $gradeable=true;
+        $attemptid = utils::create_attempt($filename, $rectime, $readaloud, $gradeable);
         if (!$attemptid) {
             $message = "Unable to add update database with submission";
         }else{

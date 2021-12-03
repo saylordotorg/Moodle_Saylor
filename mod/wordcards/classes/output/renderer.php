@@ -25,7 +25,19 @@ class renderer extends \plugin_renderer_base {
 
         $definitions = $mod->get_terms();
         if (empty($definitions)) {
-            return $OUTPUT->notification(get_string('nodefinitions', 'mod_wordcards'));
+
+            $displaytext = $this->output->box_start();
+            $displaytext .= $this->output->heading(get_string('nodefinitions', constants::M_COMPONENT), 3, 'main');
+            $showaddwordlinks = $mod->can_manage();
+            if ($showaddwordlinks) {
+                $displaytext .= \html_writer::div(get_string('letsaddwords', constants::M_COMPONENT), '', array());
+                $displaytext .= $this->output->single_button(new \moodle_url(constants::M_URL . '/managewords.php',
+                    array('id' => $mod->get_cmid())), get_string('addwords', constants::M_COMPONENT));
+            }
+            $displaytext .= $this->output->box_end();
+            $ret= \html_writer::div($displaytext,'');
+            return $ret;
+
         }
 
         //make sure each definition has a voice
@@ -94,7 +106,8 @@ class renderer extends \plugin_renderer_base {
             'markasseen' => get_string('markasseen', 'mod_wordcards'),
             'modid' => $mod->get_id(),
             'mustseealltocontinue' => get_string('mustseealltocontinue', 'mod_wordcards'),
-            'nexturl' => (new \moodle_url('/mod/wordcards/activity.php', ['id' => $mod->get_cmid(), 'state'=>\mod_wordcards_module::STATE_STEP1,'reattempt'=>$reattempt]))->out(true),
+            'nexturl' => (new \moodle_url('/mod/wordcards/activity.php', ['id' => $mod->get_cmid(),
+                'state'=>\mod_wordcards_module::STATE_STEP1,'reattempt'=>$reattempt]))->out(true),
             'noteaboutseenforteachers' => get_string('noteaboutseenforteachers', 'mod_wordcards'),
             'notseenurl' => $this->image_url('not-seen', 'mod_wordcards')->out(true),
             'definition_grid' => $this->image_url('grid', 'mod_wordcards')->out(true),
@@ -118,6 +131,20 @@ class renderer extends \plugin_renderer_base {
         return  $opts_html . $this->render_from_template('mod_wordcards/definitions_page', $data);
     }
 
+    public function cancel_attempt_button($mod){
+
+        //teachers can not attempt, so they cant quite attempts either
+        if ($mod->can_manage() || $mod->can_viewreports()) {
+            return "";
+        }
+
+        $data=array('modid'=> $mod->get_id(),
+            'cancelurl' => (new \moodle_url('/mod/wordcards/activity.php', ['id' => $mod->get_cmid(),
+                'cancelattempt'=>1]))->out(true),
+            );
+        $this->page->requires->js_call_amd("mod_wordcards/cancel_attempt_button", 'init', array($data));
+        return $this->render_from_template('mod_wordcards/cancel_attempt_button', $data);
+    }
 
     private function make_json_string($definitions,$mod){
 
@@ -174,9 +201,9 @@ class renderer extends \plugin_renderer_base {
         $opts_html = \html_writer::tag('input', '', array('id' => $widgetid, 'type' => 'hidden', 'value' => $jsonstring));
 
 
-    $nextstep = $mod->get_next_step($currentstep);
-    $nexturl =  (new \moodle_url('/mod/wordcards/activity.php', ['id' => $mod->get_cmid(),'oldstep'=>$currentstep,'nextstep'=>$nextstep]))->out(true);
-    $token = utils::fetch_token($config->apiuser, $config->apisecret);
+        $nextstep = $mod->get_next_step($currentstep);
+        $nexturl =  (new \moodle_url('/mod/wordcards/activity.php', ['id' => $mod->get_cmid(),'oldstep'=>$currentstep,'nextstep'=>$nextstep]))->out(true);
+        $token = utils::fetch_token($config->apiuser, $config->apisecret);
 
         $opts=array('widgetid'=>$widgetid,'ttslanguage'=>$mod->get_mod()->ttslanguage,
                 'dryRun'=> $mod->can_manage(),'nexturl'=>$nexturl, 'region'=>$config->awsregion,
@@ -211,12 +238,18 @@ class renderer extends \plugin_renderer_base {
 
     public function finish_page(\mod_wordcards_module $mod) {
 
-        $scattertimemsg = $mod->get_finishedstepmsg();
-        //$scattertimemsg = str_replace('[[time]]', gmdate("i:s:00", $scattertime), $scattertimemsg);
+        $finishmsg = $mod->get_finishedstepmsg();
+        $latestattempt = $mod->get_latest_attempt();
+        if($latestattempt){
+            $finishmsg = str_replace('[[totalgrade]]', $latestattempt->totalgrade, $finishmsg);
+        }else{
+            $finishmsg = str_replace('[[totalgrade]]', '[students grade]', $finishmsg);
+        }
+
 
         $data = [
             'canmanage' => $mod->can_manage(),
-            'finishtext' => $scattertimemsg .  ' <br/> ' . $mod->get_completedmsg(),
+            'finishtext' => $finishmsg .  ' <br/> ' . $mod->get_completedmsg(),
             'modid' => $mod->get_id(),
         ];
         return $this->render_from_template('mod_wordcards/finish_page', $data);
@@ -384,7 +417,7 @@ class renderer extends \plugin_renderer_base {
     }
 
 
-    public function navigation(\mod_wordcards_module $mod, $currentstate) {
+    public function navigation(\mod_wordcards_module $mod, $currentstate, $navdisabled = false){
         $tabtree = \mod_wordcards_helper::get_tabs($mod, $currentstate);
         if ($mod->can_manage() || $mod->can_viewreports()) {
             // Teachers see the tabs, as normal tabs.
@@ -393,7 +426,7 @@ class renderer extends \plugin_renderer_base {
 
         $seencurrent = false;
         $step = 1;
-        $tabs = array_map(function($tab) use ($seencurrent, $currentstate, &$step, $tabtree) {
+        $tabs = array_map(function($tab) use ($seencurrent, $currentstate, &$step, $tabtree,$navdisabled) {
             $current = $tab->id == $currentstate;
             $seencurrent = $current || $seencurrent;
             $icon = $tab->title;
@@ -406,7 +439,7 @@ class renderer extends \plugin_renderer_base {
                 'title' => '',
                 'icon' => $icon,
                 'current' => $tab->selected,
-                'inactive' => $tab->inactive,
+                'inactive' => $tab->inactive || $navdisabled,
                 'last' => $step == count($tabtree->subtree),
                 'step' => $step++
             ];

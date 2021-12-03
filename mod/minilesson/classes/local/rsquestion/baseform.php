@@ -291,6 +291,10 @@ abstract class baseform extends \moodleform {
         $options = utils::fetch_options_textprompt();
         return $this->add_dropdown($name,$label,$options,$default);
     }
+    protected final function add_showignorepuncoptions($name, $label = null, $default=constants::TEXTPROMPT_DOTS) {
+        $options = utils::fetch_options_yesno();
+        return $this->add_dropdown($name,$label,$options,$default);
+    }
 
     protected final function add_showlistorreadoptions($name, $label = null, $default=constants::LISTENORREAD_READ) {
         $options = utils::fetch_options_listenorread();

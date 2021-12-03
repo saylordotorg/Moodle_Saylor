@@ -1,5 +1,8 @@
-Version 1.0.29(Build 202109xxxx)
+Version 1.0.29(Build 2021112100)
 - Added neural voices
+- Added ability to force Poodll STT
+- Added ignore punctuation mode to dictation
+- Fixed browser speech recognition on Safari
 
 Version 1.0.28 (Build 2021082700)
 - Better phonetic comparisons

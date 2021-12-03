@@ -151,6 +151,7 @@ log.debug('correct:',correct_clean);
              var opts = {};
              opts.uniqueid = itemdata.uniqueid;
              opts.callback = theCallback;
+             opts.ds_only=quizhelper.is_ds_only();
              ttrecorder.clone().init(opts);
          }else{
              //init cloudpoodll push recorder

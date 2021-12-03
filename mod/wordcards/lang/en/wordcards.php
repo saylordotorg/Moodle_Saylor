@@ -13,7 +13,7 @@ $string['completedmsg'] = 'Completed message';
 $string['completedmsg_help'] = 'This is the message displayed on the final screen of the activity when the student complete the last practice.';
 $string['completionwhenfinish'] = 'The student has finished the activity.';
 $string['congrats'] = 'Congratulations!';
-$string['congratsitsover'] = '<div  style="text-align: center;">You have completed this activity. Feel free to go back and practice more!</div>';
+$string['congratsitsover'] = '<div  style="text-align: center;">You have finished this activity. Thank you!</div>';
 $string['definition'] = 'Definition';
 $string['definition_help'] = 'Enter definition of the term(word/phrase) here. It should be short but still tell the student what the term means.';
 $string['definitions'] = 'Definitions';
@@ -25,7 +25,7 @@ $string['delim_comma'] = 'Comma';
 $string['delim_pipe'] = 'Pipe';
 $string['description'] = 'Description';
 $string['editterm'] = 'Edit term \'{$a}\'';
-$string['finishscatterin'] = '<h4 style="text-align: center;">Congratulations!</h4>';
+$string['finishscatterin'] = '<h4 style="text-align: center;">Congratulations!</h4><br><br><p style="text-align: center;">Your score is [[totalgrade]]%</p>';
 $string['wordcards:addinstance'] = 'Add an instance';
 $string['wordcards:view'] = 'View the module';
 $string['wordcards:viewreports'] = 'View reports';
@@ -239,7 +239,8 @@ $string['unlimited'] = "Unlimited";
 //grades report
 $string['grades'] = "Grades";
 $string['userattemptsheading'] = "User Attempts Report";
-$string['gradesheading'] = "Grades Report";
+$string['gradesheadinglatest'] = "Grades Report (latest attempt)";
+$string['gradesheadinghighest'] = "Grades Report (highest scoring attempt)";
 $string['gradesreport'] = "Grades Report";
 $string['grade1_p'] = "Step1(%)";
 $string['grade2_p'] = "Step2(%)";
@@ -275,6 +276,17 @@ $string['frontfaceflip_details']="Show the term or definition on the front face 
 $string['pushalltogradebook']="Re-push grades to gradebook";
 $string['gradespushed']="Grades pushed to gradebook";
 $string['gradesadmin']="Grades Administration";
+$string['cancelbuttontext']="Quit Attempt";
+$string['cancelattempttitle']="Quit Attempt?";
+$string['cancelattemptbody']="This will quit your attempt and take you back to the start. Really quit?";
+$string['cancelattempt']="Quit Attempt";
 
-
-
+$string['gradelatest']="most recent attempt";
+$string['gradehighest']="highest scoring attempt";
+$string['gradeoptions'] = 'Grade Options';
+$string['gradeoptions_help'] =
+    'When there are multiple attempts by a user, this setting determines which attempt to use when grading';
+$string['gradeoptions_details'] =
+    'NB This determines the gradebook entry. The activity grading report will display the attempt selected here.';
+$string['letsaddwords']="Lets add some words..";
+$string['addwords']="Add Words";

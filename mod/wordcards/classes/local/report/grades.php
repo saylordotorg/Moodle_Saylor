@@ -96,14 +96,11 @@ class grades extends basereport {
     }
 
     public function fetch_formatted_heading() {
-        $record = $this->headingdata;
-        $ret = '';
-        if (!$record) {
-            return $ret;
+        if($this->headingdata->gradeoptions == constants::M_GRADEHIGHEST) {
+            return get_string('gradesheadinghighest', constants::M_COMPONENT);
+        }else{
+            return get_string('gradesheadinglatest', constants::M_COMPONENT);
         }
-        //$ec = $this->fetch_cache(constants::M_TABLE,$record->englishcentralid);
-        return get_string('gradesheading', constants::M_COMPONENT);
-
     }
 
     public function process_raw_data($formdata) {
@@ -111,6 +108,7 @@ class grades extends basereport {
 
         //heading data
         $this->headingdata = new \stdClass();
+        $this->headingdata->gradeoptions = $formdata->gradeoptions;
         $emptydata = array();
 
         //groupsmode
@@ -122,6 +120,17 @@ class grades extends basereport {
         $context = empty($cm) ? \context_course::instance($course->id) : \context_module::instance($cm->id);
         $supergrouper = has_capability('moodle/site:accessallgroups', $context, $USER->id);
 
+        //if grading on latest attempt fetch that, if grading on highest score fetch that
+        switch($formdata->gradeoptions){
+            case constants::M_GRADEHIGHEST:
+                $sortfield = "totalgrade";
+                break;
+            case constants::M_GRADELATEST:
+            default:
+                $sortfield = "timecreated";
+                break;
+        }
+
 
         //if need to partition to groups, SQL for groups
         if($formdata->groupid > 0){
@@ -131,16 +140,16 @@ class grades extends basereport {
             $allsql ="SELECT att.* FROM {".constants::M_ATTEMPTSTABLE ."} att " .
               "INNER JOIN {groups_members} gm ON att.userid=gm.userid " .
               "WHERE gm.groupid $groupswhere AND att.modid = ? " .
-              "ORDER BY timecreated DESC";
+              "ORDER BY $sortfield DESC";
             $allparams[]=$formdata->modid;
             $alldata = $DB->get_records_sql($allsql, $allparams);
         }else{
             //if no groups, or can see all groups then the SQL is simple
-            $alldata = $DB->get_records(constants::M_ATTEMPTSTABLE, array('modid' => $formdata->modid), 'timecreated DESC');
+            $alldata = $DB->get_records(constants::M_ATTEMPTSTABLE, array('modid' => $formdata->modid), "$sortfield DESC");
 
         }
 
-        //loop through data an attemptcount and latestattempts
+        //loop through data an attemptcount and add latestattempt/highestattempt
         $userattemptcount=[];
         if ($alldata) {
             foreach ($alldata as $thedata) {

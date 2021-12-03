@@ -71,6 +71,7 @@ function wordcards_update_instance(stdClass $module, mod_wordcards_mod_form $mfo
     $module->id = $module->instance;
     $params = array('id' => $module->instance);
     $oldgradefield = $DB->get_field(constants::M_TABLE, 'grade', $params);
+    $oldgradeoptionsfield = $DB->get_field(constants::M_TABLE, 'gradeoptions', $params);
 
     if (empty($module->skipreview)) {
         $module->skipreview = 0;
@@ -90,6 +91,7 @@ function wordcards_update_instance(stdClass $module, mod_wordcards_mod_form $mfo
     }
     wordcards_grade_item_update($module);
     $update_grades = ($module->grade === $oldgradefield ? false : true);
+    if(!$update_grades){ $update_grades = ($module->gradeoptions === $oldgradeoptionsfield ? false : true);}
     if ($update_grades) {
         wordcards_update_grades($module, 0, false);
     }
@@ -418,19 +420,30 @@ function wordcards_get_user_grades($moduleinstance, $userid=0) {
 
     if (!empty($userid)) {
         $params["userid"] = $userid;
-        $user = "AND u.id = :userid";
+        $user = "AND a.userid = :userid";
     }
     else {
         $user="";
     }
 
-    //grade_sql
-    $grade_sql = "SELECT u.id, u.id AS userid, a.totalgrade AS rawgrade
-                      FROM {user} u, {". constants::M_ATTEMPTSTABLE ."} a
-                     WHERE a.id= (SELECT max(id) FROM {". constants::M_ATTEMPTSTABLE ."} ia WHERE ia.userid=u.id AND ia.modid = a.modid)  AND u.id = a.userid AND a.modid = :moduleid
-                           $user
-                  GROUP BY u.id, a.totalgrade";
+    //Highest grade
+    if($moduleinstance->gradeoptions == constants::M_GRADEHIGHEST){
+        $grade_sql = "SELECT a.userid as id, a.userid AS userid,MAX(a.totalgrade) AS rawgrade
+                  FROM {" . constants::M_ATTEMPTSTABLE . "} a 
+                 WHERE  a.modid = :moduleid
+                       $user
+              GROUP BY a.userid";
 
+    //latest grade
+    }else {
+        //grade_sql
+        $grade_sql = "SELECT a.userid as id, a.userid AS userid, a.totalgrade AS rawgrade
+                      FROM {" . constants::M_ATTEMPTSTABLE . "} a
+                     WHERE a.id= (SELECT max(id) FROM {" . constants::M_ATTEMPTSTABLE . "} ia WHERE ia.userid=a.userid AND ia.modid = a.modid)  
+                     AND a.modid = :moduleid
+                           $user
+                  GROUP BY a.userid, a.totalgrade";
+    }
 
     $results = $DB->get_records_sql($grade_sql, $params);
     return $results;

@@ -371,8 +371,9 @@ $string['shortanswer']='Short Answer';
 $string['transcriber'] = 'Transcriber';
 $string['transcriber_details'] = 'The transcription engine to use';
 $string['transcriber_none'] = 'No transcription';
-$string['transcriber_amazontranscribe'] = 'Regular Transcription';
-$string['transcriber_googlecloud'] = 'Fast Transcription (no spot check)';
+$string['transcriber_auto'] = 'Hybrid STT (Browser STT + Poodll STT))';
+$string['transcriber_poodll'] = 'Use Poodll STT';
+
 
 $string['pagelayout'] = 'Page layout';
 
@@ -494,3 +495,4 @@ $string['choosevoiceoption']='TTS prompt options';
 $string['reportsmenutoptext'] = "Review grade and attempts details using the report buttons below.";
 
 $string['mediaprompts']="Media Prompts";
+$string['ignorepunctuation'] = 'Ignore Punctuation';

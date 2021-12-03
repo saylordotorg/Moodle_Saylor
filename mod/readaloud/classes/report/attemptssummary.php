@@ -124,7 +124,7 @@ class attemptssummary extends basereport {
             $human_sql = "SELECT tu.*, false as fulltranscript  FROM {" . constants::M_USERTABLE .
                     "} tu INNER JOIN {user} u ON tu.userid=u.id " .
                     " INNER JOIN {groups_members} gm ON tu.userid=gm.userid " .
-                    " WHERE gm.groupid $groupswhere AND tu.readaloudid=?" .
+                    " WHERE gm.groupid $groupswhere AND tu.readaloudid=?  AND tu.dontgrade = 0 " .
                     " ORDER BY u.lastnamephonetic,u.firstnamephonetic,u.lastname,u.firstname,u.middlename,u.alternatename,tu.id DESC";
 
             //if we are machine grading we need to fetch human and machine so we can get WPM etc from either
@@ -133,7 +133,7 @@ class attemptssummary extends basereport {
                     constants::M_USERTABLE . "} tu INNER JOIN {user} u ON tu.userid=u.id " .
                     " INNER JOIN {" . constants::M_AITABLE . "} tai ON tai.attemptid=tu.id " .
                     " INNER JOIN {groups_members} gm ON tu.userid=gm.userid " .
-                    " WHERE gm.groupid $groupswhere AND tu.readaloudid=?" .
+                    " WHERE gm.groupid $groupswhere AND tu.readaloudid=?  AND tu.dontgrade = 0 " .
                     " ORDER BY u.lastnamephonetic,u.firstnamephonetic,u.lastname,u.firstname,u.middlename,u.alternatename,tu.id DESC";
 
 
@@ -142,7 +142,7 @@ class attemptssummary extends basereport {
             $sqlparams = [];
             //if we are not machine grading the SQL is simpler
             $human_sql = "SELECT tu.*, false as fulltranscript  FROM {" . constants::M_USERTABLE .
-                    "} tu INNER JOIN {user} u ON tu.userid=u.id WHERE tu.readaloudid=?" .
+                    "} tu INNER JOIN {user} u ON tu.userid=u.id WHERE tu.readaloudid=?  AND tu.dontgrade = 0 " .
                     " ORDER BY u.lastnamephonetic,u.firstnamephonetic,u.lastname,u.firstname,u.middlename,u.alternatename,tu.id DESC";
 
             //if we are machine grading we need to fetch human and machine so we can get WPM etc from either
@@ -150,7 +150,7 @@ class attemptssummary extends basereport {
                     "SELECT tu.*,tai.accuracy as aiaccuracy,tai.wpm as aiwpm, tai.sessionscore as aisessionscore,tai.fulltranscript as fulltranscript FROM {" .
                     constants::M_USERTABLE . "} tu INNER JOIN {user} u ON tu.userid=u.id " .
                     "INNER JOIN {" . constants::M_AITABLE . "} tai ON tai.attemptid=tu.id " .
-                    "WHERE tu.readaloudid=?" .
+                    "WHERE tu.readaloudid=?  AND tu.dontgrade = 0 " .
                     " ORDER BY u.lastnamephonetic,u.firstnamephonetic,u.lastname,u.firstname,u.middlename,u.alternatename,tu.id DESC";
 
         }

@@ -223,11 +223,6 @@ class renderer extends \plugin_renderer_base {
 
         //template data for small report
         $tdata = Array();
-        $tdata['src']='';
-        //filename
-        if($attempt && $attempt->filename){
-            $tdata['src']= $attempt->filename;
-        }
 
         //star rating
         if($attempt) {
@@ -244,6 +239,16 @@ class renderer extends \plugin_renderer_base {
         if($ready) {
             $tdata['ready']=true;
         }
+
+        //audio  filename
+        $tdata['src']='';
+        if($ready && $attempt->filename){
+            //we set the filename here. If attempt is not ready yet, audio may not be ready, so we blank it here
+            //and set it from JS pinging every 500ms or so till audio is ready
+            $tdata['src']= $attempt->filename;
+        }
+
+
 
         //full report button
         $fullreportbutton = $this->output->single_button(new \moodle_url(constants::M_URL . '/view.php',
@@ -467,15 +472,8 @@ class renderer extends \plugin_renderer_base {
         global $CFG, $USER;
         //recorder modal
         $title = get_string('landrreading',constants::M_COMPONENT);
-        //are we going to force streaning transcription from AWS only if its android
-        $hints = new \stdClass();
-        $ua = strtolower($_SERVER['HTTP_USER_AGENT']);
-        if(stripos($ua,'android') !== false) {
-            $hints->streamingtranscriber = 'aws';
-        }
-        $string_hints = base64_encode(json_encode($hints));
 
-        //the recorder config
+        //the TT recorder stuff
         $data=array( 'data-id' => 'readaloud_ttrecorder',
                         'data-language' => $moduleinstance->ttslanguage,
                         'data-region' => $moduleinstance->region,
@@ -483,10 +481,8 @@ class renderer extends \plugin_renderer_base {
                         'maxtime' => 15000
                 );
 
-
         //passagehash if not empty will be region|hash eg tokyo|2353531453415134545
         //but we only send the hash up so we strip the region
-        $data['passagehash']="";
         if(!empty($moduleinstance->passagehash)){
             $hashbits = explode('|',$moduleinstance->passagehash);
             if(count($hashbits)==2){
@@ -993,7 +989,8 @@ class renderer extends \plugin_renderer_base {
                     $ret .= $passagehelper->prepare_javascript($reviewmode, $force_aidata, $readonly);
                     $ret .= $this->fetch_clicktohear_amd($moduleinstance,$token);
                     $ret .= $this->render_hiddenaudioplayer();
-                    $ret .= $passagerenderer->render_userreview($passagehelper,$moduleinstance->ttslanguage,$collapsespaces);
+                    $nograde=$latestattempt->dontgrade;
+                    $ret .= $passagerenderer->render_userreview($passagehelper,$moduleinstance->ttslanguage,$collapsespaces,$nograde);
 
                     break;
 
@@ -1011,7 +1008,8 @@ class renderer extends \plugin_renderer_base {
                     $ret .= $passagehelper->prepare_javascript($reviewmode, $force_aidata, $readonly);
                     $ret .= $this->fetch_clicktohear_amd($moduleinstance,$token);
                     $ret .= $this->render_hiddenaudioplayer();
-                    $ret .= $passagerenderer->render_userreview($passagehelper,$moduleinstance->ttslanguage,$collapsespaces);
+                    $nograde=$latestattempt->dontgrade;
+                    $ret .= $passagerenderer->render_userreview($passagehelper,$moduleinstance->ttslanguage,$collapsespaces, $nograde);
                     break;
 
                 case constants::POSTATTEMPT_EVALERRORSNOGRADE:

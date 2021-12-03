@@ -46,6 +46,7 @@ define(['jquery', 'core/log', 'mod_readaloud/ttaudiohelper', 'core/notification'
                 this.uniqueid=opts['uniqueid'];
                 this.callback=opts['callback'];
                 this.ds_only = opts['ds_only'] ? opts['ds_only'] : false;
+                this.shadow = opts['shadow'];
                 this.prepare_html();
                 this.controls.recordercontainer.show();
                 this.register_events();
@@ -263,6 +264,12 @@ define(['jquery', 'core/log', 'mod_readaloud/ttaudiohelper', 'core/notification'
                         this.audiohelper.stop();
                     }
 
+                    //lets notify the caller we stopped recording
+                    log.debug('recording stopped:');
+                    var message={};
+                    message.type='recordingstopped';
+                    that.callback(message);
+
                     //If we are NOT currently recording
                 } else {
 
@@ -297,6 +304,12 @@ define(['jquery', 'core/log', 'mod_readaloud/ttaudiohelper', 'core/notification'
                         this.update_audio(newaudio);
                         this.audiohelper.start();
                     }
+
+                    //lets notify the caller we stopped recording
+                    log.debug('recording started:');
+                    var message={};
+                    message.type='recordingstarted';
+                    that.callback(message);
                 }
             },
 

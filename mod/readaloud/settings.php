@@ -179,6 +179,10 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configtext(constants::M_COMPONENT . "/$name",
             $label, $details, $default, PARAM_INT));
 
+
+    $settings->add(new admin_setting_configcheckbox(constants::M_COMPONENT .  '/disableshadowgrading',
+        get_string('disableshadowgrading', constants::M_COMPONENT), get_string('disableshadowgrading_details',constants::M_COMPONENT), 0));
+
     $settings->add(new admin_setting_configcheckbox(constants::M_COMPONENT .  '/enablesetuptab',
             get_string('enablesetuptab', constants::M_COMPONENT), get_string('enablesetuptab_details',constants::M_COMPONENT), 0));
 

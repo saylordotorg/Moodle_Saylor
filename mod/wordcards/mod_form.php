@@ -62,8 +62,12 @@ class mod_wordcards_mod_form extends moodleform_mod {
 
         //grade options
         //for now we hard code this to latest attempt
-        $mform->addElement('hidden', 'gradeoptions',constants::M_GRADELATEST);
-        $mform->setType('gradeoptions', PARAM_INT);
+        $gradeoptions = utils::get_grade_options();
+        $mform->addElement('select', 'gradeoptions', get_string('gradeoptions', constants::M_COMPONENT), $gradeoptions);
+        $mform->setDefault('gradeoptions', constants::M_GRADELATEST);
+        $mform->addHelpButton('gradeoptions', 'gradeoptions', constants::M_COMPONENT);
+        $mform->addElement('static', 'gradeoptions_details', '',
+            get_string('gradeoptions_details', constants::M_COMPONENT));
 
         // add standard elements, common to all modules
         $this->standard_coursemodule_elements();

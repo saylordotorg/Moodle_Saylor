@@ -29,7 +29,7 @@ utils::update_finalgrade($mod->get_id());
 $pagetitle = format_string($mod->get_mod()->name, true, $mod->get_course());
 $pagetitle .= ': ' . get_string('activitycompleted', 'mod_wordcards');
 
-$PAGE->set_url('/mod/wordcards/finish.php', ['id' => $cmid]);
+$PAGE->set_url('/mod/wordcards/finish.php', ['id' => $cmid, 'sesskey'=>$sesskey]);
 $PAGE->navbar->add($pagetitle, $PAGE->url);
 $PAGE->set_heading(format_string($course->fullname, true, [context_course::instance($course->id)]));
 $PAGE->set_title($pagetitle);
@@ -47,7 +47,9 @@ $output = $PAGE->get_renderer('mod_wordcards');
 echo $output->header();
 echo $output->heading($pagetitle);
 
-echo $output->navigation($mod, $currentstate);
+
+$navdisabled=false;
+echo $output->navigation($mod, $currentstate,$navdisabled);
 
 $renderer = $PAGE->get_renderer('mod_wordcards');
 echo $renderer->finish_page($mod);

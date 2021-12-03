@@ -12,7 +12,7 @@ define(['jquery', 'core/log', 'mod_readaloud/definitions', 'mod_readaloud/depend
         lastitem: false,
         okbuttonclass: def.okbuttonclass,
         ngbuttonclass: def.ngbuttonclass,
-        quickgradecontainer: def.quickgradecontainerclass,
+        quickgradecontainerclass: def.quickgradecontainerclass,
         quickgradetitle: M.util.get_string('quickgrade', def.component),
         transcripttitle: M.util.get_string('transcript', def.component),
         oklabel: M.util.get_string('ok', def.component),
@@ -70,11 +70,11 @@ define(['jquery', 'core/log', 'mod_readaloud/definitions', 'mod_readaloud/depend
             var that = this;
 
             var thefunc = function () {
-                var wordnumber = $(this).attr("data-wordnumber");
+                var wordnumber = $(this).data("wordnumber");
                 var okbutton = "<button type='button' class='btn " + that.okbuttonclass + "' data-wordnumber='" + wordnumber + "'><i class='fa fa-check'></i> " + that.oklabel + "</button>";
                 var ngbutton = "<button type='button' class='btn " + that.ngbuttonclass + "' data-wordnumber='" + wordnumber + "'><i class='fa fa-close'></i> " + that.nglabel + "</button>";
                 var container = "<div class='" + that.quickgradecontainerclass + "'>" + okbutton + ngbutton + "</div>";
-                return container;
+                return $(container);
             };
 
             //lets add the popover

@@ -14,7 +14,7 @@ use \mod_readaloud\utils;
 class attempts extends basereport {
 
     protected $report = "attempts";
-    protected $fields = array('id', 'username', 'audiofile', 'wpm', 'accuracy_p', 'grade_p', 'timecreated', 'deletenow');
+    protected $fields = array('id', 'username', 'audiofile', 'wpm', 'accuracy_p', 'grade_p' ,'timecreated', 'deletenow');
     protected $headingdata = null;
     protected $qcache = array();
     protected $ucache = array();
@@ -118,7 +118,7 @@ class attempts extends basereport {
 
             $alldatasql = "SELECT tu.* FROM {" . constants::M_USERTABLE . "} tu " .
                     " INNER JOIN {groups_members} gm ON tu.userid=gm.userid " .
-                    " WHERE gm.groupid $groupswhere AND tu.readaloudid=?";
+                    " WHERE gm.groupid $groupswhere AND tu.readaloudid=?  AND tu.dontgrade = 0 ";
             $alldataparams[]=$formdata->readaloudid;
             $alldata = $DB->get_records_sql($alldatasql, $allparams);
         }else{

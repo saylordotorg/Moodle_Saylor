@@ -21,12 +21,19 @@ define(['jquery', 'core/log'], function ($, log) {
         },
 
         will_work_ok: function(opts){
+            //Edge and Safari both have browser recognition, but it's not good enough and we need to test it better (2021-11-21)
             var brave = typeof navigator.brave !== 'undefined';
             if(brave){return false;}
 
             var edge = navigator.userAgent.toLowerCase().indexOf("edg/") > -1;
             if(edge){return false;}
 
+            var has_chrome = navigator.userAgent.indexOf('Chrome') > -1;
+            var has_safari = navigator.userAgent.indexOf("Safari") > -1;
+            var safari = has_safari && !has_chrome;
+            if(safari){return false;}
+
+            //This is feature detection, and for chrome its ok. the others might say they do speech rec, but its hard to be sure
             return ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window);
 
         },

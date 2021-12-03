@@ -147,7 +147,7 @@ class gradingbyuser extends basereport {
         //if we are not machine grading the SQL is simpler
         $human_sql = "SELECT tu.*, false as fulltranscript  FROM {" . constants::M_USERTABLE . "} tu " .
                 "WHERE tu.readaloudid=? " .
-                "AND tu.userid=? " .
+                "AND tu.userid=?  AND tu.dontgrade = 0 " .
                 "ORDER BY tu.id DESC";
 
         //if we are machine grading we need to fetch human and machine so we can get WPM etc from either
@@ -156,7 +156,7 @@ class gradingbyuser extends basereport {
                 constants::M_USERTABLE . "} tu " .
                 "INNER JOIN {" . constants::M_AITABLE . "} tai ON tai.attemptid=tu.id " .
                 "WHERE tu.readaloudid=? " .
-                "AND tu.userid=? " .
+                "AND tu.userid=? AND tu.dontgrade = 0 " .
                 "ORDER BY tu.id DESC";
 
         //we need a module instance to know which scoring method we are using.

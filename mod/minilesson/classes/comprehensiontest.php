@@ -233,6 +233,11 @@ class comprehensiontest
                 }
             }
 
+            //Dictation, we might choose to ignore punctuation for dictation
+            if($testitem->type == constants::TYPE_DICTATION){
+                $testitem->ignorepunctuation=$item->{constants::IGNOREPUNCTUATION}==1;
+            }
+
 
             //Sentences and Audio Recorder Logic
             switch($testitem->type){

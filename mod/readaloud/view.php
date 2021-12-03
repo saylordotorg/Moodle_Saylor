@@ -16,10 +16,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Prints a particular instance of readaloud
+ * readaloud main page
  *
- * You can have a rather longer description of the file as well,
- * if you like, and it can span multiple lines.
  *
  * @package    mod_readaloud
  * @copyright  2015 Justin Hunt (poodllsupport@gmail.com)
@@ -69,7 +67,6 @@ $completion->set_module_viewed($cm);
 //are we a teacher or a student?
 $mode = "view";
 
-
 //Get an admin settings
 $config = get_config(constants::M_COMPONENT);
 
@@ -86,7 +83,6 @@ if($config->enablesetuptab){
 
 //we need to load jquery for some old themes (Essential mainly)
 $PAGE->requires->jquery();
-
 
 //Get our renderers
 $renderer = $PAGE->get_renderer('mod_readaloud');

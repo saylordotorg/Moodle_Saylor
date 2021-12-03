@@ -80,6 +80,7 @@ define(['jquery', 'core/log'], function ($, log) {
         smallreportcontainer: 'mod_readaloud_smallreport_cont',
         smallreportrating: 'mod_readaloud_smallreport_rating',
         smallreportplayer: 'mod_readaloud_smallreport_player',
+        smallreportdummyplayer: 'mod_readaloud_smallreport_dummyplayer',
         smallreportstatus: 'mod_readaloud_smallreport_status',
         smallreportheading: 'mod_readaloud_smallreport_heading',
         fullreportbutton: 'mod_readaloud_smallreport_fullreportbutton',

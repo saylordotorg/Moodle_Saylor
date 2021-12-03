@@ -12,11 +12,14 @@ define(['jquery', 'core/log', 'core/ajax', 'mod_readaloud/definitions', 'mod_rea
     language: "en-US",
     currentAudioStart: 0,
     currentAudioStop: 0,
+    oldBreak: {},
+    newBreak: {},
     mak: null,
     controls: {},
     results: [],
     phonetics: [],
     cmid: 0,
+    ttr: {},
 
     init: function(props) {
 
@@ -27,11 +30,22 @@ define(['jquery', 'core/log', 'core/ajax', 'mod_readaloud/definitions', 'mod_rea
       self.region = props.region;
       self.phonetics = props.phonetics;
       self.ds_only = props.ds_only;
+      self.shadow = props.shadow;
+      self.ttr
 
       //recorder stuff
       var theCallback =function(message) {
           switch (message.type) {
-              case 'recording':
+            case 'recordingstarted':
+              if (self.shadow === true) {
+                self.controls.playbutton.trigger('click');
+              }
+              break;
+
+            case 'recordingstopped':
+                  if (self.shadow === true){
+                    self.controls.hiddenplayer[0].pause();
+                  }
                   break;
 
               case 'speech':
@@ -54,7 +68,9 @@ define(['jquery', 'core/log', 'core/ajax', 'mod_readaloud/definitions', 'mod_rea
       opts.uniqueid = 'readaloud_ttrecorder';
       opts.ds_only = self.ds_only;
       opts.callback = theCallback;
-      ttrecorder.clone().init(opts);
+      opts.shadow = true;
+      self.ttr = ttrecorder.clone().init(opts);
+
 
       self.prepare_controls();
       self.register_events();
@@ -96,19 +112,21 @@ define(['jquery', 'core/log', 'core/ajax', 'mod_readaloud/definitions', 'mod_rea
         }
 
         // sentence contains the target text
-
         //empty strings are none of our concern
         if (sentence.trim() === '') {
           return;
         }
 
         self.currentSentence = sentence;
+        self.oldBreak = oldbreak;
+        self.newBreak = newbreak;
         self.currentAudioStart = oldbreak.audiotime;
         self.currentAudioEnd = newbreak.audiotime;
 
-          log.debug("phonetics",self.phonetics);
-          log.debug(oldbreak);
-          log.debug(newbreak);
+        if(self.currentAudioStart===self.currentAudioEnd){
+            //This is a special case where the end of the audio has been reached in MAK, and there is now no next break
+            self.currentAudioEnd=self.controls.hiddenplayer[0].duration;
+        }
 
           if(self.phonetics.length>newbreak.wordnumber-1){
               var startpos = oldbreak.wordnumber;
@@ -125,19 +143,15 @@ define(['jquery', 'core/log', 'core/ajax', 'mod_readaloud/definitions', 'mod_rea
               self.currentPhonetic  = '';
           }
 
-
-        log.debug(sentence);
-        log.debug(oldbreak);
-        log.debug(newbreak);
-
         //pause audio while we do our thing
         if (oldbreak.breaknumber == 0 && newbreak == false) {
           // do nothing
         } else {
           // detect last line
-          if (newbreak.breaknumber == breaks[breaks.length - 1].breaknumber) {
+          if (oldbreak.breaknumber == breaks[breaks.length - 1].breaknumber) {
             self.controls.finishedbutton.show();
             self.controls.skipbutton.hide();
+            self.oldBreak.isfinalbreak=true
           } else {
             self.controls.finishedbutton.hide();
             self.controls.skipbutton.show();
@@ -164,11 +178,18 @@ define(['jquery', 'core/log', 'core/ajax', 'mod_readaloud/definitions', 'mod_rea
 
       self.controls.skipbutton.on('click', function(e) {
         self.controls.container.modal('hide');
-        if (self.controls.hiddenplayer[0].playing) {
-          self.controls.hiddenplayer[0].pause();
+
+        //we might get here from a 100% score on final break on the modal (it calls the skip button
+        //so we check if its finished or not. Otherwise it will return to the first break and start playing
+        if(self.oldBreak.isfinalbreak) {
+          self.mak.controls.audioplayer[0].currentTime = 0;
+        }else{
+          if (self.controls.hiddenplayer[0].playing) {
+            self.controls.hiddenplayer[0].pause();
+          }
+            self.controls.hiddenplayer[0].currentTime = self.currentAudioStart;
+            self.mak.play_audio();
         }
-        self.controls.hiddenplayer[0].currentTime = self.currentAudioStart;
-        self.mak.play_audio();
       });
 
       self.controls.finishedbutton.on('click', function() {
@@ -251,13 +272,6 @@ define(['jquery', 'core/log', 'core/ajax', 'mod_readaloud/definitions', 'mod_rea
           }else{
               return false;
           }
-      },
-
-      use_ttrecorder: function(){
-          // we always use TT recorder.
-          return true;
-      },
-
-
+      }
   };
 });
