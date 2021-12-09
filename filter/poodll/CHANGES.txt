@@ -1,5 +1,8 @@
 Change List
 =========
+Version 3.1.50 (Build 2021120900)
+- Fixed issues causing errors in php 8 on poodlltools
+
 Version 3.1.49 (Build 2021082700)
 - Fixed issue with mimetype and extension on whiteboard drawings
 

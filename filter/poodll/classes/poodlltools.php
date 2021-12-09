@@ -193,13 +193,13 @@ class poodlltools {
     }
 
     //this is just a temporary function, until the PoodLL filter client plugins are upgraded to not use simpleaudioplayer
-    public static function fetchSimpleAudioPlayer($param1 = 'auto', $url, $param3 = 'http', $param4 = 'width', $param5 = 'height') {
+    public static function fetchSimpleAudioPlayer($param1 = 'auto', $url="", $param3 = 'http', $param4 = 'width', $param5 = 'height') {
         $html_snippet = \html_writer::tag('a', 'audiofile.mp3', array('href' => $url));
         return format_text($html_snippet);
     }
 
     //this is just a temporary function, until the PoodLL filter client plugins are upgraded to not use simpleaudioplayer
-    public static function fetchSimpleVideoPlayer($param1 = 'auto', $url, $param3 = 'http', $param4 = 'width', $param5 = 'height') {
+    public static function fetchSimpleVideoPlayer($param1 = 'auto', $url="", $param3 = 'http', $param4 = 'width', $param5 = 'height') {
         $html_snippet = \html_writer::tag('a', 'videofile.mp4', array('href' => $url));
         return format_text($html_snippet);
     }
@@ -1301,21 +1301,21 @@ class poodlltools {
     }//end of convert with FFMPEG
 
     //This a legacy call from client plugins, that ais mapped to amd recorder code
-    public static function fetchAudioRecorderForSubmission($runtime, $assigname, $updatecontrol = "saveflvvoice", $contextid,
+    public static function fetchAudioRecorderForSubmission($runtime, $assigname, $updatecontrol, $contextid,
             $component, $filearea, $itemid, $timelimit = "0", $callbackjs = false, $hints = []) {
         return self::fetchAMDRecorderCode('audio', $updatecontrol, $contextid, $component, $filearea, $itemid, $timelimit,
                 $callbackjs, $hints);
     }
 
     //This a legacy call from client plugins, that ais mapped to amd recorder code
-    public static function fetchVideoRecorderForSubmission($runtime, $assigname, $updatecontrol = "saveflvvoice", $contextid,
+    public static function fetchVideoRecorderForSubmission($runtime, $assigname, $updatecontrol, $contextid,
             $component, $filearea, $itemid, $timelimit = "0", $callbackjs = false, $hints = []) {
         return self::fetchAMDRecorderCode('video', $updatecontrol, $contextid, $component, $filearea, $itemid, $timelimit,
                 $callbackjs, $hints);
     }
 
     //This a legacy call from client plugins, that ais mapped to amd recorder code
-    public static function fetchHTML5SnapshotCamera($updatecontrol = "saveflvvoice", $width, $height, $contextid, $component,
+    public static function fetchHTML5SnapshotCamera($updatecontrol, $width, $height, $contextid, $component,
             $filearea, $itemid, $callbackjs = false, $hints = []) {
         $mediatype = "snapshot";
         return self::fetchAMDRecorderCode($mediatype, $updatecontrol, $contextid, $component, $filearea, $itemid, 0, $callbackjs,
@@ -1323,7 +1323,7 @@ class poodlltools {
     }
 
     //This a legacy call from client plugins, that ais mapped to amd recorder code
-    public static function fetch_HTML5RecorderForSubmission($updatecontrol = "saveflvvoice", $contextid, $component, $filearea,
+    public static function fetch_HTML5RecorderForSubmission($updatecontrol, $contextid, $component, $filearea,
             $itemid, $mediatype = "image", $fromrepo = false, $callbackjs = false, $hints = []) {
         return self::fetchAMDRecorderCode($mediatype, $updatecontrol, $contextid, $component, $filearea, $itemid, 0, $callbackjs,
                 $hints);

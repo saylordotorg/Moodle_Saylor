@@ -257,7 +257,7 @@ class awsremote {
     }
 
     //called from poodlltools->getAMDRecordercode. Has matching function in awstools
-    function get_presignedupload_url($mediatype, $minutes = 30, $key, $iosvideo = false) {
+    function get_presignedupload_url($mediatype, $minutes, $key, $iosvideo = false) {
         $params = Array();
         $params['region'] = $this->region;
         $params['mediatype'] = $mediatype;

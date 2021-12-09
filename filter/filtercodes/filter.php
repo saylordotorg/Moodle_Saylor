@@ -1025,13 +1025,14 @@ class filter_filtercodes extends moodle_text_filter {
                                 'phone' => get_string('phone')];
                         $iconclass = ['' => '',
                                 'email' => 'fa fa-envelope-o',
-                                'message' => 'fa fa-comment',
-                                'profile' => 'fa fa-info-circle',
+                                'message' => 'fa fa-comment-o',
+                                'profile' => 'fa fa-user-o',
                                 'phone' => 'fa fa-mobile'];
-                        $iconclass = '<i class="' . $iconclass[$clinktype] . '" aria-hidden="true"></i> ';
 
                         $cnt = 0;
                         foreach ($course->get_course_contacts() as $coursecontact) {
+                            $icon = '<i class="' . $iconclass[$clinktype] . '" aria-hidden="true"></i> ';
+
                             $contacts .= '<li>';
 
                             // Get list of course contacts based on settings in Site Administration > Appearances > Courses.
@@ -1055,25 +1056,26 @@ class filter_filtercodes extends moodle_text_filter {
                             $contactsclose .= $fullname . '</a>';
 
                             $contacts .= '<span class="fc-coursecontactroles">' . implode(", ", $rolenames) . ': </span>';
+
                             switch ($clinktype) {
                                 case 'email':
-                                    $contacts .= $iconclass . '<a href="mailto:' . $user->email . '">';
+                                    $contacts .= $icon . '<a href="mailto:' . $user->email . '">';
                                     $contacts .= $contactsclose;
                                     break;
                                 case 'message':
-                                    $contacts .= $iconclass . '<a href="' . new moodle_url('/message/index.php',
+                                    $contacts .= $icon . '<a href="' . new moodle_url('/message/index.php',
                                             ['id' => $coursecontact['user']->id]
                                             ) . '">';
                                     $contacts .= $contactsclose;
                                     break;
                                 case 'profile':
-                                    $contacts .= $iconclass . '<a href="' . new moodle_url('/user/profile.php',
+                                    $contacts .= $icon . '<a href="' . new moodle_url('/user/profile.php',
                                             ['id' => $coursecontact['user']->id, 'course' => $PAGE->course->id]
                                             ) . '">';
                                     $contacts .= $contactsclose;
                                     break;
-                                case 'phone' && !empty($user->phone):
-                                    $contacts .= $iconclass . '<a href="tel:' . $user->phone . '">';
+                                case 'phone1' && !empty($user->phone1):
+                                    $contacts .= $icon . '<a href="tel:' . $user->phone1 . '">';
                                     $contacts .= $contactsclose;
                                     break;
                                 default: // Default is no-link.
@@ -1081,7 +1083,6 @@ class filter_filtercodes extends moodle_text_filter {
                                     break;
 
                             }
-
                             if ($cshowdesc && !empty($user->description)) {
                                 $contacts .= '<div' . (empty($cshowpic) ? ' class="mb-4"' : '') . '>' . $user->description . '</div>';
                             }
@@ -1097,7 +1098,7 @@ class filter_filtercodes extends moodle_text_filter {
                 } else {
                     $replace['/\{coursecontacts\}/i'] = '<ul class="fc-coursecontacts list-unstyled ml-0 pl-0">' . $contacts . '</ul>';
                 }
-                unset($contacts, $contactsclose, $fullname, $url, $user, $rolenames, $iconclass, $linksr, $clinktype, $cshowpic);
+                unset($contacts, $contactsclose, $fullname, $url, $user, $rolenames, $icon, $iconclass, $linksr, $clinktype, $cshowpic);
             }
 
             // Tag: {courseparticipantcount}.
@@ -2015,6 +2016,33 @@ class filter_filtercodes extends moodle_text_filter {
         if (stripos($text, '{/markborder}') !== false) {
             $replace['/\{markborder\}/i'] = '<mark class="fc-markborder" style="border:2px dashed red;padding:0.03em 0.25em;">';
             $replace['/\{\/markborder\}/i'] = '</mark>';
+        }
+
+        // Tag: {showmore}{/showmore}.
+        if (stripos($text, '{/showmore}') !== false) {
+            $newtext = str_replace('{showmore}', '<span id="fc-showmore-tmp" class="fc-showmore hidden">', $text);
+            if (stripos($newtext, 'fc-showmore-tmp') !== false) {
+                $newtext = preg_replace_callback('/fc-showmore-tmp/', function($matches) {
+                        static $count = 0;
+                        return 'showmore-' . $count++;
+                    }, $newtext
+                );
+                $text = $newtext;
+                $changed = true;
+            }
+            $newtext = str_replace('{/showmore}', '</span> <a href="#" class="fc-showmore" style="white-space: nowrap;" ' .
+                    'onclick="m=document.getElementById(\'fc-showmore-tmp\').classList;m.toggle(\'hidden\');' .
+                    'this.text=(m.contains(\'hidden\')?\'' . get_string('showmore', 'form') . '\':\'' .
+                    get_string('showless', 'form') . '\');return false;">' . get_string('showmore', 'form') . '</a>', $newtext);
+            if (stripos($newtext, 'fc-showmore-tmp') !== false) {
+                $newtext = preg_replace_callback('/fc-showmore-tmp/', function($matches) {
+                        static $count = 0;
+                        return 'showmore-' . $count++;
+                    }, $newtext
+                );
+                $text = $newtext;
+                $changed = true;
+            }
         }
 
         // Tag: {note} - Used to add notes which appear when editing but not displayed.

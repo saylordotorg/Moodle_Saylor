@@ -516,17 +516,13 @@ if ($ADMIN->fulltree) {
         1 => new lang_string('no'),
         2 => new lang_string('yes')
     );
-    $setting = new admin_setting_configselect($name, $title, $description, $default, $choices);
-    $setting->set_updatedcallback('cache_helper::purge_all');
-    $settings->add($setting);
+    $settings->add(new admin_setting_configselect($name, $title, $description, $default, $choices));
 
     $name = 'format_topcoll/courseadditionalmoddatamaxstudents';
     $title = get_string('courseadditionalmoddatamaxstudents', 'format_topcoll');
     $description = get_string('courseadditionalmoddatamaxstudentsdesc', 'format_topcoll');
     $default = 0;
-    $setting = new admin_setting_configtext($name, $title, $description, $default, PARAM_INT);
-    $setting->set_updatedcallback('cache_helper::purge_all');
-    $settings->add($setting);
+    $settings->add(new admin_setting_configtext($name, $title, $description, $default, PARAM_INT));
 
     $name = 'format_topcoll/defaultshowadditionalmoddata';
     $title = get_string('defaultshowadditionalmoddata', 'format_topcoll');

@@ -1,44 +1,62 @@
 ﻿Version Information
 ===================
 
-Version 3.10.1.5 - 28/11/2021
+Version 3.11.0.5 - TBR
 -----------------------------
-  1. Fix 'Lesson activity causes DB error' - https://moodle.org/mod/forum/discuss.php?d=429093#p1727967.
+  1. Fix 'Error in urls for additional information' - #116.
+  2. Add 'enableadditionalmoddata' setting to turn on / off additional information at a site level.  Default is 'off'!
+  3. Improve documentation for Toggle blocks location' functionality - https://moodle.org/mod/forum/discuss.php?d=428924 and #100.
+  4. Improve user enrolment event handling to be more efficient for activity information - #114.
 
-Version 3.10.1.4 - 15/11/2021
+Version 3.11.0.4 - 01/11/2021
 -----------------------------
-  1. Add 'enableadditionalmoddata' setting to turn on / off additional information at a site level.  Default is 'off'!
-  2. Improve documentation for Toggle blocks location' functionality - https://moodle.org/mod/forum/discuss.php?d=428924 and #100.
-  3. Improve user enrolment event handling to be more efficient for activity information - #114.
-  4. Separate out 'Activity information' as a separate reset, new capability 'changeactivitymeta' and fix the
+  1. Refactor - remove redundant 'bsnewgrid' functionality that supported the transition from BootStrap 2.3.2.
+  2. Refactor - add display instructions template.
+  3. Refactor - add toggle all template.
+  4. Refactor - add hidden section template.
+  5. Refactor - add section summary template.
+  6. Refactor - add stealth section template.
+  7. Refactor - add single section template.
+  8. Refactor - add section template.
+  9. Separate out 'Activity information' as a separate reset, new capability 'changeactivitymeta' and fix the
      'forum' module in the list of enabled plugins so that it can be enabled and the others disabled and 'showadditionalmoddata'
      still take effect.
-  5. Added 'courseadditionalmoddatamaxstudents' setting to restrict, if desired, the display of the activity information on a
+ 10. Remove redundant BS2.3.2 support on reset section of course settings.
+ 11. Calculate the students in 'activitystudentscache' only once per course.
+ 12. Refactor - add section course module meta template.
+ 13. Refactor - add section course module template.
+ 14. Added 'courseadditionalmoddatamaxstudents' setting to restrict, if desired, the display of the activity information on a
      a course of the number of students on that course exceeds it.  When 'showadditionalmoddata' is enabled on a course, then
      additional information about the status of this is shown underneath the setting on the course settings page.  This is so
      that large courses can be automatically prevented from showing the information as the calculations would take an
      unacceptable amount of time to compute.  It is up to the administrator to set the figure based upon benchmarking / testing
      of the performance characteristics of the server.  The default is '0', which means 'unlimited' number of students.
 
-Version 3.10.1.3 - 30/09/2021
+Version 3.11.0.3 - 30/09/2021
+-----------------------------
+  1. Add support for Forums in "Course page further information" - #105.
+  2. Fix 'Collapsed topics rollover settings aren't accessible' - #111.
+
+Version 3.11.0.2 - 20/08/2021
 -----------------------------
   1. Add 'aria-controls' (https://www.w3.org/TR/wai-aria-practices/examples/disclosure/disclosure-faq.html) - CONTRIB-8637.
   2. Add caching to activity meta information in the hope of improving performance.
   3. Add 'aria-live=polite' to the section content and 'aria-controls' to the open / close all buttons - CONTRIB-8637.
-  4. Add support for Forums in "Course page further information" - #105.
-  5. Fix 'Collapsed topics rollover settings aren't accessible' - #111.
 
-Version 3.10.1.2 - 02/07/2021
+Version 3.11.0.1 - 02/07/2021
 -----------------------------
   1. Fix 'PHP Notice:  Trying to access array offset on value of type null' when accessing a single section page on PHP 7.4.
   2. Reset language improvements in line with global default tracking as implemented in 3.10.0.2.
   3. Improved backup restore with numsections.
   4. Added 'Toggle blocks location' functionality, thanks to John Joubert (https://github.com/John-Joubert) for the patch - #100.
-  5. Fix 'Section content is in a column when using horizontal columns on a single section page'.
-  6. Fix 'Column orientation combo box strings'.
-  7. Improve activity meta from information gained on #101.
-  8. No longer need 'config.php' because of #100.
-  9. New 'Accessible back to main course link' - #66.
+  5. Fix 'Deprecation warning for 3.11' - #99.
+  6. Fix 'Section content is in a column when using horizontal columns on a single section page'.
+  7. Fix 'Column orientation combo box strings'.
+  8. Improve activity meta from information gained on #101.
+  9. No longer need 'config.php' because of #100.
+ 10. New 'Accessible back to main course link' - #66.
+ 11. Apply MDL-71634.
+ 12. Removed conflicting activity meta information that is now in core.
 
 Version 3.10.1.1 - 07/03/2021
 -----------------------------
