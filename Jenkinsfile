@@ -35,7 +35,7 @@ def plugins = [
     [
         "name" : 'format_topcoll',
         "url" : 'https://github.com/gjb2048/moodle-format_topcoll.git',
-        "branch" : 'master',
+        "branch" : 'MOODLE_311',
         "dest" : 'course/format/topcoll'
     ],
     [
@@ -283,6 +283,30 @@ def plugins = [
         "url" : 'https://github.com/mudrd8mz/moodle-mod_subcourse.git',
         "branch" : 'main',
         "dest" : 'mod/subcourse'
+    ],
+    [
+      "name" : 'availability_coursecompleted',
+      "url" : 'https://github.com/ewallah/moodle-availability_coursecompleted.git',
+      "branch" : 'main',
+      "dest" : 'availability/condition/coursecompleted'
+    ],
+    [
+      "name" : 'format_buttons',
+      "url" : 'https://github.com/brandaorodrigo/moodle-format_buttons.git',
+      "branch" : 'master',
+      "dest" : 'course/format/buttons'
+    ],
+    [
+      "name" : 'block_advnotifications',
+      "url" : 'https://github.com/learningworks/moodle-block_advnotifications.git',
+      "branch" : 'master',
+      "dest" : 'blocks/advnotifications'
+    ],
+    [
+      "name" : 'availability_role',
+      "url" : 'https://github.com/moodleuulm/moodle-availability_role.git',
+      "branch" : 'master',
+      "dest" : 'availability/condition/role'
     ]
 ]
 
@@ -308,7 +332,7 @@ def StashPlugins(plugins) {
             deleteDir()
             try {
                 //git([url: (plugins[x].get("url")), branch: (plugins[x].get("branch"))])
-                checkout([$class: 'GitSCM', 
+                checkout([$class: 'GitSCM',
                     branches: [[name: plugins[x].get("branch")]],
                     userRemoteConfigs: [[url: plugins[x].get("url")]],
                     doGenerateSubmoduleConfigurations: false,
@@ -324,7 +348,7 @@ def StashPlugins(plugins) {
                                 reference: '',
                                 trackingSubmodules: false
                                 ]
-                                ], 
+                                ],
                     submoduleCfg: []
                 ])
             }
@@ -434,7 +458,7 @@ try {
 
         }
 
-    } 
+    }
     stage('Test - Set Up Environment') {
         node('master') {
             /* Load up necessary credentials */
@@ -526,7 +550,7 @@ try {
                 // Note: this might fail if no changes have been made since last build
                 NotifyOnFail("Failed to push to GitHub: ${err}")
 
-                throw err            
+                throw err
             }
 
             NotifyOnComplete()
