@@ -92,16 +92,14 @@ class activity {
      * @param cm_info $mod
      * @param string $submitstrkey
      * @param bool $isgradeable
-     * @param bool $submissionnotrequired
      *
      * @return activity_meta
      */
     protected static function std_meta(
             cm_info $mod,
             $submitstrkey,
-            $isgradeable = false,
-            $submissionnotrequired = false
-            ) {
+            $isgradeable = false
+        ) {
 
         $courseid = $mod->course;
         $meta = null;
@@ -121,17 +119,9 @@ class activity {
             } else {
                 $methodnsubmissions = $mod->modname.'_num_submissions';
                 $methodnumungraded = $mod->modname.'_num_submissions_ungraded';
-                $methodparticipants = $mod->modname.'_num_participants';
 
                 // Do this before the rest so that the caches are populated for use.
-                if (method_exists('format_topcoll\\activity', $methodparticipants)) {
-                    /* Note: This bypasses the cache code, so if for example the 'students' are
-                             needed then do not implement it for the given module. */
-                    $meta->numparticipants = call_user_func('format_topcoll\\activity::'.
-                        $methodparticipants, $courseid, $mod);
-                } else {
-                    $meta->numparticipants = self::course_participant_count($courseid, $mod);
-                }
+                $meta->numparticipants = self::course_participant_count($courseid, $mod);
                 if (!empty($meta->numparticipants)) {
                     // Only need to bother if there are participants!
                     if (method_exists('format_topcoll\\activity', $methodnsubmissions)) {
@@ -152,20 +142,22 @@ class activity {
             }
         } else if ($isgradeable) {
             $graderow = self::grade_row($courseid, $mod);
-            if ($graderow) {
-                global $USER;
-                $gradeitem = \grade_item::fetch(array(
-                    'itemtype' => 'mod',
-                    'itemmodule' => $mod->modname,
-                    'iteminstance' => $mod->instance,
-                    'outcomeid' => null
-                ));
 
+            if ($graderow) {
                 $coursecontext = \context_course::instance($courseid);
                 if (has_capability('moodle/grade:viewhidden', $coursecontext)) {
                     $meta = new activity_meta();
                     $meta->grade = true;
                 } else {
+                    global $USER;
+
+                    $gradeitem = \grade_item::fetch(array(
+                        'itemtype' => 'mod',
+                        'itemmodule' => $mod->modname,
+                        'iteminstance' => $mod->instance,
+                        'outcomeid' => null
+                    ));
+
                     $grade = new \grade_grade(array('itemid' => $gradeitem->id, 'userid' => $USER->id));
                     if (!$grade->is_hidden()) {
                         $meta = new activity_meta();
@@ -185,40 +177,7 @@ class activity {
      * @return activity_meta
      */
     protected static function assign_meta(cm_info $modinst) {
-        global $DB, $USER;
-        static $submissionsenabled;
-
-        $courseid = $modinst->course;
-
-        /* Get count of enabled submission plugins grouped by assignment id.
-           Note, under normal circumstances we only run this once but with PHP unit tests, assignments are being
-           created one after the other and so this needs to be run each time during a PHP unit test. */
-        if (empty($submissionsenabled) || PHPUNIT_TEST) {
-            $sql = "
-                SELECT a.id, count(1) AS submissionsenabled
-                    FROM {assign} a
-                    JOIN {assign_plugin_config} ac ON ac.assignment = a.id
-                    WHERE a.course = ?
-                    AND ac.name='enabled'
-                    AND ac.value = '1'
-                    AND ac.subtype='assignsubmission'
-                    AND plugin!='comments'
-                    GROUP BY a.id;";
-            $submissionsenabled = $DB->get_records_sql($sql, array($courseid));
-        }
-
-        $submitselect = '';
-
-        // If there aren't any submission plugins enabled for this module, then submissions are not required.
-        if (empty($submissionsenabled[$modinst->instance])) {
-            $submissionnotrequired = true;
-        } else {
-            $submissionnotrequired = false;
-        }
-
-        $meta = self::std_meta($modinst, 'submitted', true, $submissionnotrequired);
-
-        return ($meta);
+        return self::std_meta($modinst, 'submitted', true);
     }
 
     /**
@@ -280,8 +239,7 @@ class activity {
      * @return string
      */
     protected static function lesson_meta(cm_info $modinst) {
-        $meta = self::std_meta($modinst, 'attempted', true);
-        return $meta;
+        return self::std_meta($modinst, 'attempted', true);
     }
 
     /**
@@ -531,7 +489,7 @@ class activity {
     protected static function quiz_num_submissions_ungraded($courseid, $mod) {
         global $DB;
 
-        static $totalsbyquizid;
+        static $totalsbyquizid = null;
 
         $coursecontext = \context_course::instance($courseid);
         // Get people who are typically not students (people who can view grader report) so that we can exclude them!
@@ -623,16 +581,103 @@ class activity {
     }
 
     // Participant count code.
-
     /**
-     * Get total participant count for specific courseid and module.
+     * Get total participant count for a specific courseid and module.
      *
-     * @param int $courseid
-     * @param cm_info $mod
+     * @param int $courseid The course id.
+     * @param cm_info $mod The module.
      *
      * @return int Number of participants (students) on the module.
      */
     protected static function course_participant_count($courseid, $mod) {
+        $students = self::course_get_students($courseid);
+
+        // New users?
+        $usercreatedcache = \cache::make('format_topcoll', 'activityusercreatedcache');
+        $createdusers = $usercreatedcache->get($courseid);
+        $lock = null;
+        $newstudents = array();
+        if (!empty($createdusers)) {
+            $lock = self::lockcaches($courseid);
+
+            $studentrolescache = \cache::make('format_topcoll', 'activitystudentrolescache');
+            $studentroles = $studentrolescache->get('roles');
+            $context = \context_course::instance($courseid);
+            $alluserroles = get_users_roles($context, $createdusers, false);
+
+            foreach ($createdusers as $userid) {
+                $usershortnames = array();
+                foreach ($alluserroles[$userid] as $userrole) {
+                    $usershortnames[] = $userrole->shortname;
+                }
+                $isstudent = false;
+                foreach ($studentroles as $studentrole) {
+                    if (in_array($studentrole, $usershortnames)) {
+                        // User is in a role that is based on a student archetype on the course.
+                        $isstudent = true;
+                        break;
+                    }
+                }
+                if (!$isstudent) {
+                    // Don't go any further.
+                    continue;
+                } else {
+                    $newstudents[$userid] = $userid;
+                }
+            }
+
+            $usercreatedcache->set($courseid, null);
+
+            if (is_array($students)) {
+                foreach ($newstudents as $newstudent) {
+                    if (!array_key_exists($newstudent, $students)) {
+                        $students[$newstudent] = $newstudent;
+                    }
+                }
+                $studentscache = \cache::make('format_topcoll', 'activitystudentscache');
+                $studentscache->set($courseid, $students);
+            } else if (!empty($newstudents)) {
+                $students = $newstudents;
+                $studentscache = \cache::make('format_topcoll', 'activitystudentscache');
+                $studentscache->set($courseid, $students);
+            }
+        }
+
+        if (is_array($students)) {
+            // We have students!
+            $modulecountcache = \cache::make('format_topcoll', 'activitymodulecountcache');
+            $modulecountcourse = $modulecountcache->get($courseid);
+            if (empty($modulecountcourse)) {
+                $modulecountcourse = self::calulatecoursemodules($courseid, $students);
+                $modulecountcache->set($courseid, $modulecountcourse);
+            } else if (!empty($newstudents)) {
+                // Update.
+                $modulecountcourse = self::calulatecoursemodules($courseid, $newstudents, null, $modulecountcourse);
+                $modulecountcache->set($courseid, $modulecountcourse);
+            }
+
+            if (!is_null($lock)) {
+                $lock->release();
+            }
+
+            return $modulecountcourse[$mod->id][0];
+        }
+
+        if (!is_null($lock)) {
+            $lock->release();
+        }
+
+        return 0;
+    }
+
+    /**
+     * Get students for a specific courseid.
+     *
+     * @param int $courseid The course id.
+     *
+     * @return array / string 0 or more student id's in an array or 'nostudents' string.
+     */
+    public static function course_get_students($courseid) {
         $studentrolescache = \cache::make('format_topcoll', 'activitystudentrolescache');
         $studentroles = $studentrolescache->get('roles');
 
@@ -645,18 +690,14 @@ class activity {
             $studentrolescache->set('roles', $studentroles);
         }
 
-        $modulecountcache = \cache::make('format_topcoll', 'activitymodulecountcache');
-        $modulecountcourse = $modulecountcache->get($courseid);
-        if (empty($modulecountcourse)) {
-            // Initialise to zero in case of no enrolled students on the course - done in calulatecoursemodules().
-
-            $context = \context_course::instance($courseid);
-            $users = get_enrolled_users($context, '', 0, 'u.id', null, 0, 0, true);
-            $users = array_keys($users);
-            $alluserroles = get_users_roles($context, $users, false);
-
-            $studentscache = \cache::make('format_topcoll', 'activitystudentscache');
+        $studentscache = \cache::make('format_topcoll', 'activitystudentscache');
+        $students = $studentscache->get($courseid);
+        if (empty($students)) {
             $students = array();
+            $context = \context_course::instance($courseid);
+            $enrolledusers = get_enrolled_users($context, '', 0, 'u.id', null, 0, 0, true);
+            $users = array_keys($enrolledusers);
+            $alluserroles = get_users_roles($context, $users, false);
 
             foreach ($users as $userid) {
                 $usershortnames = array();
@@ -675,15 +716,49 @@ class activity {
                     // Don't go any further.
                     continue;
                 } else {
-                    $students[] = $userid;
+                    $students[$userid] = $userid;
                 }
             }
-            $studentscache->set($courseid, $students);
-            $modulecountcourse = self::calulatecoursemodules($courseid, $students);
-            $modulecountcache->set($courseid, $modulecountcourse);
+
+            if (empty($students)) {
+                $studentscache->set($courseid, 'nostudents');
+            } else {
+                $studentscache->set($courseid, $students);
+            }
         }
 
-        return $modulecountcourse[$mod->id];
+        return $students;
+    }
+
+    /**
+     * States if the format setting for the maximum number of students has not been
+     * exceeded for the specific courseid.
+     *
+     * @param int $courseid The course id.
+     * @param boolean $extrainfo Return extra information.
+     *
+     * @return boolean true = it has not, false = it has /
+     *         if $extrainfo then array (boolean, nostudents, maxstudents);
+     */
+    public static function maxstudentsnotexceeded($courseid, $extrainfo = false) {
+        $notexceeded = true;
+        $maxstudents = get_config('format_topcoll', 'courseadditionalmoddatamaxstudents');
+        $studentcount = 0;
+        if (($maxstudents != 0) || ($extrainfo)) {
+            $students = self::course_get_students($courseid);
+            if (is_array($students)) {
+                $studentcount = count($students);
+                if ($maxstudents < $studentcount) {
+                    $notexceeded = false;
+                }
+            }
+        }
+
+        if ($extrainfo) {
+            return array('notexceeded' => $notexceeded, 'nostudents' => $studentcount, 'maxstudents' => $maxstudents);
+        }
+
+        return $notexceeded;
     }
 
     /**
@@ -722,8 +797,8 @@ class activity {
      * @param int $courseid Course id.
      */
     public static function userenrolmentcreated($userid, $courseid, $courseformat) {
-        if (self::activitymetaused($courseformat)) {
-            self::clearcoursemodulecount($courseid);
+        if (self::activitymetaenabled() && self::activitymetaused($courseformat)) {
+            self::userenrolmentchanged($userid, $courseid, 1);
         }
     }
 
@@ -734,8 +809,8 @@ class activity {
      * @param int $courseid Course id.
      */
     public static function userenrolmentupdated($userid, $courseid, $courseformat) {
-        if (self::activitymetaused($courseformat)) {
-            self::clearcoursemodulecount($courseid);
+        if (self::activitymetaenabled() && self::activitymetaused($courseformat)) {
+            self::userenrolmentchanged($userid, $courseid, 0);
         }
     }
 
@@ -746,9 +821,60 @@ class activity {
      * @param int $courseid Course id.
      */
     public static function userenrolmentdeleted($userid, $courseid, $courseformat) {
-        if (self::activitymetaused($courseformat)) {
-            self::clearcoursemodulecount($courseid);
+        if (self::activitymetaenabled() && self::activitymetaused($courseformat)) {
+            self::userenrolmentchanged($userid, $courseid, -1);
         }
+    }
+
+    /**
+     * A user enrolment has changed.
+     *
+     * @param int $userid User id.
+     * @param int $courseid Course id.
+     * @param int $type -1 = deleted, 0 changed and 1 created.
+     */
+    private static function userenrolmentchanged($userid, $courseid, $type) {
+        $lock = self::lockcaches($courseid);
+        if ($type == 1) {
+            // Created.
+            /* Note: At the time of the event, the DB has not been updated to know that the given user has been assigned a role
+                     of 'student' - role_assignments table with data relating to that contained in the event itself. */
+            $usercreatedcache = \cache::make('format_topcoll', 'activityusercreatedcache');
+            $createdusers = $usercreatedcache->get($courseid);
+            if (empty($createdusers)) {
+                $createdusers = array();
+            }
+            $createdusers[] = $userid;
+            $usercreatedcache->set($courseid, $createdusers);
+        } else if ($type == -1) {
+            // Deleted.
+            $studentscache = \cache::make('format_topcoll', 'activitystudentscache');
+            $students = $studentscache->get($courseid);
+            if (!empty($students)) {
+                if (array_key_exists($userid, $students)) {
+                    unset($students[$userid]);
+                    $studentscache->set($courseid, $students);
+                    $modulecountcache = \cache::make('format_topcoll', 'activitymodulecountcache');
+                    $modulecountcourse = $modulecountcache->get($courseid);
+                    if (empty($modulecountcourse)) {
+                        if (!empty($students)) {
+                            $modulecountcourse = self::calulatecoursemodules($courseid, $students);
+                            $modulecountcache->set($courseid, $modulecountcourse);
+                        }
+                    } else {
+                        $modulecountcoursekeys = array_keys($modulecountcourse);
+                        foreach ($modulecountcoursekeys as $modid) {
+                            if (in_array($userid, $modulecountcourse[$modid][1])) {
+                                $modulecountcourse[$modid][0]--;
+                                unset($modulecountcourse[$modid][1][$userid]);
+                            }
+                        }
+                        $modulecountcache->set($courseid, $modulecountcourse);
+                    }
+                }
+            } // Else no students no problem.
+        }
+        $lock->release();
     }
 
     /**
@@ -778,16 +904,18 @@ class activity {
      * @param int $courseid Course id.
      */
     private static function modulechanged($modid, $courseid, $courseformat) {
-        if (self::activitymetaused($courseformat)) {
-            $lock = self::lockmodulecountcache($courseid);
-            $modulecountcache = \cache::make('format_topcoll', 'activitymodulecountcache');
-            $modulecountcourse = $modulecountcache->get($courseid);
-            if (!empty($modulecountcourse)) {
-                $studentscache = \cache::make('format_topcoll', 'activitystudentscache');
-                $students = $studentscache->get($courseid);
-                $updated = self::calulatecoursemodules($courseid, $students, $modid);
-                $modulecountcourse[$modid] = $updated[$modid];
-                $modulecountcache->set($courseid, $modulecountcourse);
+        if (self::activitymetaenabled() && self::activitymetaused($courseformat)) {
+            $lock = self::lockcaches($courseid);
+            $studentscache = \cache::make('format_topcoll', 'activitystudentscache');
+            $students = $studentscache->get($courseid);
+            if (is_array($students)) {
+                $modulecountcache = \cache::make('format_topcoll', 'activitymodulecountcache');
+                $modulecountcourse = $modulecountcache->get($courseid);
+                if (!empty($modulecountcourse)) {
+                    $updated = self::calulatecoursemodules($courseid, $students, $modid);
+                    $modulecountcourse[$modid] = $updated[$modid];
+                    $modulecountcache->set($courseid, $modulecountcourse);
+                }
             }
             $lock->release();
         }
@@ -800,8 +928,8 @@ class activity {
      * @param int $courseid Course id.
      */
     public static function moduledeleted($modid, $courseid, $courseformat) {
-        if (self::activitymetaused($courseformat)) {
-            $lock = self::lockmodulecountcache($courseid);
+        if (self::activitymetaenabled() && self::activitymetaused($courseformat)) {
+            $lock = self::lockcaches($courseid);
             $modulecountcache = \cache::make('format_topcoll', 'activitymodulecountcache');
             $modulecountcourse = $modulecountcache->get($courseid);
             if (!empty($modulecountcourse)) {
@@ -819,9 +947,11 @@ class activity {
      * @param int $courseid Course id.
      */
     private static function clearcoursemodulecount($courseid) {
-        $lock = self::lockmodulecountcache($courseid);
+        $lock = self::lockcaches($courseid);
         $modulecountcache = \cache::make('format_topcoll', 'activitymodulecountcache');
         $modulecountcache->set($courseid, null);
+        $studentscache = \cache::make('format_topcoll', 'activitystudentscache');
+        $studentscache->set($courseid, null);
         $lock->release();
     }
 
@@ -831,20 +961,22 @@ class activity {
      * @param int $courseid Course id.
      * @param array $students Array of student id's on the course.
      * @param int $modid Calculate specific module id or null if calculate all.
+     * @param array $modulecount Existing module count if any.
      *
      * @return int Number of participants (students) on the modules requested on the course.
      */
-    private static function calulatecoursemodules($courseid, $students, $modid = null) {
-        $modulecount = array(); // Mod id indexed.
-        if (is_null($modid)) {
-            // Initialise to zero in case of no enrolled students on the course.
-            $modinfo = get_fast_modinfo($courseid, -1);
-            $cms = $modinfo->get_cms(); // Array of cm_info objects.
-            foreach ($cms as $themod) {
-                $modulecount[$themod->id] = 0;
+    private static function calulatecoursemodules($courseid, $students, $modid = null, $modulecount = null) {
+        if (is_null($modulecount)) {
+            if (is_null($modid)) {
+                // Initialise to zero in case of no enrolled students on the course.
+                $modinfo = get_fast_modinfo($courseid, -1);
+                $cms = $modinfo->get_cms(); // Array of cm_info objects.
+                foreach ($cms as $themod) {
+                    $modulecount[$themod->id] = array(0, array());
+                }
+            } else {
+                $modulecount[$modid] = array(0, array());
             }
-        } else {
-            $modulecount[$modid] = 0;
         }
         foreach ($students as $userid) {
             $modinfo = get_fast_modinfo($courseid, $userid);
@@ -854,11 +986,11 @@ class activity {
                     continue;
                 }
                 // From course_section_cm() in M3.8 - is_visible_on_course_page for M3.9+.
-                if (((method_exists($usermod, 'is_visible_on_course_page')) && ($usermod->is_visible_on_course_page()))
-                    || ((!empty($usermod->availableinfo)) && ($usermod->url))) {
+                if (($usermod->is_visible_on_course_page()) || (!empty($usermod->availableinfo) && ($usermod->url))) {
                     // From course_section_cm_name_title().
                     if ($usermod->uservisible) {
-                        $modulecount[$usermod->id]++;
+                        $modulecount[$usermod->id][0]++;
+                        $modulecount[$usermod->id][1][] = $userid;
                     }
                 }
             }
@@ -868,29 +1000,38 @@ class activity {
     }
 
     /**
-     * Get a lock for the module count cache on the given course.
+     * Get a lock for the caches on the given course.
      *
      * @param int $courseid Course id.
      *
      * @return object The lock to release when complete.
      */
-    private static function lockmodulecountcache($courseid) {
+    private static function lockcaches($courseid) {
         $lockfactory = \core\lock\lock_config::get_lock_factory('format_topcoll');
         if ($lock = $lockfactory->get_lock('courseid'.$courseid, 5)) {
             return $lock;
         }
-        throw new \moodle_exception('cannotgetmodulecountcachelock', 'format_topcoll', '',
-            get_string('cannotgetmodulecountcachelock', 'format_topcoll', $courseid));
+        throw new \moodle_exception('cannotgetactivitycacheslock', 'format_topcoll', '',
+            get_string('cannotgetactivitycacheslock', 'format_topcoll', $courseid));
+    }
+
+    /**
+     * State if the site has activity meta enabled.
+     *
+     * @return boolean True or False.
+     */
+    public static function activitymetaenabled() {
+        return (get_config('format_topcoll', 'enableadditionalmoddata') == 2);
     }
 
     /**
      * State if the course has activity meta enabled.
      *
-     * @param int $courseid Course id.
+     * @param int $courseformat Course format for the course.
      *
      * @return boolean True or False.
      */
-    private static function activitymetaused($courseformat) {
+    public static function activitymetaused($courseformat) {
         $tcsettings = $courseformat->get_settings();
         if ((!empty($tcsettings['showadditionalmoddata'])) && ($tcsettings['showadditionalmoddata'] == 2)) {
             return true; // Could in theory test the module but then this method wouldn't work for user events.

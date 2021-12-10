@@ -1,0 +1,63 @@
+.action-block {
+  h2:after {
+      content: "";
+      display: block;
+      height: 2px;
+      margin: 0.4em auto 0;
+      width: 62%;
+      background-color: #183140;
+  }
+}
+
+.action-card-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin: 0;
+  padding: 1rem;
+}
+
+.action-card-icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 6rem;
+    height: 6rem;
+    margin-bottom: 0.5rem;
+    border-radius: 50%;
+    background: #183140;
+    color: #FFF;
+    z-index: 2;
+}
+
+.action-card-icon-frontpage {
+    width: 6rem;
+    height: 6rem;
+}
+
+.action-card-icon-course {
+    width: 4.2rem;
+    height: 4.2rem;
+}
+
+.action-card-icon:before {
+    content: "";
+    position: absolute;
+    display: block;
+    border-radius: 50%;
+    width: 100%;
+    height: 100%;
+    box-shadow: 0 0 0 3px #00837a;
+    opacity: 0;
+    transition: all 200ms cubic-bezier(0,0,.2,1);
+}
+
+@media (max-width: 767.98px) {
+  .action-card-icon-frontpage {
+    width: 3rem;
+    height: 3rem;
+}
+
+}

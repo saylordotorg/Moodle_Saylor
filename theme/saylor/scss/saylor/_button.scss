@@ -117,3 +117,8 @@
 .mod_questionnaire_completepage .buttons>input {
   @extend .btn-sm;
 }
+
+/** Activity Info */
+.btn-info:disabled {
+  opacity: 30%;
+}

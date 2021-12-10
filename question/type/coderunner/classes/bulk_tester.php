@@ -252,7 +252,7 @@ class qtype_coderunner_bulk_tester {
         $context = context::instance_by_id($contextid);
         $questionids = $DB->get_records_sql(
                 "SELECT q.id
-                 FROM mdl_question q JOIN mdl_quiz_slots slt
+                 FROM {question} q JOIN {quiz_slots} slt
                  ON q.id = slt.questionid
                  WHERE slt.quizid = :quizid AND q.qtype='coderunner'",
                 array('quizid' => $quizid));
@@ -278,13 +278,13 @@ class qtype_coderunner_bulk_tester {
         return $DB->get_records_sql("
             SELECT qz.id as quizid, qz.name as name,
                 (SELECT count(1)
-                 FROM mdl_question q JOIN mdl_quiz_slots slt
+                 FROM {question} q JOIN {quiz_slots} slt
                  ON q.id = slt.questionid
                  WHERE slt.quizid = qz.id AND q.qtype='coderunner'
                 ) AS count
-            FROM mdl_quiz qz
-            JOIN mdl_course crs on qz.course = crs.id
-            JOIN mdl_context ctx on ctx.instanceid = crs.id
+            FROM {quiz} qz
+            JOIN {course} crs on qz.course = crs.id
+            JOIN {context} ctx on ctx.instanceid = crs.id
             WHERE ctx.id = :contextid
             ORDER BY name",
                 array('contextid' => $contextid)
@@ -357,11 +357,19 @@ class qtype_coderunner_bulk_tester {
             echo $OUTPUT->heading("{$category->name} ($numquestions)", 4);
             echo "<ul>\n";
             foreach ($questionids as $questionid => $name) {
+                // Output question name before testing, so if something goes wrong, it is clear which question was the problem.
                 $questionname = format_string($name);
                 $previewurl = new moodle_url($questiontestsurl, array('questionid' => $questionid));
                 $questionnamelink = html_writer::link($previewurl, $questionname, array('target' => '_blank'));
+                echo "<li>$questionnamelink:";
+                flush(); // Force output to prevent timeouts and show progress.
+
+                // Now run the test.
                 list($outcome, $message) = $this->load_and_test_question($questionid);
-                $html = "<li>$questionnamelink: $message</li>";
+
+                // Report the result, and record failures for the summary.
+                echo " $message</li>";
+                flush(); // Force output to prevent timeouts and show progress.
                 if ($outcome === self::PASS) {
                     $numpasses += 1;
                 } else if ($outcome === self::MISSINGANSWER) {
@@ -369,9 +377,6 @@ class qtype_coderunner_bulk_tester {
                 } else {
                     $failingtests[] = "$questionnamelink: $message";
                 }
-                $html = "<li>$questionnamelink: $message";
-                echo $html;
-                flush(); // Force output to prevent timeouts and show progress.
             }
             echo "</ul>\n";
         }
@@ -396,10 +401,10 @@ class qtype_coderunner_bulk_tester {
             } else {
                 $ok = $this->test_question($question);
                 if ($ok) {
-                    $message = get_string('pass', 'qtype_coderunner');
+                    $message =  "<b style='color:green'>" . get_string('pass', 'qtype_coderunner') . "</b>";
                     $status = self::PASS;
                 } else {
-                    $message = get_string('fail', 'qtype_coderunner');
+                    $message = "<b style='color:red'>" . get_string('fail', 'qtype_coderunner') . "</b>";
                     $status = self::FAIL;
                 }
             }

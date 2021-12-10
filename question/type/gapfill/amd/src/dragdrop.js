@@ -16,8 +16,6 @@
 /**
  * JavaScript code for the gapfill question type.
  *
- * @package    qtype
- * @subpackage gapfill
  * @copyright  2020 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

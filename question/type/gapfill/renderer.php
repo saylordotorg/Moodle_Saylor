@@ -268,7 +268,7 @@ class qtype_gapfill_renderer extends qtype_with_combined_feedback_renderer {
         $aftergaptext = "";
         if (($fraction == 0) && ($rightanswer != "") && ($rightanswer != ".+")) {
             /* replace | operator with the word or */
-            $rightanswerdisplay = preg_replace("/\|/", get_string("or", "qtype_gapfill"), $rightanswer);
+            $rightanswerdisplay = preg_replace("/\|/", " ".get_string("or", "qtype_gapfill")." ", $rightanswer);
             /* replace !! with the 'blank' */
             $rightanswerdisplay = preg_replace("/\!!/", get_string("blank", "qtype_gapfill"), $rightanswerdisplay);
             $question = $qa->get_question();

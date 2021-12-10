@@ -105,6 +105,7 @@ class renderer_base {
 
             $loader = new \core\output\mustache_filesystem_loader();
             $stringhelper = new \core\output\mustache_string_helper();
+            $cleanstringhelper = new \core\output\mustache_clean_string_helper();
             $quotehelper = new \core\output\mustache_quote_helper();
             $jshelper = new \core\output\mustache_javascript_helper($this->page);
             $pixhelper = new \core\output\mustache_pix_helper($this);
@@ -116,6 +117,7 @@ class renderer_base {
 
             $helpers = array('config' => $safeconfig,
                              'str' => array($stringhelper, 'str'),
+                             'cleanstr' => array($cleanstringhelper, 'cleanstr'),
                              'quote' => array($quotehelper, 'quote'),
                              'js' => array($jshelper, 'help'),
                              'pix' => array($pixhelper, 'pix'),
@@ -875,13 +877,15 @@ class core_renderer extends renderer_base {
                     html_writer::link($purgeurl, get_string('purgecaches', 'admin')) . '</div>';
         }
         if (!empty($CFG->debugvalidators)) {
-            // NOTE: this is not a nice hack, $this->page->url is not always accurate and
-            // $FULLME neither, it is not a bug if it fails. --skodak.
-            $output .= '<div class="validators"><ul class="list-unstyled ml-1">
-              <li><a href="http://validator.w3.org/check?verbose=1&amp;ss=1&amp;uri=' . urlencode(qualified_me()) . '">Validate HTML</a></li>
-              <li><a href="http://www.contentquality.com/mynewtester/cynthia.exe?rptmode=-1&amp;url1=' . urlencode(qualified_me()) . '">Section 508 Check</a></li>
-              <li><a href="http://www.contentquality.com/mynewtester/cynthia.exe?rptmode=0&amp;warnp2n3e=1&amp;url1=' . urlencode(qualified_me()) . '">WCAG 1 (2,3) Check</a></li>
-            </ul></div>';
+            $siteurl = qualified_me();
+            $nuurl = new moodle_url('https://validator.w3.org/nu/', ['doc' => $siteurl, 'showsource' => 'yes']);
+            $waveurl = new moodle_url('https://wave.webaim.org/report#/' . urlencode($siteurl));
+            $validatorlinks = [
+                html_writer::link($nuurl, get_string('validatehtml')),
+                html_writer::link($waveurl, get_string('wcagcheck'))
+            ];
+            $validatorlinkslist = html_writer::alist($validatorlinks, ['class' => 'list-unstyled ml-1']);
+            $output .= html_writer::div($validatorlinkslist, 'validators');
         }
         return $output;
     }
@@ -4871,17 +4875,17 @@ class core_renderer_cli extends core_renderer {
      * To aid in CLI consistency this status is NOT translated and the visual
      * width is always exactly 10 chars.
      *
-     * @param result $result
+     * @param core\check\result $result
      * @return string HTML fragment
      */
     protected function render_check_result(core\check\result $result) {
         $status = $result->get_status();
 
         $labels = [
-            core\check\result::NA        => '      ' . cli_ansi_format('<colour:gray>' ) . ' NA ',
+            core\check\result::NA        => '      ' . cli_ansi_format('<colour:darkGray>' ) . ' NA ',
             core\check\result::OK        => '      ' . cli_ansi_format('<colour:green>') . ' OK ',
             core\check\result::INFO      => '    '   . cli_ansi_format('<colour:blue>' ) . ' INFO ',
-            core\check\result::UNKNOWN   => ' '      . cli_ansi_format('<colour:grey>' ) . ' UNKNOWN ',
+            core\check\result::UNKNOWN   => ' '      . cli_ansi_format('<colour:darkGray>' ) . ' UNKNOWN ',
             core\check\result::WARNING   => ' '      . cli_ansi_format('<colour:black><bgcolour:yellow>') . ' WARNING ',
             core\check\result::ERROR     => '   '    . cli_ansi_format('<bgcolour:red>') . ' ERROR ',
             core\check\result::CRITICAL  => ''       . cli_ansi_format('<bgcolour:red>') . ' CRITICAL ',

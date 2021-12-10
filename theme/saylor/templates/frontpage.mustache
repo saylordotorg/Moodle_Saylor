@@ -60,7 +60,13 @@
     <div id="page" class="container-fluid">
 
         <div id="page-content" class="row">
-            <div id="region-main-box" class="col-12">
+            <div id="region-main-box" class="col-12 d-flex flex-column flex-lg-row">
+                <section id="region-center">
+                {{#hastopblocks}}
+                <section id="region-top" data-region="blocks-row" class="d-print-none mt-3">
+                    {{{ topblocks }}}
+                </section>
+                {{/hastopblocks}}
                 {{#hasregionmainsettingsmenu}}
                 <div id="region-main-settings-menu" class="d-print-none {{#hasblocks}}has-blocks{{/hasblocks}}">
                     <div> {{{ output.region_main_settings_menu }}} </div>
@@ -71,11 +77,14 @@
                         <div class="region_main_settings_menu_proxy"></div>
                     {{/hasregionmainsettingsmenu}}
                     {{{ output.course_content_header }}}
+
+                    <!--
                     <div id="banner-wrapper" class="container-fluid p-0 d-flex align-items-center rounded">
                         <div id="banner-summary-container" class="mx-auto my-4 mdl-align text-white">
                             <h2>{{ sitesummary }}</h2>
                         </div>
                     </div>
+                  -->
 
                     <div class="container-fluid container-alert">
                                 {{#enable1alert}}
@@ -113,15 +122,22 @@
                                 {{/enable3alert}}
                     </div>
 
+                    {{#hastopintblocks}}
+                    <section id="region-top-interior" class="d-print-none px-3 my-2">
+                        {{{ topintblocks }}}
+                    </section>
+                    {{/hastopintblocks}}
+
                     {{{ output.main_content }}}
-                    {{{ output.activity_navigation }}}
+
                     {{{ output.course_content_footer }}}
                 </section>
-                {{#hasblocks}}
-                <section data-region="blocks-column" class="d-print-none mt-3">
+                </section>
+                {{#hassideblocks}}
+                <section data-region="blocks-column" class="d-print-none mt-3 px-3">
                     {{{ sidepreblocks }}}
                 </section>
-                {{/hasblocks}}
+                {{/hassideblocks}}
             </div>
         </div>
     </div>

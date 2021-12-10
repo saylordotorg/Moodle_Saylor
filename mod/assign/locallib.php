@@ -7771,16 +7771,15 @@ class assign {
         }
 
         $capabilitylist = array('gradereport/grader:view', 'moodle/grade:viewall');
+        $usergrade = get_string('notgraded', 'assign');
         if (has_all_capabilities($capabilitylist, $this->get_course_context())) {
             $urlparams = array('id'=>$this->get_course()->id);
             $url = new moodle_url('/grade/report/grader/index.php', $urlparams);
-            $usergrade = '-';
-            if (isset($gradinginfo->items[0]->grades[$userid]->str_grade)) {
+            if (isset($gradinginfo->items[0]->grades[$userid]->grade)) {
                 $usergrade = $gradinginfo->items[0]->grades[$userid]->str_grade;
             }
             $gradestring = $this->get_renderer()->action_link($url, $usergrade);
         } else {
-            $usergrade = '-';
             if (isset($gradinginfo->items[0]->grades[$userid]) &&
                     !$gradinginfo->items[0]->grades[$userid]->hidden) {
                 $usergrade = $gradinginfo->items[0]->grades[$userid]->str_grade;
@@ -8946,7 +8945,10 @@ class assign {
                 if ($gradebookplugin) {
                     $grade = $this->get_user_grade($result->userid, false);
                     if ($grade) {
-                        $gradebookgrade->feedback = $gradebookplugin->text_for_gradebook($grade);
+                        $feedbacktext = $gradebookplugin->text_for_gradebook($grade);
+                        if (!empty($feedbacktext)) {
+                            $gradebookgrade->feedback = $feedbacktext;
+                        }
                         $gradebookgrade->feedbackformat = $gradebookplugin->format_for_gradebook($grade);
                         $gradebookgrade->feedbackfiles = $gradebookplugin->files_for_gradebook($grade);
                     }

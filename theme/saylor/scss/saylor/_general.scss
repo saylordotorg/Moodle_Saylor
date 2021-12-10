@@ -275,3 +275,22 @@ h6,
   border: none;
 }
 
+// Set block borders.
+.block.card {
+  border: 1px solid $gray-300;
+}
+#region-main {
+  border: 1px solid $gray-300;
+}
+#page-header .card {
+  border: 1px solid $gray-300;
+}
+
+// Interior blocks or cards.
+#region-main .block {
+  border: 1px solid $gray-200;
+}
+
+.block_myoverview.block {
+  border: 1px solid $gray-200;
+}

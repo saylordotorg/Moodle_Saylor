@@ -187,6 +187,14 @@ $string['gapfillerui_delimiters_descr'] = 'A 2-character array of the strings us
 $string['gapfillerui_ui_source_descr'] = '"globalextra" to take the HTML to display from the globalextra field or "test0" to take it from the testcode field of the first test';
 $string['gapfillerui_sync_interval_secs_descr'] = 'The time interval in seconds between calls to sync the UI contents back to the question answer. 0 for no such auto-syncing.';
 
+$string['giveup'] = 'Stop button';
+$string['giveup_aftermaxmarks'] = 'Available once mark cannot be improved';
+$string['giveup_always'] = 'Always available';
+$string['giveup_help'] = 'If this option is enabled, students will see a button to stop interacting with the question, and instead display the general feedback.
+
+The \'Stop and read final feedback\' can be shown from the start, or only once the student can no longer improve their mark, due to the penalty regime.';
+$string['giveup_never'] = 'Never available';
+
 $string['globalextra'] = 'Global extra';
 $string['globalextra_help'] = 'A field of text for general-purpose use by template authors, like the extra field of each test case, but global to all tests. Available to the template author as {{ QUESTION.globalextra }}.';
 $string['graphhelp'] = '- Double click at a blank space to create a new node/state.
@@ -249,7 +257,8 @@ Result Columns field.
 If the template is a combinator, the JSON string output by the template grader
 should again contain a \'fraction\' field, this time for the total mark,
 and may contain zero or more of \'prologuehtml\', \'testresults\',
-\'epiloguehtml\', \'columnformats\', \'showoutputonly\' and \'showdifferences\'.
+\'epiloguehtml\', \'columnformats\', \'showoutputonly\', \'showdifferences\'
+and \'graderstate\'.
 The \'prologuehtml\' and \'epiloguehtml\' fields are html
 that is displayed respectively before and after the (optional) result table. The
 \'testresults\' field, if given, is a list of lists used to display some sort
@@ -270,6 +279,10 @@ The \'showdifferences\' field turns on display of a \'Show Differences\'
 button after the results table if the awarded mark fraction is not 1.0.
 The \'showoutputonly\' field, if true, is used when the question is to be
 used only to display the output and perhaps images from a run, with no mark.
+The \'graderstate\' variable is a string value that the question author can
+use to pass grading information between question attempts. If included
+in the grading response to a submission it will be available on the next
+submission as the Twig variable \'QUESTION.stepinfo.graderstate\'.
 ';
 $string['graph_ui_invalidserialisation'] = 'GraphUI: invalid serialisation';
 $string['graphui_isfsm_descr'] = 'True if the graph represents a Finite State Machine, in which case it can contain an incoming edge from nowhere (the start edge) and can have \'accept\' nodes';

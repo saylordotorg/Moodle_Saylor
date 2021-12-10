@@ -29,10 +29,10 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/question/type/coderunner/tests/coderunnertestcase.php');
+require_once($CFG->dirroot . '/question/type/coderunner/tests/test.php');
 require_once($CFG->dirroot . '/question/type/coderunner/questiontype.php');
 
-class qtype_coderunner_graphui_save_test extends qtype_coderunner_testcase {
+class qtype_coderunner_graphui_save_testcase extends qtype_coderunner_testcase {
     
     protected $qtype;
 
@@ -73,7 +73,8 @@ class qtype_coderunner_graphui_save_test extends qtype_coderunner_testcase {
 
         foreach ($questiondata->options as $optionname => $value) {
             if ($optionname != 'testcases') {
-                $this->assertEquals($value, $actualquestiondata->options->$optionname);
+                $this->assertEquals($value, $actualquestiondata->options->$optionname,
+                        'For property ' . $optionname);
             }
         }
 

@@ -1,6 +1,40 @@
 ﻿Version Information
 ===================
 
+Version 3.11.0.6 - TBR
+-----------------------------
+
+Version 3.11.0.5 - 15/11/21
+-----------------------------
+  1. Fix 'Error in urls for additional information' - #116.
+  2. Add 'enableadditionalmoddata' setting to turn on / off additional information at a site level.  Default is 'off'!
+  3. Improve documentation for Toggle blocks location' functionality - https://moodle.org/mod/forum/discuss.php?d=428924 and #100.
+  4. Improve user enrolment event handling to be more efficient for activity information - #114.
+
+Version 3.11.0.4 - 01/11/2021
+-----------------------------
+  1. Refactor - remove redundant 'bsnewgrid' functionality that supported the transition from BootStrap 2.3.2.
+  2. Refactor - add display instructions template.
+  3. Refactor - add toggle all template.
+  4. Refactor - add hidden section template.
+  5. Refactor - add section summary template.
+  6. Refactor - add stealth section template.
+  7. Refactor - add single section template.
+  8. Refactor - add section template.
+  9. Separate out 'Activity information' as a separate reset, new capability 'changeactivitymeta' and fix the
+     'forum' module in the list of enabled plugins so that it can be enabled and the others disabled and 'showadditionalmoddata'
+     still take effect.
+ 10. Remove redundant BS2.3.2 support on reset section of course settings.
+ 11. Calculate the students in 'activitystudentscache' only once per course.
+ 12. Refactor - add section course module meta template.
+ 13. Refactor - add section course module template.
+ 14. Added 'courseadditionalmoddatamaxstudents' setting to restrict, if desired, the display of the activity information on a
+     a course of the number of students on that course exceeds it.  When 'showadditionalmoddata' is enabled on a course, then
+     additional information about the status of this is shown underneath the setting on the course settings page.  This is so
+     that large courses can be automatically prevented from showing the information as the calculations would take an
+     unacceptable amount of time to compute.  It is up to the administrator to set the figure based upon benchmarking / testing
+     of the performance characteristics of the server.  The default is '0', which means 'unlimited' number of students.
+
 Version 3.11.0.3 - 30/09/2021
 -----------------------------
   1. Add support for Forums in "Course page further information" - #105.

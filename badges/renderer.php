@@ -24,6 +24,8 @@
  * @author     Yuliya Bozhko <yuliya.bozhko@totaralms.com>
  */
 
+defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->libdir . '/badgeslib.php');
 require_once($CFG->libdir . '/tablelib.php');
 
@@ -47,7 +49,14 @@ class core_badges_renderer extends plugin_renderer_base {
                     $bname = s($badge->name);
                 }
                 if (!empty($badge->image)) {
-                    $imageurl = $badge->image;
+                    if (is_object($badge->image)) {
+                        if (!empty($badge->image->caption)) {
+                            $badge->imagecaption = $badge->image->caption;
+                        }
+                        $imageurl = $badge->image->id;
+                    } else {
+                        $imageurl = $badge->image;
+                    }
                 }
                 if (isset($badge->assertion->badge->name)) {
                     $bname = s($badge->assertion->badge->name);
@@ -59,7 +68,8 @@ class core_badges_renderer extends plugin_renderer_base {
 
             $name = html_writer::tag('span', $bname, array('class' => 'badge-name'));
 
-            $image = html_writer::empty_tag('img', array('src' => $imageurl, 'class' => 'badge-image'));
+            $imagecaption = $badge->imagecaption ?? '';
+            $image = html_writer::empty_tag('img', ['src' => $imageurl, 'class' => 'badge-image', 'alt' => $imagecaption]);
             if (!empty($badge->dateexpire) && $badge->dateexpire < time()) {
                 $image .= $this->output->pix_icon('i/expired',
                         get_string('expireddate', 'badges', userdate($badge->dateexpire)),
@@ -334,7 +344,7 @@ class core_badges_renderer extends plugin_renderer_base {
         $output = '';
         $output .= html_writer::start_tag('div', array('id' => 'badge'));
         $output .= html_writer::start_tag('div', array('id' => 'badge-image'));
-        $output .= html_writer::empty_tag('img', array('src' => $badgeimage, 'alt' => $badge->name, 'width' => '100'));
+        $output .= html_writer::empty_tag('img', array('src' => $badgeimage, 'alt' => $badge->imagecaption, 'width' => '100'));
         if ($expiration < $now) {
             $output .= $this->output->pix_icon('i/expired',
             get_string('expireddate', 'badges', userdate($issued['expires'])),
@@ -380,7 +390,9 @@ class core_badges_renderer extends plugin_renderer_base {
 
         $output .= $this->output->heading(get_string('issuerdetails', 'badges'), 3);
         $dl = array();
-        $dl[get_string('issuername', 'badges')] = $badge->issuername;
+        $dl[get_string('issuername', 'badges')] = format_string($badge->issuername, true,
+            ['context' => context_system::instance()]);
+
         if (isset($badge->issuercontact) && !empty($badge->issuercontact)) {
             $dl[get_string('contact', 'badges')] = obfuscate_mailto($badge->issuercontact);
         }
@@ -413,7 +425,7 @@ class core_badges_renderer extends plugin_renderer_base {
 
         if ($badge->type == BADGE_TYPE_COURSE && isset($badge->courseid)) {
             $coursename = $DB->get_field('course', 'fullname', array('id' => $badge->courseid));
-            $dl[get_string('course')] = $coursename;
+            $dl[get_string('course')] = format_string($coursename, true, ['context' => context_course::instance($badge->courseid)]);
         }
         $dl[get_string('bcriteria', 'badges')] = self::print_badge_criteria($badge);
         $output .= $this->definition_list($dl);
@@ -505,7 +517,14 @@ class core_badges_renderer extends plugin_renderer_base {
         if (isset($issued->imageUrl)) {
             $issued->image = $issued->imageUrl;
         }
-        $output .= html_writer::empty_tag('img', array('src' => $issued->image, 'width' => '100'));
+        if (is_object($issued->image)) {
+            if (!empty($issued->image->caption)) {
+                $issued->imagecaption = $issued->image->caption;
+            }
+            $issued->image = $issued->image->id;
+        }
+        $imagecaption = $issued->imagecaption ?? '';
+        $output .= html_writer::empty_tag('img', ['src' => $issued->image, 'width' => '100', 'alt' => $imagecaption]);
         if (isset($assertion->expires)) {
             $expiration = is_numeric($assertion->expires) ? $assertion->expires : strtotime($assertion->expires);
             if ($expiration < $today) {
@@ -1276,13 +1295,13 @@ class core_badges_renderer extends plugin_renderer_base {
             );
             if (!$currentbadge->is_active() && !$currentbadge->is_locked()) {
                 $action = $this->output->action_icon(
-                    new moodle_url('related_action.php',
-                        array(
-                            'badgeid' => $related->currentbadgeid,
-                            'relatedid' => $badge->id,
-                            'action' => 'remove'
-                        )
-                    ), new pix_icon('t/delete', get_string('delete')));
+                    new moodle_url('/badges/related_action.php', [
+                        'badgeid' => $related->currentbadgeid,
+                        'relatedid' => $badge->id,
+                        'sesskey' => sesskey(),
+                        'action' => 'remove'
+                    ]),
+                    new pix_icon('t/delete', get_string('delete')));
                 $actions = html_writer::tag('div', $action, array('class' => 'badge-actions'));
                 array_push($row, $actions);
             }

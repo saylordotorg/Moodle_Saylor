@@ -1,0 +1,255 @@
+/**
+ * Advanced Notifications SCSS
+ *
+ * @package   block_advnotifications
+ * @copyright 2016 LearningWorks Ltd
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+body #advnotifications_table_wrapper td > form,
+body #advnotifications_restore_table_wrapper td > form {
+    display: inline;
+}
+
+body #advnotifications_table_wrapper td > form button,
+body #advnotifications_restore_table_wrapper td > form button {
+    border: none;
+    background: none;
+    transform: scale(1.1);
+    transition: 100ms;
+}
+
+body #advnotifications_table_wrapper td > form button[class*="restore"],
+body #advnotifications_table_wrapper td > form button[class*="edit"],
+body #advnotifications_restore_table_wrapper td > form button[class*="restore"],
+body #advnotifications_restore_table_wrapper td > form button[class*="edit"] {
+    color: #060;
+}
+
+body #advnotifications_table_wrapper td > form button[class*="delete"],
+body #advnotifications_restore_table_wrapper td > form button[class*="delete"] {
+    color: #730000;
+}
+
+body #advnotifications_table_wrapper td > form button:hover,
+body #advnotifications_table_wrapper td > form button:focus,
+body #advnotifications_restore_table_wrapper td > form button:hover,
+body #advnotifications_restore_table_wrapper td > form button:focus {
+    outline: none;
+    transform: scale(1.25);
+    transition: 100ms;
+}
+
+body #add_notification_wrapper_id {
+    margin-top: 1.5em;
+}
+
+body #add_notification_wrapper_id .alert.preview-alert {
+    position: relative;
+    padding-right: 14px;
+}
+
+body #add_notification_wrapper_id .alert.preview-alert.aicon {
+    padding-left: 3em;
+}
+
+body #add_notification_wrapper_id .alert.preview-alert.dismissible {
+    padding-right: 2em;
+}
+
+body #add_notification_wrapper_id .alert.preview-alert > * {
+    display: inline;
+}
+
+body #add_notification_wrapper_id .alert.preview-alert > .preview-aicon {
+    display: block;
+}
+
+body #add_notification_wrapper_id .alert.preview-alert > .preview-aicon img {
+    height: 1.5em;
+    position: absolute;
+    top: calc(50% - 0.75em);
+    margin-left: -2em;
+    opacity: 0.5;
+}
+
+body #add_notification_wrapper_id .alert.preview-alert > .preview-alert-dismissible {
+    position: absolute;
+    font-size: 1em;
+    line-height: 1em;
+    top: calc(50% - 0.5em);
+    right: 1em;
+}
+
+body #add_notification_wrapper_id .alert.preview-alert > .preview-alert-dismissible > * {
+    cursor: pointer;
+}
+
+body #add_notification_wrapper_id .add_notification_form_wrapper #add_notification_form .row {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+body #add_notification_wrapper_id .add_notification_form_wrapper #add_notification_form .text-muted {
+    width: 100%;
+}
+
+body #add_notification_wrapper_id .add_notification_form_wrapper #add_notification_form #add_notification_title {
+    margin-top: 1.5em;
+}
+
+body #add_notification_wrapper_id .add_notification_form_wrapper #add_notification_form #add_notification_message {
+    width: 100%;
+    margin-bottom: 1.5em;
+    resize: both;
+    min-width: 50px;
+    min-height: 1.5em;
+}
+
+body #add_notification_wrapper_id .add_notification_form_wrapper #add_notification_form .requiredfield {
+    background-color: rgba(255, 0, 0, 0.075);
+    border: 1px solid #f00;
+}
+
+body #add_notification_wrapper_id .add_notification_form_wrapper #add_notification_form strong.requiredfield {
+    padding: 0.25em;
+    border-color: transparent;
+    border-radius: 5px;
+    color: #af1e1e;
+}
+
+body #add_notification_wrapper_id .add_notification_form_wrapper #add_notification_form strong.required {
+    color: #af1e1e;
+    font-size: 1.25em;
+    padding: 0 5px;
+    vertical-align: top;
+}
+
+body #add_notification_wrapper_id .add_notification_form_wrapper #add_notification_form input[type="date"] {
+    width: calc(100% / 12 * 7);
+}
+
+body #add_notification_wrapper_id .add_notification_form_wrapper #add_notification_form .btn {
+    margin-top: 0.5em;
+    margin-bottom: 0;
+}
+
+body #add_notification_wrapper_id .add_notification_form_wrapper #add_notification_form #add_notification_status {
+    display: none;
+    position: relative;
+    margin-top: 10px;
+}
+
+body #add_notification_wrapper_id .add_notification_form_wrapper #add_notification_form #add_notification_status .signal {
+    border: 5px solid #333;
+    border-radius: 30px;
+    height: 30px;
+    left: 10px;
+    margin: -15px 0 0 -15px;
+    opacity: 0;
+    position: absolute;
+    top: 15px;
+    width: 30px;
+    animation: pulsate 1s ease-out;
+    animation-iteration-count: infinite;
+    animation-direction: reverse;
+}
+
+body #add_notification_wrapper_id .add_notification_form_wrapper #add_notification_form #add_notification_status .saving {
+    padding-top: 5px;
+    margin-left: 40px;
+}
+
+body #add_notification_wrapper_id .add_notification_form_wrapper #add_notification_form #add_notification_status .done {
+    display: none;
+    padding-top: 5px;
+    margin-left: 40px;
+}
+
+@keyframes pulsate {
+    0% {
+        transform: scale(0.1);
+        opacity: 0.0;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1.2);
+        opacity: 0;
+    }
+}
+
+#advnotifications_manage .btn.instance {
+    margin-right: 0.5rem;
+}
+
+body .block.block_advnotifications .content {
+    margin-top: 0 !important; /* stylelint-disable-line declaration-no-important */
+}
+
+body .block.block_advnotifications .content .notification-block-wrapper {
+    margin-bottom: 1em;
+}
+
+body .block.block_advnotifications .content .notification-block-wrapper .alert {
+    margin-bottom: 0;
+    position: relative;
+    padding: 0.75rem 1.25rem;
+}
+
+body .block.block_advnotifications .content .notification-block-wrapper .alert .notification-block-close {
+    position: absolute;
+    right: 1em;
+    top: calc(50% - 0.5em);
+    cursor: pointer;
+    font-size: 1em;
+    line-height: 1em;
+    transition: 250ms;
+}
+
+body .block.block_advnotifications .content .notification-block-wrapper .alert .notification-block-close:hover {
+    color: #000;
+    transition: 250ms;
+}
+
+body .block.block_advnotifications .content .notification-block-wrapper.warning {
+    font-weight: 400;
+}
+
+body .block.block_advnotifications .content .notification-block-wrapper.aicon .alert {
+    padding-left: 3em;
+}
+
+body .block.block_advnotifications .content .notification-block-wrapper.aicon .alert > .notification_aicon {
+    height: 1.5em;
+    position: absolute;
+    top: calc(50% - 0.75em);
+    margin-left: -2em;
+    opacity: 0.5;
+}
+
+body .block.block_advnotifications .content .notification-block-wrapper.dismissible .alert {
+    padding-right: 2em;
+}
+
+body:not(.editing) .block.block_advnotifications {
+    box-shadow: none;
+    border: none;
+    background-color: transparent;
+    margin-bottom: 0 !important; /* stylelint-disable-line declaration-no-important */
+    padding: 0;
+    min-height: 0;
+}
+
+body:not(.editing) .block.block_advnotifications .card-body {
+    padding: 0 !important; /* stylelint-disable-line declaration-no-important */
+}
+
+body:not(.editing) .block.block_advnotifications .header {
+    display: none;
+}
+
+body:not(.editing) .block.block_advnotifications .content {
+    padding: 0;
+    background-color: transparent;
+}

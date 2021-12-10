@@ -19,6 +19,9 @@ For full install instructions, see the
 [CodeRunner install instructions](https://github.com/trampgeek/moodle-qtype_coderunner/blob/master/Readme.md).
 
 ## CHANGE HISTORY
+23/11/21: V1.4.1. Add support for "Give up" button (Time Hunt). Add 'graderstate'
+functionality for use by combinator template graders.
+
 24/02/21: V1.3.9. Add quizbehaviour to step info.
 31/01/21: V1.3.8. Add step info (numchecks, numprechecks and fraction) to response
 array so that question author can alter feedback accordingly.

@@ -6,20 +6,20 @@ A topics based format that uses a grid of user selectable images to pop up a lig
 
 Required version of Moodle
 ==========================
-This version works with Moodle 3.10 version 2020110900.00 (Build: 20201109) and above within the 3.10 branch until the
+This version works with Moodle 3.11 version 2021051700.00 (Build: 20210517) and above within the 3.11 branch until the
 next release.
 
 Please ensure that your hardware and software complies with 'Requirements' in 'Installing Moodle' on
-'docs.moodle.org/310/en/Installing_Moodle'
+'docs.moodle.org/311/en/Installing_Moodle'
 
 Free software
 =============
 The Grid format is 'free' software under the terms of the GNU GPLv3 License, please see 'COPYING.txt'.
 
 The primary source for downloading this branch of the format is https://moodle.org/plugins/view.php?plugin=format_grid
-with 'Select Moodle version:' set at 'Moodle 3.10'.
+with 'Select Moodle version:' set at 'Moodle 3.11'.
 
-The secondary source is a tagged version with the v3.10 prefix on https://github.com/gjb2048/moodle-courseformat_grid/tags
+The secondary source is a tagged version with the v3.11 prefix on https://github.com/gjb2048/moodle-courseformat_grid/tags
 
 If you download from the development area - https://github.com/gjb2048/moodle-courseformat_grid/ - consider that
 the code is unstable and not for use in production environments.  This is because I develop the next version in stages
