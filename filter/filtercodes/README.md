@@ -140,14 +140,15 @@ FilterCodes are meant to be entered as regular text in the Moodle WYSIWYG editor
 * {coursecardsbyenrol} (ALPHA): Display course cards for most popular courses based on enrolment. Maximum number of cards is configurable in the plugin settings.
 * {courseprogress}: (ALPHA) Displays course progress status in words. Only works within a course.
 * {courseprogressbar}: (ALPHA) Displays course progress status as a status bar. Only works within a course.
-* {categorycards}: (ALPHA) Display top level categories as cards using the current location as the top level category. For example, on the Front Page, it will display all top level categories. However, if you are inside the Miscellaneous category (e.g., in Miscellaneous > Your Course) , it will only display the next level of categories under the Miscellaneous category.
+* {categorycards} or {categorycards id}: (ALPHA) Display top level categories as cards using the current location as the top level category. For example, on the Front Page, it will display all top level categories. However, if you are inside the Miscellaneous category (e.g., in Miscellaneous > Your Course) , it will only display the next level of categories under the Miscellaneous category. You can optionally specify a category in the tag.
 * {mycourses} : Display an unordered list of links to all my enrolled courses.
 * {mycoursescards} : Displays a series of cards for my enrolled courses.
 * {courserequest} : Displays a Request a Course link.
 * {label type}{/label} : Display text over background colour. The Boost theme supports the following types: **info**, **important**, **secondary**, **success** and **warning**. Other themes may also support **primary**, **danger**, **light**, **dark** and more. Example: {label info}For your information{/label}. Actual foreground and background colours vary depending on the theme. If the type is not specified, it will default to **info**. If the type specified is not supported by your theme, it may default to secondary.
 * {button URL}Label{/button} : Create a clickable button link formatted like a primary button.
-* {chart radial x} (ALPHA): Create a radial (circle) chart giving it a value of x between 0 and 100.
-* {chart progressbar x} (ALPHA) : Create a horizontal progress bar chart giving it a value of x between 0 and 100.
+* {chart radial x Title text} (ALPHA): Create a radial (circle / doughnut) chart given it a value of x between 0 and 100 and a title.
+* {chart pie x Title text} (ALPHA) : Create a pie chart given a value of x between 0 and 100 and a title.
+* {chart progressbar x Title text} (ALPHA) : Create a horizontal progress bar chart giving it a value of x between 0 and 100 and a title.
 * {showmore}{/showmore} (ALPHA) : Toggle showing content between opening and closing more tags. Limitations: Can only be used inline with text. Must now weave into other opening and closing tags.
 
 ### For use in courses
@@ -909,6 +910,7 @@ Create a Page on your Moodle site, preferably in a course, so that those tags wo
 * Course cards (ALPHA) [{coursecards}]: {coursecards}
 * Course cards by enrolment (ALPHA) [{{coursecardsbyenrol}}]: {{coursecardsbyenrol}}
 * Category cards (ALPHA) [{categorycards}]: {categorycards}
+* Category 1 cards (ALPHA) [{categorycards 1}]: Sub-categories of Miscellaneous category include {categorycards 1}
 * Total courses [{coursecount}]: {coursecount}
 * Institution [{institution}]: {institution}
 * Department [{department}]: {department}
@@ -933,8 +935,9 @@ Create a Page on your Moodle site, preferably in a course, so that those tags wo
 * Request a course / Course request in submenu [{courserequestmenu}]: {courserequestmenu}
 * Label [{label info}]Criteria for completion[{/label}]: {label info}Criteria for completion{/label}
 * Button [{button https://moodle.org}]Go to Moodle.org{/button}]: {button https://moodle.org.org}Go to Moodle{/button}
-* 80% radial chart [{chart radial 80}]: {chart radial 80}
-* 75% progressbar chart [{chart progressbar 75}]: {chart radial 75}
+* 80% radial chart [{chart radial 80 Are you over 70%?}]: {chart radial 80 Are you over 70%?}
+* 60% pie chart [{chart pie 60 Are you over 70%?}]: {chart radial 60 Are you over 70%?}
+* 75% progressbar chart [{chart progressbar 75 Are you over 70%?}]: {chart radial 75 Are you over 70%?}
 * Moodle Admin custom menu items [{menuadmin}]: {menuadmin}
 * Moodle Dev custom menu items [{menudev}]: {menudev}
 * Course category ID (0 if not in a course or category list of course) [{categoryid}]: {categoryid}

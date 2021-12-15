@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [2.2.8] 2021-12-07 (DEV)
+## [2.2.8] 2021-12-10 (DEV)
 ### Added
 - New {showmore}{/showmore} tags (ALPHA).
 - New {menuadmin} tag.
@@ -10,8 +10,9 @@ All notable changes to this project will be documented in this file.
 - New {coursecontacts} tag (formerly {courseteachers}).
 - {courseteachers} can now optionally display user profile description.
 - {courseteachers} can now optionally link to phone number.
-- New {chart progressbar x} tag (ALPHA).
-- New {chart radial x} tag (ALPHA).
+- New {chart progressbar x Title text} tag (ALPHA).
+- New {chart radial x Title text} tag (ALPHA).
+- New {chart pie x Title text} tag (ALPHA).
 - New {markborder}{/markborder} tags.
 - New {marktext}{/marktext} tags.
 - New {coursegradepercent} tag.
@@ -20,6 +21,7 @@ All notable changes to this project will be documented in this file.
 - New {label}{/label} tags.
 - New setting to enable/disable {categorycards} background.
 - New fc-categorycards class to {categorycards} to make it easier to customize.
+- New fc-categorycard-ID# class to {categorycards} to make it possible to customize background of card.
 - New {sectionname} tag.
 - New {hr} tag.
 - New {coursecardsbyenrol} tag.

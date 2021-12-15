@@ -1,3 +1,6 @@
+2.0.73 (Build 2021121500)
+- Fixed display of grades in table that was not showing all records
+
 2.0.72 (Build 2021112700)
 - Added a skeleton placeholder for loading audio
 

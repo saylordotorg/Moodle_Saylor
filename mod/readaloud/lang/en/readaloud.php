@@ -564,3 +564,4 @@ $string['pushpage_explanation']= "Use the buttons on this page to push settings 
 $string['disableshadowgrading'] = "Disable Shadow Mode Grading";
 $string['disableshadowgrading_details'] = "If checked, attempts made in shadow mode will be evaluated, but no entry passed to the gradebook.";
 $string['gradeable'] = "Gradeable";
+$string['developer'] = "Developer";

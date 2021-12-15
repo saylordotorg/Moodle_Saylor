@@ -266,6 +266,11 @@ function readaloud_update_grades($moduleinstance, $userid = 0, $nullifnone = tru
         readaloud_grade_item_update($moduleinstance);
 
     } else if ($grades = readaloud_get_user_grades($moduleinstance, $userid)) {
+        if (class_exists('\core_completion\api')) {
+            $completionexpected = (empty($readaloud->completionexpected) ? null : $readaloud->completionexpected);
+            \core_completion\api::update_completion_date_event($readaloud->coursemodule, 'readaloud', $readaloud->id,
+                $completionexpected);
+        }
         readaloud_grade_item_update($moduleinstance, $grades);
 
     } else if ($userid and $nullifnone) {
@@ -284,7 +289,7 @@ function readaloud_update_grades($moduleinstance, $userid = 0, $nullifnone = tru
  *
  * @global stdClass
  * @global object
- * @param int $moduleinstance
+ * @param object $moduleinstance
  * @param int $userid optional user id, 0 means all users
  * @return array array of grades, false if none
  */

@@ -65,8 +65,10 @@ require_capability('mod/readaloud:viewreports', $modulecontext);
 $config = get_config(constants::M_COMPONENT);
 
 //set per page according to admin setting
-if ($paging->perpage == -1) {
-    $paging->perpage = $config->itemsperpage;
+if(constants::M_USE_DATATABLES){
+    $paging=false;
+}elseif($paging->perpage==-1){
+    $paging->perpage = $config->attemptsperpage;
 }
 
 // Trigger module viewed event.

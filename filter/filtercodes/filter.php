@@ -325,6 +325,40 @@ class filter_filtercodes extends moodle_text_filter {
     }
 
     /**
+     * Render cards for provided category.
+     *
+     * @param object $category.
+     * @return string HTML rendering of category cars.
+     */
+    private function rendercategorycard($category, $categoryshowpic) {
+        global $OUTPUT;
+
+        if (!$category->visible) {
+            $dimmed = 'opacity: 0.5;';
+        } else {
+            $dimmed = '';
+        }
+
+        if ($categoryshowpic) {
+            $imgurl = $OUTPUT->get_generated_image_for_id($category->id + 65535);
+            $html = '<li class="card shadow mr-4 mb-4 ml-0" style="min-width:290px;max-width:290px;' . $dimmed . '">
+                    <a href="' . new moodle_url('/course/index.php', ['categoryid' => $category->id]);
+            $html .= '" class="text-white h-100">
+                    <div class="card-img" style="background-image: url(' . $imgurl . ');height:100px;"></div>
+                    <div class="card-img-overlay card-title pt-1 pr-3 pb-1 pl-3 m-0" '
+                        . 'style="height:fit-content;top:auto;background-color:rgba(0,0,0,.4);color:#ffffff;'
+                        . 'text-shadow:-1px -1px 0 #767676, 1px -1px 0 #767676, -1px 1px 0 #767676, 1px 1px 0 #767676">'
+                        . $category->name . '</div>';
+        } else {
+            $html = '<li class="card shadow mr-4 mb-4 ml-0 fc-categorycard-' . $category->id . '" style="min-width:350px;max-width:350px;' . $dimmed . '">
+                    <a href="' . new moodle_url('/course/index.php', ['categoryid' => $category->id]);
+            $html .= '" class="text-decoration-none h-100 p-4">' . $category->name;
+        }
+        $html .= '</a></li>' . PHP_EOL;
+        return $html;
+    }
+
+    /**
      * Render course cards for list of course ids.
      *
      * @param array $rcourseids Array of course ids.
@@ -1357,7 +1391,7 @@ class filter_filtercodes extends moodle_text_filter {
 
             // Tag: {coursecards} and {coursecards <categoryid>}.
             // Display courses in a category branch as cards.
-            if ($catids = (stripos($text, '{coursecards') !== false)) {
+            if (stripos($text, '{coursecards') !== false) {
                 global $CFG, $OUTPUT;
 
                 $chelper = new coursecat_helper();
@@ -1407,7 +1441,7 @@ class filter_filtercodes extends moodle_text_filter {
 
             // Tag: {coursecardsbyenrol}.
             // Display list of 10 most popular courses by enrolment count (tested with MySQL and PostgreSQL).
-            if ($catids = (stripos($text, '{coursecardsbyenrol}') !== false)) {
+            if (stripos($text, '{coursecardsbyenrol}') !== false) {
                 $sql = "SELECT c.id, c.fullname, COUNT(*) AS enrolments
                         FROM {course} c
                         JOIN (SELECT DISTINCT e.courseid, ue.id AS userid
@@ -1461,32 +1495,62 @@ class filter_filtercodes extends moodle_text_filter {
             }
         }
 
-        // Tag: {chart *} - Easily display a chart in one of several styles.
+        // Tag: {chart <type> <value> <title>} - Easily display a chart in one of several styles.
         if (stripos($text, '{chart ') !== false && $CFG->branch >= 32) {
             global $OUTPUT;
-            $value = 40;$title = 'Test';
-            // Tag: {chart radial} - Display a radial (circle) chart.
-            if (stripos($text, '{chart radial ') !== false) {
-                $chart = new \core\chart_pie();
-                $chart->set_doughnut(true); // Calling set_doughnut(true) we display the chart as a doughnut.
-                $chart->set_title($title);
-                $series = new \core\chart_series('Percentage', [min($value, 100), 100 - min($value, 100)]);
-                $chart->add_series($series);
-                $chart->set_labels(['Completed', 'Remaining']);
-                if ($CFG->branch >= 39) {
-                    $chart->set_legend_options(['display' => false]);  // Hide chart legend.
+            preg_match_all('/\{chart\s(\w+)\s([0-9]+)\s(.*)\}/i', $text, $matches, PREG_SET_ORDER);
+            $matches = array_unique($matches, SORT_REGULAR);
+            foreach($matches as $match) {
+                $type = $match[1]; // Chart type: radial, pie or progressbar.
+                $value = $match[2]; // Value between 0 and 100.
+                $title = $match[3]; // Text label.
+                $percent = get_string('percents', '', $value);
+                switch($type) { // Type of chart.
+                    case 'radial': // Tag: {chart radial} - Display a radial (circle) chart.
+                        $chart = new \core\chart_pie();
+                        $chart->set_doughnut(true); // Calling set_doughnut(true) we display the chart as a doughnut.
+                        $chart->set_title($title);
+                        $series = new \core\chart_series('Percentage', [min($value, 100), 100 - min($value, 100)]);
+                        $chart->add_series($series);
+                        $chart->set_labels(['Completed', 'Remaining']);
+                        if ($CFG->branch >= 39) {
+                            $chart->set_legend_options(['display' => false]);  // Hide chart legend.
+                        }
+                        $html =  $OUTPUT->render_chart($chart, false);
+                        break;
+                    case 'pie': // Tag: {chart pie} - Display a pie chart.
+                        $chart = new \core\chart_pie();
+                        $chart->set_doughnut(false); // Calling set_doughnut(true) we display the chart as a doughnut.
+                        $chart->set_title($title);
+                        $series = new \core\chart_series('Percentage', [min($value, 100), 100 - min($value, 100)]);
+                        $chart->add_series($series);
+                        $chart->set_labels(['Completed', 'Remaining']);
+                        if ($CFG->branch >= 39) {
+                            $chart->set_legend_options(['display' => false]);  // Hide chart legend.
+                        }
+                        $html =  $OUTPUT->render_chart($chart, false);
+                        break;
+                    case 'progressbar': // Tag: {chart progressbar} - Display a horizontal progres bar.
+                        $html = '
+                        <div class="progress mb-0">
+                            <div class="fc-progress progress-bar bar" role="progressbar" aria-valuenow="' . $value
+                                . '" style="width: ' . $value . '%" aria-valuemin="0" aria-valuemax="100">
+                            </div>
+                        </div>
+                        <div class="small">';
+                        if ($CFG->branch >= 310) {
+                            $html .= get_string('labelvalue', 'moodle', ['label' => $title, 'value' => $percent]);
+                        } else {
+                            $html .= $title . ' : ' . $percent;
+                        }
+                        $html .= '</div>';
+                        break;
+                    default:
+                        $html = '';
                 }
-                $replace['/\{chart radial ([0-9]+)\}/i'] =  $OUTPUT->render_chart($chart, false);
+                $replace['/\{chart ' . $type . ' ' . $value . ' ' . $title . '\}/i'] = $html;
             }
-            // Tag: {chart progressbar} - Display a horizontal progres bar.
-            if (stripos($text, '{chart progressbar ') !== false) {
-                $replace['/\{chart progressbar ([0-9]+)\}/i'] = '
-                <div class="progress">
-                    <div class="fc-progress progress-bar bar" role="progressbar" aria-valuenow="' . $value
-                        . '" style="width: ' . $value . '%" aria-valuemin="0" aria-valuemax="100">
-                    </div>
-                </div>';
-            }
+            unset($chart, $matches, $html, $value, $title);
         }
 
         // These tags: {mycourses} and {mycoursesmenu} and {mycoursescards}.
@@ -1786,58 +1850,70 @@ class filter_filtercodes extends moodle_text_filter {
                 unset($list);
             }
 
-            // Tag: {categorycards}. Course categories presented as card tiles.
-            if (stripos($text, '{categorycards}') !== false) {
-                global $DB, $OUTPUT;
-
-                if (empty($PAGE->course->category)) {
-                    // If we are not in a course, check if categoryid is part of URL (ex: course lists).
-                    $catid = optional_param('categoryid', 0, PARAM_INT);
-                } else {
-                    // Retrieve the category id of the course we are in.
-                    $catid = $PAGE->course->category;
-                }
-                $sql = "SELECT cc.id, cc.sortorder, cc.name, cc.visible, cc.parent
-                        FROM {course_categories} cc
-                        WHERE cc.parent = $catid
-                        ORDER BY cc.sortorder";
-                $categories = $DB->get_recordset_sql($sql, ['contextcoursecat' => CONTEXT_COURSECAT]);
-
-                $list = '';
+            // Tag: {categorycards} and {categorycards id}. Course categories presented as card tiles.
+            if (stripos($text, '{categorycards') !== false) {
+                $categoryids = [];
+                $thiscategorycard = null;
                 $categoryshowpic = get_config('filter_filtercodes', 'categorycardshowpic');
-                foreach ($categories as $category) {
-                    if (!core_course_category::can_view_category($category)) {
-                        continue;
-                    }
 
-                    $dimmed = '';
-                    if (!$category->visible) {
-                        $dimmed = 'opacity: 0.5;';
-                    }
-
-                    if ($categoryshowpic) {
-                        $imgurl = $OUTPUT->get_generated_image_for_id($category->id + 65535);
-                        $list .= '<li class="card shadow mr-4 mb-4 ml-0" style="min-width:290px;max-width:290px;' . $dimmed . '">
-                                <a href="' . new moodle_url('/course/index.php', ['categoryid' => $category->id]);
-                        $list .= '" class="text-white h-100">
-                                <div class="card-img" style="background-image: url(' . $imgurl . ');height:100px;"></div>
-                                <div class="card-img-overlay card-title pt-1 pr-3 pb-1 pl-3 m-0" '
-                                    . 'style="height:fit-content;top:auto;background-color:rgba(0,0,0,.4);color:#ffffff;'
-                                    . 'text-shadow:-1px -1px 0 #767676, 1px -1px 0 #767676, -1px 1px 0 #767676, 1px 1px 0 #767676">'
-                                    . $category->name . '</div>';
+                // If category ID is not specified in the tag, figure it out from context.
+                if (stripos($text, '{categorycards}') !== false) {
+                    if (empty($PAGE->course->category)) {
+                        // If we are not in a course, check if categoryid is part of URL (ex: course lists).
+                        $thiscategorycard = optional_param('categoryid', 0, PARAM_INT);
                     } else {
-                        $list .= '<li class="card shadow mr-4 mb-4 ml-0" style="min-width:350px;max-width:350px;' . $dimmed . '">
-                                <a href="' . new moodle_url('/course/index.php', ['categoryid' => $category->id]);
-                        $list .= '" class="text-decoration-none h-100 p-4">' . $category->name;
+                        // Retrieve the category id of the course we are in.
+                        $thiscategorycard = $PAGE->course->category;
                     }
-                    $list .= '</a></li>' . PHP_EOL;
+                    $categoryids[] = $thiscategorycard;
                 }
-                $categories->close();
-                $replace['/\{categorycards\}/i'] = !empty($list) ? '<ul class="fc-categorycards card-deck mr-0">' . $list . '</ul>' : '';
-                unset($categories);
-                unset($list);
-            }
 
+                // If category ID was specified in the tag, use it.
+                if (stripos($text, '{categorycards ') !== false) {
+                    // Find all categorycards tags where category ID was specified.
+                    preg_match_all('/\{categorycards ([0-9]+)\}/i', $text, $matches);
+                    if (!empty($matches)) {
+                        $categoryids = array_merge($categoryids, array_unique($matches[1]));
+                    }
+                }
+
+                // For each tag's category ID.
+                foreach($categoryids as $catid) {
+                    $sql = "SELECT cc.id, cc.sortorder, cc.name, cc.visible, cc.parent
+                            FROM {course_categories} cc
+                            WHERE cc.parent = $catid
+                            ORDER BY cc.sortorder";
+                    $subcategories = $DB->get_recordset_sql($sql);
+
+                    $html = '';
+                    foreach ($subcategories as $category) {
+                        // Skip if user does not have permissions to view.
+                        if (!core_course_category::can_view_category($category)) {
+                            continue;
+                        }
+
+                        // Render HTML category cards for the category.
+                        $html .= $this->rendercategorycard($category, $categoryshowpic);
+                    }
+                    $subcategories->close();
+
+                    if (!empty($html)) {
+                        $html = '<ul class="fc-categorycards card-deck mr-0">' . $html . '</ul>';
+                    }
+
+                    // If this is the tag with no category ID.
+                    if ($catid == $thiscategorycard) {
+                        $replace['/\{categorycards\}/i'] = $html;
+                        // If a tag with this category ID was also specified, replace it too.
+                        if (stripos($text, '{categorycards  ' . $catid . '}') !== false) {
+                            $replace['/\{categorycards ' . $catid . '\}/i'] = $html;
+                        }
+                    } else {
+                        $replace['/\{categorycards ' . $catid . '\}/i'] = $html;
+                    }
+                }
+            }
+            unset($categories, $catid, $thiscategorycard, $catids, $categoryids, $matches, $html, $categoryshowpic);
         }
 
         // Tag: {referer}.
