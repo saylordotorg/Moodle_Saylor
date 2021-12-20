@@ -37,12 +37,20 @@ if ($navdraweropen) {
 $bodyattributes = $OUTPUT->body_attributes($extraclasses);
 $blockshtml = $OUTPUT->blocks('side-pre');
 $hasblocks = strpos($blockshtml, 'data-block=') !== false;
+$topblockshtml = $OUTPUT->blocks('top');
+$hastopblocks = strpos($topblockshtml, 'data-block=') !== false;
+$topintblockshtml = $OUTPUT->blocks('top-interior');
+$hastopintblocks = strpos($topintblockshtml, 'data-block=') !== false;
 $regionmainsettingsmenu = $OUTPUT->region_main_settings_menu();
 $templatecontext = [
     'sitename' => format_string($SITE->shortname, true, ['context' => context_course::instance(SITEID), "escape" => false]),
     'output' => $OUTPUT,
     'sidepreblocks' => $blockshtml,
     'hasblocks' => $hasblocks,
+    'topblocks' => $topblockshtml,
+    'hastopblocks' => $hastopblocks,
+    'topintblocks' => $topintblockshtml,
+    'hastopintblocks' => $hastopintblocks,
     'bodyattributes' => $bodyattributes,
     'navdraweropen' => $navdraweropen,
     'regionmainsettingsmenu' => $regionmainsettingsmenu,
@@ -56,4 +64,3 @@ $templatecontext = [
 
 $templatecontext['flatnavigation'] = $PAGE->flatnav;
 echo $OUTPUT->render_from_template('/coursecategory', $templatecontext);
-

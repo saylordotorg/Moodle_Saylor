@@ -58,7 +58,7 @@ $THEME->layouts = [
     ),
     'coursecategory' => array(
         'file' => 'coursecategory.php',
-        'regions' => array('side-pre'),
+        'regions' => array('side-pre', 'top', 'top-interior'),
         'defaultregion' => 'side-pre',
     ),
     // Part of course, typical for modules - default page layout if $cm specified in require_login().
