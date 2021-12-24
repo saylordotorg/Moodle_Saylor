@@ -259,4 +259,21 @@ class condition_test extends \advanced_testcase {
         $condition = \availability_coursecompleted\condition::get_json('0');
         $this->assertEqualsCanonicalizing((object)['type' => 'coursecompleted', 'id' => '0'], $condition);
     }
+
+    /**
+     * Test behat funcs
+     * @coversDefaultClass behat_availability_coursecompleted
+     */
+    public function test_behat() {
+        global $CFG;
+        require_once($CFG->dirroot . '/availability/condition/coursecompleted/tests/behat/behat_availability_coursecompleted.php');
+        $this->resetAfterTest();
+        set_config('enableavailability', true);
+        $user = $this->getDataGenerator()->create_user();
+        $course = $this->getDataGenerator()->create_course(['enablecompletion' => true]);
+        $class = new \behat_availability_coursecompleted();
+        $class->i_mark_course_completed_for_user($course->fullname, $user->username);
+        $this->expectExceptionMessage("A user with username 'otheruser' does not exist");
+        $class->i_mark_course_completed_for_user($course->fullname, 'otheruser');
+    }
 }

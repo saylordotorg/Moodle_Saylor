@@ -1,4 +1,12 @@
 ### Version 2.133 of the Moodle Gapfill question type
+Missing space around or in non English feedback. Where the language was not
+English and there is more than one correct answer the space was missing around
+the tanslation of or. So in German if the correct answers are red or green it would present as
+redodergreen instead of red oder green. Credit to Simon Küpfer for reporting this issue.
+
+Described here
+https://github.com/marcusgreen/moodle-qtype_gapfill/issues/80
+
 Fix renderer.php so the output complies with the validator at https://validator.w3.org/
 Thanks to t-schroeder for raising this issue
 https://github.com/marcusgreen/moodle-qtype_gapfill/pull/77
