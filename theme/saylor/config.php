@@ -29,7 +29,7 @@ require_once(__DIR__ . '/lib.php');
 $THEME->name = 'saylor';
 $THEME->sheets = [];
 $THEME->editor_sheets = [];
-$THEME ->javascripts_footer = ['prettify', 'custom'];
+$THEME ->javascripts_footer = ['prettify', 'custom', 'ace/html-parser'];
 $THEME->editor_scss = ['editor'];
 $THEME->usefallback = true;
 $THEME->hidefromselector = false;
@@ -58,7 +58,7 @@ $THEME->layouts = [
     ),
     'coursecategory' => array(
         'file' => 'coursecategory.php',
-        'regions' => array('side-pre'),
+        'regions' => array('side-pre', 'top', 'top-interior'),
         'defaultregion' => 'side-pre',
     ),
     // Part of course, typical for modules - default page layout if $cm specified in require_login().

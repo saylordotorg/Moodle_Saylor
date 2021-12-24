@@ -422,15 +422,17 @@ class core_renderer extends \core_renderer {
         }
         // Show nothing if user is already on enroll page.
         if ($PAGE->pagetype == 'enrol-index') {
-                return "";
+            return "";
+        }
+        // Show nothing if user is not logged in.
+        if (isguestuser() || !isloggedin()) {
+            return "";
         }
         $output = html_writer::start_tag('div', array('id' => 'enroll-button-container', 'class' => 'enroll-container'));
         $output .= html_writer::start_tag('div', array('id' => 'main-enroll-button', 'class' => 'center-block'));
         $coursecontext = context_course::instance($COURSE->id);
-        if (isguestuser() || !isloggedin()) {
-            $link = new moodle_url('/login/index.php');
-            $output .= get_string('loginorsignupmessage', 'theme_saylor', $link->out());
-        } elseif (isloggedin($coursecontext) && !is_enrolled($coursecontext)) {
+        // Show an enroll button if user is logged in but NOT enrolled in the course.
+        if (isloggedin($coursecontext) && !is_enrolled($coursecontext)) {
             $link = new moodle_url('/enrol/index.php', array('id' => $COURSE->id));
             $output .= html_writer::link($link->out(), get_string('enrolme', 'core_enrol'), array('class' => 'btn btn-primary btn-lg'));
         };

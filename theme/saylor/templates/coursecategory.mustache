@@ -61,6 +61,11 @@
 
         <div id="page-content" class="row">
             <div id="region-main-box" class="col-12">
+              {{#hastopblocks}}
+              <section id="region-top" data-region="blocks-row" class="d-print-none mt-3">
+                  {{{ topblocks }}}
+              </section>
+              {{/hastopblocks}}
                 {{#hasregionmainsettingsmenu}}
                 <div id="region-main-settings-menu" class="d-print-none{{#hasblocks}} has-blocks{{/hasblocks}}">
                     <div> {{{ output.region_main_settings_menu }}} </div>
@@ -68,11 +73,19 @@
                 {{/hasregionmainsettingsmenu}}
                 <section id="region-main" class="{{#hasblocks}}has-blocks {{/hasblocks}}my-3 card">
 
+
+
                     <div id="{{coursecategoryclass}}-banner" class="category-banner-wrapper {{coursecategoryclass}}-banner container-fluid p-0 d-flex align-items-center rounded">
                         <div id="category-container" class="mx-auto my-4 mdl-align text-white">
                             <h1>{{coursecategory}}</h1>
                         </div>
                     </div>
+
+                    {{#hastopintblocks}}
+                    <section id="region-top-interior" class="d-print-none px-3 my-2">
+                        {{{ topintblocks }}}
+                    </section>
+                    {{/hastopintblocks}}
 
                     {{{ output.course_content_header }}}
                     {{{ output.main_content }}}
