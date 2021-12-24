@@ -1,5 +1,10 @@
 Change List
 =========
+Version 3.1.51 (Build 2021122200)
+- added some more modern diagnostics
+- moved recorder order and some player settings from general to legacy
+- added credential fetching
+
 Version 3.1.50 (Build 2021120900)
 - Fixed issues causing errors in php 8 on poodlltools
 

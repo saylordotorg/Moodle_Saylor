@@ -11,6 +11,8 @@ namespace filter_poodll;
 class constants {
     const MOD_FRANKY = 'filter_poodll';
     const M_COMP = 'filter_poodll';
+    const M_COMPONENT = 'filter_poodll';
+    const M_URL = 'filter/poodll';
     const CLOUDPOODLL = 'https://cloud.poodll.com';
    // const CLOUDPOODLL = 'https://cloudpoodll.poodll.com';
    // const CLOUDPOODLL = 'http://localhost/moodle';

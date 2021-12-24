@@ -1,3 +1,6 @@
+1.3.17 (Build 2021122200)
+- added credential fetching
+
 1.3.16 (Build 2021120200)
 - Improved navigation between steps
 - Added Cancel attempt ability (fails on the very first attempt)

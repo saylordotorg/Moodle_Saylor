@@ -652,7 +652,8 @@ function solo_get_user_grades($moduleinstance, $userid=0) {
     }
 
     //grade_sql
-    $grade_sql = "SELECT u.id, u.id AS userid, grade AS rawgrade
+    //added MAX to grade to keep postgresql happy
+    $grade_sql = "SELECT u.id, u.id AS userid, MAX(grade) AS rawgrade
                       FROM {user} u, {". constants::M_ATTEMPTSTABLE ."} a
                      WHERE a.id= (SELECT max(id) FROM {". constants::M_ATTEMPTSTABLE ."} ia WHERE ia.userid=u.id AND ia.solo = a.solo)  AND u.id = a.userid AND a.solo = :moduleid
                            $user

@@ -470,8 +470,6 @@ $string['completionallsteps_help']='Complete when all steps completed';
 $string['yes']='Yes';
 $string['no']='No';
 
-$string['topiciframe_help']='Paste iframe embed code (html only) for any media that should be shown to students as part of the speaking topic.';
-$string['topicmedia_help']='Upload an audio/video or image file that will be shown to students as part of the speaking topic on the prepare page.';
 $string['speakingtopic_help']='Short instructions to students on what to speak about.';
 $string['targetwords_help']='Target words or phrases that student should try to use while speaking. Each on a new line.';
 
@@ -491,8 +489,6 @@ $string['reportmenuinstructions']="View reports by selecting the report from the
 $string['totalgradeables']='Grading {$a} students';
 
 $string['myreports']='My Reports';
-$string['topicmedia'] ='Image, audio or video for topic';
-$string['topiciframe'] ='Embed iframe code for topic';
 $string['stats_autogrammarscore']='Grammar';
 $string['stats_autospellscore']='Spelling';
 $string['stats_clarity']='Clarity';
@@ -560,9 +556,6 @@ $string['addmedia'] = 'Add Media';
 $string['addiframe'] = 'Add iFrame';
 $string['addttsaudio'] = 'Add TTS Audio';
 
-$string['topictts'] ='Text to be read';
-$string['topicttsvoice'] ='Speaker\'s voice';
-
 $string['speakingtargetsheader'] ='Speaking Targets';
 $string['languageandrecordingheader'] ='Language and Recording';
 $string['attemptsandautogradingheader'] ='Attempts and AutoGrading';
@@ -578,3 +571,17 @@ $string['noattemptfound']= "That attempt could be found";
 $string['viewattempt']= "View";
 $string['attemptfor']= 'Attempt: {$a}';
 $string['audioandstats']="Audio and Stats";
+
+$string['content_iframe_help']='Paste iframe embed code (html only) for any media that should be shown to students.';
+$string['content_media_help']='Upload an audio/video or image file that will be shown to students.';
+$string['content_tts_help']='Text to speech content.';
+$string['content_media'] ='Image, audio or video content';
+$string['content_iframe'] ='Embed iframe code';
+$string['content_tts'] ='Text to be read';
+$string['content_ttsvoice'] ='Speaker\'s voice';
+
+$string['freetrial'] = "Get Cloud Poodll API Credentials and a Free Trial";
+$string['freetrial_desc'] = "A dialog should appear that allows you to register for a free trial with Poodll. After registering you should login to the members dashboard to get your API user and secret. And to register your site URL.";
+$string['memberdashboard'] = "Member Dashboard";
+$string['memberdashboard_desc'] = "";
+$string['fillcredentials']="Set API user and secret with existing credentials";

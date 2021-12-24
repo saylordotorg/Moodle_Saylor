@@ -1,3 +1,6 @@
+Version 1.0.30 (Build 2021122200)
+- added credential fetching
+
 Version 1.0.29(Build 2021112100)
 - Added neural voices
 - Added ability to force Poodll STT

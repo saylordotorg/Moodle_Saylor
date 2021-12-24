@@ -1510,65 +1510,9 @@ class utils{
         //$mform->addRule('speakingtopic', get_string('required'), 'required', null, 'client');
 
         //display media options for speaking prompt
-        $m35 = $CFG->version >= 2018051700;
-        $togglearray=array();
-        $togglearray[] =& $mform->createElement('advcheckbox','addmedia',get_string('addmedia',constants::M_COMPONENT),'');
-        $togglearray[] =& $mform->createElement('advcheckbox','addiframe',get_string('addiframe',constants::M_COMPONENT),'');
-        $togglearray[] =& $mform->createElement('advcheckbox','addttsaudio',get_string('addttsaudio',constants::M_COMPONENT),'');
-        $mform->addGroup($togglearray, 'togglearray', get_string('mediaoptions', constants::M_COMPONENT), array(' '), false);
-
-        //We assume they want to use some media
-        $mform->setDefault('addmedia', 1);
-
-
-        //Speaking topic upload
-        $filemanageroptions = solo_filemanager_options($context);
-        $mform->addElement('filemanager',
-                'topicmedia',
-                get_string('topicmedia',constants::M_COMPONENT),
-                null,
-                $filemanageroptions
-        );
-        $mform->addHelpButton('topicmedia', 'topicmedia', constants::M_MODNAME);
-        if($m35){
-            $mform->hideIf('topicmedia', 'addmedia', 'neq', 1);
-        }else {
-            $mform->disabledIf('topicmedia', 'addmedia', 'neq', 1);
-        }
-
-        //Speaking topic iframe
-        $mform->addElement('text', 'topiciframe', get_string('topiciframe', constants::M_COMPONENT), array('size'=>100));
-        $mform->setType('topiciframe', PARAM_RAW);
-        $mform->addHelpButton('topiciframe', 'topiciframe', constants::M_MODNAME);
-        if($m35){
-            $mform->hideIf('topiciframe','addiframe','neq', 1);
-        }else {
-            $mform->disabledIf( 'topiciframe','addiframe','neq', 1);
-        }
-
-        //Speaking topic TTS
-        $mform->addElement('textarea', 'topictts', get_string('topictts', constants::M_COMPONENT), array('wrap'=>'virtual','style'=>'width: 100%;'));
-        $mform->setType('topictts', PARAM_RAW);
-        $voiceoptions = utils::get_tts_voices();
-        $mform->addElement('select', 'topicttsvoice', get_string('topicttsvoice',constants::M_COMPONENT), $voiceoptions);
-        $mform->setDefault('topicttsvoice','Amy');
-        if($m35){
-            $mform->hideIf('topictts', 'addttsaudio', 'neq', 1);
-            $mform->hideIf('topicttsvoice', 'addttsaudio', 'neq', 1);
-        }else {
-            $mform->disabledIf('topictts', 'addttsaudio', 'neq', 1);
-            $mform->disabledIf('topicttsvoice', 'addttsaudio', 'neq', 1);
-        }
-
-
-        $options = utils::get_recorders_options();
-        $mform->addElement('select','recordertype',get_string('recordertype', constants::M_COMPONENT), $options,array());
-        $mform->setDefault('recordertype',constants::REC_AUDIO);
-
-
-        $options = utils::get_skin_options();
-        $mform->addElement('select','recorderskin',get_string('recorderskin', constants::M_COMPONENT), $options,array());
-        $mform->setDefault('recorderskin',constants::SKIN_ONCE);
+//--------------------------------------------------------
+      self::prepare_content_toggle('topic',$mform,$context);
+//--------------------------------------------------------
 
         // Speaking Targets
         $mform->addElement('header', 'speakingtargetsheader', get_string('speakingtargetsheader', constants::M_COMPONENT));
@@ -1600,6 +1544,13 @@ class utils{
         // Language and Recording
         $mform->addElement('header', 'languageandrecordingheader', get_string('languageandrecordingheader', constants::M_COMPONENT));
 
+        $options = utils::get_recorders_options();
+        $mform->addElement('select','recordertype',get_string('recordertype', constants::M_COMPONENT), $options,array());
+        $mform->setDefault('recordertype',constants::REC_AUDIO);
+
+        $options = utils::get_skin_options();
+        $mform->addElement('select','recorderskin',get_string('recorderskin', constants::M_COMPONENT), $options,array());
+        $mform->setDefault('recorderskin',constants::SKIN_ONCE);
 
         //Enable Manual Transcription [for now lets foprce this ]
         $mform->addElement('hidden', 'enabletranscription', 1);
@@ -1708,6 +1659,63 @@ class utils{
         $mform->setType('tips_editor',PARAM_RAW);
 
     } //end of add_mform_elements
+
+    public static function prepare_content_toggle($contentprefix, $mform, $context){
+        global $CFG;
+
+        //display media options for speaking prompt
+        $cp = $contentprefix;
+        $m35 = $CFG->version >= 2018051700;
+        $togglearray=array();
+        $togglearray[] =& $mform->createElement('advcheckbox',$cp . 'addmedia',get_string('addmedia',constants::M_COMPONENT),'');
+        $togglearray[] =& $mform->createElement('advcheckbox',$cp . 'addiframe',get_string('addiframe',constants::M_COMPONENT),'');
+        $togglearray[] =& $mform->createElement('advcheckbox',$cp . 'addttsaudio',get_string('addttsaudio',constants::M_COMPONENT),'');
+        $mform->addGroup($togglearray, $cp . 'togglearray', get_string('mediaoptions', constants::M_COMPONENT), array(' '), false);
+
+        //We assume they want to use some media
+        $mform->setDefault($cp . 'addmedia', 1);
+
+
+        //Speaking topic upload
+        $filemanageroptions = solo_filemanager_options($context);
+        $mform->addElement('filemanager',
+            $cp . 'media',
+            get_string('content_media',constants::M_COMPONENT),
+            null,
+            $filemanageroptions
+        );
+        $mform->addHelpButton($cp . 'media', 'content_media', constants::M_MODNAME);
+        if($m35){
+            $mform->hideIf($cp . 'media',$cp .  'addmedia', 'neq', 1);
+        }else {
+            $mform->disabledIf($cp . 'media',$cp .  'addmedia', 'neq', 1);
+        }
+
+        //Speaking topic iframe
+        $mform->addElement('text', $cp . 'iframe', get_string('content_iframe', constants::M_COMPONENT), array('size'=>100));
+        $mform->setType($cp . 'iframe', PARAM_RAW);
+        $mform->addHelpButton($cp . 'iframe', 'content_iframe', constants::M_MODNAME);
+        if($m35){
+            $mform->hideIf($cp . 'iframe',$cp . 'addiframe','neq', 1);
+        }else {
+            $mform->disabledIf( $cp . 'iframe',$cp . 'addiframe','neq', 1);
+        }
+
+        //Speaking topic TTS
+        $mform->addElement('textarea', $cp . 'tts', get_string('content_tts', constants::M_COMPONENT), array('wrap'=>'virtual','style'=>'width: 100%;'));
+        $mform->setType($cp . 'tts', PARAM_RAW);
+        $mform->addHelpButton($cp . 'tts', 'content_tts', constants::M_MODNAME);
+        $voiceoptions = utils::get_tts_voices();
+        $mform->addElement('select', $cp . 'ttsvoice', get_string('content_ttsvoice',constants::M_COMPONENT), $voiceoptions);
+        $mform->setDefault($cp . 'ttsvoice','Amy');
+        if($m35){
+            $mform->hideIf($cp . 'tts',$cp .  'addttsaudio', 'neq', 1);
+            $mform->hideIf($cp . 'ttsvoice', $cp . 'addttsaudio', 'neq', 1);
+        }else {
+            $mform->disabledIf($cp . 'tts', $cp . 'addttsaudio', 'neq', 1);
+            $mform->disabledIf($cp . 'ttsvoice', $cp . 'addttsaudio', 'neq', 1);
+        }
+    }
 
     public static function prepare_file_and_json_stuff($moduleinstance, $modulecontext){
         $filemanageroptions = solo_filemanager_options($modulecontext);

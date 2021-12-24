@@ -43,7 +43,7 @@ class settingstools {
     }
 
     public static function fetch_general_items() {
-        global $CFG;
+        global $CFG, $OUTPUT;
         $items = array();
 
         $items[] = new \admin_setting_heading('filter_poodll_registration_settings',
@@ -54,17 +54,50 @@ class settingstools {
         $items[] = new \admin_setting_configtext('filter_poodll/cpapiuser', get_string('cpapiuser', 'filter_poodll'),
                 get_string('cpapiuser_details', 'filter_poodll'), '');
 
-        //we show a summary of the users apps if we can get the info
-        $apiuser = get_config('filter_poodll', 'cpapiuser');
-        $apisecret = get_config('filter_poodll', 'cpapisecret');
-        if ($apiuser && $apisecret) {
+        $cloudpoodll_apiuser = get_config('filter_poodll', 'cpapiuser');
+        $cloudpoodll_apisecret = get_config('filter_poodll', 'cpapisecret');
+        $show_below_apisecret='';
+
+        //if we have an API user and secret we fetch token
+        if(!empty($cloudpoodll_apiuser) && !empty($cloudpoodll_apisecret)) {
             $lm = new \filter_poodll\licensemanager();
-            $tokeninfo = $lm->fetch_token_for_display($apiuser, $apisecret);
-        } else {
-            $tokeninfo = get_string('cpapisecret_details', 'filter_poodll');
+            $tokeninfo = $lm->fetch_token_for_display($cloudpoodll_apiuser, $cloudpoodll_apisecret);
+            $show_below_apisecret=$tokeninfo;
+        //if we have no API user and secret we show a "fetch from elsewhere on site" or "take a free trial" link
+        }else{
+            $amddata=['apppath'=>$CFG->wwwroot . '/' .constants::M_URL];
+            $cp_components=['qtype_cloudpoodll','mod_readaloud','mod_wordcards','mod_solo','mod_minilesson','mod_englishcentral','mod_pchat',
+                'atto_cloudpoodll','tinymce_cloudpoodll', 'assignsubmission_cloudpoodll','assignfeedback_cloudpoodll'];
+            foreach($cp_components as $cp_component){
+                switch($cp_component){
+                    case 'filter_poodll':
+                        $apiusersetting='cpapiuser';
+                        $apisecretsetting='cpapisecret';
+                        break;
+                    case 'mod_englishcentral':
+                        $apiusersetting='poodllapiuser';
+                        $apisecretsetting='poodllapisecret';
+                        break;
+                    default:
+                        $apiusersetting='apiuser';
+                        $apisecretsetting='apisecret';
+                }
+                $cloudpoodll_apiuser=get_config($cp_component,$apiusersetting);
+                if(!empty($cloudpoodll_apiuser)){
+                    $cloudpoodll_apisecret=get_config($cp_component,$apisecretsetting);
+                    if(!empty($cloudpoodll_apisecret)){
+                        $amddata['apiuser']=$cloudpoodll_apiuser;
+                        $amddata['apisecret']=$cloudpoodll_apisecret;
+                        break;
+                    }
+                }
+            }
+            $show_below_apisecret=$OUTPUT->render_from_template( constants::M_COMPONENT . '/managecreds',$amddata);
         }
+
+
         $items[] = new \admin_setting_configtext('filter_poodll/cpapisecret', get_string('cpapisecret', 'filter_poodll'),
-                $tokeninfo, '');
+            $show_below_apisecret, '');
 
         //Adding Amazon AWS regions
         $options = self::fetch_awsregion_options();
@@ -77,38 +110,6 @@ class settingstools {
                         get_string('usecloudrecording_desc', 'filter_poodll'), 1);
         $items[] = new \admin_setting_configcheckbox('filter_poodll_cloudnotifications',
                 get_string('usecloudnotifications', 'filter_poodll'), get_string('usecloudnotifications_desc', 'filter_poodll'), 1);
-
-
-        $items[] = new \admin_setting_heading('filter_poodll_recorderorder_heading', get_string('recorderorder', 'filter_poodll'),
-                get_string('recorderorder_desc', 'filter_poodll'));
-
-        //PoodLL player type settings.
-        $items[] = new \admin_setting_configtext('filter_poodll_recorderorder_audio',
-                get_string('recorderorder_audio', 'filter_poodll'),
-                get_string('recorderorder_audio_desc', 'filter_poodll'), 'media,mobile,flashaudio,red5,upload', PARAM_TEXT);
-
-        //PoodLL player type settings.
-        $items[] = new \admin_setting_configtext('filter_poodll_recorderorder_video',
-                get_string('recorderorder_video', 'filter_poodll'),
-                get_string('recorderorder_video_desc', 'filter_poodll'), 'media,mobile,red5,upload', PARAM_TEXT);
-
-        //PoodLL player type settings.
-        $items[] = new \admin_setting_configtext('filter_poodll_recorderorder_whiteboard',
-                get_string('recorderorder_whiteboard', 'filter_poodll'),
-                get_string('recorderorder_whiteboard_desc', 'filter_poodll'), 'upload', PARAM_TEXT);
-
-        //PoodLL player type settings.
-        $items[] = new \admin_setting_configtext('filter_poodll_recorderorder_snapshot',
-                get_string('recorderorder_snapshot', 'filter_poodll'),
-                get_string('recorderorder_snapshot_desc', 'filter_poodll'), 'snapshot,upload', PARAM_TEXT);
-
-        //Allow Adobe Flash on Android
-        $items[] =
-                new \admin_setting_configcheckbox('filter_poodll_flash_on_android', get_string('flashonandroid', 'filter_poodll'),
-                        get_string('flashonandroid_desc', 'filter_poodll'), 0);
-
-        $items[] = new \admin_setting_configcheckbox('filter_poodll_download_media_ok',
-                get_string('showdownloadicon', 'filter_poodll'), get_string('showdownloadicon_desc', 'filter_poodll'), 0);
 
         //html5 recorder settings.
         $items[] = new \admin_setting_heading('filter_poodll_html5recorder_settings',
@@ -125,8 +126,10 @@ class settingstools {
                 get_string('skinstyleaudio_details', 'filter_poodll'), '');
         $items[] = new \admin_setting_configtext('filter_poodll/skinstylevideo', get_string('skinstylevideo', 'filter_poodll'),
                 get_string('skinstylevideo_details', 'filter_poodll'), '');
-        $items[] = new \admin_setting_configcheckbox('filter_poodll_html5ondsafari', get_string('html5ondsafari', 'filter_poodll'),
-                get_string('html5ondsafaridetails', 'filter_poodll'), 0);
+
+        $items[] = new \admin_setting_configcheckbox('filter_poodll_download_media_ok',
+            get_string('showdownloadicon', 'filter_poodll'), get_string('showdownloadicon_desc', 'filter_poodll'), 0);
+
 
         //PoodLL Whiteboard
         $items[] = new \admin_setting_heading('filter_poodll_whiteboard_setting',
@@ -232,6 +235,37 @@ class settingstools {
     public static function fetch_legacy_items() {
         global $CFG;
         $items = array();
+
+        $items[] = new \admin_setting_heading('filter_poodll_recorderorder_heading', get_string('recorderorder', 'filter_poodll'),
+            get_string('recorderorder_desc', 'filter_poodll'));
+
+        //PoodLL player type settings.
+        $items[] = new \admin_setting_configtext('filter_poodll_recorderorder_audio',
+            get_string('recorderorder_audio', 'filter_poodll'),
+            get_string('recorderorder_audio_desc', 'filter_poodll'), 'media,mobile,flashaudio,red5,upload', PARAM_TEXT);
+
+        //PoodLL player type settings.
+        $items[] = new \admin_setting_configtext('filter_poodll_recorderorder_video',
+            get_string('recorderorder_video', 'filter_poodll'),
+            get_string('recorderorder_video_desc', 'filter_poodll'), 'media,mobile,red5,upload', PARAM_TEXT);
+
+        //PoodLL player type settings.
+        $items[] = new \admin_setting_configtext('filter_poodll_recorderorder_whiteboard',
+            get_string('recorderorder_whiteboard', 'filter_poodll'),
+            get_string('recorderorder_whiteboard_desc', 'filter_poodll'), 'upload', PARAM_TEXT);
+
+        //PoodLL player type settings.
+        $items[] = new \admin_setting_configtext('filter_poodll_recorderorder_snapshot',
+            get_string('recorderorder_snapshot', 'filter_poodll'),
+            get_string('recorderorder_snapshot_desc', 'filter_poodll'), 'snapshot,upload', PARAM_TEXT);
+
+        //Allow Adobe Flash on Android
+        $items[] =
+            new \admin_setting_configcheckbox('filter_poodll_flash_on_android', get_string('flashonandroid', 'filter_poodll'),
+                get_string('flashonandroid_desc', 'filter_poodll'), 0);
+
+        $items[] = new \admin_setting_configcheckbox('filter_poodll_html5ondsafari', get_string('html5ondsafari', 'filter_poodll'),
+            get_string('html5ondsafaridetails', 'filter_poodll'), 0);
 
         //PoodLL Network Settings.
         $items[] = new \admin_setting_heading('filter_poodll_network_settings',

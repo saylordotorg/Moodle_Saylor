@@ -1,0 +1,20 @@
+<div class="filter_poodll_credsmanager">
+    <!-- If API user then show a link + js to poke creds in -->
+    {{#apiuser}}<a href="#" class="cloudpoodll_poke_creds">{{#str}}fillcredentials, filter_poodll{{/str}}</a>{{/apiuser}}
+    <!-- if no API user then the user sees a link to a page which will allow them to take a free trial -->
+    {{^apiuser}}<a href="{{{apppath}}}/fetchcbpage.php" target="_blank">{{#str}}freetrial, filter_poodll{{/str}} [&#x2197;]</a>{{/apiuser}}
+</div>
+{{^element.frozen}}
+    {{#js}}
+        require(['jquery'],function($) {
+            //set up fetch from elsewhere
+            $(".filter_poodll_credsmanager .cloudpoodll_poke_creds").on("click", function() {
+                event.preventDefault();
+                var apiuser = document.getElementById('id_s_filter_poodll_cpapiuser');
+                var apisecret = document.getElementById('id_s_filter_poodll_cpapisecret');
+                apiuser.value='{{{apiuser}}}';
+                apisecret.value='{{{apisecret}}}';
+            });
+        });
+    {{/js}}
+{{/element.frozen}}

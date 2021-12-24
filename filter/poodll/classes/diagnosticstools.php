@@ -73,8 +73,15 @@ class diagnosticstools {
         $ds['data_field_version'] = get_config('datafield_poodll', 'version');
         $ds['repository_poodll'] = get_config('repository_poodll', 'version');
         $ds['atto_cloudpoodll_version'] = get_config('atto_cloudpoodll', 'version');
+        $ds['tinymce_cloudpoodll_version'] = get_config('tinymce_cloudpoodll', 'version');
         $ds['assignsubmission_cloudpoodll_version'] = get_config('assignsubmission_cloudpoodll', 'version');
+        $ds['assignfeedback_cloudpoodll_version'] = get_config('assignfeedback_cloudpoodll', 'version');
+        $ds['qtype_cloudpoodll_version'] = get_config('qtype_cloudpoodll', 'version');
         $ds['mod_readaloud_version'] = get_config('mod_readaloud', 'version');
+        $ds['mod_solo_version'] = get_config('mod_solo', 'version');
+        $ds['mod_minilesson_version'] = get_config('mod_minilesson', 'version');
+        $ds['mod_wordcards_version'] = get_config('mod_wordcards', 'version');
+        $ds['mod_pchat_version'] = get_config('mod_pchat', 'version');
 
         //Registration Key info
         $lm = new \filter_poodll\licensemanager();

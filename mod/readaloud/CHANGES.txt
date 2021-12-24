@@ -1,3 +1,6 @@
+Version 2.0.74 (Build 2021122200)
+- added credential fetching
+
 2.0.73 (Build 2021121500)
 - Fixed display of grades in table that was not showing all records
 

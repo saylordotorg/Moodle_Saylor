@@ -1,0 +1,46 @@
+  .que.coderunner .ace_editor.html-question {
+      height: 300px;
+  }
+
+  .que.coderunner .ace_editor.css-question {
+      height: 200px;
+  }
+  .que.coderunner .ace_editor.js-question {
+      height: 100px;
+  }
+
+  .que.coderunner .html-parser.coderunner-ui-element {
+      width: 100%;
+  }
+
+  .que.coderunner .html-parser.rendered-html {
+      width: 100%;
+      min-height: 200px;
+      border: 1px solid $gray-300;
+  }
+
+  #editors {
+      //display: flex
+  }
+
+  .html_parser_section {
+      background-color: $gray-200;
+      column-gap: 60px;
+  }
+
+  .que.coderunner .html-parser-wrapper .html-area-title {
+      @extend h3;
+  }
+  .que.coderunner .html-parser-wrapper .css-area-title {
+      @extend h3;
+  }
+  .que.coderunner .html-parser-wrapper .js-area-title {
+      @extend h3;
+  }
+  .que.coderunner .html-parser-wrapper .rendered-html-title {
+      @extend h3;
+  }
+
+.html-parser-wrapper {
+  background: white;
+}
