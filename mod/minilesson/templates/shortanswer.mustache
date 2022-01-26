@@ -1,43 +1,6 @@
 {{> mod_minilesson/questionheader}}
 
-  {{#customtext1}}
-  <div style="float:left;margin-right:35px;">A</div> 
-  <div class="custom-control custom-radio">
-    <input data-index="1" type="radio" id="{{uniqueid}}_option1" name="{{uniqueid}}_options" class="custom-control-input {{uniqueid}}_option">
-    <label class="custom-control-label" for="{{uniqueid}}_option1">{{customtext1}}
-      <span class="{{uniqueid}}_fb {{uniqueid}}_option1_fb"></span>
-    </label>
-  </div>
-  {{/customtext1}}
-
-    {{#customtext2}}
-    <div style="float:left;margin-right:35px;">B</div>
-  <div class="custom-control custom-radio">
-    <input data-index="2" type="radio" id="{{uniqueid}}_option2" name="{{uniqueid}}_options" class="custom-control-input {{uniqueid}}_option">
-    <label class="custom-control-label" for="{{uniqueid}}_option2">{{customtext2}}
-      <span class="{{uniqueid}}_fb {{uniqueid}}_option2_fb"></span>
-    </label>
-  </div>
-    {{/customtext2}}
-
-    {{#customtext3}}
-  <div style="float:left;margin-right:35px;">C</div> 
-  <div class="custom-control custom-radio">
-    <input data-index="3" type="radio" id="{{uniqueid}}_option3" name="{{uniqueid}}_options" class="custom-control-input {{uniqueid}}_option">
-    <label class="custom-control-label" for="{{uniqueid}}_option3">{{customtext3}}
-      <span class="{{uniqueid}}_fb {{uniqueid}}_option3_fb"></span>
-    </label>
-  </div>
-    {{/customtext3}}
-
-    {{#customtext4}}
-  <div style="float:left;margin-right:35px;">D</div> 
-  <div class="custom-control custom-radio">
-    <input data-index="4" type="radio" id="{{uniqueid}}_option4" name="{{uniqueid}}_options" class="custom-control-input {{uniqueid}}_option">
-    <label class="custom-control-label" for="{{uniqueid}}_option4">{{customtext4}}
-      <span class="{{uniqueid}}_fb {{uniqueid}}_option4_fb"></span>
-    </label>
-  </div>
-    {{/customtext4}}
+<div id="{{uniqueid}}_correctanswer" class="mod_minilesson_spokenandcorrect" style="display: none"></div>
+{{> mod_minilesson/ttrecorder}}
 
 {{> mod_minilesson/questionfooter}}

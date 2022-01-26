@@ -8,11 +8,11 @@
         require(['jquery'],function($) {
             //set up checkout links
                 $.getScript('https://js.chargebee.com/v2/chargebee.js', function(){
-                    var chargebee = Chargebee.init({'site': '{{poodllcbsite}}', isItemsModel: true});
+                    var chargebee = Chargebee.init({site: '{{poodllcbsite}}', isItemsModel: true});
                     var cart = chargebee.getCart()
                     var planPriceId = 'Poodll-Free-Trial-USD-Daily';
-                    var planPriceQuantity = 1
-                    var product = chargebee.initializeProduct(planPriceId, planPriceQuantity)
+                    var planPriceQuantity = 1;
+                    var product = chargebee.initializeProduct(planPriceId, planPriceQuantity);
                     cart.replaceProduct(product);
                     var customer = {email: "{{email}}", billing_address: {first_name: "{{first_name}}",last_name: "{{last_name}}", country: "{{country}}"}};
                     cart.setCustomer(customer);

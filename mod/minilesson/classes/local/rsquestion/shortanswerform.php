@@ -17,11 +17,10 @@ class shortanswerform extends baseform
 
     public function custom_definition() {
 
-        $this->add_correctanswer();
-        $this->add_textboxresponse(1,'answer1',true);
-        $this->add_textboxresponse(2,'answer2',true);
-        $this->add_textboxresponse(3,'answer3',false);
-        $this->add_textboxresponse(4,'answer4',false);
+        //all answers are correct
+        $this->add_static_text('instructions','',get_string('enterresponses',constants::M_COMPONENT));
+        $this->add_textarearesponse(1,get_string('correctresponses',constants::M_COMPONENT),true);
+
     }
 
 }

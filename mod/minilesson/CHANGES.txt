@@ -1,4 +1,10 @@
-Version 1.0.30 (Build 2021122200)
+Version 1.0.31(Build 2022012500)
+- Added missing number/alphabet processing class
+
+Version 1.0.30(Build 2022012001)
+- Added ShortAnswer question type
+- Added TTS Autoplay
+- Added Layout option
 - added credential fetching
 
 Version 1.0.29(Build 2021112100)

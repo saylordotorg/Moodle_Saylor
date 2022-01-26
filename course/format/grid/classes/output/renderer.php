@@ -31,6 +31,7 @@ namespace format_grid\output;
 defined('MOODLE_INTERNAL') || die();
 
 use context_course;
+use core_text;
 use html_writer;
 use moodle_url;
 
@@ -195,7 +196,7 @@ class renderer extends \format_section_renderer_base {
             $section++;
         }
 
-        $select = new url_select($sectionmenu, '', array('' => get_string('jumpto')));
+        $select = new \url_select($sectionmenu, '', array('' => get_string('jumpto')));
         $select->class = 'jumpmenu';
         $select->formid = 'sectionmenu';
         $o .= $this->output->render($select);
@@ -288,7 +289,7 @@ class renderer extends \format_section_renderer_base {
 
         if ($this->settings['singlepagesummaryimage'] > 1) { // I.e. not 'off'.
             if (!empty($summary)) {
-                $data = new stdClass;
+                $data = new \stdClass;
                 switch($this->settings['singlepagesummaryimage']) {
                     case 2:
                         $data->left = true;
@@ -391,7 +392,7 @@ class renderer extends \format_section_renderer_base {
             echo $this->section_header_onsectionpage($thissection, $course, $displaysection);
             if ($course->enablecompletion) {
                 // Show completion help icon.
-                $completioninfo = new completion_info($course);
+                $completioninfo = new \completion_info($course);
                 echo $completioninfo->display_help_icon();
             }
 
@@ -891,7 +892,7 @@ class renderer extends \format_section_renderer_base {
                 if ($this->settings['showsectiontitlesummary'] == 2) {
                     $summary = strip_tags($thissection->summary);
                     $summary = str_replace("&nbsp;", ' ', $summary);
-                    $summarylen = \core_text::strlen($summary);
+                    $summarylen = core_text::strlen($summary);
                     if ($summarylen > 0) {
                         if ($this->settings['sectiontitlesummarymaxlength'] != 0) {
                             if ($summarylen > $this->settings['sectiontitlesummarymaxlength']) {

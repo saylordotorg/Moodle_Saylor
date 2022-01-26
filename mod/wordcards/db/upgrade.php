@@ -388,5 +388,13 @@ function xmldb_wordcards_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2021110500, 'wordcards');
     }
 
+    if ($oldversion < 2022012000) {
+
+        $DB->set_field('wordcards_terms','ttsvoice','Seoyeon',array('ttsvoice'=>'Seoyan'));
+
+
+        upgrade_mod_savepoint(true, 2022012000, 'wordcards');
+    }
+
     return true;
 }

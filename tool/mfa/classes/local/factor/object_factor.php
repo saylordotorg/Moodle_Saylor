@@ -25,8 +25,6 @@
 
 namespace tool_mfa\local\factor;
 
-defined('MOODLE_INTERNAL') || die();
-
 interface object_factor {
     /**
      * Returns true if factor is enabled, otherwise false.
@@ -273,4 +271,36 @@ interface object_factor {
      * @return void
      */
     public function process_cancel_action();
+
+    /**
+     * Hook point for global auth form action hooks.
+     *
+     * @param $mform Form to inject global elements into.
+     * @return void
+     */
+    public function global_definition($mform);
+
+    /**
+     * Hook point for global auth form action hooks.
+     *
+     * @param $mform Form to inject global elements into.
+     * @return void
+     */
+    public function global_definition_after_data($mform);
+
+    /**
+     * Hook point for global auth form action hooks.
+     *
+     * @param array $data Data from the form.
+     * @param array $files Files form the form.
+     * @return array of errors from validation.
+     */
+    public function global_validation($data, $files): array;
+
+    /**
+     * Hook point for global auth form action hooks.
+     *
+     * @param object $data Data from the form.
+     */
+    public function global_submit($data);
 }

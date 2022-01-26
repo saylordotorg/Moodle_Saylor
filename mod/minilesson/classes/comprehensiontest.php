@@ -186,6 +186,7 @@ class comprehensiontest
                     $testitem->itemttsaudio=$item->{constants::TTSQUESTION};
                     $testitem->itemttsaudiovoice=$item->{constants::TTSQUESTIONVOICE};
                     $testitem->itemttsoption=$item->{constants::TTSQUESTIONOPTION};
+                    $testitem->itemttsautoplay=$item->{constants::TTSAUTOPLAY};
                 }
 
                 //Question TextArea
@@ -220,16 +221,26 @@ class comprehensiontest
             $videoset =isset($testitem->itemvideo) && !empty($testitem->itemvideo);
             $iframeset =isset($testitem->itemiframe) && !empty($testitem->itemiframe);
 
-            //if its not a page, any big content item will make it horizontal layout
-            if($testitem->type!==constants::TYPE_PAGE) {
-                if($textset || $imageset|| $videoset||$iframeset){
-                    $testitem->horizontal = true;
+            //layout
+            $testitem->layout=$item->{constants::LAYOUT};
+            if($testitem->layout==constants::LAYOUT_AUTO) {
+                //if its not a page or shortanswer, any big content item will make it horizontal layout
+                if ($testitem->type !== constants::TYPE_PAGE && $testitem->type !== constants::TYPE_SHORTANSWER) {
+                    if ($textset || $imageset || $videoset || $iframeset) {
+                        $testitem->horizontal = true;
+                    }
                 }
-            //if its a page, a big content item + text would make it horizontal
-            //BUT ... we decided to nix this, but maybe we can do it in the future
-            }else if(false){
-                if($textset && ( $imageset|| $videoset||$iframeset)){
-                    $testitem->horizontal = true;
+            }else{
+                switch($testitem->layout){
+                    case constants::LAYOUT_HORIZONTAL:
+                        $testitem->horizontal = true;
+                        break;
+                    case constants::LAYOUT_VERTICAL:
+                        $testitem->vertical = true;
+                        break;
+                    case constants::LAYOUT_MAGAZINE:
+                        $testitem->magazine = true;
+                        break;
                 }
             }
 
@@ -246,6 +257,7 @@ class comprehensiontest
                 case constants::TYPE_SPEECHCARDS:
                 case constants::TYPE_LISTENREPEAT:
                 case constants::TYPE_MULTIAUDIO:
+                case constants::TYPE_SHORTANSWER:
 
                     //phonetic
                     $testitem->phonetic=$item->phonetic;
@@ -300,11 +312,17 @@ class comprehensiontest
                         //so we process it. In listen and speak it still shows the target, so its word'ified.
                         //speechcards we do not give word level feedback. so we do nothing special
                         //key point is to pass unwordified passage to compare_passage_transcipt ajax.
-                        if ($testitem->type == constants::TYPE_LISTENREPEAT || $testitem->type == constants::TYPE_DICTATIONCHAT) {
-                            if ($this->mod->ttslanguage == constants::M_LANG_JAJP) {
+                        //if short answer we want to convert zankaku numbers to hankaku for comparison (probably also for other types too)
+                        if ($this->mod->ttslanguage == constants::M_LANG_JAJP) {
+                            if ($testitem->type == constants::TYPE_LISTENREPEAT ||$testitem->type == constants::TYPE_DICTATIONCHAT) {
                                 $sentence = utils::segment_japanese($sentence);
+                            }elseif($testitem->type == constants::TYPE_SHORTANSWER){
+                                $sentence =  mb_convert_kana($sentence,"n");
                             }
                         }
+
+
+
 
                         $s = new \stdClass();
                         $s->index = $index;
@@ -384,7 +402,6 @@ class comprehensiontest
                     break;
                 case constants::TYPE_PAGE:
                 case constants::TYPE_SMARTFRAME:
-                case constants::TYPE_SHORTANSWER:
             }
 
             //if its a smart frame set the host name so we can pass data around

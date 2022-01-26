@@ -1714,9 +1714,11 @@ div.mod_minilesson_feedback_cont.mod_minilesson_postattempt {
 }
 .mod_minilesson_itemtextarea {
   width: 100%;
-  max-width: 400px;
+  max-width: 600px;
   margin: auto;
 }
+
+
 .mod_minilesson_itemaudio {
   width: 100%;
   max-width: 400px;
@@ -1744,6 +1746,11 @@ div.mod_minilesson_feedback_cont.mod_minilesson_postattempt {
   width: 100%;
   margin-top: 10px;
   text-align: center;
+}
+.mod_minilesson_itemimage_cont.mod_minilesson_magazine {
+  max-width: 250px;
+  float: left;
+  padding: 5px;
 }
 .mod_minilesson_itemtextarea_cont {
   width: 100%;
@@ -1854,4 +1861,9 @@ div.mod_minilesson_feedback_cont.mod_minilesson_postattempt {
 .minilesson_reportsmenu_itembutton button{
   height: 80px;
   width: 150px;
+}
+.mod_minilesson_spokenandcorrect {
+  text-align: center;
+  margin:auto;
+  max-width: 400px;
 }

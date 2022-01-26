@@ -25,8 +25,6 @@
 
 namespace availability_coursecompleted\privacy;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Privacy main class.
  *

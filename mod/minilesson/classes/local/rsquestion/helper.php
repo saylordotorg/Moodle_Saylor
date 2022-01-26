@@ -185,6 +185,13 @@ class helper
             $theitem->{constants::TEXTQUESTION} = $data->{constants::TEXTQUESTION};
         }
 
+        //layout
+        if (property_exists($data, constants::LAYOUT)) {
+            $theitem->{constants::LAYOUT} = $data->{constants::LAYOUT};
+        }else{
+            $theitem->{constants::LAYOUT} = constants::LAYOUT_AUTO;
+        }
+
         //Item media
         if (property_exists($data, constants::MEDIAQUESTION)) {
             file_save_draft_area_files($data->{constants::MEDIAQUESTION},
@@ -205,6 +212,11 @@ class helper
                 $theitem->{constants::TTSQUESTIONOPTION} = $data->{constants::TTSQUESTIONOPTION};
             }else{
                 $theitem->{constants::TTSQUESTIONOPTION} = constants::TTS_NORMAL;
+            }
+            if (property_exists($data, constants::TTSAUTOPLAY)) {
+                $theitem->{constants::TTSAUTOPLAY} = $data->{constants::TTSAUTOPLAY};
+            }else{
+                $theitem->{constants::TTSAUTOPLAY} = 0;
             }
         }
 
@@ -240,7 +252,9 @@ class helper
                 $thetext = trim($data->{constants::TEXTANSWER . $anumber});
                 //segment the text if it is japanese and not already segmented
                 if($minilesson->ttslanguage == constants::M_LANG_JAJP &&
-                        ($data->type==CONSTANTS::TYPE_LISTENREPEAT ||$data->type==CONSTANTS::TYPE_SPEECHCARDS)){
+                        ($data->type==CONSTANTS::TYPE_LISTENREPEAT ||
+                            $data->type==CONSTANTS::TYPE_SPEECHCARDS ||
+                            $data->type==CONSTANTS::TYPE_SHORTANSWER )){
                     if(strpos($thetext,' ')==false){
                       //  $thetext = utils::segment_japanese($thetext);
                     }
@@ -326,6 +340,7 @@ class helper
             case constants::TYPE_SPEECHCARDS:
             case constants::TYPE_LISTENREPEAT:
             case constants::TYPE_MULTIAUDIO:
+            case constants::TYPE_SHORTANSWER:
 
                 $passage = $newitem->customtext1;
                 if($newitem->type == constants::TYPE_MULTIAUDIO){
@@ -334,7 +349,7 @@ class helper
                     $passage .= ' ' . $newitem->customtext4;
                 }
                 if (utils::needs_lang_model($moduleinstance,$passage)) {
-                    $newpassagehash = utils::fetch_passagehash($passage);
+                    $newpassagehash = utils::fetch_passagehash($moduleinstance->ttslanguage,$passage);
                     if ($newpassagehash) {
                         //check if it has changed, if its a brand new one, if so register a langmodel
                         if (!$olditem || $olditem->passagehash != ($moduleinstance->region . '|' . $newpassagehash)) {
@@ -372,6 +387,7 @@ class helper
             case constants::TYPE_SPEECHCARDS:
             case constants::TYPE_LISTENREPEAT:
             case constants::TYPE_MULTIAUDIO:
+            case constants::TYPE_SHORTANSWER:
 
 
                     $newpassage = $newitem->customtext1;
@@ -399,7 +415,8 @@ class helper
                     $sentences=explode(PHP_EOL,$newpassage);
                     $allphonetics =[];
                     foreach($sentences as $sentence) {
-                        $thephones  = utils::convert_to_phonetic($sentence, $moduleinstance->ttslanguage, 'tokyo', $segmented);
+                        list($thephones)  = utils::fetch_phones_and_segments($sentence, $moduleinstance->ttslanguage, 'tokyo', $segmented);
+                        //$thephones  = utils::convert_to_phonetic($sentence, $moduleinstance->ttslanguage, 'tokyo', $segmented);
                         if(!empty($thephones)) {
                             $allphonetics[] = $thephones;
                         }

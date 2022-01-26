@@ -2,8 +2,6 @@ Grid course format
 ============================
 A topics based format that uses a grid of user selectable images to pop up a light box of the section.
 
-[![Build Status](https://travis-ci.org/gjb2048/moodle-format_grid.svg?branch=master)](https://travis-ci.org/gjb2048/moodle-format_grid)
-
 Required version of Moodle
 ==========================
 This version works with Moodle 3.11 version 2021051700.00 (Build: 20210517) and above within the 3.11 branch until the
@@ -19,9 +17,9 @@ The Grid format is 'free' software under the terms of the GNU GPLv3 License, ple
 The primary source for downloading this branch of the format is https://moodle.org/plugins/view.php?plugin=format_grid
 with 'Select Moodle version:' set at 'Moodle 3.11'.
 
-The secondary source is a tagged version with the v3.11 prefix on https://github.com/gjb2048/moodle-courseformat_grid/tags
+The secondary source is a tagged version with the v3.11 prefix on https://github.com/gjb2048/moodle-format_grid/tags
 
-If you download from the development area - https://github.com/gjb2048/moodle-courseformat_grid/ - consider that
+If you download from the development area - https://github.com/gjb2048/moodle-format_grid - consider that
 the code is unstable and not for use in production environments.  This is because I develop the next version in stages
 and use GitHub as a means of backup.  Therefore the code is not finished, subject to alteration and requires testing.
 
@@ -31,23 +29,12 @@ FAQ - http://www.gnu.org/licenses/gpl-faq.html - is a good place to look.
 If you reuse any of the code then I kindly ask that you make reference to the format.
 
 If you make improvements or bug fixes then I would appreciate if you would send them back to me by forking from
-https://github.com/gjb2048/moodle-courseformat_grid and doing a 'Pull Request' so that the rest of the
+https://github.com/gjb2048/moodle-format_grid and doing a 'Pull Request' so that the rest of the
 Moodle community benefits.
 
 Support
 =======
-The Grid format comes with NO support.  If you would like support from me (Gareth) then I'm happy to provide it
-for a fee (please see my contact details below).  Otherwise, the 'Courses and course formats' forum:
-moodle.org/mod/forum/view.php?id=47 is an excellent place to ask questions.
-
-Supporting Grid development
-===========================
-If you find Grid useful and beneficial, please consider sponsoring by:
-
-PayPal - Please contact me via my 'Moodle profile' (above) for details as I am an individual and therefore am unable
-to have 'buy me now' buttons under their terms.
-
-I develop and maintain for free and any sponsorships to assist me in this endeavour are appreciated.
+Please see Support.md.
 
 Installation
 ============
@@ -110,29 +97,7 @@ do so:
 
 Reporting issues
 ================
-Before reporting an issue, please ensure that you are running the latest version for your release of Moodle.  Major version numbers
-are always the same, so for Moodle 2.5.x there will be a Grid format 2.5.x.  The primary release area is located on
-https://moodle.org/plugins/view.php?plugin=format_grid.  It is also essential that you are operating the required version of Moodle
-as stated at the top - this is because the format relies on core functionality that is out of its control.
-
-All 'Grid format' does is integrate with the course page and control it's layout, therefore what may appear to be an issue
-with the format is in fact to do with a theme or core component.  Please be confident that it is an issue with 'Grid format'
-but if in doubt, ask.
-
-I operate a policy that I will fix all genuine issues for free (this only applies to the code as supplied from the sources listed
-in 'Free Software' above.  Any changes / improvements you make are not covered and invalidate this policy for all of the code).
-Improvements are at our discretion.  I am happy to make bespoke customisations / improvements for a negotiated fee.  I will
-endeavour to respond to all requests for support as quickly as possible, if you require a faster service then offering payment for
-the service will expedite the response.
-
-It takes time and effort to maintain the format, therefore sponsorships are appreciated.
-
-When reporting an issue you can post in the course format's forum on Moodle.org (currently 'moodle.org/mod/forum/view.php?id=47'), 
-on https://github.com/gjb2048/moodle-format_grid/issues or contact me direct (details at the bottom).
-
-It is essential that you provide as much information as possible, the critical information being the contents of the format's 
-version.php file.  Other version information such as specific Moodle version, theme name and version also helps.  A screen shot
-can be really useful in visualising the issue along with any files you consider to be relevant.
+Please see Support.md.
 
 Usage
 =====
@@ -246,7 +211,7 @@ All listed on:
 
 History
 =============
-See Changes.md
+Please see Changes.md
 
 Author
 ------

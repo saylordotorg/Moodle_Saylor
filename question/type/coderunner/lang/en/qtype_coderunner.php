@@ -102,6 +102,7 @@ $string['coderunner_install_testsuite_intro'] = 'This page allows you to test th
 $string['coderunner_install_testsuite_failures'] = 'Tests that failed';
 $string['coderunner_install_testsuite_noanswer'] = 'Questions without sample answers';
 
+$string['coderunner:sandboxwsaccess'] = 'Allow access to the Jobe sandbox via web services';
 $string['coderunner_help'] = 'In response to a question, which is a specification for a program fragment, function or whole program, the respondent enters source code in a specified computer language that satisfies the specification.';
 $string['coderunner_link'] = 'question/type/coderunner';
 $string['coderunner_question_type'] = 'CodeRunner question type: ';
@@ -109,6 +110,7 @@ $string['coderunnersettings'] = 'CodeRunner settings';
 $string['coderunnersummary'] = 'Answer is program code that is executed in the context of a set of test cases to determine its correctness.';
 $string['coderunnertype'] = 'Question type';
 $string['coderunnertype_help'] = 'Select the programming language and question type. Once a type has been selected, details can be seen in the Question type details panel below.';
+$string['coderunnerwssettings'] = 'Sandob web-service settings';
 $string['columncontrols'] = 'Result table';
 $string['columncontrols_help'] = 'The checkboxes select which columns of the results table should be displayed to the student after submission';
 
@@ -155,6 +157,10 @@ $string['errorstring-accessdenied'] = 'Access to sandbox denied';
 $string['errorstring-submissionlimitexceeded'] = 'Sandbox submission limit reached';
 $string['errorstring-submissionfailed'] = 'Submission to sandbox failed';
 $string['errorstring-unknown'] = 'Unexpected error while executing your code. The sandbox server may be down or overloaded. Perhaps try again shortly?';
+
+$string['event_sandboxwebserviceexec'] = 'CR sandbox exec';
+$string['event_sandboxwebserviceexec_desc'] = 'A job was executed via the CodeRunner sandbox web service.';
+
 $string['expand'] = 'Expand';
 $string['expandtitle'] = 'Show question categories';
 $string['expected'] = 'Expected output';
@@ -325,6 +331,11 @@ $string['jobe_apikey'] = 'Jobe API-key';
 $string['jobe_apikey_desc'] = 'The API key to be included in all REST requests to the Jobe server (if required). Max 40 chars. Leave blank to omit the API Key from requests';
 $string['jobe_host'] = 'Jobe server';
 $string['jobe_host_desc'] = 'The host name of the Jobe server plus the port number if other than port 80, e.g. jobe.somewhere.edu:4010. The URL for the Jobe request is obtained by default by prefixing this string with http:// and appending /jobe/index.php/restapi/<REST_METHOD>. You may either specify the https:// protocol in front of the host name (e.g. https://jobe.somewhere.edu) if the Jobe server is set behind a reverse proxy which act as an SSL termination.';
+$string['jobe_host_ws'] = 'Jobe server to use for web services';
+$string['jobe_host_ws_desc'] = 'The sandbox server web service will use whatever sandbox is configured for the specified
+    language. This is virtually always a Jobe server, and the particular Jobe server to use is configured via the admin interface (above).
+    However, for best web service security it is better to use an alternative
+    Jobe server, set by this field. Leave blank to use the default.';
 $string['jobe_warning_html'] = "<p style='background-color:yellow'>Run using the University of Canterbury's Jobe server. This is for initial testing only. Please set up your own Jobe server as soon as possible. See <a href='https://github.com/trampgeek/moodle-qtype_coderunner/blob/master/Readme.md#sandbox-configuration' target='_blank'>here</a>.</p>";
 $string['jobe_canterbury_html'] = "<p style='color:gray; font-style:italic; font-size:smaller'>Run on the University of Canterbury's Jobe server.</p>";
 
@@ -913,7 +924,7 @@ $string['sampleanswerattachments_help'] = 'If the sample answer needs attachment
 $string['sandboxcontrols'] = 'Sandbox';
 $string['sandboxcontrols_help'] = 'All jobs are run on the Jobe sandbox, which imposes
 constraints on memory, CPU time, file output etc. Here is where you adjust those constraints.
-    
+
 \'TimeLimit (secs)\' sets the maximum CPU time in seconds  allowed for each sandbox run
 and \'MemLimit (MB)\' sets the maximum memory the run can use. A blank entry uses the sandbox\'s
 default value (typically 5 secs for the CPU time limit and a language-dependent
@@ -937,6 +948,9 @@ parameter and also, optionally, a \'jobeapikey\' parameter. For example, if the
 \'Parameters\' field is set to <code>{"jobeserver": "myspecialjobe.com"}</code>, the run
 will instead by submitted to the server "myspecialjobe.com".
 ';
+$string['enable_sandbox_ws'] = "Enable sandbox web service";
+$string['enable_sandbox_ws_desc'] = 'Enable the web service allowing direct
+access to the sandbox server (usually Jobe). EXPERIMENTAL FEATURE.';
 $string['sandboxerror'] = 'Error from the sandbox [{$a->sandbox}]: {$a->message}';
 $string['sandboxparams'] = 'Parameters';
 $string['seethisquestioninthequestionbank'] = 'See this question in the question bank';
@@ -1029,7 +1043,7 @@ response and TEST.testcode is the code for the current testcase. These values
 (and other testcase values like TEST.expected, TEST.stdin, TEST.mark)
 can be inserted into the template by enclosing them in double braces, e.g.
 <code>{{TEST.testcode}}</code>. For use within literal strings, an appropriate escape
-function should be applied, e.g. <code>{{STUDENT_ANSWER | e(\'py\')}}</code> is  
+function should be applied, e.g. <code>{{STUDENT_ANSWER | e(\'py\')}}</code> is
 suitable for use within Python triple-double-quoted
 strings. Other escape functions are <code>e(\'c\')</code>, <code>e(\'java\')</code>,
 <code>e(\'matlab\')</code>. The program that is output by Twig is then compiled and executed
@@ -1038,7 +1052,7 @@ to TEST.stdin. Output from that program is then passed to the selected grader.
 See the help under \'Grading controls\' for more on that.
 
 Note that if a customised per-test template is used
-there will be a compile-and-execute job submitted to the sandbox for every test case, 
+there will be a compile-and-execute job submitted to the sandbox for every test case,
 whereas most built-in question types define instead a combinator template that combines
 all test cases into a single run.
 
@@ -1119,7 +1133,7 @@ Note that this Twig All expansion occurs when the question is first initialised,
 the Twig expansion of the template occurs much later, when the student submits
 an answer. The environment for expanding the template includes the QUESTION
 Twig variable (a subset of the entire question record), some fields of which
-might have been expanded as a result of using Twig All. 
+might have been expanded as a result of using Twig All.
 
 The text in the template parameters field must either be JSON or must evaluate
 to yield JSON when processed by the specified Preprocessor. Be warned that choosing
@@ -1132,7 +1146,7 @@ required for each question for each student when they start the quiz.
 If <i>Evaluate per student</i> is unchecked a single sandbox submission will
 take place only when the question is saved; this is a relatively low-cost operation but
 is not normally useful, as it essentially prevents
-any use of per-student randomisation. It can however be used to generate 
+any use of per-student randomisation. It can however be used to generate
 question content in some situations.';
 $string['twigerror'] = 'Twig error {$a}';
 $string['twigerrorintest'] = 'Twig error when processing this test {$a}';
@@ -1160,9 +1174,9 @@ correct or a suitably informative error message otherwise.
 The \'Table\' user interface element, which displays a table of text
 areas for the student to
 fill in. It is used by the \'python3_program_testing\' question type, which is
-included in the sample questions on github. 
+included in the sample questions on github.
 
-The \'Gapfiller\' and \'Html\' user interfaces are documented in the 
+The \'Gapfiller\' and \'Html\' user interfaces are documented in the
 main CodeRunner documentation at https://github.com/trampgeek/moodle-qtype_coderunner#code-runner.
 
 Students with poor eyesight, or authors wishing to inspect serialisations
@@ -1198,5 +1212,14 @@ $string['useace'] = 'Template uses ace';
 $string['validateonsave'] = 'Validate on save';
 
 $string['wrongnumberofformats'] = 'Wrong number of test results column formats. Expected {$a->expected}, got {$a->got}';
+$string['wsdisabled'] = 'Sandbox web service disabled. Talk to a sysadmin';
+$string['wsloggingenable'] = 'Log sandbox web service usage';
+$string['wsloggingenable_desc'] = 'If this option is checked, every code execution via the sandbox web service will be logged. This option must be enabled if user rate throttling is to work.';
+$string['wsnoaccess'] = 'Only logged-in non-guest users can access this functionality';
+$string['wsmaxcputime'] = 'Max CPU time (secs)';
+$string['wsmaxcputime_desc'] = 'Limits the maximum CPU time that a web service job can use, even if it explicitly sets the CPU time sandbox parameter.';
+$string['wsmaxhourlyrate'] = 'Max hourly rate of submissions';
+$string['wsmaxhourlyrate_desc'] = 'If a user attempts to exceed this rate of submissions in any given hour their submissions will be disallowed. 0 for no rate throttling. Requires that logging of web service usage be enabled.';
+$string['wssubmissionrateexceeded'] = 'You have exceeded the maximum hourly \'Try it!\' submission rate. Request denied.';
 
 $string['xmlcoderunnerformaterror'] = 'XML format error in coderunner question';

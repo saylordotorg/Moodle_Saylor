@@ -178,6 +178,11 @@ class mod_readaloud_external extends external_api {
 
         }
 
+        //if its japanese turn zenkaku numbers into hankaku ones
+        if($language==constants::M_LANG_JAJP) {
+            $sentence = mb_convert_kana($passage, "n");
+        }
+
         //turn the passage and transcript into an array of words
         $passagebits = diff::fetchWordArray($passage);
         $transcriptbits = diff::fetchWordArray($transcript);

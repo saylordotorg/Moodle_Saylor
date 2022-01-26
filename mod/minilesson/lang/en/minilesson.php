@@ -347,7 +347,7 @@ $string['notes']="Notes";
 
 
 $string['addmultichoiceitem']='Multi Choice';
-$string['addmultiaudioitem']='MultiChoice Audio';
+$string['addmultiaudioitem']='MC Audio';
 $string['adddictationchatitem']='Dictation Chat';
 $string['adddictationitem']='Dictation';
 $string['addlistenrepeatitem']='Listen and Speak';
@@ -359,7 +359,7 @@ $string['addshortansweritem']='Short Answer';
 
 
 $string['multichoice'] = 'Multi Choice';
-$string['multiaudio'] = 'MultiChoice Audio';
+$string['multiaudio'] = 'MC Audio';
 $string['dictation']='Dictation';
 $string['dictationchat']='Dictation Chat';
 $string['speechcards']='Speech Cards';
@@ -447,6 +447,8 @@ $string['qnumber'] ='No.';
 $string['title'] ='Title';
 $string['type'] ='Type';
 $string['sentences'] ='Sentences';
+$string['correctresponses'] ='Correct responses';
+$string['enterresponses'] ='Enter a list of correct responses in the text area below. Place each response on a new line.';
 $string['sentenceprompts'] ='Sentences (prompts)';
 $string['entersentences'] ='Enter a list of sentences in the text area below. Place each sentence on a new line.';
 $string['phraseresponses'] ='Enter a list of speaking prompts in the text area below. Place each prompt on a new line. If the prompt and the spoken response are different, seperate them with a pipe "|" character. <br>e.g How are you?|I am fine.';
@@ -491,14 +493,22 @@ $string['ttsslow']='Slow';
 $string['ttsveryslow']='Very Slow';
 $string['ttsssml']='SSML';
 $string['choosevoiceoption']='TTS prompt options';
+$string['autoplay']='Autoplay';
 
 $string['reportsmenutoptext'] = "Review grade and attempts details using the report buttons below.";
 
 $string['mediaprompts']="Media Prompts";
 $string['ignorepunctuation'] = 'Ignore Punctuation';
 
+$string['chooselayout']='Choose layout';
+$string['layoutauto']='Auto';
+$string['layoutvertical']='Vertical';
+$string['layouthorizontal']='Horizontal';
+$string['layoutmagazine']='Magazine';
+
 $string['freetrial'] = "Get Cloud Poodll API Credentials and a Free Trial";
 $string['freetrial_desc'] = "A dialog should appear that allows you to register for a free trial with Poodll. After registering you should login to the members dashboard to get your API user and secret. And to register your site URL.";
 $string['memberdashboard'] = "Member Dashboard";
 $string['memberdashboard_desc'] = "";
 $string['fillcredentials']="Set API user and secret with existing credentials";
+

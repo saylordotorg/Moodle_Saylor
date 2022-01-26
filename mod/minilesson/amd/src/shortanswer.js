@@ -1,4 +1,6 @@
-define(['jquery', 'core/log', 'mod_minilesson/definitions', 'mod_minilesson/pollyhelper'], function($, log, def, polly) {
+define(['jquery', 'core/log', 'mod_minilesson/definitions', 'mod_minilesson/pollyhelper','mod_minilesson/cloudpoodllloader',
+      'mod_minilesson/ttrecorder'],
+    function($, log, def, polly,cloudpoodll, ttrecorder) {
   "use strict"; // jshint ;_;
 
   /*
@@ -8,6 +10,7 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'mod_minilesson/poll
   log.debug('MiniLesson ShortAnswer: initialising');
 
   return {
+    passmark: 90,//lower this if it often doesnt match (was 85)
 
     //for making multiple instances
       clone: function () {
@@ -15,7 +18,9 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'mod_minilesson/poll
      },
 
     init: function(index, itemdata, quizhelper) {
+   //   this.prepare_audio(itemdata);
       this.register_events(index, itemdata, quizhelper);
+      this.init_components(index, itemdata, quizhelper);
     },
     next_question: function(percent) {
       var self = this;
@@ -27,6 +32,17 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'mod_minilesson/poll
       stepdata.grade = percent;
       self.quizhelper.do_next(stepdata);
     },
+
+    /* NOT NEEDED */
+    prepare_audio: function(itemdata) {
+      // debugger;
+      $.each(itemdata.sentences, function(index, sentence) {
+        polly.fetch_polly_url(sentence.sentence, itemdata.voiceoption, itemdata.usevoice).then(function(audiourl) {
+          $("#" + itemdata.uniqueid + "_option" + (index+1)).attr("data-src", audiourl);
+        });
+      });
+    },
+    
     register_events: function(index, itemdata, quizhelper) {
       
       var self = this;
@@ -54,6 +70,129 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'mod_minilesson/poll
         
       });
       
-    }
+    },
+
+    init_components: function(index, itemdata, quizhelper) {
+      var app= this;
+      var sentences = itemdata.sentences;//sentence & phonetic
+      //clean the text of any junk
+      for(var i=0;i<sentences.length;i++){
+          sentences[i].sentence=quizhelper.cleanText(sentences[i].sentence);
+      }
+
+      var theCallback = async function(message) {
+
+        switch (message.type) {
+          case 'recording':
+
+            break;
+
+          case 'speech':
+            log.debug("speech at shortanswer");
+            var speechtext = message.capturedspeech;
+            var cleanspeechtext = quizhelper.cleanText(speechtext);
+            var spoken = cleanspeechtext;
+
+            log.debug('speechtext:',speechtext);
+            log.debug('cleanspeechtext:',spoken);
+
+
+            //Similarity check by direct-match/acceptable-mistranscriptio
+            for(var x=0;x<sentences.length;x++){
+              //if this is the correct answer index, just move on
+              if(sentences[x].sentence===''){continue;}
+              var similar = quizhelper.similarity(spoken, sentences[x].sentence);
+              log.debug('JS similarity: ' + spoken + ':' + sentences[x].sentence + ':' + similar);
+              if (similar >= app.passmark ||
+                  app.spokenIsCorrect(quizhelper, cleanspeechtext, sentences[x].sentence)) {
+
+                //proceed to next question
+                var percent = app.process_accepted_response(itemdata, x);
+                $(".minilesson_nextbutton").prop("disabled", true);
+
+                //proceed to next question
+                setTimeout(function() {
+                  $(".minilesson_nextbutton").prop("disabled", false);
+                  app.next_question(percent);
+                }, 2000);
+                return;
+              }//end of if similarity
+            }//end of for x
+
+
+            //Similarity check by phonetics(ajax)
+            //this is an expensive call since it goes out to the server and possibly to the cloud
+            for(var x=0;x<sentences.length;x++) {
+              var similarity = await quizhelper.checkByPhonetic(sentences[x].sentence, spoken, sentences[x].phonetic, itemdata.language);
+
+                if (!similarity || similarity < app.passmark) {
+                  //do nothing ?? or tough luck ?
+                  //return $.Deferred().reject();
+
+                 // var percent = app.process_accepted_response(itemdata, -1);
+
+                } else {
+
+                  log.debug('PHP similarity: ' + spoken + similarity);
+
+                  var percent = app.process_accepted_response(itemdata, x);
+
+                  //proceed to next question
+                  $(".minilesson_nextbutton").prop("disabled", true);
+                  setTimeout(function () {
+                    $(".minilesson_nextbutton").prop("disabled", false);
+                    app.next_question(percent);
+                  }, 2000);
+                }
+
+            }//end of for x loop
+
+        } //end of switch message type
+      }; //end of callback declaration
+
+      //init TT recorder
+      var opts = {};
+      opts.uniqueid = itemdata.uniqueid;
+      log.debug('sa uniqueid:' + itemdata.uniqueid);
+      opts.callback = theCallback;
+      opts.ds_only=quizhelper.is_ds_only();
+      ttrecorder.clone().init(opts);
+
+    } ,//end of init components
+
+    spokenIsCorrect: function(quizhelper, phraseheard, currentphrase) {
+      //lets lower case everything
+      phraseheard = quizhelper.cleanText(phraseheard);
+      currentphrase = quizhelper.cleanText(currentphrase);
+      if (phraseheard === currentphrase) {
+        return true;
+      }
+      return false;
+    },
+
+    process_accepted_response: function(itemdata, sentenceindex){
+      var percent = sentenceindex >= 0 ? 100 : 0;
+      //TO DO .. disable TT recorder here
+      //disable TT recorder
+
+      if(percent > 0) {
+        //turn dots into text (if they were dots)
+        if (parseInt(itemdata.show_text) === 0) {
+          for (var i = 0; i < itemdata.sentences.length; i++) {
+            var theline = $("#" + itemdata.uniqueid + "_option" + (i + 1));
+            $("#" + itemdata.uniqueid + "_option" + (i + 1) + ' .minilesson_sentence').text(itemdata.sentences[i].sentence);
+          }
+        }
+
+        //TO DO: add fancy animation
+        var  answerdisplay =  $("#" + itemdata.uniqueid + "_correctanswer");
+        answerdisplay.text(itemdata.sentences[sentenceindex].sentence);
+        answerdisplay.show();//this should also trigger any entry animation
+      }
+
+      return percent;
+
+    },
+
   };
 });

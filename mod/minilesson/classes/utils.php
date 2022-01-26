@@ -80,9 +80,24 @@ class utils{
      * Hash the passage and compare
      *
      */
-    public static function fetch_passagehash($passage) {
+    public static function fetch_passagehash($ttslanguage,$passage) {
 
         $cleanpassage = self::fetch_clean_passage($passage);
+
+        //number or odd char converter
+        if(substr($ttslanguage,0,2)=='en' || substr($ttslanguage,0,2)=='de' ){
+            //find numbers in the passage, and then replace those with words in the target text
+            switch (substr($ttslanguage,0,2)){
+                case 'en':
+                    $cleanpassage=alphabetconverter::numbers_to_words_convert($cleanpassage,$cleanpassage);
+                    break;
+                case 'de':
+                    $cleanpassage=alphabetconverter::eszett_to_ss_convert($cleanpassage,$cleanpassage);
+                    break;
+
+            }
+        }
+
         if(!empty($cleanpassage)) {
             return sha1($cleanpassage);
         }else{
@@ -124,6 +139,19 @@ class utils{
     public static function fetch_lang_model($passage, $language, $region){
         $usepassage = self::fetch_clean_passage($passage);
         if($usepassage===false ){return false;}
+
+        //find numbers in the passage, and then replace those with words in the target text
+        switch (substr($language,0,2)){
+            case 'en':
+                //find digits in original passage, and convert number words to digits in the target passage
+                $usepassage=alphabetconverter::numbers_to_words_convert($usepassage,$usepassage);
+                break;
+            case 'de':
+                //find eszetts in original passage, and convert ss words to eszetts in the target passage
+                $params["passage"]=alphabetconverter::eszett_to_ss_convert($usepassage,$usepassage);
+                break;
+
+        }
 
         $conf= get_config(constants::M_COMPONENT);
         if (!empty($conf->apiuser) && !empty($conf->apisecret)) {;
@@ -537,7 +565,7 @@ class utils{
 
      /**
      * Returns the link for the related activity
-     * @return string
+     * @return stdClass
      */
     public static function fetch_next_activity($activitylink) {
         global $DB;
@@ -609,15 +637,17 @@ class utils{
         return implode(" ",$segments);
     }
 
-
     //convert a phrase or word to a series of phonetic characters that we can use to compare text/spoken
-    public static function convert_to_phonetic($phrase,$language,$region='tokyo',$segmented=true){
+    //the segments will usually just return the phrase , but in japanese we want to segment into words
+    public static function fetch_phones_and_segments($phrase, $language, $region='tokyo', $segmented=true){
         global $CFG;
 
         switch($language){
             case constants::M_LANG_ENUS:
             case constants::M_LANG_ENAB:
             case constants::M_LANG_ENAU:
+            case constants::M_LANG_ENNZ:
+            case constants::M_LANG_ENZA:
             case constants::M_LANG_ENIN:
             case constants::M_LANG_ENIE:
             case constants::M_LANG_ENWL:
@@ -629,9 +659,12 @@ class utils{
                 }
                 if($segmented) {
                     $phonetic = implode(' ', $phonebits);
+                    $segments=$phrase;
                 }else {
                     $phonetic = implode('', $phonebits);
+                    $segments=$phrase;
                 }
+
                 //the resulting phonetic string will look like this: 0S IS A TK IT IS A KT WN TW 0T IS A MNK
                 // but "one" and "won" result in diff phonetic strings and non english support is not there so
                 //really we want to put an IPA database on services server and poll as we do for katakanify
@@ -667,46 +700,88 @@ class utils{
                     }
                 */
 
+
+                //for Japanese we want to segment it into "words"
+                //   $passage = utils::segment_japanese($phrase);
+
+                //First check if the phrase is in our cache
+                $cache = \cache::make_from_params(\cache_store::MODE_APPLICATION, constants::M_COMPONENT, 'jpphrases');
+                $phrasekey = sha1($phrase);
+                $phones_and_segments = $cache->get($phrasekey);
+                //if we have phones and segments cached, yay
+                if($phones_and_segments){
+                    return $phones_and_segments;
+                }
+
+                //send out for the phonetic processing for japanese text
+                //turn numbers into hankaku first // this could be skipped possibly
+                //transcripts are usually hankaku but phonetics shouldnt be different either way
+                //except they seem to come back as numbers if zenkaku which is better than ni ni for 22
+                $phrase = mb_convert_kana($phrase,"n");
                 $postdata =array('passage'=>$phrase);
                 $results = self::curl_fetch($katakanify_url,$postdata,'post');
                 if(!self::is_json($results)){return false;}
 
                 $jsonresults = json_decode($results);
                 $nodes=[];
+                $words=[];
                 if($jsonresults && $jsonresults->status==true){
                     foreach($jsonresults->data->results as $result){
                         $bits = preg_split("/\t+/", $result);
                         if(count($bits)>1) {
                             $nodes[] = $bits[1];
+                            $words[] = $bits[0];
                         }
                     }
                 }
 
                 //process nodes
                 $katakanaarray=[];
+                $segmentarray=[];
+                $nodeindex=-1;
                 foreach ($nodes as $n) {
+                    $nodeindex++;
                     $analysis = explode(',',$n);
-                    if(count($analysis) > 7) {
-                        if($analysis[0]!=='記号') {
-                            $reading = $analysis[7];
-                            if ($reading != '*') {
-                                $katakanaarray[] = $reading;
-                            }
+                    if(count($analysis) > 5) {
+                        switch($analysis[0]) {
+                            case '記号':
+                                $segmentcount = count($segmentarray);
+                                if($segmentcount>0){
+                                    $segmentarray[$segmentcount-1].=$words[$nodeindex];
+                                }
+                                break;
+                            default:
+                                $reading = '*';
+                                if(count($analysis) > 7) {
+                                    $reading = $analysis[7];
+                                }
+                                if ($reading != '*') {
+                                    $katakanaarray[] = $reading;
+                                } else if($analysis[1]=='数'){
+                                    //numbers dont get phoneticized
+                                    $katakanaarray[] = $words[$nodeindex];
+                                }
+                                $segmentarray[]=$words[$nodeindex];
                         }
                     }
                 }
                 if($segmented) {
                     $phonetic = implode(' ',$katakanaarray);
+                    $segments = implode(' ',$segmentarray);
                 }else {
                     $phonetic = implode('',$katakanaarray);
+                    $segments = implode('',$segmentarray);
                 }
                 break;
 
             default:
                 $phonetic = '';
+                $segments = $phrase;
         }
-        return $phonetic;
-
+        //cache results, so the same data coming again returns faster and saves traffic
+        $phones_and_segments = [$phonetic,$segments];
+        $cache->set($phrasekey,$phones_and_segments );
+        return $phones_and_segments;
     }
 
     //fetch lang server url, services incl. 'transcribe' , 'lm', 'lt', 'spellcheck', 'katakanify'

@@ -58,19 +58,8 @@ class qtype_gapfill_edit_form extends question_edit_form {
      * @param object $mform the form being built.
      */
     protected function definition_inner($mform) {
-        global $PAGE;
-        $PAGE->requires->jquery();
-        $PAGE->requires->jquery_plugin('ui');
-        $PAGE->requires->jquery_plugin('ui-css');
+        $mform = $this->form_setup($mform);
 
-        $PAGE->requires->strings_for_js(array('itemsettingserror', 'editquestiontext', 'additemsettings',
-            'correct', 'incorrect'), 'qtype_gapfill');
-        $PAGE->requires->js_call_amd('qtype_gapfill/questionedit', 'init');
-
-        $mform->addElement('hidden', 'reload', 1);
-        $mform->setType('reload', PARAM_RAW);
-
-        $mform->removeelement('questiontext');
         /*for storing the json containing the settings data */
         $mform->addElement('hidden', 'itemsettings', '', array('size' => '80'));
         $mform->setType('itemsettings', PARAM_RAW);
@@ -119,10 +108,32 @@ class qtype_gapfill_edit_form extends question_edit_form {
 
         $mform->setType('generalfeedback', PARAM_RAW);
         $mform->addHelpButton('generalfeedback', 'generalfeedback', 'question');
+
+        $config = get_config('qtype_gapfill');
+        $mform = $this->get_options($mform, $config);
+
+        // To add combined feedback (correct, partial and incorrect).
+        $this->add_combined_feedback_fields(true);
+
+        // Adds hinting features.
+        $this->add_interactive_settings(true, true);
+        if ($config->letterhints && $config->addhinttext) {
+            $this->_form->getElement('hint[0]')->setValue(array('text' => get_string('letterhint0', 'qtype_gapfill')));
+            $this->_form->getElement('hint[1]')->setValue(array('text' => get_string('letterhint1', 'qtype_gapfill')));
+        }
+    }
+
+    /**
+     * Add the (mainly) checkboxes for customising how a question
+     * works/displays
+     *
+     * @param MoodleQuickform $mform
+     * @param \stdClass $config
+     * @return MoodleQuickform
+     */
+    protected function get_options(MoodleQuickform $mform, $config) {
         $mform->addElement('header', 'feedbackheader', get_string('moreoptions', 'qtype_gapfill'));
 
-        // The delimiting characters around fields.
-        $config = get_config('qtype_gapfill');
         /* turn  config->delimitchars into an array) */
         $delimitchars = explode(",", $config->delimitchars);
         /* copies the values into the keys */
@@ -183,17 +194,30 @@ class qtype_gapfill_edit_form extends question_edit_form {
         $mform->addHelpButton('casesensitive', 'casesensitive', 'qtype_gapfill');
         $mform->setAdvanced('casesensitive');
 
-        // To add combined feedback (correct, partial and incorrect).
-        $this->add_combined_feedback_fields(true);
-
-        // Adds hinting features.
-        $this->add_interactive_settings(true, true);
-        if ($config->letterhints && $config->addhinttext) {
-            $this->_form->getElement('hint[0]')->setValue(array('text' => get_string('letterhint0', 'qtype_gapfill')));
-            $this->_form->getElement('hint[1]')->setValue(array('text' => get_string('letterhint1', 'qtype_gapfill')));
-        }
     }
+    /**
+     * Setup form elements that are very unlikely to change
+     *
+     * @param MoodleQuickForm $mform
+     * @return MoodleQuickForm
+     */
+    protected function form_setup(MoodleQuickForm $mform) : MoodleQuickForm {
+        global $PAGE;
+        $PAGE->requires->jquery();
+        $PAGE->requires->jquery_plugin('ui');
+        $PAGE->requires->jquery_plugin('ui-css');
 
+        $PAGE->requires->strings_for_js(array('itemsettingserror', 'editquestiontext', 'additemsettings',
+            'correct', 'incorrect'), 'qtype_gapfill');
+        $PAGE->requires->js_call_amd('qtype_gapfill/questionedit', 'init');
+
+        $mform->addElement('hidden', 'reload', 1);
+        $mform->setType('reload', PARAM_RAW);
+
+        $mform->removeelement('questiontext');
+
+        return $mform;
+    }
     /**
      * item settings such as feedback for correct and incorrect responses
      * @param stdClass $question

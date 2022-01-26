@@ -1,8 +1,14 @@
 <div class="minilesson_questionheader_contents">
-    {{#itemtextarea}}<div class="mod_minilesson_itemtextarea_cont"><div class="mod_minilesson_itemtextarea">{{{itemtextarea}}}</div></div>{{/itemtextarea}}
-    {{#itemimage}}<div class="mod_minilesson_itemimage_cont"><img src="{{{itemimage}}}" class="mod_minilesson_itemimage"/></div>{{/itemimage}}
+    {{^magazine}}{{#itemimage}}<div class="mod_minilesson_itemimage_cont"><img src="{{{itemimage}}}" class="mod_minilesson_itemimage"/></div>{{/itemimage}}{{/magazine}}
+    {{#itemtextarea}}<div class="mod_minilesson_itemtextarea_cont">
+            <div class="mod_minilesson_itemtextarea">
+                {{#magazine}}{{#itemimage}}<div class="mod_minilesson_itemimage_cont mod_minilesson_magazine"><img src="{{{itemimage}}}" class="mod_minilesson_itemimage"/></div>{{/itemimage}}{{/magazine}}
+                {{{itemtextarea}}}
+            </div>
+        </div>
+    {{/itemtextarea}}
     {{#itemaudio}}<div class="mod_minilesson_itemaudio_cont"><audio controls src="{{{itemaudio}}}" class="mod_minilesson_itemaudio"></audio></div>{{/itemaudio}}
     {{#itemvideo}}<div class="mod_minilesson_itemvideo_cont"><video controls src="{{{itemvideo}}}" class="mod_minilesson_itemvideo"></video></div>{{/itemvideo}}
     {{#itemiframe}}<div class="mod_minilesson_itemiframe_cont"><div class="mod_minilesson_iframe_responsive">{{{itemiframe}}}</div></div>{{/itemiframe}}
-    {{#itemttsaudio}}<div class="mod_minilesson_itemttsaudio_cont"><audio data-text="{{itemttsaudio}}" data-ttsoption="{{itemttsoption}}" data-voice="{{itemttsaudiovoice}}" controls src="" class="mod_minilesson_itemttsaudio"></audio></div>{{/itemttsaudio}}
+    {{#itemttsaudio}}<div class="mod_minilesson_itemttsaudio_cont"><audio data-text="{{itemttsaudio}}" data-autoplay="{{itemttsautoplay}}"  data-ttsoption="{{itemttsoption}}" data-voice="{{itemttsaudiovoice}}" controls src="" class="mod_minilesson_itemttsaudio"></audio></div>{{/itemttsaudio}}
 </div>

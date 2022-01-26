@@ -71,10 +71,10 @@ class backup_minilesson_activity_structure_step extends backup_activity_structur
         $rsquestions = new backup_nested_element('rsquestions');
         $rsquestion = new backup_nested_element('rsquestion', array('id'),array(
             constants::M_MODNAME, 'name','itemorder', 'type','visible','itemtext', 'itemtextformat','itemtts','itemttsvoice','itemttsoption',
-                'itemaudiofname','itemtextarea', 'customtext1', 'customtext1format','customtext2', 'customtext2format','customtext3',
+            'itemttsautoplay', 'itemaudiofname','itemtextarea', 'customtext1', 'customtext1format','customtext2', 'customtext2format','customtext3',
             'customtext3format','customtext4', 'customtext4format','customtext5', 'customtext5format',
                 'customdata1','customdata2', 'customdata3','customdata4', 'customdata5',
-                'customint1','customint2', 'customint3','customint4', 'customint5','correctanswer',
+                'customint1','customint2', 'customint3','customint4', 'customint5','layout','correctanswer',
             'timemodified','rsquestionkey','passagehash','alternatives','phonetic','createdby','modifiedby'));
 
 		

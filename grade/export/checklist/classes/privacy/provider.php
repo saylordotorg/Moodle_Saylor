@@ -24,8 +24,6 @@
 
 namespace gradeexport_checklist\privacy;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Class provider
  * @package gradeexport_checklist

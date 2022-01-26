@@ -46,9 +46,9 @@ class rsquestion_renderer extends \plugin_renderer_base {
         $qtypes = [constants::TYPE_PAGE,constants::TYPE_MULTICHOICE, constants::TYPE_DICTATIONCHAT,
                 constants::TYPE_DICTATION,constants::TYPE_SPEECHCARDS, constants::TYPE_LISTENREPEAT];
         $qtypes[]= constants::TYPE_MULTIAUDIO;
+        $qtypes[]=constants::TYPE_SHORTANSWER;
         if(isset($CFG->minilesson_experimental) &&$CFG->minilesson_experimental){
            $qtypes[]=constants::TYPE_SMARTFRAME;
-           //$qtypes[]=constants::TYPE_SHORTANSWER;
         }
         foreach($qtypes as $qtype){
             $url=

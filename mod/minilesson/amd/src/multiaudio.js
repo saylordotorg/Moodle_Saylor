@@ -213,6 +213,7 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'mod_minilesson/poll
             //init tt recorder
             var opts = {};
             opts.uniqueid = itemdata.uniqueid;
+            log.debug('ma uniqueid:' + itemdata.uniqueid);
             opts.callback = theCallback;
             opts.ds_only=quizhelper.is_ds_only();
             ttrecorder.clone().init(opts);

@@ -8,9 +8,66 @@
     <info format="moodle_auto_format">
       <text></text>
     </info>
+    <idnumber></idnumber>
   </question>
 
-<!-- question: 629  -->
+<!-- question: 6293  -->
+  <question type="ddwtos">
+    <name>
+      <text>Core DDWTos Example</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">This is an example of the core question type Drag Drop Words Into Text question type. It is included here to make it easy to compare with the Gapfill as it has similar functionality. The question to be answered is to add verbs to the gaps.</p><p dir="ltr" style="text-align: left;">The cat [[1]] on the mat. The cow [[2]] over the moon.</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <shuffleanswers>1</shuffleanswers>
+    <correctfeedback format="html">
+      <text>Your answer is correct.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Your answer is partially correct.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Your answer is incorrect.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <dragbox>
+      <text>sat</text>
+      <group>1</group>
+    </dragbox>
+    <dragbox>
+      <text>jumped</text>
+      <group>1</group>
+    </dragbox>
+    <dragbox>
+      <text>brown</text>
+      <group>1</group>
+    </dragbox>
+    <dragbox>
+      <text>sky</text>
+      <group>1</group>
+    </dragbox>
+    <dragbox>
+      <text>horse</text>
+      <group>1</group>
+    </dragbox>
+    <dragbox>
+      <text>mouse</text>
+      <group>1</group>
+    </dragbox>
+    <tags>
+      <tag><text>core</text>
+</tag>
+    </tags>
+  </question>
+
+<!-- question: 6271  -->
   <question type="gapfill">
     <name>
       <text>Alternative_Delimiters</text>
@@ -33,6 +90,7 @@
     <fixedgapsize>0</fixedgapsize>
     <optionsaftertext>0</optionsaftertext>
     <letterhints>0</letterhints>
+    <singleuse>0</singleuse>
     <answer fraction="100" format="moodle_auto_format">
       <text>0</text>
       <feedback format="moodle_auto_format">
@@ -47,7 +105,7 @@
     <fixedgapsize>0</fixedgapsize>
     <optionsaftertext>0</optionsaftertext>
     <letterhints>0</letterhints>
-    <!-- Gapfill release:1.977 version:2019100400 Moodle version:2019052000.04 release:3.7+ (Build: 20190614) -->
+    <!-- Gapfill release:2.132 version:2021121300 Moodle version:2021051700.01 release:3.11+ (Build: 20210520) -->
     <correctfeedback format="moodle_auto_format">
       <text></text>
     </correctfeedback>
@@ -67,9 +125,13 @@
       <shownumcorrect/>
       <clearwrong/>
     </hint>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+    </tags>
   </question>
 
-<!-- question: 630  -->
+<!-- question: 6272  -->
   <question type="gapfill">
     <name>
       <text>AnyOrderDDrop</text>
@@ -92,6 +154,7 @@
     <fixedgapsize>0</fixedgapsize>
     <optionsaftertext>0</optionsaftertext>
     <letterhints>0</letterhints>
+    <singleuse>0</singleuse>
     <answer fraction="100" format="moodle_auto_format">
       <text>gold|silver|bronze</text>
       <feedback format="moodle_auto_format">
@@ -136,7 +199,7 @@
     <fixedgapsize>0</fixedgapsize>
     <optionsaftertext>0</optionsaftertext>
     <letterhints>0</letterhints>
-    <!-- Gapfill release:1.977 version:2019100400 Moodle version:2019052000.04 release:3.7+ (Build: 20190614) -->
+    <!-- Gapfill release:2.132 version:2021121300 Moodle version:2021051700.01 release:3.11+ (Build: 20210520) -->
     <correctfeedback format="moodle_auto_format">
       <text></text>
     </correctfeedback>
@@ -156,9 +219,13 @@
       <shownumcorrect/>
       <clearwrong/>
     </hint>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+    </tags>
   </question>
 
-<!-- question: 631  -->
+<!-- question: 6273  -->
   <question type="gapfill">
     <name>
       <text>AnyOrderGapfill</text>
@@ -181,6 +248,7 @@
     <fixedgapsize>0</fixedgapsize>
     <optionsaftertext>0</optionsaftertext>
     <letterhints>0</letterhints>
+    <singleuse>0</singleuse>
     <answer fraction="100" format="moodle_auto_format">
       <text>gold|silver|bronze</text>
       <feedback format="moodle_auto_format">
@@ -207,7 +275,7 @@
     <fixedgapsize>0</fixedgapsize>
     <optionsaftertext>0</optionsaftertext>
     <letterhints>0</letterhints>
-    <!-- Gapfill release:1.977 version:2019100400 Moodle version:2019052000.04 release:3.7+ (Build: 20190614) -->
+    <!-- Gapfill release:2.132 version:2021121300 Moodle version:2021051700.01 release:3.11+ (Build: 20210520) -->
     <correctfeedback format="moodle_auto_format">
       <text></text>
     </correctfeedback>
@@ -227,9 +295,13 @@
       <shownumcorrect/>
       <clearwrong/>
     </hint>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+    </tags>
   </question>
 
-<!-- question: 632  -->
+<!-- question: 6274  -->
   <question type="gapfill">
     <name>
       <text>CaseSensitive</text>
@@ -252,6 +324,7 @@
     <fixedgapsize>0</fixedgapsize>
     <optionsaftertext>0</optionsaftertext>
     <letterhints>0</letterhints>
+    <singleuse>0</singleuse>
     <answer fraction="100" format="moodle_auto_format">
       <text>Cat</text>
       <feedback format="moodle_auto_format">
@@ -272,7 +345,7 @@
     <fixedgapsize>0</fixedgapsize>
     <optionsaftertext>0</optionsaftertext>
     <letterhints>0</letterhints>
-    <!-- Gapfill release:1.977 version:2019100400 Moodle version:2019052000.04 release:3.7+ (Build: 20190614) -->
+    <!-- Gapfill release:2.132 version:2021121300 Moodle version:2021051700.01 release:3.11+ (Build: 20210520) -->
     <correctfeedback format="moodle_auto_format">
       <text></text>
     </correctfeedback>
@@ -282,9 +355,13 @@
     <incorrectfeedback format="html">
       <text><![CDATA[<p>Your answer is incorrect.</p>]]></text>
     </incorrectfeedback>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+    </tags>
   </question>
 
-<!-- question: 633  -->
+<!-- question: 6275  -->
   <question type="gapfill">
     <name>
       <text>Correct_empty_gaps with !!</text>
@@ -307,6 +384,7 @@
     <fixedgapsize>1</fixedgapsize>
     <optionsaftertext>0</optionsaftertext>
     <letterhints>0</letterhints>
+    <singleuse>0</singleuse>
     <answer fraction="100" format="moodle_auto_format">
       <text>dog</text>
       <feedback format="moodle_auto_format">
@@ -339,7 +417,7 @@
     <fixedgapsize>1</fixedgapsize>
     <optionsaftertext>0</optionsaftertext>
     <letterhints>0</letterhints>
-    <!-- Gapfill release:1.977 version:2019100400 Moodle version:2019052000.04 release:3.7+ (Build: 20190614) -->
+    <!-- Gapfill release:2.132 version:2021121300 Moodle version:2021051700.01 release:3.11+ (Build: 20210520) -->
     <correctfeedback format="moodle_auto_format">
       <text></text>
     </correctfeedback>
@@ -349,9 +427,13 @@
     <incorrectfeedback format="html">
       <text><![CDATA[<p>Your answer is incorrect.</p>]]></text>
     </incorrectfeedback>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+    </tags>
   </question>
 
-<!-- question: 634  -->
+<!-- question: 6276  -->
   <question type="gapfill">
     <name>
       <text>Crossword</text>
@@ -374,6 +456,7 @@
     <fixedgapsize>0</fixedgapsize>
     <optionsaftertext>0</optionsaftertext>
     <letterhints>0</letterhints>
+    <singleuse>0</singleuse>
     <answer fraction="100" format="moodle_auto_format">
       <text>T</text>
       <feedback format="moodle_auto_format">
@@ -472,7 +555,7 @@
     <fixedgapsize>0</fixedgapsize>
     <optionsaftertext>0</optionsaftertext>
     <letterhints>0</letterhints>
-    <!-- Gapfill release:1.977 version:2019100400 Moodle version:2019052000.04 release:3.7+ (Build: 20190614) -->
+    <!-- Gapfill release:2.132 version:2021121300 Moodle version:2021051700.01 release:3.11+ (Build: 20210520) -->
     <correctfeedback format="html">
       <text>Your answer is correct.</text>
     </correctfeedback>
@@ -482,9 +565,13 @@
     <incorrectfeedback format="html">
       <text>Your answer is incorrect.</text>
     </incorrectfeedback>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+    </tags>
   </question>
 
-<!-- question: 635  -->
+<!-- question: 6277  -->
   <question type="gapfill">
     <name>
       <text>Disable RegEx for Math, HTML and Code questions</text>
@@ -507,6 +594,7 @@
     <fixedgapsize>0</fixedgapsize>
     <optionsaftertext>0</optionsaftertext>
     <letterhints>0</letterhints>
+    <singleuse>0</singleuse>
     <answer fraction="100" format="moodle_auto_format">
       <text>+</text>
       <feedback format="moodle_auto_format">
@@ -533,7 +621,7 @@
     <fixedgapsize>0</fixedgapsize>
     <optionsaftertext>0</optionsaftertext>
     <letterhints>0</letterhints>
-    <!-- Gapfill release:1.977 version:2019100400 Moodle version:2019052000.04 release:3.7+ (Build: 20190614) -->
+    <!-- Gapfill release:2.132 version:2021121300 Moodle version:2021051700.01 release:3.11+ (Build: 20210520) -->
     <correctfeedback format="moodle_auto_format">
       <text></text>
     </correctfeedback>
@@ -553,9 +641,13 @@
       <shownumcorrect/>
       <clearwrong/>
     </hint>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+    </tags>
   </question>
 
-<!-- question: 636  -->
+<!-- question: 6278  -->
   <question type="gapfill">
     <name>
       <text>DragAndDrop</text>
@@ -578,6 +670,7 @@
     <fixedgapsize>0</fixedgapsize>
     <optionsaftertext>1</optionsaftertext>
     <letterhints>0</letterhints>
+    <singleuse>0</singleuse>
     <answer fraction="100" format="moodle_auto_format">
       <text>cat</text>
       <feedback format="moodle_auto_format">
@@ -622,7 +715,7 @@
     <fixedgapsize>0</fixedgapsize>
     <optionsaftertext>1</optionsaftertext>
     <letterhints>0</letterhints>
-    <!-- Gapfill release:1.977 version:2019100400 Moodle version:2019052000.04 release:3.7+ (Build: 20190614) -->
+    <!-- Gapfill release:2.132 version:2021121300 Moodle version:2021051700.01 release:3.11+ (Build: 20210520) -->
     <correctfeedback format="moodle_auto_format">
       <text></text>
     </correctfeedback>
@@ -641,9 +734,13 @@
       <text><![CDATA[<p>Hint2: The answer refers to a domestic feline and a floor covering that rhymes with bat. The show number of correct responses option is not ticked for this.</p>]]></text>
       <clearwrong/>
     </hint>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+    </tags>
   </question>
 
-<!-- question: 637  -->
+<!-- question: 6279  -->
   <question type="gapfill">
     <name>
       <text>DropDownMathSymbols</text>
@@ -666,6 +763,7 @@
     <fixedgapsize>0</fixedgapsize>
     <optionsaftertext>0</optionsaftertext>
     <letterhints>0</letterhints>
+    <singleuse>0</singleuse>
     <answer fraction="100" format="moodle_auto_format">
       <text><![CDATA[&gt;]]></text>
       <feedback format="moodle_auto_format">
@@ -716,7 +814,7 @@
     <fixedgapsize>0</fixedgapsize>
     <optionsaftertext>0</optionsaftertext>
     <letterhints>0</letterhints>
-    <!-- Gapfill release:1.977 version:2019100400 Moodle version:2019052000.04 release:3.7+ (Build: 20190614) -->
+    <!-- Gapfill release:2.132 version:2021121300 Moodle version:2021051700.01 release:3.11+ (Build: 20210520) -->
     <correctfeedback format="moodle_auto_format">
       <text></text>
     </correctfeedback>
@@ -726,9 +824,13 @@
     <incorrectfeedback format="html">
       <text><![CDATA[<p>Your answer is incorrect.</p>]]></text>
     </incorrectfeedback>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+    </tags>
   </question>
 
-<!-- question: 638  -->
+<!-- question: 6280  -->
   <question type="gapfill">
     <name>
       <text>DropDowns</text>
@@ -751,6 +853,7 @@
     <fixedgapsize>0</fixedgapsize>
     <optionsaftertext>0</optionsaftertext>
     <letterhints>0</letterhints>
+    <singleuse>0</singleuse>
     <answer fraction="100" format="moodle_auto_format">
       <text>cat</text>
       <feedback format="moodle_auto_format">
@@ -783,7 +886,7 @@
     <fixedgapsize>0</fixedgapsize>
     <optionsaftertext>0</optionsaftertext>
     <letterhints>0</letterhints>
-    <!-- Gapfill release:1.977 version:2019100400 Moodle version:2019052000.04 release:3.7+ (Build: 20190614) -->
+    <!-- Gapfill release:2.132 version:2021121300 Moodle version:2021051700.01 release:3.11+ (Build: 20210520) -->
     <correctfeedback format="moodle_auto_format">
       <text></text>
     </correctfeedback>
@@ -801,9 +904,13 @@
       <shownumcorrect/>
       <clearwrong/>
     </hint>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+    </tags>
   </question>
 
-<!-- question: 639  -->
+<!-- question: 6281  -->
   <question type="gapfill">
     <name>
       <text>Fixed Gapsize</text>
@@ -826,6 +933,7 @@
     <fixedgapsize>1</fixedgapsize>
     <optionsaftertext>0</optionsaftertext>
     <letterhints>0</letterhints>
+    <singleuse>0</singleuse>
     <answer fraction="100" format="moodle_auto_format">
       <text>kangaroo</text>
       <feedback format="moodle_auto_format">
@@ -858,7 +966,7 @@
     <fixedgapsize>1</fixedgapsize>
     <optionsaftertext>0</optionsaftertext>
     <letterhints>0</letterhints>
-    <!-- Gapfill release:1.977 version:2019100400 Moodle version:2019052000.04 release:3.7+ (Build: 20190614) -->
+    <!-- Gapfill release:2.132 version:2021121300 Moodle version:2021051700.01 release:3.11+ (Build: 20210520) -->
     <correctfeedback format="moodle_auto_format">
       <text></text>
     </correctfeedback>
@@ -868,9 +976,13 @@
     <incorrectfeedback format="html">
       <text><![CDATA[<p>Your answer is incorrect.</p>]]></text>
     </incorrectfeedback>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+    </tags>
   </question>
 
-<!-- question: 640  -->
+<!-- question: 6282  -->
   <question type="gapfill">
     <name>
       <text>Gapfill (no prompts)</text>
@@ -893,6 +1005,7 @@
     <fixedgapsize>0</fixedgapsize>
     <optionsaftertext>0</optionsaftertext>
     <letterhints>0</letterhints>
+    <singleuse>0</singleuse>
     <answer fraction="100" format="moodle_auto_format">
       <text>cat</text>
       <feedback format="moodle_auto_format">
@@ -913,7 +1026,7 @@
     <fixedgapsize>0</fixedgapsize>
     <optionsaftertext>0</optionsaftertext>
     <letterhints>0</letterhints>
-    <!-- Gapfill release:1.977 version:2019100400 Moodle version:2019052000.04 release:3.7+ (Build: 20190614) -->
+    <!-- Gapfill release:2.132 version:2021121300 Moodle version:2021051700.01 release:3.11+ (Build: 20210520) -->
     <correctfeedback format="moodle_auto_format">
       <text></text>
     </correctfeedback>
@@ -933,9 +1046,13 @@
       <shownumcorrect/>
       <clearwrong/>
     </hint>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+    </tags>
   </question>
 
-<!-- question: 641  -->
+<!-- question: 6283  -->
   <question type="gapfill">
     <name>
       <text>GroupTablesHorizontal</text>
@@ -958,6 +1075,7 @@
     <fixedgapsize>1</fixedgapsize>
     <optionsaftertext>0</optionsaftertext>
     <letterhints>0</letterhints>
+    <singleuse>0</singleuse>
     <answer fraction="100" format="moodle_auto_format">
       <text>tiger|lion</text>
       <feedback format="moodle_auto_format">
@@ -1002,7 +1120,7 @@
     <fixedgapsize>1</fixedgapsize>
     <optionsaftertext>0</optionsaftertext>
     <letterhints>0</letterhints>
-    <!-- Gapfill release:1.977 version:2019100400 Moodle version:2019052000.04 release:3.7+ (Build: 20190614) -->
+    <!-- Gapfill release:2.132 version:2021121300 Moodle version:2021051700.01 release:3.11+ (Build: 20210520) -->
     <correctfeedback format="moodle_auto_format">
       <text></text>
     </correctfeedback>
@@ -1012,9 +1130,13 @@
     <incorrectfeedback format="html">
       <text>Your answer is incorrect.</text>
     </incorrectfeedback>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+    </tags>
   </question>
 
-<!-- question: 642  -->
+<!-- question: 6284  -->
   <question type="gapfill">
     <name>
       <text>GroupTablesVertical</text>
@@ -1037,6 +1159,7 @@
     <fixedgapsize>1</fixedgapsize>
     <optionsaftertext>0</optionsaftertext>
     <letterhints>0</letterhints>
+    <singleuse>0</singleuse>
     <answer fraction="100" format="moodle_auto_format">
       <text>tiger|lion</text>
       <feedback format="moodle_auto_format">
@@ -1087,7 +1210,7 @@
     <fixedgapsize>1</fixedgapsize>
     <optionsaftertext>0</optionsaftertext>
     <letterhints>0</letterhints>
-    <!-- Gapfill release:1.977 version:2019100400 Moodle version:2019052000.04 release:3.7+ (Build: 20190614) -->
+    <!-- Gapfill release:2.132 version:2021121300 Moodle version:2021051700.01 release:3.11+ (Build: 20210520) -->
     <correctfeedback format="moodle_auto_format">
       <text></text>
     </correctfeedback>
@@ -1107,9 +1230,13 @@
       <shownumcorrect/>
       <clearwrong/>
     </hint>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+    </tags>
   </question>
 
-<!-- question: 643  -->
+<!-- question: 6285  -->
   <question type="gapfill">
     <name>
       <text>Images in tables (fruit)</text>
@@ -1134,6 +1261,7 @@
     <fixedgapsize>1</fixedgapsize>
     <optionsaftertext>0</optionsaftertext>
     <letterhints>0</letterhints>
+    <singleuse>0</singleuse>
     <answer fraction="100" format="moodle_auto_format">
       <text>apple</text>
       <feedback format="moodle_auto_format">
@@ -1166,7 +1294,7 @@
     <fixedgapsize>1</fixedgapsize>
     <optionsaftertext>0</optionsaftertext>
     <letterhints>0</letterhints>
-    <!-- Gapfill release:1.977 version:2019100400 Moodle version:2019052000.04 release:3.7+ (Build: 20190614) -->
+    <!-- Gapfill release:2.132 version:2021121300 Moodle version:2021051700.01 release:3.11+ (Build: 20210520) -->
     <correctfeedback format="moodle_auto_format">
       <text></text>
     </correctfeedback>
@@ -1176,9 +1304,13 @@
     <incorrectfeedback format="html">
       <text><![CDATA[<p>Your answer is incorrect.</p>]]></text>
     </incorrectfeedback>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+    </tags>
   </question>
 
-<!-- question: 650  -->
+<!-- question: 6286  -->
   <question type="gapfill">
     <name>
       <text>Large numbers of draggables</text>
@@ -1201,6 +1333,7 @@
     <fixedgapsize>0</fixedgapsize>
     <optionsaftertext>0</optionsaftertext>
     <letterhints>0</letterhints>
+    <singleuse>0</singleuse>
     <answer fraction="100" format="moodle_auto_format">
       <text>sat</text>
       <feedback format="moodle_auto_format">
@@ -1280,7 +1413,7 @@
       </feedback>
     </answer>
     <answer fraction="0" format="moodle_auto_format">
-      <text> bat</text>
+      <text>bat</text>
       <feedback format="moodle_auto_format">
         <text></text>
       </feedback>
@@ -1298,7 +1431,7 @@
       </feedback>
     </answer>
     <answer fraction="0" format="moodle_auto_format">
-      <text> banked</text>
+      <text>banked</text>
       <feedback format="moodle_auto_format">
         <text></text>
       </feedback>
@@ -1316,13 +1449,13 @@
       </feedback>
     </answer>
     <answer fraction="0" format="moodle_auto_format">
-      <text> moodle</text>
+      <text>moodle</text>
       <feedback format="moodle_auto_format">
         <text></text>
       </feedback>
     </answer>
     <answer fraction="0" format="moodle_auto_format">
-      <text> causation</text>
+      <text>causation</text>
       <feedback format="moodle_auto_format">
         <text></text>
       </feedback>
@@ -1334,7 +1467,7 @@
       </feedback>
     </answer>
     <answer fraction="0" format="moodle_auto_format">
-      <text> coffee</text>
+      <text>coffee</text>
       <feedback format="moodle_auto_format">
         <text></text>
       </feedback>
@@ -1353,7 +1486,7 @@
     <fixedgapsize>0</fixedgapsize>
     <optionsaftertext>0</optionsaftertext>
     <letterhints>0</letterhints>
-    <!-- Gapfill release:1.977 version:2019100400 Moodle version:2019052000.04 release:3.7+ (Build: 20190614) -->
+    <!-- Gapfill release:2.132 version:2021121300 Moodle version:2021051700.01 release:3.11+ (Build: 20210520) -->
     <correctfeedback format="html">
       <text>Your answer is correct.</text>
     </correctfeedback>
@@ -1363,9 +1496,13 @@
     <incorrectfeedback format="html">
       <text>Your answer is incorrect.</text>
     </incorrectfeedback>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+    </tags>
   </question>
 
-<!-- question: 644  -->
+<!-- question: 6287  -->
   <question type="gapfill">
     <name>
       <text>Maths Operators</text>
@@ -1388,6 +1525,7 @@
     <fixedgapsize>0</fixedgapsize>
     <optionsaftertext>0</optionsaftertext>
     <letterhints>0</letterhints>
+    <singleuse>0</singleuse>
     <answer fraction="100" format="moodle_auto_format">
       <text><![CDATA[&gt;]]></text>
       <feedback format="moodle_auto_format">
@@ -1456,7 +1594,7 @@
     <fixedgapsize>0</fixedgapsize>
     <optionsaftertext>0</optionsaftertext>
     <letterhints>0</letterhints>
-    <!-- Gapfill release:1.977 version:2019100400 Moodle version:2019052000.04 release:3.7+ (Build: 20190614) -->
+    <!-- Gapfill release:2.132 version:2021121300 Moodle version:2021051700.01 release:3.11+ (Build: 20210520) -->
     <correctfeedback format="moodle_auto_format">
       <text></text>
     </correctfeedback>
@@ -1466,9 +1604,13 @@
     <incorrectfeedback format="html">
       <text><![CDATA[<p>Your answer is incorrect.</p>]]></text>
     </incorrectfeedback>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+    </tags>
   </question>
 
-<!-- question: 645  -->
+<!-- question: 6288  -->
   <question type="gapfill">
     <name>
       <text>Multi Word Answers</text>
@@ -1491,6 +1633,7 @@
     <fixedgapsize>0</fixedgapsize>
     <optionsaftertext>0</optionsaftertext>
     <letterhints>0</letterhints>
+    <singleuse>0</singleuse>
     <answer fraction="100" format="moodle_auto_format">
       <text>black cat</text>
       <feedback format="moodle_auto_format">
@@ -1511,7 +1654,7 @@
     <fixedgapsize>0</fixedgapsize>
     <optionsaftertext>0</optionsaftertext>
     <letterhints>0</letterhints>
-    <!-- Gapfill release:1.977 version:2019100400 Moodle version:2019052000.04 release:3.7+ (Build: 20190614) -->
+    <!-- Gapfill release:2.132 version:2021121300 Moodle version:2021051700.01 release:3.11+ (Build: 20210520) -->
     <correctfeedback format="moodle_auto_format">
       <text></text>
     </correctfeedback>
@@ -1521,9 +1664,13 @@
     <incorrectfeedback format="html">
       <text><![CDATA[<p>Your answer is incorrect.</p>]]></text>
     </incorrectfeedback>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+    </tags>
   </question>
 
-<!-- question: 646  -->
+<!-- question: 6289  -->
   <question type="gapfill">
     <name>
       <text>Other scripts and accents</text>
@@ -1546,6 +1693,7 @@
     <fixedgapsize>0</fixedgapsize>
     <optionsaftertext>0</optionsaftertext>
     <letterhints>0</letterhints>
+    <singleuse>0</singleuse>
     <answer fraction="100" format="moodle_auto_format">
       <text>Россия</text>
       <feedback format="moodle_auto_format">
@@ -1578,7 +1726,7 @@
     <fixedgapsize>0</fixedgapsize>
     <optionsaftertext>0</optionsaftertext>
     <letterhints>0</letterhints>
-    <!-- Gapfill release:1.977 version:2019100400 Moodle version:2019052000.04 release:3.7+ (Build: 20190614) -->
+    <!-- Gapfill release:2.132 version:2021121300 Moodle version:2021051700.01 release:3.11+ (Build: 20210520) -->
     <correctfeedback format="html">
       <text><![CDATA[<p>Your answer is correct.</p>]]></text>
     </correctfeedback>
@@ -1588,9 +1736,13 @@
     <incorrectfeedback format="html">
       <text><![CDATA[<p>Your answer is incorrect.</p>]]></text>
     </incorrectfeedback>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+    </tags>
   </question>
 
-<!-- question: 647  -->
+<!-- question: 6290  -->
   <question type="gapfill">
     <name>
       <text>RegularExpressions</text>
@@ -1613,6 +1765,7 @@
     <fixedgapsize>0</fixedgapsize>
     <optionsaftertext>0</optionsaftertext>
     <letterhints>0</letterhints>
+    <singleuse>0</singleuse>
     <answer fraction="100" format="moodle_auto_format">
       <text>colou?rs?</text>
       <feedback format="moodle_auto_format">
@@ -1645,7 +1798,7 @@
     <fixedgapsize>0</fixedgapsize>
     <optionsaftertext>0</optionsaftertext>
     <letterhints>0</letterhints>
-    <!-- Gapfill release:1.977 version:2019100400 Moodle version:2019052000.04 release:3.7+ (Build: 20190614) -->
+    <!-- Gapfill release:2.132 version:2021121300 Moodle version:2021051700.01 release:3.11+ (Build: 20210520) -->
     <correctfeedback format="moodle_auto_format">
       <text></text>
     </correctfeedback>
@@ -1655,9 +1808,13 @@
     <incorrectfeedback format="html">
       <text><![CDATA[<p>Your answer is incorrect.</p>]]></text>
     </incorrectfeedback>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+    </tags>
   </question>
 
-<!-- question: 648  -->
+<!-- question: 6291  -->
   <question type="gapfill">
     <name>
       <text>Troubleshooting</text>
@@ -1680,6 +1837,7 @@
     <fixedgapsize>0</fixedgapsize>
     <optionsaftertext>0</optionsaftertext>
     <letterhints>0</letterhints>
+    <singleuse>0</singleuse>
     <answer fraction="100" format="moodle_auto_format">
       <text><![CDATA[<span>work</span>]]></text>
       <feedback format="moodle_auto_format">
@@ -1694,7 +1852,7 @@
     <fixedgapsize>0</fixedgapsize>
     <optionsaftertext>0</optionsaftertext>
     <letterhints>0</letterhints>
-    <!-- Gapfill release:1.977 version:2019100400 Moodle version:2019052000.04 release:3.7+ (Build: 20190614) -->
+    <!-- Gapfill release:2.132 version:2021121300 Moodle version:2021051700.01 release:3.11+ (Build: 20210520) -->
     <correctfeedback format="moodle_auto_format">
       <text></text>
     </correctfeedback>
@@ -1704,9 +1862,13 @@
     <incorrectfeedback format="html">
       <text><![CDATA[<p>Your answer is incorrect.</p>]]></text>
     </incorrectfeedback>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+    </tags>
   </question>
 
-<!-- question: 649  -->
+<!-- question: 6292  -->
   <question type="gapfill">
     <name>
       <text>UsingCommas</text>
@@ -1729,6 +1891,7 @@
     <fixedgapsize>0</fixedgapsize>
     <optionsaftertext>0</optionsaftertext>
     <letterhints>0</letterhints>
+    <singleuse>0</singleuse>
     <answer fraction="100" format="moodle_auto_format">
       <text>blue, white, red</text>
       <feedback format="moodle_auto_format">
@@ -1755,7 +1918,7 @@
     <fixedgapsize>0</fixedgapsize>
     <optionsaftertext>0</optionsaftertext>
     <letterhints>0</letterhints>
-    <!-- Gapfill release:1.977 version:2019100400 Moodle version:2019052000.04 release:3.7+ (Build: 20190614) -->
+    <!-- Gapfill release:2.132 version:2021121300 Moodle version:2021051700.01 release:3.11+ (Build: 20210520) -->
     <correctfeedback format="moodle_auto_format">
       <text></text>
     </correctfeedback>
@@ -1765,6 +1928,10 @@
     <incorrectfeedback format="html">
       <text><![CDATA[<p>Your answer is incorrect.</p>]]></text>
     </incorrectfeedback>
+    <tags>
+      <tag><text>gapfill</text>
+</tag>
+    </tags>
   </question>
 
 </quiz>

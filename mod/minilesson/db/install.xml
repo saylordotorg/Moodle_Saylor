@@ -70,6 +70,7 @@
             <FIELD NAME="itemttsvoice" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
             <FIELD NAME="itemttsoption" TYPE="int" LENGTH="2" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
             <FIELD NAME="itemtextarea" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+            <FIELD NAME="itemttsautoplay" TYPE="int" LENGTH="2" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
             <FIELD NAME="itemaudiofname" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
             <FIELD NAME="customtext1" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
             <FIELD NAME="customtext1format" TYPE="int" LENGTH="2" NOTNULL="false" SEQUENCE="false"/>
@@ -91,6 +92,7 @@
             <FIELD NAME="customint3" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
             <FIELD NAME="customint4" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
             <FIELD NAME="customint5" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
+            <FIELD NAME="layout" TYPE="int" LENGTH="4" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
             <FIELD NAME="correctanswer" TYPE="int" LENGTH="4" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
             <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
             <FIELD NAME="passagehash" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="hash for DS lang model" />

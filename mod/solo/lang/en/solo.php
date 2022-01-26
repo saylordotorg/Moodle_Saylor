@@ -398,7 +398,7 @@ $string['postattemptedit_details'] = 'Allow student to edit their submission aft
 $string['dopostattemptedit'] = 'Edit the last attempt';
 $string['audiofilename'] = 'Audio';
 
-#ID, Name, ai score, sentences, av sentence length
+//ID, Name, ai score, sentences, av sentence length
 $string['gradesid'] = 'ID';
 $string['gradesfirst'] = 'First';
 $string['gradeslast'] = 'Last';
@@ -579,7 +579,6 @@ $string['content_media'] ='Image, audio or video content';
 $string['content_iframe'] ='Embed iframe code';
 $string['content_tts'] ='Text to be read';
 $string['content_ttsvoice'] ='Speaker\'s voice';
-
 $string['freetrial'] = "Get Cloud Poodll API Credentials and a Free Trial";
 $string['freetrial_desc'] = "A dialog should appear that allows you to register for a free trial with Poodll. After registering you should login to the members dashboard to get your API user and secret. And to register your site URL.";
 $string['memberdashboard'] = "Member Dashboard";

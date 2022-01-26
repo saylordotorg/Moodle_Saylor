@@ -10,6 +10,7 @@
 use mod_minilesson\utils;
 use mod_minilesson\constants;
 use mod_minilesson\diff;
+use mod_minilesson\alphabetconverter;
 
 /**
  * External class.
@@ -33,7 +34,13 @@ class mod_minilesson_external extends external_api {
     }
     public static function check_by_phonetic($spoken, $correct, $phonetic, $language,$region, $cmid){
         $segmented = true;
-        $spokenphonetic = utils::convert_to_phonetic($spoken,$language,$region,$segmented);
+
+        if($language==constants::M_LANG_JAJP){
+                //find digits in original passage, and convert number words to digits in the target passage
+                //this works but segmented digits are a bit messed up, not sure its worthwhile. more testing needed
+            $spoken=alphabetconverter::words_to_suji_convert($phonetic,$spoken);
+        }
+        list($spokenphonetic) = utils::fetch_phones_and_segments($spoken,$language,$region,$segmented);
         $similar_percent = 0;
 
         //if our convert_to_phonetic returned false(error) then its hopeless, return 0
@@ -46,8 +53,12 @@ class mod_minilesson_external extends external_api {
             return 0;
         }
 
-        //similar_percent calc'd by reference
-        $similar_chars = similar_text($phonetic,$spokenphonetic,$similar_percent);
+        //similar_percent calc'd by reference but multibyte is weird
+        if($language!==constants::M_LANG_JAJP) {
+            $similar_percent = similar_text($phonetic, $spokenphonetic, $similar_percent);
+        }else{
+            $similar_percent = $phonetic == $spokenphonetic ?100:0;
+        }
         return round($similar_percent,0);
 
     }
@@ -91,7 +102,32 @@ class mod_minilesson_external extends external_api {
     public static function compare_passage_to_transcript($transcript,$passage,$language,$alternatives,$phonetic,$region, $cmid) {
         global $DB;
 
+
+        //Fetch phonetics and segments
+        list($transcript_phonetic,$transcript) = utils::fetch_phones_and_segments($transcript,$language,$region);
+
+        //EXPERIMENTAL
+        switch (substr($language,0,2)){
+            case 'en':
+                //find digits in original passage, and convert number words to digits in the target passage
+                $transcript=alphabetconverter::words_to_numbers_convert($passage,$transcript);
+                break;
+            case 'de':
+                //find eszetts in original passage, and convert ss words to eszetts in the target passage
+                $transcript=alphabetconverter::ss_to_eszett_convert($passage,$transcript );
+                break;
+            case 'ja':
+                //find digits in original passage, and convert number words to digits in the target passage
+                //this works but segmented digits are a bit messed up, not sure its worthwhile. more testing needed
+                //from here and aigrade
+                $transcript=alphabetconverter::words_to_suji_convert($passage,$transcript);
+                break;
+
+
+        }
+
         //If this is Japanese, and the passage has been segmented, we want to segment it into "words"
+        /*
         if($language == constants::M_LANG_JAJP) {
             $transcript = utils::segment_japanese($transcript);
             $passage = utils::segment_japanese($passage);
@@ -100,6 +136,7 @@ class mod_minilesson_external extends external_api {
         }else{
             $transcript_phonetic ='';
         }
+        */
 
         //turn the passage and transcript into an array of words
         $passagebits = diff::fetchWordArray($passage);

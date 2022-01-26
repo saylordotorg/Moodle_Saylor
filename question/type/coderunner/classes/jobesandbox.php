@@ -28,6 +28,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
+require_once($CFG->libdir . '/filelib.php'); // Needed when run as web service.
+
 class qtype_coderunner_jobesandbox extends qtype_coderunner_sandbox {
 
     const DEBUGGING = 0;
@@ -70,7 +73,7 @@ class qtype_coderunner_jobesandbox extends qtype_coderunner_sandbox {
         } else {
             $this->jobeserver = get_config('qtype_coderunner', 'jobe_host');
         }
-        
+
         $this->apikey = get_config('qtype_coderunner', 'jobe_apikey');
         $this->languages = null;
     }
@@ -105,9 +108,7 @@ class qtype_coderunner_jobesandbox extends qtype_coderunner_sandbox {
      *         file contents, defining a file context at execution time
      * @param associative array $params Sandbox parameters, depends on
      *         particular sandbox but most sandboxes should recognise
-     *         at least cputime (secs), memorylimit (Megabytes) and
-     *         files (an associative array mapping filenames to string
-     *         filecontents.
+     *         at least cputime (secs) and memorylimit (Megabytes).
      *         If the $params array is null, sandbox defaults are used.
      * @return an object with at least the attribute 'error'.
      *         The error attribute is one of the
@@ -168,7 +169,7 @@ class qtype_coderunner_jobesandbox extends qtype_coderunner_sandbox {
         if (self::DEBUGGING) {
             $runspec['debug'] = 1;
         }
-        
+
         if ($params !== null) {
             // Process any given sandbox parameters.
             $runspec['parameters'] = $params;
@@ -192,7 +193,7 @@ class qtype_coderunner_jobesandbox extends qtype_coderunner_sandbox {
         // Try submitting the job. If we get a 404, try again after
         // putting all the files on the server. Anything else is an error.
         $httpcode = $this->submit($postbody);
-        if ($httpcode == 404) { // Missing file(s)?
+        if ($httpcode == 404) { // If it's a file not found error ...
             foreach ($files as $filename => $contents) {
                 if (($httpcode = $this->put_file($contents)) != 204) {
                     break;
@@ -203,7 +204,7 @@ class qtype_coderunner_jobesandbox extends qtype_coderunner_sandbox {
                 $httpcode = $this->submit($postbody);
             }
         }
-        
+
         $runresult = array();
         $runresult['sandboxinfo'] = array(
             'jobeserver' => $this->jobeserver,
@@ -243,7 +244,8 @@ class qtype_coderunner_jobesandbox extends qtype_coderunner_sandbox {
     // Not totally safe as it doesn't parse the file, e.g. would be fooled
     // by a commented-out main class with a different name.
     private function get_main_class($prog) {
-        $pattern = '/(^|\W)public\s+class\s+(\w+)[^{]*\{.*?((public\s([a-z]*\s)*static)|(static\s([a-z]*\s)*public))\s([a-z]*\s)*void\s+main\s*\(\s*String/ms';
+        $pattern = '/(^|\W)public\s+class\s+(\w+)[^{]*\{.*?((public\s([a-z]*\s)*static)|';
+        $pattern .= '(static\s([a-z]*\s)*public))\s([a-z]*\s)*void\s+main\s*\(\s*String/ms';
         if (preg_match_all($pattern, $prog, $matches) !== 1) {
             return false;
         } else {
@@ -307,7 +309,7 @@ class qtype_coderunner_jobesandbox extends qtype_coderunner_sandbox {
     private function get_jobe_connection_info($resource) {
         $jobe = $this->jobeserver;
         if (!empty($this->currentjobid) && strpos($jobe, ';') !== false) {
-            // Support multiple servers - thanks Khang Pham Nguyen KHANG: 2021/10/18
+            // Support multiple servers - thanks Khang Pham Nguyen KHANG: 2021/10/18.
             $servers = array_values(array_filter(array_map('trim', explode(';', $jobe)), 'strlen'));
             $jobe = $servers[intval($this->currentjobid, 16) % count($servers)];
         }
@@ -353,7 +355,6 @@ class qtype_coderunner_jobesandbox extends qtype_coderunner_sandbox {
     // from json).
     // The code is -1 if the request fails utterly.
     private function http_request($resource, $method, $body=null) {
-        //debugging("Sending an http_request");
         list($url, $headers) = $this->get_jobe_connection_info($resource);
 
         $curl = new curl();

@@ -1,3 +1,6 @@
+Version 2.0.75 (Build 2022012500)
+- Improved Japanese number recognition
+
 Version 2.0.74 (Build 2021122200)
 - added credential fetching
 

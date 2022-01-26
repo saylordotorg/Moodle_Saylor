@@ -290,7 +290,8 @@ class mod_wordcards_module {
         $cms = $modinfo->get_instances_of('wordcards');
         $allowedmodids = [];
         foreach ($cms as $cm) {
-            if ($cm->uservisible) {
+            //we only want visible mods and not the current one
+            if ($cm->uservisible && $cm->id != $this->cm->id) {
                 $allowedmodids[] = $cm->instance;
             }
         }

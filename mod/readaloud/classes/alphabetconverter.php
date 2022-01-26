@@ -420,7 +420,7 @@ class alphabetconverter {
                 }
             }else{
                 if($nowsuji>0) {
-                    $word .= $factorword;
+                    $word .= $arr[$nowsuji];
                 }
                 break;
             }

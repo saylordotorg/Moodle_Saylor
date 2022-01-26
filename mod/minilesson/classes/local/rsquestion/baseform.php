@@ -150,6 +150,8 @@ abstract class baseform extends \moodleform {
                 //Question text
                 $mform->addElement('textarea', constants::TEXTQUESTION, get_string('itemcontents', constants::M_COMPONENT), array('wrap'=>'virtual','style'=>'width: 100%;'));
                 $mform->setType(constants::TEXTQUESTION, PARAM_RAW);
+                //add layout
+                $this->add_layoutoptions();
                 switch($this->type) {
                     case constants::TYPE_LISTENREPEAT:
                         $mform->setDefault(constants::TEXTQUESTION,
@@ -204,14 +206,17 @@ abstract class baseform extends \moodleform {
                 $mform->setType(constants::TTSQUESTION, PARAM_RAW);
                 $this->add_voiceselect(constants::TTSQUESTIONVOICE,get_string('itemttsquestionvoice',constants::M_COMPONENT));
                 $this->add_voiceoptions(constants::TTSQUESTIONOPTION,get_string('choosevoiceoption',constants::M_COMPONENT));
+                $mform->addElement('advcheckbox',constants::TTSAUTOPLAY,get_string('autoplay',constants::M_COMPONENT),'');
                 if($m35){
                     $mform->hideIf(constants::TTSQUESTION, 'addttsaudio', 'neq', 1);
                     $mform->hideIf(constants::TTSQUESTIONVOICE, 'addttsaudio', 'neq', 1);
                     $mform->hideIf(constants::TTSQUESTIONOPTION, 'addttsaudio', 'neq', 1);
+                    $mform->hideIf(constants::TTSAUTOPLAY, 'addttsaudio', 'neq', 1);
                 }else {
                     $mform->disabledIf(constants::TTSQUESTION, 'addttsaudio', 'neq', 1);
                     $mform->disabledIf(constants::TTSQUESTIONVOICE, 'addttsaudio', 'neq', 1);
                     $mform->disabledIf(constants::TTSQUESTIONOPTION, 'addttsaudio', 'neq', 1);
+                    $mform->disabledIf(constants::TTSAUTOPLAY, 'addttsaudio', 'neq', 1);
                 }
                 //Question itemtextarea
                 $someid = \html_writer::random_id();
@@ -413,6 +418,21 @@ abstract class baseform extends \moodleform {
      * @param string $label, null means default
      * @return void
      */
+    protected final function add_layoutoptions() {
+        $layoutoptions = [constants::LAYOUT_AUTO=>get_string('layoutauto',constants::M_COMPONENT),
+            constants::LAYOUT_HORIZONTAL=>get_string('layouthorizontal',constants::M_COMPONENT),
+            constants::LAYOUT_VERTICAL=>get_string('layoutvertical',constants::M_COMPONENT),
+            constants::LAYOUT_MAGAZINE=>get_string('layoutmagazine',constants::M_COMPONENT)];
+        $name=constants::LAYOUT;
+        $this->add_dropdown($name, get_string('chooselayout',constants::M_COMPONENT),$layoutoptions,constants::LAYOUT_AUTO);
+    }
+
+    /**
+     * Convenience function: Adds a dropdown list of voices
+     *
+     * @param string $label, null means default
+     * @return void
+     */
     protected final function add_voiceselect($name, $label = null, $showif=false) {
         global $CFG;
         $showall =true;
@@ -445,6 +465,7 @@ abstract class baseform extends \moodleform {
             $this->_form->disabledIf($name, $showif, 'neq', 1);
         }
     }
+
     /**
      * Convenience function: Adds a dropdown list of tts language
      *

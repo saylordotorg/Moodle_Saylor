@@ -358,7 +358,7 @@ if(true){
 
                 //for Japanese we want to segment it into "words"
              //   $passage = utils::segment_japanese($phrase);
-
+                $phrase = mb_convert_kana($phrase,"n");
                 $postdata =array('passage'=>$phrase);
                 $results = self::curl_fetch($katakanify_url,$postdata,'post');
                 if(!self::is_json($results)){return false;}

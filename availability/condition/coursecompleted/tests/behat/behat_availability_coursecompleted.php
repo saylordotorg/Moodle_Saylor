@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Step definitions related to administration overrides for the iplus theme.
+ * Step definitions related to mark user complete.
  *
  * @package    availability_coursecompleted
  * @copyright  2021 iplusacademy (www.iplusacademy.org)
@@ -31,7 +31,7 @@ require_once(__DIR__ . '/../../../../../lib/behat/behat_base.php');
 use Behat\Mink\Exception\ElementNotFoundException as ElementNotFoundException;
 
 /**
- * Site administration level steps definitions overrides for the iplus theme.
+ * Step definitions related to mark user complete.
  *
  * @package    availability_coursecompleted
  * @copyright  2021 iplusacademy (www.iplusacademy.org)

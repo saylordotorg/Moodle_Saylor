@@ -26,3 +26,4 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
+global $CFG; // To keep codechecker happy - otherwise it will complain about MOODLE_INTERNAL being present OR being absent.

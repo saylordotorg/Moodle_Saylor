@@ -18,6 +18,7 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'core/templates', 'c
       //nopunc is diff to split on because it does not match on spaces
       nopunc_regexp: new RegExp(/[!"#$%&'()。「」、*+,-.\/:;<=>?@[\]^_`{|}~]/,'g'),
       nonspaces_regexp: new RegExp(/[^ ]/,'g'),
+      autoplaydelay: 800,
 
       controls: {},
       submitbuttonclass: 'mod_minilesson_quizsubmitbutton',
@@ -177,6 +178,13 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'core/templates', 'c
               default:
           }//end of nextitem switch
 
+            //autoplay audio if we need to
+            var ttsquestionplayer = $("#" + nextitem.uniqueid + "_container audio.mod_minilesson_itemttsaudio");
+            if(ttsquestionplayer.data('autoplay')=="1"){
+                var that=this;
+                setTimeout(function() {ttsquestionplayer[0].play();}, that.autoplaydelay);
+            }
+
         } else {
 
           var results = dd.stepresults.filter(function(e){return e.hasgrade;});
@@ -201,7 +209,7 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'core/templates', 'c
               }
           );
 
-        }
+        }//end of if has more questions
 
         this.render_quiz_progress(stepdata.index+1,this.quizdata.length);
 
@@ -230,6 +238,12 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'core/templates', 'c
 
       start_quiz: function() {
         $("#" + this.quizdata[0].uniqueid + "_container").show();
+          //autoplay audio if we need to
+          var ttsquestionplayer = $("#" + this.quizdata[0].uniqueid + "_container audio.mod_minilesson_itemttsaudio");
+          if(ttsquestionplayer.data('autoplay')=="1"){
+              var that=this;
+              setTimeout(function() {ttsquestionplayer[0].play();}, that.autoplaydelay);
+          }
         this.render_quiz_progress(0,this.quizdata.length);
       },
 

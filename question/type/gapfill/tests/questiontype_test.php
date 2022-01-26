@@ -21,6 +21,8 @@
  * @copyright  2012 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+namespace qtype_gapfill;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -35,7 +37,7 @@ require_once($CFG->dirroot . '/question/type/gapfill/tests/helper.php');
  * @copyright  2012 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class questiontype_test extends advanced_testcase {
+class questiontype_test extends \advanced_testcase {
 
     /**
      *  explained here https://docs.moodle.org/dev/Unit_test_API
@@ -47,7 +49,7 @@ class questiontype_test extends advanced_testcase {
     );
 
     protected function setUp(): void {
-        $this->qtype = new qtype_gapfill();
+        $this->qtype = new \qtype_gapfill();
     }
 
     protected function tearDown(): void {
@@ -59,7 +61,7 @@ class questiontype_test extends advanced_testcase {
      */
     protected function get_test_question_data() {
         global $USER;
-        $q = new stdClass();
+        $q = new \stdClass();
         $q->id = 0;
         $q->name = 'Gapfill Question';
         $q->category = 0;
@@ -80,7 +82,7 @@ class questiontype_test extends advanced_testcase {
         $q->createdby = $USER->id;
         $q->modifiedby = $USER->id;
         $q->options = new stdClass();
-        test_question_maker::set_standard_combined_feedback_fields($q->options);
+        \test_question_maker::set_standard_combined_feedback_fields($q->options);
         $q->options->displayanswers = 0;
         $q->options->delimitchars = "[]";
 
@@ -91,13 +93,13 @@ class questiontype_test extends advanced_testcase {
     public function test_save_question() {
         $this->resetAfterTest();
         global $DB;
-        $syscontext = context_system::instance();
+        $syscontext = \context_system::instance();
         $questiongenerator = $this->getDataGenerator()->get_plugin_generator('core_question');
         $category = $questiongenerator->create_question_category([]);
-        $fromform = test_question_maker::get_question_form_data('gapfill', 'catmat');
+        $fromform = \test_question_maker::get_question_form_data('gapfill', 'catmat');
         $fromform->category = $category->id . ',' . $syscontext->id;
 
-        $question = new stdClass();
+        $question = new \stdClass();
         $question->category = $category->id;
         $question->qtype = 'gapfill';
         $question->createdby = 0;
