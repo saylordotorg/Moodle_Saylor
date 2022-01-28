@@ -56,9 +56,7 @@ Feature: Checklists export without warnings or errors
       | Item 8   | yes         |
 
   Scenario: The teacher exports the checklist
-    Given I log in as "teacher1"
-    When I am on "Course 1" course homepage
-    And I navigate to "Export > Checklist" in the course gradebook
+    When I am on the "C1" "gradeexport_checklist > export" page logged in as "teacher1"
     And I set the following fields to these values:
       | Checklist to export     | Test checklist 1 |
       | Percentage column       | 1                |

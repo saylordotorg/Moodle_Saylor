@@ -167,7 +167,7 @@ class qtype_gapfill extends question_type {
      * Sets the default mark as 1* the number of gaps
      * Does not allow setting any other value per space/field at the moment
      * @param stdClass $question
-     * @param array $form
+     * @param \stdClass $form
      * @return object
      */
     public function save_question($question, $form) {

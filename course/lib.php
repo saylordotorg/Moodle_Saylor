@@ -1744,6 +1744,9 @@ function moveto_module($mod, $section, $beforemod=NULL) {
         echo $OUTPUT->notification("Could not delete module from existing section");
     }
 
+    // Add the module into the new section.
+    course_add_cm_to_section($section->course, $mod->id, $section->section, $beforemod);
+
     // If moving to a hidden section then hide module.
     if ($mod->section != $section->id) {
         if (!$section->visible && $mod->visible) {
@@ -1760,8 +1763,6 @@ function moveto_module($mod, $section, $beforemod=NULL) {
         }
     }
 
-    // Add the module into the new section.
-    course_add_cm_to_section($section->course, $mod->id, $section->section, $beforemod);
     return $modvisible;
 }
 
@@ -3957,7 +3958,7 @@ function course_get_tagged_course_modules($tag, $exclusivemode = false, $fromcon
  * @since  Moodle 3.2
  */
 function course_get_user_navigation_options($context, $course = null) {
-    global $CFG;
+    global $CFG, $USER;
 
     $isloggedin = isloggedin();
     $isguestuser = isguestuser();
@@ -4000,8 +4001,37 @@ function course_get_user_navigation_options($context, $course = null) {
     } else {
         // We are in a course, so make sure we use the proper capability (course:viewparticipants).
         $options->participants = course_can_view_participants($context);
-        $options->badges = !empty($CFG->enablebadges) && !empty($CFG->badges_allowcoursebadges) &&
-                            has_capability('moodle/badges:viewbadges', $context);
+
+        // Only display badges if they are enabled and the current user can manage them or if they can view them and have,
+        // at least, one available badge.
+        if (!empty($CFG->enablebadges) && !empty($CFG->badges_allowcoursebadges)) {
+            $canmanage = has_any_capability([
+                    'moodle/badges:createbadge',
+                    'moodle/badges:awardbadge',
+                    'moodle/badges:configurecriteria',
+                    'moodle/badges:configuremessages',
+                    'moodle/badges:configuredetails',
+                    'moodle/badges:deletebadge',
+                ],
+                $context
+            );
+            $totalbadges = [];
+            $canview = false;
+            if (!$canmanage) {
+                // This only needs to be calculated if the user can't manage badges (to improve performance).
+                $canview = has_capability('moodle/badges:viewbadges', $context);
+                if ($canview) {
+                    require_once($CFG->dirroot.'/lib/badgeslib.php');
+                    if (is_null($course)) {
+                        $totalbadges = count(badges_get_badges(BADGE_TYPE_SITE, 0, '', '', 0, 0, $USER->id));
+                    } else {
+                        $totalbadges = count(badges_get_badges(BADGE_TYPE_COURSE, $course->id, '', '', 0, 0, $USER->id));
+                    }
+                }
+            }
+
+            $options->badges = ($canmanage || ($canview && $totalbadges > 0));
+        }
         // Add view grade report is permitted.
         $grades = false;
 

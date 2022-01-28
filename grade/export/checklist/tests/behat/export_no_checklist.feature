@@ -17,7 +17,5 @@ Feature: Exporting when there are no checklists on the course, should show a sen
       | C1     | teacher1 | editingteacher |
 
   Scenario: The teacher visits the checklist export page
-    Given I log in as "teacher1"
-    When I am on "Course 1" course homepage
-    And I navigate to "Export > Checklist" in the course gradebook
+    When I am on the "C1" "gradeexport_checklist > export" page logged in as "teacher1"
     Then I should see "No suitable checklists found"

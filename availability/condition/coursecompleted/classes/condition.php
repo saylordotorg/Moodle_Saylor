@@ -25,8 +25,10 @@
 
 namespace availability_coursecompleted;
 
-defined('MOODLE_INTERNAL') || die();
-require_once($CFG->libdir . '/completionlib.php');
+use \core_availability\info;
+use \coding_exception;
+use \stdClass;
+
 
 /**
  * Condition main class.
@@ -44,8 +46,8 @@ class condition extends \core_availability\condition {
     /**
      * Constructor.
      *
-     * @param \stdClass $structure Data structure from JSON decode
-     * @throws \coding_exception If invalid data.
+     * @param stdClass $structure Data structure from JSON decode
+     * @throws coding_exception If invalid data.
      */
     public function __construct($structure) {
         if (!property_exists($structure, 'id')) {
@@ -53,14 +55,14 @@ class condition extends \core_availability\condition {
         } else if (is_string($structure->id)) {
             $this->coursecompleted = $structure->id;
         } else {
-            throw new \coding_exception('Invalid value for course completed condition');
+            throw new coding_exception('Invalid value for course completed condition');
         }
     }
 
     /**
      * Saves tree data back to a structure object.
      *
-     * @return \stdClass Structure object (ready to be made into JSON format)
+     * @return stdClass Structure object (ready to be made into JSON format)
      */
     public function save() {
         return (object)['type' => 'coursecompleted', 'id' => $this->coursecompleted];
@@ -84,15 +86,16 @@ class condition extends \core_availability\condition {
      * according to this availability condition.
      *
      * @param bool $not Set true if we are inverting the condition
-     * @param \core_availability\info $info Item we're checking
+     * @param info $info Item we're checking
      * @param bool $grabthelot Performance hint: if true, caches information
      *   required for all course-modules, to make the front page and similar
      *   pages work more quickly (works only for current user)
      * @param int $userid User ID to check availability for
      * @return bool True if available
      */
-    public function is_available($not, \core_availability\info $info, $grabthelot, $userid) {
-        global $USER;
+    public function is_available($not, info $info, $grabthelot, $userid) {
+        global $CFG, $USER;
+        require_once($CFG->libdir . '/completionlib.php');
         $completioninfo = new \completion_info($info->get_course());
         $allow = $completioninfo->is_course_complete($userid != $USER->id ? $userid : $USER->id);
         if (!$this->coursecompleted) {
@@ -112,11 +115,11 @@ class condition extends \core_availability\condition {
      *
      * @param bool $full Set true if this is the 'full information' view
      * @param bool $not Set true if we are inverting the condition
-     * @param \core_availability\info $info Item we're checking
+     * @param info $info Item we're checking
      * @return string Information string (for admin) about all restrictions on
      *   this item
      */
-    public function get_description($full, $not, \core_availability\info $info) {
+    public function get_description($full, $not, info $info) {
         $allow = $this->coursecompleted;
         if ($not) {
             $allow = !$allow;

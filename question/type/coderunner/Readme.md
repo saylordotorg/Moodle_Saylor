@@ -1,6 +1,6 @@
 # CodeRunner
 
-Version: 4.1.1 November 2021
+Version: 4.2.1 January 2022
 
 Authors: Richard Lobb, University of Canterbury, New Zealand.
          Tim Hunt, The Open University, UK.
@@ -77,6 +77,9 @@ unusual question type.
   - [Prototype template parameters](#prototype-template-parameters)
 - [Supporting or implementing new languages](#supporting-or-implementing-new-languages)
 - [Multilanguage questions](#multilanguage-questions)
+- [The 'qtype_coderunner_run_in_sandbox' web service](#the-qtype_coderunner_run_in_sandbox-web-service)
+  - [Enabling and configuring the web service](#enabling-and-configuring-the-web-service)
+  - [Use of the web service.](#use-of-the-web-service)
 - [Administrator scripts](#administrator-scripts)
 - [A note on accessibility](#a-note-on-accessibility)
 - [APPENDIX 1: How questions get marked](#appendix-1-how-questions-get-marked)
@@ -362,7 +365,7 @@ Assuming you have built *Jobe* on a separate server, suitably firewalled,
 the JobeSandbox fully
 isolates student code from the Moodle server. Some users install Jobe on
 the Moodle server but this is not recommended for security reasons: a student
-who manages to break out of the Jobe security might then run code on the 
+who manages to break out of the Jobe security might then run code on the
 Moodle server itself if it is not adequately locked down. If you really want to
 run Jobe on the Moodle server, please at least use the JobeInAbox docker image,
 which should adequately protect the Moodle system from direct damage.
@@ -429,7 +432,7 @@ By "executable", we mean a program that can be executed, possibly
 with a preliminary compilation step.
 1. The executable program is passed to the Jobe sandbox, which compiles
    the program (if necessary) and runs it,
-   using the standard input supplied by the testcase. 
+   using the standard input supplied by the testcase.
 1. The output from the run is passed into whatever Grader component is
    configured, as is the expected output specified for the test case.
    The most common grader is the
@@ -684,7 +687,7 @@ be customised or extended in various ways.
 The following question types, used by the University
 of Canterbury (UOC) are not part of the basic supported question type set.
 They can be imported, if desired, from the file
-`uoc_prototypes.xml`, located in the CodeRunner/coderunner/samples folder. 
+`uoc_prototypes.xml`, located in the CodeRunner/coderunner/samples folder.
 However, they come with no guarantees of correctness or on-going support.
 
 The UOC question types include:
@@ -731,7 +734,7 @@ answer, the test code and other custom code within the template itself.
 The template for a question is by default defined by the CodeRunner question
 type, which itself is defined by a special "prototype" question, to be explained later.
 You can inspect the template of any question by clicking the customise box in
-the question authoring form. 
+the question authoring form.
 
 A question's template can be either a *per-test template* or a *combinator
 template*. The first one is the simpler; it is applied once for every test
@@ -838,7 +841,7 @@ variable they are given a TESTCASES variable. This is
 is a list of all the individual TEST objects. A combinator template is expected
 to iterate through all the tests in a single run, separating the output
 from the different tests with a special separator string, defined within the
-question authoring form. The default separator string is 
+question authoring form. The default separator string is
 
     "#<ab@17943918#@>#"
 
@@ -976,7 +979,7 @@ like
 If you're a newcomer to customising templates or developing your own question type (see later),
 it is recommended that you start
 with a per-test template, and move to a combinator template only when you're
-familiar with how things work and need the performance gain offered by a 
+familiar with how things work and need the performance gain offered by a
 combinator template.
 
 ## Template debugging
@@ -1051,7 +1054,7 @@ The full `python3_cosc121` question type is much more complex than the
 above, because it includes many extra features, enabled by use of
 [template parameters](#template-parameters).
 
-Some other complex question types that we've built using the technique 
+Some other complex question types that we've built using the technique
 described above include:
 
  1. A Matlab question in which the template code (also Matlab) breaks down
@@ -1218,7 +1221,7 @@ For example, if there is a template parameter function name, defined as, say,
 the body of the question might begin
 
 Write a function `{{ functionname }}(items)` that takes a list of items as a
-parameter and returns the first ... 
+parameter and returns the first ...
 
 The test cases would then also need be parameterised, e.g. the test code might
 be
@@ -1298,7 +1301,7 @@ on the sandbox server and cannot even be displayed until the run completes. If
 you are running a large test or exam, and students all start at the same time,
 there can be thousands of jobs hitting the sandbox server within a few seconds.
 This is almost certain to overload it! Caveat emptor! The approach should,
-however, be safe for lab and assignment use, when students are not all 
+however, be safe for lab and assignment use, when students are not all
 starting the quiz at the same time.
 
 If you still wish to use this approach , here's how to do it.
@@ -1309,7 +1312,7 @@ The template parameter program must print to standard output a single valid JSON
 which then is used in exactly the same way as if it had been entered into the
 template parameter field as pure JSON with no preprocessor. The program is given
 command line arguments specifying the random number seed that it must use
-and the various attributes of the student. For example, it should behave as if 
+and the various attributes of the student. For example, it should behave as if
 invoked from a Linux command line of the form:
 
     blah seed=1257134 id=902142 username='amgc001' firstname='Angus' 'lastname=McGurk' email='angus@somewhere.ac'
@@ -1338,13 +1341,13 @@ student's first name:
     first_name = args['firstname']
     print(json.dumps({'func_name': func_name, 'first_name': first_name}))
 
-The question text could then say 
+The question text could then say
 
 Write a function {{ func_name }}() that prints a welcome message of the
 form "Hello {{ first_name }}!".
 
 However, please realise that that is an extremely bad example of when to use
-a preprocessor, as the job is more easily and more efficiently done in Twig, 
+a preprocessor, as the job is more easily and more efficiently done in Twig,
 as explained in the section [Randomising questions](#randomising-questions).
 Note, too, that *Twig All* must be set.
 
@@ -1352,10 +1355,10 @@ Note, too, that *Twig All* must be set.
 When you select a preprocessor other than Twig, a checkbox 'Evaluate per
 run' is shown, and is initially unchecked. This controls when the preprocessor
 gets called. If you are using the template preprocessor for randomisation or
-for per-student customisation, 
-you must check this option so that the preprocessor is invoked for each 
-student when they start their attempt. As explained above, this can have serious 
-load implications. 
+for per-student customisation,
+you must check this option so that the preprocessor is invoked for each
+student when they start their attempt. As explained above, this can have serious
+load implications.
 
 However, if you are using the template preprocessor for other purposes,
 e.g. to compute values within the question text in a non-randomised question
@@ -1386,12 +1389,12 @@ test only when *Precheck* is clicked" and 2 denotes "always run this test".
  * `TEST.extra` Whatever text was entered by the author into the Extra field of this test.
  * `TEST.stdin` The standard input (as a text string) to be used when running this test. This
 isn't generally needed by the question author because CodeRunner by default copies it to
-a file and sets standard input to use that file when running the test. 
+a file and sets standard input to use that file when running the test.
  * `TEST.expected` The expected output when running this test.
  * `TEST.useasexample` True (1) if the "Use as example" checkbox is checked for
 this test.
  * `TEST.display` One of the string values "SHOW", "HIDE", "HIDE_IF_SUCCEED" or
-"HIDE_IF_FAIL". 
+"HIDE_IF_FAIL".
  * `TEST.hiderestiffail` True (1) if the "Hide rest if fail" checkbox is checked
 for this test.
  * `TEST.mark` How many marks to allocate to this test. Meaningful only if
@@ -1437,11 +1440,11 @@ Other fields are:
  * `QUESTION.questiontext` The question text itself
  * `QUESTION.answerpreload` The string that is preloaded into the answer box.
  * `QUESTION.stepinfo`. An object with info regarding the current step. Attributes
-   are *preferredbehaviour*, *numchecks*, *numprechecks* and *fraction* being respectively the 
+   are *preferredbehaviour*, *numchecks*, *numprechecks* and *fraction* being respectively the
    behaviour set for the quiz in which the question is running, the number
    of times the user has clicked *Check* prior to this submission, the number
    of times the user has clicked *Precheck* prior to this submission, and the
-   best fraction (0 - 1) the student has achieved so far 
+   best fraction (0 - 1) the student has achieved so far
    on this question (not including this submission). Additionally, if a
    combinator template grader is being used and the question author has chosen
    to report the grader state in a previous submission, a string-valued attribute
@@ -2389,7 +2392,7 @@ not recommended.
 
 This is a new and still experimental variant on the Gap Filler UI in which
 the text is rendered by the Ace editor with all usual syntax highlighting
-but the user can edit only the text in the gaps. 
+but the user can edit only the text in the gaps.
 
 It behaves exactly like the Gap Filler UI, above, except that it does not
 currently support the {[ rows, columns ]} syntax for multiline gaps. Only
@@ -2483,7 +2486,7 @@ A workaround for this problem is to include the special macro string
 
     ___textareaId___
 
-as part of any new ids. Note the capital-I and that there are THREE (3) underscores at both the 
+as part of any new ids. Note the capital-I and that there are THREE (3) underscores at both the
 start and end of the macro string.
 
 When the Html UI inserts the global extra
@@ -2702,7 +2705,7 @@ distribution.
 The above is just a general template and some languages will need additional
 tweaks, e.g. to set up required environment variables. One user tells me that
 he had to redirect stderr output to stdout in the call to subprocess.check_output
-when using R, because it apparently writes some messages and warnings to 
+when using R, because it apparently writes some messages and warnings to
 stderr while still returning a 0 ('SUCCESS') exit code. In another example,
 the same user reports that Erlang requires the HOME environment variable to
 be defined and set to be the current working directory.
@@ -2758,6 +2761,146 @@ isn't efficient for sluggish languages like Java.
 If the author wishes to supply a sample answer to a multilanguage question,
 they must write it in the default language, if specified, or the
 first of the allowed languages otherwise.
+
+## The 'qtype_coderunner_run_in_sandbox' web service
+
+Note: This feature is experimental and may change in the future.
+
+CodeRunner provides an Ajax-accessible web service that allows JavaScript code
+to directly run jobs on the Jobe server. (More precisely, it runs jobs
+on whatever sandbox has been configured for the specified language, but
+nowadays the only sandbox in production use is the Jobe sandbox).
+This service was added to support the
+[Ace_inline code Moodle filter plugin](https://github.com/trampgeek/ace_inline)
+in order to display syntax-coloured editable code with a 'Try it!' button
+in any Moodle content page, but may have other uses.
+
+### Enabling and configuring the web service
+
+The web service is not enabled by default, and must be enabled in the CodeRunner
+settings page by by a moodle system
+administrator. There are several additional configuration options:
+
+ 1. Jobe server to use for web services. The sandbox server
+    web service will use whatever sandbox is configured for the specified
+    language. This is virtually always a Jobe server, and the particular
+    Jobe server to use is configured via the admin interface (above).
+    However, for best web service security it is better to use an alternative
+    Jobe server, set by this field. Leave blank to use the default.
+
+ 2. Enable logging. By default every request made using the web service is
+    logged to the Moodle event log. Only logged-in users can use the service,
+    and the event records simply the name of the user and the date and time
+    at which they made use of the service. It does not record which particular
+    page or script initiated the request Logging can be disabled by unchecking
+    this option, which will reduce the size of user-activity reports if there
+    is heavy usage of the web service. Unless there is a problem with the
+    size of reports, however, it is strongly recommended to leave logging enabled.
+
+ 3. Maximum hourly submission rate. If logging is enabled (above) the system
+    administrator can set a per-user maximum web service submission rate. This
+    is mostly a security feature to prevent abuse of the service, for example by
+    JavaScripted automatic submissions. The default rate is 200 submissions
+    per hour. The system denies any request that would result in exceeding
+    the specified rate over the preceding hour. The feature works only if
+    event logging is enabled.
+
+ 4. Maximum allowed CPU time. The maximum
+    CPU time that a web service job can take is configurable by a system administrator.
+    The default value of 5 seconds is sufficient for most short runs but larger
+    values might be appropriate in some environments. The absolute maximum CPU
+    time is set by the Jobe server configuration and is usually about 50 seconds.
+
+### Use of the web service.
+
+The service is intended for use within Moodle content pages, usually within
+AMD scripts. However, the service can be used from JavaScript directly
+embedded in a page using an HTML editor. For example:
+
+        <h3>A simple demo of the CodeRunner sandbox web service.</h3>
+        <textarea id="code" rows="4" cols="40"></textarea>
+        <br>
+        <button type="button" id="mybutton">Run me!</button>
+
+        <script>
+            var button = document.getElementById('mybutton');
+            var text = document.getElementById('code');
+            button.onclick = function() {
+                require(['core/ajax'], function(ajax) {
+                    ajax.call([{
+                        methodname: 'qtype_coderunner_run_in_sandbox',
+                        args: {
+                            contextid: M.cfg.contextid, // Moodle context ID
+                            sourcecode: text.value,
+                            language: "python3"
+                        },
+                        done: function(responseJson) {
+                            var response = JSON.parse(responseJson);
+                            if (response.error !== 0 || response.result !== 15) {
+                                alert("Oops: " + responseJson);
+                            } else {
+                                alert("Output was: '" + response.output + "'");
+                            }
+                        },
+                        fail: function(error) {
+                            alert(error.message);
+                        }
+                    }]);
+                });
+            }
+        </script>
+
+This page displays a textarea into which a user can enter Python code, which
+can then be run by clicking the button. The output is displayed in an alert.
+The [ace_inline filter plugin](https://github.com/trampgeek/ace_inline)
+does something similar to this, except it
+uses the Ace editor to provide code editing, displays the output inline in the
+page, does much more extensive error analysis and has many more configuration
+options.
+
+The *response* object is an object with at least an attribute 'error'. This is one of the
+values 0 through 9 (OK to SERVER_OVERLOAD) as defined in the CodeRunner source
+file [sandbox.php](https://github.com/trampgeek/moodle-qtype_coderunner/blob/master/classes/sandbox.php).
+Any value other than 0 is a sandbox error of some sort,
+meaning the run did not take place.
+
+If error is 0 (OK), the job did get run on the sandbox server and the returned
+object then has additional attributes
+`result`, `output`, `stderr`, `signal` and `cmpinfo` as follows:
+
+ * `result`: one of the result constants defined in *sandbox.php*. The hoped-for
+   value is 15 ('RESULT_SUCCESS'). Other common values are 11
+   ('RESULT_COMPILATION_ERROR), 12 ('RESULT_RUNTIME_ERROR') and 13 ('RESULT_TIME_LIMIT').
+   Other outcomes are more serious (and much more rare) and can be classified as, say,
+   'Unexpected sandbox error'.
+
+ * `output`: the stdout from the run
+
+ * `stderr`: the stderr output from the run (generally a non-empty string is taken as a runtime error)
+
+ * `signal`: one of the standard Linux signal values (but often not used)
+
+ * `cmpinfo`: the output from the compilation run (usually empty unless the result
+   code is for a compilation error).
+
+If error is anything other than OK, the returned object may optionally
+include an error message in the stderr field.
+
+Other arguments to the ajax webservice call are:
+
+ * `stdin`, which prides a fixed string to use as standard input by the code.
+
+ * `files`, which is a JSON-encoded object that provides a map from a so-called 'filename'
+   (the attribute name) to 'file contents' (the attribute value). Each attribute
+   of the files object is used to create a file in the working directory on
+   the Jobe server.
+
+ * `params`, which is a JSON-encoded object that defines parameters to the
+   jobe sandbox. For example the following string value would set the maximum
+   runtime on the sandbox to 10 seconds (although constrained
+   by the system administrator's setting of the maximum allowed CPU time):
+
+       {"cputime": 10}
 
 ## Administrator scripts
 

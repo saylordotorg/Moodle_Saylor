@@ -27,8 +27,6 @@
 
 namespace format_grid;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * The format's toolbox.
  *

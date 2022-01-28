@@ -25,9 +25,11 @@
 
 namespace availability_coursecompleted;
 
-defined('MOODLE_INTERNAL') || die();
-
 use \availability_coursecompleted\condition;
+use \availability_coursecompleted\frontend;
+use core_availability\tree;
+use core_availability\info_module;
+use core_availability\mock_info;
 
 /**
  * Unit tests for the coursecompleted condition.
@@ -52,7 +54,6 @@ class condition_test extends \advanced_testcase {
 
     /**
      * Tests constructing and using coursecompleted condition as part of tree.
-     * @coversDefaultClass availability_coursecompleted\condition
      */
     public function test_in_tree() {
         global $USER;
@@ -64,12 +65,12 @@ class condition_test extends \advanced_testcase {
         $course = $this->getDataGenerator()->create_course(['enablecompletion' => true]);
         $userid = $this->getDataGenerator()->create_user()->id;
         $this->getDataGenerator()->enrol_user($userid, $course->id);
-        $info = new \core_availability\mock_info($course, $userid);
+        $info = new mock_info($course, $userid);
 
         $structure1 = (object)['op' => '|', 'show' => true, 'c' => [(object)['type' => 'coursecompleted', 'id' => '1']]];
         $structure2 = (object)['op' => '|', 'show' => true, 'c' => [(object)['type' => 'coursecompleted', 'id' => '0']]];
-        $tree1 = new \core_availability\tree($structure1);
-        $tree2 = new \core_availability\tree($structure2);
+        $tree1 = new tree($structure1);
+        $tree2 = new tree($structure2);
 
         $this->assertFalse($tree1->check_available(false, $info, true, $USER->id)->is_available());
         $this->assertTrue($tree2->check_available(false, $info, true, $USER->id)->is_available());
@@ -96,7 +97,6 @@ class condition_test extends \advanced_testcase {
 
     /**
      * Tests the constructor including error conditions.
-     * @coversDefaultClass availability_coursecompleted\condition
      */
     public function test_constructor() {
         // This works with no parameters.
@@ -156,7 +156,6 @@ class condition_test extends \advanced_testcase {
 
     /**
      * Tests the save() function.
-     * @coversDefaultClass availability_coursecompleted\condition
      */
     public function test_save() {
         $structure = (object)['id' => '1'];
@@ -167,7 +166,6 @@ class condition_test extends \advanced_testcase {
 
     /**
      * Tests the get_description and get_standalone_description functions.
-     * @coversDefaultClass availability_coursecompleted\frontend
      */
     public function test_get_description() {
         $this->resetAfterTest();
@@ -178,13 +176,13 @@ class condition_test extends \advanced_testcase {
         $modinfo = get_fast_modinfo($course);
         $sections = $modinfo->get_section_info_all();
 
-        $frontend = new \availability_coursecompleted\frontend();
+        $frontend = new frontend();
         $name = 'availability_coursecompleted\frontend';
         $this->assertTrue(\phpunit_util::call_internal_method($frontend, 'allow_add', [$course], $name));
         $this->assertTrue(\phpunit_util::call_internal_method($frontend, 'allow_add', [$course, null, $sections[0]], $name));
         $this->assertTrue(\phpunit_util::call_internal_method($frontend, 'allow_add', [$course, null, $sections[1]], $name));
 
-        $info = new \core_availability\mock_info();
+        $info = new mock_info();
         $nau = 'Not available unless: ';
         $completed = new condition((object)['type' => 'coursecompleted', 'id' => '1']);
         $information = $completed->get_description(true, false, $info);
@@ -208,7 +206,6 @@ class condition_test extends \advanced_testcase {
 
     /**
      * Tests a page before and after completion.
-     * @covers availability_coursecompleted\condition
      */
     public function test_page() {
         global $PAGE;
@@ -225,8 +222,8 @@ class condition_test extends \advanced_testcase {
         $modinfo = get_fast_modinfo($course);
         $cm = $modinfo->get_cm($page->cmid);
         $PAGE->set_url('/course/modedit.php', ['update' => $page->cmid]);
-        \core_availability\frontend::include_all_javascript($course, $cm);
-        $info = new \core_availability\info_module($cm);
+        frontend::include_all_javascript($course, $cm);
+        $info = new info_module($cm);
         $cond = new condition((object)['type' => 'coursecompleted', 'id' => '1']);
         $this->assertFalse($cond->is_available(false, $info, true, $user->id));
         $this->assertFalse($cond->is_available(false, $info, false, $user->id));
@@ -251,18 +248,14 @@ class condition_test extends \advanced_testcase {
 
     /**
      * Tests using course completion condition in front end.
-     * @covers availability_coursecompleted\condition
      */
     public function test_other() {
-        $condition = \availability_coursecompleted\condition::get_json('3');
-        $this->assertEqualsCanonicalizing((object)['type' => 'coursecompleted', 'id' => '3'], $condition);
-        $condition = \availability_coursecompleted\condition::get_json('0');
-        $this->assertEqualsCanonicalizing((object)['type' => 'coursecompleted', 'id' => '0'], $condition);
+        $this->assertEqualsCanonicalizing((object)['type' => 'coursecompleted', 'id' => '3'], condition::get_json('3'));
+        $this->assertEqualsCanonicalizing((object)['type' => 'coursecompleted', 'id' => '0'], condition::get_json('0'));
     }
 
     /**
      * Test behat funcs
-     * @coversDefaultClass behat_availability_coursecompleted
      */
     public function test_behat() {
         global $CFG;

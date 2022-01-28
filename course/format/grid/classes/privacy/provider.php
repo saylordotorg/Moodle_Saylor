@@ -29,8 +29,6 @@
 
 namespace format_grid\privacy;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * The Grid format does not store any user data.
  */

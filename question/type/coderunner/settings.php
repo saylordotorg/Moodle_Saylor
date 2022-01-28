@@ -77,3 +77,41 @@ $settings->add(new admin_setting_configtext(
         get_string('ideone_pass', 'qtype_coderunner'),
         get_string('ideone_pass_desc', 'qtype_coderunner'),
         ''));
+
+$settings->add(new admin_setting_heading('codeRunnerwssettings',
+        get_string('coderunnerwssettings', 'qtype_coderunner'), ''));
+
+$settings->add(new admin_setting_configcheckbox(
+        "qtype_coderunner/wsenabled",
+        get_string('enable_sandbox_ws', 'qtype_coderunner'),
+        get_string('enable_sandbox_ws_desc', 'qtype_coderunner'),
+        false)
+);
+
+$settings->add(new admin_setting_configtext(
+        "qtype_coderunner/wsjobeserver",
+        get_string('jobe_host_ws', 'qtype_coderunner'),
+        get_string('jobe_host_ws_desc', 'qtype_coderunner'),
+        '')
+);
+
+$settings->add(new admin_setting_configcheckbox(
+        "qtype_coderunner/wsloggingenabled",
+        get_string('wsloggingenable', 'qtype_coderunner'),
+        get_string('wsloggingenable_desc', 'qtype_coderunner'),
+        true)
+);
+
+$settings->add(new admin_setting_configtext(
+        "qtype_coderunner/wsmaxhourlyrate",
+        get_string('wsmaxhourlyrate', 'qtype_coderunner'),
+        get_string('wsmaxhourlyrate_desc', 'qtype_coderunner'),
+        '200')
+);
+
+$settings->add(new admin_setting_configtext(
+        "qtype_coderunner/wsmaxcputime",
+        get_string('wsmaxcputime', 'qtype_coderunner'),
+        get_string('wsmaxcputime_desc', 'qtype_coderunner'),
+        '5')
+);
