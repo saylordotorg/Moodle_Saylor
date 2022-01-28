@@ -58,7 +58,7 @@ require(['jquery'], function ($) {
                   // Set unique ID.
                   $(htmlParser).find('.html-question').attr('id', 'ace-editor-html' + index);
                   var htmlEditor = ace.edit("ace-editor-html" + index);
-                  htmlEditor.setTheme("ace/theme/solarized_dark");
+                  htmlEditor.setTheme("ace/theme/saylor");
                   htmlEditor.getSession().setMode("ace/mode/html");
                   htmlEditor.setOptions({
                   fontSize: "16pt",
@@ -80,7 +80,7 @@ require(['jquery'], function ($) {
                   // Set unique ID.
                   $(htmlParser).find('.css-question').attr('id', 'ace-editor-css' + index);
                   var cssEditor = ace.edit("ace-editor-css" + index);
-                  cssEditor.setTheme("ace/theme/solarized_dark");
+                  cssEditor.setTheme("ace/theme/saylor");
                   cssEditor.getSession().setMode("ace/mode/css");
                   cssEditor.getSession().setValue(cssArea.val());
                   cssEditor.getSession().on('change', function() {
@@ -95,7 +95,7 @@ require(['jquery'], function ($) {
                     // Set unique ID.
                     $(htmlParser).find('.js-question').attr('id', 'ace-editor-js' + index);
                     var jsEditor= ace.edit("ace-editor-js" + index);
-                    jsEditor.setTheme("ace/theme/solarized_dark");
+                    jsEditor.setTheme("ace/theme/saylor");
                     jsEditor.getSession().setMode("ace/mode/javascript");
                     jsEditor.getSession().setValue(jsArea.val());
                     jsEditor.getSession().on('change', function() {
