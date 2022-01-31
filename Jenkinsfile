@@ -307,6 +307,12 @@ def plugins = [
       "url" : 'https://github.com/moodleuulm/moodle-availability_role.git',
       "branch" : 'master',
       "dest" : 'availability/condition/role'
+    ],
+    [
+      "name" : 'tool_trigger',
+      "url" : 'https://github.com/catalyst/moodle-tool_trigger.git',
+      "branch" : 'master',
+      "dest" : 'admin/tool'
     ]
 ]
 
