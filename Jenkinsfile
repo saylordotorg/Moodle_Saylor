@@ -453,6 +453,12 @@ def plugins = [
       "dest" : 'availability/condition/coursecompleted'
     ],
     [
+      "name" : 'tool_certificate',
+      "url" : 'https://github.com/moodleworkplace/moodle-tool_certificate.git',
+      "branch" : 'master',
+      "dest" : 'admin/tool/certificate'
+    ],
+    [
       "name" : 'mod_coursecertificate',
       "url" : 'https://github.com/moodleworkplace/moodle-mod_coursecertificate.git',
       "branch" : 'master',
