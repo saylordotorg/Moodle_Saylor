@@ -451,6 +451,12 @@ def plugins = [
       "url" : 'https://github.com/ewallah/moodle-availability_coursecompleted.git',
       "branch" : 'main',
       "dest" : 'availability/condition/coursecompleted'
+    ],
+    [
+      "name" : 'mod_coursecertificate',
+      "url" : 'https://github.com/moodleworkplace/moodle-mod_coursecertificate.git',
+      "branch" : 'master',
+      "dest" : 'mod/coursecertificate'
     ]
 ]
 
