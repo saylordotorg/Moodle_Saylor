@@ -18,7 +18,7 @@
  * Main filter code for FilterCodes.
  *
  * @package    filter_filtercodes
- * @copyright  2017-2021 TNG Consulting Inc. - www.tngconsulting.ca
+ * @copyright  2017-2022 TNG Consulting Inc. - www.tngconsulting.ca
  * @author     Michael Milette
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -35,7 +35,7 @@ require_once($CFG->dirroot . '/course/renderer.php');
 /**
  * Extends the moodle_text_filter class to provide plain text support for new tags.
  *
- * @copyright  2017-2021 TNG Consulting Inc. - www.tngconsulting.ca
+ * @copyright  2017-2022 TNG Consulting Inc. - www.tngconsulting.ca
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class filter_filtercodes extends moodle_text_filter {
@@ -1357,8 +1357,15 @@ class filter_filtercodes extends moodle_text_filter {
 
             // Tag: {coursesactive}. The total visible courses.
             if (stripos($text, '{coursesactive}') !== false) {
-                // Count visible courses excluding front page.
-                $cnt = $DB->count_records('course', ['visible' => 1]) - 1;
+                // Count current courses (between start and end date, if any) set to Show - excluding front page.
+                $today = time();
+                $sql = "SELECT COUNT(id)
+                        FROM {course}
+                        WHERE visible = 1
+                            AND startdate <= :today
+                            AND (enddate > :today2 OR enddate = 0);";
+                // Subtract one for site course id = 1).
+                $cnt = $DB->count_records_sql($sql, ['today' => $today, 'today2' => $today]) - 1;
                 $replace['/\{coursesactive\}/i'] = $cnt;
             }
 

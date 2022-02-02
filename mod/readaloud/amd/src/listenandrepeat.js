@@ -31,7 +31,7 @@ define(['jquery', 'core/log', 'core/ajax', 'mod_readaloud/definitions', 'mod_rea
       self.phonetics = props.phonetics;
       self.ds_only = props.ds_only;
       self.shadow = props.shadow;
-      self.ttr
+      self.ttr={};
 
       //recorder stuff
       var theCallback =function(message) {
@@ -40,11 +40,17 @@ define(['jquery', 'core/log', 'core/ajax', 'mod_readaloud/definitions', 'mod_rea
               if (self.shadow === true) {
                 self.controls.playbutton.trigger('click');
               }
+              //hide the self model player (though it may not be here) because we do not want it playing old stuff into mic
+              self.controls.playselfbutton.hide();
+
               break;
 
             case 'recordingstopped':
                   if (self.shadow === true){
                     self.controls.hiddenplayer[0].pause();
+                  }
+                  if(self.ds_only || self.ttr.usebrowserrec===false){
+                    self.controls.playselfbutton.show();
                   }
                   break;
 
@@ -69,7 +75,8 @@ define(['jquery', 'core/log', 'core/ajax', 'mod_readaloud/definitions', 'mod_rea
       opts.ds_only = self.ds_only;
       opts.callback = theCallback;
       opts.shadow = true;
-      self.ttr = ttrecorder.clone().init(opts);
+      self.ttr = ttrecorder.clone();
+      self.ttr.init(opts);
 
 
       self.prepare_controls();
@@ -92,10 +99,12 @@ define(['jquery', 'core/log', 'core/ajax', 'mod_readaloud/definitions', 'mod_rea
       var self = this;
       self.controls.container = $('#' + def.landrcontainer);
       self.controls.hiddenplayer = $('#mod_readaloud_landr_hiddenplayer');
+      self.controls.hiddenselfplayer = $('#mod_readaloud_landr_hiddenselfplayer');
       self.controls.playbutton = $('#mod_readaloud_landr_modalplay');
       self.controls.shadowplaybutton = $('#mod_readaloud_landr_modalshadowplay');
       self.controls.skipbutton = $('#mod_readaloud_landr_modalskip');
       self.controls.finishedbutton = $("#mod_readaloud_landr_modalfinished");
+      self.controls.playselfbutton = $("#mod_readaloud_landr_modalplayself");
       self.audiourl = self.mak.fetch_audio_url();
       self.controls.hiddenplayer.attr('src', self.audiourl);
 
@@ -172,12 +181,28 @@ define(['jquery', 'core/log', 'core/ajax', 'mod_readaloud/definitions', 'mod_rea
       var self = this;
 
       self.controls.playbutton.on('click', function(e) {
-        self.controls.hiddenplayer[0].currentTime = self.currentAudioStart;
-        self.controls.hiddenplayer[0].play();
+        if (!self.controls.hiddenplayer[0].paused) {
+          self.controls.hiddenplayer[0].pause();
+        }else {
+          self.controls.hiddenplayer[0].currentTime = self.currentAudioStart;
+          self.controls.hiddenplayer[0].play();
+        }
+      });
+
+      self.controls.playselfbutton.on('click',function(e){
+        if (!self.controls.hiddenselfplayer[0].paused) {
+          self.controls.hiddenselfplayer[0].pause();
+        }else {
+          self.controls.hiddenselfplayer.attr('src', self.ttr.audio.dataURI);
+          self.controls.hiddenselfplayer[0].play();
+        }
       });
 
       self.controls.skipbutton.on('click', function(e) {
         self.controls.container.modal('hide');
+
+        //hide the self model player because when we show page again we dont want it enabled
+        self.controls.playselfbutton.hide();
 
         //we might get here from a 100% score on final break on the modal (it calls the skip button
         //so we check if its finished or not. Otherwise it will return to the first break and start playing

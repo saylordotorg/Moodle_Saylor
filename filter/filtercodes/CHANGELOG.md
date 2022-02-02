@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [2.2.8] 2022-01-18 (DEV)
+## [2.2.8] 2022-02-01 (DEV)
 ### Added
 - New {ifnotvisible}{/ifnotvisible}
 - New {showmore}{/showmore} tags (ALPHA).
@@ -29,6 +29,7 @@ All notable changes to this project will be documented in this file.
 - New {userscountrycount} tag.
 - Known limitation in README.md regarding Moodle's 'Download course content' feature.
 ### Updated
+- {coursesactive} no longer count courses that are before start date or after end date, if any.
 - Renamed {courseteachers} tag to {coursecontacts}. No longer ALPHA.
 - {coursecontacts} now display's based on role coursecontacts setting in Site Admin > Display > Courses.
 - The {highlight} tag now uses HTML5 mark tags instead of span tags.
@@ -42,6 +43,7 @@ All notable changes to this project will be documented in this file.
 - Fixed {ifprofile_field_...} tag visibility and clarified documentation.
 - {coursecards} no longer displays hidden courses or those whose end-dates are past, unless you are an administrator.
 - Results fron {course_field_shortname} and {course_fields} are now both processed through Moodle filters.
+- Updated copyright notice to include 2022.
 
 ## [2.2.1] 2021-05-25
 ### Updated
@@ -78,6 +80,7 @@ All notable changes to this project will be documented in this file.
 - {filtercodes} tag now works on all pages but only for users who have course:update capability.
 - Custom menu tags should not be processed through the "URL to Link" (urltolink) filter. See README.md to update your theme.
 - Documentation in this README.md file.
+- Tested to be compatible up to and including Moodle 3.11.
 - Copyright notice for 2021.
 
 ## [2.1.0] 2020-11-23

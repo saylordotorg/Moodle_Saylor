@@ -149,6 +149,7 @@ define(['jquery', 'core/log', 'mod_readaloud/ttaudiohelper', 'core/notification'
                     that.audiohelper.onStream = on_gotstream;
 
                 }//end of setting up recorders
+
             },
 
             prepare_html: function(){

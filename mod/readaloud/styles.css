@@ -605,8 +605,11 @@ div.mod_readaloud_attemptsummarytable {
 .mod_readaloud_grading_passageword {
   cursor: pointer;
 }
-
 #mod_readaloud_landr_modalfinished {
+  display: none;
+}
+
+#mod_readaloud_landr_modalplayself {
   display: none;
 }
 

@@ -1,0 +1,76 @@
+{{!
+    This file is part of the mod_coursecertificate plugin for Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_coursecertificate/view_page
+
+    Template for showing the view page.
+
+    Example context (json):
+    {
+        "certificateid": 1,
+        "certificatename": "Certificate Name",
+        "showautomaticsend": true,
+        "showreport": true,
+        "automaticsend": true,
+        "notemplateselected": false,
+        "showhiddenwarning": false,
+        "shownoautosendinfo": false,
+        "table": "<table></table>"
+    }
+}}
+<div data-region="mod_coursecertificate_view">
+    <h2>{{certificatename}}</h2>
+    {{#studentview}}
+        {{#notemplateselected}}
+            <div class="alert alert-danger mt-3">
+                {{#str}} notemplateselecteduser, coursecertificate {{/str}}
+            </div>
+        {{/notemplateselected}}
+    {{/studentview}}
+    {{^studentview}}
+        {{#showautomaticsend}}
+            <div data-region="automaticsend-alert" class="position-relative w-100">
+                {{> coursecertificate/automaticsend_alert}}
+            </div>
+        {{/showautomaticsend}}
+        {{#notemplateselected}}
+            <div class="alert alert-danger mt-3">
+                {{#str}} notemplateselected, coursecertificate {{/str}}
+            </div>
+        {{/notemplateselected}}
+        <div class="alert alert-warning mt-3 hidden-warning {{^showhiddenwarning}}d-none{{/showhiddenwarning}}">
+            {{#str}} activityhiddenwarning, coursecertificate {{/str}}
+        </div>
+        <div class="alert alert-info mt-3 noautosend-info {{^shownoautosendinfo}}d-none{{/shownoautosendinfo}}">
+            {{#str}} automaticsenddisabledalert, coursecertificate {{/str}}
+        </div>
+        {{#showreport}}
+            <h3>{{#str}} certifiedusers, coursecertificate {{/str}}</h3>
+            <div data-region="issues-report" class="position-relative w-100">
+                {{> coursecertificate/issues_report}}
+            </div>
+        {{/showreport}}
+    {{/studentview}}
+</div>
+
+{{#js}}
+    {{^studentview}}
+    require(['mod_coursecertificate/manager'], function(m) {
+        m.init();
+    });
+    {{/studentview}}
+{{/js}}

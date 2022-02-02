@@ -2381,6 +2381,24 @@ if(true){
                 get_string('submitrawaudio_details', constants::M_COMPONENT));
         $mform->setDefault('submitrawaudio', $config->submitrawaudio);
 
+        $name = 'activityopenscloses';
+        $label = get_string($name, 'readaloud');
+        $mform->addElement('header', $name, $label);
+        $mform->setExpanded($name, false);
+
+        $name = 'viewstart';
+        $label = get_string($name, "readaloud");
+        $mform->addElement('date_time_selector', $name, $label, array('optional' => true));
+
+        $mform->addHelpButton($name, $name,constants::M_COMPONENT);
+
+
+        $name = 'viewend';
+        $label = get_string($name, "readaloud");
+        $mform->addElement('date_time_selector', $name, $label,  array('optional' => true));
+        $mform->addHelpButton($name, $name,constants::M_COMPONENT);
+
+
         // Post attempt
         $mform->addElement('header', 'postattemptheader', get_string('postattemptheader', constants::M_COMPONENT));
 

@@ -125,4 +125,18 @@ class mod_readaloud_mod_form extends moodleform_mod {
         }
     }
 
+
+public function validation($data, $files) {
+        $errors = parent::validation($data, $files);
+        
+          if (!empty($data['viewend'])) {
+            if ($data['viewend'] < $data['viewstart']) {
+                $errors['viewend'] = "End date should be after Start Date";
+            }
+        }
+
+
+
+        return $errors;
+    }
 }

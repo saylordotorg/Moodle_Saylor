@@ -1,0 +1,112 @@
+image: moodlehq/moodle-workplace-plugin-ci:7.3
+
+services:
+- postgres:9.6
+#- mysql:5.7.26
+- name: selenium/standalone-chrome:3
+  alias: selenium-standalone-chrome
+
+variables:
+  MOODLE_REPO_WORKPLACE: git@git.in.moodle.com:workplace/workplacedev.git
+  MOODLE_BRANCH_WORKPLACE: master
+  MOODLE_REPO_LMS: git@git.in.moodle.com:moodle/moodle.git
+  MOODLE_BRANCH_LMS: MOODLE_311_STABLE
+  MOODLE_BRANCH_LMSPREV: MOODLE_310_STABLE
+  MOODLE_BEHAT_WDHOST: "http://selenium-standalone-chrome:4444/wd/hub"
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: ""
+  POSTGRES_HOST_AUTH_METHOD: "trust"
+  MYSQL_ALLOW_EMPTY_PASSWORD: "true"
+  DB: "pgsql"
+#  DB: "mysqli"
+
+# Gitlab-ci does not have matrixes, so we have these hidden jobs .setupworkplace and .setuplms to do the set up.
+.setupworkplace: &setupworkplace
+  before_script:
+  - export MOODLE_REPO=$MOODLE_REPO_WORKPLACE
+  - export MOODLE_BRANCH=$MOODLE_BRANCH_WORKPLACE
+  - . prepare-workplace $cibot_sshkey
+  - cd $CI_PROJECT_DIR/..
+  - moodle-plugin-ci add-plugin --clone git@git.in.moodle.com:workplace/moodle-theme_workplace.git
+  - moodle-plugin-ci add-plugin --clone git@git.in.moodle.com:workplace/moodle-tool_tenant.git
+  - moodle-plugin-ci add-plugin --clone git@git.in.moodle.com:workplace/moodle-tool_wp.git
+  - moodle-plugin-ci add-plugin --clone git@git.in.moodle.com:workplace/moodle-tool_reportbuilder.git
+  - moodle-plugin-ci add-plugin --clone git@git.in.moodle.com:workplace/moodle-tool_dynamicrule.git
+  - moodle-plugin-ci add-plugin --clone git@git.in.moodle.com:workplace/moodle-tool_organisation.git
+  - moodle-plugin-ci install --db-host="$DB_HOST" --no-init -vvv
+  - cd moodle
+
+codecheck:
+  <<: *setupworkplace
+  script:
+  - php admin/tool/phpunit/cli/init.php
+  - php admin/tool/phpunit/cli/util.php --buildcomponentconfigs
+  - . check-start
+  - . check version_number
+  - . check no_workplace_licenses
+  - . check this_plugin_is_part_of "the tool_certificate plugin for Moodle - http://moodle.org/" --nowplicensecomment
+  - . check language_file_sorting
+  - . check moodle-plugin-ci phplint
+  #- . check moodle-plugin-ci phpcpd
+  #- . check moodle-plugin-ci phpmd
+  - . check moodle-plugin-ci codechecker --max-warnings 0
+  - . check moodle-plugin-ci phpdoc
+  - . check moodle-plugin-ci validate
+  - . check moodle-plugin-ci savepoints
+  - . check moodle-plugin-ci mustache
+  - . check moodle-plugin-ci grunt --max-lint-warnings 0
+  - . check vendor/bin/phpunit --fail-on-risky --disallow-test-output --filter tool_dataprivacy_metadata_registry_testcase
+  - . check vendor/bin/phpunit --fail-on-risky --disallow-test-output --filter core_externallib_testcase
+  - . check vendor/bin/phpunit --fail-on-risky --disallow-test-output --testsuite core_privacy_testsuite --filter provider_testcase
+  - . check moodle-plugin-ci phpunit --coverage-text
+  - . check-finish
+  except:
+  - tags
+
+behat:
+  <<: *setupworkplace
+  script:
+  - php -S ${IPADDRESS}:8000 -t $CI_PROJECT_DIR/../moodle > /dev/null 2>&1 &
+  - php admin/tool/behat/cli/init.php --add-core-features-to-theme --parallel=3 --optimize-runs=@tool_certificate
+  - . check-start
+  - . check moodle-plugin-ci behat --suite workplace --profile chrome
+  - . check-finish
+  except:
+  - master
+  - tags
+  - /^WORKPLACE_\d+$/
+
+.scriptlms: &scriptlms
+  script:
+    - export MOODLE_REPO=$MOODLE_REPO_LMS
+    # TODO: when all plugins are removed, remove the argument with the sshkey but leave the call to prepare-workplace, it sets up the env
+    - . prepare-workplace $cibot_sshkey
+    - cd $CI_PROJECT_DIR/..
+    - moodle-plugin-ci install --db-host="$DB_HOST" --no-init -vvv
+    - cd moodle
+    - php admin/tool/phpunit/cli/init.php
+    - php admin/tool/phpunit/cli/util.php --buildcomponentconfigs
+    - php -S ${IPADDRESS}:8000 -t $CI_PROJECT_DIR/../moodle > /dev/null 2>&1 &
+    - php admin/tool/behat/cli/init.php --add-core-features-to-theme --parallel=3 --optimize-runs=@tool_certificate
+    - . check-start
+    - . check moodle-plugin-ci phpunit --coverage-text
+    - . check moodle-plugin-ci behat --suite default --profile chrome
+    - . check-finish
+
+lms:
+  before_script:
+    - export MOODLE_BRANCH=$MOODLE_BRANCH_LMS
+  <<: *scriptlms
+  except:
+    - master
+    - tags
+    - /^WORKPLACE_\d+$/
+
+lmsprev:
+  before_script:
+    - export MOODLE_BRANCH=$MOODLE_BRANCH_LMSPREV
+  <<: *scriptlms
+  except:
+    - master
+    - tags
+    - /^WORKPLACE_\d+$/

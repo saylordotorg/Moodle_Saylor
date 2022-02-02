@@ -183,6 +183,27 @@ if ($attempts && $reviewattempts) {
 //show activity description
 echo $renderer->show_intro($moduleinstance, $cm);
 
+//show open close dates
+$hasopenclosedates = $moduleinstance->viewend > 0 || $moduleinstance->viewstart>0;
+if($hasopenclosedates){
+    echo $renderer->show_open_close_dates($moduleinstance);
+    $current_time=time();
+    $closed = false;
+    if ( $current_time>$moduleinstance->viewend){
+        echo get_string('activityisclosed',constants::M_COMPONENT);
+        $closed = true;
+    }elseif($current_time<$moduleinstance->viewstart){
+        echo get_string('activityisnotopenyet',constants::M_COMPONENT);
+        $closed = true;
+    }
+    //if we are not a teacher and the activity is closed/not-open leave at this point
+    if(!has_capability('mod/readaloud:preview',$modulecontext) && $closed){
+        echo $renderer->footer();
+        exit;
+    }
+}
+
+
 //show small report
 if($attempts) {
     if(!$latestattempt){$latestattempt = current($attempts);}
