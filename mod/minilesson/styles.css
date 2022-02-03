@@ -1742,7 +1742,8 @@ div.mod_minilesson_feedback_cont.mod_minilesson_postattempt {
 .mod_minilesson_itemvideo_cont,
 .mod_minilesson_itemaudio_cont,
 .mod_minilesson_itemiframe_cont,
-.mod_minilesson_itemttsaudio_cont {
+.mod_minilesson_itemttsaudio_cont,
+.mod_minilesson_itemytclip_cont {
   width: 100%;
   margin-top: 10px;
   text-align: center;
@@ -1765,7 +1766,8 @@ div.mod_minilesson_feedback_cont.mod_minilesson_postattempt {
   margin: auto;
 }
 
-.mod_minilesson_itemiframe_cont {
+.mod_minilesson_itemiframe_cont,
+.mod_minilesson_itemytclip_cont {
   margin-top: 10px;
   margin-left: auto;
   margin-right: auto;

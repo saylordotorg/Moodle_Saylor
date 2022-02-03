@@ -480,6 +480,7 @@ $string['addmedia'] = 'Add Media';
 $string['addiframe'] = 'Add iFrame';
 $string['addttsaudio'] = 'Add TTS Audio';
 $string['addtextarea'] = 'Add Text Block';
+$string['addyoutubeclip'] = 'Add YouTube Clip';
 
 //showtextprompt
 $string['showtextprompt'] = 'Show text prompt';
@@ -511,4 +512,9 @@ $string['freetrial_desc'] = "A dialog should appear that allows you to register 
 $string['memberdashboard'] = "Member Dashboard";
 $string['memberdashboard_desc'] = "";
 $string['fillcredentials']="Set API user and secret with existing credentials";
+
+$string['ytclipdetails'] = "Youtube Clip";
+$string['itemytid'] = "Youtube Video ID";
+$string['itemytstart'] = "Start Secs";
+$string['itemytend'] = "End Secs";
 

@@ -228,6 +228,17 @@ class helper
             $theitem->{constants::QUESTIONTEXTAREA} = trim($data->{constants::QUESTIONTEXTAREA});
         }
 
+        //Item YT Clip
+        if (property_exists($data, constants::YTVIDEOID)) {
+            $theitem->{constants::YTVIDEOID} = $data->{constants::YTVIDEOID};
+            if (property_exists($data, constants::YTVIDEOSTART)) {
+                $theitem->{constants::YTVIDEOSTART} = $data->{constants::YTVIDEOSTART};
+            }
+            if (property_exists($data, constants::YTVIDEOEND)) {
+                $theitem->{constants::YTVIDEOEND} = $data->{constants::YTVIDEOEND};
+            }
+        }
+
         //save correct answer if we have one
         if (property_exists($data, constants::CORRECTANSWER)) {
             $theitem->{constants::CORRECTANSWER} = $data->{constants::CORRECTANSWER};

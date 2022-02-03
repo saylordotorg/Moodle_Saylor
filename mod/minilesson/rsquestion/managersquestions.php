@@ -254,6 +254,11 @@ if ($edit) {
         }else{
             $data->addiframe = 0;
         }
+        if(!empty($data->{constants::YTVIDEOID})){
+            $data->addyoutubeclip = 1;
+        }else{
+            $data->addyoutubeclip = 0;
+        }
         if(!empty($data->{constants::QUESTIONTEXTAREA})){
             $edoptions = constants::ITEMTEXTAREA_EDOPTIONS;
             $data = file_prepare_standard_editor($data, constants::QUESTIONTEXTAREA, $edoptions, $context, constants::M_COMPONENT,

@@ -188,6 +188,12 @@ class comprehensiontest
                     $testitem->itemttsoption=$item->{constants::TTSQUESTIONOPTION};
                     $testitem->itemttsautoplay=$item->{constants::TTSAUTOPLAY};
                 }
+                //YT Clip
+                if(!empty(trim($item->{constants::YTVIDEOID}))){
+                    $testitem->itemytvideoid=$item->{constants::YTVIDEOID};
+                    $testitem->itemytvideostart=$item->{constants::YTVIDEOSTART};
+                    $testitem->itemytvideoend=$item->{constants::YTVIDEOEND};
+                }
 
                 //Question TextArea
                 if(!empty(trim($item->{constants::QUESTIONTEXTAREA}))){
@@ -220,13 +226,14 @@ class comprehensiontest
             $imageset = isset($testitem->itemimage) && !empty($testitem->itemimage);
             $videoset =isset($testitem->itemvideo) && !empty($testitem->itemvideo);
             $iframeset =isset($testitem->itemiframe) && !empty($testitem->itemiframe);
+            $ytclipset =isset($testitem->itemytvideoid) && !empty($testitem->itemytvideoid);
 
             //layout
             $testitem->layout=$item->{constants::LAYOUT};
             if($testitem->layout==constants::LAYOUT_AUTO) {
                 //if its not a page or shortanswer, any big content item will make it horizontal layout
                 if ($testitem->type !== constants::TYPE_PAGE && $testitem->type !== constants::TYPE_SHORTANSWER) {
-                    if ($textset || $imageset || $videoset || $iframeset) {
+                    if ($textset || $imageset || $videoset || $iframeset || $ytclipset) {
                         $testitem->horizontal = true;
                     }
                 }

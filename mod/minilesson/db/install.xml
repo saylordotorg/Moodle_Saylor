@@ -71,6 +71,9 @@
             <FIELD NAME="itemttsoption" TYPE="int" LENGTH="2" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
             <FIELD NAME="itemtextarea" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
             <FIELD NAME="itemttsautoplay" TYPE="int" LENGTH="2" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
+            <FIELD NAME="itemytid" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+            <FIELD NAME="itemytstart" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
+            <FIELD NAME="itemytend" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
             <FIELD NAME="itemaudiofname" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
             <FIELD NAME="customtext1" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
             <FIELD NAME="customtext1format" TYPE="int" LENGTH="2" NOTNULL="false" SEQUENCE="false"/>

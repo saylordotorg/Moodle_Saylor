@@ -1,3 +1,7 @@
+Version 1.0.32(Build 2022020300)
+- Fixed broken new item saving when not using Japanese on qs with speech recognition
+- Added Youtube Clip content type
+
 Version 1.0.31(Build 2022012500)
 - Added missing number/alphabet processing class
 

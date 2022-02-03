@@ -472,7 +472,6 @@ class renderer extends \plugin_renderer_base {
         return $ret_html;
     }
 
-
     /**
      * Return HTML to display message about problem
      */

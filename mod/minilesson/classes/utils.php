@@ -664,7 +664,7 @@ class utils{
                     $phonetic = implode('', $phonebits);
                     $segments=$phrase;
                 }
-
+                $phones_and_segments = [$phonetic,$segments];
                 //the resulting phonetic string will look like this: 0S IS A TK IT IS A KT WN TW 0T IS A MNK
                 // but "one" and "won" result in diff phonetic strings and non english support is not there so
                 //really we want to put an IPA database on services server and poll as we do for katakanify
@@ -772,15 +772,16 @@ class utils{
                     $phonetic = implode('',$katakanaarray);
                     $segments = implode('',$segmentarray);
                 }
+                //cache results, so the same data coming again returns faster and saves traffic
+
+                $cache->set($phrasekey,$phones_and_segments );
                 break;
 
             default:
                 $phonetic = '';
                 $segments = $phrase;
+                $phones_and_segments = [$phonetic,$segments];
         }
-        //cache results, so the same data coming again returns faster and saves traffic
-        $phones_and_segments = [$phonetic,$segments];
-        $cache->set($phrasekey,$phones_and_segments );
         return $phones_and_segments;
     }
 
