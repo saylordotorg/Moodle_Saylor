@@ -21,7 +21,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace qtype_gapfill\privacy;
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Privacy Subsystem for qtype_gapfill implementing null_provider.
@@ -31,8 +30,7 @@ defined('MOODLE_INTERNAL') || die();
  */
 class provider implements
     // This plugin does not store any personal user data.
-    \core_privacy\local\metadata\null_provider
-{
+    \core_privacy\local\metadata\null_provider {
     /**
      * Get the language string identifier with the component's language
      * file to explain why this plugin stores no data.

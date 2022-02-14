@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="admin/tool/trigger/db" VERSION="20210224" COMMENT="XMLDB file for Moodle admin/tool/trigger"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="tool_trigger_workflows" COMMENT="Workflows for the Trigger administration tool">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Name of this workflow"/>
+        <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Description of the workflow"/>
+        <FIELD NAME="event" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="event name associated with this workflow"/>
+        <FIELD NAME="enabled" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="is this workflow enabled"/>
+        <FIELD NAME="realtime" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="is this workflow realtime"/>
+        <FIELD NAME="draft" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Is this workflow in draft mode"/>
+        <FIELD NAME="debug" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Flag for debug mode"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Timestamp when this workflow was created"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Timestamp when this workflow was last modified"/>
+        <FIELD NAME="timetriggered" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Timestamp of when the workflow was last triggered"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="event" UNIQUE="false" FIELDS="event" COMMENT="event index"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="tool_trigger_queue" COMMENT="Queue of workflow tasks to be processed.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="workflowid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="ID of the workflow this queue item relates to"/>
+        <FIELD NAME="eventid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="ID of the trigger event this queue item relates to"/>
+        <FIELD NAME="status" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Status of processing. 0 pending, 1, processed, -1 failed"/>
+        <FIELD NAME="tries" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="number of times this item has attempted to be processed"/>
+        <FIELD NAME="laststep" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="ID of last step that was attempted."/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Timestamp this item was added to the queue"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Time this item was last modifief"/>
+        <FIELD NAME="executiontime" TYPE="int" LENGTH="15" NOTNULL="false" SEQUENCE="false" COMMENT="optional execution time."/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="workflowid" TYPE="foreign" FIELDS="workflowid" REFTABLE="tool_trigger_workflows" REFFIELDS="id" COMMENT="foreign key relates to id in workflow table"/>
+        <KEY NAME="eventid" TYPE="foreign" FIELDS="eventid" REFTABLE="tool_trigger_events" REFFIELDS="id"/>
+        <KEY NAME="laststep" TYPE="foreign" FIELDS="laststep" REFTABLE="tool_trigger_steps" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="tool_trigger_steps" COMMENT="Table to store data about individual steps in a workflow.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="workflowid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The workflow ID this step relates to."/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="name of the step"/>
+        <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Description of the step"/>
+        <FIELD NAME="type" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Type of the step"/>
+        <FIELD NAME="stepclass" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="the class path for the step"/>
+        <FIELD NAME="data" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="The JSON data for the step."/>
+        <FIELD NAME="steporder" TYPE="int" LENGTH="4" NOTNULL="true" SEQUENCE="false" COMMENT="The steps order in the workflow processing"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The time the step was created"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The time the step was last modified"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="workflowid" TYPE="foreign" FIELDS="workflowid" REFTABLE="tool_trigger_workflows" REFFIELDS="id" COMMENT="Foreign key for workflow table"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="class" UNIQUE="false" FIELDS="stepclass" COMMENT="index for class paths"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="tool_trigger_events" COMMENT="Events that we have active workflow subscriptions for.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="eventname" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="component" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="action" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="target" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="objecttable" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="objectid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="crud" TYPE="char" LENGTH="1" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="edulevel" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="contextid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="contextlevel" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="contextinstanceid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="relateduserid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="anonymous" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Was this event anonymous at the time of triggering?"/>
+        <FIELD NAME="other" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="origin" TYPE="char" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="cli, cron, ws, etc."/>
+        <FIELD NAME="ip" TYPE="char" LENGTH="45" NOTNULL="false" SEQUENCE="false" COMMENT="IP address"/>
+        <FIELD NAME="realuserid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="real user id when logged-in-as"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="contextid" TYPE="foreign" FIELDS="contextid" REFTABLE="context" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="timecreated" UNIQUE="false" FIELDS="timecreated"/>
+        <INDEX NAME="eventname" UNIQUE="false" FIELDS="eventname"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="tool_trigger_learn_events" COMMENT="Captured events to learn field types from.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="eventname" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="component" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="action" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="target" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="objecttable" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="objectid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="crud" TYPE="char" LENGTH="1" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="edulevel" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="contextid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="contextlevel" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="contextinstanceid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="relateduserid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="anonymous" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Was this event anonymous at the time of triggering?"/>
+        <FIELD NAME="other" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="origin" TYPE="char" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="cli, cron, ws, etc."/>
+        <FIELD NAME="ip" TYPE="char" LENGTH="45" NOTNULL="false" SEQUENCE="false" COMMENT="IP address"/>
+        <FIELD NAME="realuserid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="real user id when logged-in-as"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="contextid" TYPE="foreign" FIELDS="contextid" REFTABLE="context" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="timecreated" UNIQUE="false" FIELDS="timecreated"/>
+        <INDEX NAME="eventname" UNIQUE="false" FIELDS="eventname"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="tool_trigger_event_fields" COMMENT="Table stores the available fields for am event. Fields and their data types ares tored in JSON">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="eventname" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="the name of the event"/>
+        <FIELD NAME="jsonfields" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="The fields available for this event in JSON"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="eventname" UNIQUE="true" FIELDS="eventname"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="tool_trigger_workflow_hist" COMMENT="Table for storing workflow run history">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="workflowid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Id of the workflow for the run"/>
+        <FIELD NAME="number" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Trigger run number"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="15" NOTNULL="true" SEQUENCE="false" COMMENT="Time that this run was created."/>
+        <FIELD NAME="eventid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="ID of the event in the events table."/>
+        <FIELD NAME="event" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="The event data that triggered this run"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="The user id which triggered this event"/>
+        <FIELD NAME="failedstep" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="A field to hold the last failed step number for the run."/>
+        <FIELD NAME="errorstep" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="The step that had an error, if there was one."/>
+        <FIELD NAME="attemptnum" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="1" SEQUENCE="false" COMMENT="The attempt number, if errored this increments."/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="eventid" TYPE="foreign" FIELDS="eventid" REFTABLE="tool_trigger_events" REFFIELDS="id" COMMENT="Relates to the event id in the events table."/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="tool_trigger_run_hist" COMMENT="Table to store run history">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="workflowid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Workflow ID for this run"/>
+        <FIELD NAME="runid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="ID of the run for the step"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="The name of the step executed"/>
+        <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Description of the step"/>
+        <FIELD NAME="type" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="The type of step"/>
+        <FIELD NAME="stepclass" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Class of step"/>
+        <FIELD NAME="data" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="The data for the step"/>
+        <FIELD NAME="steporder" TYPE="int" LENGTH="4" NOTNULL="true" SEQUENCE="false" COMMENT="Order of steps"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Time created"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Time last modified"/>
+        <FIELD NAME="executed" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Time of execution"/>
+        <FIELD NAME="prevstepid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="ID of previous step in the run flow"/>
+        <FIELD NAME="number" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The number of the step within the run"/>
+        <FIELD NAME="results" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="stepconfigid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="This is the ID of the step in the steps table"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="workflowid" TYPE="foreign" FIELDS="workflowid" REFTABLE="tool_trigger_workflows" REFFIELDS="id" COMMENT="ID of the workflow"/>
+        <KEY NAME="run" TYPE="foreign" FIELDS="runid" REFTABLE="tool_trigger_workflow_hist" REFFIELDS="id"/>
+        <KEY NAME="stepconfigid" TYPE="foreign" FIELDS="stepconfigid" REFTABLE="tool_trigger_steps" REFFIELDS="id" COMMENT="Key to the step in the steps table"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="class" UNIQUE="false" FIELDS="stepclass"/>
+      </INDEXES>
+    </TABLE>
+  </TABLES>
+</XMLDB>
