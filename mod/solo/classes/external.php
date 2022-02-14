@@ -354,4 +354,27 @@ class external extends external_api {
         return new external_value(PARAM_RAW);
     }
 
+    public static function submit_step_parameters() {
+        return new external_function_parameters([
+            'cmid' => new external_value(PARAM_INT),
+            'step' => new external_value(PARAM_INT),
+            'action' => new external_value(PARAM_ALPHA),
+            'data' => new external_value(PARAM_RAW)
+        ]);
+    }
+
+    public static function submit_step($cmid,$step,$action,$data) {
+          $params = self::validate_parameters(self::submit_step_parameters(),
+            array('cmid'=>$cmid,'step'=>$step,'action'=>$action, 'data'=>$data));
+        $dataobject=json_decode($data);
+        $cm = get_coursemodule_from_id(constants::M_MODNAME, $cmid, 0, false, MUST_EXIST);
+        $attempt_helper =  new attempthelper($cm);
+        $ret = $attempt_helper->submit_step($step,$dataobject);
+        return json_encode($ret);
+    }
+
+    public static function submit_step_returns() {
+        return new external_value(PARAM_RAW);
+    }
+
 }

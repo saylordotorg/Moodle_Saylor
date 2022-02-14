@@ -83,6 +83,19 @@ $capabilities = array(
                 'clonepermissionsfrom' => 'moodle/course:manageactivities'
         ),
 
+          'mod/solo:preview' => array(
+                'captype' => 'write',
+                'contextlevel' => CONTEXT_COURSE,
+                'archetypes' => array(
+                        'teacher' => CAP_ALLOW,
+                        'editingteacher' => CAP_ALLOW,
+                        'manager' => CAP_ALLOW
+                ),
+                'clonepermissionsfrom' => 'moodle/grade:viewall'
+        ),
+
+
+
         'mod/solo:viewreports' => array(
                 'riskbitmask' => RISK_XSS,
                 'captype' => 'write',

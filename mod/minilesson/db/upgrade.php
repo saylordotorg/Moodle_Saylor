@@ -225,7 +225,7 @@ function xmldb_minilesson_upgrade($oldversion) {
         $fields=[];
         $fields[] = new xmldb_field('itemytid', XMLDB_TYPE_TEXT, null, null, null, null);
         $fields[]= new xmldb_field('itemytstart', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0);
-        $fields[]= new xmldb_field('itemytend', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, constants::LAYOUT_AUTO);
+        $fields[]= new xmldb_field('itemytend', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0);
 
         // Add fields
         foreach ($fields as $field) {
@@ -235,6 +235,52 @@ function xmldb_minilesson_upgrade($oldversion) {
         }
 
         upgrade_mod_savepoint(true, 2022020300, 'minilesson');
+    }
+
+
+ // Add open and close dates to the activity
+    if ($oldversion < 2022020800) {
+        $table = new xmldb_table(constants::M_TABLE);
+
+        $fields=[];
+        $fields[] = new xmldb_field('viewstart', XMLDB_TYPE_INTEGER, 10, XMLDB_NOTNULL, null, 0);
+        $fields[] = new xmldb_field('viewend', XMLDB_TYPE_INTEGER, 10, XMLDB_NOTNULL, null, 0);
+
+        // Add fields
+        foreach ($fields as $field) {
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+
+        upgrade_mod_savepoint(true, 2022020800, 'minilesson');
+    }
+    //redo the prompt/response =>
+    if ($oldversion < 2022021400) {
+        $questions = $DB->get_records(constants::M_QTABLE);
+        foreach($questions as $question){
+            $sentences = explode(PHP_EOL, $question->customtext1);
+            $updaterequired=false;
+            $newsentences=[];
+            foreach($sentences as $sentence){
+                $sentencebits = explode('|', $sentence);
+                if (count($sentencebits) > 1) {
+                    $updaterequired=true;
+                    $audioprompt = trim($sentencebits[1]);
+                    $correctresponse= trim($sentencebits[0]);
+                    $textprompt = $correctresponse;
+                    $newsentences[]=$audioprompt . '|' . $correctresponse .'|' . $textprompt;
+                }else{
+                    $newsentences[]=$sentence;
+                }//end of if count
+            }//end of for sentences
+            if($updaterequired){
+                $updatetext=implode(PHP_EOL,$newsentences);
+                $DB->update_record(constants::M_QTABLE,array('id'=>$question->id,'customtext1'=>$updatetext));
+            }
+        }
+
+        upgrade_mod_savepoint(true, 2022021400, 'minilesson');
     }
 
     // Final return of upgrade result (true, all went good) to Moodle.

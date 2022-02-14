@@ -61,4 +61,14 @@ $functions = array(
                 'type'        => 'write',
                 'ajax'        => true,
         ),
+
+        'mod_minilesson_duplicate_item' => array(
+            'classname'   => 'mod_minilesson_external',
+            'methodname'  => 'duplicate_item',
+            'description' => 'duplicate item.',
+            'capabilities'=> 'mod/minilesson:managequestions',
+            'type'        => 'write',
+            'ajax'        => true,
+        )
+
 );

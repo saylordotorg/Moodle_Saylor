@@ -66,7 +66,20 @@ $capabilities = [
                     'manager' => CAP_ALLOW
             ],
             'clonepermissionsfrom' => 'moodle/grade:viewall'
-    ]
+    ],
+
+ 'mod/wordcards:preview' => array(
+                'captype' => 'write',
+                'contextlevel' => CONTEXT_COURSE,
+                'archetypes' => array(
+                        'teacher' => CAP_ALLOW,
+                        'editingteacher' => CAP_ALLOW,
+                        'manager' => CAP_ALLOW
+                ),
+                'clonepermissionsfrom' => 'moodle/grade:viewall'
+        ),
+
+    
 
 ];
 

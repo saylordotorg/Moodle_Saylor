@@ -341,6 +341,16 @@ $string['attempt_parttwo_instructions'] = 'Use the recorder below to record your
 $string['attempt_partthree_instructions'] = 'Listen to your recording and enter what you said in the editor below. Do not change what you said, when you type it.';
 $string['attempt_partfour_instructions'] = 'Compare the transcript you entered, to the automatically generated transcript. Are there many differences? Could you improve your speaking? Enter your self review in the text fields below.';
 
+$string['step_preparetitle']='Prepare';
+$string['step_prepareinstructions']='Check the speaking topic, target words and target speaking time from the options below. When you are ready, move to the next page and begin speaking';
+$string['step_mediarecordtitle']='Record';
+$string['step_mediarecordinstructions']='Use the recorder below to record yourself. Try to use the target words. Good luck.';
+$string['step_typetitle']='Enter Text';
+$string['step_typeinstructions']='Use the recorder below to record yourself. Try to use the target words. Good luck.';
+$string['step_selftranscribetitle']='Transcribe';
+$string['step_selftranscribeinstructions']='Listen to your recording and enter what you said in the editor below. Do not change what you said, when you type it.';
+
+
 $string['savesubtitles'] = 'Save Speech';
 $string['removesubtitles'] = 'Remove Speech';
 $string['addnew'] = 'Add new';
@@ -584,3 +594,17 @@ $string['freetrial_desc'] = "A dialog should appear that allows you to register 
 $string['memberdashboard'] = "Member Dashboard";
 $string['memberdashboard_desc'] = "";
 $string['fillcredentials']="Set API user and secret with existing credentials";
+
+$string['viewstart']="Activity open";
+$string['viewend']="Activity close";
+$string['viewstart_help']="If set, prevents a student from entering the activity before the start date/time.";
+$string['viewend_help']="If set, prevents a student from entering the activity after the closing date/time.";
+$string['activitydate:submissionsdue'] = 'Due:';
+$string['activitydate:submissionsopen'] = 'Opens:';
+$string['activitydate:submissionsopened'] = 'Opened:';
+$string['activityisnotopenyet']="This activity is not open yet.";
+$string['activityisclosed']="This activity is closed.";
+$string['open']="Open: ";
+$string['until']="Until: ";
+$string['activityopenscloses']="Activity open/close dates";
+$string['solo:preview'] = 'Can preview Wordcards activities';

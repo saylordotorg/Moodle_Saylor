@@ -1,7 +1,8 @@
 /* jshint ignore:start */
 define(['jquery','jqueryui', 'core/log','core/templates','mod_minilesson/definitions','mod_minilesson/modalformhelper',
-        'mod_minilesson/modaldeletehelper','mod_minilesson/moveitemhelper','mod_minilesson/modalpreviewhelper','mod_minilesson/datatables'],
-    function($, jqui, log, templates, def, mfh, mdh, mih, mph, datatables) {
+        'mod_minilesson/modaldeletehelper','mod_minilesson/moveitemhelper','mod_minilesson/modalpreviewhelper',
+        'mod_minilesson/duplicateitemhelper','mod_minilesson/datatables'],
+    function($, jqui, log, templates, def, mfh, mdh, mih, mph,dplh, datatables) {
 
     "use strict"; // jshint ;_;
 
@@ -139,6 +140,28 @@ define(['jquery','jqueryui', 'core/log','core/templates','mod_minilesson/definit
                 dd.controls.noquestionscontainer.hide();
                 dd.controls.questionscontainer.show();
             };
+            var after_questionduplicate= function($resp) {
+
+                var ret = JSON.parse($resp);
+                var item={};
+                item.id = ret.newitemid;
+                item.name = decodeURIComponent(ret.newitemname);
+                item.type = ret.type;
+                item.typelabel = decodeURIComponent(ret.typelabel);
+                item.index = dd.controls.questionstable.data().length+1;
+                item.up = {'key': 't/up','component': 'moodle','title': 'up'};
+                item.down = {'key': 't/down','component': 'moodle','title': 'down'};
+                templates.render('mod_minilesson/itemlistitem',item).then(
+                    function(html,js){
+                        //add row move to the last page so we can see the new row if its off page
+                        dd.controls.questionstable.row.add($(html)[0]).page('last').draw(false);
+                        dd.collate_rowids();
+                        dd.hide_useless_arrows();
+                    }
+                );
+                dd.controls.noquestionscontainer.hide();
+                dd.controls.questionscontainer.show();
+            };
             var after_questiondelete= function(itemid) {
                 log.debug('after question delete');
                 var therow=dd.controls.questionstable.row('#' + def.itemrow + '_' + itemid);
@@ -172,6 +195,8 @@ define(['jquery','jqueryui', 'core/log','core/templates','mod_minilesson/definit
             mih.init('.' + def.movearrow , dd.contextid, after_questionmove);
             //preview helper
             mph.init('.' + def.itemrow + '_previewlink', dd.contextid, after_questionpreview);
+            //duplicate item helper
+            dplh.init('.' + def.itemrow + '_duplicatelink', dd.contextid, after_questionduplicate);
         }
 
     };//end of returned object

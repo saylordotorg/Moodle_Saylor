@@ -24,12 +24,13 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  **/
 
-use \mod_solo\constants;
-use \mod_solo\utils;
+
 
 require_once("../../../config.php");
 require_once($CFG->dirroot.'/mod/solo/lib.php');
 
+use \mod_solo\constants;
+use \mod_solo\utils;
 
 global $USER,$DB;
 
@@ -218,9 +219,9 @@ if ($data = $mform->get_data()) {
             $st_altered = $attempt && $newattempt->selftranscript
                     && $attempt->selftranscript != $newattempt->selftranscript;
             if($st_altered) {
-                $stats = utils::calculate_stats($newattempt->selftranscript, $attempt);
+                $stats = utils::calculate_stats($newattempt->selftranscript, $attempt, $moduleinstance->ttslanguage);
                 if ($stats) {
-                    $stats = utils::fetch_sentence_stats($newattempt->selftranscript,$stats);
+                    $stats = utils::fetch_sentence_stats($newattempt->selftranscript,$stats,$moduleinstance->ttslanguage);
                     $stats = utils::fetch_word_stats($newattempt->selftranscript,$moduleinstance->ttslanguage,$stats);
                     $stats = utils::calc_grammarspell_stats($newattempt->selftranscript,$moduleinstance->region,
                             $moduleinstance->ttslanguage,$stats);
@@ -289,8 +290,132 @@ $PAGE->navbar->add(get_string('editingattempt', constants::M_COMPONENT, get_stri
 $mode='attempts';
 
 echo $renderer->header($moduleinstance, $cm,$mode, null, get_string('edit', constants::M_COMPONENT));
+
+
+
+//show open close dates
+$hasopenclosedates = $moduleinstance->viewend > 0 || $moduleinstance->viewstart>0;
+if($hasopenclosedates){
+    echo $renderer->box($renderer->show_open_close_dates($moduleinstance), 'generalbox');
+    $current_time=time();
+    $closed = false;
+    if ( $current_time>$moduleinstance->viewend){
+        echo get_string('activityisclosed',constants::M_COMPONENT);
+        $closed = true;
+    }elseif($current_time<$moduleinstance->viewstart){
+        echo get_string('activityisnotopenyet',constants::M_COMPONENT);
+        $closed = true;
+    }
+    //if we are not a teacher and the activity is closed/not-open leave at this point
+    if(!has_capability('mod/solo:preview', $context) && $closed){
+        echo $renderer->footer();
+        exit;
+    }
+}
+
+
 echo $attempt_renderer->add_edit_page_links($moduleinstance, $attempt,$type,$cm);
 echo html_writer::start_div(constants::M_COMPONENT .'_step' . $type);
-$mform->display();
+
+//generic step info
+$stepcontent = $moduleinstance;
+$stepcontent->attemptid = $attemptid;
+$stepcontent->type = $type;
+$stepcontent->cmid = $cm->id;
+$stepcontent->nexturl = $redirecturl;
+
+//specific step data and then render
+switch($type . 'FALSEEEE') {
+
+    case constants::STEP_USERSELECTIONS:
+
+        //contentitem
+        $contentitem = [];
+        $context = \context_module::instance($cm->id);
+
+        //Prepare speaking topic text
+        $contentitem['itemtext']=$moduleinstance->speakingtopic;
+
+        //Prepare IFrame
+        if(!empty(trim($moduleinstance->topiciframe))){
+            $contentitem['itemiframe']=$moduleinstance->topiciframe;
+        }
+
+        //Prepare TTS prompt
+        if(!empty(trim($moduleinstance->topictts))){
+            $contentitem['itemtts']=utils::fetch_polly_url($token,$moduleinstance->region,$moduleinstance->topictts,'text',$moduleinstance->topicttsvoice);
+        }
+
+        //media items
+        $itemid=0;
+        $filearea='topicmedia';
+        $mediaurls = utils::fetch_media_urls($context->id,$filearea,$itemid);
+        if($mediaurls && count($mediaurls)>0){
+            foreach($mediaurls as $mediaurl){
+                $file_parts = pathinfo(strtolower($mediaurl));
+                switch($file_parts['extension'])
+                {
+                    case "jpg":
+                    case "png":
+                    case "gif":
+                    case "bmp":
+                    case "svg":
+                        $contentitem['itemimage'] = $mediaurl;
+                        break;
+
+                    case "mp4":
+                    case "mov":
+                    case "webm":
+                    case "ogv":
+                        $contentitem['itemvideo'] = $mediaurl;
+                        break;
+
+                    case "mp3":
+                    case "ogg":
+                    case "wav":
+                        $contentitem['itemaudio'] = $mediaurl;
+                        break;
+
+                    default:
+                        //do nothing
+                }//end of extension switch
+            }//end of for each
+        }//end of if mediaurls
+        //there is only one contentitem in the array , it just seems the neatest way to pass a big chunk of data to a partial
+        $stepcontent->contentitems = [$contentitem];
+        echo $renderer->render_from_template(constants::M_COMPONENT . '/stepprepare', $stepcontent);
+
+        break;
+    case constants::STEP_AUDIORECORDING:
+
+        $width = 450;
+        $height = 280;
+        $media = 'audio';
+        if ($media=='video') {
+        $stepcontent->recordvideo = 1;
+        }
+        else{
+            $stepcontent->recordaudio = 1;
+        }
+
+        $stepcontent->rec = utils::fetch_recorder_data($cm, $moduleinstance, $media, $token, $width, $height);
+        echo $renderer->render_from_template(constants::M_COMPONENT . '/stepmediarecord', $stepcontent);
+        break;
+
+    case constants::STEP_SELFTRANSCRIBE:
+
+        $stepcontent->audiofilename=$attempt->filename;
+        if(isset($attempt->selftranscript)&&!empty($attempt->selftranscript)){
+            $stepcontent->selftranscript=$attempt->selftranscript;
+        }else{
+            $stepcontent->selftranscript='';
+        }
+        echo $renderer->render_from_template(constants::M_COMPONENT . '/stepselftranscribe', $stepcontent);
+        break;
+    default:
+        $mform->display();
+
+}
+
 echo html_writer::end_div();
 echo $renderer->footer();

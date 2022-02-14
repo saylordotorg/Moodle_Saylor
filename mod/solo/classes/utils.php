@@ -22,9 +22,13 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
  namespace mod_solo;
+
 defined('MOODLE_INTERNAL') || die();
 
 use \mod_solo\constants;
+
+//sometimes its not present ... how
+require_once($CFG->dirroot . '/mod/solo/lib.php');
 
 
 /**
@@ -208,20 +212,7 @@ class utils{
         return true;
     }
 
-    //fetch interlocutor array to string
-    public static function interlocutors_array_to_string($interlocutors) {
-        //the incoming data is an array, and we need to csv it.
-        if($interlocutors) {
-            if(is_array($interlocutors)) {
-                $ret = implode(',', $interlocutors);
-            }else{
-                $ret = $interlocutors;
-            }
-        }else{
-            $ret ='';
-        }
-        return $ret;
-    }
+
 
     //fetch lang server url, services incl. 'transcribe' , 'lm', 'lt', 'spellcheck'
     public static function fetch_lang_server_url($region,$service='transcribe'){
@@ -247,7 +238,7 @@ class utils{
         }
     }
 
-    public static function fetch_sentence_stats($text,$stats){
+    public static function fetch_sentence_stats($text,$stats, $language){
 
         //count sentences
         $items = preg_split('/[!?.]+(?![0-9])/', $text);
@@ -260,7 +251,7 @@ class utils{
         $averagesentence=1;
         $totallengths = 0;
         foreach($items as $sentence){
-            $length = str_word_count($sentence,0);
+            $length = self::mb_count_words($sentence,$language);
             if($length>$longestsentence){
                 $longestsentence =$length;
             }
@@ -281,7 +272,7 @@ class utils{
         //prepare data
         $is_english=strpos($language,'en')===0;
         $items = \core_text::strtolower($text);
-        $items = str_word_count($items, 1);
+        $items = self::mb_count_words($items,$language,1);
         $items = array_unique($items);
 
         //unique words
@@ -307,6 +298,33 @@ class utils{
         return $stats;
     }
 
+    public static function mb_count_words($string, $language, $format=0)
+    {
+        //wordcount will be different for different languages
+        switch($language){
+            //arabic
+            case constants::M_LANG_ARAE:
+            case constants::M_LANG_ARSA:
+                //remove double spaces and count spaces remaining to estimate words
+                $string= preg_replace('!\s+!', ' ', $string);
+                switch($format){
+
+                    case 1:
+                        $wordcount = explode(' ', $string);
+                        break;
+                    case 0:
+                    default:
+                        $wordcount = substr_count($string, ' ') + 1;
+                }
+
+                break;
+            //others
+            default:
+                $wordcount = str_word_count($string,$format);
+        }
+
+        return $wordcount;
+    }
 
     /**
      * count_syllables
@@ -376,9 +394,19 @@ class utils{
             return $stats;
         }
 
+        //get lanserver lang string
+        switch($language){
+            case constants::M_LANG_ARSA:
+            case constants::M_LANG_ARAE:
+                $uselanguage = 'ar';
+                break;
+            default:
+                $uselanguage = $language;
+        }
+
         //fetch grammar stats
         $lt_url = utils::fetch_lang_server_url($region,'lt');
-        $postdata =array('text'=> $selftranscript,'language'=>$language);
+        $postdata =array('text'=> $selftranscript,'language'=>$uselanguage);
         $autogrammar = utils::curl_fetch($lt_url,$postdata,'post');
         //default grammar score
         $autogrammarscore =100;
@@ -386,7 +414,7 @@ class utils{
         //fetch spell stats
         $spellcheck_url = utils::fetch_lang_server_url($region,'spellcheck');
         $spelltranscript = diff::cleanText($selftranscript);
-        $postdata =array('passage'=>$spelltranscript,'lang'=>$language);
+        $postdata =array('passage'=>$spelltranscript,'lang'=>$uselanguage);
         $autospell = utils::curl_fetch($spellcheck_url,$postdata,'post');
         //default spell score
         $autospellscore =100;
@@ -451,10 +479,10 @@ class utils{
             $moduleinstance = $DB->get_record(constants::M_TABLE, array('id' => $attempt->solo));
         }
         if(!$stats){
-            $stats = self::calculate_stats($attempt->selftranscript, $attempt);
+            $stats = self::calculate_stats($attempt->selftranscript, $attempt,$moduleinstance->ttslanguage);
             //if that worked, and why wouldn't it, lets save them too.
             if ($stats) {
-                $stats = utils::fetch_sentence_stats($attempt->selftranscript,$stats);
+                $stats = utils::fetch_sentence_stats($attempt->selftranscript,$stats,$moduleinstance->ttslanguage);
                 $stats = utils::fetch_word_stats($attempt->selftranscript,$moduleinstance->ttslanguage,$stats);
                 $stats = self::calc_grammarspell_stats($attempt->selftranscript,
                         $moduleinstance->region,$moduleinstance->ttslanguage,$stats);
@@ -491,7 +519,7 @@ class utils{
     }
 
     //calculate stats of transcript (no db code)
-    public static function calculate_stats($usetranscript, $attempt){
+    public static function calculate_stats($usetranscript, $attempt, $language){
         $stats= new \stdClass();
         $stats->turns=0;
         $stats->words=0;
@@ -511,7 +539,9 @@ class utils{
         $jsontranscript = '';
 
         foreach($transcriptarray as $sentence){
-            $wordcount = str_word_count($sentence,0);
+            //wordcount will be different for different languages
+            $wordcount = self::mb_count_words($sentence,$language);
+
             if($wordcount===0){continue;}
             $jsontranscript .= $sentence . ' ' ;
             $stats->turns++;
@@ -631,6 +661,7 @@ class utils{
         //apply use ratio (default aiaccuracy)
         //eg we reduce score according to accuracy. in this case 50%
         // 64 x 50 x .01 = 32
+        if(!is_number($useratio)){$useratio=0;}//ai accuracy returns  "--" ..
         $autograde = $autograde * $useratio * .01;
 
         //apply bonuses
@@ -1429,6 +1460,69 @@ class utils{
         }
     }
 
+    /**
+     * The html part of the recorder (js is in the fetch_activity_amd)
+     * PARAM $media one of audio, video
+     * PARAM $recordertype something like "upload" or "fresh" or "bmr"
+     */
+    public static function fetch_recorder_data($cm, $moduleinstance, $media, $token,$width,$height){
+        global $CFG, $USER;
+        $rec = new \stdClass();
+
+        $rec->timelimit = $moduleinstance->maxconvlength * 60;
+        $rec->recorderskin = $moduleinstance->recorderskin;
+        $rec->recordertype = $moduleinstance->recordertype;
+
+
+        $rec->widgetid = \html_writer::random_id(constants::M_WIDGETID);
+
+        switch ($moduleinstance->transcriber){
+            case constants::TRANSCRIBER_AMAZONSTREAMING :
+                $moduleinstance->transcriber = constants::TRANSCRIBER_AMAZONTRANSCRIBE;
+            case constants::TRANSCRIBER_AMAZONTRANSCRIBE:
+            case constants::TRANSCRIBER_GOOGLECLOUDSPEECH:
+            case constants::TRANSCRIBER_NONE:
+            default:
+            $can_transcribe = \mod_solo\utils::can_transcribe($moduleinstance);
+            $rec->transcribe = $can_transcribe ? $moduleinstance->transcriber : "0";
+            $rec->subtitle=$rec->transcribe;
+            $rec->speechevents="0";
+        }
+
+        //we encode any hints
+        $hints = new \stdClass();
+        $rec->hints = base64_encode(json_encode($hints));
+        $rec->id='therecorder';
+        $rec->parent=$CFG->wwwroot;
+        $rec->owner=hash('md5',$USER->username);
+        $rec->localloading='auto';
+        $rec->localloader= constants::M_URL . '/poodllloader.html';
+        $rec->media=$media;
+        $rec->appid=constants::M_COMPONENT;
+        $rec->width=$width;
+        $rec->height=$height;
+        $rec->updatecontrol=constants::M_WIDGETID . constants::RECORDINGURLFIELD;
+        $rec->transcode="1";
+        $rec->language=$moduleinstance->ttslanguage;
+        $rec->expiredays=$moduleinstance->expiredays;
+        $rec->region=$moduleinstance->region;
+        $rec->fallback='warning';
+        $rec->token=$token;
+
+        //here we set up any info we need to pass into javascript
+        //importantly we tell it the div id of the recorder
+       // $recopts =Array();
+      //  $recopts['recorderid']=$rec->widgetid;
+
+        $rec->transcriber=$moduleinstance->transcriber;
+        $rec->expiretime=300;//max expire time is 300 seconds
+        $rec->cmid=$cm->id;
+
+        //these need to be returned and echo'ed to the page
+        return $rec;
+
+    }
+
     //fetch the MP3 URL of the text we want read aloud
     public static function fetch_polly_url($token,$region,$speaktext,$texttype, $voice) {
         global $USER;
@@ -1469,7 +1563,7 @@ class utils{
     public static function add_mform_elements($mform, $context,$setuptab=false) {
         global $CFG;
         $config = get_config(constants::M_COMPONENT);
-
+          $dateoptions = array('optional' => true);
         //if this is setup tab we need to add a field to tell it the id of the activity
         if($setuptab) {
             $mform->addElement('hidden', 'n');
@@ -1514,6 +1608,24 @@ class utils{
       self::prepare_content_toggle('topic',$mform,$context);
 //--------------------------------------------------------
 
+
+	    $name = 'activityopenscloses';
+        $label = get_string($name, 'solo');
+        $mform->addElement('header', $name, $label);
+        $mform->setExpanded($name, false);
+        //-----------------------------------------------------------------------------
+
+        $name = 'viewstart';
+        $label = get_string($name, "solo");
+        $mform->addElement('date_time_selector', $name, $label, $dateoptions);
+        $mform->addHelpButton($name, $name,constants::M_COMPONENT);
+        
+
+        $name = 'viewend';
+        $label = get_string($name, "solo");
+        $mform->addElement('date_time_selector', $name, $label, $dateoptions);
+        $mform->addHelpButton($name, $name ,constants::M_COMPONENT);
+
         // Speaking Targets
         $mform->addElement('header', 'speakingtargetsheader', get_string('speakingtargetsheader', constants::M_COMPONENT));
 
@@ -1526,7 +1638,7 @@ class utils{
         //the size attribute doesn't work because the attributes are applied on the div container holding the select
         $mform->addElement('select','maxconvlength',get_string('maxconvlength', constants::M_COMPONENT), $options,array());
         $mform->setDefault('maxconvlength',constants::DEF_CONVLENGTH);
-
+       
 
         //targetwords
         $mform->addElement('static','targetwordsexplanation','',get_string('targetwordsexplanation',constants::M_COMPONENT));

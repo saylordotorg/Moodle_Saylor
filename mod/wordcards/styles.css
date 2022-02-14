@@ -972,3 +972,31 @@ ul.definition_flashcards_ul {
 .mod_wordcards_center {
     text-align: center;
 }
+.mod_wordcards_ww_label {
+    display: inline-block;
+    width: 50px;
+    text-align: right;
+}
+.mod_wordcards_ww_onesense {
+    border: 1px solid grey;
+    border-radius: 3px;
+    margin: 20px;
+    padding: 20px;
+}
+
+.mod_wordcards_ww_sourcedef {
+    font-style: italic;
+}
+
+.mod_wordcards_ww_def {
+    width: 100%;
+    max-width: 400px;
+}
+.mod_wordcards_ww_modelsentence {
+    width: 100%;
+    max-width: 600px;
+}
+.mod_wordcards_ww_fieldset {
+    margin: 20px;
+    padding: 10px;
+}

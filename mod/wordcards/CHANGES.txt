@@ -1,3 +1,9 @@
+1.3.20 (Build 2022020800)
+- Added open and close dates (Kuldeep Banga)
+
+1.3.19 (Build 2022020500)
+- Added (beta) word wizard
+
 1.3.18 (Build 2022012000)
 - Fixed issue with incorrect name/id for Korean Polly voice Seoyeon
 - Stopped review mode from pulling items from current mod

@@ -1,0 +1,65 @@
+<div class="mod_wordcards_word_wizard_oneresult" id="{{uniqid}}_oneresult">
+    <fieldset class="mod_wordcards_ww_fieldset border p-2">
+        <legend class="w-auto">{{term}}</legend>
+        <div class="container">
+            <div class="row">
+            {{#nosenses}}
+                <div class="col-sm mod_wordcards_ww_onesense" id="{{uniqid}}_0_onesense">
+                    <div class="mod_wordcards_ww_sourcedef">{{#str}}nodefinitionfound, mod_wordcards {{/str}}</div>
+                </div>
+            {{/nosenses}}
+            {{#senses}}
+                <div class="col-sm-4 mod_wordcards_ww_onesense" id="{{uniqid}}_{{senseindex}}_onesense">
+                    <div class="mod_wordcards_ww_sourcedef">{{sourcedefinition}}</div>
+                    <span style="display: none" class="mod_wordcards_ww_trans">{{translations}}</span>
+                    <label class="mod_wordcards_ww_label">{{#str}}shortdefinition, mod_wordcards {{/str}}</label><input type="text" class="mod_wordcards_ww_def" value="{{definition}}"><br>
+                    <label class="mod_wordcards_ww_label">{{#str}}model, mod_wordcards {{/str}}</label><input type="text" class="mod_wordcards_ww_modelsentence" value="{{modelsentence}}"><br>
+                    <button class="mod_wordcards_ww_use {{uniqid}}_usebutton" data-senseindex="{{senseindex}}" type='button'>{{#str}}use, mod_wordcards {{/str}}</button>
+                    <button class="mod_wordcards_ww_dismiss {{uniqid}}_dismissbutton" data-senseindex="{{senseindex}}" type='button'>{{#str}}dismiss, mod_wordcards {{/str}}</button>
+                </div>
+            {{/senses}}
+            </div>
+        </div>
+    </fieldset>
+</div>
+{{^element.frozen}}
+    {{#js}}
+        <script>
+        require(['jquery','core/ajax'],function($,ajax) {
+
+            //remove the box
+            $(".{{uniqid}}_dismissbutton").unbind(); // bad hack to prevent multiple bindings from where?
+            $(".{{uniqid}}_dismissbutton").on("click", function() {
+                var senseindex = $(this).data('senseindex');
+                $("#{{uniqid}}_" + senseindex + "_onesense").remove();
+            });
+
+            //Update the textbox
+            $(".{{uniqid}}_usebutton").unbind(); // bad hack to prevent multiple bindings from where?
+            $(".{{uniqid}}_usebutton").on("click", function() {
+                var that = this;
+                var senseindex = $(this).data('senseindex');
+                var definition = $("#{{uniqid}}_" + senseindex + "_onesense .mod_wordcards_ww_def").val();
+                var sourcedef = $("#{{uniqid}}_" + senseindex + "_onesense .mod_wordcards_ww_sourcedef").text();
+                var translations = $("#{{uniqid}}_" + senseindex + "_onesense .mod_wordcards_ww_trans").text();
+                var modelsentence = $("#{{uniqid}}_" + senseindex + "_onesense .mod_wordcards_ww_modelsentence").val();
+
+
+                var promises = ajax.call([
+                    { methodname: 'mod_wordcards_submit_newterm',
+                        args: { modid: {{modid}}, term: "{{term}}", definition: definition,
+                                sourcedef: sourcedef, translations: translations,
+                                modelsentence: modelsentence}
+                    }
+                ]);
+
+                //update button
+                promises[0].done(function(response) {
+                    $(that).text('submitted').unbind();
+                    $(that).attr('disabled',true);
+                });
+
+            });
+        });//end of require
+    {{/js}}
+{{/element.frozen}}

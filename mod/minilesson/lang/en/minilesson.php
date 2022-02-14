@@ -312,6 +312,7 @@ $string['itemtype'] = 'Item Type';
 $string['actions'] = 'Actions';
 $string['edititem'] = 'Edit item';
 $string['previewitem'] = 'Preview item';
+$string['duplicateitem'] = 'Duplicate item';
 $string['deleteitem'] = 'Delete item';
 $string['confirmitemdelete'] = 'Are you sure you want to <i>DELETE</i> item? : {$a}';
 $string['confirmitemdeletetitle'] = 'Really Delete item?';
@@ -451,7 +452,7 @@ $string['correctresponses'] ='Correct responses';
 $string['enterresponses'] ='Enter a list of correct responses in the text area below. Place each response on a new line.';
 $string['sentenceprompts'] ='Sentences (prompts)';
 $string['entersentences'] ='Enter a list of sentences in the text area below. Place each sentence on a new line.';
-$string['phraseresponses'] ='Enter a list of speaking prompts in the text area below. Place each prompt on a new line. If the prompt and the spoken response are different, seperate them with a pipe "|" character. <br>e.g How are you?|I am fine.';
+$string['phraseresponses'] ='Enter a list of items in the text area below. Each item should be a on a new line. The format is:<br> audio prompt | correct response (optional)| text prompt (optional) <br>e.g How are you?|I am fine.';
 $string['phrases'] ='Phrases';
 
 $string['itemmedia'] ='Image, audio or video to show';
@@ -513,8 +514,23 @@ $string['memberdashboard'] = "Member Dashboard";
 $string['memberdashboard_desc'] = "";
 $string['fillcredentials']="Set API user and secret with existing credentials";
 
+
+$string['viewstart']="Activity open";
+$string['viewend']="Activity close";
+$string['viewstart_help']="If set, prevents a student from entering the activity before the start date/time.";
+$string['viewend_help']="If set, prevents a student from entering the activity after the closing date/time.";
+$string['activitydate:submissionsdue'] = 'Due:';
+$string['activitydate:submissionsopen'] = 'Opens:';
+$string['activitydate:submissionsopened'] = 'Opened:';
+$string['activityisnotopenyet']="This activity is not open yet.";
+$string['activityisclosed']="This activity is closed.";
+$string['open']="Open: ";
+$string['until']="Until: ";
+$string['activityopenscloses']="Activity open/close dates";
+
 $string['ytclipdetails'] = "Youtube Clip";
 $string['itemytid'] = "Youtube Video ID";
 $string['itemytstart'] = "Start Secs";
 $string['itemytend'] = "End Secs";
+
 

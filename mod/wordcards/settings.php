@@ -82,7 +82,7 @@ if ($ADMIN->fulltree) {
     $expiredays = utils::get_expiredays_options();
     $settings->add(new admin_setting_configselect(constants::M_COMPONENT .  '/expiredays', get_string('expiredays', constants::M_COMPONENT), '', '365', $expiredays));
 
-    //Language options
+    //TTS Language options
     $name = 'ttslanguage';
     $label = get_string($name, constants::M_COMPONENT);
     $details ="";
@@ -90,6 +90,19 @@ if ($ADMIN->fulltree) {
     $options = utils::get_lang_options();
     $settings->add(new admin_setting_configselect(constants::M_COMPONENT . "/$name",
             $label, $details, $default, $options));
+
+    //Definitions Language options
+    $name = 'deflanguage';
+    $label = get_string($name, constants::M_COMPONENT);
+    $details ="";
+    $default = "en";
+    $lexicala = utils::get_lexicala_langs();
+    $options=[];
+    foreach($lexicala as $lexone){
+        $options[$lexone['code']]=$lexone['name'];
+    }
+    $settings->add(new admin_setting_configselect(constants::M_COMPONENT . "/$name",
+        $label, $details, $default, $options));
 
     // Transcriber options
     $name = 'transcriber';

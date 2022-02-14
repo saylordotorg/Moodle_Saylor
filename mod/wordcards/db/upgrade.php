@@ -389,11 +389,49 @@ function xmldb_wordcards_upgrade($oldversion) {
     }
 
     if ($oldversion < 2022012000) {
-
         $DB->set_field('wordcards_terms','ttsvoice','Seoyeon',array('ttsvoice'=>'Seoyan'));
-
-
         upgrade_mod_savepoint(true, 2022012000, 'wordcards');
+    }
+
+    if ($oldversion < 2022020500) {
+        $table = new xmldb_table('wordcards');
+        // Define field foriframe to be added to wordcards
+        $field= new xmldb_field('deflanguage', XMLDB_TYPE_CHAR, '255', XMLDB_UNSIGNED, null, null);
+
+        // add  field to wordcards table
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        //Add translation fields to wordcards
+        $table = new xmldb_table('wordcards_terms');
+        $fields=[];
+        $fields[] = new xmldb_field('translations', XMLDB_TYPE_TEXT, null, null, null, null);
+        $fields[]= new xmldb_field('sourcedef', XMLDB_TYPE_TEXT, null, null, null, null);
+        // Add fields
+        foreach ($fields as $field) {
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+        upgrade_mod_savepoint(true, 2022020500, 'wordcards');
+    }
+
+	  if ($oldversion < 2022020800) {
+        $table = new xmldb_table(constants::M_TABLE);
+
+        $fields=[];
+        $fields[] = new xmldb_field('viewstart', XMLDB_TYPE_INTEGER, 10, XMLDB_NOTNULL, null, 0);
+        $fields[] = new xmldb_field('viewend', XMLDB_TYPE_INTEGER, 10, XMLDB_NOTNULL, null, 0);
+
+        // Add fields
+        foreach ($fields as $field) {
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+
+        upgrade_mod_savepoint(true, 2022020800, 'wordcards');
     }
 
     return true;

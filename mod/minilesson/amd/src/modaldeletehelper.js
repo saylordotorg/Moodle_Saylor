@@ -1,8 +1,8 @@
 /**
  * Add a create new group modal to the page.
  *
- * @module     mod_minilesson/modalformhelper
- * @class      modalformhelper
+ * @module     mod_minilesson/modaldeletehelper
+ * @class      modaldeletehelper
  * @package    mod_minilesson
  * @copyright  2020 Justin Hunt <poodllsupport@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

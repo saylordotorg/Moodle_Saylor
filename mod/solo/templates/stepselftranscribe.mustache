@@ -1,0 +1,58 @@
+
+{{! we set the base form fields common to each step}}
+{{>mod_solo/stepbase}}
+
+{{! we set the title and instructions}}
+<div class="solo_steptitle">
+    {{#str}}step_selftranscribetitle, mod_solo{{/str}}
+</div>
+<div class="solo_stepinstructions">
+    {{#str}}step_selftranscribeinstructions, mod_solo{{/str}}
+</div>
+<div class="mod_solo_speakingtopic_readonly">
+    {{#str}}speakingtopic, mod_solo{{/str}}:{{speakingtopic}}
+</div>
+<div class="mod_solo_bordered mod_solo_readonly">
+    {{#str}}targettime, mod_solo{{/str}}: {{#str}}xmins, mod_solo, {{convlength}}{{/str}}
+</div>
+
+<div class='mod_solo_transcripteditor'>
+    {{>mod_solo/audioplayer}}
+    <div class='mod_solo_maybereloadaudio'>{{#str}}maybereloadaudio, mod_solo{{/str}}</div>
+    <textarea name="selftranscript" id="{{uniqid}}_selftranscript" class="form-control" rows="5" cols="80">{{selftranscript}}</textarea>
+</div>
+
+
+<button id="{{uniqid}}_button" type="button">Submit</button>
+{{^element.frozen}}
+    {{#js}}
+        //this submits the form data by ajax
+        require(['jquery', 'core/log','core/notification' ,'core/ajax','core/templates'],
+            function($, log, Notification, Ajax, Templates) {
+                $('#' + '{{uniqid}}_button').click(function(){
+                    var data = {};
+                    data.selftranscript = $('#' + '{{uniqid}}_selftranscript').val();
+                    data.attemptid ={{attemptid}};
+                    data.activitytype = 3; // {{type}}
+                    var cmid={{cmid}};
+                    var id={{id}};
+                    var step=3;
+                    var action = 'submitstep';
+
+                   var ret = Ajax.call([{
+                        methodname: 'mod_solo_submit_step',
+                        args: {
+                            cmid: cmid,
+                            step: step,
+                            action: action,
+                            data: JSON.stringify(data)
+                        },
+                        done:  function(a){window.location='{{{nexturl}}}';},
+                        fail: Notification.exception,
+                   }]);
+
+                });
+            }
+        );
+    {{/js}}
+{{/element.frozen}}

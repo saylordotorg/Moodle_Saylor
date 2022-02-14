@@ -81,8 +81,82 @@ class helper
             $prioritem = $item;
         }//end of for each
     }//end of move item function
+    
+    public static function get_new_itemorder($cm){
+        //get itemorder
+        $comprehensiontest = new \mod_minilesson\comprehensiontest($cm);
+        $currentitems = $comprehensiontest->fetch_items();
+        if (count($currentitems) > 0) {
+            $lastitem = array_pop($currentitems);
+            $itemorder = $lastitem->itemorder + 1;
+        } else {
+            $itemorder = 1;
+        }
+        return $itemorder;
+    }
 
+    public static function duplicate_item($minilesson,$context, $itemid)
+    {
+        global $CFG, $USER, $DB;
+        
 
+        if (!$item = $DB->get_record(constants::M_QTABLE, array('minilesson' => $minilesson->id, 'id'=>$itemid))) {
+            print_error("Could not fetch item for duplication");
+            return;
+        }
+
+        //reset the item order and clear the ID before we insert
+        $cm = get_coursemodule_from_id('', $context->instanceid, 0, false, MUST_EXIST);
+        $newitemorder = self::get_new_itemorder($cm);
+        $item->itemorder = $newitemorder;
+        $item->name = $item->name . '(1)';
+        $olditemid = $item->id;
+        unset($item->id);
+        
+        //insert new record
+        if (!$newitemid = $DB->insert_record(constants::M_QTABLE, $item)) {
+            print_error("Could not duplicate item");
+            return;
+        }
+
+        //copy files
+        $fs = get_file_storage();
+        $fileareas = array(constants::TEXTPROMPT_FILEAREA,
+            constants::TEXTPROMPT_FILEAREA . '1',
+            constants::TEXTPROMPT_FILEAREA . '2',
+            constants::TEXTPROMPT_FILEAREA . '3',
+            constants::TEXTPROMPT_FILEAREA . '4',
+            constants::MEDIAQUESTION);
+        
+        //file record
+        $newfilerecord = new \stdClass();
+        $newfilerecord->userid = $USER->id;
+        $newfilerecord->contextid = $context->id;
+        $newfilerecord->component = constants::M_COMPONENT;
+        $newfilerecord->itemid = $newitemid;
+        $newfilerecord->filepath = '/';
+        $newfilerecord->license = $CFG->sitedefaultlicense;
+        $newfilerecord->author = 'Moodle User';
+        $newfilerecord->source = '';
+        $newfilerecord->timecreated = time();
+        $newfilerecord->timemodified = time();
+
+        foreach ($fileareas as $filearea) {
+            $newfilerecord->filearea = $filearea;
+            $files = $fs->get_area_files($context->id, constants::M_COMPONENT, $filearea, $olditemid);
+            if($files){
+                foreach ($files as $file){
+                    if($file->get_filename()!=='.') {
+                        $newfilerecord->filename = $file->get_filename();
+                        $fs->create_file_from_storedfile($newfilerecord, $file);
+                    }
+                }
+            }
+        }
+        $typelabel = get_string($item->type,constants::M_COMPONENT);
+       return [$newitemid,$item->name,$item->type,$typelabel];
+    }//end of move item function
+    
     public static function delete_item($minilesson, $itemid, $context)
     {
         global $DB;
@@ -99,10 +173,11 @@ class helper
             constants::TEXTPROMPT_FILEAREA . '1',
             constants::TEXTPROMPT_FILEAREA . '2',
             constants::TEXTPROMPT_FILEAREA . '3',
-            constants::TEXTPROMPT_FILEAREA . '4');
+            constants::TEXTPROMPT_FILEAREA . '4',
+            constants::MEDIAQUESTION);
 
         foreach ($fileareas as $filearea) {
-            $fs->delete_area_files($context->id, 'mod_minilesson', $filearea, $itemid);
+            $fs->delete_area_files($context->id, constants::M_COMPONENT, $filearea, $itemid);
         }
         $ret = true;
         return $ret;

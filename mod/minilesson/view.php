@@ -132,6 +132,27 @@ if(has_capability('mod/minilesson:evaluate',$modulecontext)){
 $comp_test =  new \mod_minilesson\comprehensiontest($cm);
 $itemcount = $comp_test->fetch_item_count();
 
+//show open close dates
+$hasopenclosedates = $moduleinstance->viewend > 0 || $moduleinstance->viewstart>0;
+if($hasopenclosedates){
+    echo $renderer->box($renderer->show_open_close_dates($moduleinstance), 'generalbox');
+
+    $current_time=time();
+    $closed = false;
+    if ( $current_time>$moduleinstance->viewend){
+        echo get_string('activityisclosed',constants::M_COMPONENT);
+        $closed = true;
+    }elseif($current_time<$moduleinstance->viewstart){
+        echo get_string('activityisnotopenyet',constants::M_COMPONENT);
+        $closed = true;
+    }
+    //if we are not a teacher and the activity is closed/not-open leave at this point
+    if(!has_capability('mod/minilesson:canpreview',$modulecontext) && $closed){
+        echo $renderer->footer();
+        exit;
+    }
+}
+
 if($latestattempt->status==constants::M_STATE_COMPLETE){
     echo $renderer->show_finished_results($comp_test,$latestattempt, $canattempt);
 }else if($itemcount > 0) {

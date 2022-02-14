@@ -47,5 +47,13 @@ $functions = array(
                 'ajax' => true,
                 'type' => 'read',
                 'capabilities' => 'mod/solo:view'
+        ),
+        'mod_solo_submit_step' => array(
+            'classname' => '\mod_solo\external',
+            'methodname' => 'submit_step',
+            'description' => 'submits a step of the attempt',
+            'ajax' => true,
+            'type' => 'write',
+            'capabilities' => 'mod/solo:view'
         )
 );

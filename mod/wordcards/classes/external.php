@@ -160,6 +160,30 @@ class mod_wordcards_external extends external_api {
         return new external_value(PARAM_BOOL);
     }
 
+    public static function submit_newterm_parameters() {
+        return new external_function_parameters([
+            'modid' => new external_value(PARAM_INT),
+            'term' => new external_value(PARAM_RAW),
+            'definition' => new external_value(PARAM_RAW),
+            'translations' => new external_value(PARAM_RAW),
+            'sourcedef' => new external_value(PARAM_RAW),
+            'modelsentence' => new external_value(PARAM_RAW),
+        ]);
+    }
+
+    public static function submit_newterm($modid,$term, $definition,$translations,$sourcedef,$modelsentence){
+        $ret= utils::save_newterm($modid,$term, $definition,$translations,$sourcedef,$modelsentence);
+        if($ret){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    public static function submit_newterm_returns() {
+        return new external_value(PARAM_BOOL);
+    }
+
+
     public static function submit_mform_parameters() {
         return new external_function_parameters(
                 array(

@@ -18,6 +18,8 @@ use mod_wordcards\constants;
 class mod_wordcards_helper {
 
     public static function get_tabs(mod_wordcards_module $mod, $current) {
+        global $CFG;
+
         $config = get_config(constants::M_COMPONENT);
         $cmid = $mod->get_cmid();
         $canmanage = $mod->can_manage();
@@ -99,7 +101,14 @@ class mod_wordcards_helper {
             $tabs[] = new tabobject('import',
                 new moodle_url('/mod/wordcards/import.php', ['id' => $cmid]),
                 get_string('tabimport', constants::M_COMPONENT), '', true);
+
+            if(isset($CFG->wordcards_experimental) && $CFG->wordcards_experimental) {
+                $tabs[] = new tabobject('wordwizard',
+                    new moodle_url('/mod/wordcards/wordwizard.php', ['id' => $cmid]),
+                    get_string('wordwizard', constants::M_COMPONENT), '', true);
+            }
         }
+
 
         return new tabtree($tabs, $current, $inactives);
     }

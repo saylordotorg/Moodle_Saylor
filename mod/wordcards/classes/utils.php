@@ -1019,6 +1019,15 @@ class utils{
                 $options);
         $mform->setDefault('ttslanguage',$config->ttslanguage);
 
+        $lexicala = utils::get_lexicala_langs();
+        $options=[];
+        foreach($lexicala as $lexone){
+            $options[$lexone['code']]=$lexone['name'];
+        }
+        $mform->addElement('select', 'deflanguage', get_string('deflanguage', 'mod_wordcards'),
+            $options);
+        $mform->setDefault('deflanguage',$config->deflanguage);
+
         $mform->addElement('header', 'hdrappearance', get_string('appearance'));
         $mform->setExpanded('hdrappearance');
 
@@ -1082,7 +1091,24 @@ class utils{
         $mform->addElement('select', 'frontfaceflip', get_string('frontfaceflip', 'mod_wordcards'),
                 $frontfaceoptions, $config->frontfaceflip);
 
+  // show activity open closes
+   $dateoptions = array('optional' => true);
+        $name = 'activityopenscloses';
+        $label = get_string($name, 'wordcards');
+        $mform->addElement('header', $name, $label);
+        $mform->setExpanded($name, false);
+        //-----------------------------------------------------------------------------
 
+        $name = 'viewstart';
+        $label = get_string($name, "wordcards");
+        $mform->addElement('date_time_selector', $name, $label, $dateoptions);
+        $mform->addHelpButton($name, $name, constants::M_COMPONENT);
+        
+
+        $name = 'viewend';
+        $label = get_string($name, "wordcards");
+        $mform->addElement('date_time_selector', $name, $label, $dateoptions);
+        $mform->addHelpButton($name, $name, constants::M_COMPONENT);
     } //end of add_mform_elements
 
     public static function prepare_file_and_json_stuff($moduleinstance, $modulecontext){
@@ -1101,5 +1127,100 @@ class utils{
         );
     }
 
+    public static function save_newterm($modid,$term, $definition,$translations,$sourcedef,$modelsentence){
+
+        global $DB;
+        $mod = \mod_wordcards_module::get_by_modid($modid);
+
+        $insertdata = new \stdClass();
+        $insertdata->modid = $modid;
+        $insertdata->term = trim($term);
+        $insertdata->definition = trim($definition);
+        $insertdata->translations = trim($translations);
+        $insertdata->sourcedef = trim($sourcedef);
+        $insertdata->model_sentence = trim($modelsentence);
+        $insertdata->ttsvoice = utils::fetch_auto_voice($mod->get_mod()->ttslanguage);
+        $ret = $DB->insert_record('wordcards_terms', $insertdata);
+        if($ret && !empty($insertdata->model_sentence)){
+            $DB->update_record('wordcards', array('id' => $modid, 'hashisold' => 1));
+        }
+        return $ret;
+    }
+
+    public static function get_lexicala_langs($selected='en'){
+        $langdefs=[];
+        $langdefs[] = ['code'=>'af','name'=>'Afrikaans'];
+        $langdefs[] = ['code'=>'ar','name'=>'Arabic'];
+        $langdefs[] = ['code'=>'az','name'=>'Azerbaijani'];
+        $langdefs[] = ['code'=>'bg','name'=>'Bulgarian'];
+        $langdefs[] = ['code'=>'br','name'=>'Breton'];
+        $langdefs[] = ['code'=>'ca','name'=>'Catalan'];
+        $langdefs[] = ['code'=>'cs','name'=>'Czech'];
+        $langdefs[] = ['code'=>'de','name'=>'German'];
+        $langdefs[] = ['code'=>'dk','name'=>'Danish'];
+        $langdefs[] = ['code'=>'el','name'=>'Greek'];
+        $langdefs[] = ['code'=>'en','name'=>'English'];
+        $langdefs[] = ['code'=>'es','name'=>'Spanish'];
+        $langdefs[] = ['code'=>'et','name'=>'Estonian'];
+        $langdefs[] = ['code'=>'fa','name'=>'Persian'];
+        $langdefs[] = ['code'=>'fi','name'=>'Finnish'];
+        $langdefs[] = ['code'=>'fr','name'=>'French'];
+        $langdefs[] = ['code'=>'fy','name'=>'Western Frisian'];
+        $langdefs[] = ['code'=>'he','name'=>'Hebrew'];
+        $langdefs[] = ['code'=>'hi','name'=>'Hindi'];
+        $langdefs[] = ['code'=>'hr','name'=>'Croatian'];
+        $langdefs[] = ['code'=>'hu','name'=>'Hungarian'];
+        $langdefs[] = ['code'=>'is','name'=>'Icelandic'];
+        $langdefs[] = ['code'=>'it','name'=>'Italian'];
+        $langdefs[] = ['code'=>'ja','name'=>'Japanese'];
+        $langdefs[] = ['code'=>'ko','name'=>'Korean'];
+        $langdefs[] = ['code'=>'lt','name'=>'Lithuanian'];
+        $langdefs[] = ['code'=>'lv','name'=>'Latvian'];
+        $langdefs[] = ['code'=>'ml','name'=>'Burmese'];
+        $langdefs[] = ['code'=>'nl','name'=>'Dutch'];
+        $langdefs[] = ['code'=>'no','name'=>'Norwegian'];
+        $langdefs[] = ['code'=>'pl','name'=>'Polish'];
+        $langdefs[] = ['code'=>'prs','name'=>'English'];
+        $langdefs[] = ['code'=>'ps','name'=>'Pushto'];
+        $langdefs[] = ['code'=>'pt','name'=>'Portuguese'];
+        $langdefs[] = ['code'=>'ro','name'=>'Romanian'];
+        $langdefs[] = ['code'=>'ru','name'=>'Russian'];
+        $langdefs[] = ['code'=>'sk','name'=>'Slovak'];
+        $langdefs[] = ['code'=>'sl','name'=>'Slovenian'];
+        $langdefs[] = ['code'=>'sr','name'=>'Serbian'];
+        $langdefs[] = ['code'=>'sv','name'=>'Swedish'];
+        $langdefs[] = ['code'=>'th','name'=>'Thai'];
+        $langdefs[] = ['code'=>'tr','name'=>'Turkish'];
+        $langdefs[] = ['code'=>'tw','name'=>'Twi'];
+        $langdefs[] = ['code'=>'uk','name'=>'Ukranian'];
+        $langdefs[] = ['code'=>'ur','name'=>'Urdu'];
+        $langdefs[] = ['code'=>'vi','name'=>'Vietnamese'];
+        $langdefs[] = ['code'=>'zh','name'=>'Chinese'];
+        $default_set = false;
+        for($i=0;$i<count($langdefs);$i++){
+            if($langdefs[$i]['code']==$selected){
+                $langdefs[$i]['selected']=true;
+                $default_set = true;
+                break;
+            }
+        }
+        if(!$default_set){$langdefs[10]['selected']=true;}
+        return $langdefs;
+    }
+
+    public static function update_deflanguage($mod){
+        global $DB;
+        $terms = $DB->get_records('wordcards_terms',array('modid'=>$mod->get_mod()->id));
+        if(!$terms){return;}
+        foreach($terms as $term){
+            if(empty($term->translations)){continue;}
+            if(!self::is_json($term->translations)){continue;}
+            $translations = json_decode($term->translations);
+            if(!empty($translations) && isset($translations->{$mod->get_mod()->deflanguage})){
+                $DB->update_record('wordcards_terms',
+                    ['id'=>$term->id,'definition'=>$translations->{$mod->get_mod()->deflanguage}->text]);
+            }
+        }
+    }
 
 }

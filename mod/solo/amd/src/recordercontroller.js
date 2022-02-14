@@ -17,23 +17,31 @@ define(['jquery', 'core/log','mod_solo/definitions','mod_solo/cloudpoodllloader'
         init: function(props){
             var dd = this.clone();
 
-            //pick up opts from html
-            var theid='#amdopts_' + props.widgetid;
-            var configcontrol = $(theid).get(0);
-            if(configcontrol){
-                dd.activitydata = JSON.parse(configcontrol.value);
-                $(theid).remove();
-            }else{
-                //if there is no config we might as well give up
-                log.debug('solo Recorder Controller: No config found on page. Giving up.');
-                return;
+            if(props.hasOwnProperty('token')){
+                //opts are passed in directly (probably from mustache template)
+                dd.activitydata = props;
+
+            }else {
+                //pick up opts from html (stashed in hidden form field)
+                var theid = '#amdopts_' + props.widgetid;
+                var configcontrol = $(theid).get(0);
+                if (configcontrol) {
+                    dd.activitydata = JSON.parse(configcontrol.value);
+                    dd.activitydata.widgetid  = props.widgetid;
+                    $(theid).remove();
+                } else {
+                    //if there is no config we might as well give up
+                    log.debug('solo Recorder Controller: No config found on page. Giving up.');
+                    return;
+                }
             }
 
             dd.cmid = props.cmid;
             dd.recorderid = dd.activitydata.recorderid;
-            dd.updatecontrolid = props.widgetid + def.C_UPDATECONTROL;
-            dd.streamingresultsid = props.widgetid + def.C_STREAMINGCONTROL;
-
+            dd.updatecontrolid = dd.activitydata.widgetid + '_' + def.C_UPDATECONTROL;
+            dd.streamingresultsid = dd.activitydata.widgetid + def.C_STREAMINGCONTROL;
+log.debug( dd.activitydata);
+log.debug('updateid', dd.updatecontrolid);
 
             //if the browser doesn't support html5 recording.
             //then do not go any further

@@ -1,0 +1,161 @@
+
+<div class="mod_wordcards_ww_cont" >
+    <label for="ww_langdef">{{#str}}ww_langdef, mod_wordcards {{/str}}</label>
+    <select id="{{uniqid}}_ww_langdef" name="ww_langdef">
+        {{#langdefs}}
+            <option value="{{code}}" {{#selected}}selected{{/selected}}>{{name}}</option>
+        {{/langdefs}}
+    </select><br>
+    <label for="ww_words">{{#str}}ww_words, mod_wordcards {{/str}}</label>
+    <textarea id="{{uniqid}}_ww_words" name="ww_words" rows="4" cols="50"></textarea>
+    <a class="btn btn-secondary" id="{{uniqid}}_fetchbtn">{{#str}}ww_words_fetch, mod_wordcards{{/str}}</a>
+    <div id="{{uniqid}}_resultscont" class="mod_wordcards_ww_results"></div>
+</div>
+
+{{^element.frozen}}
+    {{#js}}
+
+        require(['jquery','core/templates','core/ajax'],function($,templates, ajax) {
+
+            //get words from text area and fetch definitions
+            var resultscont = $("#{{uniqid}}_resultscont");
+
+            $("xxx#{{uniqid}}_fetchbtn").on("click", function() {
+                var langs = ['ar','id','zh','zh_tw','ja','ko','pt','es','th','vi','fr','rus'];
+                var langdef = $("#{{uniqid}}_ww_langdef").val();
+                var allwords = $("#{{uniqid}}_ww_words").val();
+                if (allwords.trim() === '') {
+                    return;
+                }
+                var wordsarray = allwords.split(',');
+                var promises = ajax.call([
+                    {methodname: 'mod_wordcards_search_dictionary', args: {words: wordsarray, cmid: 'CMID' }},
+                ]);
+
+                promises[0].done(function (response) {
+                    if (response && response.response[0]) {
+
+                        for(var i; i < results.length;i++){
+                            var result = results[i];
+                            //if a word search failed show an editable area
+                            if(result.count===0){
+                                var tdata = {term: result.term,nosenses: true, senses: [], modid: {{modid}} };
+                                templates.render('mod_wordcards/word_wizard_oneresult',tdata).then(
+                                        function(html,js){
+                                            resultscont.append(html);
+                                            templates.runTemplateJS(js);
+                                        }
+                                );
+                            }else{
+                                var tdata = {term: result.term, senses: [], modid: {{modid}} };
+                                for(var sindex = 0;sindex < result.count; sindex++ ){
+                                    var modelsentence = result[sindex].example;
+                                    var sourcedefinition = result[sindex].definition;
+                                    var alltrans={};
+                                    for(var ti=0;ti<langs.length;ti++){
+                                        alltrans[langs[ti]] = result['lang_' + langs[ti]];
+                                    }
+                                    var translations = JSON.stringify(alltrans);
+                                    var definition = sourcedefinition;
+                                    if(langdef!=="{{langterm}}"){
+                                        if(result.hasOwnProperty('lang_' + langdef)){
+                                            definition = result['lang_' + langdef];
+                                        }else{
+                                            definition = 'No translation available';
+                                        }
+                                    }
+                                    tdata.senses.push({definition: definition,sourcedefinition: sourcedefinition,
+                                        modelsentence: modelsentence, senseindex: sindex, translations: translations});
+                                }//end of results loop
+                                templates.render('mod_wordcards/word_wizard_oneresult',tdata).then(
+                                        function(html,js){
+                                            resultscont.append(html);
+                                            templates.runTemplateJS(js);
+                                        }
+                                );
+                            }
+                        }
+                    }
+                });
+            });
+
+
+            $("#{{uniqid}}_fetchbtn").on("click", async function() {
+                var langdef = $("#{{uniqid}}_ww_langdef").val();
+                var allwords = $("#{{uniqid}}_ww_words").val();
+                if(allwords.trim()===''){return;}
+                var wordsarray = allwords.split(',');
+                var analyzed=false;
+
+                //choose dictionary (global has more entries, but passport has more en -> otherlangs
+                //For now FORCING password
+                var global_en_translations = ['br','dk','es','fr','ja','no','sv'];
+              //  if('{{langterm}}' == 'en' && !global_en_translations.includes(langdef)){
+                if(true){
+                    var dictionary="password";
+                    analyzed=true;
+                }else{
+                    var dictionary="global";
+                }
+
+                for (var i=0;i<wordsarray.length && i>-1;i++){
+                   await $.ajax({
+                        type: "GET",
+                        url: "https://dictapi.lexicala.com/search-entries",
+                        headers: {
+                        "Authorization": "Basic " + btoa("{{lexicalauser}}" + ":" + "{{lexicalapass}}")
+                        },
+                        data: {source: dictionary,language: "{{langterm}}", text: wordsarray[i], analyzed: analyzed},
+                        success: function (ret){
+
+                            //if no results
+                            if(ret.results.length===0){
+                                var senses=[];
+                                senses.push({definition: '',sourcedefinition: 'No def. available',
+                                    modelsentence: '', senseindex: 0, translations: {}})
+                                var tdata = {term: wordsarray[i], senses: senses, modid: {{modid}} };
+                                templates.render('mod_wordcards/word_wizard_oneresult',tdata).then(
+                                        function(html,js){
+                                            resultscont.append(html);
+                                            templates.runTemplateJS(js);
+                                        }
+                                );
+                            }
+                            //if results
+                            for(var rindex = 0;rindex < ret.results.length; rindex++ ){
+                                var currentresult = ret.results[rindex];
+                                var tdata = {term: currentresult.headword.text, senses: [], modid: {{modid}} };
+                                for(var sindex = 0;sindex < currentresult.senses.length; sindex++ ){
+                                    if(currentresult.senses[sindex].hasOwnProperty('examples') &&
+                                        currentresult.senses[sindex].examples.length>0){
+                                        var modelsentence = currentresult.senses[sindex].examples[0].text;
+                                    }else{
+                                        var modelsentence = '';
+                                    }
+                                    var sourcedefinition = currentresult.senses[sindex].definition;
+                                    var translations = JSON.stringify(currentresult.senses[sindex].translations);
+                                    var definition = sourcedefinition;
+                                    if(langdef!=="{{langterm}}"){
+                                        if(currentresult.senses[sindex].translations.hasOwnProperty(langdef)){
+                                            definition = currentresult.senses[sindex].translations[langdef].text;
+                                        }else{
+                                            definition = 'No translation available';
+                                        }
+                                    }
+                                    tdata.senses.push({definition: definition,sourcedefinition: sourcedefinition,
+                                            modelsentence: modelsentence, senseindex: sindex, translations: translations });
+                                }//end of results loop
+                                templates.render('mod_wordcards/word_wizard_oneresult',tdata).then(
+                                    function(html,js){
+                                        resultscont.append(html);
+                                        templates.runTemplateJS(js);
+                                    }
+                                );
+                            }
+                        }
+                    });
+                }//end of for loop
+            });//end of fetchbtn
+        });//end of require
+    {{/js}}
+{{/element.frozen}}

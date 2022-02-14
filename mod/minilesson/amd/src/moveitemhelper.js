@@ -1,8 +1,8 @@
 /**
  * Add a modal to manage question adding and editing to the page.
  *
- * @module     mod_minilesson/modalformhelper
- * @class      modalformhelper
+ * @module     mod_minilesson/moveitemhelper
+ * @class      moveitemhelper
  * @package    mod_minilesson
  * @copyright  2020 Justin Hunt <poodllsupport@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

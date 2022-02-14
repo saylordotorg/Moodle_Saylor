@@ -30,7 +30,7 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'mod_minilesson/poll
 
     prepare_audio: function(itemdata) {
       $.each(itemdata.sentences, function(index, sentence) {
-        polly.fetch_polly_url(sentence.displaysentence, itemdata.voiceoption, itemdata.usevoice).then(function(audiourl) {
+        polly.fetch_polly_url(sentence.prompt, itemdata.voiceoption, itemdata.usevoice).then(function(audiourl) {
           $("#" + itemdata.uniqueid + "_container .dictationplayer_" + index + " .dictationtrigger").attr("data-src", audiourl);
         });
       });

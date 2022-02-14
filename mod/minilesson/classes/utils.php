@@ -983,6 +983,7 @@ class utils{
 
         public static function add_mform_elements($mform, $context,$cmid, $setuptab=false) {
             global $CFG, $COURSE;
+			  $dateoptions = array('optional' => true);
             $config = get_config(constants::M_COMPONENT);
 
             //if this is setup tab we need to add a field to tell it the id of the activity
@@ -1082,6 +1083,25 @@ class utils{
             $mform->addHelpButton('richtextprompt', 'prompttype', constants::M_COMPONENT);
             $mform->setDefault('richtextprompt', $config->prompttype);
 
+                 
+            //activity opens closes
+        $name = 'activityopenscloses';
+        $label = get_string($name, 'minilesson');
+        $mform->addElement('header', $name, $label);
+        $mform->setExpanded($name, false);
+        //-----------------------------------------------------------------------------
+
+        $name = 'viewstart';
+        $label = get_string($name, "minilesson");
+        $mform->addElement('date_time_selector', $name, $label, $dateoptions);
+        $mform->addHelpButton($name, $name, constants::M_COMPONENT);
+    
+
+        $name = 'viewend';
+        $label = get_string($name, "minilesson");
+        $mform->addElement('date_time_selector', $name, $label, $dateoptions);
+        $mform->addHelpButton($name, $name, constants::M_COMPONENT);
+  
 
             // Post attempt
             // Get the modules.

@@ -457,6 +457,48 @@ class mod_minilesson_external extends external_api {
         return new external_value(PARAM_RAW);
     }
 
+    public static function duplicate_item_parameters() {
+        return new external_function_parameters(
+            array(
+                'contextid' => new external_value(PARAM_INT, 'The context id for the course'),
+                'itemid' => new external_value(PARAM_INT, 'The itemid to move')
+            )
+        );
+    }
+
+    public static function duplicate_item($contextid,$itemid)
+    {
+        global $CFG, $DB, $USER;
+
+        // We always must pass webservice params through validate_parameters.
+        $params = self::validate_parameters(self::duplicate_item_parameters(),
+            ['contextid' => $contextid, 'itemid' => $itemid]);
+
+        $context = context::instance_by_id($params['contextid'], MUST_EXIST);
+
+        // We always must call validate_context in a webservice.
+        self::validate_context($context);
+
+        //DO move
+        // get the objects we need
+        $cm = get_coursemodule_from_id('', $context->instanceid, 0, false, MUST_EXIST);
+        $moduleinstance = $DB->get_record(constants::M_TABLE, array('id' => $cm->instance), '*', MUST_EXIST);
+        list($newitemid,$newitemname,$type,$typelabel) = \mod_minilesson\local\rsquestion\helper::duplicate_item($moduleinstance,$context, $itemid);
+
+        $ret = new \stdClass();
+        $ret->olditemid=$itemid;
+        $ret->newitemid=$newitemid;
+        $ret->newitemname=$newitemname;
+        $ret->type=$type;
+        $ret->typelabel=$typelabel;
+        $ret->error=false;
+        return json_encode($ret);
+    }
+
+    public static function duplicate_item_returns() {
+        return new external_value(PARAM_RAW);
+    }
+
 
 
 

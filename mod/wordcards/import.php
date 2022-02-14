@@ -42,7 +42,7 @@ if($config->enablesetuptab){
     $PAGE->set_pagelayout('course');
 }
 
-$output = $PAGE->get_renderer('mod_wordcards');
+$renderer = $PAGE->get_renderer('mod_wordcards');
 
 $form = new mod_wordcards_form_import($formurl->out(false),['leftover_rows'=>$leftover_rows]);
 
@@ -112,10 +112,10 @@ if ($data = $form->get_data()) {
     }
 }
 
-echo $output->header();
-echo $output->heading($pagetitle);
-echo $output->navigation($mod, 'import');
-echo $output->box(get_string('importinstructions',constants::M_COMPONENT), 'generalbox wordcards_importintro', 'intro');
+echo $renderer->header();
+echo $renderer->heading($pagetitle);
+echo $renderer->navigation($mod, 'import');
+echo $renderer->box(get_string('importinstructions',constants::M_COMPONENT), 'generalbox wordcards_importintro', 'intro');
 
 $form->display();
 /*
@@ -123,4 +123,4 @@ $table = new mod_wordcards_table_terms('tblterms', $mod);
 $table->define_baseurl($PAGE->url);
 $table->out(25, false);
 */
-echo $output->footer();
+echo $renderer->footer();

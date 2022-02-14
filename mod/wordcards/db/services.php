@@ -56,8 +56,16 @@ $functions = array(
                 'classname'   => 'mod_wordcards_external',
                 'methodname'  => 'submit_mform',
                 'description' => 'saves or edits term/def form',
-                'capabilities'=> 'mod/wordcards:view',
+                'capabilities'=> 'mod/wordcards:manage',
                 'type'        => 'write',
                 'ajax'        => true,
      ),
+    'mod_wordcards_submit_newterm' => array(
+        'classname'   => 'mod_wordcards_external',
+        'methodname'  => 'submit_newterm',
+        'description' => 'saves a new term in the db',
+        'capabilities'=> 'mod/wordcards:manage',
+        'type'        => 'write',
+        'ajax'        => true,
+    ),
 );

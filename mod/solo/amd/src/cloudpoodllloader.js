@@ -6,7 +6,7 @@ define(['jquery','core/log','https://cdn.jsdelivr.net/gh/justinhunt/cloudpoodll@
             CloudPoodll.theCallback = thecallback;
             CloudPoodll.initEvents();
             $( "iframe" ).on("load",function(){
-                $(".mod_readseed_recording_cont").css('background-image','none');
+                $(".mod_solo_recording_cont").css('background-image','none');
             });
         }
 }
