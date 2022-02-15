@@ -307,6 +307,12 @@ def plugins = [
       "url" : 'https://github.com/catalyst/moodle-tool_trigger.git',
       "branch" : 'master',
       "dest" : 'admin/tool'
+    ],
+    [
+        "name" : 'block_sharing_cart',
+        "url" : 'https://github.com/donhinkelman/moodle-block_sharing_cart.git',
+        "branch" : 'master',
+        "dest" : 'blocks/sharing_cart'
     ]
 ]
 
