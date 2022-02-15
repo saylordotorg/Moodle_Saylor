@@ -306,13 +306,19 @@ def plugins = [
       "name" : 'tool_trigger',
       "url" : 'https://github.com/catalyst/moodle-tool_trigger.git',
       "branch" : 'master',
-      "dest" : 'admin/tool'
+      "dest" : 'admin/tool/trigger'
     ],
     [
         "name" : 'block_sharing_cart',
         "url" : 'https://github.com/donhinkelman/moodle-block_sharing_cart.git',
         "branch" : 'master',
         "dest" : 'blocks/sharing_cart'
+    ],
+    [
+      "name" : 'mod_facetoface',
+      "url" : 'https://github.com/catalyst/moodle-mod_facetoface.git',
+      "branch" : 'MOODLE_311_STABLE',
+      "dest" : 'mod/facetoface'
     ]
 ]
 
