@@ -319,6 +319,12 @@ def plugins = [
       "url" : 'https://github.com/catalyst/moodle-mod_facetoface.git',
       "branch" : 'MOODLE_311_STABLE',
       "dest" : 'mod/facetoface'
+    ],
+    [
+      "name" : 'mod_bigbluebuttonbn',
+      "url" : 'https://github.com/blindsidenetworks/moodle-mod_bigbluebuttonbn.git',
+      "branch" : 'master',
+      "dest" : 'mod/bigbluebuttonbn'
     ]
 ]
 
