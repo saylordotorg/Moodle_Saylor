@@ -14,13 +14,13 @@
 
 {{^element.frozen}}
     {{#js}}
-
+//<script>
         require(['jquery','core/templates','core/ajax'],function($,templates, ajax) {
 
             //get words from text area and fetch definitions
             var resultscont = $("#{{uniqid}}_resultscont");
 
-            $("xxx#{{uniqid}}_fetchbtn").on("click", function() {
+            $("xxx#{{uniqid}}_fetchbtn").on("click", async function() {
                 var langs = ['ar','id','zh','zh_tw','ja','ko','pt','es','th','vi','fr','rus'];
                 var langdef = $("#{{uniqid}}_ww_langdef").val();
                 var allwords = $("#{{uniqid}}_ww_words").val();
@@ -28,8 +28,8 @@
                     return;
                 }
                 var wordsarray = allwords.split(',');
-                var promises = ajax.call([
-                    {methodname: 'mod_wordcards_search_dictionary', args: {words: wordsarray, cmid: 'CMID' }},
+                var promises = await ajax.call([
+                    {methodname: 'mod_wordcards_search_dictionary', args: {terms: wordsarray, cmid: {{cmid}}, sourcelang: '{{langterm}}', targetlangs: langdef }},
                 ]);
 
                 promises[0].done(function (response) {
@@ -39,7 +39,10 @@
                             var result = results[i];
                             //if a word search failed show an editable area
                             if(result.count===0){
-                                var tdata = {term: result.term,nosenses: true, senses: [], modid: {{modid}} };
+                                var senses=[];
+                                senses.push({definition: '',sourcedefinition: 'No def. available',
+                                    modelsentence: '', senseindex: 0, translations: {}})
+                                var tdata = {term: wordsarray[i], senses: senses, modid: {{modid}} };
                                 templates.render('mod_wordcards/word_wizard_oneresult',tdata).then(
                                         function(html,js){
                                             resultscont.append(html);

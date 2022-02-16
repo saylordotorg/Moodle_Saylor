@@ -434,5 +434,22 @@ function xmldb_wordcards_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2022020800, 'wordcards');
     }
 
+    if ($oldversion < 2022021500) {
+        $table = new xmldb_table(constants::M_TABLE);
+
+        $fields=[];
+        $fields[] = new xmldb_field('journeymode', XMLDB_TYPE_INTEGER, 4, XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0);
+
+
+        // Add fields
+        foreach ($fields as $field) {
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+
+        upgrade_mod_savepoint(true, 2022021500, 'wordcards');
+    }
+
     return true;
 }

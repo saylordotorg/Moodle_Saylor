@@ -1,0 +1,417 @@
+3.0-alpha.1 (2021091407)
+
+Matching code with moodle/master after inception to core.
+
+2.5-alpha.2 (2021091407)
+
+Extensive work required to integrate the BBB plugin into Moodle LMS (MDL-70658).
+
+2.5-alpha.1 (2021091406)
+
+Extensive refactoring: Align version 2.5 to the latest versions of Moodle 3.11 (CONTRIB-8390).
+
+2.4.4 (2019101011)
+Bug: Fix for users and roles should be sorted alphabetically (CONTRIB-8113).
+Bug: Fix for compatibility with protected recordings when BBB implements that.
+
+2.4.3 (2019101010)
+Bug: Fix default welcome message (CONTRIB-8573).
+Bug: Fix for issue with Imported recordings (CONTRIB-8580).
+Bug: Fix preuploading presentation process (CONTRIB-8587).
+Enhancement: Add option to allow teachers to edit the welcome message (CONTRIB-8574).
+Enhancement: Disable notification on recording ready callback (CONTRIB-8591).
+
+2.4.2 (2019101009)
+Bug: Fix for issue with bigbluebuttonbn_welcome_default considered not valid (CONTRIB-8435).
+Bug: Fix for issue with BBB Server being spammed on calendar dashboard view (CONTRIB-8419).
+Bug: Fix for issue with import recording page layout being broken (CONTRIB-8566).
+Bug: Fix for issue with activity always visible in the calendar (CONTRIB-8461).
+Bug: Fix for regresion on issue with activities are not being listed in Timeline tab of Course overview block (CONTRIB-7377).
+Bug: Fix for issue with manager not being able to see import links from all courses (CONTRIB-8489).
+
+2.4.1 (2019101008)
+Hot-fix: Patch for issue with Completion caused blocks view to crash (CONTRIB-8551).
+
+2.4 (2019101007)
+2.4-rc.2 (2019101006)
+Bug: Patch for issue with Groups (CONTRIB-8471).
+Enhancement: Re-brand BigBlueButtonBN to BigBlueButton (CONTRIB-8521)
+
+2.4-rc.1 (2019101005)
+Bug: Patch for issue with Calendar/Event (CONTRIB-8454).
+
+2.4-beta.2 (2019101004)
+Bug: Patch for adding timestamp to join.
+Bug: Fix for issue after bug fixed on BBB post_events script (CONTRIB-7457).
+Bug: Fix for check capabilities also in module context (CONTRIB-8371 & GITHUB-315).
+Bug: Fix for preventing bugged displays on recordings (GITHUB-321).
+Enhancement: Update to external.php.
+Enhancement: Add default welcome message to settings (CONTRIB-7845).
+
+2.4-beta.1 (2019101003)
+Bug: Fix for issue with search on updated recordings only works if page is refreshed (CONTRIB-7700).
+Bug: Fix for end session action not always working (CONTRIB-7895).
+Bug: Fix for message sending triggered by recordng ready callback hangs (CONTRIB-7905).
+Bug: Fix for issue with mod_bigbluebuttonbn\privacy\provider::get_contexts_for_userid (CONTRIB-7915).
+Bug: Fix for participation report is not correctly implemented (CONTRIB-7951).
+Bug: Fix for "Recordings Only" instances have the feature [Restrict Access] disabled (CONTRIB-7960).
+Bug: Fix for missing strings for the new recording formats (CONTRIB-7962).
+Bug: Fix for "Moderator by default" setting does not recognise custom roles (CONTRIB-7966).
+Bug: Fix for BBB hard-coded dependency on mod_lti (CONTRIB-7969).
+Bug: Fix for possible CSRF vulnerability in BBB ajax intermediate script (CONTRIB-7971).
+Bug: Fix for BBB add participant module setting doesn't respect group mode/capabilities (CONTRIB-7972).
+Bug: Fix for error while creating or updating a BBB activity (CONTRIB-8019).
+Bug: Fix for '&' breaks the password when randomly assigned (CONTRIB-8049).
+Bug: Fix for validation of recording links fails some times (CONTRIB-8051).
+Bug: Fix for problem of List Table Pagination (CONTRIB-8053).
+Bug: Fix for improve performance on view (CONTRIB-8157).
+Enhancement: Add a way to reprocess completion validation (CONTRIB-7917).
+Enhancement: Completion by engagement should include configurable metrics (CONTRIB-7919).
+Enhancement: BBB should only include core libraries as required (CONTRIB-7970).
+Enhancement: Notification should contain link to BBB (CONTRIB-8029).
+Enhancement: Corrected problem of Import List Same Course Names (CONTRIB-8052).
+Enhancement: Recording parameters in activity form (CONTRIB-8116).
+Enhancement: Change the UI for Participants to User/Role Mapping (CONTRIB-8164).
+New Feature: -Experimental- Completion should be based on events captured from the live session (CONTRIB-7457).
+New Feature: -Experimental- Completion should be extended for supporting engagement (CONTRIB-7908).
+New Feature: Configure meeting room from the plugin (CONTRIB-8239).
+
+2.3.6 (2019042011)
+Bug: Fix for issue with users joining meetings with static URLs on mobile devices.
+
+2.3.5 (2019042010)
+Bug: Fix for issue with users joining meetings with static URLs.
+
+2.3.4 (2019042009)
+Bug: Fix for issue with regression BBB incorrectly distributes moderator rights to student-role (CONTRIB-7627).
+Bug: Fix for issue with regression meeting name is not required in the recording list (CONTRIB-7703).
+Bug: Fix for issue with imported recordings shows all the "Imported recordings" in the course (CONTRIB-7961).
+Bug: Fix for issue with administrator and manager-role cannot see recordings when groups are used (CONTRIB-8038).
+Bug: Fix for issue with BigBlueButton notifications include the sender email-address (CONTRIB-8042).
+Bug: Fix for issue with notification when activity is updated not respecting enrolment status (CONTRIB-8046).
+Bug: Fix for issue with wrong role ids in Website Administration (CONTRIB-8047).
+Bug: Fix for issue with performance on view (CONTRIB-8157).
+Bug: Fix for issue with closingtime shown on the Dashboard if it isn't set in the activity instance (CONTRIB-8158).
+Bug: Fix for issue with "wait for moderator" not allowing join meetings from mobile app (CONTRIB-8162).
+Bug: Fix for issue with option 'Session can be recorded' not shown for 'Room/Activity only' (CONTRIB-8174).
+Enhancement: Added option for turn off sending notifications when recording ready feature. (CONTRIB-8026).
+
+2.3.3 (2019042008)
+Bug: Fix for issue with instances not being saved on Moodle 3.5 and earlier (CONTRIB-8019).
+
+2.3.2 (2019042007)
+Bug: Fix for issue with Restrict Access setting on "Recording Only" and "Room/Activity Only" modes (CONTRIB-7960).
+Bug: Fix for issue with HAndle missing language strings for new recording formats (CONTRIB-7962).
+Bug: Fix for issue with hard-coded dependency on mod_lti (CONTRIB-7969).
+Bug: Fix for issue with missing sesskey on ajax requests (CONTRIB-7971).
+Bug: Fix for issue with participant module setting doesn't respect group mode/capabilities (CONTRIB-7972).
+Bug: Fix for issue with recordings table doesn't respect forced group mode (CONTRIB-7973).
+Bug: Fix for issue with fails core privacy provider testcase (CONTRIB-7983).
+
+2.3.1 (2019042006)
+Bug: Fix for issue with notifications on creation (CONTRIB-7874).
+Bug: Fix for issue with unit test failure on v2.2 stable (CONTRIB-7875).
+Bug: Fix for issue with DML when using Oracle or MSSQL (CONTRIB-7894).
+
+2.3 (2019042005)
+Tag: Bumped version and release tags and updated maturity to stable.
+
+2.3-rc1 (2019042004)
+Tag: Bumped version and release tags and updated maturity to release candidate.
+
+2.3-beta2 (2019042003)
+Bug: Fix for issue with importing recordings on 3.7 (CONTRIB-7754).
+Bug: Fix for regression on recording ready notifications (CONTRIB-7740).
+
+2.3-beta2 (2019042002)
+Bug: Fix for recording ready notifications not working (CONTRIB-7740).
+Bug: Fix for false positive sent to the logs (CONTRIB-7742).
+Bug: Fix for recording settings showing empty when no feature can be edited (CONTRIB-7701).
+Bug: Fix for notifications to be sent only to users allowed to see the activity (CONTRIB-7733).
+
+2.3-beta1 (2019042001)
+Bug: Fix for issue with JWT library clashing in Moodle 3.7 (CONTRIB-7716).
+Bug: Fix for implementation of resetting function (CONTRIB-7695).
+Bug: Fix for for issue with delete instances with recycle bin disabled (CONTRIB-7660).
+Bug: Fix for hard-coded string in room.js and old reference to RecordingsBN (GIT-130).
+
+2.3-beta0 (2019042000)
+Bug: Fix for instanceTypeProfiles array used by keys but NOT defined so (CONTRIB-7399).
+Bug: Fix for hard-coded strings in recordings table based on YUI datatables (CONTRIB-7518).
+Bug: Fix for Join session timeline button don't work (CONTRIB-7538).
+Bug: Fix for Index page does not show actions (CONTRIB-7579).
+Enhancement: Playback recordings should be shown in a new tab (CONTRIB-7386).
+Enhancement: Limit instance type repertoire by capabilities (CONTRIB-7400).
+Enhancement: Media files in the description are not shown (CONTRIB-7440).
+Enhancement: Code cleanup and refactoring (CONTRIB-7625).
+New Feature: Being able to define a default presentation file for a Moodle site through settings (CONTRIB-6970).
+New Feature: Users being able to see recordings of only the rooms they have access to (CONTRIB-7225).
+New Feature: Add support for mobile application (CONTRIB-7227).
+New Feature: Add support for muteOnStart (CONTRIB-7519).
+New Feature: Add option for forcing all the sessions to be recorded (with no button) (CONTRIB-7520).
+New Feature: Add support for recordings of breakout rooms (CONTRIB-7521).
+New Feature: Recording list should give an option for searching recordings (CONTRIB-7522).
+
+2.2.13 (2017101021)
+Bug: Fix for issue with users joining meetings with static URLs.
+
+2.2.12 (2017101020)
+Bug: Fix for issue with JWT library clashing in Moodle 3.7 (CONTRIB-7716).
+Bug: Fix for implementation of resetting function (CONTRIB-7695).
+Bug: Fix for for issue with delete instances with recycle bin disabled (CONTRIB-7660).
+Bug: Fix for hard-coded string in room.js and old reference to RecordingsBN (GIT-130).
+
+2.2.11 (2017101019)
+Bug: Fix for participation rules for users applied as rules for roles (CONTRIB-7627).
+Bug: Fix for some themes broken updated prefix for icon-bigbluebutton (CONTRIB-7616).
+Bug: Fix on missing strings for new recording formats (CONTRIB-7617).
+Bug: Fix notification messages send in FOMAT_MOODLE instead of FORMAT_HTML.
+
+2.2.10 (2017101018)
+Bug: Fixed issue JWT library conflicting with other plugins using it (CONTRIB-7612).
+
+2.2.9 (2017101017)
+Bug: Fixed issue with media files not shown in the description (CONTRIB-7454).
+Bug: Fixed issue with date-time shown in calendar and timeline (CONTRIB-7589).
+
+2.2.8 (2017101016)
+Enhancement: Added support for new privacy methods in Moodle 3.6, 3.5.3, 3.4.6 (CONTRIB-7549).
+
+2.2.7 (2017101015)
+Bug: Fixed issue with recording-ready notifications sometimes sent more than once (CONTRIB-7438).
+Bug: Fixed issue with rooms not being created when using Oracle (CONTRIB-7481).
+Bug: Fixed issue with privacy requests not being processed when the user was already deleted (CONTRIB-7527).
+Bug: Fixed issue with recordings from other Moodle server may be wrongly included (CONTRIB-7528).
+Bug. Fixed issue with warning message in Moodle 3.2 and previous when instance was created or updated (CONTRIB-7512).
+Enhancement: Added support for HTML5 client that now can be set to be used by default or per room (CONTRIB-7413).
+
+2.2.6 (2017101014)
+Hot-fix:  Fixed issue with room viewing too slow when several recordings where included (CONTRIB-7435).
+Bug: Fixed regression issue with activities still not listed in Timeline tab (CONTRIB-7377).
+Bug: Fixed issue with default settings for moderator not applied to existent activities (CONTRIB-7437).
+
+2.2.5 (2017101013)
+Bug: Fixed issue with recording lenght shown as 0 in some cases (CONTRIB-7383).
+Bug: Fixed issus with activities not listed in Timeline tab of Course overview block (CONTRIB-7377).
+Bug: Fixed issue with filter "Show only imported links" not working work (CONTRIB-7424)
+Bug: Fixed issue with thumbnails overriding a css class in Boost theme.
+Enhancement: Validates and notifies when recordings are incorrectly migrated from one BBB server to another.
+
+2.2.4 (2017101012)
+Bug: Fixed issue with error message shown for some rooms when displayed (CONTRIB-7243).
+Bug: Fixed issue with recordings are accessible from copied activities (CONTRIB-7118).
+Bug: Fixed issue with edit name or description of an recording under firefox (CONTRIB-7279).
+Bug: Fixed issue with Hide/Show images not changing when publishing unpublishing recordings (CONTRIB-7297).
+Bug: Fixed issue when preview is disabled, on publish/unpublish recordings js fails (CONTRIB-7298).
+Bug: Fixed issue with diverged install and upgrade schema (CONTRIB-7302).
+Feature: Added support for privacy API in compliance with GDPR (CONTRIB-7290).
+
+2.2.3 (2017101011)
+Bug: Fixed issue with Groups not working properly in BigBlueButtonBN (CONTRIB-7220).
+Bug: Fixed issue with Time out when migrating from 2.1.14 to 2.2.2 (CONTRIB-7221).
+Bug: Fixed issue with When recordings are unpublished they disappear (CONTRIB-7234).
+
+2.2.2 (2017101010)
+Bug: Fixed issue with YUI datatable not deleting recordings correctly.
+Bug: Fixed issue with events not being properly described.
+Bug: Fixed issue with guest users not being able to view or use rooms.
+Bug: Fixed issue with thumbnails overriding a css class on Essential theme.
+Bug: Fixed issue with separated groups showing all the recordings when the user is allowed to manage them.
+Feature: Show a warning message to administrators when using the BBB server pre-configured by default.
+DB migration: Fix issue with internal passwords that may have not been generated on instance creation.
+
+2.2.1 (2017101009)
+Bug: Fixed issue with voice bridge not accepted when editing the instance.
+Bug: Added fa-circle as the default icon for Totara.
+Bug: Fixed icon for delete action broken in Participant List.
+Bug: Fixed issue with tags not working when class core_tag_tag not defined.
+Bug: Fixed flickering on recording preview.
+Bug: Fixed issue with JavaScript for modform not working with participantList in old versions.
+Bug: Fixed issue with not correctly formed BBB url and trailing white characters in shared_secret.
+Feature: Recording preview can now be enabled/disabled by configuration (Updates the db).
+
+2.2 (2017101008)
+Bug: Fix for issue with JS not supported by IE11!.
+Bug: Fix for flicking page when waiting for moderator enabled.
+
+2.2 (2017101007)
+Enhancement: Added alert boxed warning message in configuration that is shown when the old cfg global variable is used.
+Enhancement: Added filter for restricting access to links when recordings include multiple formats.
+Bug: Fix for issue with recording option showing up on 'Room/Activity only' instances.
+
+2.2 (2017101006)
+Bug: Make sure the common settings are wiped out when type is changed to 'recordings only'
+Bug: Fixed issue with import recordings not working with postgresql
+Bug: Fixed issue with recordings_imported_enabled not being shown in mod_form
+Bug: Fixed issue with filter for recordings when groups enabled
+Bug: Fixed issue with previews shown even with servers not implementing the feature
+Bug: Fixed general warning to be shown only to selected roles
+Bug: Fixed issue with 'protect' button not shown on imported links
+Bug: Fixed issue with turning on/off importing links by configuration
+
+2.2 (2017101005)
+Bug: Fix for issue with internal passwords not being generated for instances created with 2017101003.
+Bug: Fix for issue with notifications not being send when the recording is ready.
+
+2.2 (2017101004)
+Hot-Fix: Fix for issue with internal passwords not being generated on instance creation.
+
+2.2 (2017101003)
+Bug: Fix for issue when using BN servers, Recording name and description could not be edited.
+Bug: Fix for issue with html in the name when multi-language filter is used.
+Bug: Fix for issue when editing instance the passwords were overridden.
+
+2.2 (2017101002)
+Bug: Fix for issues raised in the previous release.
+Bug: Fix for issues when importing link and using PostgreSQL.
+
+2.2 (2017101001)
+Enhancement: A general warning message can be set up by configuration.
+
+2.2 (2017101000)
+Enhancement: Included the parameter userID as part of the join request.
+Enhancement: Added preview thumbnails to recordings.
+Enhancement: Merged RecordingsBN by adding a type to differentiate if the instance implements "Room & Recordings"/"Only room"/"Only recordings".
+Enhancement: Recording name and description can be edited.
+Enhancement: Make use of Moodle tags for tagging recordings.
+Enhancement: Imported links to real recordings can also be imported.
+Enhancement: Links can be imported from activities in the same course.
+Enhancement: When users playback a recording an event for reports is logged.
+Enhancement: Guest users may are able to join a meeting based on Moodle permissions.
+Enhancement: Added automated tests.
+Refactoring: Major refactoring was applied in order to improve the quality of the code.
+
+2.1.14 (2016051919)
+Bug: Fixed issue participant list not considering rules based on Moodle roles when user had multiple.
+Bug: Fixed issue participant list not applying the default rule correctly.
+
+2.1.13 (2016051918)
+Bug: Fixed issue with hint on hovering participant list button
+Bug: Fixed issue participant list not considering rules based on Moodle roles.
+
+2.1.12 (2016051917)
+Hot fix: After some changes introduced in v2.1.7 the way participants are handled changed. As the permissions are now based in role and user id, previous settings were ignored. (CONTRIB-6925)
+Bug: Fixed issue with mod_form not being rendered when participants were not set (happened with activities imported from old versions).
+Bug: Fixed issue with all recordings shown to all users when separated groups were set.
+
+2.1.11 (2016051916)
+Bug: Fixed issue with role names not properly shown in Totara.
+Bug: Fixed issue with roles in participant list not showing correctly.
+Bug: Fixed issue with users enrolled and no active being included in participant list.
+Bug: Fixed issue with moderators being considered viewers.
+Bug: Fixed issue with message shown to non-moderators when the room is not open yet.
+Bug: Fixed issue with messages not properly sent when the room/activity was added/updated.
+
+2.1.10 (2016051915)
+Hot fix: After some changes introduced in v2.1.7 the way participants are handled changed. This affected the way the new UI renders the settings form. (CONTRIB-6900)
+Bug: Fixed Participants for style in mod_form not working in all versions.
+Bug: Fixed issue with action buttons not being updated on publish/unpublish and delete recordings
+Bug: Fixed style in 'Import recordings' and 'Go back' buttons.
+
+2.1.9 (2016051914)
+Bug: Fixed Participants for style in mod_form and buttons in view.
+Bug: Fixed Participants for style in mod_form not working in all versions.
+
+2.1.8 (2016051913)
+Bug: Fixed issue with custom role names failing when they were edited after being used.
+Bug: Fixed issue with separated groups.
+
+2.1.7 (2016051911)
+Bug: Fixed issue with roles not shown correctly in Totara and any custom implementation.
+Bug: Fixed issue with a string not properly localized.
+
+2.1.7 (2016051911)
+Bug: Fixed issue with roles not shown correctly in Totara and any custom implementation.
+Bug: Fixed issue with a string not properly localised.
+
+2.1.6 (2016051910)
+Bug: Fixed issue with groups not shown correctly when set up as separated and no groups where created. (CONTRIB-6652)
+Bug: Fixed issue with references to recordings and imported links duplicated when a backup is restored in a different course.
+Bug: Fixed issue with references to recordings and imported links not being properly restored when using the option import from backups.
+Bug: Fixed issue with guest users not able to join as moderators even though the role is matched with the role with BBB .
+
+2.1.5 (2016051909)
+Bug: Fixed issue with actions for recording management not working in instances with schedule. (CONTRIB-6654)
+Bug: Standardized output in intermediate page for activities not started/ended.
+Bug: Fixed issue with past BBB sessions listed as upcoming in the course overview block. (CONTRIB-6650)
+Bug: Fixed issue with default bigbluebutton server settings. (CONTRIB-6630)
+Bug: Rework to prevent potential issue with recordings not fetched when the course has too many groups.
+
+2.1.4 (2016051908)
+Bug: Reverted changes made to the language strings in previous release.
+
+2.1.3 (2016051907)
+Bug: Fixed issue with course logs not being backup/restore.
+Bug: Fixed issue with localized event description affecting multi-language sites.
+Bug: Fixed issue with activities not shown in the dashboard block in Moodle 3.x.
+
+2.1.2 (2016051906)
+Bug: Fixed version format for recording list so it works for formats used in non western countries.
+Bug: Fixed issue with user limit not being correctly enforced when default limit was updated and edition was not allowed. (This bug only affected sites making use of the user limit feature)
+Bug: Fixed issue in "wait for moderator" feature. The only way to enable the join session was to refresh the page manually.
+
+2.1.1 (2016051905)
+Bug: Fixed issue with database upgrade when updating from versions older than 2.1.x. (This bug only affected users upgrading directly from 1.x to 2.1.0).
+
+2.1.0 (2016051904)
+Tag: Bumped version and release tags and updated maturity to stable
+
+2.1.0-rc2 (2016051903)
+Bug: Fixed missing variable triggering warning message showing up on in development mode
+Bug: Fixed bug in format of imported recordings on YUI table
+Bug: Fixed a bug in import recording. Recordings from deleted activities were not considered.
+
+2.1.0-rc1 (2016051902)
+Tag: Bumped release tag and updated maturity
+
+2.1.0-b3 (2016051902)
+Bug: Considers all the imported recordings corresponding to a course.
+Bug: Duration was not shown properly in recordings
+Bug: All events are localized
+Bug: recordings not showing up after restore
+Bug: backup/restore were not working on logs
+Bug: Added missing event
+
+2.1.0-b2 (2016051901)
+Bug: Fix for action management not working in recordings.
+
+2.1.0-b1 (2016051900)
+Enhancement: Links to recordings can now be imported into a room/activity from a different course room/activity.
+Bug: Fixed backups. The logs, a secondary table dependent of mdl_bigbluebuttonbn used for tracking meeting creation is now included as part of the backup.
+Bug: Fixed issue with database prefix.
+
+2.0.4 (2015080611)
+Bug: Fixed a bug introduced in the previous revision that was making pre-uploaded presentations to be ignored when a new activity was created.
+Bug: Changed wording for message shown when user is waiting for moderator.
+
+2.0.3 (2015080610)
+Enhancement: Make sure the php-curl extension is installed. For pre-uploading slides, the use of the php-curl extension is required. If it is not installed or enabled the feature won't be available.
+Bug: Toggle form for tagging sessions was flicking for a second when the activity page was shown.
+Bug: When creating a new and pre-uploading presentation is turned off an error messages comes up.
+Bug: When for security reasons either the webserver or the proxy ahead of the webserver(s) adds the header x-content-type-options: nosniff to force the MIME Type verification, the javascript in the client doesn't work in Chrome/IE.
+
+2.0.2 (2015080609)
+Bug: When using localization in a language different than English, the recording table produced for RecordingsBN showed an 'Invalid date' message.
+
+2.0.1 (2015080608)
+Bug: Adding a presentation file while creating a new BigBlueButtonBN activity failed. Only after editing the activity and adding a presentation file again would let the feature work.
+Bug: Fixed warning message was shown in the logs when joining a session
+
+1.0.7 (April 8, 2012)
+Enhancement: Added Spanish and French.
+Enhancement: Synced API calls with BigBlueButton 0.8-beta-4.
+
+1.0.6 (October 31, 2011)
+Enhancement: Extended supported languages (ru), fixed a bug in bigbluebuttonbn/index.php
+
+1.0.5 (October 19, 2011)
+Enhancement: Extended supported languages
+
+1.0.4 (October 12, 2011)
+Enhancement: Added support for separate groups
+
+1.0-b2 (September 16, 2011)
+Enhancement: Removed unnecesarry code related to grade scales
+
+1.0-b1 (September 13, 2011)
+Tag: Beta release for use with BigBlueButton 0.71a and BigBlueButton 0.8-beta servers

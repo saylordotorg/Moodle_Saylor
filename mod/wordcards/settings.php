@@ -79,6 +79,9 @@ if ($ADMIN->fulltree) {
     $regions = utils::get_region_options();
     $settings->add(new admin_setting_configselect(constants::M_COMPONENT .  '/awsregion', get_string('awsregion', constants::M_COMPONENT), '', 'useast1', $regions));
 
+    $modes = utils::get_journeymode_options();
+    $settings->add(new admin_setting_configselect(constants::M_COMPONENT .  '/journeymode', get_string('journeymode', constants::M_COMPONENT), '', constants::MODE_SEQUENTIAL, $modes));
+
     $expiredays = utils::get_expiredays_options();
     $settings->add(new admin_setting_configselect(constants::M_COMPONENT .  '/expiredays', get_string('expiredays', constants::M_COMPONENT), '', '365', $expiredays));
 

@@ -322,4 +322,6 @@ $string['open']="Open: ";
 $string['until']="Until: ";
 $string['activityopenscloses']="Activity open/close dates";
 $string['wordcards:preview']="Can preview Wordcards activities";
-
+$string['mode_sequential']="Sequential mode";
+$string['mode_free']="Free mode";
+$string['journeymode']="Mode";

@@ -36,7 +36,8 @@ use \mod_wordcards\constants;
  */
 class utils{
 
-
+    //const CLOUDPOODLL = 'http://localhost/moodle';
+    const CLOUDPOODLL = 'https://cloud.poodll.com';
 
     //are we willing and able to transcribe submissions?
     public static function can_transcribe($instance)
@@ -323,7 +324,7 @@ class utils{
         }
 
         // Send the request & save response to $resp
-        $token_url ="https://cloud.poodll.com/local/cpapi/poodlltoken.php";
+        $token_url =  self::CLOUDPOODLL . "/local/cpapi/poodlltoken.php";
         $postdata = array(
             'username' => $apiuser,
             'password' => $apisecret,
@@ -482,6 +483,11 @@ class utils{
         return '';
     }
 
+    public static function get_journeymode_options() {
+        $options = array(constants::MODE_SEQUENTIAL => get_string("mode_sequential", constants::M_COMPONENT),
+            constants::MODE_FREE => get_string("mode_free", constants::M_COMPONENT));
+        return $options;
+    }
 
   public static function get_region_options(){
       return array(
@@ -586,10 +592,54 @@ class utils{
         $params['text'] = urlencode($speaktext);
         $params['texttype'] = $texttype;
         $params['voice'] = $voice;
-        $params['appid'] = 'mod_wordcards';
+        $params['appid'] = constants::M_COMPONENT;
         $params['owner'] = hash('md5',$USER->username);
         $params['region'] = $region;
-        $serverurl = 'https://cloud.poodll.com/webservice/rest/server.php';
+        $serverurl = self::CLOUDPOODLL . '/webservice/rest/server.php';
+        $response = self::curl_fetch($serverurl, $params);
+        if (!self::is_json($response)) {
+            return false;
+        }
+        $payloadobject = json_decode($response);
+
+        //returnCode > 0  indicates an error
+        if ($payloadobject->returnCode > 0) {
+            return false;
+            //if all good, then lets do the embed
+        } else if ($payloadobject->returnCode === 0) {
+            $pollyurl = $payloadobject->returnMessage;
+            return $pollyurl;
+        } else {
+            return false;
+        }
+    }
+
+    //fetch the dictionary entries from cloud poodll
+    public static function fetch_dictionary_entries($terms,$sourcelang, $targetlangs) {
+        global $USER;
+
+        $token=false;
+        $conf= get_config(constants::M_COMPONENT);
+        if (!empty($conf->apiuser) && !empty($conf->apisecret)) {
+            $token = self::fetch_token($conf->apiuser, $conf->apisecret);
+        }
+        if(!$token || empty($token)){
+            return false;
+        }
+
+        //The REST API we are calling
+        $functionname = 'local_cpapi_fetch_words';
+
+        //log.debug(params);
+        $params = array();
+        $params['wstoken'] = $token;
+        $params['wsfunction'] = $functionname;
+        $params['moodlewsrestformat'] = 'json';
+        $params['terms'] = urlencode($terms);
+        $params['sourcelang'] =$sourcelang;
+        $params['targetlangs'] =urlencode($targetlangs);;
+        $params['appid'] = constants::M_COMPONENT;
+        $serverurl = self::CLOUDPOODLL . '/webservice/rest/server.php';
         $response = self::curl_fetch($serverurl, $params);
         if (!self::is_json($response)) {
             return false;
@@ -692,13 +742,13 @@ class utils{
           case \mod_wordcards_module::PRACTICETYPE_DICTATION:
           case \mod_wordcards_module::PRACTICETYPE_SPEECHCARDS:
           case \mod_wordcards_module::PRACTICETYPE_LISTENCHOOSE:
-              return get_string('practice','mod_wordcards') ;
+              return get_string('practice',constants::M_COMPONENT) ;
           case \mod_wordcards_module::PRACTICETYPE_MATCHSELECT_REV:
           case \mod_wordcards_module::PRACTICETYPE_MATCHTYPE_REV:
           case \mod_wordcards_module::PRACTICETYPE_DICTATION_REV:
           case \mod_wordcards_module::PRACTICETYPE_SPEECHCARDS_REV:
           case \mod_wordcards_module::PRACTICETYPE_LISTENCHOOSE_REV:
-              return get_string('review','mod_wordcards');
+              return get_string('review',constants::M_COMPONENT);
 
       }
     }
@@ -749,21 +799,21 @@ class utils{
     }
 
   public static function get_practicetype_options($wordpool=false){
-      $none =  array(\mod_wordcards_module::PRACTICETYPE_NONE => get_string('title_noactivity', 'mod_wordcards'));
+      $none =  array(\mod_wordcards_module::PRACTICETYPE_NONE => get_string('title_noactivity', constants::M_COMPONENT));
       $learnoptions = [
-              \mod_wordcards_module::PRACTICETYPE_MATCHSELECT => get_string('title_matchselect', 'mod_wordcards'),
-              \mod_wordcards_module::PRACTICETYPE_MATCHTYPE => get_string('title_matchtype', 'mod_wordcards'),
-              \mod_wordcards_module::PRACTICETYPE_DICTATION => get_string('title_dictation', 'mod_wordcards'),
-              \mod_wordcards_module::PRACTICETYPE_SPEECHCARDS => get_string('title_speechcards', 'mod_wordcards'),
-              \mod_wordcards_module::PRACTICETYPE_LISTENCHOOSE => get_string('title_listenchoose', 'mod_wordcards')
+              \mod_wordcards_module::PRACTICETYPE_MATCHSELECT => get_string('title_matchselect', constants::M_COMPONENT),
+              \mod_wordcards_module::PRACTICETYPE_MATCHTYPE => get_string('title_matchtype', constants::M_COMPONENT),
+              \mod_wordcards_module::PRACTICETYPE_DICTATION => get_string('title_dictation', constants::M_COMPONENT),
+              \mod_wordcards_module::PRACTICETYPE_SPEECHCARDS => get_string('title_speechcards', constants::M_COMPONENT),
+              \mod_wordcards_module::PRACTICETYPE_LISTENCHOOSE => get_string('title_listenchoose', constants::M_COMPONENT)
       ];
 
         $reviewoptions = [
-            \mod_wordcards_module::PRACTICETYPE_MATCHSELECT_REV => get_string('title_matchselect_rev', 'mod_wordcards'),
-            \mod_wordcards_module::PRACTICETYPE_MATCHTYPE_REV => get_string('title_matchtype_rev', 'mod_wordcards'),
-            \mod_wordcards_module::PRACTICETYPE_DICTATION_REV => get_string('title_dictation_rev', 'mod_wordcards'),
-            \mod_wordcards_module::PRACTICETYPE_SPEECHCARDS_REV => get_string('title_speechcards_rev', 'mod_wordcards'),
-            \mod_wordcards_module::PRACTICETYPE_LISTENCHOOSE_REV => get_string('title_listenchoose_rev', 'mod_wordcards')
+            \mod_wordcards_module::PRACTICETYPE_MATCHSELECT_REV => get_string('title_matchselect_rev', constants::M_COMPONENT),
+            \mod_wordcards_module::PRACTICETYPE_MATCHTYPE_REV => get_string('title_matchtype_rev', constants::M_COMPONENT),
+            \mod_wordcards_module::PRACTICETYPE_DICTATION_REV => get_string('title_dictation_rev', constants::M_COMPONENT),
+            \mod_wordcards_module::PRACTICETYPE_SPEECHCARDS_REV => get_string('title_speechcards_rev', constants::M_COMPONENT),
+            \mod_wordcards_module::PRACTICETYPE_LISTENCHOOSE_REV => get_string('title_listenchoose_rev', constants::M_COMPONENT)
             ];
 
       if($wordpool===\mod_wordcards_module::WORDPOOL_LEARN){
@@ -1014,8 +1064,13 @@ class utils{
             $mform->addHelpButton('showdescription', 'showdescription');
         }
 
+        $options = utils::get_journeymode_options();
+        $mform->addElement('select', 'journeymode', get_string('journeymode', constants::M_COMPONENT),
+            $options);
+        $mform->setDefault('journeymode',$config->journeymode);
+
         $options = utils::get_lang_options();
-        $mform->addElement('select', 'ttslanguage', get_string('ttslanguage', 'mod_wordcards'),
+        $mform->addElement('select', 'ttslanguage', get_string('ttslanguage', constants::M_COMPONENT),
                 $options);
         $mform->setDefault('ttslanguage',$config->ttslanguage);
 
@@ -1024,7 +1079,7 @@ class utils{
         foreach($lexicala as $lexone){
             $options[$lexone['code']]=$lexone['name'];
         }
-        $mform->addElement('select', 'deflanguage', get_string('deflanguage', 'mod_wordcards'),
+        $mform->addElement('select', 'deflanguage', get_string('deflanguage', constants::M_COMPONENT),
             $options);
         $mform->setDefault('deflanguage',$config->deflanguage);
 
@@ -1036,28 +1091,28 @@ class utils{
         $ptype_options_all = utils::get_practicetype_options();
         $termcount_options = [4 => 4, 5 => 5, 6 => 6, 7 => 7,8 => 8,9 => 9,10 => 10,11 => 11,12 => 12,13 => 13,14 => 14,15 => 15];
 
-        $mform->addElement('select', 'step1practicetype', get_string('step1practicetype', 'mod_wordcards'),
+        $mform->addElement('select', 'step1practicetype', get_string('step1practicetype', constants::M_COMPONENT),
                 $ptype_options_learn, \mod_wordcards_module::PRACTICETYPE_MATCHSELECT);
-        $mform->addElement('select', 'step1termcount', get_string('step1termcount', 'mod_wordcards'), $termcount_options, 4);
+        $mform->addElement('select', 'step1termcount', get_string('step1termcount', constants::M_COMPONENT), $termcount_options, 4);
 
-        $mform->addElement('select', 'step2practicetype', get_string('step2practicetype', 'mod_wordcards'),
+        $mform->addElement('select', 'step2practicetype', get_string('step2practicetype', constants::M_COMPONENT),
                 $ptype_options_all,\mod_wordcards_module::PRACTICETYPE_MATCHSELECT_REV);
-        $mform->addElement('select', 'step2termcount', get_string('step2termcount', 'mod_wordcards'), $termcount_options, 4);
+        $mform->addElement('select', 'step2termcount', get_string('step2termcount', constants::M_COMPONENT), $termcount_options, 4);
         $mform->disabledIf('step2termcount', 'step2practicetype', 'eq',\mod_wordcards_module::PRACTICETYPE_NONE);
 
-        $mform->addElement('select', 'step3practicetype', get_string('step3practicetype', 'mod_wordcards'),
+        $mform->addElement('select', 'step3practicetype', get_string('step3practicetype', constants::M_COMPONENT),
                 $ptype_options_all,\mod_wordcards_module::PRACTICETYPE_MATCHSELECT_REV);
-        $mform->addElement('select', 'step3termcount', get_string('step3termcount', 'mod_wordcards'), $termcount_options, 4);
+        $mform->addElement('select', 'step3termcount', get_string('step3termcount', constants::M_COMPONENT), $termcount_options, 4);
         $mform->disabledIf('step3termcount', 'step3practicetype', 'eq',\mod_wordcards_module::PRACTICETYPE_NONE);
 
-        $mform->addElement('select', 'step4practicetype', get_string('step4practicetype', 'mod_wordcards'),
+        $mform->addElement('select', 'step4practicetype', get_string('step4practicetype', constants::M_COMPONENT),
                 $ptype_options_all,\mod_wordcards_module::PRACTICETYPE_MATCHSELECT_REV);
-        $mform->addElement('select', 'step4termcount', get_string('step4termcount', 'mod_wordcards'), $termcount_options, 4);
+        $mform->addElement('select', 'step4termcount', get_string('step4termcount', constants::M_COMPONENT), $termcount_options, 4);
         $mform->disabledIf('step4termcount', 'step4practicetype', 'eq',\mod_wordcards_module::PRACTICETYPE_NONE);
 
-        $mform->addElement('select', 'step5practicetype', get_string('step5practicetype', 'mod_wordcards'),
+        $mform->addElement('select', 'step5practicetype', get_string('step5practicetype', constants::M_COMPONENT),
                 $ptype_options_all,\mod_wordcards_module::PRACTICETYPE_MATCHSELECT_REV);
-        $mform->addElement('select', 'step5termcount', get_string('step5termcount', 'mod_wordcards'), $termcount_options, 4);
+        $mform->addElement('select', 'step5termcount', get_string('step5termcount', constants::M_COMPONENT), $termcount_options, 4);
         $mform->disabledIf('step5termcount', 'step5practicetype', 'eq',\mod_wordcards_module::PRACTICETYPE_NONE);
 
         //Attempts
@@ -1066,29 +1121,29 @@ class utils{
         $mform->addElement('select', 'maxattempts', get_string('maxattempts', constants::M_COMPONENT), $attemptoptions);
 
         $t_options = utils::fetch_options_transcribers();
-        $mform->addElement('select', 'transcriber', get_string('transcriber', 'mod_wordcards'),
+        $mform->addElement('select', 'transcriber', get_string('transcriber', constants::M_COMPONENT),
                 $t_options,$config->transcriber);
 
         $mform->addElement('hidden', 'skipreview',0);
         $mform->setType('skipreview',PARAM_INT);
-        // $mform->addElement('checkbox', 'skipreview', get_string('skipreview', 'mod_wordcards'));
+        // $mform->addElement('checkbox', 'skipreview', get_string('skipreview', constants::M_COMPONENT));
         // $mform->setDefault('skipreview', 1);
-        // $mform->addHelpButton('skipreview', 'skipreview', 'mod_wordcards');
+        // $mform->addHelpButton('skipreview', 'skipreview', constants::M_COMPONENT);
 
-        $mform->addElement('editor', 'finishedstepmsg_editor', get_string('finishedstepmsg', 'mod_wordcards'));
-        $mform->setDefault('finishedstepmsg_editor', array('text' => get_string('finishscatterin', 'mod_wordcards')));
-        $mform->addHelpButton('finishedstepmsg_editor', 'finishedstepmsg', 'mod_wordcards');
+        $mform->addElement('editor', 'finishedstepmsg_editor', get_string('finishedstepmsg', constants::M_COMPONENT));
+        $mform->setDefault('finishedstepmsg_editor', array('text' => get_string('finishscatterin', constants::M_COMPONENT)));
+        $mform->addHelpButton('finishedstepmsg_editor', 'finishedstepmsg', constants::M_COMPONENT);
 
-        $mform->addElement('editor', 'completedmsg_editor', get_string('completedmsg', 'mod_wordcards'));
-        $mform->setDefault('completedmsg_editor', array('text' => get_string('congratsitsover', 'mod_wordcards')));
-        $mform->addHelpButton('completedmsg_editor', 'completedmsg', 'mod_wordcards');
+        $mform->addElement('editor', 'completedmsg_editor', get_string('completedmsg', constants::M_COMPONENT));
+        $mform->setDefault('completedmsg_editor', array('text' => get_string('congratsitsover', constants::M_COMPONENT)));
+        $mform->addHelpButton('completedmsg_editor', 'completedmsg', constants::M_COMPONENT);
 
         //Show images on task flip screen
-        $mform->addElement('selectyesno', 'showimageflip', get_string('showimagesonflipscreen', 'mod_wordcards'));
+        $mform->addElement('selectyesno', 'showimageflip', get_string('showimagesonflipscreen', constants::M_COMPONENT));
         $mform->setDefault('showimageflip', $config->showimageflip);
 
         $frontfaceoptions = self::fetch_options_fontfaceflip();
-        $mform->addElement('select', 'frontfaceflip', get_string('frontfaceflip', 'mod_wordcards'),
+        $mform->addElement('select', 'frontfaceflip', get_string('frontfaceflip', constants::M_COMPONENT),
                 $frontfaceoptions, $config->frontfaceflip);
 
   // show activity open closes

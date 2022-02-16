@@ -479,13 +479,14 @@ class renderer extends \plugin_renderer_base {
     /**
      * Show error (but when?)
      */
-    public function word_wizard($mod, $lexicalauser, $lexicalapass){
+    public function word_wizard($mod,$cm, $lexicalauser, $lexicalapass){
         //lexicala uses 2 char lang codes
         $langterm =  substr($mod->get_mod()->ttslanguage,0,2);
         $langdefs= utils::get_lexicala_langs($mod->get_mod()->deflanguage);
 
         $data = [
             'modid' =>$mod->get_mod()->id,
+            'cmid' =>$cm->id,
             'langterm' =>$langterm,
             'langdefs'=>$langdefs,
             'lexicalauser'=>$lexicalauser,

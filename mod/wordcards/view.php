@@ -83,7 +83,6 @@ if($hasopenclosedates){
 
 echo $renderer->navigation($mod, $currentstate);
 
-
 echo $renderer->definitions_page($mod);
 
 echo $renderer->footer();

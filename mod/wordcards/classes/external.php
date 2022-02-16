@@ -349,4 +349,31 @@ class mod_wordcards_external extends external_api {
         //return new external_value(PARAM_INT, 'group id');
     }
 
+    public static function search_dictionary_parameters(){
+        return new external_function_parameters(
+            array('terms' => new external_value(PARAM_RAW, 'The wordarray'),
+                'cmid' => new external_value(PARAM_INT, 'The cmid'),
+                'sourcelang' => new external_value(PARAM_TEXT, 'The language searched'),
+                'targetlangs' => new external_value(PARAM_TEXT, 'The translation langs')
+            )
+        );
+
+    }
+    public static function search_dictionary($terms, $cmid, $sourcelang, $targetlangs){
+        $ret = new \stdClass();
+        $payload = utils::fetch_dictionary_entries($token,$terms,$sourcelang,$targetlangs);
+        if(!$payload){
+            $ret->success=false;
+            $ret->payload="unable to fetch dictionary entries";
+        }else{
+            $ret->success=true;
+            $ret->payload=$payload;
+        }
+       return $ret;
+    }
+
+    public static function search_dictionary_returns(){
+        return new external_value(PARAM_RAW);
+    }
+
 }

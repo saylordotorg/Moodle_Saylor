@@ -27,6 +27,9 @@ const CLOUDPOODLL = 'https://cloud.poodll.com';
 const M_FRONTFACEFLIP_DEF = 0;
 const M_FRONTFACEFLIP_TERM = 1;
 
+const MODE_SEQUENTIAL = 0;
+const MODE_FREE = 1;
+
 
 //grading options
 const M_GRADEHIGHEST= 0;

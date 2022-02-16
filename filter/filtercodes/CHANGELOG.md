@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [2.2.8] 2022-02-01 (DEV)
+## [2.2.8] 2022-02-15 (DEV)
 ### Added
 - New {ifnotvisible}{/ifnotvisible}
 - New {showmore}{/showmore} tags (ALPHA).
@@ -27,8 +27,13 @@ All notable changes to this project will be documented in this file.
 - New {hr} tag.
 - New {coursecardsbyenrol} tag.
 - New {userscountrycount} tag.
+- Missing support for {supportname}, {supportemail} and {supportpage} tags.
 - Known limitation in README.md regarding Moodle's 'Download course content' feature.
+- Compatible with Moodle 4.0 (ALPHA) - Note: Custom menu patch does not work in 4.0 yet.
 ### Updated
+- Many tags that didn't work if it contained a line break now work correctly.
+- Tag %7Bcoursecontextid%7D now works.
+- Fix-166,168,191 multiple instances of date/time related tags (firstaccessdate, coursestartdate, courseenddate, coursecompletiondate, now)
 - {coursesactive} no longer count courses that are before start date or after end date, if any.
 - Renamed {courseteachers} tag to {coursecontacts}. No longer ALPHA.
 - {coursecontacts} now display's based on role coursecontacts setting in Site Admin > Display > Courses.
