@@ -99,7 +99,12 @@ if(count($attempts)==0){
     $attemptid = 0;
 }else{
     $latestattempt = $attempt = $attempthelper->fetch_latest_attempt();
-    if ($latestattempt && $latestattempt->completedsteps < constants::STEP_SELFTRANSCRIBE){
+    if(utils::has_modelanswer($moduleinstance, $context)){
+        $totalsteps=4;
+    }else{
+        $totalsteps=3;
+    }
+    if ($latestattempt && $latestattempt->completedsteps < $totalsteps){
         $start_or_continue=true;
         $nextstep=$latestattempt->completedsteps+1;
         $attemptid=$latestattempt->id;

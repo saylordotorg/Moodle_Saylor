@@ -161,7 +161,7 @@ function solo_reset_userdata($data) {
 }
 
 function solo_get_filemanagernames(){
-    return array('topicmedia');
+    return array('topicmedia','modelmedia');
 }
 
 function solo_get_editornames(){

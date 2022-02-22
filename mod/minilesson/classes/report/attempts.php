@@ -102,8 +102,8 @@ class attempts extends basereport {
 
             $allsql ="SELECT att.* FROM {".constants::M_ATTEMPTSTABLE ."} att " .
                     "INNER JOIN {groups_members} gm ON att.userid=gm.userid " .
-                    "WHERE gm.groupid $groupswhere AND att.moduleid = ? " .
-                    "ORDER BY timecreated DESC";
+                    "WHERE gm.groupid $groupswhere AND att.moduleid = ? AND att.status = " . constants::M_STATE_COMPLETE .
+                    " ORDER BY timecreated DESC";
             $allparams[]=$formdata->moduleid;
             $alldata = $DB->get_records_sql($allsql, $allparams);
 

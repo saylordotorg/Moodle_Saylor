@@ -296,7 +296,6 @@ class comprehensiontest
                             continue;
                         }
 
-
                         if($testitem->type==constants::TYPE_MULTIAUDIO){
                             if($item->{constants::SHOWTEXTPROMPT}==constants::TEXTPROMPT_DOTS){
                                 $prompt = $this->dottify_text($sentence);

@@ -47,15 +47,21 @@ $taskname = required_param('task', PARAM_RAW_TRIMMED);
 require_admin();
 $context = context_system::instance();
 
-if (!get_config('tool_task', 'enablerunnow')) {
-    print_error('nopermissions', 'error', '', get_string('runnow', 'tool_task'));
-}
-
 // Check input parameter against all existing tasks (this ensures it isn't possible to
 // create some kind of security problem by specifying a class that isn't a task or whatever).
 $task = \core\task\manager::get_scheduled_task($taskname);
 if (!$task) {
-    print_error('cannotfindinfo', 'error', $taskname);
+    throw new moodle_exception('cannotfindinfo', 'error', new moodle_url('/admin/tool/task/scheduledtasks.php'), $taskname);
+}
+
+$plugininfo = core_plugin_manager::instance()->get_plugin_info($task->get_component());
+$plugindisabled = $plugininfo && $plugininfo->is_enabled() === false &&
+    !$task->get_run_if_component_disabled();
+
+$canruntasks = \core\task\manager::is_runnable() && get_config('tool_task', 'enablerunnow');
+if (!$canruntasks || $plugindisabled) {
+    throw new moodle_exception('nopermissions', 'error', new moodle_url('/admin/tool/task/scheduledtasks.php'),
+        get_string('runnow', 'tool_task'), $task->get_name());
 }
 
 // Start output.

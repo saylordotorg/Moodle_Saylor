@@ -492,7 +492,7 @@ class aitranscriptutils{
         );
     }
 
-    public static function render_passage($passage) {
+    public static function render_passage($passage,$markuptype='passage') {
         // load the HTML document
         $doc = new \DOMDocument;
         // it will assume ISO-8859-1  encoding, so we need to hint it:
@@ -502,6 +502,16 @@ class aitranscriptutils{
         // select all the text nodes
         $xpath = new \DOMXPath($doc);
         $nodes = $xpath->query('//text()');
+
+        //base CSS class
+        if($markuptype=='passage') {
+            $cssword = constants::M_CLASS . '_grading_passageword';
+            $cssspace = constants::M_CLASS . '_grading_passagespace';
+        }else{
+            $cssword = constants::M_CLASS . '_grading_correctionsword';
+            $cssspace = constants::M_CLASS . '_grading_correctionsspace';
+        }
+
         //init the text count
         $wordcount = 0;
         foreach ($nodes as $node) {
@@ -531,15 +541,15 @@ class aitranscriptutils{
                 $spacenode = $doc->createElement('span', $seperator);
                 //$newnode->appendChild($spacenode);
                 //print_r($newnode);
-                $newnode->setAttribute('id', constants::M_CLASS . '_grading_passageword_' . $wordcount);
+                $newnode->setAttribute('id', $cssword . '_' . $wordcount);
                 $newnode->setAttribute('data-wordnumber', $wordcount);
-                $newnode->setAttribute('class', constants::M_CLASS . '_grading_passageword');
-                $spacenode->setAttribute('class', constants::M_CLASS . '_grading_passagespace');
+                $newnode->setAttribute('class', $cssword);
+                $spacenode->setAttribute('id', $cssspace . '_' . $wordcount);
                 $spacenode->setAttribute('data-wordnumber', $wordcount);
-                $spacenode->setAttribute('id', constants::M_CLASS . '_grading_passagespace_' . $wordcount);
+                $spacenode->setAttribute('class', $cssspace);
                 $node->parentNode->appendChild($newnode);
                 $node->parentNode->appendChild($spacenode);
-                $newnode = $doc->createElement('span', $word);
+                //$newnode = $doc->createElement('span', $word);
             }
             $node->nodeValue = "";
         }
@@ -549,7 +559,11 @@ class aitranscriptutils{
         $usepassage= str_replace('<p>','',$usepassage);
         $usepassage= str_replace('</p>','',$usepassage);
 
-        $ret = \html_writer::div($usepassage, constants::M_CLASS . '_grading_passagecont ' . constants::M_CLASS . '_summarytranscriptplaceholder');
+        if($markuptype=='passage') {
+            $ret = \html_writer::div($usepassage, constants::M_CLASS . '_grading_passagecont ' . constants::M_CLASS . '_summarytranscriptplaceholder');
+        }else{
+            $ret = \html_writer::div($usepassage, constants::M_CLASS . '_corrections ');
+        }
         return $ret;
     }
 
@@ -645,6 +659,26 @@ class aitranscriptutils{
         $PAGE->requires->js_call_amd("mod_solo/passagemarkup", 'init', array(array('id' => $passageopts['opts_id'])));
         $PAGE->requires->strings_for_js(array('heard'),
                 'mod_solo');
+
+        //these need to be returned and echo'ed to the page
+        return $opts_html;
+    }
+
+    public static function prepare_corrections_amd($sessionerrors, $sessionmatches) {
+        global $PAGE;
+
+        //here we set up any info we need to pass into javascript
+        $correctionsopts = Array();
+        $correctionsopts['sessionerrors'] = $sessionerrors; //these are words different from those in original
+        $correctionsopts['sessionmatches'] = $sessionmatches; //these are words missing from the original
+        $correctionsopts['opts_id'] = 'mod_solo_correctionopts';
+
+
+
+        $jsonstring = json_encode($correctionsopts);
+        $opts_html =
+            \html_writer::tag('input', '', array('id' => $correctionsopts['opts_id'], 'type' => 'hidden', 'value' => $jsonstring));
+        $PAGE->requires->js_call_amd("mod_solo/correctionsmarkup", 'init', array(array('id' => $correctionsopts['opts_id'])));
 
         //these need to be returned and echo'ed to the page
         return $opts_html;

@@ -29,6 +29,15 @@
         <FIELD NAME="topictts" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="topicttsvoice" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="topiciframe" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="topicytid" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="topicytstart" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="topicytend" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="modeltts" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="modelttsvoice" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="modeliframe" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="modelytid" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="modelytstart" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="modelytend" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="targetwords" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="enabletranscription" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Whether to require student to transcribe manually"/>
         <FIELD NAME="enableautograde" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Whether to use autograde on this activity"/>
@@ -65,6 +74,7 @@
         <FIELD NAME="jsontranscript" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="The full AI transcript (JSON)"/>
         <FIELD NAME="vtttranscript" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="The AI subtitles"/>
         <FIELD NAME="selftranscript" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="The users self transcript"/>
+        <FIELD NAME="grammarcorrection" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="The Grammar Correction"/>
         <FIELD NAME="topictargetwords" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="mywords" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="convlength" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>

@@ -52,6 +52,7 @@ class backup_solo_activity_structure_step extends backup_activity_structure_step
         $oneactivity = new backup_nested_element(constants::M_MODNAME, array('id'), array(
             'course','name','intro','introformat','grade','gradeoptions','manualgraded','mingrade',
                 'convlength','maxconvlength','speakingtopic','topictts','topicttsvoice','topiciframe','targetwords','tips','tipsformat',
+            'topicytid','topicytstart','topicytend','modeltts','modelttsvoice','modeliframe','modelytid','modelytstart','modelytend',
             'ttslanguage','recorderskin','recordertype','enableai','enabletranscribe','expiredays','region','transcriber','multiattempts',
                 'enabletranscription','enablesharing','enableautograde','gradewordgoal','autogradeoptions','completionallsteps',
                 'postattemptedit','foriframe','timecreated','timemodified','viewstart','viewend'
@@ -60,7 +61,7 @@ class backup_solo_activity_structure_step extends backup_activity_structure_step
         // attempt
         $attempts = new backup_nested_element('attempts');
         $attempt = new backup_nested_element('attempt', array('id'),array(
-            constants::M_MODNAME, 'userid', 'type','visible','filename', 'transcript','jsontranscript','vtttranscript',
+            constants::M_MODNAME, 'userid', 'type','visible','filename', 'transcript','jsontranscript','vtttranscript','grammarcorrection',
             'selftranscript','topictargetwords','mywords','convlength',
             'customtext1', 'customtext1format','completedsteps',
             'currentint1','currentint2','currentint3','currentint4',

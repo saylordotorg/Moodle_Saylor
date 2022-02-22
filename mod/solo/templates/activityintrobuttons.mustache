@@ -1,0 +1,18 @@
+
+{{! we set the title and instructions}}
+<div class="container">
+    <div class="row">
+        <div class="col-sm-6 mx-auto">
+            <div class="solo_introcontent">{{{introcontent}}}</div>
+        </div>
+    </div>
+    <div class="row">
+        {{#buttons}}
+        <div class="col-sm">
+            <div class="row solo_steptitle">
+                <a href="{{{url}}}" class="{{class}}">{{label}}</a>
+            </div>
+        </div>
+        {{/buttons}}
+    </div>
+</div>

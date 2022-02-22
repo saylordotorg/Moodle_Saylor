@@ -1,6 +1,14 @@
+Version 1.0.36(Build 2022022000)
+- Added a more detailed results screen
+- Added a placeholder while activity loads
+
+Version 1.0.35(Build 2022021401)
+- Fixed issue with incomplete attempts
+
 Version 1.0.34(Build 2022021400)
 - Added duplicate feature
 - Added a 3rd prompt/response option textprompt and changed sequence in UI. (update.php rewrites existing qs to match)
+- Added an incomplete attempts report
 
 Version 1.0.33(Build 2022020800)
 - Added open and close start dates

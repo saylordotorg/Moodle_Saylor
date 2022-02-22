@@ -1,0 +1,38 @@
+<div class="col-sm">
+    <div class="card">
+        <div class="card-header">
+            {{#str}}targettime, mod_solo{{/str}}
+        </div>
+        <div class="card-body">
+            <div class="mod_solo_bordered mod_solo_readonly">
+                {{#str}}xmins, mod_solo, {{convlength}}{{/str}}
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-sm">
+    <div class="card">
+        <div class="card-header">
+            {{#str}}gradewordgoal, mod_solo{{/str}}
+        </div>
+        <div class="card-body">
+            <div class="solo_goals">
+                {{#str}}displaygradewordgoal, mod_solo, {{gradewordgoal}}{{/str}}
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-sm">
+    <div class="card">
+        <div class="card-header">
+            {{#str}}targetwords, mod_solo{{/str}}
+        </div>
+        <div class="card-body">
+            <div id="mod_solo_targetwordsdisplay" class="solo_targetwords">
+                {{>mod_solo/targetwords}}
+            </div>
+        </div>
+    </div>
+</div>
+
+

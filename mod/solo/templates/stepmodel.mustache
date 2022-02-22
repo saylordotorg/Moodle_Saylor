@@ -1,0 +1,64 @@
+
+{{! we set the base form fields common to each step}}
+{{>mod_solo/stepbase}}
+
+{{! we set the title and instructions}}
+<div class="container">
+
+    <div class="row">
+        <div class="col-sm-12 mx-auto">
+            <div class="solo_stepinstructions">
+                {{#str}}step_modelinstructions, mod_solo{{/str}}
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm">
+            <div class="mod_solo_activitycontent_container">
+                {{#contentitems}}
+                    {{>mod_solo/activitycontent}}
+                {{/contentitems}}
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-6 mx-auto mod_solo_stepsubmit">
+            <button class="btn btn-primary btn-lg" id="{{uniqid}}_button" type="button">Submit</button>
+        </div>
+    </div>
+
+</div>
+{{^element.frozen}}
+    {{#js}}
+        //this submits the form data by ajax
+        require(['jquery', 'core/log','core/notification' ,'core/ajax','core/templates'],
+            function($, log, Notification, Ajax, Templates) {
+                $('#' + '{{uniqid}}_button').click(function(){
+                    var data = {};
+                    data.selftranscript = $('#' + '{{uniqid}}_selftranscript').val();
+                    data.attemptid ={{attemptid}};
+                    data.activitytype = 4; // {{type}}
+                    var cmid={{cmid}};
+                    var id={{id}};
+                    var step=4;
+                    var action = 'submitstep';
+
+                   var ret = Ajax.call([{
+                        methodname: 'mod_solo_submit_step',
+                        args: {
+                            cmid: cmid,
+                            step: step,
+                            action: action,
+                            data: JSON.stringify(data)
+                        },
+                        done:  function(a){window.location='{{{nexturl}}}';},
+                        fail: Notification.exception,
+                   }]);
+
+                });
+            }
+        );
+    {{/js}}
+{{/element.frozen}}

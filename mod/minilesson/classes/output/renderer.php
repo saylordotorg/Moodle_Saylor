@@ -231,12 +231,14 @@ class renderer extends \plugin_renderer_base {
      *  Finished View
      */
     public function show_finished_results($comp_test, $latestattempt, $canattempt){
-        global $CFG;
-
+        global $CFG, $DB;
+        $ans = array();
         //quiz data
         $quizdata = $comp_test->fetch_test_data_for_js();
+
         //config
         $config = get_config(constants::M_COMPONENT);
+        $course = $DB->get_record('course', array('id' => $latestattempt->courseid));
 
         //steps data
         $steps = json_decode($latestattempt->sessiondata)->steps;
@@ -245,17 +247,97 @@ class renderer extends \plugin_renderer_base {
         $results = array_filter($steps, function($step){return $step->hasgrade;});
         $useresults=[];
         foreach($results as $result){
+            /*
             if(isset($quizdata[$result->index]->title)) {
                 $result->title = $quizdata[$result->index]->title;
             }else{
                 $result->title = get_string($quizdata[$result->index]->type,constants::M_COMPONENT);
             }
+            */
+
+            $items = $DB->get_record('minilesson_rsquestions', array('id' => $quizdata[$result->index]->id));
+            $result->title = $items->name;
+            $result->questext = $items->itemtext;
+
+            // Correct answer.
+            switch($quizdata[$result->index]->type ){
+                case constants::TYPE_DICTATION:
+                case constants::TYPE_DICTATIONCHAT:
+                case constants::TYPE_LISTENREPEAT:
+                case constants::TYPE_SPEECHCARDS:
+                case constants::TYPE_SHORTANSWER:
+                    $result->correctans = $quizdata[$result->index]->sentences;
+                    break;
+
+                case constants::TYPE_MULTIAUDIO:
+                case constants::TYPE_MULTICHOICE:
+                    $result->hasincorrectanswer = true;
+                    $correctanswers=[];
+                    $incorrectanswers=[];
+                    $correctindex = $quizdata[$result->index]->correctanswer;
+                    for($i=1;$i<5;$i++){
+                        if(!isset($quizdata[$result->index]->{"customtext" . $i})){continue;}
+                        if($i==$correctindex){
+                            $correctanswers[]=['sentence'=>$quizdata[$result->index]->{"customtext" . $i}];
+                        }else{
+                            $incorrectanswers[]=['sentence'=>$quizdata[$result->index]->{"customtext" . $i}];
+                        }
+                    }
+                    $result->correctans = $correctanswers;
+                    $result->incorrectans = $incorrectanswers;
+                    break;
+
+                default:
+                    $result->correctans = [];
+                    $result->incorrectans = [];
+            }
+
+
             $result->index++;
+            // Every item stars.
+            if($result->grade==0){
+                $ystar_cnt=0;
+            }else if($result->grade<19) {
+                $ystar_cnt=1;
+            }else if($result->grade<39) {
+                $ystar_cnt=2;
+            }else if($result->grade<59) {
+                $ystar_cnt=3;
+            }else if($result->grade<79) {
+                $ystar_cnt=4;
+            }else{
+                $ystar_cnt=5;
+            }
+            $result->yellowstars = array_fill(0, $ystar_cnt, true);
+            $gstar_cnt= 5 - $ystar_cnt;
+            $result->graystars = array_fill(0, $gstar_cnt, true);
+
             $useresults[]=$result;
         }
 
         //output results and back to course button
         $tdata=new \stdClass();
+
+        // Course name at top of page.
+        $tdata->coursename = $course->fullname;
+        // Item stars.
+        if($latestattempt->sessionscore==0){
+            $ystar_cnt=0;
+        }else if($latestattempt->sessionscore<19) {
+            $ystar_cnt=1;
+        }else if($latestattempt->sessionscore<39) {
+            $ystar_cnt=2;
+        }else if($latestattempt->sessionscore<59) {
+            $ystar_cnt=3;
+        }else if($latestattempt->sessionscore<79) {
+            $ystar_cnt=4;
+        }else{
+            $ystar_cnt=5;
+        }
+        $tdata->yellowstars = array_fill(0, $ystar_cnt, true);
+        $gstar_cnt= 5 - $ystar_cnt;
+        $tdata->graystars = array_fill(0, $gstar_cnt, true);
+
         $tdata->total = $latestattempt->sessionscore;
         $tdata->courseurl = $CFG->wwwroot . '/course/view.php?id=' . $latestattempt->courseid;
         $tdata->results=$useresults;
@@ -295,11 +377,13 @@ class renderer extends \plugin_renderer_base {
 
         $finisheddiv = \html_writer::div("" ,constants::M_QUIZ_FINISHED,
             array('id'=>constants::M_QUIZ_FINISHED));
-      
+
+        $placeholderdiv = \html_writer::div('',constants::M_QUIZ_PLACEHOLDER . ' ' . constants::M_QUIZ_SKELETONBOX,
+            array('id'=>constants::M_QUIZ_PLACEHOLDER));
         $quizdiv = \html_writer::div($finisheddiv.implode('',$itemshtml) ,constants::M_QUIZ_CONTAINER,
             array('id'=>constants::M_QUIZ_CONTAINER));
       
-        $ret = $quizdiv;
+        $ret = $placeholderdiv  . $quizdiv;
         return $ret;
     }
 
@@ -422,11 +506,15 @@ class renderer extends \plugin_renderer_base {
 
 
         $recopts['courseurl']=$CFG->wwwroot . '/course/view.php?id=' . $moduleinstance->course ;
-        $recopts['reattempturl']='';
+        //the activity URL for returning to on finished
+        $activityurl = new \moodle_url(constants::M_URL . '/view.php',
+            array('n' => $moduleinstance->id));
+        $recopts['activityurl']=$activityurl->out();
+        //the reattempturl if its ok
+        $recopts['reattempturl']="";
         if($canreattempt) {
-            $reattempturl = new \moodle_url(constants::M_URL . '/view.php',
-                    array('n' => $moduleinstance->id, 'retake' => 1));
-            $recopts['reattempturl']=$reattempturl->out();
+            $activityurl->param('retake','1');
+            $recopts['reattempturl']=$activityurl->out();
         }
         //show back to course button if we are not in an iframe
         if(!$config->enablesetuptab) {

@@ -307,6 +307,7 @@ $string['model'] = "Model";
 $string['use'] = "Use";
 $string['dismiss'] = "Dismiss";
 $string['deflanguage'] = "Definitions Language";
+$string['deflanguage_help'] = "This is choosed to preselect the correct language when using the dictionary in teh Word Wizard. (Only some langs are aavailable ..sorry)";
 $string['wizardinstructions'] = "Word Wizard will search a dictionary for a list of words and return a list of dictionary entries. Choose the definition language, enter a comma separated list of words and press the 'Fetch Definitions' button. From the entries returned, edit the entry content and press the 'use' button to add the word to the wordcards activity. ";
 $string['nodefinitionfound'] = "No definition found";
 $string['viewstart']="Activity open";

@@ -335,11 +335,13 @@ $string['attempt_partone'] = '1: Prepare';
 $string['attempt_partone_title'] = '1: Prepare to Speak';
 $string['attempt_parttwo'] = '2: Record';
 $string['attempt_partthree'] = '3: Transcribe';
-$string['attempt_partfour'] = '4: Review';
+$string['attempt_partfour'] = '4: Model Answer';
+$string['attempt_partfive'] = '5: Review';
 $string['attempt_partone_instructions'] = 'Choose your partners, topic, target words and target speaking time from the options below. When you are ready, move to the next page and begin speaking';
 $string['attempt_parttwo_instructions'] = 'Use the recorder below to record yourself. Try to use the target words. Good luck.';
 $string['attempt_partthree_instructions'] = 'Listen to your recording and enter what you said in the editor below. Do not change what you said, when you type it.';
-$string['attempt_partfour_instructions'] = 'Compare the transcript you entered, to the automatically generated transcript. Are there many differences? Could you improve your speaking? Enter your self review in the text fields below.';
+$string['attempt_partfour_instructions'] = 'Check the model answer. Do you think it is a good answer?';
+$string['attempt_partfive_instructions'] = 'Compare the transcript you entered, to the automatically generated transcript. Are there many differences? Could you improve your speaking? Enter your self review in the text fields below.';
 
 $string['step_preparetitle']='Prepare';
 $string['step_prepareinstructions']='Check the speaking topic, target words and target speaking time from the options below. When you are ready, move to the next page and begin speaking';
@@ -349,7 +351,8 @@ $string['step_typetitle']='Enter Text';
 $string['step_typeinstructions']='Use the recorder below to record yourself. Try to use the target words. Good luck.';
 $string['step_selftranscribetitle']='Transcribe';
 $string['step_selftranscribeinstructions']='Listen to your recording and enter what you said in the editor below. Do not change what you said, when you type it.';
-
+$string['step_modeltitle']='Model Answer';
+$string['step_modelinstructions']='Check the model answer below.';
 
 $string['savesubtitles'] = 'Save Speech';
 $string['removesubtitles'] = 'Remove Speech';
@@ -380,8 +383,6 @@ $string['ATL']= 'ASL';
 $string['LTL']= 'LSL';
 $string['TW']= 'TW';
 $string['idnumber']= 'ID-number';
-
-
 
 $string['audiorecording']= 'Audio Recording';
 $string['summaryuserattemptheadertitle']= '(Attempt: {$a}) Speech Details';
@@ -565,6 +566,7 @@ $string['mediaoptions'] = 'Media Options';
 $string['addmedia'] = 'Add Media';
 $string['addiframe'] = 'Add iFrame';
 $string['addttsaudio'] = 'Add TTS Audio';
+$string['addytclip'] = 'Add YouTube';
 
 $string['speakingtargetsheader'] ='Speaking Targets';
 $string['languageandrecordingheader'] ='Language and Recording';
@@ -589,12 +591,15 @@ $string['content_media'] ='Image, audio or video content';
 $string['content_iframe'] ='Embed iframe code';
 $string['content_tts'] ='Text to be read';
 $string['content_ttsvoice'] ='Speaker\'s voice';
+$string['content_ytid'] = "Youtube Video ID";
+$string['content_ytstart'] = "Start Secs";
+$string['content_ytend'] = "End Secs";
+$string['ytclipdetails'] = "Youtube Clip";
 $string['freetrial'] = "Get Cloud Poodll API Credentials and a Free Trial";
 $string['freetrial_desc'] = "A dialog should appear that allows you to register for a free trial with Poodll. After registering you should login to the members dashboard to get your API user and secret. And to register your site URL.";
 $string['memberdashboard'] = "Member Dashboard";
 $string['memberdashboard_desc'] = "";
 $string['fillcredentials']="Set API user and secret with existing credentials";
-
 $string['viewstart']="Activity open";
 $string['viewend']="Activity close";
 $string['viewstart_help']="If set, prevents a student from entering the activity before the start date/time.";
@@ -607,4 +612,10 @@ $string['activityisclosed']="This activity is closed.";
 $string['open']="Open: ";
 $string['until']="Until: ";
 $string['activityopenscloses']="Activity open/close dates";
-$string['solo:preview'] = 'Can preview Wordcards activities';
+$string['solo:preview'] = 'Can preview Solo activities';
+$string['modelanswer'] = "Model Answer";
+$string['modelanswerheader'] = "Model Answer";
+$string['modelanswerinstructions'] = "If you wish to display a model answer to students after they have entered their transcription, set that here.";
+$string['audiorec_heading'] = "Audio Recorder";
+$string['videorec_heading'] = "Video Recorder";
+$string['grammarcorrection'] = "Suggested Corrections";

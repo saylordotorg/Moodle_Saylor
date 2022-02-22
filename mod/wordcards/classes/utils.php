@@ -37,6 +37,7 @@ use \mod_wordcards\constants;
 class utils{
 
     //const CLOUDPOODLL = 'http://localhost/moodle';
+    //const CLOUDPOODLL = 'https://vbox.poodll.com/cphost';
     const CLOUDPOODLL = 'https://cloud.poodll.com';
 
     //are we willing and able to transcribe submissions?
@@ -635,7 +636,7 @@ class utils{
         $params['wstoken'] = $token;
         $params['wsfunction'] = $functionname;
         $params['moodlewsrestformat'] = 'json';
-        $params['terms'] = urlencode($terms);
+        $params['terms'] = $terms;
         $params['sourcelang'] =$sourcelang;
         $params['targetlangs'] =urlencode($targetlangs);;
         $params['appid'] = constants::M_COMPONENT;
@@ -1074,7 +1075,7 @@ class utils{
                 $options);
         $mform->setDefault('ttslanguage',$config->ttslanguage);
 
-        $lexicala = utils::get_lexicala_langs();
+        $lexicala =  utils::get_rcdic_langs();// utils::get_lexicala_langs();
         $options=[];
         foreach($lexicala as $lexone){
             $options[$lexone['code']]=$lexone['name'];
@@ -1082,6 +1083,7 @@ class utils{
         $mform->addElement('select', 'deflanguage', get_string('deflanguage', constants::M_COMPONENT),
             $options);
         $mform->setDefault('deflanguage',$config->deflanguage);
+        $mform->addHelpButton('deflanguage', 'deflanguage', constants::M_COMPONENT);
 
         $mform->addElement('header', 'hdrappearance', get_string('appearance'));
         $mform->setExpanded('hdrappearance');
@@ -1202,6 +1204,35 @@ class utils{
         return $ret;
     }
 
+    public static function get_rcdic_langs($selected='en'){
+
+        $langdefs=[];
+        $langdefs[] = ['code'=>'ar','name'=>'Arabic'];
+      //  $langdefs[] = ['code'=>'de','name'=>'German'];
+        $langdefs[] = ['code'=>'en','name'=>'English'];
+        $langdefs[] = ['code'=>'es','name'=>'Spanish'];
+        $langdefs[] = ['code'=>'fr','name'=>'French'];
+        $langdefs[] = ['code'=>'id','name'=>'Bahasa Indonesia'];
+        $langdefs[] = ['code'=>'ja','name'=>'Japanese'];
+        $langdefs[] = ['code'=>'ko','name'=>'Korean'];
+        $langdefs[] = ['code'=>'pt','name'=>'Portuguese'];
+        $langdefs[] = ['code'=>'ru','name'=>'Russian'];
+        $langdefs[] = ['code'=>'th','name'=>'Thai'];
+        $langdefs[] = ['code'=>'vi','name'=>'Vietnamese'];
+        $langdefs[] = ['code'=>'zh','name'=>'Chinese (simpl.)'];
+        $langdefs[] = ['code'=>'zh_tw','name'=>'Chinese (trad.)'];
+        $default_set = false;
+        for($i=0;$i<count($langdefs);$i++){
+            if($langdefs[$i]['code']==$selected){
+                $langdefs[$i]['selected']=true;
+                $default_set = true;
+                break;
+            }
+        }
+        if(!$default_set){$langdefs[10]['selected']=true;}
+        return $langdefs;
+    }
+
     public static function get_lexicala_langs($selected='en'){
         $langdefs=[];
         $langdefs[] = ['code'=>'af','name'=>'Afrikaans'];
@@ -1271,9 +1302,16 @@ class utils{
             if(empty($term->translations)){continue;}
             if(!self::is_json($term->translations)){continue;}
             $translations = json_decode($term->translations);
-            if(!empty($translations) && isset($translations->{$mod->get_mod()->deflanguage})){
-                $DB->update_record('wordcards_terms',
-                    ['id'=>$term->id,'definition'=>$translations->{$mod->get_mod()->deflanguage}->text]);
+            if(!empty($translations) &&
+                isset($translations->{$mod->get_mod()->deflanguage})){
+                if(isset($translations->{$mod->get_mod()->deflanguage}->text)){
+                    //lexicala
+                    $newdef = $translations->{$mod->get_mod()->deflanguage}->text;
+                }else{
+                    //r and c db
+                    $newdef = $translations->{$mod->get_mod()->deflanguage};
+                }
+                $DB->update_record('wordcards_terms', ['id'=>$term->id,'definition'=>$newdef]);
             }
         }
     }

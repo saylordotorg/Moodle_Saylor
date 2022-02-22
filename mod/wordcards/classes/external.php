@@ -351,17 +351,17 @@ class mod_wordcards_external extends external_api {
 
     public static function search_dictionary_parameters(){
         return new external_function_parameters(
-            array('terms' => new external_value(PARAM_RAW, 'The wordarray'),
+            array('terms' => new external_value(PARAM_RAW, 'The csv word list'),
                 'cmid' => new external_value(PARAM_INT, 'The cmid'),
                 'sourcelang' => new external_value(PARAM_TEXT, 'The language searched'),
-                'targetlangs' => new external_value(PARAM_TEXT, 'The translation langs')
+                'targetlangs' => new external_value(PARAM_TEXT, 'The csv translation langs')
             )
         );
 
     }
     public static function search_dictionary($terms, $cmid, $sourcelang, $targetlangs){
         $ret = new \stdClass();
-        $payload = utils::fetch_dictionary_entries($token,$terms,$sourcelang,$targetlangs);
+        $payload = utils::fetch_dictionary_entries($terms,$sourcelang,$targetlangs);
         if(!$payload){
             $ret->success=false;
             $ret->payload="unable to fetch dictionary entries";
@@ -373,7 +373,12 @@ class mod_wordcards_external extends external_api {
     }
 
     public static function search_dictionary_returns(){
-        return new external_value(PARAM_RAW);
+        return new external_single_structure(
+            array(
+                'success' => new external_value(PARAM_INT, 'Indicates success or failure of the call'),
+                'payload' => new external_value(PARAM_RAW, 'If call failed, contains a message about why. Else contains a json string of results')
+            )
+        );
     }
 
 }

@@ -50,7 +50,8 @@ define(['jquery','jqueryui', 'core/log','mod_minilesson/definitions','mod_minile
                 feedbackcontainer: $('.' +  opts['feedbackcontainer']),
                 errorcontainer: $('.' +  opts['errorcontainer']),
                 instructionscontainer: $('.' +  opts['instructionscontainer']),
-                wheretonextcontainer: $('.' +  opts['wheretonextcontainer'])
+                wheretonextcontainer: $('.' +  opts['wheretonextcontainer']),
+                placeholder: $('.mod_minilesson_placeholder')
             };
             this.controls = controls;
         },
@@ -73,7 +74,9 @@ define(['jquery','jqueryui', 'core/log','mod_minilesson/definitions','mod_minile
                 polly);
 
             //show the quiz
+            dd.controls.placeholder.hide();
             dd.controls.quizcontainer.show();
+
 
         },
 

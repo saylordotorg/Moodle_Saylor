@@ -1,0 +1,82 @@
+<div
+        data-video="{{itemytvideoid}}"
+        data-start="{{itemytvideostart}}"
+        data-end="{{itemytvideoend}}"
+        data-height="560"
+        data-width="315"
+        id="{{uniqid}}_ytplayer"
+></div>
+{{^element.frozen}}
+    {{#js}}
+        require(['jquery'],function($) {
+
+        <!-- script type="text/javascript" -->
+            var player = {
+                initVideo: function(container) {
+                    if (typeof(YT) == 'undefined' || typeof(YT.Player) == 'undefined') {
+                        if (typeof(window.deferredYTClips) == 'undefined') {
+                            window.deferredYTClips=[];
+                        }
+                        window.deferredYTClips.push(container);
+                        window.onYouTubeIframeAPIReady = function() {
+                            for(var i=0;i<window.deferredYTClips.length && i>-1;i++){
+                                player.loadPlayer(window.deferredYTClips[i]);
+                            }
+                        };
+
+                        $.getScript('//www.youtube.com/iframe_api');
+                    } else {
+                        player.loadPlayer(container);
+                    }
+                },
+
+                loadPlayer: function(container) {
+                    var theDiv = $("#" + container);
+                    var startSeconds = theDiv.data('start');
+                    var endSeconds  = theDiv.data('end');
+                    var thePlayer = new YT.Player(container, {
+                        width: theDiv.data('width'),
+                        height: theDiv.data('height'),
+                        // For a list of all parameters, see:
+                        // https://developers.google.com/youtube/player_parameters
+                        playerVars: {
+                            autoplay: 0,
+                            controls: 1,
+                            modestbranding: 0,
+                            rel: 0,
+                            showinfo: 0
+                        },
+                        events: {
+                            onReady: function (e) {
+                                var videocue = {videoId: theDiv.data('video')};
+                                if(!isNaN(startSeconds) && startSeconds > 0){
+                                    videocue.startSeconds = startSeconds
+                                }else{
+                                    startSeconds = 0;
+                                };
+                                if(!isNaN(endSeconds) && endSeconds > 0){videocue.endSeconds = endSeconds};
+                                e.target.cueVideoById(videocue);
+                            },
+                            onStateChange: function (e) {
+                                switch(e.data) {
+                                    case YT.PlayerState.ENDED:
+                                        thePlayer.seekTo(startSeconds);
+                                        thePlayer.pauseVideo();
+                                        break;
+                                    case YT.PlayerState.PAUSED:
+                                    case YT.PlayerState.PLAYING:
+                                    default:
+
+                                }
+                            },
+                        },
+                    });
+                }
+            };
+
+            player.initVideo("{{uniqid}}_ytplayer");
+        <!-- script -->
+
+        });//end of require
+    {{/js}}
+{{/element.frozen}}

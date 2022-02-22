@@ -77,6 +77,7 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'mod_minilesson/poll
       var sentences = itemdata.sentences;//sentence & phonetic
       //clean the text of any junk
       for(var i=0;i<sentences.length;i++){
+          sentences[i].originalsentence= sentences[i].sentence
           sentences[i].sentence=quizhelper.cleanText(sentences[i].sentence);
       }
 
@@ -95,7 +96,8 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'mod_minilesson/poll
 
             log.debug('speechtext:',speechtext);
             log.debug('cleanspeechtext:',spoken);
-
+            var matched=false;
+            var percent=0;
 
             //Similarity check by direct-match/acceptable-mistranscriptio
             for(var x=0;x<sentences.length;x++){
@@ -105,48 +107,58 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'mod_minilesson/poll
               log.debug('JS similarity: ' + spoken + ':' + sentences[x].sentence + ':' + similar);
               if (similar >= app.passmark ||
                   app.spokenIsCorrect(quizhelper, cleanspeechtext, sentences[x].sentence)) {
-
-                //proceed to next question
-                var percent = app.process_accepted_response(itemdata, x);
-                $(".minilesson_nextbutton").prop("disabled", true);
-
-                //proceed to next question
-                setTimeout(function() {
-                  $(".minilesson_nextbutton").prop("disabled", false);
-                  app.next_question(percent);
-                }, 2000);
-                return;
+                  percent = app.process_accepted_response(itemdata, x);
+                  matched=true;
+                  break;
               }//end of if similarity
             }//end of for x
 
-
             //Similarity check by phonetics(ajax)
             //this is an expensive call since it goes out to the server and possibly to the cloud
-            for(var x=0;x<sentences.length;x++) {
-              var similarity = await quizhelper.checkByPhonetic(sentences[x].sentence, spoken, sentences[x].phonetic, itemdata.language);
-
+            if(!matched) {
+              for (x = 0; x < sentences.length; x++) {
+                var similarity = await quizhelper.checkByPhonetic(sentences[x].sentence, spoken, sentences[x].phonetic, itemdata.language);
                 if (!similarity || similarity < app.passmark) {
-                  //do nothing ?? or tough luck ?
-                  //return $.Deferred().reject();
-
-                 // var percent = app.process_accepted_response(itemdata, -1);
-
+                  //keep looking
                 } else {
-
+                  matched = true;
                   log.debug('PHP similarity: ' + spoken + similarity);
-
-                  var percent = app.process_accepted_response(itemdata, x);
-
-                  //proceed to next question
-                  $(".minilesson_nextbutton").prop("disabled", true);
-                  setTimeout(function () {
-                    $(".minilesson_nextbutton").prop("disabled", false);
-                    app.next_question(percent);
-                  }, 2000);
+                  percent = app.process_accepted_response(itemdata, x);
+                  break;
                 }
+              }//end of Similarity check by phonetics(ajax) loop
+            }
 
-            }//end of for x loop
+            //we do not do a passage match check , but this is how we would ..
+              if(!matched ) {
+                for (x = 0; x < sentences.length; x++) {
+                  var ajaxresult = await quizhelper.comparePassageToTranscript(sentences[x].sentence, spoken, sentences[x].phonetic, itemdata.language);
+                  var result = JSON.parse(ajaxresult);
+                  var haserror=false;
+                  for (var i=0;i<result.length;i++){
+                    if(result[i].matched===false){haserror=true;break;}
+                  }
+                  if(!haserror){
+                    percent = app.process_accepted_response(itemdata, x);
+                    matched=true;
+                    break;
+                  }
+                }
+              }
 
+              //if we got a match then process it
+            if(matched && false){
+              //proceed to next question
+              $(".minilesson_nextbutton").prop("disabled", true);
+              setTimeout(function () {
+                $(".minilesson_nextbutton").prop("disabled", false);
+                app.next_question(percent);
+              }, 2000);
+              return;
+            }else{
+              //shake the screen
+              $("#" + itemdata.uniqueid + "_correctanswer").effect("shake");
+            }
         } //end of switch message type
       }; //end of callback declaration
 
@@ -184,10 +196,10 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'mod_minilesson/poll
           }
         }
 
-        //TO DO: add fancy animation
+        //hightlight successgit cm
         var  answerdisplay =  $("#" + itemdata.uniqueid + "_correctanswer");
-        answerdisplay.text(itemdata.sentences[sentenceindex].sentence);
-        answerdisplay.show();//this should also trigger any entry animation
+        answerdisplay.text(itemdata.sentences[sentenceindex].originalsentence);
+        answerdisplay.addClass("minilesson_success");
       }
 
       return percent;

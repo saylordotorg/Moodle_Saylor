@@ -29,7 +29,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/course/moodleform_mod.php');
-require_once($CFG->dirroot.'/mod/solo/classes/attempt/userselectionsform.php');
 
 use \mod_solo\constants;
 use \mod_solo\utils;

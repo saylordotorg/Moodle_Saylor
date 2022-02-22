@@ -33,6 +33,7 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'core/templates', 'c
         this.courseurl = activitydata.courseurl;
         this.cmid = cmid;
         this.reattempturl = activitydata.reattempturl;
+        this.activityurl = activitydata.activityurl;
         this.backtocourse = activitydata.backtocourse;
         this.ds_only = activitydata.ds_only;
         this.prepare_html();
@@ -143,7 +144,7 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'core/templates', 'c
 
       },
 
-      do_next: function(stepdata){
+      do_next: async function(stepdata){
         var dd = this;
         //get current question
         var currentquizdataindex =   stepdata.index;
@@ -153,7 +154,9 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'core/templates', 'c
         if(currentitem.preview===true){return;}
 
         //post grade
-        dd.report_step_grade(stepdata);
+         // log.debug("reporting step grade");
+        await dd.report_step_grade(stepdata);
+         // log.debug("reported step grade");
         //hide current question
         var theoldquestion = $("#" + currentitem.uniqueid + "_container");
         theoldquestion.hide();
@@ -186,7 +189,17 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'core/templates', 'c
             }
 
         } else {
+          //just reload and re-fetch all the data to display
+            $(".minilesson_nextbutton").prop("disabled", true);
+            setTimeout(function () {
+               // log.debug("forwarding to finished page");
+                window.location.href=dd.activityurl;
+            }, 1000);
 
+          return;
+
+          //no longer do this
+            /*
           var results = dd.stepresults.filter(function(e){return e.hasgrade;});
           var correctitems = 0;
           var totalitems = 0;
@@ -208,6 +221,7 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'core/templates', 'c
                   templates.runTemplateJS(js);
               }
           );
+          */
 
         }//end of if has more questions
 
@@ -218,14 +232,14 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'core/templates', 'c
         
       },
 
-      report_step_grade: function(stepdata) {
+      report_step_grade: async function(stepdata) {
         var dd = this;
 
         //store results locally
         this.stepresults.push(stepdata);
 
         //push results to server
-        Ajax.call([{
+        await Ajax.call([{
           methodname: 'mod_minilesson_report_step_grade',
           args: {
             cmid: dd.cmid,

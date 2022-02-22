@@ -482,7 +482,7 @@ class renderer extends \plugin_renderer_base {
     public function word_wizard($mod,$cm, $lexicalauser, $lexicalapass){
         //lexicala uses 2 char lang codes
         $langterm =  substr($mod->get_mod()->ttslanguage,0,2);
-        $langdefs= utils::get_lexicala_langs($mod->get_mod()->deflanguage);
+        $langdefs= utils::get_rcdic_langs($mod->get_mod()->deflanguage);//utils::get_lexicala_langs($mod->get_mod()->deflanguage);
 
         $data = [
             'modid' =>$mod->get_mod()->id,

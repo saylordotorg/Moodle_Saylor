@@ -89,13 +89,14 @@ log.debug('updateid', dd.updatecontrolid);
             //originates from the recording:ended event
             //contains no meaningful data
             //See https://api.poodll.com
-            var on_recording_end= function(eventdata){
-                uploadwarning.show();
-            };
+           var on_recording_end= function(eventdata){
+               $("button.mod_solo_step2_btn").attr("disabled",true);
+           };
 
             //data sent here originates from the awaiting_processing event
             //See https://api.poodll.com
             var on_media_processing= function(eventdata){
+                uploadwarning.show();
                 var updatecontrol = $('#' + dd.updatecontrolid);
                 updatecontrol.val(eventdata.mediaurl);
 
@@ -113,8 +114,8 @@ log.debug('updateid', dd.updatecontrolid);
             var on_file_submitted= function(){
                 uploadwarning.hide();
                 /* disable cancel button because users can try to leave too soon */
-                $(".mod_solo_step2 .btn").attr('disabled', 'disabled');
-                theform.submit();
+                $("button.mod_solo_step2_btn").attr("disabled",false);
+                $("button.mod_solo_step2_btn").trigger('click');
             };
 
             //init the recorder

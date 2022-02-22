@@ -35,10 +35,30 @@ class mod_minilesson_external extends external_api {
     public static function check_by_phonetic($spoken, $correct, $phonetic, $language,$region, $cmid){
         $segmented = true;
 
-        if($language==constants::M_LANG_JAJP){
+        switch($language){
+            case constants::M_LANG_JAJP:
+
                 //find digits in original passage, and convert number words to digits in the target passage
                 //this works but segmented digits are a bit messed up, not sure its worthwhile. more testing needed
-            $spoken=alphabetconverter::words_to_suji_convert($phonetic,$spoken);
+                $spoken=alphabetconverter::words_to_suji_convert($phonetic,$spoken);
+                break;
+            case constants::M_LANG_ENUS:
+            case constants::M_LANG_ENAB:
+            case constants::M_LANG_ENAU:
+            case constants::M_LANG_ENGB:
+            case constants::M_LANG_ENIE:
+            case constants::M_LANG_ENIN:
+            case constants::M_LANG_ENNZ:
+            case constants::M_LANG_ENWL:
+            case constants::M_LANG_ENZA:
+                //find digits in original passage, and convert number words to digits in the target passage
+                $spoken=alphabetconverter::words_to_numbers_convert($correct,$spoken);
+                break;
+            case constants::M_LANG_DEDE:
+            case constants::M_LANG_DECH:
+                //find eszetts in original passage, and convert ss words to eszetts in the target passage
+                $spoken=alphabetconverter::ss_to_eszett_convert($correct,$spoken);
+                break;
         }
         list($spokenphonetic) = utils::fetch_phones_and_segments($spoken,$language,$region,$segmented);
         $similar_percent = 0;
@@ -55,7 +75,7 @@ class mod_minilesson_external extends external_api {
 
         //similar_percent calc'd by reference but multibyte is weird
         if($language!==constants::M_LANG_JAJP) {
-            $similar_percent = similar_text($phonetic, $spokenphonetic, $similar_percent);
+            similar_text($phonetic, $spokenphonetic, $similar_percent);
         }else{
             $similar_percent = $phonetic == $spokenphonetic ?100:0;
         }

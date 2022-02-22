@@ -66,6 +66,9 @@ switch($source){
 	case 'attempts':
 		$redirecturl = new moodle_url('/mod/minilesson/reports.php', array('report'=>'attempts','id'=>$cm->id,'n'=>$n));
 		break;
+    case 'incompleteattempts':
+        $redirecturl = new moodle_url('/mod/minilesson/reports.php', array('report'=>'incompleteattempts','id'=>$cm->id,'n'=>$n));
+        break;
 	case 'grading':
 		$redirecturl = new moodle_url('/mod/minilesson/grading.php', array('id'=>$cm->id,'action'=>'grading'));
 		break;

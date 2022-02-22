@@ -15,12 +15,12 @@
 {{^element.frozen}}
     {{#js}}
 //<script>
-        require(['jquery','core/templates','core/ajax'],function($,templates, ajax) {
+        require(['jquery','core/log','core/templates','core/ajax'],function($,log, templates, ajax) {
 
             //get words from text area and fetch definitions
             var resultscont = $("#{{uniqid}}_resultscont");
 
-            $("xxx#{{uniqid}}_fetchbtn").on("click", async function() {
+            $("#{{uniqid}}_fetchbtn").on("click", async function() {
                 var langs = ['ar','id','zh','zh_tw','ja','ko','pt','es','th','vi','fr','rus'];
                 var langdef = $("#{{uniqid}}_ww_langdef").val();
                 var allwords = $("#{{uniqid}}_ww_words").val();
@@ -29,20 +29,25 @@
                 }
                 var wordsarray = allwords.split(',');
                 var promises = await ajax.call([
-                    {methodname: 'mod_wordcards_search_dictionary', args: {terms: wordsarray, cmid: {{cmid}}, sourcelang: '{{langterm}}', targetlangs: langdef }},
+                    {methodname: 'mod_wordcards_search_dictionary', args: {terms: allwords, cmid: {{cmid}}, sourcelang: '{{langterm}}', targetlangs: langdef }},
                 ]);
 
                 promises[0].done(function (response) {
-                    if (response && response.response[0]) {
+                    //if return code=0, disaster, log and die
+                    if(response.success===0){
+                        log.debug(response.payload);
+                        return;
+                    }
 
-                        for(var i; i < results.length;i++){
-                            var result = results[i];
+                    var terms=JSON.parse(response.payload);
+                        for(var i=0; i < terms.length;i++){
+                            var theterm = terms[i];
                             //if a word search failed show an editable area
-                            if(result.count===0){
+                            if(theterm.count===0){
                                 var senses=[];
                                 senses.push({definition: '',sourcedefinition: 'No def. available',
-                                    modelsentence: '', senseindex: 0, translations: {}})
-                                var tdata = {term: wordsarray[i], senses: senses, modid: {{modid}} };
+                                    modelsentence: '', senseindex: 0, translations: '{}'})
+                                var tdata = {term: theterm.term, senses: senses, modid: {{modid}} };
                                 templates.render('mod_wordcards/word_wizard_oneresult',tdata).then(
                                         function(html,js){
                                             resultscont.append(html);
@@ -50,26 +55,27 @@
                                         }
                                 );
                             }else{
-                                var tdata = {term: result.term, senses: [], modid: {{modid}} };
-                                for(var sindex = 0;sindex < result.count; sindex++ ){
-                                    var modelsentence = result[sindex].example;
-                                    var sourcedefinition = result[sindex].definition;
+                                var tdata = {term: theterm.term, senses: [], modid: {{modid}} };
+                                 for(var sindex in theterm.results){
+                                     var sense = theterm.results[sindex];
+                                    var modelsentence = sense.example;
+                                    var sourcedefinition = sense.definition;
                                     var alltrans={};
                                     for(var ti=0;ti<langs.length;ti++){
-                                        alltrans[langs[ti]] = result['lang_' + langs[ti]];
+                                        alltrans[langs[ti]] = sense['lang_' + langs[ti]];
                                     }
                                     var translations = JSON.stringify(alltrans);
                                     var definition = sourcedefinition;
                                     if(langdef!=="{{langterm}}"){
-                                        if(result.hasOwnProperty('lang_' + langdef)){
-                                            definition = result['lang_' + langdef];
+                                        if(sense.hasOwnProperty('lang_' + langdef)){
+                                            definition = sense['lang_' + langdef];
                                         }else{
                                             definition = 'No translation available';
                                         }
                                     }
                                     tdata.senses.push({definition: definition,sourcedefinition: sourcedefinition,
                                         modelsentence: modelsentence, senseindex: sindex, translations: translations});
-                                }//end of results loop
+                                 }//end of results loop
                                 templates.render('mod_wordcards/word_wizard_oneresult',tdata).then(
                                         function(html,js){
                                             resultscont.append(html);
@@ -78,12 +84,11 @@
                                 );
                             }
                         }
-                    }
                 });
             });
 
 
-            $("#{{uniqid}}_fetchbtn").on("click", async function() {
+            $("xxxxx#{{uniqid}}_fetchbtn").on("click", async function() {
                 var langdef = $("#{{uniqid}}_ww_langdef").val();
                 var allwords = $("#{{uniqid}}_ww_words").val();
                 if(allwords.trim()===''){return;}

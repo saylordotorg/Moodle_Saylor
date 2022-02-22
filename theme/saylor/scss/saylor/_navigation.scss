@@ -94,6 +94,7 @@
 
 .navbar-nav .usermenu .login {
    line-height: 1rem;
+   @extend .btn,.btn-secondary !important;
 }
 
 // Round corners for groups in the nav drawer.

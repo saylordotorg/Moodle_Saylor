@@ -3,35 +3,55 @@
 {{>mod_solo/stepbase}}
 
 {{! we set the title and instructions}}
-<div class="solo_steptitle">
-    {{#str}}step_preparetitle, mod_solo{{/str}}
-</div>
-<div class="solo_stepinstructions">
-    {{#str}}step_prepareinstructions, mod_solo{{/str}}
-</div>
-<div class="mod_solo_speakingtopic_readonly">
-    {{#str}}speakingtopic, mod_solo{{/str}}:{{speakingtopic}}
+<div class="container">
+
+    <div class="row">
+        <div class="col-sm-12 mx-auto">
+            <div class="solo_stepinstructions">
+                {{#str}}step_prepareinstructions, mod_solo{{/str}}
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        {{>mod_solo/snippetgoals}}
+    </div>
+
+    <div class="row">
+        <div class="col-sm">
+            <div class="card">
+                <div class="card-header">
+                    {{#str}}speakingtopic, mod_solo{{/str}}
+                </div>
+                <div class="card-body">
+                    <div class="mod_solo_speakingtopic_readonly">
+                        {{speakingtopic}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-10 mx-auto">
+            <div class="mod_solo_activitycontent_container">
+                {{#contentitems}}
+                    {{>mod_solo/activitycontent}}
+                {{/contentitems}}
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="row">
+        <div class="col-sm-6 mx-auto mod_solo_stepsubmit">
+            <button class="btn btn-primary btn-lg" id="{{uniqid}}_button" type="button">{{#str}}next{{/str}}</button>
+        </div>
+    </div>
+
 </div>
 
-<div class="mod_solo_activitycontent_container">
-    {{#contentitems}}
-    {{>mod_solo/activitycontent}}
-    {{/contentitems}}
-</div>
-
-<div class="mod_solo_bordered mod_solo_readonly">
-    {{#str}}targettime, mod_solo{{/str}}: {{#str}}xmins, mod_solo, {{convlength}}{{/str}}
-</div>
-
-<div id="mod_solo_targetwordsdisplay" class="solo_targetwords">
-    {{#str}}targetwords, mod_solo{{/str}}: {{>mod_solo/targetwords}}
-</div>
-<div class="solo_goals">
-    {{#str}}gradewordgoal, mod_solo{{/str}}: {{#str}}displaygradewordgoal, mod_solo, {{gradewordgoal}}{{/str}}
-</div>
-
-
-<button id="{{uniqid}}_button" type="button">Submit</button>
 {{^element.frozen}}
     {{#js}}
         //this submits the form data by ajax

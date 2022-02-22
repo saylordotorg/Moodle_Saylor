@@ -13,6 +13,12 @@
         </div>
     </div>
     <hr>
+    {{#grammarcorrection}}
+        <div class='mod_solo_sr_title'>{{#str}}grammarcorrection, mod_solo{{/str}}</div>
+        <div class='mod_solo_sr_details mod_solo_corrections_cont'>{{{grammarcorrection}}}</div>
+        <hr>
+    {{/grammarcorrection}}
+
     <p class="mod_solo_attemptdetailscontainer">
         <a class="btn btn-primary mod_solo_attemptdetailsbutton" data-toggle="collapse" href="#attemptdetails" role="button" aria-expanded="false" aria-controls="attemptdetails">
             {{#str}}moreattemptdetails, mod_solo{{/str}}

@@ -1,8 +1,8 @@
 <div class="mod_solo_activitycontent">
-    <div class="mod_solo_activitycontent_text">{{{itemtext}}}</div>
     {{#itemimage}}<div class="mod_solo_activitycontent_image_cont"><img src="{{{itemimage}}}" class="mod_solo_activitycontent_image"/></div>{{/itemimage}}
     {{#itemaudio}}<div class="mod_solo_activitycontent_audio_cont"><audio controls src="{{{itemaudio}}}" class="mod_solo_activitycontent_audio" playsInline="true"></audio></div>{{/itemaudio}}
     {{#itemvideo}}<div class="mod_solo_activitycontent_video_cont"><video controls src="{{{itemvideo}}}" class="mod_solo_activitycontent_video" playsInline="true"></video></div>{{/itemvideo}}
     {{#itemtts}}<div class="mod_solo_activitycontent_tts_cont"><audio controls src="{{{itemtts}}}" class="mod_solo_activitycontent_audio" crossorigin="anoymous" playsInline="true"></audio></div></div>{{/itemtts}}
     {{#itemiframe}}<div class="mod_solo_activitycontent_iframe_cont"><div class="mod_solo_activitycontent_iframe_responsive">{{{itemiframe}}}</div></div>{{/itemiframe}}
+{{#itemytvideoid}}<div class="mod_solo_activitycontent_ytclip_cont"><div class="mod_solo_activitycontent_iframe_responsive">{{> mod_solo/youtubeclip}}</div></div>{{/itemytvideoid}}
 </div>

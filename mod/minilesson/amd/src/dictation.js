@@ -36,7 +36,7 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'mod_minilesson/poll
       });
     },
 
-    register_events: function(index, itemdata, quizhelper) {
+    register_events: function(qindex, itemdata, quizhelper) {
 
       var self = this;
 
@@ -86,7 +86,7 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'mod_minilesson/poll
         var correct = $('#' + itemdata.uniqueid + '_container .dictate-feedback.fa-check').length;
         var total = $('#' + itemdata.uniqueid + '_container .dictate-feedback').length;
         var grade = Math.round(correct / total, 2) * 100;
-        stepdata.index = index;
+        stepdata.index = qindex;
         stepdata.hasgrade = true;
         stepdata.grade = grade;
         stepdata.totalitems=total;

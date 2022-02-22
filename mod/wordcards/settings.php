@@ -99,7 +99,7 @@ if ($ADMIN->fulltree) {
     $label = get_string($name, constants::M_COMPONENT);
     $details ="";
     $default = "en";
-    $lexicala = utils::get_lexicala_langs();
+    $lexicala = utils::get_rcdic_langs();
     $options=[];
     foreach($lexicala as $lexone){
         $options[$lexone['code']]=$lexone['name'];

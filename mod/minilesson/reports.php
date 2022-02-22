@@ -154,6 +154,14 @@ switch ($showreport){
         break;
 
 
+    case 'incompleteattempts':
+        $report = new \mod_minilesson\report\incompleteattempts();
+        $formdata = new stdClass();
+        $formdata->moduleid = $moduleinstance->id;
+        $formdata->modulecontextid = $modulecontext->id;
+        $formdata->groupmenu = true;
+        break;
+
     //list view of attempts and grades and action links
     //same as "grading" mainly. Just for report not action purposes
 	case 'gradereport':
