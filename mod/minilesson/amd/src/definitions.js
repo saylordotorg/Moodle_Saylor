@@ -120,10 +120,10 @@ This file contains class and ID definitions.
             'es-US': ['Miguel','Penelope'],
             'es-ES': [ 'Enrique','Conchita','Lucia'],
             'fr-CA': ['Chantal','Gabrielle'],
-            'fr-FR': ['Mathieu','Celine','Léa'],
+            'fr-FR': ['Mathieu','Celine','Lea'],
             'hi-IN': ["Aditi"],
             'it-IT': ['Carla','Bianca','Giorgio'],
-            'ja-JP': ['Takumi','Mizuki','Mizuki'],
+            'ja-JP': ['Takumi','Mizuki'],
             'ko-KR': ['Seoyeon'],
             'nl-NL': ["Ruben","Lotte"],
             'pt-BR': ['Ricardo','Vitoria'],
@@ -134,7 +134,7 @@ This file contains class and ID definitions.
         },
 
         neural_voices: ["Amy","Emma","Brian","Olivia","Aria","Ayanda","Ivy","Joanna","Kendra","Kimberly",
-            "Salli","Joey","Justin","Kevin","Matthew","Camila","Lupe", "Gabrielle", "Vicki", "Seoyeon"]
+            "Salli","Joey","Justin","Kevin","Matthew","Camila","Lupe","Lucia","Gabrielle","Lea", "Vicki", "Seoyeon", "Takumi"]
 
     };//end of return value
 });

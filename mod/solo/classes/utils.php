@@ -1447,13 +1447,13 @@ class utils{
                 constants::M_LANG_ESES => ['Enrique' => 'Enrique', 'Conchita' => 'Conchita', 'Lucia' => 'Lucia'],
             //constants::M_LANG_FAIR => [],
                 constants::M_LANG_FRCA => ['Chantal' => 'Chantal'],
-                constants::M_LANG_FRFR => ['Mathieu' => 'Mathieu', 'Celine' => 'Celine', 'Léa' => 'Léa'],
+                constants::M_LANG_FRFR => ['Mathieu' => 'Mathieu', 'Celine' => 'Celine', 'Lea' => 'Lea'],
                 constants::M_LANG_HIIN => ["Aditi" => "Aditi"],
             //constants::M_LANG_HEIL => [],
             //constants::M_LANG_IDID => [],
                 constants::M_LANG_ITIT => ['Carla' => 'Carla', 'Bianca' => 'Bianca', 'Giorgio' => 'Giorgio'],
                 constants::M_LANG_JAJP => ['Takumi' => 'Takumi', 'Mizuki' => 'Mizuki'],
-                constants::M_LANG_KOKR => ['Seoyan' => 'Seoyan'],
+                constants::M_LANG_KOKR => ['Seoyeon' => 'Seoyeon'],
             //constants::M_LANG_MSMY => [],
                 constants::M_LANG_NLNL => ["Ruben" => "Ruben", "Lotte" => "Lotte"],
                 constants::M_LANG_PTBR => ['Ricardo' => 'Ricardo', 'Vitoria' => 'Vitoria'],
@@ -1655,6 +1655,7 @@ class utils{
         $params['appid'] = constants::M_COMPONENT;
         $params['owner'] = hash('md5',$USER->username);
         $params['region'] = $region;
+        $params['engine'] = self::can_speak_neural($voice, $region)?'neural' : 'standard';
         $serverurl = self::CLOUDPOODLL . '/webservice/rest/server.php';
         $response = self::curl_fetch($serverurl, $params);
         if (!self::is_json($response)) {
@@ -1670,6 +1671,33 @@ class utils{
             $pollyurl = $payloadobject->returnMessage;
             return $pollyurl;
         } else {
+            return false;
+        }
+    }
+
+    //can speak neural?
+    public static function can_speak_neural($voice,$region){
+        //check if the region is supported
+        switch($region){
+            case "useast1":
+            case "tokyo":
+            case "sydney":
+            case "dublin":
+            case "ottawa":
+            case "frankfurt":
+            case "london":
+            case "singapore":
+            case "capetown":
+                //ok
+                break;
+            default:
+                return false;
+        }
+
+        //check if the voice is supported
+        if(in_array($voice,constants::M_NEURALVOICES)){
+            return true;
+        }else{
             return false;
         }
     }

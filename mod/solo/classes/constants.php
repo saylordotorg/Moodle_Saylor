@@ -153,4 +153,8 @@ const M_HIDDEN_PLAYER_BUTTON_ACTIVE = 'mod_solo_hidden_player_button_active';
 const M_HIDDEN_PLAYER_BUTTON_PAUSED = 'mod_solo_hidden_player_button_paused';
 const M_HIDDEN_PLAYER_BUTTON_PLAYING = 'mod_solo_hidden_player_button_playing';
 
+const M_NEURALVOICES = array("Amy","Emma","Brian","Olivia","Aria","Ayanda","Ivy","Joanna","Kendra","Kimberly",
+        "Salli","Joey","Justin","Kevin","Matthew","Camila","Lupe", "Gabrielle", "Vicki", "Seoyeon","Takumi","lucia");
+
+
 }

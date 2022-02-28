@@ -154,7 +154,8 @@ span.mod_readaloud_debugsequence {
   position: relative;
 }
 
-.mod_readaloud_grading_passagespace {
+.mod_readaloud_grading_passagespace,
+.mod_readaloud_grading_correctionsspace{
   padding: 2px;
 }
 
@@ -690,6 +691,5 @@ div.mod_readaloud_attemptsummarytable {
 @keyframes readaloudshimmer {
   100% {-webkit-mask-position:left}
 }
-
 
 

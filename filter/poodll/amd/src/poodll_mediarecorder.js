@@ -517,7 +517,10 @@ define(['jquery', 'core/log', 'filter_poodll/utils_amd',
         fetch_video_constraints: function (ip) {
             var mediaConstraints = {
                 audio: !utils.is_opera() && !utils.is_edge(),
-                video: true
+                video: {
+                    width: {ideal: 640},
+                    height: {ideal: 480}
+                }
             };
 
             //set aspect ratio and I think the "exact" below should be "ideal"
@@ -527,15 +530,16 @@ define(['jquery', 'core/log', 'filter_poodll/utils_amd',
             // check for a user video selected device
             if (ip.uservideodeviceid) {
                 var videodeviceid = ip.uservideodeviceid.valueOf();
-                var constraints = {deviceId: videodeviceid ? {exact: videodeviceid} : undefined};
-
-                mediaConstraints.video = constraints;
+                var videoconstraints = {deviceId: videodeviceid ? {exact: videodeviceid} : undefined};
+                videoconstraints.width={ideal: 640};
+                videoconstraints.height={ideal: 480};
+                mediaConstraints.video = videoconstraints;
             }
             // check for a user audio selected device
             if (ip.useraudiodeviceid) {
                 var audiodeviceid = ip.useraudiodeviceid.valueOf();
-                var constraints = {deviceId: audiodeviceid ? {exact: audiodeviceid} : undefined};
-                mediaConstraints.audio = constraints;
+                var audioconstraints = {deviceId: audiodeviceid ? {exact: audiodeviceid} : undefined};
+                mediaConstraints.audio = audioconstraints;
             }
             return mediaConstraints;
         },

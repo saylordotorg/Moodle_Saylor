@@ -1,3 +1,8 @@
+Version 1.0.37(Build 202202XXXX)
+- Fixed an issue with JP phonetic matching
+- fixed issue in get_course_moduleinfo that could kill backup and restore
+- tweaked polly stuff
+
 Version 1.0.36(Build 2022022000)
 - Added a more detailed results screen
 - Added a placeholder while activity loads

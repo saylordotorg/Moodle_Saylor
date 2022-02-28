@@ -291,15 +291,15 @@ function wordcards_extend_navigation(navigation_node $navref, stdclass $course, 
 }
 
 /**
- * Extends the settings navigation with the readseed settings
+ * Extends the settings navigation with the wordcards settings
  *
- * This function is called when the context for the page is a readseed module. This is not called by AJAX
+ * This function is called when the context for the page is a wordcards module. This is not called by AJAX
  * so it is safe to rely on the $PAGE.
  *
  * @param settings_navigation $settingsnav {@link settings_navigation}
- * @param navigation_node $readseednode {@link navigation_node}
+ * @param navigation_node $wordcardsnode {@link navigation_node}
  */
-function wordcards_extend_settings_navigation(settings_navigation $settingsnav, navigation_node $readseednode=null) {
+function wordcards_extend_settings_navigation(settings_navigation $settingsnav, navigation_node $wordcardsnode=null) {
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -556,7 +556,9 @@ function mod_wordcards_cm_info_dynamic(cm_info $cm) {
 function wordcards_get_coursemodule_info($coursemodule) {
     global $DB;
 
-    $moduleinstance= $DB->get_record('wordcards', array('id' => $coursemodule->instance,), '*', MUST_EXIST);
+    if(!$moduleinstance= $DB->get_record('wordcards', array('id' => $coursemodule->instance,), '*')){
+        return false;
+    }
     $result = new cached_cm_info();
     if ($coursemodule->showdescription) {
         if (time() > $moduleinstance->viewstart) {

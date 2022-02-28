@@ -923,7 +923,9 @@ function mod_readaloud_cm_info_dynamic(cm_info $cm) {
 }
 function readaloud_get_coursemodule_info($coursemodule) {
     global $DB;
-    $moduleinstance= $DB->get_record('readaloud', array('id' => $coursemodule->instance,), '*', MUST_EXIST);
+    if(!$moduleinstance= $DB->get_record('readaloud', array('id' => $coursemodule->instance,), '*')){
+        return false;
+    }
     $result = new cached_cm_info();
     if ($coursemodule->showdescription) {
         if (time() > $moduleinstance->viewstart) {

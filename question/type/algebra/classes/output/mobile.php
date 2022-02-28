@@ -46,7 +46,7 @@ class mobile {
             'templates' => [
                 [
                     'id' => 'main',
-                    'html' => file_get_contents($CFG->dirroot .'/question/type/algebra/mobile/qtype-algebra.html')
+                    'html' => file_get_contents($CFG->dirroot .'/question/type/algebra/mobile/addon-qtype-algebra.html')
                     ]
             ],
             'javascript' => file_get_contents($CFG->dirroot . '/question/type/algebra/mobile/mobile.js')

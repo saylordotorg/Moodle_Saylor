@@ -876,7 +876,9 @@ function mod_solo_cm_info_dynamic(cm_info $cm) {
 function solo_get_coursemodule_info($coursemodule) {
     global $DB;
 
-    $moduleinstance= $DB->get_record('solo', array('id' => $coursemodule->instance,), '*', MUST_EXIST);
+    if(!$moduleinstance= $DB->get_record('solo', array('id' => $coursemodule->instance,), '*')){
+        return false;
+    }
     $result = new cached_cm_info();
     if ($coursemodule->showdescription) {
         if (time() > $moduleinstance->viewstart) {

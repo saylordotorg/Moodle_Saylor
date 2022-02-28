@@ -330,7 +330,13 @@ class comprehensiontest
                         //if short answer we want to convert zankaku numbers to hankaku for comparison (probably also for other types too)
                         if ($this->mod->ttslanguage == constants::M_LANG_JAJP) {
                             if ($testitem->type == constants::TYPE_LISTENREPEAT ||$testitem->type == constants::TYPE_DICTATIONCHAT) {
-                                $sentence = utils::segment_japanese($sentence);
+                              // sadly this segmentation algorithm mismatches with server based one we need for phonetics
+                              //so we are not using it. We ought to save the segment rather than call each time
+                              // 初めまして =>(1) はじめまし て　＆　(2) はじめま　して
+                                //はなしてください=>(1)はな　して　く　だ　さい & (2)はな　して　ください
+                              //  $sentence = utils::segment_japanese($sentence);
+                              //TO DO save segments and not collect them at runtime
+                              list($phones,$sentence) = utils::fetch_phones_and_segments($sentence,$this->mod->ttslanguage,$this->mod->region);
                             }elseif($testitem->type == constants::TYPE_SHORTANSWER){
                                 $sentence =  mb_convert_kana($sentence,"n");
                             }

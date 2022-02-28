@@ -116,6 +116,16 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configselect(constants::M_COMPONENT . "/$name",
             $label, $details, $default, $options));
 
+
+    // Reports Table
+    $name = 'reportstable';
+    $label = get_string($name, constants::M_COMPONENT);
+    $details = get_string($name . '_details', constants::M_COMPONENT);
+    $default = constants::M_USE_DATATABLES;
+    $options = utils::fetch_options_reportstable();
+    $settings->add(new admin_setting_configselect(constants::M_COMPONENT . "/$name",
+        $label, $details, $default, $options));
+
     // Items per page options
     $name = 'itemsperpage';
     $label = get_string($name, constants::M_COMPONENT);

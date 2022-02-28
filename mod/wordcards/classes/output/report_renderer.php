@@ -139,6 +139,8 @@ class report_renderer extends \plugin_renderer_base {
             return $this->render_empty_section_html($sectiontitle);
         }
 
+        $config=get_config(constants::M_COMPONENT);
+
         //set up our table and head attributes
         $tableattributes = array('class' => 'generaltable ' . constants::M_CLASS . '_table');
         $headrow_attributes = array('class' => constants::M_CLASS . '_headrow');
@@ -171,7 +173,7 @@ class report_renderer extends \plugin_renderer_base {
         $html .= \html_writer::table($htmltable);
 
         //if datatables set up datatables
-        if(constants::M_USE_DATATABLES) {
+        if($config->reportstable == constants::M_USE_DATATABLES) {
             $tableprops = [];
             $tableprops['paging']=true;
             $tableprops['pageLength']=10;

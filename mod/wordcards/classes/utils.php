@@ -558,6 +558,12 @@ class utils{
         return $options;
     }
 
+    public static function fetch_options_reportstable() {
+        $options = array(constants::M_USE_DATATABLES => get_string("reporttableajax", constants::M_COMPONENT),
+            constants::M_USE_PAGEDTABLES => get_string("reporttablepaged", constants::M_COMPONENT));
+        return $options;
+    }
+
     public static function fetch_filemanager_opts($mediatype){
       global $CFG;
         $file_external = 1;

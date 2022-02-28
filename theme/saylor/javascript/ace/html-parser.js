@@ -49,45 +49,56 @@ require(['jquery'], function ($) {
             console.log("Detected a html-parser-wrapper, loading ACE.");
             require.config({paths: { "ace" : "/theme/saylor/javascript/ace/v1.4.13"}});
             require(['ace/ace'], function (ace) {
-                ace.EditSession.prototype.$useWorker=false;
+                ace.EditSession.prototype.$useWorker=true;
                 // Get html-parser wrappers.
                 $('.html-parser-wrapper').each( function(index, htmlParser) {
                     // Remove loading message.
-                  $(htmlParser).find('textarea[name="crui_html"]').empty();
-                  var htmlArea = $(htmlParser).find('textarea[name="crui_html"]').hide();
-                  // Set unique ID.
-                  $(htmlParser).find('.html-question').attr('id', 'ace-editor-html' + index);
-                  var htmlEditor = ace.edit("ace-editor-html" + index);
-                  htmlEditor.setTheme("ace/theme/saylor");
-                  htmlEditor.getSession().setMode("ace/mode/html");
-                  htmlEditor.setOptions({
-                  fontSize: "16pt",
-                  showLineNumbers: true,
-                  showGutter: true,
-                  vScrollBarAlwaysVisible:true,
-                  //enableBasicAutocompletion: false, 
-                  //enableLiveAutocompletion: false
-                  });
-                  htmlEditor.getSession().setValue(htmlArea.val());
-                  htmlEditor.getSession().on('change', function() {
-                  htmlArea.val(htmlEditor.getSession().getValue());
-                  htmlArea.change();
-                  });
+                    $(htmlParser).find('textarea[name="crui_html"]').empty();
+                    var htmlArea = $(htmlParser).find('textarea[name="crui_html"]').hide();
+                    // Set unique ID.
+                    $(htmlParser).find('.html-question').attr('id', 'ace-editor-html' + index);
+                    var htmlEditor = ace.edit("ace-editor-html" + index);
+                    htmlEditor.setTheme("ace/theme/saylor");
+                    htmlEditor.getSession().setMode("ace/mode/html");
+                    ace.config.loadModule('ace/ext/language_tools', function () {
+                        htmlEditor.setOptions({
+                            fontSize: "16pt",
+                            showLineNumbers: true,
+                            showGutter: true,
+                            vScrollBarAlwaysVisible:true,
+                            enableBasicAutocompletion: true,
+                            enableLiveAutocompletion: true
+                        });
+                    });
+                    htmlEditor.getSession().setValue(htmlArea.val());
+                    htmlEditor.getSession().on('change', function() {
+                    htmlArea.val(htmlEditor.getSession().getValue());
+                    htmlArea.change();
+                    });
 
-                  // Remove loading message.
-                  $(htmlParser).find('textarea[name="crui_css"]').empty();
-                  var cssArea = $(htmlParser).find('textarea[name="crui_css"]').hide();
-                  // Set unique ID.
-                  $(htmlParser).find('.css-question').attr('id', 'ace-editor-css' + index);
-                  var cssEditor = ace.edit("ace-editor-css" + index);
-                  cssEditor.setTheme("ace/theme/saylor");
-                  cssEditor.getSession().setMode("ace/mode/css");
-                  cssEditor.getSession().setValue(cssArea.val());
-                  cssEditor.getSession().on('change', function() {
+                    // Remove loading message.
+                    $(htmlParser).find('textarea[name="crui_css"]').empty();
+                    var cssArea = $(htmlParser).find('textarea[name="crui_css"]').hide();
+                    // Set unique ID.
+                    $(htmlParser).find('.css-question').attr('id', 'ace-editor-css' + index);
+                    var cssEditor = ace.edit("ace-editor-css" + index);
+                    cssEditor.setTheme("ace/theme/saylor");
+                    cssEditor.getSession().setMode("ace/mode/css");
+                    ace.config.loadModule('ace/ext/language_tools', function () {
+                        cssEditor.setOptions({
+                            fontSize: "16pt",
+                            showLineNumbers: true,
+                            showGutter: true,
+                            vScrollBarAlwaysVisible:true,
+                            enableBasicAutocompletion: true,
+                            enableLiveAutocompletion: true
+                        });
+                    });
+                    cssEditor.getSession().setValue(cssArea.val());
+                    cssEditor.getSession().on('change', function() {
                       cssArea.val(cssEditor.getSession().getValue());
                       cssArea.change();
-                  });
-
+                    });
 
                     // Remove loading message.
                     $(htmlParser).find('textarea[name="crui_js"]').empty();
@@ -97,6 +108,16 @@ require(['jquery'], function ($) {
                     var jsEditor= ace.edit("ace-editor-js" + index);
                     jsEditor.setTheme("ace/theme/saylor");
                     jsEditor.getSession().setMode("ace/mode/javascript");
+                    ace.config.loadModule('ace/ext/language_tools', function () {
+                        jsEditor.setOptions({
+                            fontSize: "16pt",
+                            showLineNumbers: true,
+                            showGutter: true,
+                            vScrollBarAlwaysVisible:true,
+                            enableBasicAutocompletion: true,
+                            enableLiveAutocompletion: true
+                        });
+                    });
                     jsEditor.getSession().setValue(jsArea.val());
                     jsEditor.getSession().on('change', function() {
                         jsArea.val( jsEditor.getSession().getValue());

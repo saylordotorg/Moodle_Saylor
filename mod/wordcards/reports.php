@@ -38,7 +38,7 @@ $userid = optional_param('userid', 0, PARAM_INT); // user id
 $attemptid = optional_param('attemptid', 0, PARAM_INT); // attempt id
 
 //paging details
-$paging = new stdClass();
+$paging = new \stdClass();
 $paging->perpage = optional_param('perpage', -1, PARAM_INT);
 $paging->pageno = optional_param('pageno', 0, PARAM_INT);
 $paging->sort = optional_param('sort', 'iddsc', PARAM_TEXT);
@@ -66,9 +66,9 @@ require_capability('mod/wordcards:viewreports', $modulecontext);
 //Get an admin settings 
 $config = get_config(constants::M_COMPONENT);
 
-//set per page according to admin setting
+//set per page according to admin setting (not for datatables reports though)
 if ($paging->perpage == -1) {
-    $paging->perpage = 20;//$config->itemsperpage;
+    $paging->perpage = $config->itemsperpage;
 }
 
 // Trigger module viewed event.
@@ -209,10 +209,12 @@ switch ($format) {
                 $report->fetch_fields());
         exit;
     default:
-        $pagetitle =get_string('reports', constants::M_COMPONENT);
-        $reportrows = $report->fetch_formatted_rows(true, $paging);
-        $allrowscount = $report->fetch_all_rows_count();
-        if(constants::M_USE_DATATABLES){
+
+        if($config->reportstable == constants::M_USE_DATATABLES){
+            $pagetitle =get_string('reports', constants::M_COMPONENT);
+            $reportrows = $report->fetch_formatted_rows(true);
+            $allrowscount = $report->fetch_all_rows_count();
+
             //css must be required before header sent out
             $PAGE->requires->css( new \moodle_url('https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css'));
             echo $renderer->header();
@@ -223,6 +225,10 @@ switch ($format) {
             echo $reportrenderer->render_section_html($reportheading, $report->fetch_name(), $report->fetch_head(), $reportrows,
                 $report->fetch_fields());
         }else{
+            $pagetitle =get_string('reports', constants::M_COMPONENT);
+            $reportrows = $report->fetch_formatted_rows(true, $paging);
+            $allrowscount = $report->fetch_all_rows_count();
+
             $pagingbar = $reportrenderer->show_paging_bar($allrowscount, $paging, $PAGE->url);
             echo $renderer->header();
             echo $renderer->heading($pagetitle);

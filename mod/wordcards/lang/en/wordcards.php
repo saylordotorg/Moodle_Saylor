@@ -326,3 +326,7 @@ $string['wordcards:preview']="Can preview Wordcards activities";
 $string['mode_sequential']="Sequential mode";
 $string['mode_free']="Free mode";
 $string['journeymode']="Mode";
+$string['reportstable']="Reports Style";
+$string['reportstable_details']="Ajax tables are faster to use and can sort data. Paged tables load faster but are harder to navigate with.";
+$string['reporttableajax']="Ajax Tables";
+$string['reporttablepaged']="Paged Tables";

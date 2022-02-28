@@ -36,7 +36,9 @@ class qtype_algebra_renderer extends qtype_renderer {
             question_display_options $options) {
             global $CFG;
 
-        $this->page->requires->js_call_amd('qtype_algebra/display', 'init');
+         if (get_config('qtype_algebra', 'formuladisplay') == 'dynamic') {
+            $this->page->requires->js_call_amd('qtype_algebra/display', 'init');
+        }
 
         $question = $qa->get_question();
         $currentanswer = $qa->get_last_qt_var('answer');

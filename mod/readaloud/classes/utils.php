@@ -86,7 +86,6 @@ class utils {
           //number or odd char converter
         if(substr($moduleinstance->ttslanguage,0,2)=='en' || substr($moduleinstance->ttslanguage,0,2)=='de' ){
             //find numbers in the passage, and then replace those with words in the target text
-            $cleantext=alphabetconverter::numbers_to_words_convert($cleantext,$cleantext);
             switch (substr($moduleinstance->ttslanguage,0,2)){
                 case 'en':
                     $cleantext=alphabetconverter::numbers_to_words_convert($cleantext,$cleantext);
@@ -168,23 +167,20 @@ class utils {
             $params["moodlewsrestformat"]='json';
             $params["passage"]=diff::cleanText($passage);
 
-//strange char or number converter
-//if(isset($CFG->readaloud_experimental) && $CFG->readaloud_experimental){
-if(true){
-    //find numbers in the passage, and then replace those with words in the target text
 
-    switch (substr($language,0,2)){
-        case 'en':
-            //find digits in original passage, and convert number words to digits in the target passage
-            $params["passage"]=alphabetconverter::numbers_to_words_convert($params["passage"],$params["passage"]);
-            break;
-        case 'de':
-            //find eszetts in original passage, and convert ss words to eszetts in the target passage
-            $params["passage"]=alphabetconverter::eszett_to_ss_convert($params["passage"],$params["passage"]);
-            break;
+            //find numbers in the passage, and then replace those with words in the target text
+            switch (substr($language,0,2)){
+                case 'en':
+                    //find digits in original passage, and convert number words to digits in the target passage
+                    $params["passage"]=alphabetconverter::numbers_to_words_convert($params["passage"],$params["passage"]);
+                    break;
+                case 'de':
+                    //find eszetts in original passage, and convert ss words to eszetts in the target passage
+                    $params["passage"]=alphabetconverter::eszett_to_ss_convert($params["passage"],$params["passage"]);
+                    break;
 
-    }
-}
+            }
+
 
             $params["language"]=$language;
             $params["region"]=$region;
@@ -1952,7 +1948,7 @@ if(true){
                 constants::M_LANG_ESES => [ 'Enrique'=>'Enrique', 'Conchita'=>'Conchita', 'Lucia'=>'Lucia'],
                 //constants::M_LANG_FAIR => [],
                 constants::M_LANG_FRCA => ['Chantal'=>'Chantal', 'Gabrielle'=>'Gabrielle'],
-                constants::M_LANG_FRFR => ['Mathieu'=>'Mathieu','Celine'=>'Celine', 'Léa'=>'Léa'],
+                constants::M_LANG_FRFR => ['Mathieu'=>'Mathieu','Celine'=>'Celine', 'Lea'=>'Lea'],
                 constants::M_LANG_HIIN => ["Aditi"=>"Aditi"],
                 //constants::M_LANG_HEIL => [],
                 //constants::M_LANG_IDID => [],

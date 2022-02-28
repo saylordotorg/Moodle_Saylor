@@ -33,7 +33,7 @@ const M_ITEMS_CONT= 'mod_minilesson_items_cont';
 const M_ITEMS_TABLE= 'mod_minilesson_qpanel';
 
 const M_NEURALVOICES = array("Amy","Emma","Brian","Olivia","Aria","Ayanda","Ivy","Joanna","Kendra","Kimberly",
-        "Salli","Joey","Justin","Kevin","Matthew","Camila","Lupe", "Gabrielle", "Vicki", "Seoyeon");
+        "Salli","Joey","Justin","Kevin","Matthew","Camila","Lupe", "Gabrielle", "Vicki", "Seoyeon","Takumi", "Lucia");
 
 
 //grading options

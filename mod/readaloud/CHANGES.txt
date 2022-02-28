@@ -1,3 +1,7 @@
+2.0.77 (xxxx)
+- fixed issue in get_course_moduleinfo that could kill backup and restore
+- tweaked polly stuff
+
 2.0.76 (Build 2022020100)
 - Added a listen to your own speech feature on L&R
 - Added open and close dates (Kuldeep Banga)
