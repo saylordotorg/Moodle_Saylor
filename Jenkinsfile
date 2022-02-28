@@ -325,6 +325,12 @@ def plugins = [
       "url" : 'https://github.com/blindsidenetworks/moodle-mod_bigbluebuttonbn.git',
       "branch" : 'master',
       "dest" : 'mod/bigbluebuttonbn'
+    ],
+    [
+      "name" : 'availability_role',
+      "url" : 'https://github.com/moodle-an-hochschulen/moodle-availability_role.git',
+      "branch" : 'master',
+      "dest" : 'availability/condition/role'
     ]
 ]
 
