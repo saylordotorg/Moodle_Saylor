@@ -11560,6 +11560,8 @@ ul {
   display: block;
   width: 100%;
   color: #1d2125; }
+  .dropdown-item a:focus-visible {
+    outline: 0; }
 
 .dropdown-item:active, .dropdown-item:hover, .dropdown-item:focus, .dropdown-item:focus-within {
   outline: 0;
@@ -11955,8 +11957,7 @@ input[disabled] {
   margin: 0;
   padding: 0;
   box-sizing: content-box;
-  margin-right: 0.5rem;
-  margin-left: 0.5rem; }
+  margin-right: 0.5rem; }
   .icon.spacer {
     margin-right: 0; }
   .icon.iconsize-big {
@@ -12739,6 +12740,7 @@ input[disabled] {
 
 .block_recentlyaccessedcourses .paging-bar-container {
   margin-top: -2.4rem;
+  padding-right: 0.5rem;
   justify-content: flex-end; }
 
 @media (max-width: 575.98px) {

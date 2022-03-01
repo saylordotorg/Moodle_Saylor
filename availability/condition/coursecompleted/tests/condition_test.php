@@ -30,6 +30,7 @@ use \availability_coursecompleted\frontend;
 use core_availability\tree;
 use core_availability\info_module;
 use core_availability\mock_info;
+use core_availability\mock_condition;
 
 /**
  * Unit tests for the coursecompleted condition.
@@ -47,8 +48,6 @@ class condition_test extends \advanced_testcase {
     public function setUp():void {
         // Load the mock info class so that it can be used.
         global $CFG;
-        require_once($CFG->dirroot . '/availability/tests/fixtures/mock_info.php');
-        require_once($CFG->dirroot . '/availability/tests/fixtures/mock_condition.php');
         require_once($CFG->libdir . '/completionlib.php');
     }
 
@@ -56,7 +55,8 @@ class condition_test extends \advanced_testcase {
      * Tests constructing and using coursecompleted condition as part of tree.
      */
     public function test_in_tree() {
-        global $USER;
+        global $CFG, $USER;
+        require_once($CFG->dirroot . '/availability/tests/fixtures/mock_info.php');
         $this->resetAfterTest();
         $this->setAdminUser();
 
