@@ -76,4 +76,12 @@ $functions = array(
         'type'        => 'read',
         'ajax'        => true,
     ),
+    'mod_wordcards_set_my_words' => array(
+        'classname'   => 'mod_wordcards_external',
+        'methodname'  => 'set_my_words',
+        'description' => 'Set a word as being in my words or not',
+        'capabilities'=> 'mod/wordcards:view',
+        'type'        => 'write',
+        'ajax'        => true,
+    ),
 );

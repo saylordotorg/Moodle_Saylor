@@ -39,6 +39,7 @@ use core_availability\mock_condition;
  * @copyright 2017 iplusacademy (www.iplusacademy.org)
  * @author    Renaat Debleu <info@eWallah.net>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @coversDefaultClass \availability_coursecompleted
  */
 class condition_test extends \advanced_testcase {
 
@@ -53,6 +54,7 @@ class condition_test extends \advanced_testcase {
 
     /**
      * Tests constructing and using coursecompleted condition as part of tree.
+     * @covers \availability_coursecompleted\condition
      */
     public function test_in_tree() {
         global $CFG, $USER;
@@ -97,6 +99,7 @@ class condition_test extends \advanced_testcase {
 
     /**
      * Tests the constructor including error conditions.
+     * @covers \availability_coursecompleted\condition
      */
     public function test_constructor() {
         // This works with no parameters.
@@ -156,6 +159,7 @@ class condition_test extends \advanced_testcase {
 
     /**
      * Tests the save() function.
+     * @covers \availability_coursecompleted\condition
      */
     public function test_save() {
         $structure = (object)['id' => '1'];
@@ -166,6 +170,8 @@ class condition_test extends \advanced_testcase {
 
     /**
      * Tests the get_description and get_standalone_description functions.
+     * @covers \availability_coursecompleted\condition
+     * @covers \availability_coursecompleted\frontend
      */
     public function test_get_description() {
         $this->resetAfterTest();
@@ -206,6 +212,8 @@ class condition_test extends \advanced_testcase {
 
     /**
      * Tests a page before and after completion.
+     * @covers \availability_coursecompleted\condition
+     * @covers \availability_coursecompleted\frontend
      */
     public function test_page() {
         global $PAGE;
@@ -248,6 +256,7 @@ class condition_test extends \advanced_testcase {
 
     /**
      * Tests using course completion condition in front end.
+     * @covers \availability_coursecompleted\condition
      */
     public function test_other() {
         $this->assertEqualsCanonicalizing((object)['type' => 'coursecompleted', 'id' => '3'], condition::get_json('3'));
@@ -256,6 +265,7 @@ class condition_test extends \advanced_testcase {
 
     /**
      * Test behat funcs
+     * @covers \behat_availability_coursecompleted
      */
     public function test_behat() {
         global $CFG;

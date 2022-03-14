@@ -41,6 +41,7 @@ class privacy_test extends provider_testcase {
 
     /**
      * Test returning metadata.
+     * @covers \availability_coursecompleted\privacy\provider
      */
     public function test_get_metadata() {
         $collection = new collection('availability_coursecompleted');

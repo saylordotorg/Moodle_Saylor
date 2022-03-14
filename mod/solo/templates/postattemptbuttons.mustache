@@ -10,6 +10,14 @@
     <a class="btn btn-secondary solo_postattemptedit_btn center" href="{{{postattemptediturl}}}">{{#str}}dopostattemptedit, mod_solo{{/str}}</a>
 </div>
 {{/postattemptediturl}}
+{{#backtocourse}}
+    <div class="solo_actionbutton">
+        <a class="btn btn-secondary solo_backtocourse center" href="{{{courseurl}}}">
+            <i class="icon fa fa-home fa-fw " aria-hidden="true"></i>
+            <span> {{#str}}backtotop, mod_solo{{/str}}</span>
+        </a>
+    </div>
+{{/backtocourse}}
 {{^element.frozen}}
     {{#js}}
         require(['jquery', 'mod_solo/postattemptbuttons'], function($, postattemptbuttons) {

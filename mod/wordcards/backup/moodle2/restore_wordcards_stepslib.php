@@ -45,6 +45,7 @@ class restore_wordcards_activity_structure_step extends restore_activity_structu
             $paths[] = new restore_path_element('wordcards_seen', '/activity/wordcards/terms/term/seens/seen');
             $paths[] = new restore_path_element('wordcards_association', '/activity/wordcards/terms/term/associations/association');
             $paths[] = new restore_path_element('wordcards_progress', '/activity/wordcards/progresses/progress');
+            $paths[] = new restore_path_element('wordcards_myword', '/activity/wordcards/terms/term/mywords/myword');
         }
 
         // Return the paths wrapped into standard activity structure.
@@ -125,6 +126,22 @@ class restore_wordcards_activity_structure_step extends restore_activity_structu
 
         $newitemid = $DB->insert_record('wordcards_progress', $data);
         $this->set_mapping('wordcards_progress', $oldid, $newitemid);
+    }
+
+    protected function process_wordcards_myword($data) {
+        global $DB;
+
+        $data = (object)$data;
+        $data->userid = $this->get_mappingid('user', $data->userid);
+        $data->termid = $this->get_new_parentid('wordcards_term');
+        $data->courseid = $this->get_courseid();
+        $data->timemodified = time();
+
+        if (!$DB->record_exists('wordcards_my_words', ['userid' => $data->userid, 'termid' => $data->termid, 'courseid' => $data->courseid])) {
+            $newitemid = $DB->insert_record('wordcards_my_words', $data);
+            // No need to save this mapping as far as nothing depend on it
+            // (child paths, file areas nor links decoder)
+        }
     }
 
     /**

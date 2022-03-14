@@ -1,16 +1,19 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [2.2.8] 2022-02-15 (DEV)
+## [2.2.8] 2022-03-05 (DEV)
 ### Added
+- New {lastlogin} tag.
+- New {mygroups} tag.
+- New {teamcards} (ALPHA) tag.
 - New {ifnotvisible}{/ifnotvisible}
 - New {showmore}{/showmore} tags (ALPHA).
 - New {menuadmin} tag.
 - New {mycoursescards} tag.
 - New fc-coursecontacts and fc-coursecontactroles classes for {coursecontacts} HTML.
 - New {coursecontacts} tag (formerly {courseteachers}).
-- {courseteachers} can now optionally display user profile description.
-- {courseteachers} can now optionally link to phone number.
+- {coursecontacts} can now optionally display user profile description.
+- {coursecontacts} can now optionally link to phone number.
 - New {chart progressbar x Title text} tag (ALPHA).
 - New {chart radial x Title text} tag (ALPHA).
 - New {chart pie x Title text} tag (ALPHA).
@@ -31,6 +34,7 @@ All notable changes to this project will be documented in this file.
 - Known limitation in README.md regarding Moodle's 'Download course content' feature.
 - Compatible with Moodle 4.0 (ALPHA) - Note: Custom menu patch does not work in 4.0 yet.
 ### Updated
+- Fixed {coursecards catid}.
 - Many tags that didn't work if it contained a line break now work correctly.
 - Tag %7Bcoursecontextid%7D now works.
 - Fix-166,168,191 multiple instances of date/time related tags (firstaccessdate, coursestartdate, courseenddate, coursecompletiondate, now)

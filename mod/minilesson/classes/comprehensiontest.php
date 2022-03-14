@@ -434,6 +434,10 @@ class comprehensiontest
                     if($hostbits) {
                         $testitem->smartframehost = $hostbits['scheme'] . "://" . $hostbits['host'];
                     }
+                    //if username is requested, could set it here, any -usersname- in iframe url will be replaced with url encoded name
+                    //as test use this url in smartframe instance  [site root]/mod/minilesson/framemessagetest.html?someid=1234&usersname=-usersname-
+                    $users_name = fullname($USER);
+                    $testitem->customtext1 = str_replace('-usersname-',urlencode($users_name),$testitem->customtext1);
                 }
             }
 

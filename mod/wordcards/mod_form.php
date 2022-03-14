@@ -89,8 +89,8 @@ class mod_wordcards_mod_form extends moodleform_mod {
     public function get_data() {
         $data = parent::get_data();
         if ($data) {
-            $data->finishedstepmsg = $data->finishedstepmsg_editor['text'];
-            $data->completedmsg = $data->completedmsg_editor['text'];
+            //$data->finishedstepmsg = $data->finishedstepmsg_editor['text'];
+            //$data->completedmsg = $data->completedmsg_editor['text'];
         }
 
         return $data;
@@ -98,7 +98,7 @@ class mod_wordcards_mod_form extends moodleform_mod {
 
      public function data_preprocessing(&$data) {
         if ($this->current->instance) {
-            $data =  utils::prepare_file_and_json_stuff($data,$this->context);
+            //$data =  utils::prepare_file_and_json_stuff($data,$this->context);
         }
     }
     

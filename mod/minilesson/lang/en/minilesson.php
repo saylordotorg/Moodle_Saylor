@@ -170,8 +170,9 @@ $string['pt-br'] = 'Portuguese (BR)';
 $string['en-in'] = 'English (IN)';
 $string['es-es'] = 'Spanish (ES)';
 $string['fr-fr'] = 'French (FR)';
+$string['fil-ph'] = 'Filipino';
 $string['de-de'] = 'German (DE)';
-$string['da-dk'] = 'Danish (DK) (fast transcription only)';
+$string['da-dk'] = 'Danish (DK)';
 $string['hi-in'] = 'Hindi';
 $string['ko-kr'] = 'Korean';
 $string['ar-ae'] = 'Arabic (Gulf)';
@@ -192,6 +193,11 @@ $string['ru-ru'] = 'Russian';
 $string['ta-in'] = 'Tamil';
 $string['te-in'] = 'Telegu';
 $string['tr-tr'] = 'Turkish';
+
+$string['sv-se'] = 'Swedish';
+$string['nb-no'] = 'Norwegian';
+$string['pl-pl'] = 'Polish';
+$string['ro-ro'] = 'Romanian';
 
 $string['awsregion']='AWS Region';
 $string['region']='AWS Region';

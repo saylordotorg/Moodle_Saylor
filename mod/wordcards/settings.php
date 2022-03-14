@@ -80,7 +80,7 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configselect(constants::M_COMPONENT .  '/awsregion', get_string('awsregion', constants::M_COMPONENT), '', 'useast1', $regions));
 
     $modes = utils::get_journeymode_options();
-    $settings->add(new admin_setting_configselect(constants::M_COMPONENT .  '/journeymode', get_string('journeymode', constants::M_COMPONENT), '', constants::MODE_SEQUENTIAL, $modes));
+    $settings->add(new admin_setting_configselect(constants::M_COMPONENT .  '/journeymode', get_string('journeymode', constants::M_COMPONENT), '', constants::MODE_STEPSTHENFREE, $modes));
 
     $expiredays = utils::get_expiredays_options();
     $settings->add(new admin_setting_configselect(constants::M_COMPONENT .  '/expiredays', get_string('expiredays', constants::M_COMPONENT), '', '365', $expiredays));
@@ -155,4 +155,20 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configselect(constants::M_COMPONENT . "/$name",
             $label, $details, $default, $options));
 
+    //Listen and Choose
+    $name = 'lcoptions';
+    $label = get_string($name, constants::M_COMPONENT);
+    $details = get_string($name . '_details', constants::M_COMPONENT);
+    $default = constants::M_LC_TERMDEF;
+    $options = utils::fetch_options_listenchoose();
+    $settings->add(new admin_setting_configselect(constants::M_COMPONENT . "/$name",
+        $label, $details, $default, $options));
+
+    // In free mode, how many items max to show to users.
+    $name = 'def_wordstoshow';
+    $label = get_string($name, constants::M_COMPONENT);
+    $details = get_string($name . '_details', constants::M_COMPONENT);
+    $default = 6;
+    $settings->add(new admin_setting_configtext(constants::M_COMPONENT . "/$name",
+        $label, $details, $default, PARAM_INT));
 }

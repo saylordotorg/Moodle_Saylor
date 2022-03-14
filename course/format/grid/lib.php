@@ -655,7 +655,7 @@ class format_grid extends format_base {
                 $courseformatoptionsedit['sectiontitlegridlengthmaxoption'] = array(
                     'label' => new lang_string('sectiontitlegridlengthmaxoption', 'format_grid'),
                     'element_type' => 'text',
-                    'element_attributes' => array('size' => 3),
+                    'element_attributes' => array(array('size' => 3)),
                     'help' => 'sectiontitlegridlengthmaxoption',
                     'help_component' => 'format_grid'
                 );
@@ -696,7 +696,7 @@ class format_grid extends format_base {
                 $courseformatoptionsedit['sectiontitleboxheight'] = array(
                     'label' => new lang_string('sectiontitleboxheight', 'format_grid'),
                     'element_type' => 'text',
-                    'element_attributes' => array('size' => 3),
+                    'element_attributes' => array(array('size' => 3)),
                     'help' => 'sectiontitleboxheight',
                     'help_component' => 'format_grid'
                 );
@@ -802,7 +802,7 @@ class format_grid extends format_base {
                 $courseformatoptionsedit['sectiontitlesummarymaxlength'] = array(
                     'label' => new lang_string('sectiontitlesummarymaxlength', 'format_grid'),
                     'element_type' => 'text',
-                    'element_attributes' => array('size' => 3),
+                    'element_attributes' => array(array('size' => 3)),
                     'help' => 'sectiontitlesummarymaxlength',
                     'help_component' => 'format_grid'
                 );

@@ -88,8 +88,8 @@ define(['jquery', 'core/log'], function ($, log) {
         markup_suggestedwords: function () {
             var m = this;
             $.each(m.options.suggestedwords, function (index) {
-                log.debug('.' + m.cd.correctionscontainer + ' #' + m.cd.wordclass + '_' + m.options.suggestedwords[index].wordnumber);
-                    $('.' + m.cd.correctionscontainer + ' #' + m.cd.wordclass + '_' + m.options.suggestedwords[index].wordnumber).addClass(m.cd.suggestionclass);
+                log.debug('.' + m.cd.correctionscontainer + ' #' + m.cd.wordclass + '_' + (m.options.suggestedwords[index].wordnumber));
+                    $('.' + m.cd.correctionscontainer + ' #' + m.cd.wordclass + '_' + (m.options.suggestedwords[index].wordnumber)).addClass(m.cd.suggestionclass);
                 }
             );
         },

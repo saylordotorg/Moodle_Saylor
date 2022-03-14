@@ -6,9 +6,8 @@
             <option value="{{code}}" {{#selected}}selected{{/selected}}>{{name}}</option>
         {{/langdefs}}
     </select><br>
-    <label for="ww_words">{{#str}}ww_words, mod_wordcards {{/str}}</label>
-    <textarea id="{{uniqid}}_ww_words" name="ww_words" rows="4" cols="50"></textarea>
-    <a class="btn btn-secondary" id="{{uniqid}}_fetchbtn">{{#str}}ww_words_fetch, mod_wordcards{{/str}}</a>
+    <textarea id="{{uniqid}}_ww_words" placeholder="{{#str}}ww_words, mod_wordcards {{/str}}" name="ww_words" rows="4" cols="50"></textarea><br>
+    <a class="btn btn-primary" id="{{uniqid}}_fetchbtn">{{#str}}ww_words_fetch, mod_wordcards{{/str}}</a>
     <div id="{{uniqid}}_resultscont" class="mod_wordcards_ww_results"></div>
 </div>
 
@@ -21,6 +20,10 @@
             var resultscont = $("#{{uniqid}}_resultscont");
 
             $("#{{uniqid}}_fetchbtn").on("click", async function() {
+
+                //clear any old results
+                resultscont.empty();
+
                 var langs = ['ar','id','zh','zh_tw','ja','ko','pt','es','th','vi','fr','rus'];
                 var langdef = $("#{{uniqid}}_ww_langdef").val();
                 var allwords = $("#{{uniqid}}_ww_words").val();
@@ -87,7 +90,7 @@
                 });
             });
 
-
+            //this was the older lexicala code. TODO remove
             $("xxxxx#{{uniqid}}_fetchbtn").on("click", async function() {
                 var langdef = $("#{{uniqid}}_ww_langdef").val();
                 var allwords = $("#{{uniqid}}_ww_words").val();

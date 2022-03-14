@@ -2,21 +2,23 @@
 
   {{#results}}
 
-  <div class="a4e-detailed_feedback_div term-wrapper ">
+  <div class="a4e-detailed_feedback_div term-wrapper position-relative">
 
     <div class="term">
 
       <div class="term-header">
-        <div class="term-title">{{correct}}</div>
+        <div class="term-title">
+            <span>{{correct}}</span>
+        </div>
         <div class="term-tick">
-          {{#points}}
-          <div class="a4e-correct"><i class='fa fa-lg fa-check'></i></div>{{/points}} {{^points}}
-          <div class="a4e-incorrect"><i class='fa fa-lg fa-times'></i></div>{{/points}}
+            {{#points}}<div class="a4e-correct"><i class='fa fa-lg fa-check'></i></div>{{/points}}
+            {{^points}}<div class="a4e-incorrect"><i class='fa fa-lg fa-times'></i></div>{{/points}}
         </div>
       </div>
 
       <div class="term-body">
-        {{question}}
+        <span>{{question}}</span>
+          {{>mod_wordcards/my_words_button}}
       </div>
     </div>
 

@@ -29,6 +29,7 @@ class mod_wordcards_module {
 
     const WORDPOOL_LEARN = 0;
     const WORDPOOL_REVIEW = 1;
+    const WORDPOOL_MY_WORDS = 2;
 
     const PRACTICETYPE_SCATTER = -1;//not used
     const PRACTICETYPE_SCATTER_REV = -2;//not used
@@ -148,6 +149,18 @@ class mod_wordcards_module {
         return self::$states;
     }
 
+    public static function get_wordpools() {
+        $refClass = new ReflectionClass(__CLASS__);
+        $constants = $refClass->getConstants();
+        $pools = [];
+        foreach ($constants as $k => $v) {
+            if (substr($k, 0, 9) == 'WORDPOOL_') {
+                $pools[$k] = $v;
+            }
+        }
+        return $pools;
+    }
+
     public function get_allowed_states() {
         //if we are an admin/teacher kind of person we can see all the steps
         if ($this->can_manage() || $this->can_viewreports()) {
@@ -163,14 +176,6 @@ class mod_wordcards_module {
             return [self::STATE_TERMS];
         }
         return [$state];
-    }
-
-    public function get_finishedstepmsg() {
-        return $this->mod->finishedstepmsg;
-    }
-
-    public function get_completedmsg() {
-        return $this->mod->completedmsg;
     }
 
     public function get_cm() {
@@ -234,7 +239,7 @@ class mod_wordcards_module {
         }
     }
 
-    public function insert_media_urls($terms) {
+    public static function insert_media_urls($terms) {
         global $CFG;
         foreach($terms as $term){
             $contextid = false;
@@ -266,22 +271,20 @@ class mod_wordcards_module {
         return $terms;
     }
 
-    public function get_learn_terms($step) {
+    public function get_learn_terms(int $maxterms) {
         $records = $this->get_terms();
         if (!$records) {
             return [];
         }
         shuffle($records);
-        $maxterms = $this->fetch_step_termcount($step);
         $selected_records = array_slice($records, 0, $maxterms);
-        return $this->insert_media_urls($selected_records);
+        return self::insert_media_urls($selected_records);
     }
 
-    public function get_review_terms($step) {
+    public function get_review_terms(int $maxterms) {
         global $DB, $USER;
-
-        $maxterms = $this->fetch_step_termcount($step);
-        if($maxterms<1){$maxterms=4;}
+        // Old code had a min of 4 so keeping this - not sure why.
+        $maxterms = max(4, $maxterms);
         $from = 0;
         $limit = $maxterms + 5;
 
@@ -321,14 +324,10 @@ class mod_wordcards_module {
                       FROM {wordcards_terms} t
                       JOIN {wordcards} f
                         ON f.id = t.modid
-                      JOIN {wordcards_seen} s          -- Join on what the student has marked as seen.
-                        ON s.termid = t.id
-                       AND s.userid = :userid1
                  LEFT JOIN {wordcards_associations} a  -- Link the associations, if any.
                         ON a.termid = t.id
                        AND a.userid = :userid2
                      WHERE t.deleted = 0        -- The term was not deleted.
-                       AND s.id IS NOT NULL     -- The user has marked the term as seen.
                        AND f.id $insql          -- The user has access to the module in which the term is.
                   ORDER BY
                            -- Prioritise the terms which have never been associated, associated once or associated twice.
@@ -361,7 +360,7 @@ class mod_wordcards_module {
         shuffle($records);
         $selected_records = array_slice($records, 0, $maxterms);
 
-        return $this->insert_media_urls($selected_records);
+        return self::insert_media_urls($selected_records);
     }
 
     public function get_attempts() {
@@ -383,6 +382,31 @@ class mod_wordcards_module {
             return false;
         }else{
             return array_shift($records);
+        }
+    }
+
+    //can they use free mode
+    public function can_free_mode(){
+
+        switch($this->mod->journeymode){
+            //steps mode, no
+            case constants::MODE_STEPS:
+                return false;
+
+            //steps then free, if they have a completed attempt they can
+            case constants::MODE_STEPSTHENFREE:
+                //if no attempts, we can attempt
+                $attempts=$this->get_attempts();
+                if($attempts){
+                    return true;
+                }else{
+                    return false;
+                }
+
+            //free mode, or otherwise (there is no otherwise..) they can
+            case constants::MODE_FREE:
+            default:
+                return true;
         }
     }
 
@@ -434,23 +458,9 @@ class mod_wordcards_module {
         }
         $terms = $DB->get_records('wordcards_terms', $params, 'id ASC');
         if($terms){
-            $terms =$this->insert_media_urls($terms);
+            $terms = self::insert_media_urls($terms);
         }
         return $terms;
-    }
-
-    public function get_terms_seen() {
-        global $DB, $USER;
-
-        $sql = 'SELECT s.*
-                  FROM {wordcards_seen} s
-                  JOIN {wordcards_terms} t
-                    ON s.termid = t.id
-                   AND t.deleted = 0
-                 WHERE t.modid = ?
-                   AND s.userid = ?';
-
-        return $DB->get_records_sql($sql, [$this->mod->id, $USER->id]);
     }
 
     protected function has_completed_state($state) {
@@ -493,9 +503,25 @@ class mod_wordcards_module {
         return $DB->count_records_sql($sql, [$USER->id, $this->get_id()]) >= $passmark;
     }
 
-    protected function has_seen_all_terms() {
+    public function mark_terms_as_seen(){
+        global $DB, $USER;
+        $terms = self::get_terms();
+        foreach($terms as $term){
+            $params = ['userid' => $USER->id, 'termid' => $term->id];
+            if (!$DB->record_exists('wordcards_seen', $params)) {
+                $record = (object)$params;
+                $record->timecreated = time();
+                $DB->insert_record('wordcards_seen', $record);
+            }
+        }
+    }
+
+
+    public function has_seen_all_terms() {
         global $DB, $USER;
 
+
+        //TO DO remove this code, terms are always seen
         if (!$this->has_terms()) {
             return false;
         }
@@ -804,7 +830,7 @@ class mod_wordcards_module {
         return $nextstep;
     }
 
-    public function are_there_words_to_review($userid=null){
+    public function are_there_words_to_review($userid = null) {
         global $USER, $DB;
 
         //if we are an admin, just say yes
@@ -812,21 +838,21 @@ class mod_wordcards_module {
             return true;
         }
 
-        if (empty($userid)) {
-            $userid = $USER->id;
-        }
+            if (empty($userid)) {
+                $userid = $USER->id;
+            }
 
-        // Retrieve the list of wordcard modids of the course.
-        $modids = array();
+            // Retrieve the list of wordcard modids of the course.
+            $modids = array();
 
-        foreach(get_fast_modinfo($this->course)->get_instances_of('wordcards') as $wordcard) {
-            $modids[] = $wordcard->instance;
-        }
+            foreach(get_fast_modinfo($this->course)->get_instances_of('wordcards') as $wordcard) {
+                $modids[] = $wordcard->instance;
+            }
 
-        $params = array('state' => self::STATE_END, 'userid' => $userid);
-        list($sqlmodidtest, $modidparams) = $DB->get_in_or_equal($modids, SQL_PARAMS_NAMED);
-        $params = array_merge($params, $modidparams);
-        $sqlmodidtest = 'AND modid ' . $sqlmodidtest;
+            $params = array('state' => self::STATE_END, 'userid' => $userid);
+            list($sqlmodidtest, $modidparams) = $DB->get_in_or_equal($modids, SQL_PARAMS_NAMED);
+            $params = array_merge($params, $modidparams);
+            $sqlmodidtest = 'AND modid ' . $sqlmodidtest;
 
         $completedwordcardtotal = $DB->count_records_select('wordcards_progress',
                 'state = :state AND userid = :userid ' . $sqlmodidtest, $params);

@@ -48,7 +48,7 @@ class mod_wordcards_external extends external_api {
     }
 
     public static function mark_as_seen($termid) {
-        global $DB, $USER;
+        global $DB;
 
         $params = self::validate_parameters(self::mark_as_seen_parameters(), compact('termid'));
         extract($params);
@@ -62,18 +62,20 @@ class mod_wordcards_external extends external_api {
             return true;
         }
 
-        // Require view and make sure the user did not previously mark as seen.
-        $params = ['userid' => $USER->id, 'termid' => $termid];
         $mod->require_view();
+        return self::mark_as_seen_db($termid);
+    }
+
+    private static function mark_as_seen_db(int $termid):bool {
+        global $DB, $USER;
+        $params = ['userid' => $USER->id, 'termid' => $termid];
         if ($DB->record_exists('wordcards_seen', $params)) {
             return true;
         }
 
         $record = (object) $params;
         $record->timecreated = time();
-        $DB->insert_record('wordcards_seen', $record);
-
-        return true;
+        return (bool) $DB->insert_record('wordcards_seen', $record);
     }
 
     public static function mark_as_seen_returns() {
@@ -82,11 +84,12 @@ class mod_wordcards_external extends external_api {
 
     public static function report_successful_association_parameters() {
         return new external_function_parameters([
-            'termid' => new external_value(PARAM_INT)
+            'termid' => new external_value(PARAM_INT),
+            'isfreemode' => new external_value(PARAM_BOOL, 'True if free mode is being used', VALUE_OPTIONAL)
         ]);
     }
 
-    public static function report_successful_association($termid) {
+    public static function report_successful_association($termid, $isfreemode = false) {
         global $DB;
 
         $params = self::validate_parameters(self::report_successful_association_parameters(), compact('termid'));
@@ -95,6 +98,8 @@ class mod_wordcards_external extends external_api {
         $term = $DB->get_record('wordcards_terms', ['id' => $termid], '*', MUST_EXIST);
         $mod = mod_wordcards_module::get_by_modid($term->modid);
         self::validate_context($mod->get_context());
+
+        self::mark_as_seen_db($term->id);
 
         // We do not log associations for teachers.
         if ($mod->can_manage()) {
@@ -116,10 +121,11 @@ class mod_wordcards_external extends external_api {
         return new external_function_parameters([
             'term1id' => new external_value(PARAM_INT),
             'term2id' => new external_value(PARAM_INT),
+            'isfreemode' => new external_value(PARAM_BOOL, 'True if free mode is being used', VALUE_OPTIONAL)
         ]);
     }
 
-    public static function report_failed_association($term1id, $term2id) {
+    public static function report_failed_association($term1id, $term2id, $isfreemode = false) {
         global $DB;
 
         $params = self::validate_parameters(self::report_failed_association_parameters(), compact('term1id', 'term2id'));
@@ -128,6 +134,7 @@ class mod_wordcards_external extends external_api {
         $term = $DB->get_record('wordcards_terms', ['id' => $term1id], '*', MUST_EXIST);
         $mod = mod_wordcards_module::get_by_modid($term->modid);
         self::validate_context($mod->get_context());
+        self::mark_as_seen_db($term->id);
 
         // We do not log associations for teachers.
         if ($mod->can_manage()) {
@@ -377,6 +384,59 @@ class mod_wordcards_external extends external_api {
             array(
                 'success' => new external_value(PARAM_INT, 'Indicates success or failure of the call'),
                 'payload' => new external_value(PARAM_RAW, 'If call failed, contains a message about why. Else contains a json string of results')
+            )
+        );
+    }
+
+    public static function set_my_words_parameters(){
+        return new external_function_parameters(
+            array(
+                'termid' => new external_value(PARAM_INT, 'The term id for the word'),
+                'newstatus' => new external_value(PARAM_BOOL, 'The new status (in my words or not)')
+            )
+        );
+
+    }
+
+    /**
+     * Set a word as being in "My words" pool or not.
+     * @param int $termid
+     * @param bool $newstatus
+     * @return array
+     * @throws invalid_parameter_exception
+     */
+    public static function set_my_words(int $termid, bool $newstatus){
+        global $DB;
+        $params = self::validate_parameters(
+            self::set_my_words_parameters(),
+            ['termid' => $termid, 'newstatus' => $newstatus]
+        );
+
+        $courseandmoduleid = $DB->get_record_sql(
+            "SELECT cm.course, cm.id as cmid
+            FROM {course_modules} cm
+            JOIN {modules} m ON m.id = cm.module AND m.name = 'wordcards'
+            JOIN {wordcards_terms} wt ON wt.modid = cm.instance AND wt.id = ?",
+            [$params['termid']]
+        );
+        if (!$courseandmoduleid) {
+            throw new invalid_parameter_exception('Term not found with id ' . $params['termid']);
+        }
+        $context = context_module::instance($courseandmoduleid->cmid);
+        self::validate_context($context);
+
+        $mywordspool = new \mod_wordcards\my_words_pool($courseandmoduleid->course);
+        return [
+            'success' => $newstatus ? $mywordspool->add_word($params['termid']) : $mywordspool->remove_word($params['termid']),
+            'newStatus' => $newstatus
+        ];
+    }
+
+    public static function set_my_words_returns(){
+        return new external_single_structure(
+            array(
+                'success' => new external_value(PARAM_INT, 'Indicates success or failure of the call'),
+                'newStatus' => new external_value(PARAM_BOOL, 'Indicates new status of the word')
             )
         );
     }

@@ -116,6 +116,7 @@ FilterCodes are meant to be entered as regular text in the Moodle WYSIWYG editor
 * {profile_field_shortname} : Display's custom user profile field. Replace "shortname" with the shortname of a custom user profile field all in lowercase. NOTE: Will not display if the custom user profile field's settings are set to **Not Visible**.
 * {profilefullname}: Similar to {fullname} except that it displays a profile owner's name when placed on the Profile page.
 * {firstaccessdate dateTimeFormat} : Date that the user first accessd the site. For information on the optional dateTimeFormat format, see Supported dateTimeFormats Formats in the [FAQ](#faq) section of this documentation.
+* {lastlogin dateTimeFormat} : Date that the user last logged into the site. For information on the optional dateTimeFormat format, see Supported dateTimeFormats Formats in the [FAQ](#faq) section of this documentation.
 
 ### System Information
 
@@ -136,6 +137,7 @@ FilterCodes are meant to be entered as regular text in the Moodle WYSIWYG editor
 
 ### UI Elements
 
+* {teamcards}: Displays photos, name (optionally linked) and optional description of user's who are teachers. Only Verbose format is suitable for use in side-blocks.
 * {coursecards} or {coursecards categoryID}: (ALPHA) Display available courses as cards. You can optionally specify the ID number of a category. Example: {coursecards 1} will only display courses in the default Miscellaneous category. Note: The categoryID is not the "Category ID Number" field that you can optionally specify when creating a category.
 * {coursecardsbyenrol} (ALPHA): Display course cards for most popular courses based on enrolment. Maximum number of cards is configurable in the plugin settings.
 * {courseprogress}: (ALPHA) Displays course progress status in words. Only works within a course.
@@ -173,6 +175,7 @@ FilterCodes are meant to be entered as regular text in the Moodle WYSIWYG editor
 * {sectionname} : Display the section name in which the activity is located.
 * {coursecontacts}: List of course contacts with links to their profiles, email address or messaging or phone number, and their user description (there are settings for these). Note: This tag was formerly called {courseteachers}.
 * {coursegradepercent}: Displays the current accumulated course grade of the student.
+* {mygroups}: Displays a list of groups to which you are a member, separated by a commas+space.
 
 Also see Courses section below.
 
@@ -901,6 +904,7 @@ Create a Page on your Moodle site, preferably in a course, so that those tags wo
 * Total number of users [{userscountrycount}]: {userscountrycount}
 * Current 4-digit year [{siteyear}]: {siteyear}
 * You first accessed the site on [{firstaccessdate strftimedatetime}] : {firstaccessdate strftimedatetime}
+* You last logged-in on [{lastlogin strftimedatetime}] : {lastlogin strftimedatetime}
 * Course or Site full name [{coursename}]: {coursename}
 * Course or Site short name [{courseshortname}]: {courseshortname}
 * Course start date [{coursestartdate strftimedatetime}]: {coursestartdate strftimedatetime}
@@ -909,7 +913,8 @@ Create a Page on your Moodle site, preferably in a course, so that those tags wo
 * Course progress (ALPHA) [{courseprogress}]: {courseprogress}
 * Course progress bar (ALPHA) [{courseprogressbar}]: {courseprogressbar}
 * Course cards (ALPHA) [{coursecards}]: {coursecards}
-* Course cards by enrolment (ALPHA) [{{coursecardsbyenrol}}]: {{coursecardsbyenrol}}
+* Course cards by enrolment (ALPHA) [{coursecardsbyenrol}]: {coursecardsbyenrol}
+* Team cards Our faculty team [{teamcards}]: Our faculty team<br>{teamcards}
 * Category cards (ALPHA) [{categorycards}]: {categorycards}
 * Category 1 cards (ALPHA) [{categorycards 1}]: Sub-categories of Miscellaneous category include {categorycards 1}
 * Total courses [{coursecount}]: {coursecount}
@@ -923,8 +928,9 @@ Create a Page on your Moodle site, preferably in a course, so that those tags wo
 * Course ID number [{courseidnumber}]: {courseidnumber}
 * Section ID [{sectionid}]: {sectionid}
 * Section ID (encoded) [%7Bsectionid%7D]: %7Bsectionid%7D
-* Section Name [{sectionname}] : [{sectionname}]
+* Section Name [{sectionname}] : {sectionname}
 * Contacts in this course [{coursecontacts}]: {coursecontacts}
+* Please help other members of [{mygroups}] who might be struggling : Please help other members of {mygroups} who might be struggling.
 * You current grade in this course is [{coursegradepercent}]: {coursegradepercent}
 * Available free application disk space [{diskfreespace}]: {diskfreespace}
 * Available free moodledata disk space [{diskfreespacedata}]: {diskfreespacedata}

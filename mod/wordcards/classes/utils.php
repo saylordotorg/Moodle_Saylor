@@ -133,6 +133,7 @@ class utils{
             $grade = ROUND(($correct / $termcount) * 100, 0);
             $DB->set_field(constants::M_ATTEMPTSTABLE,$field,$grade,array('id'=>$record->id));
         }
+
         return true;
     }
 
@@ -485,7 +486,8 @@ class utils{
     }
 
     public static function get_journeymode_options() {
-        $options = array(constants::MODE_SEQUENTIAL => get_string("mode_sequential", constants::M_COMPONENT),
+        $options = array( constants::MODE_STEPSTHENFREE => get_string("mode_freeaftersteps", constants::M_COMPONENT),
+            constants::MODE_STEPS => get_string("mode_steps", constants::M_COMPONENT),
             constants::MODE_FREE => get_string("mode_free", constants::M_COMPONENT));
         return $options;
     }
@@ -602,6 +604,7 @@ class utils{
         $params['appid'] = constants::M_COMPONENT;
         $params['owner'] = hash('md5',$USER->username);
         $params['region'] = $region;
+        $params['engine'] = self::can_speak_neural($voice, $region)?'neural' : 'standard';
         $serverurl = self::CLOUDPOODLL . '/webservice/rest/server.php';
         $response = self::curl_fetch($serverurl, $params);
         if (!self::is_json($response)) {
@@ -671,7 +674,7 @@ class utils{
         return $voices[$autoindex];
   }
 
-  public static function get_tts_voices($langcode){
+  public static function get_tts_voices($langcode, $showall=false){
       $alllang= array(
               constants::M_LANG_ARAE => ['Zeina'],
           //constants::M_LANG_ARSA => [],
@@ -689,7 +692,7 @@ class utils{
               constants::M_LANG_ESES => [ 'Enrique'=>'Enrique', 'Conchita'=>'Conchita', 'Lucia'=>'Lucia'],
           //constants::M_LANG_FAIR => [],
               constants::M_LANG_FRCA => ['Chantal'=>'Chantal'],
-              constants::M_LANG_FRFR => ['Mathieu'=>'Mathieu','Celine'=>'Celine', 'Léa'=>'Léa'],
+              constants::M_LANG_FRFR => ['Mathieu'=>'Mathieu','Celine'=>'Celine', 'Lea'=>'Lea'],
               constants::M_LANG_HIIN => ["Aditi"=>"Aditi"],
           //constants::M_LANG_HEIL => [],
           //constants::M_LANG_IDID => [],
@@ -704,10 +707,32 @@ class utils{
           //constants::M_LANG_TAIN => [],
           //constants::M_LANG_TEIN => [],
               constants::M_LANG_TRTR => ['Filiz'=>'Filiz'],
-              constants::M_LANG_ZHCN => ['Zhiyu']
+              constants::M_LANG_ZHCN => ['Zhiyu'],
+
+              constants::M_LANG_NBNO => ['Liv'=>'Liv'],
+              constants::M_LANG_PLPL => ['Ewa'=>'Ewa','Maja'=>'Maja','Jacek'=>'Jacek','Jan'=>'Jan'],
+              constants::M_LANG_RORO => ['Carmen'=>'Carmen'],
+              constants::M_LANG_SVSE => ['Astrid'=>'Astrid']
       );
-      if(array_key_exists($langcode,$alllang)) {
+      if(array_key_exists($langcode,$alllang)&& !$showall) {
           return $alllang[$langcode];
+      }elseif($showall) {
+          $usearray =[];
+
+          //add current language first
+          foreach($alllang[$langcode] as $v=>$thevoice){
+              $neuraltag = in_array($thevoice,constants::M_NEURALVOICES) ? ' (+)' : '';
+              $usearray[$thevoice] = get_string(strtolower($langcode), constants::M_COMPONENT) . ': ' . $thevoice . $neuraltag;
+          }
+          //then all the rest
+          foreach($alllang as $lang=>$voices){
+              if($lang==$langcode){continue;}
+              foreach($voices as $v=>$thevoice){
+                  $neuraltag = in_array($thevoice,constants::M_NEURALVOICES) ? ' (+)' : '';
+                  $usearray[$thevoice] = get_string(strtolower($lang), constants::M_COMPONENT) . ': ' . $thevoice . $neuraltag;
+              }
+          }
+          return $usearray;
       }else{
           return $alllang[constants::M_LANG_ENUS];
       }
@@ -805,6 +830,54 @@ class utils{
         }
     }
 
+    public static function get_stars($grade){
+        // Every item stars.
+        if($grade==0){
+            $ystar_cnt=0;
+        }else if($grade<19) {
+            $ystar_cnt=1;
+        }else if($grade<39) {
+            $ystar_cnt=2;
+        }else if($grade<59) {
+            $ystar_cnt=3;
+        }else if($grade<79) {
+            $ystar_cnt=4;
+        }else{
+            $ystar_cnt=5;
+        }
+        $yellowstars = array_fill(0, $ystar_cnt, true);
+        $gstar_cnt= 5 - $ystar_cnt;
+        $graystars = array_fill(0, $gstar_cnt, true);
+        return[$yellowstars,$graystars];
+    }
+
+    public static function get_practicetype_label($practicetype){
+        switch($practicetype) {
+            case \mod_wordcards_module::PRACTICETYPE_NONE:
+                return get_string('title_noactivity', constants::M_COMPONENT);
+            case \mod_wordcards_module::PRACTICETYPE_MATCHSELECT:
+                return get_string('title_matchselect', constants::M_COMPONENT);
+            case \mod_wordcards_module::PRACTICETYPE_MATCHTYPE:
+                return get_string('title_matchtype', constants::M_COMPONENT);
+            case \mod_wordcards_module::PRACTICETYPE_DICTATION:
+                return get_string('title_dictation', constants::M_COMPONENT);
+            case \mod_wordcards_module::PRACTICETYPE_SPEECHCARDS:
+                return get_string('title_speechcards', constants::M_COMPONENT);
+            case \mod_wordcards_module::PRACTICETYPE_LISTENCHOOSE:
+                return get_string('title_listenchoose', constants::M_COMPONENT);
+            case \mod_wordcards_module::PRACTICETYPE_MATCHSELECT_REV:
+                return get_string('title_matchselect_rev', constants::M_COMPONENT);
+            case \mod_wordcards_module::PRACTICETYPE_MATCHTYPE_REV:
+                return get_string('title_matchtype_rev', constants::M_COMPONENT);
+            case \mod_wordcards_module::PRACTICETYPE_DICTATION_REV:
+                return get_string('title_dictation_rev', constants::M_COMPONENT);
+            case \mod_wordcards_module::PRACTICETYPE_SPEECHCARDS_REV:
+                return get_string('title_speechcards_rev', constants::M_COMPONENT);
+            case \mod_wordcards_module::PRACTICETYPE_LISTENCHOOSE_REV:
+                return get_string('title_listenchoose_rev', constants::M_COMPONENT);
+        }
+    }
+
   public static function get_practicetype_options($wordpool=false){
       $none =  array(\mod_wordcards_module::PRACTICETYPE_NONE => get_string('title_noactivity', constants::M_COMPONENT));
       $learnoptions = [
@@ -832,6 +905,11 @@ class utils{
       return $options;
   }
 
+    public static function fetch_options_listenchoose(){
+        return array(
+            constants::M_LC_TERMTERM=> get_string('lc_termterm', constants::M_COMPONENT),
+            constants::M_LC_TERMDEF => get_string('lc_termdef', constants::M_COMPONENT));
+    }
   public static function fetch_options_fontfaceflip(){
       return array(
               constants::M_FRONTFACEFLIP_TERM=> get_string('term', constants::M_COMPONENT),
@@ -870,7 +948,12 @@ class utils{
                constants::M_LANG_TAIN => get_string('ta-in', constants::M_COMPONENT),
                constants::M_LANG_TEIN => get_string('te-in', constants::M_COMPONENT),
                constants::M_LANG_TRTR => get_string('tr-tr', constants::M_COMPONENT),
-               constants::M_LANG_ZHCN => get_string('zh-cn', constants::M_COMPONENT)
+               constants::M_LANG_ZHCN => get_string('zh-cn', constants::M_COMPONENT),
+
+           constants::M_LANG_NBNO => get_string('nb-no', constants::M_COMPONENT),
+           constants::M_LANG_PLPL => get_string('pl-pl', constants::M_COMPONENT),
+           constants::M_LANG_RORO => get_string('ro-ro', constants::M_COMPONENT),
+           constants::M_LANG_SVSE => get_string('sv-se', constants::M_COMPONENT)
        );
    }
 
@@ -1081,10 +1164,10 @@ class utils{
                 $options);
         $mform->setDefault('ttslanguage',$config->ttslanguage);
 
-        $lexicala =  utils::get_rcdic_langs();// utils::get_lexicala_langs();
+        $deflangs =  utils::get_rcdic_langs();// utils::get_lexicala_langs();
         $options=[];
-        foreach($lexicala as $lexone){
-            $options[$lexone['code']]=$lexone['name'];
+        foreach($deflangs as $deflang){
+            $options[$deflang['code']]=$deflang['name'];
         }
         $mform->addElement('select', 'deflanguage', get_string('deflanguage', constants::M_COMPONENT),
             $options);
@@ -1134,17 +1217,11 @@ class utils{
 
         $mform->addElement('hidden', 'skipreview',0);
         $mform->setType('skipreview',PARAM_INT);
-        // $mform->addElement('checkbox', 'skipreview', get_string('skipreview', constants::M_COMPONENT));
-        // $mform->setDefault('skipreview', 1);
-        // $mform->addHelpButton('skipreview', 'skipreview', constants::M_COMPONENT);
 
-        $mform->addElement('editor', 'finishedstepmsg_editor', get_string('finishedstepmsg', constants::M_COMPONENT));
-        $mform->setDefault('finishedstepmsg_editor', array('text' => get_string('finishscatterin', constants::M_COMPONENT)));
-        $mform->addHelpButton('finishedstepmsg_editor', 'finishedstepmsg', constants::M_COMPONENT);
-
-        $mform->addElement('editor', 'completedmsg_editor', get_string('completedmsg', constants::M_COMPONENT));
-        $mform->setDefault('completedmsg_editor', array('text' => get_string('congratsitsover', constants::M_COMPONENT)));
-        $mform->addHelpButton('completedmsg_editor', 'completedmsg', constants::M_COMPONENT);
+        $mform->addElement('hidden', 'finishedstepmsg','');
+        $mform->addElement('hidden', 'completedstepmsg','');
+        $mform->setType('finishedstepmsg',PARAM_TEXT);
+        $mform->setType('completedstepmsg',PARAM_TEXT);
 
         //Show images on task flip screen
         $mform->addElement('selectyesno', 'showimageflip', get_string('showimagesonflipscreen', constants::M_COMPONENT));
@@ -1153,6 +1230,10 @@ class utils{
         $frontfaceoptions = self::fetch_options_fontfaceflip();
         $mform->addElement('select', 'frontfaceflip', get_string('frontfaceflip', constants::M_COMPONENT),
                 $frontfaceoptions, $config->frontfaceflip);
+
+        $lcoptions = self::fetch_options_listenchoose();
+        $mform->addElement('select', 'lcoptions', get_string('lcoptions', constants::M_COMPONENT),
+            $lcoptions, $config->lcoptions);
 
   // show activity open closes
    $dateoptions = array('optional' => true);
@@ -1174,13 +1255,6 @@ class utils{
         $mform->addHelpButton($name, $name, constants::M_COMPONENT);
     } //end of add_mform_elements
 
-    public static function prepare_file_and_json_stuff($moduleinstance, $modulecontext){
-        $moduleinstance['finishedstepmsg_editor']['text'] = $moduleinstance['finishedstepmsg'];
-        $moduleinstance['completedmsg_editor']['text'] = $moduleinstance['completedmsg'];
-
-        return $moduleinstance;
-
-    }//end of prepare_file_and_json_stuff
 
     //What multi-attempt grading approach
     public static function get_grade_options() {
@@ -1222,7 +1296,7 @@ class utils{
         $langdefs[] = ['code'=>'ja','name'=>'Japanese'];
         $langdefs[] = ['code'=>'ko','name'=>'Korean'];
         $langdefs[] = ['code'=>'pt','name'=>'Portuguese'];
-        $langdefs[] = ['code'=>'ru','name'=>'Russian'];
+        $langdefs[] = ['code'=>'rus','name'=>'Russian'];
         $langdefs[] = ['code'=>'th','name'=>'Thai'];
         $langdefs[] = ['code'=>'vi','name'=>'Vietnamese'];
         $langdefs[] = ['code'=>'zh','name'=>'Chinese (simpl.)'];
@@ -1235,7 +1309,7 @@ class utils{
                 break;
             }
         }
-        if(!$default_set){$langdefs[10]['selected']=true;}
+        if(!$default_set){$langdefs[1]['selected']=true;}
         return $langdefs;
     }
 
@@ -1308,6 +1382,10 @@ class utils{
             if(empty($term->translations)){continue;}
             if(!self::is_json($term->translations)){continue;}
             $translations = json_decode($term->translations);
+            //english is a special case, lets support it
+            if($mod->get_mod()->deflanguage=='en') {
+                $translations->en=$term->sourcedef;
+            }
             if(!empty($translations) &&
                 isset($translations->{$mod->get_mod()->deflanguage})){
                 if(isset($translations->{$mod->get_mod()->deflanguage}->text)){
@@ -1319,6 +1397,32 @@ class utils{
                 }
                 $DB->update_record('wordcards_terms', ['id'=>$term->id,'definition'=>$newdef]);
             }
+        }
+    }
+
+    //can speak neural?
+    public static function can_speak_neural($voice,$region){
+        //check if the region is supported
+        switch($region){
+            case "useast1":
+            case "tokyo":
+            case "sydney":
+            case "dublin":
+            case "ottawa":
+            case "frankfurt":
+            case "london":
+            case "singapore":
+                //ok
+                break;
+            default:
+                return false;
+        }
+
+        //check if the voice is supported
+        if(in_array($voice,constants::M_NEURALVOICES)){
+            return true;
+        }else{
+            return false;
         }
     }
 

@@ -396,7 +396,7 @@ function xmldb_wordcards_upgrade($oldversion) {
     if ($oldversion < 2022020500) {
         $table = new xmldb_table('wordcards');
         // Define field foriframe to be added to wordcards
-        $field= new xmldb_field('deflanguage', XMLDB_TYPE_CHAR, '255', XMLDB_UNSIGNED, null, null);
+        $field= new xmldb_field('deflanguage', XMLDB_TYPE_CHAR, '255', XMLDB_UNSIGNED, null, null,'en');
 
         // add  field to wordcards table
         if (!$dbman->field_exists($table, $field)) {
@@ -438,8 +438,7 @@ function xmldb_wordcards_upgrade($oldversion) {
         $table = new xmldb_table(constants::M_TABLE);
 
         $fields=[];
-        $fields[] = new xmldb_field('journeymode', XMLDB_TYPE_INTEGER, 4, XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0);
-
+        $fields[] = new xmldb_field('journeymode', XMLDB_TYPE_INTEGER, 4, XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 2);
 
         // Add fields
         foreach ($fields as $field) {
@@ -449,6 +448,45 @@ function xmldb_wordcards_upgrade($oldversion) {
         }
 
         upgrade_mod_savepoint(true, 2022021500, 'wordcards');
+    }
+
+    if ($oldversion < 2022022701) {
+
+        // Define table wordcards_my_words to be created.
+        $table = new xmldb_table('wordcards_my_words');
+
+        // Adding fields to table wordcards_my_words.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('termid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('courseid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table wordcards_my_words.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('userid', XMLDB_KEY_FOREIGN, ['userid'], 'user', ['id']);
+        $table->add_key('termid', XMLDB_KEY_FOREIGN, ['termid'], 'wordcards_terms', ['id']);
+        $table->add_key('courseid', XMLDB_KEY_FOREIGN, ['courseid'], 'course', ['id']);
+
+        // Conditionally launch create table for wordcards_my_words.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+        upgrade_mod_savepoint(true, 2022022701, 'wordcards');
+    }
+
+    if ($oldversion < 2022031300) {
+        $table = new xmldb_table(constants::M_TABLE);
+        $fields=[];
+        $fields[] = new xmldb_field('lcoptions', XMLDB_TYPE_INTEGER, 10, XMLDB_UNSIGNED, XMLDB_NOTNULL, null, constants::M_LC_TERMDEF);
+
+        // Add fields
+        foreach ($fields as $field) {
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+        upgrade_mod_savepoint(true, 2022031300, 'wordcards');
     }
 
     return true;

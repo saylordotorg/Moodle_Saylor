@@ -1,3 +1,54 @@
 <div id="finish-page-{{uniqid}}">
-    <p>{{{finishtext}}}</p>
+
+    {{#hasscore}}
+        <h1 class="text-center">{{#str}}totalscore, mod_wordcards{{/str}} {{total}}%</h1>
+    {{/hasscore}}
+    {{^hasscore}}
+        <h1 class="text-center">{{#str}}congratsitsover, mod_wordcards{{/str}}</h1>
+    {{/hasscore}}
+    <hr>
+
+    {{#ratingitems}}
+        <div class="mod_wordcards_item_rating  text-center">
+            <span class="mod_wordcards_step_rating_title"><i class="icon fa {{icon}} fa-fw " aria-hidden="true"></i>{{title}}</span>
+            <div class="mod_wordcards_step_rating">
+                {{#yellowstars}}
+                    <span><img src="{{{ config.wwwroot }}}/mod/wordcards/pix/yellow_star.png"/></span>
+                {{/yellowstars}}
+                {{#graystars}}
+                    <span><img src="{{{ config.wwwroot }}}/mod/wordcards/pix/gray_star.png"/></span>
+                {{/graystars}}
+            </div>
+        </div>
+    {{/ratingitems}}
+
+    <hr>
+
+    <div class="mod_wordcards_action_buttons text-center">
+        {{#reattempturl}}
+            <div class="wordcards_actionbutton">
+                <a class="btn btn-secondary solo_backtocourse center" href="{{{reattempturl}}}">
+                    <i class="icon fa fa-repeat fa-fw " aria-hidden="true"></i>
+                    <span> {{#str}}try_again, mod_wordcards{{/str}}</span>
+                </a>
+            </div>
+        {{/reattempturl}}
+
+        {{#canfreemode}}
+            <div class="wordcards_actionbutton">
+                <a class="btn btn-secondary solo_backtocourse center" href="{{{freemodeurl}}}">
+                    <i class="icon fa fa-random fa-fw " aria-hidden="true"></i>
+                    <span> {{#str}}morepractice, mod_wordcards{{/str}}</span>
+                </a>
+            </div>
+        {{/canfreemode}}
+
+        <div class="wordcards_actionbutton">
+            <a class="btn btn-secondary solo_backtocourse center" href="{{{courseurl}}}">
+                <i class="icon fa fa-home fa-fw " aria-hidden="true"></i>
+                <span> {{#str}}backtocourse, mod_wordcards{{/str}}</span>
+            </a>
+        </div>
+    </div>
+
 </div>

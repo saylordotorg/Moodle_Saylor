@@ -1,6 +1,13 @@
-1.3.33 (xxxx)
+1.3.34 (2022031300)
+- tweaked appearance of cards
+- fixed issue with review mode
+- added selection of term/definition for listen-and-choose
+- added Norwegian, Romanian, Polish and Swedish
+
+1.3.33 (2022022700)
 - fixed issue in get_course_moduleinfo that could kill backup and restore
 - tweaked polly stuff
+- added freemode and mywords
 
 1.3.22 (Build 2022022300)
 - Fixed issue which prevented more than 40 results showing in the reports

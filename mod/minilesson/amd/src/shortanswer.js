@@ -147,7 +147,7 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'mod_minilesson/poll
               }
 
               //if we got a match then process it
-            if(matched && false){
+            if(matched){
               //proceed to next question
               $(".minilesson_nextbutton").prop("disabled", true);
               setTimeout(function () {

@@ -157,13 +157,18 @@ $string['ta-in'] = 'Tamil';
 $string['te-in'] = 'Telegu';
 $string['tr-tr'] = 'Turkish';
 
+$string['sv-se'] = 'Swedish';
+$string['nb-no'] = 'Norwegian';
+$string['pl-pl'] = 'Polish';
+$string['ro-ro'] = 'Romanian';
+
 $string['awsregion']='AWS Region';
 $string['region']='AWS Region';
 $string['expiredays']='Days to keep file';
 $string['aigradenow']='AI Grade';
 
 $string['attemptsperpage']="Attempts to show per page: ";
-$string['backtotop']="Back to Start";
+$string['backtotop']="Back to Course";
 $string['transcript']="Transcript";
 $string['quickgrade']="Quick Grade";
 $string['ok']="OK";
@@ -545,7 +550,7 @@ $string['rating_fair'] = 'Thank you';
 $string['rating_good'] = 'Good Job';
 $string['rating_verygood'] = 'Very Good';
 $string['rating_excellent'] = 'Excellent !';
-$string['maybereloadaudio']='(If audio does not play, try reloading the page.)';
+$string['toggleplayinstructions']='(Press ESC key to start and stop the audio player.)';
 
 //reattempt
 $string['reattempt'] = 'Try Again';

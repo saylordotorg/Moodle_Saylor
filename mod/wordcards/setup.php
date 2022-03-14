@@ -96,9 +96,6 @@ if ($mform->is_cancelled()) {
         $data->skipreview = 0;
     }
 
-    $data->finishedstepmsg = $data->finishedstepmsg_editor['text'];
-    $data->completedmsg = $data->completedmsg_editor['text'];
-
     //now update the db once we have saved files and stuff
     if ($DB->update_record(constants::M_TABLE, $data)) {
         //Process the hashcode and lang model if it makes sense

@@ -2,7 +2,7 @@
     <div class="wordcards_timer">00:00:00</div>
     <div id="wordcards" class="wordcards">
         <div class="congrats">
-          <div class="wordcards_congrats">{{{finishedstepmsg}}}</div>
+          <div class="wordcards_congrats">Congratulations</div>
           {{#hascontinue}}
               <button data-href="{{{nexturl}}}" class="btn btn-primary wordcards-continue-button">{{continue}}</button>
           {{/hascontinue}}
@@ -12,22 +12,18 @@
 </div>
 
 {{#js}}
-    require(['jquery', 'mod_wordcards/cards', './amd/src/easytimer.js'], function($, Cards, Timer) {
-        var container = $('#cards-page-{{uniqid}}'),
-            modid = {{modid}},
-            canmanage = {{canmanage}},
-            cards = container.find('.wordcards'),
-            btn = container.find('.wordcards-continue-button'),
-            timer = new Timer();
+    require(['jquery', 'mod_wordcards/cards'], function($, Cards) {
+        var container = $('#cards-page-{{uniqid}}');
+        var    modid = {{modid}};
+        var    canmanage = {{canmanage}};
+        var    cards = container.find('.wordcards');
+        var    btn = container.find('.wordcards-continue-button');
+
 
         var inst = new Cards(cards, {{{definitionsjson}}});
 
         function displayfinishmessage() {
-            // replace [[time]] by <span class="wordcards_timer_time">00:00:00</span>
-            var convertedfinishedstepmsg = $('.wordcards_congrats').text().replace("[[time]]", "<span class=\"wordcards_timer_time\">00:00:00</span>");
-            $('.wordcards_congrats').html(convertedfinishedstepmsg);
 
-            $('.wordcards_timer_time').text(timer.getTimeValues().toString(['minutes', 'seconds', 'secondTenths']));
             $('.wordcards_timer').css('display', 'none');
             container.find('.congrats').css('display', 'block');
         }
@@ -48,13 +44,13 @@
 
                 {{#completeafterlocal}}
                     var redirecturl = "{{{nexturl}}}";
-                    window.location.replace(redirecturl.replace(/&amp;/g,'&') + "&localscattertime=" +  timer.getTotalTimeValues().seconds);
+                    window.location.replace(redirecturl.replace(/&amp;/g,'&') + "&localscattertime=1");
                     return;
                 {{/completeafterlocal}}
 
                 {{#isglobalscatter}}
                     var redirecturl = "{{{nexturl}}}";
-                    window.location.replace(redirecturl.replace(/&amp;/g,'&') + "&globalscattertime=" + timer.getTotalTimeValues().seconds);
+                    window.location.replace(redirecturl.replace(/&amp;/g,'&') + "&globalscattertime=" + 1);
                     return;
                 {{/isglobalscatter}}
 
@@ -62,7 +58,6 @@
 
                 displayfinishmessage();
 
-                timer.stop();
 
             });
         {{/hascontinue}}
@@ -70,21 +65,13 @@
         {{#isglobalcompleted}}
             inst.on('complete', function() {
                 displayfinishmessage();
-                timer.stop();
+
             });
         {{/isglobalcompleted}}
 
         // Move the wordcards on top of screen.
         $(window).scrollTop($('#wordcards').offset().top - 45);
 
-        // Set timer.
-        $('.wordcards_timer').css('display', 'block');
-        timer.start({precision: 'secondTenths', callback: function (values) {
-            $('.wordcards_timer').html(values.toString(['minutes', 'seconds', 'secondTenths']));
-        }});
-        timer.addEventListener('secondsUpdated', function (e) {
-            $('.wordcards_timer .values').html(timer.getTimeValues().toString(['minutes', 'seconds', 'secondTenths']));
-        });
     });
 
 {{/js}}

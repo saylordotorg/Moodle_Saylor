@@ -39,6 +39,7 @@ class backup_wordcards_activity_structure_step extends backup_activity_structure
     protected function define_structure() {
         // Get know if we are including userinfo.
         $userinfo = $this->get_setting_value('userinfo');
+
         // Define the root element describing the wordcards instance.
         $wordcards = new backup_nested_element('wordcards', array('id'), array(
             'name', 'intro', 'introformat', 'journeymode','step1termcount', 'step2termcount', 'step3termcount', 'step4termcount','step5termcount',
@@ -46,7 +47,7 @@ class backup_wordcards_activity_structure_step extends backup_activity_structure
                 'step1practicetype','step2practicetype','step3practicetype','step4practicetype','step5practicetype',
                 'completionwhenfinish','maxattempts', 'timecreated', 'timemodified','skipreview', 'finishedstepmsg',
                 'completedmsg', 'ttslanguage','deflanguage','transcriber','passagehash','hashisold','foriframe',
-                'showimageflip', 'frontfaceflip','viewstart','viewend'));
+                'showimageflip', 'frontfaceflip','lcoptions','viewstart','viewend'));
 
         $terms = new backup_nested_element('terms');
         $term = new backup_nested_element('term', array('id'), array(
@@ -97,6 +98,16 @@ class backup_wordcards_activity_structure_step extends backup_activity_structure
               FROM {wordcards_progress}
              WHERE modid = ?',
             array(backup::VAR_PARENTID));
+
+            // We only need to include my words if we are including user info.
+            $mywords = new backup_nested_element('mywords');
+            $myword = new backup_nested_element('myword', array('id'), array(
+                'userid', 'termid', 'timecreated'));
+            $term->add_child($mywords);
+            $mywords->add_child($myword);
+            $myword->set_source_table('wordcards_my_words', array('courseid' => backup::VAR_COURSEID, 'termid' => '../../id'));
+            $myword->annotate_ids('user', 'userid');
+            $myword->annotate_ids('mod_wordcards_terms', 'termid');
         }
 
         // If we were referring to other tables, we would annotate the relation
@@ -104,6 +115,7 @@ class backup_wordcards_activity_structure_step extends backup_activity_structure
         $seen->annotate_ids('user', 'userid');
         $association->annotate_ids('user', 'userid');
         $progress->annotate_ids('user', 'userid');
+
 
         // Define file annotations (we do not use itemid in this example).
         $wordcards->annotate_files('mod_wordcards', 'intro', null);

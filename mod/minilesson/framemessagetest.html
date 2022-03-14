@@ -5,6 +5,7 @@
     <title>Frame Message Test</title>
 </head>
 <script>
+
     function postGrades(){
         var urlParams = new URLSearchParams(window.location.search);
         var targetWindow = window.parent;
@@ -18,7 +19,13 @@
 </script>
 <body>
 <h1> Frame Test</h1>
+Hi <span id="usersname"></span><br>
 Push the button to submit the grades
 <button type="button" onClick="postGrades()">Submit Grades</button>
 </body>
+<script>
+    var urlParams = new URLSearchParams(window.location.search);
+    var usersname=urlParams.get('usersname');
+    document.getElementById('usersname').innerHTML = usersname;
+</script>
 </html>

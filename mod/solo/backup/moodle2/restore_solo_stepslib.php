@@ -227,6 +227,7 @@ class restore_solo_activity_structure_step extends restore_activity_structure_st
 
     protected function after_execute() {
         // Add module related files, no need to match by itemname (just internally handled context)
+        $this->add_related_files(constants::M_COMPONENT, constants::M_FILEAREA_MODELMEDIA, null);
         $this->add_related_files(constants::M_COMPONENT, constants::M_FILEAREA_TOPICMEDIA, null);
         $this->add_related_files(constants::M_COMPONENT, 'intro', null);
 

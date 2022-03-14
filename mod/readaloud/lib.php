@@ -64,7 +64,12 @@ function readaloud_supports($feature) {
         case FEATURE_BACKUP_MOODLE2:
             return true;
         default:
-            return null;
+            //cute hack to work on M4.0 and above
+            if(defined('FEATURE_MOD_PURPOSE') && defined('MOD_PURPOSE_ASSESSMENT') && $feature=='mod_purpose'){
+                return "assessment";
+            }else{
+                return null;
+            }
     }
 }
 

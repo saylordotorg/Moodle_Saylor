@@ -1,0 +1,82 @@
+.mod_wordcards_freemode .dropbtn {
+    font-size: 16px;
+    cursor: pointer;
+    padding: .5rem 1rem;
+    width: 100%;
+    background-color: inherit;
+    border: 1px solid #e1e1e1;
+    border-radius: 3px;
+}
+.mod_wordcards_freemode .dropdown {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+.mod_wordcards_freemode .dropdown .fa-chevron-down {
+    position: absolute;
+    right: 5px;
+    top: 10px;
+}
+.mod_wordcards_freemode .dropdown-content {
+    display: none;
+    position: absolute;
+    width: 100%;
+    box-shadow: 3px 5px 10px 3px rgba(0, 0, 0, 0.4);
+    z-index: 1;
+    transition: display 3000ms ease-in-out;
+}
+.mod_wordcards_freemode .dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+.mod_wordcards_freemode .dropdown-content a.disabled {
+    color: gray;
+}
+.mod_wordcards_freemode .dropdown:hover .dropdown-content,
+.mod_wordcards_freemode .dropdown .dropdown-content.show {
+    display: block;
+    transition: display 3000ms ease-in-out;
+}
+.mod_wordcards_freemode .dropdown-content a:hover,
+.mod_wordcards_freemode a#exit-btn:hover,
+.mod_wordcards_freemode a.nav-link:hover {
+    background-color: #0f6cbf;
+    color: white;
+}
+.mod_wordcards_freemode .dropdown-content a.disabled:hover {
+    background-color: inherit;
+    color: gray;
+}
+.mod_wordcards_freemode .dropdown-content a.disabled:hover i {
+    color: gray;
+}
+.mod_wordcards_freemode a#exit-btn {
+    padding: .5rem 1rem;
+    color: #333;
+    display: block;
+    border-top: 1px solid lightgray;
+    text-decoration: none;
+    position: absolute;
+    bottom: 25px;
+    width: 220px;
+}
+.mod_wordcards_freemode a.nav-link {
+    color: #333;
+ }
+.mod_wordcards_freemode .fa.wordpool-chooser-icon {
+    font-size: 1.1em;
+    margin-right: 10px;
+    padding-top: 2px;
+    color: #777;
+    float: left;
+}
+.mod_wordcards_freemode  a:hover .fa.wordpool-chooser-icon {
+    color: #fff;
+}
+@media (min-width: 768px) {
+    .col-md-3.buttons-column {
+        max-width: 250px;
+    }
+}

@@ -175,6 +175,7 @@ class constants {
     const M_LANG_PTBR = 'pt-BR';
 
     const M_LANG_DADK = 'da-DK';
+    const M_LANG_FILPH = 'fil-PH';
 
     const M_LANG_KOKR = 'ko-KR';
     const M_LANG_HIIN = 'hi-IN';
@@ -196,6 +197,11 @@ class constants {
     const M_LANG_TAIN ='ta-IN';
     const M_LANG_TEIN ='te-IN';
     const M_LANG_TRTR ='tr-TR';
+
+    const M_LANG_NBNO ='nb-NO';
+    const M_LANG_PLPL ='pl-PL';
+    const M_LANG_RORO ='ro-RO';
+    const M_LANG_SVSE ='sv-SE';
 
     const TRANSCRIBER_NONE = 0;
     const TRANSCRIBER_AUTO = 1;

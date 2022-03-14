@@ -17,7 +17,7 @@
         <div class="col-sm">
             <div class='mod_solo_transcripteditor'>
                 {{>mod_solo/audioplayer}}
-                <div class='mod_solo_maybereloadaudio'>{{#str}}maybereloadaudio, mod_solo{{/str}}</div>
+                <div class='mod_solo_maybereloadaudio'>{{#str}}toggleplayinstructions, mod_solo{{/str}}</div>
                 <textarea name="selftranscript" id="{{uniqid}}_selftranscript" class="form-control" rows="5" cols="80">{{selftranscript}}</textarea>
             </div>
         </div>
@@ -32,9 +32,11 @@
 </div>
 {{^element.frozen}}
     {{#js}}
-        //this submits the form data by ajax
+        //<script>
         require(['jquery', 'core/log','core/notification' ,'core/ajax','core/templates'],
             function($, log, Notification, Ajax, Templates) {
+
+                //this submits the form data by ajax
                 $('#' + '{{uniqid}}_button').click(function(){
                     var data = {};
                     data.selftranscript = $('#' + '{{uniqid}}_selftranscript').val();
@@ -58,6 +60,16 @@
                    }]);
 
                 });
+
+                //this stops or starts the  audio player by pressing the ESC key
+                $(document).on('keyup', function(e) {
+                    if (e.key == "Escape"){
+                       var aplayer = $('#mod_solo_passageaudioplayer')[0];
+                       aplayer.paused ? aplayer.play() : aplayer.pause();
+                    }
+                });
+
+
             }
         );
     {{/js}}

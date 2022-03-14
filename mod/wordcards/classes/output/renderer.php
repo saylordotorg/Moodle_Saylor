@@ -15,47 +15,26 @@
 
 namespace mod_wordcards\output;
 
+use mod_wordcards\my_words_pool;
 use mod_wordcards\utils;
 use mod_wordcards\constants;
 
 class renderer extends \plugin_renderer_base {
 
-    public function definitions_page(\mod_wordcards_module $mod) {
-        global $PAGE, $OUTPUT,$USER;
+    public function definitions_page_data(\mod_wordcards_module $mod, $definitions) {
+        global $USER;
 
-        $definitions = $mod->get_terms();
-        if (empty($definitions)) {
+        $mywordspool = new my_words_pool($mod->get_course()->id);
 
-            $displaytext = $this->output->box_start();
-            $displaytext .= $this->output->heading(get_string('nodefinitions', constants::M_COMPONENT), 3, 'main');
-            $showaddwordlinks = $mod->can_manage();
-            if ($showaddwordlinks) {
-                $displaytext .= \html_writer::div(get_string('letsaddwords', constants::M_COMPONENT), '', array());
-                $displaytext .= $this->output->single_button(new \moodle_url(constants::M_URL . '/managewords.php',
-                    array('id' => $mod->get_cmid())), get_string('addwords', constants::M_COMPONENT));
-            }
-            $displaytext .= $this->output->box_end();
-            $ret= \html_writer::div($displaytext,'');
-            return $ret;
-
-        }
-
-        //make sure each definition has a voice
         foreach($definitions as $def){
+            //make sure each definition has a voice
             if($def->ttsvoice=='Auto' || $def->ttsvoice==''){
                 $def->ttsvoice = utils::fetch_auto_voice($mod->get_mod()->ttslanguage);
             }
-        }
 
+            // Add flag to show if it's in "My words" or not.
+            $def->isinmywords = $mywordspool->has_term($def->id);
 
-        // Get whe the student has seen.
-        $seen = $mod->get_terms_seen();
-        foreach ($seen as $s) {
-            if (!isset($definitions[$s->termid])) {
-                // Shouldn't happen.
-                continue;
-            }
-            $definitions[$s->termid]->seen = true;
         }
 
         //attempt info
@@ -83,11 +62,10 @@ class renderer extends \plugin_renderer_base {
             $nextbuttontext=get_string('continue',constants::M_COMPONENT);
         }
 
-
         //config
         $config = get_config('mod_wordcards');
         $token = utils::fetch_token($config->apiuser, $config->apisecret);
-
+        $journeymode= $mod->get_mod()->journeymode; //get_config(constants::M_COMPONENT, 'journeymode');
 
         $data = [
             'uniqid'=> \html_writer::random_id('wordcards'),
@@ -105,30 +83,41 @@ class renderer extends \plugin_renderer_base {
             'loadingurl' => $this->image_url('i/loading_small')->out(true),
             'markasseen' => get_string('markasseen', 'mod_wordcards'),
             'modid' => $mod->get_id(),
-            'mustseealltocontinue' => get_string('mustseealltocontinue', 'mod_wordcards'),
             'nexturl' => (new \moodle_url('/mod/wordcards/activity.php', ['id' => $mod->get_cmid(),
                 'state'=>\mod_wordcards_module::STATE_STEP1,'reattempt'=>$reattempt]))->out(true),
             'noteaboutseenforteachers' => get_string('noteaboutseenforteachers', 'mod_wordcards'),
             'notseenurl' => $this->image_url('not-seen', 'mod_wordcards')->out(true),
             'definition_grid' => $this->image_url('grid', 'mod_wordcards')->out(true),
             'definition_flashcards' => $this->image_url('flashcards', 'mod_wordcards')->out(true),
-            'seenall' => count($definitions) == count($seen),
             'seenurl' => $this->image_url('seen', 'mod_wordcards')->out(true),
             'str_term' => get_string('term', 'mod_wordcards'),
             'termnotseen' => get_string('termnotseen', 'mod_wordcards'),
             'termseen' => get_string('termseen', 'mod_wordcards'),
             'token'=>$token,
             'region'=>$config->awsregion,
-            'owner'=>hash('md5',$USER->username)
+            'owner'=>hash('md5',$USER->username),
+            'cmid' => $mod->get_cmid(),
+            'freemodeavailable' => $journeymode == constants::MODE_FREE || ($journeymode == constants::MODE_STEPSTHENFREE && $attemptcount>0),
+            'stepsmodeavailable' => $journeymode == constants::MODE_STEPS || $journeymode == constants::MODE_STEPSTHENFREE
         ];
 
-
-        $jsonstring=json_encode($data);
-        $opts_html = \html_writer::tag('input', '', array('id' => $data['uniqid'], 'type' => 'hidden', 'value' => $jsonstring));
+        $data['optshtml'] = \html_writer::tag('input', '', array('id' => $data['uniqid'], 'type' => 'hidden', 'value' => json_encode($data)));
         $jsdata=array('widgetid'=> $data['uniqid']);
         $this->page->requires->js_call_amd("mod_wordcards/definitions", 'init', array($jsdata));
 
-        return  $opts_html . $this->render_from_template('mod_wordcards/definitions_page', $data);
+        // Heading and intro paras (these are after opthtml for JS as we dont want to include them there).
+        $data['introheading'] = get_string('tabdefinitions', 'mod_wordcards');
+        $stringmanager = get_string_manager();
+        $data['introstrings'] = [];
+        for ($x = 1; $x <= 10; $x++) {
+            $stringkey = 'startintropara' . $x;
+            if ($stringmanager->string_exists($stringkey, 'mod_wordcards')) {
+                $data['introstrings'][] = get_string($stringkey, 'mod_wordcards');
+            } else {
+                break;
+            }
+        }
+        return $data;
     }
 
     public function cancel_attempt_button($mod){
@@ -144,6 +133,20 @@ class renderer extends \plugin_renderer_base {
             );
         $this->page->requires->js_call_amd("mod_wordcards/cancel_attempt_button", 'init', array($data));
         return $this->render_from_template('mod_wordcards/cancel_attempt_button', $data);
+    }
+
+    public function no_definitions_yet($mod){
+        $displaytext = $this->output->box_start();
+        $displaytext .= $this->output->heading(get_string('nodefinitions', constants::M_COMPONENT), 3, 'main');
+        $showaddwordlinks = $mod->can_manage();
+        if ($showaddwordlinks) {
+            $displaytext .= \html_writer::div(get_string('letsaddwords', constants::M_COMPONENT), '', array());
+            $displaytext .= $this->output->single_button(new \moodle_url(constants::M_URL . '/managewords.php',
+                array('id' => $mod->get_cmid())), get_string('addwords', constants::M_COMPONENT));
+        }
+        $displaytext .= $this->output->box_end();
+        $ret= \html_writer::div($displaytext,'');
+        return $ret;
     }
 
     private function make_json_string($definitions,$mod){
@@ -173,7 +176,7 @@ class renderer extends \plugin_renderer_base {
     }
 
 
-    public function a4e_page(\mod_wordcards_module $mod, $practicetype, $wordpool, $currentstep ) {
+    public function a4e_page(\mod_wordcards_module $mod, int $practicetype, array $definitions, bool $isfreemode, $currentstep = '' ) {
         global $USER, $PAGE, $OUTPUT;
 
         //config
@@ -181,13 +184,6 @@ class renderer extends \plugin_renderer_base {
 
         //get state
         list($state) = $mod->get_state();
-
-        //if we are in review state, we use different words
-        if($wordpool == \mod_wordcards_module::WORDPOOL_REVIEW) {
-            $definitions = $mod->get_review_terms($currentstep);
-        }else{
-            $definitions = $mod->get_learn_terms($currentstep);
-        }
 
         //make sure each definition has a voice
         foreach($definitions as $def){
@@ -201,13 +197,22 @@ class renderer extends \plugin_renderer_base {
         $opts_html = \html_writer::tag('input', '', array('id' => $widgetid, 'type' => 'hidden', 'value' => $jsonstring));
 
 
-        $nextstep = $mod->get_next_step($currentstep);
-        $nexturl =  (new \moodle_url('/mod/wordcards/activity.php', ['id' => $mod->get_cmid(),'oldstep'=>$currentstep,'nextstep'=>$nextstep]))->out(true);
+        if ($currentstep) {
+            $nextstep = $mod->get_next_step($currentstep);
+            $nexturl =  (new \moodle_url('/mod/wordcards/activity.php', ['id' => $mod->get_cmid(),'oldstep'=>$currentstep,'nextstep'=>$nextstep]))->out(true);
+        } else {
+            // In Freemode we will not have a next or current step, so we pass an empty next URL to JS.
+            $nexturl = '';
+        }
+
         $token = utils::fetch_token($config->apiuser, $config->apisecret);
 
         $opts=array('widgetid'=>$widgetid,'ttslanguage'=>$mod->get_mod()->ttslanguage,
-                'dryRun'=> $mod->can_manage(),'nexturl'=>$nexturl, 'region'=>$config->awsregion,
-                'token'=>$token,'owner'=>hash('md5',$USER->username),'modid'=>$mod->get_id());
+                'dryRun'=> $mod->can_manage() && !$isfreemode, 'nexturl'=>$nexturl, 'region'=>$config->awsregion,
+                'token'=>$token,'owner'=>hash('md5',$USER->username),'modid'=>$mod->get_id(),
+                'isfreemode' => get_config(constants::M_COMPONENT, 'journeymode') == constants::MODE_FREE
+                    && $PAGE->url->compare(new \moodle_url('/mod/wordcards/freemode.php'), URL_MATCH_BASE)
+            );
 
         $data = [];
         switch($practicetype){
@@ -223,6 +228,7 @@ class renderer extends \plugin_renderer_base {
                 break;
             case \mod_wordcards_module::PRACTICETYPE_LISTENCHOOSE:
             case \mod_wordcards_module::PRACTICETYPE_LISTENCHOOSE_REV:
+                $opts['lcoptions']=$mod->get_mod()->lcoptions;
                 $this->page->requires->js_call_amd("mod_wordcards/listenchoose", 'init', array($opts));
                 $activity_html = $this->render_from_template('mod_wordcards/listenchoose_page', $data);
                 break;
@@ -237,21 +243,56 @@ class renderer extends \plugin_renderer_base {
     }
 
     public function finish_page(\mod_wordcards_module $mod) {
-
-        $finishmsg = $mod->get_finishedstepmsg();
-        $latestattempt = $mod->get_latest_attempt();
-        if($latestattempt){
-            $finishmsg = str_replace('[[totalgrade]]', $latestattempt->totalgrade, $finishmsg);
-        }else{
-            $finishmsg = str_replace('[[totalgrade]]', '[students grade]', $finishmsg);
-        }
-
+     global $CFG;
 
         $data = [
             'canmanage' => $mod->can_manage(),
-            'finishtext' => $finishmsg .  ' <br/> ' . $mod->get_completedmsg(),
             'modid' => $mod->get_id(),
+            'courseurl'=>$CFG->wwwroot . '/course/view.php?id=' . $this->page->course->id . '#section-'. $mod->get_cm()->sectionnum,
+            'freemodeurl'=>$CFG->wwwroot . '/mod/wordcards/freemode.php?id=' . $mod->get_cmid(),
+            'canfreemode'=>$mod->can_free_mode()
         ];
+
+        //attempt info
+        $canattempt=$mod->can_attempt();
+        if($canattempt){
+            $data['reattempturl']=$CFG->wwwroot . '/mod/wordcards/view.php?id=' . $mod->get_cmid();
+        }
+
+        //if we have a latest attempt, we need STARS!!!
+        //teachers attempts are not saved, so they have no score when they get to the finished page
+        $latestattempt = $mod->get_latest_attempt();
+        if($latestattempt){
+
+            ///final score
+            $data['hasscore'] = true;
+            $data['total'] = $latestattempt->totalgrade;
+
+            //total rating
+            [$totalyellowstars,$totalgraystars] = utils::get_stars($latestattempt->totalgrade);
+            $data['totalyellowstars'] = $totalyellowstars;
+            $data['totalgraystars'] = $totalgraystars;
+
+            //each steps rating
+            $ratingitems=[];
+            for($x=1;$x<6;$x++){
+                $practicetype = $mod->get_mod()->{'step' . $x .'practicetype'};
+                if((int)$practicetype!==\mod_wordcards_module::PRACTICETYPE_NONE){
+                    $ratingitem=new \stdClass();
+                    $ratingitem->grade=$latestattempt->{"grade" . $x};
+                    $ratingitem->icon= utils::fetch_activity_tabicon($practicetype);
+                    $ratingitem->title= utils::get_practicetype_label($practicetype);
+                    [$yellowstars,$graystars] = utils::get_stars($ratingitem->grade);
+                    $ratingitem->yellowstars = $yellowstars;
+                    $ratingitem->graystars = $graystars;
+                    $ratingitems[]=$ratingitem;
+                }
+            }
+            $data['ratingitems']=$ratingitems;
+        }
+
+
+
         return $this->render_from_template('mod_wordcards/finish_page', $data);
     }
 
@@ -262,7 +303,7 @@ class renderer extends \plugin_renderer_base {
 
 
 
-    public function speechcards_page(\mod_wordcards_module $mod, $wordpool, $currentstep){
+    public function speechcards_page(\mod_wordcards_module $mod, array $definitions, bool $isfreemode, $currentstep = ''){
         global $CFG,$USER;
 
         //get state
@@ -295,14 +336,6 @@ class renderer extends \plugin_renderer_base {
         $nextstep = $mod->get_next_step($currentstep);
         $nexturl =  (new \moodle_url('/mod/wordcards/activity.php', ['id' => $mod->get_cmid(),'oldstep'=>$currentstep,'nextstep'=>$nextstep]))->out(true);
 
-        //if we are in review state, we use different words and the next page is a finish page
-        if($wordpool == \mod_wordcards_module::WORDPOOL_REVIEW) {
-            $definitions = $mod->get_review_terms($currentstep);
-        }else{
-            $definitions = $mod->get_learn_terms($currentstep);
-
-        }
-
         //make sure each definition has a voice
         foreach($definitions as $def){
             if($def->ttsvoice=='Auto' || $def->ttsvoice==''){
@@ -314,7 +347,7 @@ class renderer extends \plugin_renderer_base {
         $opts_html = \html_writer::tag('input', '', array('id' => $widgetid, 'type' => 'hidden', 'value' => $jsonstring));
 
 
-        $opts=array('widgetid'=>$widgetid,'dryRun'=> $mod->can_manage(),'nexturl'=>$nexturl);
+        $opts=array('widgetid'=>$widgetid, 'dryRun'=> $mod->can_manage() && !$isfreemode, 'nexturl'=>$nexturl);
         $opts['language']=$mod->get_mod()->ttslanguage;
         $opts['region']=$region;
         $opts['token']=$token;
@@ -387,9 +420,9 @@ class renderer extends \plugin_renderer_base {
 
         //if we are in review state, we use different words and the next page is a finish page
         if($wordpool == \mod_wordcards_module::WORDPOOL_REVIEW) {
-            $definitions = $mod->get_review_terms($currentstep);
+            $definitions = $mod->get_review_terms($mod->fetch_step_termcount($currentstep));
         }else{
-            $definitions = $mod->get_learn_terms($currentstep);
+            $definitions = $mod->get_learn_terms($mod->fetch_step_termcount($currentstep));
         }
 
         //make sure each definition has a voice
@@ -405,7 +438,6 @@ class renderer extends \plugin_renderer_base {
                 'congrats' => get_string('congrats', 'mod_wordcards'),
                 'definitionsjson' => json_encode(array_values($definitions)),
                 'finishscatterin' => get_string('finishscatterin', 'mod_wordcards'),
-                'finishedstepmsg' => $mod->get_finishedstepmsg(),
                 'modid' => $mod->get_id(),
                 'isglobalcompleted' => $state == \mod_wordcards_module::STATE_END,
                 'hascontinue' => $state != \mod_wordcards_module::STATE_END,
@@ -446,7 +478,8 @@ class renderer extends \plugin_renderer_base {
         }, $tabtree->subtree);
 
         $data = [
-            'tabs' => $tabs
+            'tabs' => $tabs,
+            'cmid' => $mod->get_cmid()
         ];
         return $this->render_from_template('mod_wordcards/student_navigation', $data);
     }
@@ -479,7 +512,7 @@ class renderer extends \plugin_renderer_base {
     /**
      * Show error (but when?)
      */
-    public function word_wizard($mod,$cm, $lexicalauser, $lexicalapass){
+    public function word_wizard($mod,$cm){
         //lexicala uses 2 char lang codes
         $langterm =  substr($mod->get_mod()->ttslanguage,0,2);
         $langdefs= utils::get_rcdic_langs($mod->get_mod()->deflanguage);//utils::get_lexicala_langs($mod->get_mod()->deflanguage);
@@ -489,10 +522,42 @@ class renderer extends \plugin_renderer_base {
             'cmid' =>$cm->id,
             'langterm' =>$langterm,
             'langdefs'=>$langdefs,
-            'lexicalauser'=>$lexicalauser,
-            'lexicalapass'=>$lexicalapass
+            //'lexicalauser'=>$lexicalauser,
+           // 'lexicalapass'=>$lexicalapass
         ];
         return $this->render_from_template('mod_wordcards/word_wizard', $data);
+    }
+
+    /**
+     * Depending on wordpool etc, get page title.
+     * @param int $practicetype
+     * @param int $wordpool
+     * @return string
+     * @throws \coding_exception
+     */
+    public function page_heading(int $practicetype, int $wordpool): string {
+        // First practice type.
+        if($practicetype !== \mod_wordcards_module::PRACTICETYPE_NONE) {
+            $practicetypeoptions = utils::get_practicetype_options();
+            $pagetitle = isset($practicetypeoptions[$practicetype]) ? $practicetypeoptions[$practicetype] : '';
+        }else{
+            $pagetitle = get_string('introduction',constants::M_COMPONENT);
+        }
+        // Then wordpool.
+        $wordpoolstring = $this->get_wordpool_string($wordpool);
+        if ($wordpoolstring) {
+            $pagetitle = $pagetitle . ' (' . $wordpoolstring . ')';
+        }
+        return $pagetitle;
+    }
+
+    public function get_wordpool_string(int $wordpoolid) {
+        $wordpoolstringkeys = [
+            \mod_wordcards_module::WORDPOOL_LEARN => 'learnactivity',
+            \mod_wordcards_module::WORDPOOL_REVIEW => 'seenwords',
+            \mod_wordcards_module::WORDPOOL_MY_WORDS => 'mywords'
+        ];
+        return isset($wordpoolstringkeys[$wordpoolid]) ? get_string($wordpoolstringkeys[$wordpoolid], 'mod_wordcards') : '';
     }
 
 }

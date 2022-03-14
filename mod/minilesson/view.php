@@ -154,7 +154,7 @@ if($hasopenclosedates){
 }
 
 if($latestattempt->status==constants::M_STATE_COMPLETE){
-    echo $renderer->show_finished_results($comp_test,$latestattempt, $canattempt);
+    echo $renderer->show_finished_results($comp_test,$latestattempt,$cm, $canattempt);
 }else if($itemcount > 0) {
     echo $renderer->show_quiz($comp_test);
     $previewid=0;

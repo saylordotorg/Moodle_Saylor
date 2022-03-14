@@ -78,6 +78,7 @@ const TEXTDESCR_FILEAREA = 'itemarea';
 
 const M_FILEAREA_SUBMISSIONS='submission';
 const M_FILEAREA_TOPICMEDIA='topicmedia';
+const M_FILEAREA_MODELMEDIA='modelmedia';
 
 const AUDIOPROMPT_FILEAREA = 'audioitem';
 const AUDIOANSWER_FILEAREA = 'audioanswer';
@@ -146,6 +147,11 @@ const M_LANG_RURU ='ru-RU';
 const M_LANG_TAIN ='ta-IN';
 const M_LANG_TEIN ='te-IN';
 const M_LANG_TRTR ='tr-TR';
+
+const M_LANG_NBNO ='nb-NO';
+const M_LANG_PLPL ='pl-PL';
+const M_LANG_RORO ='ro-RO';
+const M_LANG_SVSE ='sv-SE';
 
 const M_HIDDEN_PLAYER = 'mod_solo_hidden_player';
 const M_HIDDEN_PLAYER_BUTTON = 'mod_solo_hidden_player_button';

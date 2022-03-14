@@ -27,8 +27,12 @@ const CLOUDPOODLL = 'https://cloud.poodll.com';
 const M_FRONTFACEFLIP_DEF = 0;
 const M_FRONTFACEFLIP_TERM = 1;
 
-const MODE_SEQUENTIAL = 0;
+const M_LC_TERMTERM = 0;
+const M_LC_TERMDEF = 1;
+
+const MODE_STEPS = 0;
 const MODE_FREE = 1;
+const MODE_STEPSTHENFREE =2;
 
 
 //grading options
@@ -73,12 +77,20 @@ const M_LANG_TAIN ='ta-IN';
 const M_LANG_TEIN ='te-IN';
 const M_LANG_TRTR ='tr-TR';
 
+const M_LANG_NBNO ='nb-NO';
+const M_LANG_PLPL ='pl-PL';
+const M_LANG_RORO ='ro-RO';
+const M_LANG_SVSE ='sv-SE';
+
 const TRANSCRIBER_NONE = 0;
 const TRANSCRIBER_AUTO = 1;
 const TRANSCRIBER_POODLL = 2;
 
 const M_USE_DATATABLES=0;
 const M_USE_PAGEDTABLES=1;
+
+const M_NEURALVOICES = array("Amy","Emma","Brian","Olivia","Aria","Ayanda","Ivy","Joanna","Kendra","Kimberly",
+        "Salli","Joey","Justin","Kevin","Matthew","Camila","Lupe", "Gabrielle", "Vicki", "Seoyeon","Takumi","lucia");
 
 
 }

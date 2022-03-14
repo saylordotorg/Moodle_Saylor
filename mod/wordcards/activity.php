@@ -30,8 +30,13 @@ require_login($course, true, $cm);
 $mod->require_view();
 
 //create a new attempt and set it to STATE_TERMS (which should be bumped up to STATE_STEP1 shortly after)
-if($mod->can_attempt() && $reattempt){
-    $mod->create_reattempt();
+if($mod->can_attempt()){
+    if($reattempt) {
+        $mod->create_reattempt();
+    }else{
+        //if its a first attempt mark all terms as seen
+        $mod->mark_terms_as_seen();
+    }
 }
 
 //fetch current step
@@ -44,11 +49,14 @@ $isteacher = ($mod->can_manage() || $mod->can_viewreports());
 //must be not a reattempt (url fiddling by someone) and not on END or TERM. But a teacher is always on END so we let teachers through
 //because they may be in "switch role to student" mode
 // There is an issue currently, if a user is on their first attempt and "quits" their latest stare will be terms and since all terms are seen
-// they wil "resume" to step 1. First attempt users can not quit basically 2021-12-02
+// they wil "resume" to step 1. First attempt users can not quit basically 2021-12-02 -> see attempted fix below
 if(!$reattempt
     && $cancelattempt
-    && ($currentstate!==mod_wordcards_module::STATE_END  && $currentstate!== mod_wordcards_module::STATE_TERMS)
+    //&& ($currentstate!==mod_wordcards_module::STATE_END  && $currentstate!== mod_wordcards_module::STATE_TERMS)
+    //is this OK 2022.03.07?
+    && ($currentstate!==mod_wordcards_module::STATE_END)
     ){
+
     $mod->remove_attempt();
     redirect(new moodle_url('/mod/wordcards/view.php', ['id' => $cm->id]));
 }
@@ -74,7 +82,8 @@ if($currentstep==mod_wordcards_module::STATE_END) {
     redirect(new moodle_url('/mod/wordcards/finish.php', ['id' => $cm->id, 'sesskey'=>sesskey()]));
 }
 
-//redirect to finished if this state end
+
+//do we need this anymore?
 if($currentstep==mod_wordcards_module::STATE_TERMS) {
     redirect(new moodle_url('/mod/wordcards/view.php', ['id' => $cm->id]));
 }
@@ -119,7 +128,7 @@ if($config->enablesetuptab){
 }
 
 //load glide
-$PAGE->requires->css(new moodle_url('https://cdn.jsdelivr.net/npm/glidejs@2.1.0/dist/css/glide.core.min.css'));
+//$PAGE->requires->css(new moodle_url('https://cdn.jsdelivr.net/npm/glidejs@2.1.0/dist/css/glide.core.min.css'));
 //load google font never works ... why?
 //$PAGE->requires->css(new moodle_url('https//fonts.googleapis.com/css2',array('family'=>'Orbitron','display'=>'swap')));
 
@@ -135,6 +144,29 @@ if (!empty($mod->get_mod()->intro)) {
 }
 
 echo $renderer->navigation($mod, $currentstep);
+//get wordpool
+switch ($practicetype){
+
+    case mod_wordcards_module::PRACTICETYPE_MATCHSELECT:
+    case mod_wordcards_module::PRACTICETYPE_MATCHTYPE:
+    case mod_wordcards_module::PRACTICETYPE_DICTATION:
+    case mod_wordcards_module::PRACTICETYPE_LISTENCHOOSE:
+    case mod_wordcards_module::PRACTICETYPE_SPEECHCARDS:
+    case mod_wordcards_module::PRACTICETYPE_SCATTER:
+        $definitions = $mod->get_learn_terms($mod->fetch_step_termcount($currentstep));
+        break;
+
+    case mod_wordcards_module::PRACTICETYPE_MATCHSELECT_REV:
+    case mod_wordcards_module::PRACTICETYPE_MATCHTYPE_REV:
+    case mod_wordcards_module::PRACTICETYPE_DICTATION_REV:
+    case mod_wordcards_module::PRACTICETYPE_LISTENCHOOSE_REV:
+    case mod_wordcards_module::PRACTICETYPE_SPEECHCARDS_REV:
+    case mod_wordcards_module::PRACTICETYPE_SCATTER_REV:
+    default:
+        $definitions = $mod->get_review_terms($mod->fetch_step_termcount($currentstep));
+        break;
+
+}
 switch ($practicetype){
 
     case mod_wordcards_module::PRACTICETYPE_MATCHSELECT:
@@ -145,12 +177,12 @@ switch ($practicetype){
     case mod_wordcards_module::PRACTICETYPE_MATCHTYPE_REV:
     case mod_wordcards_module::PRACTICETYPE_DICTATION_REV:
     case mod_wordcards_module::PRACTICETYPE_LISTENCHOOSE_REV:
-        echo $renderer->a4e_page($mod, $practicetype, $wordpool, $currentstep);
+        echo $renderer->a4e_page($mod, $practicetype, $definitions, false, $currentstep);
         break;
 
     case mod_wordcards_module::PRACTICETYPE_SPEECHCARDS:
     case mod_wordcards_module::PRACTICETYPE_SPEECHCARDS_REV:
-        echo $renderer->speechcards_page($mod, $wordpool,$currentstep);
+        echo $renderer->speechcards_page($mod, $definitions, false, $currentstep);
         break;
     //no longer using this
     case mod_wordcards_module::PRACTICETYPE_SCATTER:
@@ -159,4 +191,12 @@ switch ($practicetype){
         echo $renderer->scatter_page($mod, $wordpool,$currentstep);
 }
 echo $renderer->cancel_attempt_button($mod);
+
+// Add the ids of all terms in my words pool to the page markup so that JS can see them.
+$mywordspool = new \mod_wordcards\my_words_pool($course->id);
+echo html_writer::div(
+    '','',
+    ['id' => "my-words-ids", 'data-my-words-term-ids' => json_encode(array_keys($mywordspool->get_words()))]
+);
+
 echo $renderer->footer();

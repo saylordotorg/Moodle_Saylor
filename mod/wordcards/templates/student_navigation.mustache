@@ -37,4 +37,11 @@
             </div>
         {{/inactive}}
     {{/tabs}}
+    {{#freemodeavailable}}
+        <a href="{{config.wwwroot}}/mod/wordcards/freemode.php?id={{cmid}}" class="btn btn-primary pull-right">
+            <i class='fa fa-random mr-1'></i>
+            {{#str}}freemode, mod_wordcards{{/str}}
+        </a>
+    {{/freemodeavailable}}
+
 </div>

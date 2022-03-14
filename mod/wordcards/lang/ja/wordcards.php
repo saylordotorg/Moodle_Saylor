@@ -43,7 +43,6 @@ $string['markasseen'] = '「チェック」をする';
 $string['modulename'] = 'Wordcards';
 $string['modulename_help'] = 'Wordcardsは単語・用語を暗記するアクティビティです。すでに習った単語の復習活動がふくめています。';
 $string['modulenameplural'] = 'Wordcards';
-$string['mustseealltocontinue'] = '全ての用語を「チェック」して進みましょう。';
 $string['name'] = 'Name';
 $string['nodefinitions'] = '用語はまだ入れていません。';
 $string['noteaboutseenforteachers'] = //'注意: 生徒の進捗のみは記録されます.';

@@ -30,105 +30,61 @@ define(['jquery', 'core/ajax', 'core/notification','core/modal_factory','core/st
 			var ef = $(".event_flashcards");
 			var eg = $(".event_grid");
 
-			$('.ProgressBar-step').on('click', function () {
-				if ($(this).hasClass("is-current")) {
-					return false;
-				}
-				$('.ProgressBar-step').removeClass("is-current").removeClass('is-complete');
-				$(this).addClass("is-current");
-				var str = $(this).index();
-				if (str > 0) {
-					for (var i = 0; i <= str; i++) {
-						$('.ProgressBar')
-							.find('li:eq(' + i + ')')
-							.addClass('is-complete');
-					}
-				}
-				$('.definition_flashcards_ul li').slideUp(300);
-				$('.definition_flashcards_ul')
-					.find('li:eq(' + str + ')')
-					.slideDown(300);
-				$('.is-current').removeClass('is-complete');
-				check_prev_level();
-				check_next_level();
-
-			});
-			
-			if (window.matchMedia("(max-width: 767px)").matches) {
-
-				var definition_flashcards_ul = $('.definition_flashcards_ul li').length;
-				$('.wrapper_pr').append('<div class="mb_nav"><span class="curr_level_card">1</span> / <span class="tot_level_card">' + definition_flashcards_ul + '</span></div>');
-				$('.ProgressBar').hide();
-			}
+			var totalcards = $('.definition_flashcards_ul li').length;
 			$(".definition_flashcards_ul li:gt(0)").hide();
-			var $bar = $(".ProgressBar");
-			$bar.children("li:first").addClass('is-current');
-			check_prev_level();
-			check_next_level();
+            //set the first card as is_current
+            $(".definition_flashcards_ul li:first").addClass('is-current');
+			set_progress_info(1,totalcards);
+
 			ef.click(function (d) {
 				d.preventDefault();
-				$('.definition_flashcards').show();
-				$('.definition_grid').hide();
+				$('.definition_flashcards').fadeIn();
+				$('.definition_grid').fadeOut();
+				ef.addClass('btn-primary').removeClass('btn-outline-primary')
+				eg.removeClass('btn-primary').addClass('btn-outline-primary')
 			});
 			eg.click(function (d) {
 				d.preventDefault();
-				$('.definition_flashcards').hide();
-				$('.definition_grid').show();
+				$('.definition_flashcards').fadeOut();
+				$('.definition_grid').fadeIn();
+				eg.addClass('btn-primary').removeClass('btn-outline-primary')
+				ef.removeClass('btn-primary').addClass('btn-outline-primary')
 			});
 
-			function check_prev_level() {
 
-				var $bar = $(".ProgressBar");
-				if ($bar.children("li:first").hasClass('is-current') === true) {
-					$('#Prev').attr('disabled', 'disabled').addClass('add_opacity_level');
-					return true;
-				}
-
-				$('#Prev').removeAttr('disabled');
-				$('#Prev').removeAttr('disabled').removeClass('add_opacity_level');
-			}
 
 			$('#Next').click(function () {
 				var cr_index = $(".is-current").index() + 1;
+                if(cr_index > (totalcards-1)){cr_index=0;}
 				$('.definition_flashcards_ul li').slideUp(300);
+                $('.definition_flashcards_ul li').removeClass("is-current");
+                $('.definition_flashcards_ul li:eq(' + cr_index + ')').addClass("is-current");
 				$('.definition_flashcards_ul li:eq(' + cr_index + ')').slideDown(300);
-				var curr_level_card = $('.curr_level_card').html();
-				$('.curr_level_card').html(parseInt(curr_level_card) + 1);
 
-				var $bar = $(".ProgressBar");
-				if ($bar.children(".is-current").length > 0) {
-					$bar.children(".is-current").removeClass("is-current").addClass("is-complete").next().addClass("is-current");
-				} else {
-					$bar.children().first().addClass("is-current");
-				}
-				check_prev_level();
-				check_next_level();
+				//var curr_level_card = $('.curr_level_card').html();
+				//$('.curr_level_card').html(parseInt(curr_level_card) + 1);
+
+				set_progress_info(cr_index + 1,totalcards);
+
 			});
 
 			$('#Prev').click(function () {
 				var cr_index = $(".is-current").index() - 1;
+                if(cr_index <0){cr_index=(totalcards-1);}
 				$('.definition_flashcards_ul li').slideUp(300);
+                $('.definition_flashcards_ul li').removeClass("is-current");
+                $('.definition_flashcards_ul li:eq(' + cr_index + ')').addClass("is-current");
 				$('.definition_flashcards_ul li:eq(' + cr_index + ')').slideDown(300);
 				var curr_level_card = $('.curr_level_card').html();
 				$('.curr_level_card').html(parseInt(curr_level_card) - 1);
-				var $bar = $(".ProgressBar");
-				if ($bar.children(".is-current").length > 0) {
-					$bar.children(".is-current").removeClass("is-current").prev().removeClass("is-complete").addClass("is-current");
-				} else {
-					$bar.children(".is-complete").last().removeClass("is-complete").addClass("is-current");
-				}
-				check_prev_level();
-				check_next_level();
+				set_progress_info(cr_index + 1 ,totalcards);
+
 			});
 
-			function check_next_level() {
-				var $bar = $(".ProgressBar");
-				if ($bar.children("li:last").hasClass('is-current') === true) {
-					$('#Next').attr('disabled', 'disabled').addClass('add_opacity_level');
-					return true;
-				}
-				$('#Next').removeAttr('disabled').removeClass('add_opacity_level');
+			function set_progress_info(index,total) {
+				$(".definition_flashcards .wc_cardsprogress").text(index + ' / ' + total);
 			}
+
 			/* flashcards code end */
       var container = $('#definitions-page-' + opts['widgetid']),
         modid = props.modid,
@@ -139,10 +95,6 @@ define(['jquery', 'core/ajax', 'core/notification','core/modal_factory','core/st
        //set up audio
        a4e.register_events();
        a4e.init_audio(props.token,props.region,props.owner);
-
-      function seenAll() {
-        return container.find('.term').length === container.find('.term.term-seen').length
-      }
 
       container.on('click', '.term-seen-action', function(e) {
         e.preventDefault();
@@ -173,16 +125,9 @@ define(['jquery', 'core/ajax', 'core/notification','core/modal_factory','core/st
           .always(function() {
           	//remove loading from  node which loading was applied to
             termNode.removeClass('term-loading');
-            if (seenAll()) {
-              btn.prop('disabled', false);
-            }
+
           });
       });
-
-      // Teachers can jump to the next steps.
-      if (!seenAll() && !canmanage) {
-        btn.prop('disabled', true);
-      }
 
       btn.click(function(e) {
         e.preventDefault();

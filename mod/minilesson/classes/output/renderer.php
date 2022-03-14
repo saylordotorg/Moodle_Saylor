@@ -230,7 +230,7 @@ class renderer extends \plugin_renderer_base {
     /**
      *  Finished View
      */
-    public function show_finished_results($comp_test, $latestattempt, $canattempt){
+    public function show_finished_results($comp_test, $latestattempt,$cm, $canattempt){
         global $CFG, $DB;
         $ans = array();
         //quiz data
@@ -339,7 +339,8 @@ class renderer extends \plugin_renderer_base {
         $tdata->graystars = array_fill(0, $gstar_cnt, true);
 
         $tdata->total = $latestattempt->sessionscore;
-        $tdata->courseurl = $CFG->wwwroot . '/course/view.php?id=' . $latestattempt->courseid;
+        $tdata->courseurl = $CFG->wwwroot . '/course/view.php?id=' .
+            $latestattempt->courseid . '#section-'. ($cm->section-1);
         $tdata->results=$useresults;
         //output reattempt button
         if($canattempt){
@@ -505,7 +506,9 @@ class renderer extends \plugin_renderer_base {
         $recopts['ds_only']=$moduleinstance->transcriber==constants::TRANSCRIBER_POODLL;
 
 
-        $recopts['courseurl']=$CFG->wwwroot . '/course/view.php?id=' . $moduleinstance->course ;
+        $recopts['courseurl']=$CFG->wwwroot . '/course/view.php?id=' .
+            $moduleinstance->course  . '#section-'. ($cm->section-1);
+
         //the activity URL for returning to on finished
         $activityurl = new \moodle_url(constants::M_URL . '/view.php',
             array('n' => $moduleinstance->id));

@@ -10,11 +10,13 @@
 .path-mod-wordcards .term-wrapper {
     width: 32%;
     display: inline-block;
-    border: 1px solid #eee;
+    border: 1px solid #ccc;
     margin-right: 1%;
     border-radius: 3px;
     margin-bottom: 10px;
     float: left;
+    box-shadow:  0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    padding: 5px;
 }
 
 /* Remove the margin at the end of each 'row'. */
@@ -45,7 +47,6 @@
 
 .path-mod-wordcards .term-header  {
     font-weight: bold;
-    padding-right: 25px;
     border-bottom: 1px solid #ccc;
     /* Separator between title and body. */
     padding-bottom: 10px;
@@ -735,7 +736,6 @@
 
 #try-again-or-next {
     height: 48px;
-    border: 1px solid black;
     margin-bottom: 50px;
 }
 
@@ -923,7 +923,7 @@
 }
 
 ul.definition_flashcards_ul {
-    border: 2px solid #546f1f;
+   /*border: 2px solid #546f1f; */
     padding: 8px;
 }
 .df_fl_control button:focus {
@@ -957,13 +957,6 @@ ul.definition_flashcards_ul {
 	height: 180px;
 }
 
-.wordcards_display_options {
-   float: right;
-}
-.wordcards_display_option {
-   cursor: pointer;
-   padding: 8px;
-}
 .wordcards_importintro {
     max-width: 1200px;
     margin: 10px;
@@ -999,4 +992,51 @@ ul.definition_flashcards_ul {
 .mod_wordcards_ww_fieldset {
     margin: 20px;
     padding: 10px;
+}
+a.wordcards-my-words-action.btn-outline-primary i.fa-check,
+a.wordcards-my-words-action.disabled i.fa-check {
+    /*If the btn-outline-primary class is applied so the button is in the "Add" state (show plus icon only). */
+    display: none;
+}
+a.wordcards-my-words-action.btn-primary i.fa-plus,
+a.wordcards-my-words-action.disabled i.fa-plus {
+    /*In this case the btn-outline-primary class is applied so the button is in the "Remove" state (show check icon only). */
+    display: none;
+}
+a.wordcards-my-words-action i.fa-spinner {
+    display: none;
+}
+a.wordcards-my-words-action.disabled i.fa-spinner{
+    display: inline-block;
+}
+.btn.wordcards-my-words-action {
+    font-weight: normal;
+    font-size: 0.7em;
+    padding: 0 5px 0 5px;
+    border-radius: 3px;
+    margin-left: 5px;
+}
+.mod_wordcards_freemode #results-inner .wordcards-my-words-action.btn.btn-primary,
+.mod_wordcards_freemode #results-inner .wordcards-my-words-action.btn.btn-outline-primary {
+    margin-top: 3px;
+}
+.mod_wordcards_item_rating {
+
+    margin-top:12px;
+}
+
+.wordcards_actionbutton a.btn {
+    min-width: 150px;
+    margin-top:8px;
+}
+
+@media screen and (max-width:480px) {
+    .mod_wordcards_step_rating img {
+        max-width: 100%;
+    }
+}
+@media screen and (max-width:922px){
+    .mod_wordcards_step_rating img {
+        max-width: 16px;
+    }
 }
