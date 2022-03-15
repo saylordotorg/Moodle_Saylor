@@ -18,7 +18,8 @@
  * Unit tests for the coursecompleted condition.
  *
  * @package   availability_coursecompleted
- * @copyright 2021 Renaat Debleu <info@eWallah.net>
+ * @copyright 2022 iplusacademy (www.iplusacademy.org)
+ * @author    Renaat Debleu <info@eWallah.net>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -27,13 +28,4 @@ defined('MOODLE_INTERNAL') || die();
 return new class extends phpunit_coverage_info {
     /** @var array The list of folders relative to the plugin root to include in coverage generation. */
     protected $includelistfolders = ['classes'];
-
-    /** @var array The list of files relative to the plugin root to include in coverage generation. */
-    protected $includelistfiles = [];
-
-    /** @var array The list of folders relative to the plugin root to exclude from coverage generation. */
-    protected $excludelistfolders = [];
-
-    /** @var array The list of files relative to the plugin root to exclude from coverage generation. */
-    protected $excludelistfiles = [];
 };

@@ -3,6 +3,7 @@ History
 Version 3.11.1.1 - TBR
 =============================
  1. Fix maturity information not showing in information site setting.
+ 2. Fix 'PHP8.0 Compatibility issue when switching to Grid format' - #157.
 
 Version 3.11.1.1 - 17/01/2022
 =============================
