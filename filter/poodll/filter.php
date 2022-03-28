@@ -475,6 +475,18 @@ class filter_poodll extends moodle_text_filter {
         if (strpos($poodlltemplate . ' ' . $dataset_vars . ' ' . $alternate_content . ' ' . $js_custom_script, '@@COURSE:') !==
                 false) {
             $coursevars = get_object_vars($COURSE);
+            //custom fields
+            if(class_exists('\core_customfield\handler')) {
+                $handler = \core_customfield\handler::get_handler('core_course', 'course');
+                $customfields = $handler->get_instance_data($filterprops['courseid']);
+                foreach ($customfields as $customfield) {
+                    if (empty($customfield->get_value())) {
+                        continue;
+                    }
+                    $shortname = $customfield->get_field()->get('shortname');
+                    $coursevars[$shortname] = $customfield->get_value();
+                }
+            }
             $coursepropstubs = explode('@@COURSE:', $poodlltemplate);
             $d_stubs = explode('@@COURSE:', $dataset_vars);
             if ($d_stubs) {

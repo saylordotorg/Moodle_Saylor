@@ -33,7 +33,7 @@ const M_ITEMS_CONT= 'mod_minilesson_items_cont';
 const M_ITEMS_TABLE= 'mod_minilesson_qpanel';
 
 const M_NEURALVOICES = array("Amy","Emma","Brian","Olivia","Aria","Ayanda","Ivy","Joanna","Kendra","Kimberly",
-        "Salli","Joey","Justin","Kevin","Matthew","Camila","Lupe", "Gabrielle", "Vicki", "Seoyeon","Takumi", "Lucia");
+        "Salli","Joey","Justin","Kevin","Matthew","Camila","Lupe", "Gabrielle", "Vicki", "Seoyeon","Takumi", "Lucia","Lea","Bianca");
 
 
 //grading options
@@ -80,6 +80,13 @@ const TTSQUESTION = 'itemtts';
 const TTSQUESTIONVOICE = 'itemttsvoice';
 const TTSQUESTIONOPTION = 'itemttsoption';
 const TTSAUTOPLAY = 'itemttsautoplay';
+const TTSDIALOG = 'itemttsdialog';
+
+const TTSDIALOGVOICEA = 'itemttsdialogvoicea';
+const TTSDIALOGVOICEB = 'itemttsdialogvoiceb';
+const TTSDIALOGVOICEC = 'itemttsdialogvoicec';
+const TTSDIALOGVISIBLE = 'itemttsdialogvisible';
+
 const MEDIAQUESTION = 'itemmedia';
 const QUESTIONTEXTAREA = 'itemtextarea';
 const YTVIDEOID = 'itemytid';

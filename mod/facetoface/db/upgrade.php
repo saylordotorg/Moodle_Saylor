@@ -45,20 +45,16 @@ function facetoface_send_admin_upgrade_msg($data) {
     }
 
     $table = new html_table();
-    $table->head = array('Custom field ID',
-                         'Custom field original shortname',
-                         'Custom field new shortname');
+    $table->head = array(get_string('customfieldid', 'mod_facetoface'),
+                         get_string('customfieldoriginalshortname', 'mod_facetoface'),
+                         get_string('customfieldnewshortname', 'mod_facetoface'));
     $table->data = $data;
     $table->align = array ('center', 'center', 'center');
 
-    $title    = "$SITE->fullname: Face to Face upgrade info";
-    $note = 'During the last site upgrade the face-to-face module has been modified. It now
-requires session custom fields to have unique shortnames. Since some of your
-custom fields had duplicate shortnames, they have been renamed to remove
-duplicates (see table below). This could impact on your email messages if you
-reference those custom fields in the message templates.';
+    $title = get_string('upgradeinfofacetoface', 'mod_facetoface', $SITE->fullname);
+    $note = get_string('noteinfo', 'mod_facetoface');
 
-    $message  = html_writer::start_tag('html');
+    $message = html_writer::start_tag('html');
     $message .= html_writer::start_tag('head') . html_writer::tag('title', $title) . html_writer::end_tag('head');
     $message .= html_writer::start_tag('body');
     $message .= html_writer::tag('p', $note) . html_writer::table($table, true);
@@ -745,6 +741,21 @@ function xmldb_facetoface_upgrade($oldversion=0) {
 
         // Facetoface savepoint reached.
         upgrade_mod_savepoint(true, 2017053000, 'facetoface');
+    }
+
+    if ($oldversion < 2021113001) {
+
+        // Define field confirmationmessageformat to be added to facetoface.
+        $table = new xmldb_table('facetoface');
+        $field = new xmldb_field('confirmationmessageformat', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'confirmationmessage');
+
+        // Conditionally launch add field confirmationmessageformat.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Facetoface savepoint reached.
+        upgrade_mod_savepoint(true, 2021113001, 'facetoface');
     }
 
     return $result;

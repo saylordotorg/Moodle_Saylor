@@ -544,6 +544,13 @@ $string['itemytstart'] = "Start Secs";
 $string['itemytend'] = "End Secs";
 $string['itemscomplete'] = "Items Complete";
 
+$string['ttsdialog'] = "TTS Dialog";
+$string['ttsdialogvoicea'] = "Voice A";
+$string['ttsdialogvoiceb'] = "Voice B";
+$string['ttsdialogvoicec'] = "Voice C";
+$string['ttsdialogvisible'] = "Dialog Visible";
+$string['ttsdialogvisible_desc'] = "Uncheck if the students should not see the dialog text.";
+$string['addttsdialog'] = "Add TTS Dialog";
 
 $string['totalscore'] = 'Total Score:';
 $string['score'] = 'Score';

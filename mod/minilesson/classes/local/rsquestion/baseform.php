@@ -177,6 +177,7 @@ abstract class baseform extends \moodleform {
                 $togglearray[] =& $mform->createElement('advcheckbox','addttsaudio',get_string('addttsaudio',constants::M_COMPONENT),'');
                 $togglearray[] =& $mform->createElement('advcheckbox','addtextarea',get_string('addtextarea',constants::M_COMPONENT),'');
                 $togglearray[] =& $mform->createElement('advcheckbox','addyoutubeclip',get_string('addyoutubeclip',constants::M_COMPONENT),'');
+                $togglearray[] =& $mform->createElement('advcheckbox','addttsdialog',get_string('addttsdialog',constants::M_COMPONENT),'');
                 $mform->addGroup($togglearray, 'togglearray', get_string('mediaprompts', constants::M_COMPONENT), array(' '), false);
                 //in the case of page we assume they will want to use some media
                 if($this->type== constants::TYPE_PAGE) {
@@ -257,6 +258,30 @@ abstract class baseform extends \moodleform {
                 $mform->hideIf('ytarray', 'addyoutubeclip', 'neq', 1);
             }else {
                 $mform->disabledIf('ytarray', 'addyoutubeclip', 'neq', 1);
+            }
+
+            //Question TTS Dialog
+            $this->add_voiceselect(constants::TTSDIALOGVOICEA,get_string('ttsdialogvoicea',constants::M_COMPONENT));
+            $this->add_voiceselect(constants::TTSDIALOGVOICEB,get_string('ttsdialogvoiceb',constants::M_COMPONENT));
+            $this->add_voiceselect(constants::TTSDIALOGVOICEC,get_string('ttsdialogvoicec',constants::M_COMPONENT));
+            $mform->addElement('textarea', constants::TTSDIALOG, get_string('ttsdialog', constants::M_COMPONENT), array('wrap'=>'virtual','style'=>'width: 100%;'));
+            $mform->setType(constants::TTSDIALOG, PARAM_RAW);
+            $mform->addElement('advcheckbox',constants::TTSDIALOGVISIBLE,get_string('ttsdialogvisible',constants::M_COMPONENT),get_string('ttsdialogvisible_desc', constants::M_COMPONENT));
+            $mform->setDefault(constants::TTSDIALOGVISIBLE, 1);
+
+
+            if($m35){
+                $mform->hideIf(constants::TTSDIALOGVOICEA, 'addttsdialog', 'neq', 1);
+                $mform->hideIf(constants::TTSDIALOGVOICEB, 'addttsdialog', 'neq', 1);
+                $mform->hideIf(constants::TTSDIALOGVOICEC, 'addttsdialog', 'neq', 1);
+                $mform->hideIf(constants::TTSDIALOG, 'addttsdialog', 'neq', 1);
+                $mform->hideIf(constants::TTSDIALOGVISIBLE, 'addttsdialog', 'neq', 1);
+            }else {
+                $mform->disabledIf(constants::TTSDIALOGVOICEA, 'addttsdialog', 'neq', 1);
+                $mform->disabledIf(constants::TTSDIALOGVOICEB, 'addttsdialog', 'neq', 1);
+                $mform->disabledIf(constants::TTSDIALOGVOICEC, 'addttsdialog', 'neq', 1);
+                $mform->disabledIf(constants::TTSDIALOG, 'addttsdialog', 'neq', 1);
+                $mform->disabledIf(constants::TTSDIALOGVISIBLE, 'addttsdialog', 'neq', 1);
             }
         }
 

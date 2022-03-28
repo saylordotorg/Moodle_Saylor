@@ -1,5 +1,9 @@
 Change List
 =========
+Version 3.1.52 (Build 2022032400)
+- added custom course fields to filter variables
+- added highest month to usage report
+
 Version 3.1.51 (Build 2021122200)
 - added some more modern diagnostics
 - moved recorder order and some player settings from general to legacy

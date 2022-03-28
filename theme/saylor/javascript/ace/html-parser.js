@@ -45,7 +45,7 @@ async function monitorJsAreaChange(htmlParser) {
 require(['jquery'], function ($) {
     $(window).on('load', function() {
         // Check if a html-parser-wrapper is present.
-        if (document.getElementsByClassName("html-parser-wrapper").length > 0) {
+        if (document.getElementsByClassName("html-parser-wrapper").length > 0 && !(window.location.href.indexOf("/question/question.php") > -1)) {
             console.log("Detected a html-parser-wrapper, loading ACE.");
             require.config({paths: { "ace" : "/theme/saylor/javascript/ace/v1.4.13"}});
             require(['ace/ace'], function (ace) {

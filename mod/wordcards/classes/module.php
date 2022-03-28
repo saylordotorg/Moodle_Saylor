@@ -277,8 +277,12 @@ class mod_wordcards_module {
             return [];
         }
         shuffle($records);
-        $selected_records = array_slice($records, 0, $maxterms);
-        return self::insert_media_urls($selected_records);
+        if($maxterms>0) {
+            $selected_records = array_slice($records, 0, $maxterms);
+            return self::insert_media_urls($selected_records);
+        }else {
+            return self::insert_media_urls($records);
+        }
     }
 
     public function get_review_terms(int $maxterms) {
@@ -358,9 +362,13 @@ class mod_wordcards_module {
             return [];
         }
         shuffle($records);
-        $selected_records = array_slice($records, 0, $maxterms);
+        if($maxterms>0) {
+            $selected_records = array_slice($records, 0, $maxterms);
+            return self::insert_media_urls($selected_records);
+        }else{
+            return self::insert_media_urls($records);
+        }
 
-        return self::insert_media_urls($selected_records);
     }
 
     public function get_attempts() {

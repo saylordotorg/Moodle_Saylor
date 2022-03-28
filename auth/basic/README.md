@@ -6,8 +6,9 @@
 * [Branches](#branches)
 * [Installation](#installation)
 * [Logging out](#logging-out)
-* [Feedback and issues](#feedback-and-issues)
+* [Curl example](#curl-example)
 * [Master password feature](#master-password-feature)
+* [Feedback and issues](#feedback-and-issues)
 
 What is this?
 ========================
@@ -16,13 +17,13 @@ This is a moodle plugin which enables you to authenticate via HTTP basic auth.
 
 This is more for development and backend purposes and allows easier testing with tools such as webpage test, page speed, link checkers etc which often can use basic auth out of the box, but you don't want to attempt to customize them in order to handle moodle specific authentication, or try to, where Moodle API access is inappropriate.
 
-You would almost never want to use this for real human users as basic auth is a fairly terrible user expereince. It is designed to work side by side with your real moodle authentication but doesn't impact on normal authentication.
+You would almost never want to use this for real human users as basic auth is a fairly terrible user experience. It is designed to work side by side with your real moodle authentication but doesn't impact on normal authentication.
 
 Even in production this has value for use cases such as performance regression testing using a real user and a real page which does a full bootstrap.
 
 Unlike the core 'no authentication' plugin, this still requires real users and does proper password checks. It can be set to ignore the auth type against the account, eg manual, ldap, smtp so can be used side by side with other auth plugins, as long as those plugins store or cache the password, ie prevent_local_passwords() returns false for those plugins. So it can only be used with existing accounts and doesn't create accounts.
 
-There is a bonus features which is a 'master password' mode. This is defintely not for production use and you have to jump through some tiny hoops to turn it on so it can't be used accidentally. But when it's set up it enables you to not only log in as anyone with the same password, but also to randomly select who to log in as well. This makes it trivial to run things like simple 1-liner load tests using Apache Bench. See below for details.
+There is a bonus features which is a 'master password' mode. This is definitely not for production use and you have to jump through some tiny hoops to turn it on so it can't be used accidentally. But when it's set up it enables you to not only log in as anyone with the same password, but also to randomly select who to log in as well. This makes it trivial to run things like simple 1-liner load tests using Apache Bench. See below for details.
 
 
 From a security perspective this auth plugin is exactly as secure as the manual auth plugin, so this should only be used in conjuntion with https.
@@ -42,9 +43,9 @@ Installation
 
 1. Install the plugin the same as any standard moodle plugin either via the
 Moodle plugin directory, or you can use git to clone it into your source:
-
-     git clone git@github.com:catalyst/moodle-auth_basic.git auth/basic
-
+    ```php
+   git clone git@github.com:catalyst/moodle-auth_basic.git auth/basic
+    ```
     Or install via the Moodle plugin directory:
     
      https://moodle.org/plugins/auth_basic
@@ -132,4 +133,4 @@ Please raise any issues in github:
 
 https://github.com/catalyst/moodle-auth_basic/issues
 
-If you need anything urgently and would like to sponsor it's implemenation please email me: Brendan Heywood brendan@catalyst-au.net
+If you need anything urgently and would like to sponsor its implementation please email me: Brendan Heywood brendan@catalyst-au.net

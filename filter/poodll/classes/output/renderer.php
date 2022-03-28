@@ -74,12 +74,35 @@ class renderer extends \plugin_renderer_base implements renderable {
         $ninety_puser = 0;
         $thirty_puser = 0;
 
+        //monthlymax
+        $monthusertotals=[0,0,0,0,0,0,0,0,0,0,0,0];
+        $monthpusers=['','','','','','','','','','','',''];
+        $monthminutetotals=[0,0,0,0,0,0,0,0,0,0,0,0];
+        $monthrecordtotals=[0,0,0,0,0,0,0,0,0,0,0,0];
+        $monthaudiototals=[0,0,0,0,0,0,0,0,0,0,0,0];
+        $monthvideototals=[0,0,0,0,0,0,0,0,0,0,0,0];
+
         $plugin_types_arr = "[";
 
         if($usagedata->usersubs_details) {
             foreach ($usagedata->usersubs_details as $subdatadetails) {
 
                 $timecreated = $subdatadetails->timecreated;
+
+
+                for($x=0;$x<12;$x++){
+                    $upperdays=-1 * $x * 30 . ' days';
+                    $lowerdays=-1 * ($x+1) * 30 . ' days';
+                    if (($timecreated <= strtotime($upperdays)) && ($timecreated > strtotime($lowerdays) )) {
+                        $monthminutetotals[$x] = $monthminutetotals[$x] + ($subdatadetails->audio_min + $subdatadetails->video_min);
+                        $monthaudiototals[$x] = $monthaudiototals[$x] + $subdatadetails->audio_file_count;
+                        $monthvideototals[$x] = $monthvideototals[$x] + $subdatadetails->video_file_count;
+                        $monthrecordtotals[$x] = $monthrecordtotals[$x] + $subdatadetails->video_file_count + $subdatadetails->audio_file_count;
+                        $monthvideototals[$x] = $monthvideototals[$x] + $subdatadetails->video_min;
+                        $monthpusers[$x] = $monthpusers[$x] .= $subdatadetails->pusers;
+
+                    }
+                }
 
                 //if(($timecreated > strtotime('-180 days'))&&($timecreated <= strtotime('-365 days'))) {
                 if (($timecreated >= strtotime('-365 days'))) {
@@ -119,27 +142,44 @@ class renderer extends \plugin_renderer_base implements renderable {
             }//end of for loop
         }//end of if usagedata
 
+        //calc max month totals
+        $maxmonth_pusers = 0;
+        $maxmonth_minutes = 0;
+        $maxmonth_audio = 0;
+        $maxmonth_video = 0;
+        $maxmonth_recordings = 0;
+        for($x=0;$x<12;$x++){
+            $monthusertotals[$x]=$this->count_pusers($monthpusers[$x]);
+            if($maxmonth_pusers<$monthusertotals[$x]){$maxmonth_pusers=$monthusertotals[$x];}
+            if($maxmonth_minutes<$monthminutetotals[$x]){$maxmonth_minutes=$monthminutetotals[$x];}
+            if($maxmonth_audio<$monthaudiototals[$x]){$maxmonth_audio=$monthaudiototals[$x];}
+            if($maxmonth_video<$monthvideototals[$x]){$maxmonth_video=$monthvideototals[$x];}
+            if($maxmonth_recordings<$monthrecordtotals[$x]){$maxmonth_recordings=$monthrecordtotals[$x];}
+        }
 
         //calculate report summaries
         $reportdata['pusers']=array_values(array(
                 array('name'=>'30','value'=>$this->count_pusers($thirty_puser)),
                 array('name'=>'90','value'=>$this->count_pusers($ninety_puser)),
                 array('name'=>'180','value'=>$this->count_pusers($oneeighty_puser)),
-                array('name'=>'365','value'=>$this->count_pusers($threesixtyfive_puser))
+                array('name'=>'365','value'=>$this->count_pusers($threesixtyfive_puser)),
+                array('name'=>'maxmonth','value'=>$maxmonth_pusers)
         ));
 
         $reportdata['record']=array_values(array(
                 array('name'=>'30','value'=>$thirty_record),
                 array('name'=>'90','value'=>$ninety_record),
                 array('name'=>'180','value'=>$oneeighty_record),
-                array('name'=>'365','value'=>$threesixtyfive_record)
+                array('name'=>'365','value'=>$threesixtyfive_record),
+                array('name'=>'maxmonth','value'=>$maxmonth_recordings)
         ));
 
         $reportdata['recordmin']=array_values(array(
                 array('name'=>'30','value'=>$thirty_recordmin),
                 array('name'=>'90','value'=>$ninety_recordmin),
                 array('name'=>'180','value'=>$oneeighty_recordmin),
-                array('name'=>'365','value'=>$threesixtyfive_recordmin)
+                array('name'=>'365','value'=>$threesixtyfive_recordmin),
+                array('name'=>'maxmonth','value'=>$maxmonth_minutes)
         ));
 
         $reportdata['recordtype']=array_values(array(
@@ -147,6 +187,7 @@ class renderer extends \plugin_renderer_base implements renderable {
                 array('name'=>'90','video'=>$ninety_recordtype_video,'audio'=>$ninety_recordtype_audio),
                 array('name'=>'180','video'=>$oneeighty_recordtype_video,'audio'=>$oneeighty_recordtype_audio),
                 array('name'=>'365','video'=>$threesixtyfive_recordtype_video,'audio'=>$threesixtyfive_recordtype_audio),
+                array('name'=>'maxmonth','video'=>$maxmonth_video,'audio'=>$maxmonth_audio),
         ));
 
         $plugin_types_arr = [];

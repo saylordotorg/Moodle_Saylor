@@ -1938,7 +1938,7 @@ if(true){
                 constants::M_LANG_DADK => ["Naja"=>"Naja","Mads"=>"Mads"],
                 constants::M_LANG_DEDE => ['Hans'=>'Hans','Marlene'=>'Marlene', 'Vicki'=>'Vicki'],
                 //constants::M_LANG_DECH => [],
-                constants::M_LANG_ENUS => ['Joey'=>'Joey','Justin'=>'Justin','Matthew'=>'Matthew','Ivy'=>'Ivy',
+                constants::M_LANG_ENUS => ['Joey'=>'Joey','Justin'=>'Justin','Kevin'=>'Kevin','Matthew'=>'Matthew','Ivy'=>'Ivy',
                 'Joanna'=>'Joanna','Kendra'=>'Kendra','Kimberly'=>'Kimberly','Salli'=>'Salli'],
                 constants::M_LANG_ENGB => ['Brian'=>'Brian','Amy'=>'Amy', 'Emma'=>'Emma'],
                 constants::M_LANG_ENAU => ['Russell'=>'Russell','Nicole'=>'Nicole','Olivia'=>'Olivia'],
@@ -1948,7 +1948,7 @@ if(true){
                // constants::M_LANG_ENIE => [],
                 constants::M_LANG_ENWL => ["Geraint"=>"Geraint"],
                // constants::M_LANG_ENAB => [],
-                constants::M_LANG_ESUS => ['Miguel'=>'Miguel','Penelope'=>'Penelope'],
+                constants::M_LANG_ESUS => ['Miguel'=>'Miguel','Penelope'=>'Penelope','Lupe'=>'Lupe'],
                 constants::M_LANG_ESES => [ 'Enrique'=>'Enrique', 'Conchita'=>'Conchita', 'Lucia'=>'Lucia'],
                 //constants::M_LANG_FAIR => [],
                 constants::M_LANG_FRCA => ['Chantal'=>'Chantal', 'Gabrielle'=>'Gabrielle'],
@@ -1961,7 +1961,7 @@ if(true){
                 constants::M_LANG_KOKR => ['Seoyeon'=>'Seoyeon'],
                 //constants::M_LANG_MSMY => [],
                 constants::M_LANG_NLNL => ["Ruben"=>"Ruben","Lotte"=>"Lotte"],
-                constants::M_LANG_PTBR => ['Ricardo'=>'Ricardo', 'Vitoria'=>'Vitoria'],
+                constants::M_LANG_PTBR => ['Ricardo'=>'Ricardo', 'Vitoria'=>'Vitoria','Camila'=>'Camila'],
                 constants::M_LANG_PTPT => ["Ines"=>"Ines",'Cristiano'=>'Cristiano'],
                 constants::M_LANG_RURU => ["Tatyana"=>"Tatyana","Maxim"=>"Maxim"],
                 //constants::M_LANG_TAIN => [],
@@ -1969,10 +1969,10 @@ if(true){
                 constants::M_LANG_TRTR => ['Filiz'=>'Filiz'],
                 constants::M_LANG_ZHCN => ['Zhiyu'],
 
-               // constants::M_LANG_NBNO => ['Liv'=>'Liv'],
-               // constants::M_LANG_PLPL => ['Ewa'=>'Ewa','Maja'=>'Maja','Jacek'=>'Jacek','Jan'=>'Jan'],
-               // constants::M_LANG_RORO => ['Carmen'=>'Carmen'],
-               // constants::M_LANG_SVSE => ['Astrid'=>'Astrid']
+                constants::M_LANG_NBNO => ['Liv'=>'Liv'],
+                constants::M_LANG_PLPL => ['Ewa'=>'Ewa','Maja'=>'Maja','Jacek'=>'Jacek','Jan'=>'Jan'],
+                constants::M_LANG_RORO => ['Carmen'=>'Carmen'],
+                constants::M_LANG_SVSE => ['Astrid'=>'Astrid']
         );
 
 

@@ -1,4 +1,4 @@
-1.0.17 (xxxx)
+1.0.17 (Build 2022032000)
 - fixed issue in get_course_moduleinfo that could kill backup and restore
 - tweaked polly stuff
 - added modelmedia to back up and restore

@@ -152,10 +152,12 @@ FilterCodes are meant to be entered as regular text in the Moodle WYSIWYG editor
 * {chart pie x Title text} (ALPHA) : Create a pie chart given a value of x between 0 and 100 and a title.
 * {chart progressbar x Title text} (ALPHA) : Create a horizontal progress bar chart giving it a value of x between 0 and 100 and a title.
 * {showmore}{/showmore} (ALPHA) : Toggle showing content between opening and closing more tags. Limitations: Can only be used inline with text. Must now weave into other opening and closing tags.
+* {qrcode}{/qrcode} : Generate and display a QR Code for the content between the tags.
 
 ### For use in courses
 
 * {coursename} : Display the full name of the current course or the site name if not in a course.
+* {coursename ID} : Display the full name of the course specified by the course ID.
 * {courseshortname} : Display the short name of t he current course or the site short name if not in a course.
 * {coursestartdate dateTimeFormat} : Course star t date. Will display "Open event" if there is no start date. For information on the optional dateTimeFormat format, see Supported dateTimeFormats Formats in the [FAQ](#faq) section of this documentation.
 * {courseenddate dateTimeFormat} : Course end date. Will display "Open event" if there is no end date. For information on the optional dateTimeFormat format, see Supported dateTimeFormats Formats in the [FAQ](#faq) section of this documentation.
@@ -165,6 +167,7 @@ FilterCodes are meant to be entered as regular text in the Moodle WYSIWYG editor
 * {course_fields}: Displays the custom course fields. NOTE: Respects a custom course field's Visible To setting.
 * {course_field_shortname} : Display's custom course field. Replace "shortname" with the shortname of a custom course field all in lowercase. NOTE: Respects a custom course field's Visible To setting.
 * {coursesummary} : Display's the course summary. If placed in a site page, displays the site summary.
+* {coursesummary ID} : Display's the course summary of the course with the specified course ID number.
 * {courseimage} : Display's the course image.
 * {courseparticipantcount} : Displays the number of students enrolled in the current course.
 * {courseid} or %7Bcourseid%7D : Display a course's ID.
@@ -270,6 +273,10 @@ Note: {if*rolename*} and {ifmin*rolename*} type tags are based on role archetype
 * {ifnotinsection}{/ifnotinsection} : Will display the enclosed content only if the user is not in a section of a course.
 * {ifingroup id|idnumber}{/ifingroup} : Display content if the user is part of the specified course group ID or group ID number.
 * {ifnotvisible}{/ifnotvisible} : Display content if the course visibility is set to Hide.
+* {ifinactivity}{/ifinactivity} : Display content only in course activities.
+* {ifnotinactivity}{/ifnotinactivity} : Display content only when not in a course activity.
+* {ifactivitycompleted id}{/ifactivitycompleted} : Display content if the activity module specified by the id (see the activity's URL id= parameter), has been completed. Requires that completion be enabled for the site, the course and configured in the specified activity. Note: Activity IDs change when you copy or restore a course. In such cases, you will need to manually edit and correct the IDs in the tags to reflect the new activity id numbers so as to restore their functionality.
+* {ifnotactivitycompleted id}{/ifnotactivitycompleted} : Display content if the activity module specified by the id (see the activity's URL id= parameter), has NOT been completed. Requires that completion be enabled for the site, the course and configured in the specified activity. Note: Activity IDs change when you copy or restore a course. In such cases, you will need to manually edit and correct the IDs in the tags to reflect the new activity id numbers so as to restore their functionality.
 
 #### Roles
 
@@ -869,7 +876,7 @@ Here is an example that reduces the image and places the information next to it.
     padding-top: 5px
     }
 
-### Do you have examples, samples and ways to which tags are working in my version of FilterCodes?
+### Do you have examples/samples of how tags work in my version of FilterCodes?
 
 Create a Page on your Moodle site, preferably in a course, so that those tags work too, and include the following code:
 
@@ -906,6 +913,9 @@ Create a Page on your Moodle site, preferably in a course, so that those tags wo
 * You first accessed the site on [{firstaccessdate strftimedatetime}] : {firstaccessdate strftimedatetime}
 * You last logged-in on [{lastlogin strftimedatetime}] : {lastlogin strftimedatetime}
 * Course or Site full name [{coursename}]: {coursename}
+* Course or Site description/Summary [{coursesummary}] : {coursesummary}
+* The description for course "[{coursename 2}]" is [{coursesummary 2}]: The summary for course "[{coursename 2}]" is [{coursesummary 2}] (note: only works if you have a course with a course id of 2 that has a summary for this example).
+* [{courseimage}] : {courseimage}
 * Course or Site short name [{courseshortname}]: {courseshortname}
 * Course start date [{coursestartdate strftimedatetime}]: {coursestartdate strftimedatetime}
 * Course end date [{courseenddate strftimedatetime}]: {courseenddate strftimedatetime}
@@ -959,8 +969,6 @@ Create a Page on your Moodle site, preferably in a course, so that those tags wo
 * Other course categories in this categories menu [{categoriesxmenu}]: <br><pre>{categoriesxmenu}</pre>
 * List of custom course fields [{course_fields}]: {course_fields}
 * Course custom fields [{course_field_location}] (assumes you have created a custom course field called "location"): {course_field_location}
-* Course description [{coursesummary}] : {coursesummary}
-* [{courseimage}] : {courseimage}
 * Number of participants in the course [{courseparticipantcount}] : {courseparticipantcount}
 * The base (root) URL of your Moodle site [{wwwroot}]: {wwwroot}
 * Site support name [{supportname}]: {supportname}
@@ -998,6 +1006,7 @@ Create a Page on your Moodle site, preferably in a course, so that those tags wo
 * [{marktext}]This text is highlited in a different colour[{/marktext}] : {marktext}This text is highlited in a different colour{/marktext}
 * [{markborder}]This text has a red border around it[{/markborder}] : {markborder}This text has a red border around it{/markborder}
 * This is a course description. [{showmore}]These are the details.[{/showmore}] : This is a course description. {showmore}These are the details.{/showmore}
+* QR Code the URL to site's home page [{qrcode}][{wwwroot}][{/qrcode}] : {qrcode}{wwwroot}{/qrcode}
 * Current language [{lang}] : {lang}
 * Display content of custom user profile field [{profile_field_learningstyle}] - assuming you have a custom user profile field with a shortname called 'learningstyle': {profile_field_learningstyle}
 * Display profile owner's full name on profile pages [{profilefullname}]: This is the profile of {profilefullname}.
@@ -1037,6 +1046,9 @@ Create a Page on your Moodle site, preferably in a course, so that those tags wo
 * This is FilterCodes version [{filtercodes}] : {filtercodes} Note: Will be blank if you do not have the ability to edit this tag.
 * Are you a member of the ATEAM group [{ifingroup ATEAM}]Yes[{/ifingroup}] ? : {ifingroup ATEAM}Yes{/ifingroup} Note: Only works in courses.
 * [{ifnotvisible}]Warning: Course visibility is set to Hide.[{/ifnotvisible}] : {ifnotvisible}Warning: Course visibility is set to Hide.{/ifnotvisible}
+* Are you in an activity? [{ifinactivity}]Yes[{/ifinactivity}][{ifnotinactivity}]No[{/ifnotinactivity}]: {ifinactivity}Yes{/ifinactivity}{ifnotinactivity}No{/ifnotinactivity}
+* [{ifactivitycompleted 2}]You have completed activity with ID 2.[{/ifactivitycompleted}] : {ifactivitycompleted id}You have completed activity with ID 2.{/ifactivitycompleted} (example assumes you have an activity in your course with an ID of 2)
+* [{ifnotactivitycompleted 2}]You have NOT completed activity with ID 2.[{/ifnotactivitycompleted}] : {ifnotactivitycompleted id}You have completed activity with ID 2.{/ifnotactivitycompleted} (example assumes you have an activity in your course with an ID of 2)
 * It is now [{now}] : {now}
 * It is now [{now backupnameformat}] : {now backupnameformat}
 * It is now [{now strftimedate}] : {now strftimedate}

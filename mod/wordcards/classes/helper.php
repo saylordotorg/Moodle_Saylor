@@ -117,11 +117,9 @@ class mod_wordcards_helper {
                 new moodle_url('/mod/wordcards/import.php', ['id' => $cmid]),
                 get_string('tabimport', constants::M_COMPONENT), '', true);
 
-            if(isset($CFG->wordcards_experimental) && $CFG->wordcards_experimental) {
                 $tabs[] = new tabobject('wordwizard',
                     new moodle_url('/mod/wordcards/wordwizard.php', ['id' => $cmid]),
                     get_string('wordwizard', constants::M_COMPONENT), '', true);
-            }
         }
 
 

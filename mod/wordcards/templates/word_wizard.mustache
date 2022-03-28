@@ -61,7 +61,7 @@
                                 var tdata = {term: theterm.term, senses: [], modid: {{modid}} };
                                  for(var sindex in theterm.results){
                                      var sense = theterm.results[sindex];
-                                    var modelsentence = sense.example;
+                                     //by default its term:English def:English
                                     var sourcedefinition = sense.definition;
                                     var alltrans={};
                                     for(var ti=0;ti<langs.length;ti++){
@@ -69,13 +69,24 @@
                                     }
                                     var translations = JSON.stringify(alltrans);
                                     var definition = sourcedefinition;
+                                    //if its NOT term:english and def:english, we need to pull the definition from the translation
                                     if(langdef!=="{{langterm}}"){
                                         if(sense.hasOwnProperty('lang_' + langdef)){
                                             definition = sense['lang_' + langdef];
+                                        }else if(langdef==='en'){
+                                            definition = sense.meaning;
                                         }else{
                                             definition = 'No translation available';
                                         }
                                     }
+
+                                    //model sentence is only in english (for now)
+                                    if('{{langterm}}'==='en'){
+                                        var modelsentence = sense.example;
+                                    }else{
+                                        var modelsentence = '';
+                                    }
+
                                     tdata.senses.push({definition: definition,sourcedefinition: sourcedefinition,
                                         modelsentence: modelsentence, senseindex: sindex, translations: translations});
                                  }//end of results loop

@@ -1,4 +1,4 @@
-2.0.77 (xxxx)
+2.0.77 (Build 2022032000)
 - fixed issue in get_course_moduleinfo that could kill backup and restore
 - tweaked polly stuff
 

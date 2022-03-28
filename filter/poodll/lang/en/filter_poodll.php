@@ -477,3 +477,4 @@ $string['freetrial_desc'] = "A dialog should appear that allows you to register 
 $string['memberdashboard'] = "Member Dashboard";
 $string['memberdashboard_desc'] = "";
 $string['fillcredentials']="Set API user and secret with existing credentials";
+$string['maxmonth']="Highest Month";

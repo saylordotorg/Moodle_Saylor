@@ -47,6 +47,8 @@ const M_GRADENONE= 4;
 const M_LANG_ENUS = 'en-US';
 const M_LANG_ENGB = 'en-GB';
 const M_LANG_ENAU = 'en-AU';
+const M_LANG_ENNZ = 'en-NZ';
+const M_LANG_ENZA = 'en-ZA';
 const M_LANG_ESUS = 'es-US';
 const M_LANG_FRCA = 'fr-CA';
 const M_LANG_FRFR = 'fr-FR';
@@ -90,7 +92,5 @@ const M_USE_DATATABLES=0;
 const M_USE_PAGEDTABLES=1;
 
 const M_NEURALVOICES = array("Amy","Emma","Brian","Olivia","Aria","Ayanda","Ivy","Joanna","Kendra","Kimberly",
-        "Salli","Joey","Justin","Kevin","Matthew","Camila","Lupe", "Gabrielle", "Vicki", "Seoyeon","Takumi","lucia");
-
-
+        "Salli","Joey","Justin","Kevin","Matthew","Camila","Lupe", "Gabrielle", "Vicki", "Seoyeon","Takumi","lucia","Lea","Bianca");
 }

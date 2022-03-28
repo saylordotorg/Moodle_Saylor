@@ -159,13 +159,17 @@ class freemode implements \renderable, \templatable {
     private function get_terms(int $wordpool, bool $countonly, int $practicetype=0) {
         global $DB, $USER;
 
+        //SQL Params
+        $params = ['userid' => $USER->id, 'modid' => $this->cm->instance, 'courseid'=>$this->cm->course];
+
+        //words to show
         if($practicetype ==\mod_wordcards_module::PRACTICETYPE_NONE){
             $maxwords=0;
         }else{
             $maxwords = get_config(constants::M_COMPONENT, 'def_wordstoshow');
         }
 
-
+        //wordpool :: MY WORDS
         if ($wordpool == \mod_wordcards_module::WORDPOOL_MY_WORDS) {
             $wordpool = new \mod_wordcards\my_words_pool($this->course->id);
             return $countonly
@@ -173,30 +177,37 @@ class freemode implements \renderable, \templatable {
                 : $wordpool->get_words($maxwords);
         }
 
-        $sql = $countonly ? "SELECT COUNT(t.id)" : "SELECT t.*";
-        $sql .= " FROM {wordcards_terms} t
-            LEFT OUTER JOIN {wordcards_seen} s ON s.termid = t.id AND t.deleted = 0 AND s.userid = :userid";
+        //wordpool :: REVIEW WORDS
+        if ($wordpool == \mod_wordcards_module::WORDPOOL_REVIEW){
+            //in this case we want ALL the words returned
+            if ($countonly || $practicetype ==\mod_wordcards_module::PRACTICETYPE_NONE) {
+                $reviewsql = $countonly ? "SELECT COUNT(t.id)" : "SELECT t.*";
+                $reviewsql .= " FROM {wordcards_terms} t INNER JOIN {wordcards} w ON w.id = t.modid ";
+                $reviewsql .= " LEFT OUTER JOIN {wordcards_seen} s ON s.termid = t.id AND t.deleted = 0 AND s.userid = :userid";
+                $reviewsql .= " WHERE t.deleted = 0 AND NOT t.modid = :modid AND s.id IS NOT NULL AND w.course = :courseid";
+                if($countonly) {
+                    return $DB->get_field_sql($reviewsql, $params);
+                }else{
+                    $records = $DB->get_records_sql($reviewsql, $params);
+                    if (!$records) {
+                        return [];
+                    }
+                    shuffle($records);
+                    return \mod_wordcards_module::insert_media_urls($records);
+                }
+            } else {
+                //in this case we want words to practice returned
+                return $this->mod->get_review_terms($maxwords);
+            }
+        }
 
-        if ($wordpool == \mod_wordcards_module::WORDPOOL_LEARN) {
-            // Words we have not seen before.
-            $sql .= " WHERE t.deleted = 0 AND t.modid = :modid";
-        } else if ($wordpool == \mod_wordcards_module::WORDPOOL_REVIEW) {
-            // Words we have seen before.
-            $sql .= " WHERE t.deleted = 0 AND NOT t.modid = :modid AND s.id IS NOT NULL";
-        } else {
-            throw new \invalid_parameter_exception('Wordpool not known ' . $wordpool);
-        }
-        $params = ['userid' => $USER->id, 'modid' => $this->cm->instance];
+        //wordpool :: NEW WORDS
         if ($countonly) {
-            // We don't apply the max terms config setting def_wordstoshow when getting the count for the select menu.
-            return $DB->get_field_sql($sql, $params);
-        }
-        $records = $DB->get_records_sql($sql, $params);
-        shuffle($records);
-        if($maxwords>0) {
-            return \mod_wordcards_module::insert_media_urls(array_slice($records, 0, $maxwords));
+            $learnsql = "SELECT COUNT(t.id)  FROM {wordcards_terms} t WHERE t.deleted = 0 AND t.modid = :modid";
+            return $DB->get_field_sql($learnsql, $params);
         }else{
-            return \mod_wordcards_module::insert_media_urls($records);
+            return $this->mod->get_learn_terms($maxwords);
         }
+
     }
 }

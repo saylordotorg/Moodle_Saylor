@@ -110,7 +110,7 @@ This file contains class and ID definitions.
         //VOICES
         voices: {'ar-AR': ['Zeina'],
             'de-DE': ['Hans','Marlene','Vicki'],
-            'en-US': ['Joey','Justin','Matthew','Ivy','Joanna','Kendra','Kimberly','Salli'],
+            'en-US': ['Joey','Justin','Kevin','Matthew','Ivy','Joanna','Kendra','Kimberly','Salli'],
             'en-GB': ['Brian','Amy', 'Emma'],
             'en-AU': ['Russell','Nicole','Olivia'],
             'en-NZ': ['Aria'],

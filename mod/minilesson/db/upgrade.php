@@ -283,6 +283,26 @@ function xmldb_minilesson_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2022021400, 'minilesson');
     }
 
+    // Add TTS Dialog to minilesson question table
+    if ($oldversion < 2022032900) {
+        $table = new xmldb_table(constants::M_QTABLE);
+
+
+        // Define field itemttsdialog
+        $fields=[];
+        $fields[]= new xmldb_field('itemttsdialog', XMLDB_TYPE_TEXT, null, null, null, null);
+        $fields[]= new xmldb_field('itemttsdialogopts', XMLDB_TYPE_TEXT, null, null, null, null);
+
+        // Add fields
+        foreach ($fields as $field) {
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+
+        upgrade_mod_savepoint(true, 2022032900, 'minilesson');
+    }
+
     // Final return of upgrade result (true, all went good) to Moodle.
     return true;
 }

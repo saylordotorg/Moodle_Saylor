@@ -25,6 +25,7 @@
 
 namespace availability_coursecompleted;
 
+use \completion_info;
 use \core_availability\info;
 use \coding_exception;
 use \stdClass;
@@ -94,10 +95,10 @@ class condition extends \core_availability\condition {
      * @return bool True if available
      */
     public function is_available($not, info $info, $grabthelot, $userid) {
-        global $CFG, $USER;
-        require_once($CFG->libdir . '/completionlib.php');
+        global $USER;
         $completioninfo = new \completion_info($info->get_course());
         $allow = $completioninfo->is_course_complete($userid != $USER->id ? $userid : $USER->id);
+        unset($completioninfo);
         if (!$this->coursecompleted) {
             $allow = !$allow;
         }

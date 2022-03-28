@@ -58,7 +58,8 @@ class facetoface_test extends advanced_testcase {
             'modulename' => 'facetoface',
             'module' => $module->id,
             'visible' => 1,
-            'section' => 0
+            'section' => 0,
+            'confirmationmessage' => ['text' => 'test message']
         ];
         $updatedmodule = add_moduleinfo($module, $course);
         $facetofacerecord = $DB->get_record('facetoface', ['course' => $updatedmodule->course]);

@@ -29,6 +29,7 @@ use block_online_users\fetcher;
 use core_table\local\filter\integer_filter;
 use core_user\table\participants_filterset;
 use core_user\table\participants_search;
+use Endroid\QrCode\QrCode;
 
 require_once($CFG->dirroot . '/course/renderer.php');
 
@@ -444,6 +445,29 @@ class filter_filtercodes extends moodle_text_filter {
     }
 
     /**
+     * Generate base64 encoded data img of QR Code.
+     *
+     * @param string $string Text to be encoded.
+     * @return string Base64 encoded data image.
+     */
+    function qrcode($text, $label = '') {
+        if (empty($text)) {
+            return '';
+        }
+        global $CFG;
+        require_once($CFG->dirroot . '/filter/filtercodes/thirdparty/QrCode/src/QrCode.php');
+        $code = new QrCode();
+        $code->setText($text);
+        $code->setErrorCorrection('high');
+        $code->setPadding(0);
+        $code->setSize(480);
+        $code->setLabelFontSize(16);
+        $code->setLabel($label);
+        $src = 'data:image/png;base64,' . base64_encode($code->get('png'));
+        return $src;
+    }
+
+    /**
      * Main filter function called by Moodle.
      *
      * @param string $text   Content to be filtered.
@@ -537,75 +561,95 @@ class filter_filtercodes extends moodle_text_filter {
         }
 
         // Tag: {coursesummary}.
-        if (stripos($text, '{coursesummary}') !== false) {
-            $replace['/\{coursesummary\}/i'] = $PAGE->course->summary;
+        if (stripos($text, '{coursesummary') !== false) {
+            if (stripos($text, '{coursesummary}') !== false) {
+                // No course ID specified.
+                $coursecontext = context_course::instance($PAGE->course->id);
+                $replace['/\{coursesummary\}/i'] = format_text($PAGE->course->summary, FORMAT_HTML,
+                        ['context' => $coursecontext]);
+            }
+            if (stripos($text, '{coursesummary ') !== false) {
+                // Course ID was specified.
+                preg_match_all('/\{coursesummary ([0-9]+)\}/', $text, $matches);
+                // Eliminate course IDs.
+                $courseids = array_unique($matches[1]);
+                $coursecontext = context_course::instance($PAGE->course->id);
+                foreach ($courseids as $id) {
+                    $course = $DB->get_record('course', ['id' => $id]);
+                    if (!empty($course)) {
+                        $replace['/\{coursesummary ' . $course->id . '\}/isuU'] = format_text($course->summary, FORMAT_HTML,
+                                ['context' => $coursecontext]);;
+                    }
+                }
+                unset($matches, $course, $courseids, $id);
+            }
         }
 
         // This tag: {menuadmin}.
         if (stripos($text, '{menuadmin}') !== false) {
             $theme = $PAGE->theme->name;
             $menu = '';
-            $menu .= '{ifminteacher}' . PHP_EOL;
-            $menu .= '{fa fa-wrench} {getstring}admin{/getstring}' . PHP_EOL;
-            $menu .= '{/ifminteacher}' . PHP_EOL;
-            $menu .= '{ifmincreator}' . PHP_EOL;
-            $menu .= '-{getstring}administrationsite{/getstring}|/admin/search.php' . PHP_EOL;
-            $menu .= '-{toggleeditingmenu}' . PHP_EOL;
-            $menu .= '-Learn Moodle|https://learn.moodle.org/" target="_blank' . PHP_EOL;
-            $menu .= '-Moodle Academy|https://moodle.academy/" target="_blank' . PHP_EOL;
-            $menu .= '-###' . PHP_EOL;
-            $menu .= '{/ifmincreator}' . PHP_EOL;
-            $menu .= '{ifminmanager}' . PHP_EOL;
-            $menu .= '-{getstring}user{/getstring}: {getstring:admin}usermanagement{/getstring}|/admin/user.php' . PHP_EOL;
-            $menu .= '{ifminsitemanager}' . PHP_EOL;
-            $menu .= '-{getstring}user{/getstring}: {getstring:mnet}profilefields{/getstring}|/user/profile/index.php' . PHP_EOL;
-            $menu .= '-###' . PHP_EOL;
-            $menu .= '{/ifminsitemanager}' . PHP_EOL;
-            $menu .= '-{getstring}course{/getstring}: {getstring:admin}coursemgmt{/getstring}|/course/management.php' .
-                    '?categoryid={categoryid}' . PHP_EOL;
-            $menu .= '-{getstring}course{/getstring}: {getstring}new{/getstring}|/course/edit.php' .
-                    '?category={categoryid}&returnto=topcat' . PHP_EOL;
-            $menu .= '-{getstring}course{/getstring}: {getstring}searchcourses{/getstring}|/course/search.php' . PHP_EOL;
-            $menu .= '{/ifminmanager}' . PHP_EOL;
-            $menu .= '{ifminteacher}' . PHP_EOL;
-            $menu .= '-{getstring}course{/getstring}: {getstring}restore{/getstring}|/backup/restorefile.php' .
-                    '?contextid={coursecontextid}' . PHP_EOL;
-            $menu .= '{ifincourse}' . PHP_EOL;
-            $menu .= '-{getstring}course{/getstring}: {getstring}backup{/getstring}|/backup/backup.php?id={courseid}' . PHP_EOL;
-            $menu .= '-{getstring}course{/getstring}: {getstring}participants{/getstring}|/user/index.php?id={courseid}' . PHP_EOL;
-            $menu .= '-{getstring}course{/getstring}: {getstring:badges}badges{/getstring}|/badges/index.php' .
-                    '?type={courseid}' . PHP_EOL;
-            $menu .= '-{getstring}course{/getstring}: {getstring}reports{/getstring}|/course/admin.php' .
-                    '?courseid={courseid}#linkcoursereports' . PHP_EOL;
-            $menu .= '-{getstring}course{/getstring}: {getstring:enrol}enrolmentinstances{/getstring}|/enrol/instances.php' .
-                    '?id={courseid}' . PHP_EOL;
-            $menu .= '-{getstring}course{/getstring}: {getstring}reset{/getstring}|/course/reset.php?id={courseid}' . PHP_EOL;
-            $menu .= '-Course: Layoutit|https://www.layoutit.com/build" target="popup" ' .
-                    'onclick="window.open(\'https://www.layoutit.com/build\',\'popup\',\'width=1340,height=700\'); return false;' .
-                    '|Bootstrap Page Builder' . PHP_EOL;
-            $menu .= '{/ifincourse}' . PHP_EOL;
-            $menu .= '-###' . PHP_EOL;
-            $menu .= '{/ifminteacher}' . PHP_EOL;
-            $menu .= '{ifminmanager}' . PHP_EOL;
-            $menu .= '-{getstring}site{/getstring}: {getstring}reports{/getstring}|/admin/category.php?category=reports' . PHP_EOL;
-            $menu .= '{/ifminmanager}' . PHP_EOL;
-            $menu .= '{ifadmin}' . PHP_EOL;
-            $menu .= '-{getstring}site{/getstring}: {getstring:admin}additionalhtml{/getstring}|/admin/settings.php' .
-                    '?section=additionalhtml' . PHP_EOL;
-            $menu .= '-{getstring}site{/getstring}: {getstring:admin}frontpage{/getstring}|/admin/settings.php' .
-                    '?section=frontpagesettings|Including site name' . PHP_EOL;
-            $menu .= '-{getstring}site{/getstring}: {getstring:admin}plugins{/getstring}|/admin/search.php#linkmodules' . PHP_EOL;
-            $menu .= '-{getstring}site{/getstring}: {getstring:admin}supportcontact{/getstring}|/admin/settings.php' .
-                    '?section=supportcontact' . PHP_EOL;
-            $menu .= '-{getstring}site{/getstring}: {getstring:admin}themesettings{/getstring}|/admin/settings.php' .
-                    '?section=themesettings|Including custom menus, designer mode, theme in URL' . PHP_EOL;
-            if (file_exists($CFG->dirroot . '/theme/' . $theme . '/settings.php')) {
-                $menu .= '-{getstring}site{/getstring}: {getstring:admin}currenttheme{/getstring}|/admin/settings.php' .
-                        '?section=themesetting' . $theme . PHP_EOL;
+            if ($this->hasminarchetype('editingteacher')) {
+                $menu .= '{fa fa-wrench} {getstring}admin{/getstring}' . PHP_EOL;
             }
-            $menu .= '-{getstring}site{/getstring}: {getstring}notifications{/getstring} ({getstring}admin{/getstring})' .
-                    '|/admin/index.php' . PHP_EOL;
-            $menu .= '{/ifadmin}' . PHP_EOL;
+            if ($this->hasminarchetype('coursecreator')) { // If a course creator or above.
+                $menu .= '-{getstring}administrationsite{/getstring}|/admin/search.php' . PHP_EOL;
+                $menu .= '-{toggleeditingmenu}' . PHP_EOL;
+                $menu .= '-Learn Moodle|https://learn.moodle.org/" target="_blank' . PHP_EOL;
+                $menu .= '-Moodle Academy|https://moodle.academy/" target="_blank' . PHP_EOL;
+                $menu .= '-###' . PHP_EOL;
+            }
+            if ($this->hasminarchetype('manager')) { // If a manager or above.
+                $menu .= '-{getstring}user{/getstring}: {getstring:admin}usermanagement{/getstring}|/admin/user.php' . PHP_EOL;
+                $menu .= '{ifminsitemanager}' . PHP_EOL;
+                $menu .= '-{getstring}user{/getstring}: {getstring:mnet}profilefields{/getstring}|/user/profile/index.php' . PHP_EOL;
+                $menu .= '-###' . PHP_EOL;
+                $menu .= '{/ifminsitemanager}' . PHP_EOL;
+                $menu .= '-{getstring}course{/getstring}: {getstring:admin}coursemgmt{/getstring}|/course/management.php' .
+                        '?categoryid={categoryid}' . PHP_EOL;
+                $menu .= '-{getstring}course{/getstring}: {getstring}new{/getstring}|/course/edit.php' .
+                        '?category={categoryid}&returnto=topcat' . PHP_EOL;
+                $menu .= '-{getstring}course{/getstring}: {getstring}searchcourses{/getstring}|/course/search.php' . PHP_EOL;
+            }
+            if ($this->hasminarchetype('editingteacher')) {
+                $menu .= '-{getstring}course{/getstring}: {getstring}restore{/getstring}|/backup/restorefile.php' .
+                    '?contextid={coursecontextid}' . PHP_EOL;
+                $menu .= '{ifincourse}' . PHP_EOL;
+                $menu .= '-{getstring}course{/getstring}: {getstring}backup{/getstring}|/backup/backup.php?id={courseid}' . PHP_EOL;
+                $menu .= '-{getstring}course{/getstring}: {getstring}participants{/getstring}|/user/index.php?id={courseid}' . PHP_EOL;
+                $menu .= '-{getstring}course{/getstring}: {getstring:badges}badges{/getstring}|/badges/index.php' .
+                        '?type={courseid}' . PHP_EOL;
+                $menu .= '-{getstring}course{/getstring}: {getstring}reports{/getstring}|/course/admin.php' .
+                        '?courseid={courseid}#linkcoursereports' . PHP_EOL;
+                $menu .= '-{getstring}course{/getstring}: {getstring:enrol}enrolmentinstances{/getstring}|/enrol/instances.php' .
+                        '?id={courseid}' . PHP_EOL;
+                $menu .= '-{getstring}course{/getstring}: {getstring}reset{/getstring}|/course/reset.php?id={courseid}' . PHP_EOL;
+                $menu .= '-Course: Layoutit|https://www.layoutit.com/build" target="popup" ' .
+                        'onclick="window.open(\'https://www.layoutit.com/build\',\'popup\',\'width=1340,height=700\'); return false;' .
+                        '|Bootstrap Page Builder' . PHP_EOL;
+                $menu .= '{/ifincourse}' . PHP_EOL;
+                $menu .= '-###' . PHP_EOL;
+            }
+            if ($this->hasminarchetype('manager')) { // If a manager or above.
+                $menu .= '-{getstring}site{/getstring}: {getstring}reports{/getstring}|/admin/category.php?category=reports' . PHP_EOL;
+            }
+            if (is_siteadmin() && !is_role_switched($PAGE->course->id)) { // If an administrator.
+                $menu .= '-{getstring}site{/getstring}: {getstring:admin}additionalhtml{/getstring}|/admin/settings.php' .
+                        '?section=additionalhtml' . PHP_EOL;
+                $menu .= '-{getstring}site{/getstring}: {getstring:admin}frontpage{/getstring}|/admin/settings.php' .
+                        '?section=frontpagesettings|Including site name' . PHP_EOL;
+                $menu .= '-{getstring}site{/getstring}: {getstring:admin}plugins{/getstring}|/admin/search.php#linkmodules' . PHP_EOL;
+                $menu .= '-{getstring}site{/getstring}: {getstring:admin}supportcontact{/getstring}|/admin/settings.php' .
+                        '?section=supportcontact' . PHP_EOL;
+                $menu .= '-{getstring}site{/getstring}: {getstring:admin}themesettings{/getstring}|/admin/settings.php' .
+                        '?section=themesettings|Including custom menus, designer mode, theme in URL' . PHP_EOL;
+                if (file_exists($CFG->dirroot . '/theme/' . $theme . '/settings.php')) {
+                    $menu .= '-{getstring}site{/getstring}: {getstring:admin}currenttheme{/getstring}|/admin/settings.php' .
+                            '?section=themesetting' . $theme . PHP_EOL;
+                }
+                $menu .= '-{getstring}site{/getstring}: {getstring}notifications{/getstring} ({getstring}admin{/getstring})' .
+                        '|/admin/index.php' . PHP_EOL;
+            }
             $replace['/\{menuadmin\}/i'] = $menu;
         }
 
@@ -1356,14 +1400,35 @@ class filter_filtercodes extends moodle_text_filter {
                 $replace['/\{courseidnumber\}/i'] = $PAGE->course->idnumber;
             }
 
-            // Tag: {coursename}. The full name of this course.
-            if (stripos($text, '{coursename}') !== false) {
-                $course = $PAGE->course;
-                if ($course->id == $SITE->id) { // Front page - use site name.
-                    $replace['/\{coursename\}/i'] = format_string($SITE->fullname);
-                } else { // In a course - use course full name.
-                    $coursecontext = context_course::instance($course->id);
-                    $replace['/\{coursename\}/i'] = format_string($course->fullname, true, ['context' => $coursecontext]);
+            // Tag: {coursename}. The full name of a course or the site name.
+            if (stripos($text, '{coursename') !== false) {
+                if (stripos($text, '{coursename}') !== false) {
+                    // No course ID was specified.
+                    $course = $PAGE->course;
+                    if ($course->id == $SITE->id) { // If not in a course, use the site name.
+                        $coursecontext = context_system::instance();
+                        $replace['/\{coursename\}/i'] = format_string($SITE->fullname, true,
+                                ['context' => $coursecontext]);
+                    } else { // If in a course - use course full name.
+                        $coursecontext = context_course::instance($course->id);
+                        $replace['/\{coursename\}/i'] = format_string($course->fullname, true,
+                                ['context' => $coursecontext]);
+                    }
+                }
+                if (stripos($text, '{coursename ') !== false) {
+                    // Course ID was specified.
+                    preg_match_all('/\{coursename ([0-9]+)\}/', $text, $matches);
+                    // Eliminate course IDs.
+                    $courseids = array_unique($matches[1]);
+                    $coursecontext = context_system::instance();
+                    foreach ($courseids as $id) {
+                        $course = $DB->get_record('course', ['id' => $id]);
+                        if (!empty($course)) {
+                            $replace['/\{coursename ' . $course->id . '\}/isuU'] = format_string($course->fullname, true,
+                                    ['context' => $coursecontext]);
+                        }
+                    }
+                    unset($matches, $course, $courseids, $id);
                 }
             }
 
@@ -2348,6 +2413,82 @@ class filter_filtercodes extends moodle_text_filter {
 
         if (strpos($text, '{if') !== false) { // If there are conditional tags.
 
+            require_once($CFG->libdir.'/completionlib.php');
+
+            // Tag: {ifinactivity}
+            if (stripos($text, '{/ifinactivity}') !== false) {
+                global $PAGE;
+                if (substr($PAGE->pagetype, 0, 4) == 'mod-') {
+                    $replace['/\{ifinactivity\}/isu'] = '';
+                    $replace['/\{\/ifinactivity\}/isu'] = '';
+                } else {
+                    $replace['/\{ifinactivity\}(.*){\/ifinactivity\}/isuU'] = '';
+                }
+            }
+
+            // Tag: {ifnotinactivity}
+            if (stripos($text, '{/ifnotinactivity}') !== false) {
+                global $PAGE;
+                if (substr($PAGE->pagetype, 0, 4) != 'mod-') {
+                    $replace['/\{ifnotinactivity\}/isu'] = '';
+                    $replace['/\{\/ifnotinactivity\}/isu'] = '';
+                } else {
+                    $replace['/\{ifnotinactivity\}(.*){\/ifnotinactivity\}/isuU'] = '';
+                }
+            }
+
+            // Tag: {ifactivitycompleted id}{/ifactivitycompleted}.
+            if (stripos($text, '{/ifactivitycompleted}') !== false) {
+                global $PAGE;
+                $course = $PAGE->course;
+                $completion = new completion_info($course);
+                if ($completion->is_enabled_for_site() && $completion->is_enabled() == COMPLETION_ENABLED) {
+                    $activities = $completion->get_activities();
+
+                    $re = '/{ifactivitycompleted\s+([0-9]+)\}(.*)\{\/ifactivitycompleted\}/isuU';
+                    $found = preg_match_all($re, $text, $matches);
+                    if ($found > 0) {
+                        foreach ($matches[1] as $modid) {
+                            if (array_key_exists($modid, $activities)) {
+                                $mod = $completion->get_data($activities[$modid], true, $USER->id);
+                                $key = '/{ifactivitycompleted\s+' . $modid . '\}(.*)\{\/ifactivitycompleted\}/isuU';
+                                if ($mod->completionstate) { // Activity completed by user. Just remove the tags, keep content.
+                                    $replace[$key] = "$1";
+                                } else { // Activity not completed. Remove tags and content.
+                                    $replace[$key] = '';
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Tag: {ifnotactivitycompleted id}{/ifnotactivitycompleted}.
+            if (stripos($text, '{/ifnotactivitycompleted}') !== false) {
+                global $PAGE;
+                $course = $PAGE->course;
+                $completion = new completion_info($course);
+                if ($completion->is_enabled_for_site() && $completion->is_enabled() == COMPLETION_ENABLED) {
+                    $activities = $completion->get_activities();
+
+                    $re = '/{ifnotactivitycompleted\s+([0-9]+)\}(.*)\{\/ifnotactivitycompleted\}/isuU';
+                    $found = preg_match_all($re, $text, $matches);
+                    if ($found > 0) {
+                        foreach ($matches[1] as $modid) {
+                            if (array_key_exists($modid, $activities)) {
+                                $mod = $completion->get_data($activities[$modid], true, $USER->id);
+                                $key = '/{ifnotactivitycompleted\s+' . $modid . '\}(.*)\{\/ifnotactivitycompleted\}/isuU';
+                                if ($mod->completionstate) { // Activity completed. Remove tags and content.
+                                    $replace[$key] = '';
+                                } else { // Activity NOT completed by user. Just remove the tags, keep content.
+                                    $replace[$key] = "$1";
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             // Tag: {ifprofile_field_...}.
             // If Custom User Profile Fields is not empty.
             if (stripos($text, '{ifprofile_field_') !== false) {
@@ -2954,6 +3095,21 @@ class filter_filtercodes extends moodle_text_filter {
             $newtext = preg_replace_callback('/\{urlencode\}(.*)\{\/urlencode\}/isuU',
                 function($matches) {
                     return urlencode($matches[1]);
+                }, $text);
+            if ($newtext !== false) {
+                $text = $newtext;
+                $changed = true;
+            }
+        }
+
+        // Tag: {qrcode}{/qrcode}.
+        if (stripos($text, '{qrcode}') !== false) {
+            // Remove {qrcode}{/qrcode} tags and turn content between the tags into a QR code.
+            $newtext = preg_replace_callback('/\{qrcode\}(.*)\{\/qrcode\}/isuU',
+                function($matches) {
+                    $src = $this->qrcode(html_to_text($matches[1]));
+                    $src = '<img src="' . $src . '" style="width:100%;max-width:480px;height:auto;" class="fc-qrcode">';
+                    return $src;
                 }, $text);
             if ($newtext !== false) {
                 $text = $newtext;
