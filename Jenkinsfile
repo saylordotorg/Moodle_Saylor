@@ -331,6 +331,12 @@ def plugins = [
       "url" : 'https://github.com/moodle-an-hochschulen/moodle-availability_role.git',
       "branch" : 'master',
       "dest" : 'availability/condition/role'
+    ],
+    [
+      "name" : 'enrol_autoenrol',
+      "url" : 'https://github.com/bobopinna/moodle-enrol_autoenrol.git',
+      "branch" : 'master',
+      "dest" : 'enrol'
     ]
 ]
 
