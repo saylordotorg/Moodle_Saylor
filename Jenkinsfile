@@ -336,7 +336,7 @@ def plugins = [
       "name" : 'enrol_autoenrol',
       "url" : 'https://github.com/bobopinna/moodle-enrol_autoenrol.git',
       "branch" : 'master',
-      "dest" : 'enrol'
+      "dest" : 'enrol/autoenrol'
     ]
 ]
 
