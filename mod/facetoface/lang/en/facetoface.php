@@ -106,6 +106,9 @@ $string['crontask'] = 'Face-to-Face maintenance jobs';
 $string['costheading'] = 'Session Cost';
 $string['currentstatus'] = 'Current status';
 $string['customfieldsheading'] = 'Custom Session Fields';
+$string['customfieldid'] = 'Custom field ID';
+$string['customfieldoriginalshortname'] = 'Custom field original shortname';
+$string['customfieldnewshortname'] = 'Custom field new shortname';
 $string['date'] = 'Date';
 $string['dateadd'] = 'Add a new date';
 $string['dateremove'] = 'Remove this date';
@@ -266,6 +269,11 @@ $string['notificationemail'] = 'Email Notification only';
 $string['notificationical'] = 'iCalendar Appointment only';
 $string['noticedeleteconfirm'] = 'Delete site notice \'{$a->name}\'?<br/><blockquote>{$a->text}</blockquote>';
 $string['noticetext'] = 'Notice text';
+$string['noteinfo'] ='During the last site upgrade the face-to-face module has been modified. It now
+requires session custom fields to have unique shortnames. Since some of your
+custom fields had duplicate shortnames, they have been renamed to remove
+duplicates (see table below). This could impact on your email messages if you
+reference those custom fields in the message templates.';
 $string['notsignedup'] = 'You are not signed up for this session.';
 $string['notsubmittedyet'] = 'Not yet evaluated';
 $string['noupcoming'] = '<p><i>No upcoming sessions</i></p>';
@@ -413,6 +421,7 @@ To re-schedule your booking you need to cancel this booking and then re-book a n
 
 You will receive a reminder [reminderperiod] business days before this course.
 ';
+$string['setting:defaultconfirmationmessagedefault2'] = '<p><b>Thank you for signing up!</b></p>';
 $string['setting:defaultconfirmationsubject'] = 'Default subject line for confirmation emails.';
 $string['setting:defaultconfirmationsubject_caption'] = 'Confirmation subject';
 $string['setting:defaultconfirmationsubjectdefault'] = 'Course booking confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]';
@@ -570,6 +579,7 @@ $string['unknowntime'] = '(unknown time)';
 $string['upcomingsessions'] = 'Upcoming sessions';
 $string['upcomingsessionslist'] = 'List of all upcoming sessions for this Face-to-Face activity';
 $string['updaterequests'] = 'Update requests';
+$string['upgradeinfofacetoface'] = '{$a}: Face to Face upgrade info';
 $string['upgradeprocessinggrades'] = 'Processing Face-to-Face grades, this may take a while if there are many sessions...';
 $string['usercancelledon'] = 'User cancelled on {$a}';
 $string['usercalentry'] = 'Show entry on user\'s calendar';

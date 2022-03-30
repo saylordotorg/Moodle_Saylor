@@ -19,8 +19,7 @@ Branches
 
 | Moodle version     | Branch            |
 | -----------------  | ----------------- |
-| Moodle 2.4 - 2.5   | moodle-2.2.x
-| Moodle 2.6 to 3.10 | main              |
+| Moodle 3.4 to 3.10 | MOODLE_34_STABLE  |
 | Moodle 3.11+       | MOODLE_311_STABLE |
 
 Installation

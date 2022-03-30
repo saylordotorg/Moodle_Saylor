@@ -25,8 +25,10 @@
 
 namespace availability_coursecompleted;
 
+
 use \availability_coursecompleted\condition;
 use \availability_coursecompleted\frontend;
+use \completion_info;
 use core_availability\tree;
 use core_availability\info_module;
 use core_availability\mock_info;
@@ -42,15 +44,6 @@ use core_availability\mock_condition;
  * @coversDefaultClass \availability_coursecompleted
  */
 class condition_test extends \advanced_testcase {
-
-    /**
-     * Load required classes.
-     */
-    public function setUp():void {
-        // Load the mock info class so that it can be used.
-        global $CFG;
-        require_once($CFG->libdir . '/completionlib.php');
-    }
 
     /**
      * Tests constructing and using coursecompleted condition as part of tree.

@@ -6,22 +6,19 @@ Feature: Test all the basic functionality of this Gapfill question type
   Background:
     Given the following "users" exist:
         | username | firstname | lastname | email               |
-        | teacher1 | T1        | Teacher1 | teacher1@moodle.com |
+        | teacher  | Mark      | Allright | teacher@example.com |
     And the following "courses" exist:
         | fullname | shortname | category |
         | Course 1 | C1        | 0        |
     And the following "course enrolments" exist:
-        | user     | course | role           |
-        | teacher1 | C1     | editingteacher |
+        | user    | course | role           |
+        | teacher | C1     | editingteacher |
 
   @javascript
   Scenario: Create, edit then preview a gapfill question.
-    Given I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I navigate to "Questions" in current page administration
-
+    When I am on the "Course 1" "core_question > course question bank" page logged in as teacher
     # Create a new question.
-    And I add a "Gapfill" question filling the form with:
+    And I add a "item_qtype_gapfill" question filling the form with:
         | Question name                  | Gapfill-001                           |
         | Question text                  | The cat [sat] on the [mat]            |
         | General feedback               | This is general feedback              |
@@ -35,19 +32,18 @@ Feature: Test all the basic functionality of this Gapfill question type
     Then I should see "Gapfill-001"
 
     When I choose "Edit question" action for "Gapfill-001" in the question bank
+    And I set the field "Question name" to "Gapfill-002"
     And I press "Gap settings"
     And I click on "//span[@id='id1_0']" "xpath_element"
 
     And I set the field with xpath "//div[@id='id_correcteditable']" to "pergap correct feedback"
     And I set the field with xpath "//div[@id='id_incorrecteditable']" to "pergap incorrect feedback"
 
-    # And I click on "OK"
     And I click on "#SaveItemFeedback" "css_element"
-    And I click on "#id_submitbutton" "css_element"
-    # Preview it.
-    #When I click on "Preview" "link" in the "Gapfill-001" "table_row"
-    When I choose "Preview" action for "Gapfill-001" in the question bank
-    And I switch to "questionpreview" window
+    And I click on "Save changes" "button"
+    When I am on the "Course 1" "core_question > course question bank" page logged in as teacher
+
+    When I am on the "Gapfill-002" "core_question > preview" page logged in as teacher
 
  ##################################################
     # Deferred Feedback behaviour with CBM
@@ -66,9 +62,10 @@ Feature: Test all the basic functionality of this Gapfill question type
     And I should see "CBM mark 2.00"
     And I should see "pergap correct feedback"
 
-    And I press "Start again with these options"
+    And I press "Start again"
     And I drag "sat" into gap "2" in the gapfill question
     And I drag "mat" into gap "1" in the gapfill question
+
     And I press "Submit and finish"
     And I should see "pergap incorrect feedback"
 
@@ -100,7 +97,7 @@ Feature: Test all the basic functionality of this Gapfill question type
     And I should see "Mark 2.00 out of 2.00"
     And I wait "1" seconds
 
-    And I press "Start again with these options"
+    And I press "Start again"
     And I type "sat" into gap "1" in the gapfill question
     And I type "xxx" into gap "2" in the gapfill question
 
@@ -109,7 +106,7 @@ Feature: Test all the basic functionality of this Gapfill question type
     And I should see "Mark 1.00 out of 2.00"
     And I wait "1" seconds
 
-    And I press "Start again with these options"
+    And I press "Start again"
     And I type "xxx" into gap "1" in the gapfill question
     And I type "yyy" into gap "2" in the gapfill question
 
@@ -141,7 +138,7 @@ Feature: Test all the basic functionality of this Gapfill question type
     #and all/both correct options on the second attempt
     ################################################
     #first attempt
-    And I press "Start again with these options"
+    And I press "Start again"
     And I type "sat" into gap "1" in the gapfill question
     And I type "rugnotmat" into gap "2" in the gapfill question
 
@@ -187,7 +184,7 @@ Feature: Test all the basic functionality of this Gapfill question type
     And I should see "Mark 2.00 out of 2.00"
     And I wait "1" seconds
 
-    And I press "Start again with these options"
+    And I press "Start again"
     And I type "sat" into gap "1" in the gapfill question
     And I type "xxx" into gap "2" in the gapfill question
 
@@ -196,7 +193,7 @@ Feature: Test all the basic functionality of this Gapfill question type
     And I should see "Mark 1.00 out of 2.00"
     And I wait "1" seconds
 
-    And I press "Start again with these options"
+    And I press "Start again"
     And I type "xxx" into gap "1" in the gapfill question
     And I type "yyy" into gap "2" in the gapfill question
 

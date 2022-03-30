@@ -314,6 +314,7 @@ function facetoface_add_instance($facetoface) {
     global $DB;
 
     $facetoface->timemodified = time();
+    $facetoface->confirmationmessage = $facetoface->confirmationmessage['text'];
     facetoface_fix_settings($facetoface);
     if ($facetoface->id = $DB->insert_record('facetoface', $facetoface)) {
         facetoface_grade_item_update($facetoface);
@@ -340,6 +341,7 @@ function facetoface_update_instance($facetoface, $instanceflag = true) {
     if ($instanceflag) {
         $facetoface->id = $facetoface->instance;
     }
+    $facetoface->confirmationmessage = $facetoface->confirmationmessage['text'];
 
     facetoface_fix_settings($facetoface);
     if ($return = $DB->update_record('facetoface', $facetoface)) {
@@ -2132,10 +2134,11 @@ function facetoface_user_cancel($session, $userid=false, $forcecancel=false, &$e
  * @param class $facetoface record from the facetoface table
  * @param class $session record from the facetoface_sessions table
  * @param integer $userid ID of the recipient of the email
+ * @param string $htmlmessage Html message
  * @returns string Error message (or empty string if successful)
  */
 function facetoface_send_notice($postsubject, $posttext, $posttextmgrheading,
-                                $notificationtype, $facetoface, $session, $userid) {
+                                $notificationtype, $facetoface, $session, $userid, $htmlmessage) {
     global $CFG, $DB;
 
     $user = $DB->get_record('user', array('id' => $userid));
@@ -2186,7 +2189,8 @@ function facetoface_send_notice($postsubject, $posttext, $posttextmgrheading,
                                                           $user, $session, $session->id);
                 $body = facetoface_email_substitutions($posttext, format_string($facetoface->name), $facetoface->reminderperiod,
                                                        $user, $session, $session->id);
-                $htmlbody = ''; // TODO.
+                $htmlmessage = facetoface_email_substitutions($posttext, $facetoface->name, $facetoface->reminderperiod, $user, $session, $session->id);
+                $htmlbody = $htmlmessage;
                 $icalattachments[] = array('filename' => $filename, 'subject' => $subject,
                                            'body' => $body, 'htmlbody' => $htmlbody);
             }
@@ -2199,7 +2203,8 @@ function facetoface_send_notice($postsubject, $posttext, $posttextmgrheading,
                                                       $user, $session, $session->id);
             $body = facetoface_email_substitutions($posttext, format_string($facetoface->name), $facetoface->reminderperiod,
                                                    $user, $session, $session->id);
-            $htmlbody = ''; // FIXME.
+            $htmlmessage = facetoface_email_substitutions($posttext, $facetoface->name, $facetoface->reminderperiod, $user, $session, $session->id);
+            $htmlbody = $htmlmessage;
             $icalattachments[] = array('filename' => $filename, 'subject' => $subject,
                                        'body' => $body, 'htmlbody' => $htmlbody);
         }
@@ -2305,8 +2310,11 @@ function facetoface_send_confirmation_notice($facetoface, $session, $userid, $no
     // Set invite bit.
     $notificationtype |= MDL_F2F_INVITE;
 
+    // Set HTML Body.
+    $htmlmessage = $facetoface->confirmationmessage;
+
     return facetoface_send_notice($postsubject, $posttext, $posttextmgrheading,
-                                  $notificationtype, $facetoface, $session, $userid);
+                                  $notificationtype, $facetoface, $session, $userid, $htmlmessage);
 }
 
 /**

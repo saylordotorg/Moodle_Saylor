@@ -1,26 +1,19 @@
 @mod @mod_quiz @qtype @qtype_gapfill @gapfill_import @javascript
 
 Feature: Test importing Gapfill questions
-    As a teacher
-    In order to reuse Gapfill questions
-    I need to import them
-
   Background:
     Given the following "users" exist:
-        | username | firstname | lastname | email                |
-        | teacher1 | T1        | Teacher1 | teacher1@example.com |
+        | username |
+        | teacher  |
     And the following "courses" exist:
         | fullname | shortname | category |
         | Course 1 | C1        | 0        |
     And the following "course enrolments" exist:
-        | user     | course | role           |
-        | teacher1 | C1     | editingteacher |
-    And I log in as "teacher1"
-    And I am on "Course 1" course homepage
-
+        | user    | course | role           |
+        | teacher | C1     | editingteacher |
   @javascript @_file_upload
-  Scenario: import drag and drop into text question.
-    And I navigate to "Question bank > Import" in current page administration
+  Scenario: import gapfill question.
+    When I am on the "Course 1" "core_question > course question import" page logged in as teacher
     And I set the field "id_format_xml" to "1"
     And I upload "question/type/gapfill/tests/fixtures/gapfill_examples.xml" file to "Import" filemanager
     And I press "id_submitbutton"
@@ -28,4 +21,4 @@ Feature: Test importing Gapfill questions
     And I should see "Importing 21 questions from file"
     And I press "Continue"
     #This is just the name of one of the example questions imported that will be listed
-    And I should see "Alternative_Delimiters"
+    And I should see "Crossword"

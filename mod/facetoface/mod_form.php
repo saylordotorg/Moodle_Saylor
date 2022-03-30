@@ -122,9 +122,13 @@ class mod_facetoface_mod_form extends moodleform_mod {
         $mform->setType('confirmationsubject', PARAM_TEXT);
         $mform->setDefault('confirmationsubject', get_string('setting:defaultconfirmationsubjectdefault', 'facetoface'));
 
-        $mform->addElement('textarea', 'confirmationmessage', get_string('email:message', 'facetoface'), 'wrap="virtual" rows="15" cols="70"');
-        $mform->setDefault('confirmationmessage', get_string('setting:defaultconfirmationmessagedefault', 'facetoface'));
-
+        $editoroptions = ['trusttext' => true];
+        $mform->addElement('editor', 'confirmationmessage', get_string('email:message', 'facetoface'), null, $editoroptions);
+        $mform->setType('confirmationmessage', PARAM_RAW);
+        $confirmationmessagedata = [
+            'text' => get_string('setting:defaultconfirmationmessagedefault2', 'facetoface'),
+            'format' => FORMAT_HTML
+        ];
         $mform->addElement('checkbox', 'emailmanagerconfirmation', get_string('emailmanager', 'facetoface'));
         $mform->addHelpButton('emailmanagerconfirmation', 'emailmanagerconfirmation', 'facetoface');
 
@@ -189,7 +193,10 @@ class mod_facetoface_mod_form extends moodleform_mod {
         $mform->addHelpButton('cancellationinstrmngr', 'cancellationinstrmngr', 'facetoface');
         $mform->disabledIf('cancellationinstrmngr', 'emailmanagercancellation');
         $mform->setDefault('cancellationinstrmngr', get_string('setting:defaultcancellationinstrmngrdefault', 'facetoface'));
-
+        $data = (object) [
+            'confirmationmessage' => $confirmationmessagedata
+        ];
+        $this->set_data($data);
         $features = new stdClass;
         $features->groups = false;
         $features->groupings = false;
@@ -203,6 +210,7 @@ class mod_facetoface_mod_form extends moodleform_mod {
     }
 
     public function data_preprocessing(&$defaultvalues) {
+        global $CFG;
 
         // Fix manager emails.
         if (empty($defaultvalues['confirmationinstrmngr'])) {
@@ -221,6 +229,31 @@ class mod_facetoface_mod_form extends moodleform_mod {
             $defaultvalues['cancellationinstrmngr'] = null;
         } else {
             $defaultvalues['emailmanagercancellation'] = 1;
+        }
+
+        if ($this->current->instance) {
+            $draftitemid = file_get_submitted_draft_itemid('confirmationmessage');
+            $defaultvalues['confirmationmessage'] = [
+                'format' => FORMAT_HTML,
+                'text' => file_prepare_draft_area(
+                    $draftitemid,
+                    $this->context->id,
+                    'mod_facetoface',
+                    'confirmationmessage',
+                    0,
+                    [
+                        'subdirs' => 1,
+                        'maxbytes' => $CFG->maxbytes,
+                        'maxfiles' => 0,
+                        'changeformat' => false,
+                        'context' => $this->context,
+                        'noclean' => true,
+                        'trusttext' => false,
+                    ],
+                    $defaultvalues['confirmationmessage']
+                ),
+                'itemid' => $draftitemid,
+            ];
         }
     }
 }
