@@ -267,6 +267,13 @@ if ($edit) {
         }else{
             $data->addtextarea = 0;
         }
+        if(!empty($data->{constants::TTSDIALOG})){
+            $data->addttsdialog = 1;
+            //expand opts
+            $data=utils::unpack_ttsdialogopts($data);
+        }else{
+            $data->addttsdialog = 0;
+        }
 
         //init our itemmedia upload file field
         $draftitemid = file_get_submitted_draft_itemid(constants::MEDIAQUESTION);

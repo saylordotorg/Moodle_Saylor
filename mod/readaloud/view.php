@@ -67,6 +67,18 @@ $completion->set_module_viewed($cm);
 //are we a teacher or a student?
 $mode = "view";
 
+//In the case that passage segments have not been set (usually from an upgrade from an earlier version) set those now
+if($moduleinstance->passagesegments===null) {
+    $olditem = false;
+    list($thephonetic, $thepassagesegments) = utils::update_create_phonetic_segments($moduleinstance, $olditem);
+    if (!empty($thephonetic)) {
+        $DB->update_record(constants::M_TABLE, array('id' => $moduleinstance->id, 'phonetic' => $thephonetic, 'passagesegments' => $thepassagesegments));
+        $moduleinstance->phonetic=$thephonetic;
+        $moduleinstance->passagesegments=$thepassagesegments;
+    }
+}
+
+
 //Get an admin settings
 $config = get_config(constants::M_COMPONENT);
 

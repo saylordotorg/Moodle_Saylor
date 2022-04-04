@@ -1,0 +1,81 @@
+<div class="ttsdialogplayer container"  id="{{uniqid}}_ttsdialogplayer">
+
+    {{#ttsdialoglines}}
+    <span class="hide ttsdialogline" data-voice="{{voice}}" data-speaker="{{speaker}}" data-audiourl="{{audiourl}}" data-speakertext="{{speakertext}}"></span>
+    {{/ttsdialoglines}}
+
+    <div class="row">
+        {{#itemttsdialogvisible}}
+            <div class="col-md-1">
+                    <button class="ttsdialog_button btn btn-secondary" ><i class="fa fa-play"></i></button>
+            </div>
+            <div class="col-md-11 ttsdialog_text"></div>
+        {{/itemttsdialogvisible}}
+        {{^itemttsdialogvisible}}
+            <div class="col-md-12" style="text-align: center">
+                <button class="ttsdialog_button btn btn-secondary" style="width: 200px;"><i class="fa fa-play"></i></button>
+            </div>
+            <div class="hide ttsdialog_text"></div>
+        {{/itemttsdialogvisible}}
+    </div>
+    <audio class="ttsdialog_audioplayer" ></audio>
+
+
+
+</div>
+{{^element.frozen}}
+    {{#js}}
+        require(['jquery','core/log'],function($,log) {
+        var dialoglines = $('#' + '{{uniqid}}_ttsdialogplayer .ttsdialogline');
+        var linecount = dialoglines.length;
+        var stoppedstate = '<i class="fa fa-play"></i>';
+        var playingstate = '<i class="fa fa-stop"></i>';
+
+        var currentline=-1;
+
+        var player = $('#' + '{{uniqid}}_ttsdialogplayer .ttsdialog_audioplayer');
+        var speakertext = $('#' + '{{uniqid}}_ttsdialogplayer .ttsdialog_text');
+        var playbutton = $('#' + '{{uniqid}}_ttsdialogplayer .ttsdialog_button');
+
+        player[0].addEventListener('ended', nextPlay);
+
+        playbutton.click(function(){
+            if(!(player[0].paused)){
+                currentline--;
+                player[0].pause();
+                playbutton.html(stoppedstate);
+            }else{
+                nextPlay();
+                playbutton.html(playingstate);
+            }
+
+        });
+
+        function nextPlay(){
+            log.debug("currentline: " + currentline);
+            log.debug("linecount: " + linecount);
+            currentline++;
+            if (currentline >= linecount){
+                currentline =-1;
+                playbutton.html(stoppedstate);
+                speakertext.text(" ");
+                return;
+            }
+            player.attr('src',dialoglines.eq(currentline).data('audiourl'));
+            if(dialoglines.eq(currentline).data('speaker')=='soundeffect'){
+                speakertext.text(' ');
+            }else{
+                speakertext.text(dialoglines.eq(currentline).data('speakertext'));
+            }
+
+            player[0].play();
+        }
+
+        <!-- script type="text/javascript" -->
+
+
+        <!-- script -->
+
+        });//end of require
+    {{/js}}
+{{/element.frozen}}

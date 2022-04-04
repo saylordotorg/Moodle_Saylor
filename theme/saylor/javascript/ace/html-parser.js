@@ -62,10 +62,11 @@ require(['jquery'], function ($) {
                     htmlEditor.getSession().setMode("ace/mode/html");
                     ace.config.loadModule('ace/ext/language_tools', function () {
                         htmlEditor.setOptions({
-                            fontSize: "16pt",
+                            fontFamily: 'SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace',
+                            fontSize: "12pt",
                             showLineNumbers: true,
                             showGutter: true,
-                            vScrollBarAlwaysVisible:true,
+                            vScrollBarAlwaysVisible: false,
                             enableBasicAutocompletion: true,
                             enableLiveAutocompletion: true
                         });
@@ -86,10 +87,11 @@ require(['jquery'], function ($) {
                     cssEditor.getSession().setMode("ace/mode/css");
                     ace.config.loadModule('ace/ext/language_tools', function () {
                         cssEditor.setOptions({
-                            fontSize: "16pt",
+                            fontFamily: 'SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace',
+                            fontSize: "12pt",
                             showLineNumbers: true,
                             showGutter: true,
-                            vScrollBarAlwaysVisible:true,
+                            vScrollBarAlwaysVisible: false,
                             enableBasicAutocompletion: true,
                             enableLiveAutocompletion: true
                         });
@@ -110,10 +112,11 @@ require(['jquery'], function ($) {
                     jsEditor.getSession().setMode("ace/mode/javascript");
                     ace.config.loadModule('ace/ext/language_tools', function () {
                         jsEditor.setOptions({
-                            fontSize: "16pt",
+                            fontFamily: 'SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace',
+                            fontSize: "12pt",
                             showLineNumbers: true,
                             showGutter: true,
-                            vScrollBarAlwaysVisible:true,
+                            vScrollBarAlwaysVisible: false,
                             enableBasicAutocompletion: true,
                             enableLiveAutocompletion: true
                         });

@@ -1,5 +1,8 @@
 Change List
 =========
+Version 3.1.07 (Build 2022033000)
+- Added premature leaving check (for quizzes with time limits) to safe save
+
 Version 3.1.06 (Build 2021052000)
 - Implemented SafeSave
 

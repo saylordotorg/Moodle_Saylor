@@ -81,6 +81,7 @@ const TTSQUESTIONVOICE = 'itemttsvoice';
 const TTSQUESTIONOPTION = 'itemttsoption';
 const TTSAUTOPLAY = 'itemttsautoplay';
 const TTSDIALOG = 'itemttsdialog';
+const TTSDIALOGOPTS = 'itemttsdialogopts';
 
 const TTSDIALOGVOICEA = 'itemttsdialogvoicea';
 const TTSDIALOGVOICEB = 'itemttsdialogvoiceb';

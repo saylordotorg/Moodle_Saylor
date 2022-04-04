@@ -840,6 +840,25 @@ class utils{
         return $options;
     }
 
+    public static function unpack_ttsdialogopts($data){
+        if(!self::is_json($data->{constants::TTSDIALOGOPTS})){return $data;}
+        $opts = json_decode($data->{constants::TTSDIALOGOPTS});
+        $data->{constants::TTSDIALOGVISIBLE}=$opts->{constants::TTSDIALOGVISIBLE};
+        $data->{constants::TTSDIALOGVOICEA}=$opts->{constants::TTSDIALOGVOICEA};
+        $data->{constants::TTSDIALOGVOICEB}=$opts->{constants::TTSDIALOGVOICEB};
+        $data->{constants::TTSDIALOGVOICEC}=$opts->{constants::TTSDIALOGVOICEB};
+        return $data;
+    }
+    public static function pack_ttsdialogopts($data){
+        $opts = new \stdClass();
+        $opts->{constants::TTSDIALOGVISIBLE}=$data->{constants::TTSDIALOGVISIBLE};
+        $opts->{constants::TTSDIALOGVOICEA}=$data->{constants::TTSDIALOGVOICEA};
+        $opts->{constants::TTSDIALOGVOICEB}=$data->{constants::TTSDIALOGVOICEB};
+        $opts->{constants::TTSDIALOGVOICEC}=$data->{constants::TTSDIALOGVOICEC};
+        $opts_json = json_encode($opts);
+        return $opts_json;
+    }
+
     public static function fetch_auto_voice($langcode){
         $showall=false;
         $voices = self::get_tts_voices($langcode,$showall);
@@ -1164,6 +1183,56 @@ class utils{
             return $moduleinstance;
 
         }//end of prepare_file_and_json_stuff
+
+    //fetch the MP3 URL of the text we want read aloud
+    public static function fetch_polly_url($token,$region,$speaktext,$texttype, $voice) {
+        global $USER;
+
+
+        $cache = \cache::make_from_params(\cache_store::MODE_APPLICATION, constants::M_COMPONENT, 'polly');
+        $key = sha1($speaktext . '|' . $texttype . '|' . $voice);
+        $pollyurl = $cache->get($key);
+        if($pollyurl && !empty($pollyurl)){
+            return $pollyurl;
+        }
+
+        //The REST API we are calling
+        $functionname = 'local_cpapi_fetch_polly_url';
+
+        //log.debug(params);
+        $params = array();
+        $params['wstoken'] = $token;
+        $params['wsfunction'] = $functionname;
+        $params['moodlewsrestformat'] = 'json';
+        $params['text'] = urlencode($speaktext);
+        $params['texttype'] = $texttype;
+        $params['voice'] = $voice;
+        $params['appid'] = constants::M_COMPONENT;;
+        $params['owner'] = hash('md5',$USER->username);
+        $params['region'] = $region;
+        $params['engine'] = self::can_speak_neural($voice, $region)?'neural' : 'standard';
+        $serverurl = self::CLOUDPOODLL . '/webservice/rest/server.php';
+        $response = self::curl_fetch($serverurl, $params);
+        if (!self::is_json($response)) {
+            return false;
+        }
+        $payloadobject = json_decode($response);
+
+        //returnCode > 0  indicates an error
+        if (!isset($payloadobject->returnCode) || $payloadobject->returnCode > 0) {
+            return false;
+            //if all good, then lets do the embed
+        } else if ($payloadobject->returnCode === 0) {
+            $pollyurl = $payloadobject->returnMessage;
+            //if its an S3 URL  then we cache it, yay
+            if(\core_text::strpos($pollyurl,'pollyfile.poodll.net')>0) {
+                $cache->set($key, $pollyurl);
+            }
+            return $pollyurl;
+        } else {
+            return false;
+        }
+    }
 
 
 

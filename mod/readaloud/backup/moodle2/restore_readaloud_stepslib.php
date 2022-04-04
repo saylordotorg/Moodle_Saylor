@@ -82,6 +82,12 @@ class restore_readaloud_activity_structure_step extends restore_activity_structu
 
         $data->timemodified = $this->apply_date_offset($data->timemodified);
         $data->timecreated = $this->apply_date_offset($data->timecreated);
+        if(isset($data->viewstart) && !empty($data->viewstart)){
+            $data->viewstart = $this->apply_date_offset($data->viewstart);
+        }
+        if(isset($data->viewend) && !empty($data->viewend)){
+            $data->viewend = $this->apply_date_offset($data->viewend);
+        }
 
         // insert the activity record
         $newitemid = $DB->insert_record(constants::M_TABLE, $data);

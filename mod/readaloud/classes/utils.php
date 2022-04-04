@@ -137,6 +137,7 @@ class utils {
         global $DB;
         $updates=0;
         $items = $DB->get_records(constants::M_TABLE);
+
         foreach($items as $moduleinstance) {
             $olditem = false;
             list($thephonetic,$thepassagesegments) = self::update_create_phonetic_segments($moduleinstance,$olditem);

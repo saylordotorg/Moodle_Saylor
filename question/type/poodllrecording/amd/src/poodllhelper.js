@@ -7,6 +7,7 @@ define(["jquery", "core/log"], function ($, log) {
 
 
         init: function (opts) {
+            var that =this;
             var prquestion = function (evt) {
 
                 if(evt){
@@ -23,6 +24,8 @@ define(["jquery", "core/log"], function ($, log) {
                                 var nextbtn = $('.submitbtns .mod_quiz-next-nav');
                                 nextbtn.removeClass('qtype_poodllrecording_disabledbtn');
                                 nextbtn.removeAttr('disabled', 'disabled');
+                                //deactivate premature leaving
+                                $(window).off('beforeunload', that.preventPrematureLeaving);
                             }
 
                             //poke the filename
@@ -49,6 +52,8 @@ define(["jquery", "core/log"], function ($, log) {
                                 var savebtn = $('.submitbtns .mod_quiz-next-nav');
                                 savebtn.addClass('qtype_poodllrecording_disabledbtn');
                                 savebtn.attr('disabled', 'disabled');
+                                //Add a page unload check ..
+                                $(window).on('beforeunload', that.preventPrematureLeaving);
                             }
 
                             break;
@@ -57,7 +62,14 @@ define(["jquery", "core/log"], function ($, log) {
             }; //end of callback function
             window.prquestion = prquestion;
 
-        } //end of init
+        }, //end of init
+
+        preventPrematureLeaving: function(e){
+            log.debug('preventPrematureLeaving has been called');
+            e.preventDefault();
+            e.returnValue = "Your recording has not been uploaded. Cancel to stay on this page.";
+            return e.returnValue;
+        },
 
     };//end of return object
 });

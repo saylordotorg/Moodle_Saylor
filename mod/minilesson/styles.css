@@ -1999,3 +1999,9 @@ span.mod_minilesson_finishedanswer {
 .mod_minilesson_spokenandcorrect.minilesson_success {
   background-color: lightgreen;
 }
+
+.ttsdialog_text {
+  border: 1px solid darkgray;
+  background-color: white;
+  min-height: 30px;
+}

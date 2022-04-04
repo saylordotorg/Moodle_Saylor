@@ -1,3 +1,9 @@
+2.0.79 (Build 2022040200)
+    - Fixed bug when restoring into new installed 2.0.76- 2.0.78 versions from older backups (viewstart DB field had no default set)
+
+2.0.78 (Build 2022040100)
+- improved upgrade of readalouds that needed a lot of phonetics and passagesegments upgraded too
+
 2.0.77 (Build 2022032000)
 - fixed issue in get_course_moduleinfo that could kill backup and restore
 - tweaked polly stuff

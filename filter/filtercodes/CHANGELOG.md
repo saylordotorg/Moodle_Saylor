@@ -1,8 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [2.2.8] 2022-03-27 (DEV)
+## [2.2.8] 2022-03-31 (DEV)
 ### Added
+- New {ifwebservice}{/ifwebservice} tags.
+- New {ifnotwebservice}{/ifnotwebservice} tags.
 - New {ifnotinactivity}{/ifnotinactivity} tags.
 - New {ifinactivity}{/ifinactivity} tags.
 - New {ifnotactivitycompleted id}{/ifnotactivitycompleted} tags.

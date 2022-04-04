@@ -791,6 +791,13 @@ function minilesson_output_fragment_mform($args) {
                 }else{
                     $data->addtextarea = 0;
                 }
+                if(!empty($data->{constants::TTSDIALOG})){
+                    $data->addttsdialog = 1;
+                    //expand opts
+                    $data=utils::unpack_ttsdialogopts($data);
+                }else{
+                    $data->addttsdialog = 0;
+                }
 
 
 

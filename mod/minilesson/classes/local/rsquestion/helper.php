@@ -314,6 +314,12 @@ class helper
             }
         }
 
+        //TTS Dialog
+        if(property_exists($data,constants::TTSDIALOG)){
+            $theitem->{constants::TTSDIALOG} = $data->{constants::TTSDIALOG};
+            $theitem->{constants::TTSDIALOGOPTS} = utils::pack_ttsdialogopts($data);
+        }
+
         //save correct answer if we have one
         if (property_exists($data, constants::CORRECTANSWER)) {
             $theitem->{constants::CORRECTANSWER} = $data->{constants::CORRECTANSWER};
