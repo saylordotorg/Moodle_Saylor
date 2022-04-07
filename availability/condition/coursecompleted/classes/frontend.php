@@ -26,6 +26,7 @@
 namespace availability_coursecompleted;
 
 use \cm_info;
+use \completion_info;
 use \section_info;
 use \stdClass;
 
@@ -50,6 +51,12 @@ class frontend extends \core_availability\frontend {
      * @return bool True if there are completion criteria
      */
     protected function allow_add($course, cm_info $cm = null, section_info $section = null) {
-        return $course->enablecompletion == 1;
+        if ($course->enablecompletion == 1) {
+            $completioninfo = new \completion_info($course);
+            if (count($completioninfo->get_criteria()) > 0) {
+                return true;
+            }
+        }
+        return false;
     }
 }

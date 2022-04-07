@@ -1,12 +1,18 @@
   .que.coderunner .ace_editor.html-question {
-      height: 300px;
+      resize: vertical;
+      overflow: hidden;
+      min-height: 200px;
   }
 
   .que.coderunner .ace_editor.css-question {
-      height: 200px;
+      resize: vertical;
+      overflow: hidden;
+      min-height: 200px;
   }
   .que.coderunner .ace_editor.js-question {
-      height: 100px;
+      resize: vertical;
+      overflow: hidden;
+      min-height: 200px;
   }
 
   .que.coderunner .html-parser.coderunner-ui-element {
@@ -15,8 +21,10 @@
 
   .que.coderunner .html-parser.rendered-html {
       width: 100%;
-      min-height: 200px;
+      min-height: 300px;
       border: 1px solid $gray-300;
+      resize: vertical;
+      overflow: hidden;
   }
 
   #editors {
@@ -30,15 +38,27 @@
 
   .que.coderunner .html-parser-wrapper .html-area-title {
       @extend h3;
+      padding-left: 0.5rem;
+      padding-top: 0.5rem;
+      margin-bottom: 0;
   }
   .que.coderunner .html-parser-wrapper .css-area-title {
       @extend h3;
+      padding-left: 0.5rem;
+      padding-top: 0.5rem;
+      margin-bottom: 0;
   }
   .que.coderunner .html-parser-wrapper .js-area-title {
       @extend h3;
+      padding-left: 0.5rem;
+      padding-top: 0.5rem;
+      margin-bottom: 0;
   }
   .que.coderunner .html-parser-wrapper .rendered-html-title {
       @extend h3;
+      padding-left: 0.5rem;
+      padding-top: 0.5rem;
+      margin-bottom: 0;
   }
 
 .html-parser-wrapper {
