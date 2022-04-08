@@ -70,6 +70,13 @@ class utils {
             return (substr($moduleinstance->ttslanguage,0,2)=='en' ||
                             substr($moduleinstance->ttslanguage,0,2)=='de' ||
                             substr($moduleinstance->ttslanguage,0,2)=='fr' ||
+                            substr($moduleinstance->ttslanguage,0,2)=='ru' ||
+                            substr($moduleinstance->ttslanguage,0,2)=='eu' ||
+                            substr($moduleinstance->ttslanguage,0,2)=='pl' ||
+                            substr($moduleinstance->ttslanguage,0,2)=='fi' ||
+                            substr($moduleinstance->ttslanguage,0,2)=='it' ||
+                            substr($moduleinstance->ttslanguage,0,2)=='pt' ||
+                            substr($moduleinstance->ttslanguage,0,2)=='uk' ||
                             substr($moduleinstance->ttslanguage,0,2)=='es') && trim($moduleinstance->passage)!=="";
         }
     }
@@ -82,21 +89,16 @@ class utils {
         global $CFG;
 
         $cleantext = diff::cleanText($moduleinstance->passage);
+        $shortlang = substr($moduleinstance->ttslanguage,0,2);
 
-          //number or odd char converter
-        if(substr($moduleinstance->ttslanguage,0,2)=='en' || substr($moduleinstance->ttslanguage,0,2)=='de' ){
             //find numbers in the passage, and then replace those with words in the target text
-            $cleantext=alphabetconverter::numbers_to_words_convert($cleantext,$cleantext);
-            switch (substr($moduleinstance->ttslanguage,0,2)){
-                case 'en':
-                    $cleantext=alphabetconverter::numbers_to_words_convert($cleantext,$cleantext);
-                    break;
-                case 'de':
-                    $cleantext=alphabetconverter::eszett_to_ss_convert($cleantext,$cleantext);
-                    break;
+            $cleantext=alphabetconverter::numbers_to_words_convert($cleantext,$cleantext,$shortlang);
 
+            //dealt with eszetts
+            if($shortlang=='de' ){
+                    $cleantext=alphabetconverter::eszett_to_ss_convert($cleantext,$cleantext);
             }
-        }
+
 
         if(!empty($cleantext)) {
             return sha1($cleantext);
@@ -169,23 +171,21 @@ class utils {
             $params["moodlewsrestformat"]='json';
             $params["passage"]=diff::cleanText($passage);
 
-//strange char or number converter
-//if(isset($CFG->readaloud_experimental) && $CFG->readaloud_experimental){
-if(true){
-    //find numbers in the passage, and then replace those with words in the target text
+        //strange char or number converter
+        $shortlang = substr($language,0,2);
+        //find numbers in the passage, and then replace those with words in the target text
 
-    switch (substr($language,0,2)){
-        case 'en':
-            //find digits in original passage, and convert number words to digits in the target passage
-            $params["passage"]=alphabetconverter::numbers_to_words_convert($params["passage"],$params["passage"]);
-            break;
-        case 'de':
-            //find eszetts in original passage, and convert ss words to eszetts in the target passage
-            $params["passage"]=alphabetconverter::eszett_to_ss_convert($params["passage"],$params["passage"]);
-            break;
+        $params["passage"]=alphabetconverter::numbers_to_words_convert($params["passage"],$params["passage"],$shortlang);
 
-    }
-}
+        //other conversions
+        switch ($shortlang){
+
+            case 'de':
+                //find eszetts in original passage, and convert ss words to eszetts in the target passage
+                $params["passage"]=alphabetconverter::eszett_to_ss_convert($params["passage"],$params["passage"]);
+                break;
+
+        }
 
             $params["language"]=$language;
             $params["region"]=$region;
@@ -251,6 +251,22 @@ if(true){
         }else{
             return false;
         }
+    }
+
+    //De accent and other processing so our auto transcript will match the passage
+    public static function remove_accents_and_poormatchchars($moduleinstance){
+        switch($moduleinstance->ttslanguage){
+            case constants::M_LANG_UKUA:
+                $ret = str_replace(
+                    array("е́","о́","у́","а́","и́","я́","ю́","Е́","О́","У́","А́","И́","Я́","Ю́","“","”","'","́"),
+                    array("е","о","у","а","и","я","ю","Е","О","У","А","И","Я","Ю","\"","\"","’",""),
+                    $moduleinstance->passage
+                );
+               break;
+            default:
+                $ret = $moduleinstance->passage;
+        }
+        return $ret;
     }
 
     //are we willing and able to transcribe submissions?
@@ -1701,7 +1717,7 @@ if(true){
                     case ';':
                     case '、':
                     case '；':
-                        if(($matches->{$i + 1}->audiostart - $lastbreak)>2){
+                        if(($matches->{$i + 1}->audioend - $lastbreak)>2){
                             $letsbreak =true;
                         }
                         break;
@@ -1709,9 +1725,9 @@ if(true){
                 }//end of switch
                 //we add the new break
                 if($letsbreak){
-                    $newbreak = ['wordnumber' => $i + 1, 'audiotime' => $matches->{$i + 1}->audiostart];
+                    $newbreak = ['wordnumber' => $i + 1, 'audiotime' => $matches->{$i + 1}->audioend];
                     $breaks[] = $newbreak;
-                    $lastbreak = $matches->{$i + 1}->audiostart;
+                    $lastbreak = $matches->{$i + 1}->audioend;
                 }
             }//end of for
         }//end of if count > 0
@@ -1985,6 +2001,7 @@ if(true){
              $ret[$voice]=$voice . $neuraltag . ' - (' . $lang_options[$lang] . ')';
             }
         }
+        $ret = array_merge(array(constants::TTS_NONE => get_string('nottsvoice',constants::M_COMPONENT)), $ret);
         return $ret;
     }
 
@@ -2029,7 +2046,10 @@ if(true){
                 constants::M_LANG_NBNO => get_string('nb-no', constants::M_COMPONENT),
                 constants::M_LANG_PLPL => get_string('pl-pl', constants::M_COMPONENT),
                 constants::M_LANG_RORO => get_string('ro-ro', constants::M_COMPONENT),
-                constants::M_LANG_SVSE => get_string('sv-se', constants::M_COMPONENT)
+                constants::M_LANG_SVSE => get_string('sv-se', constants::M_COMPONENT),
+                constants::M_LANG_UKUA => get_string('uk-ua',constants::M_COMPONENT),
+                constants::M_LANG_EUES => get_string('eu-es',constants::M_COMPONENT),
+                constants::M_LANG_FIFI => get_string('fi-FI',constants::M_COMPONENT)
         );
         /*
           return array(

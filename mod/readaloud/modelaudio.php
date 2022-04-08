@@ -111,6 +111,17 @@ switch ($action) {
             redirect($PAGE->url);
         }
         break;
+    case 'modelaudiobreaksgenerate':
+
+        $ma_matches = json_decode($moduleinstance->modelaudiomatches);
+        $breaks = utils::guess_modelaudio_breaks($moduleinstance->passage,$ma_matches,$moduleinstance->ttslanguage);
+        $modelaudiobreaks = json_encode($breaks);
+        $DB->update_record(constants::M_TABLE,
+            array('id' => $moduleinstance->id, 'modelaudiobreaks' => $modelaudiobreaks));
+        redirect($PAGE->url);
+
+        break;
+
     case 'modelaudiobreaksclear':
 
           $DB->update_record(constants::M_TABLE,
@@ -119,16 +130,20 @@ switch ($action) {
 
         break;
     case 'modelaudioclear':
+            $havettsvoice = $moduleinstance->ttsvoice != constants::TTS_NONE;
+            $matches=[];
+            $breaks=[];
+            if($havettsvoice) {
+                $slowpassage = utils::fetch_speech_ssml($moduleinstance->passage, $moduleinstance->ttsspeed);
+                $speechmarks = utils::fetch_polly_speechmarks($token, $moduleinstance->region,
+                    $slowpassage, 'ssml', $moduleinstance->ttsvoice);
+                $matches = utils::speechmarks_to_matches($moduleinstance->passagesegments, $speechmarks, $moduleinstance->ttslanguage);
 
-            $slowpassage = utils::fetch_speech_ssml($moduleinstance->passage,$moduleinstance->ttsspeed);
-            $speechmarks = utils::fetch_polly_speechmarks($token,$moduleinstance->region,
-                    $slowpassage,'ssml',$moduleinstance->ttsvoice);
-            $matches = utils::speechmarks_to_matches($moduleinstance->passagesegments,$speechmarks,$moduleinstance->ttslanguage);
-
-            if(!empty($moduleinstance->modelaudiobreaks)){
-                $breaks = utils::sync_modelaudio_breaks(json_decode($moduleinstance->modelaudiobreaks),$matches);
-            }else{
-                $breaks = utils::guess_modelaudio_breaks($moduleinstance->passagesegments,$matches,$moduleinstance->ttslanguage);
+                if (!empty($moduleinstance->modelaudiobreaks)) {
+                    $breaks = utils::sync_modelaudio_breaks(json_decode($moduleinstance->modelaudiobreaks), $matches);
+                } else {
+                    $breaks = utils::guess_modelaudio_breaks($moduleinstance->passagesegments, $matches, $moduleinstance->ttslanguage);
+                }
             }
 
             $DB->update_record(constants::M_TABLE, array('id' => $moduleinstance->id,
@@ -236,6 +251,10 @@ $modelaudiobreaksform->display();
 //clear breaks button
 $clearbutton = $OUTPUT->single_button(new \moodle_url(constants::M_URL . '/modelaudio.php',
         array('n' => $moduleinstance->id, 'action' => 'modelaudiobreaksclear')), get_string('modelaudiobreaksclear', constants::M_COMPONENT),'get');
+echo $clearbutton;
+//auto-generate model audio breaks button
+$clearbutton = $OUTPUT->single_button(new \moodle_url(constants::M_URL . '/modelaudio.php',
+    array('n' => $moduleinstance->id, 'action' => 'modelaudiobreaksgenerate')), get_string('modelaudiobreaksgenerate', constants::M_COMPONENT),'get');
 echo $clearbutton;
 
 //set up the AMD js and related opts

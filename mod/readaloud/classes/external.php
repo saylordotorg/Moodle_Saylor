@@ -157,25 +157,27 @@ class mod_readaloud_external extends external_api {
 
         //Fetch phonetics and segments
         list($transcript_phonetic,$transcript) = utils::fetch_phones_and_segments($transcript,$language,$region);
+        $shortlang = substr($language,0,2);
 
-        //EXPERIMENTAL
-        switch (substr($language,0,2)){
-            case 'en':
-                //find digits in original passage, and convert number words to digits in the target passage
-                $transcript=alphabetconverter::words_to_numbers_convert($passage,$transcript);
-                break;
-            case 'de':
-                //find eszetts in original passage, and convert ss words to eszetts in the target passage
-                $transcript=alphabetconverter::ss_to_eszett_convert($passage,$transcript );
-                break;
+        //conv. number words to digits (if that is what they originally were)
+        switch ($shortlang){
             case 'ja':
                 //find digits in original passage, and convert number words to digits in the target passage
                 //this works but segmented digits are a bit messed up, not sure its worthwhile. more testing needed
                 //from here and aigrade
                 $transcript=alphabetconverter::words_to_suji_convert($passage,$transcript);
                 break;
+            case 'en':
+            default:
+                //find digits in original passage, and convert number words to digits in the target passage
+                $transcript=alphabetconverter::words_to_numbers_convert($passage,$transcript,$shortlang);
+                break;
+        }
 
-
+        //for german we need to deal with eszetts
+        if($shortlang=='de'){
+                //find eszetts in original passage, and convert ss words to eszetts in the target passage
+                $transcript=alphabetconverter::ss_to_eszett_convert($passage,$transcript );
         }
 
         //if its japanese turn zenkaku numbers into hankaku ones

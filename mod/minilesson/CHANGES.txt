@@ -1,5 +1,7 @@
 Version 1.0.38(Build 2022032900)
 - Added TTS Dialog
+- Added Ukranian, Finnish, Russian, Portuguese, Basque, Italian and Polish to Poodll STT
+- Added YouTube URL parsing
 
 Version 1.0.37(Build 2022032000)
 - Fixed an issue with JP phonetic matching

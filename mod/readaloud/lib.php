@@ -272,6 +272,7 @@ function readaloud_update_grades($moduleinstance, $userid = 0, $nullifnone = tru
 
     } else if ($grades = readaloud_get_user_grades($moduleinstance, $userid)) {
         if (class_exists('\core_completion\api')) {
+            require_once("{$CFG->libdir}/completionlib.php");
             $completionexpected = (empty($moduleinstance->completionexpected) ? null : $moduleinstance->completionexpected);
             \core_completion\api::update_completion_date_event($moduleinstance->coursemodule, 'readaloud', $moduleinstance->id,
                 $completionexpected);
@@ -500,10 +501,15 @@ function readaloud_add_instance(stdClass $readaloud, mod_readaloud_mod_form $mfo
     $readaloud->timecreated = time();
     $readaloud = readaloud_process_editors($readaloud, $mform);
 
+    //trim any bad chars that might kill recognition (Accents in the real world are fine, but out speech results often wont have them)
+    $readaloud->passage = utils::remove_accents_and_poormatchchars($readaloud);
+
     //do phonetics
     list($thephonetic,$thepassagesegments) = utils::update_create_phonetic_segments($readaloud,false);
     $readaloud->phonetic = $thephonetic;
     $readaloud->passagesegments = $thepassagesegments;
+
+
 
     //we want to process the hashcode and lang model if it makes sense
     if(utils::needs_lang_model($readaloud)){
@@ -526,7 +532,8 @@ function readaloud_add_instance(stdClass $readaloud, mod_readaloud_mod_form $mfo
     if(!empty($readaloud->passage)) {
         $config = get_config(constants::M_COMPONENT);
         $token = utils::fetch_token($config->apiuser,$config->apisecret);
-        if($token) {
+        $havettsvoice = $readaloud->ttsvoice != constants::TTS_NONE;
+        if($token && $havettsvoice) {
             $slowpassage = utils::fetch_speech_ssml($readaloud->passage, $readaloud->ttsspeed);
             $speechmarks = utils::fetch_polly_speechmarks($token, $readaloud->region,
                     $slowpassage, 'ssml', $readaloud->ttsvoice);
@@ -573,6 +580,9 @@ function readaloud_update_instance(stdClass $readaloud, mod_readaloud_mod_form $
     $readaloud->id = $readaloud->instance;
     $readaloud = readaloud_process_editors($readaloud, $mform);
 
+    //trim any bad chars that might kill recognition (Accents in the real world are fine, but out speech results often wont have them)
+    $readaloud->passage = utils::remove_accents_and_poormatchchars($readaloud);
+
     //we want to process the hashcode and lang model if it makes sense
     $oldrecord = $DB->get_record(constants::M_TABLE,array('id'=>$readaloud->id));
 
@@ -598,7 +608,8 @@ function readaloud_update_instance(stdClass $readaloud, mod_readaloud_mod_form $
 
     //we want to create a polly record and speechmarks, if (!human_modelaudio && passage) && (passage change || voice change || speed change)
     $needspeechmarks =false;
-    if(empty($readaloud->modelaudiourl) && !empty($readaloud->passage) && $newpassagehash){
+    $havettsvoice = $readaloud->ttsvoice != constants::TTS_NONE;
+    if(empty($readaloud->modelaudiourl) && !empty($readaloud->passage && $havettsvoice) && $newpassagehash){
         //if it has changed OR voice has changed we need to do some work
         if($oldrecord->passagehash!= ($readaloud->region . '|' . $newpassagehash) ||
             $oldrecord->ttsvoice != $readaloud->ttsvoice ||

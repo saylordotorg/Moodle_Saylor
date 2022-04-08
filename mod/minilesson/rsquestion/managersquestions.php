@@ -203,7 +203,11 @@ if ($data = $mform->get_data()) {
         }else{
             $olditem=false;
         }
-        $data->passagehash = \mod_minilesson\local\rsquestion\helper::update_create_langmodel($minilesson,$olditem,$data);
+    //remove bad accents and things that mess up transcription (kind of like clear but permanent)
+    $data = \mod_minilesson\local\rsquestion\helper::deaccent_item($minilesson,$data);
+
+    //xreate passage hash
+    $data->passagehash = \mod_minilesson\local\rsquestion\helper::update_create_langmodel($minilesson,$olditem,$data);
 
         //lets update the phonetics
         $data->phonetic = \mod_minilesson\local\rsquestion\helper::update_create_phonetic($minilesson,$olditem,$data);

@@ -22,9 +22,410 @@ namespace mod_minilesson;
 
 class alphabetconverter {
 
+    //Russian
+    //---------------------------------------------------------------------------------------
+    static function numberToWords_ru($num) {
+        $num = (int)$num;
+        $nul='ноль';
+        $ten=array(
+            array('','один','два','три','четыре','пять','шесть','семь', 'восемь','девять'),
+            array('','одна','две','три','четыре','пять','шесть','семь', 'восемь','девять'),
+        );
+        $a20=array('десять','одиннадцать','двенадцать','тринадцать','четырнадцать' ,'пятнадцать','шестнадцать','семнадцать','восемнадцать','девятнадцать');
+        $tens=array(2=>'двадцать','тридцать','сорок','пятьдесят','шестьдесят','семьдесят' ,'восемьдесят','девяносто');
+        $hundred=array('','сто','двести','триста','четыреста','пятьсот','шестьсот', 'семьсот','восемьсот','девятьсот');
+        $unit=array( // Units
+            array('коп.','коп.','коп.',	 1),
+            array('руб.','руб.','руб.',	 0),
+            array('тыс.','тыс.','тыс.',	 1),
+            array('млн.','млн.','млн.',	 0),
+            array('млрд.','млрд.','млрд.',	 0),
+            array('trilyon','trilyon','trilyon',	 0),
+        );
+        //
+        list($rub,$kop) = explode('.',sprintf("%015.2f", floatval($num)));
+        $out = array();
+        if (intval($rub)>0) {
+            foreach(str_split($rub,3) as $uk=>$v) { // by 3 symbols
+                if (!intval($v)) continue;
+                $uk = sizeof($unit)-$uk-1; // unit key
+                $gender = $unit[$uk][3];
+                list($i1,$i2,$i3) = array_map('intval',str_split($v,1));
+                // mega-logic
+                $out[] = $hundred[$i1]; # 1xx-9xx
+                if ($i2>1) $out[]= $tens[$i2].' '.$ten[$gender][$i3]; # 20-99
+                else $out[]= $i2>0 ? $a20[$i3] : $ten[$gender][$i3]; # 10-19 | 1-9
+                // units without rub & kop
+                if ($uk>1) $out[]= self::ru_morph($v,$unit[$uk][0],$unit[$uk][1],$unit[$uk][2]);
+            } //foreach
+        }
+        else $out[] = $nul;
+        $out[] = self::ru_morph(intval($rub), $unit[1][0],$unit[1][1],$unit[1][2]); // rub
+        $out[] = $kop.' '.self::ru_morph($kop,$unit[0][0],$unit[0][1],$unit[0][2]); // kop
+        return trim(preg_replace('/ {2,}/', ' ', join(' ',$out)));
+    }
+
+    static function ru_morph($n, $f1, $f2, $f5) {
+        $n = abs(intval($n)) % 100;
+        if ($n>10 && $n<20) return $f5;
+        if ($n%10>1 && $n%10<5) return $f2;
+        if ($n%10==1) return $f1;
+        return $f5;
+    }
+
+    //Finnish
+    //---------------------------------------------------------------------------------------
+    static function numberToWords_fi($number) {
+        $number = (int)$number;
+        $ones = array("", "yksi", "kaksi", "kolme", "neljä", "viisi", "kuusi",
+            "seitsemän", "kahdeksan", "yhdeksän");
+        $tens = array("", "kymmenen", "kaksikymmentä", "kolmekymmentä",
+            "neljäkymmentä", "viisikymmentä", "kuusikymmentä", "seitsemänkymmentä",
+            "kahdeksankymmentä", "yhdeksänkymmentä");
+        $triplets = array("", "sata", "tuhat");
+
+        // split the number into digits
+        $digits = str_split(strrev((string) $number), 1);
+
+        // find out how many digits we have
+        $num_digits = count($digits);
+
+        // make sure the number is not bigger than 999 or less than 1
+        if ($num_digits > 3 || $number < 1) {
+            return false;
+        }
+
+        // loop through each digit, starting from the right
+        $words = array();
+        for ($i = 0; $i < $num_digits; $i++) {
+
+            // if this is the last digit, we need to multiply by 10^i
+            if ($i == $num_digits - 1) {
+                $multiplier = pow(10, $i);
+
+                // otherwise we need to multiply by 10^(i+1)
+            } else {
+                $multiplier = pow(10, $i + 1);
+            }
+
+            // look up the index in the ones, tens, and triplets arrays
+            $index = (int) ($number / $multiplier) % 10;
+
+            // if this is not the last digit, we need to multiply by 10^i
+            if ($i == 2) {
+
+                // we can't say something like 'sata kaksisataa', so we need to add 'toista' in front of 2nd triplet
+                if ($index == 1) {
+                    $words[] = 'toista';
+
+                    // otherwise we just need to look up the triplet index directly and add 'sata' in front of it
+                } else {
+                    $words[] = $triplets[$index];
+                }
+
+                // finally, we need to add 'sata' after the triplet index (if it's not zero that is)
+                if ($index != 0) {
+                    $words[] = 'sata';
+                }
+
+                // otherwise just look up the index directly and add it to the array of words
+            } else {
+                $words[] = $ones[$index];
+
+                // if this is a tens digit, we need to add the appropriate tens word after it as well (if it's not zero that is)
+                if ($index != 0 && $i == 1) {
+                    $words[] = $tens[$index];
+                }
+
+                // if this is a hundreds digit, we need to add 'sata' after it as well (if it's not zero that is)
+                if ($index != 0 && $i == 0) {
+                    $words[] = 'sata';
+                }
+            }
+
+        }
+
+        // now that we have all the words, we need to reverse them and return the string
+        return implode(' ', array_reverse($words));
+    }
+
+
+    //Polish
+    //---------------------------------------------------------------------------------------
+    static function numberToWords_pl($number) {
+        $number = (int)$number;
+        $words = array();
+        $words[0] = 'zero';
+        $words[1] = 'jeden';
+        $words[2] = 'dwa';
+        $words[3] = 'trzy';
+        $words[4] = 'cztery';
+        $words[5] = 'pięć';
+        $words[6] = 'sześć';
+        $words[7] = 'siedem';
+        $words[8] = 'osiem';
+        $words[9] = 'dziewięć';
+        $words[10] = 'dziesięć';
+        $words[11] = 'jedenaście';
+        $words[12] = 'dwanaście';
+        $words[13] = 'trzynaście';
+        $words[14] = 'czternaście';
+        $words[15] = 'piętnaście';
+        $words[16] = 'szesnaście';
+        $words[17] = 'siedemnaście';
+        $words[18] = 'osiemnaście';
+        $words[19] = 'dziewiętnaście';
+        $words[20] = 'dwadzieścia';
+        $words[30] = 'trzydzieści';
+        $words[40] = 'czterdzieści';
+        $words[50] = 'pięćdziesiąt';
+        $words[60] = 'sześćdziesiąt';
+        $words[70] = 'siedemdziesiąt';
+        $words[80] = 'osiemdziesiąt';
+        $words[90] = 'dziewięćdziesiąt';
+        $words['hundred'] = 'sto';
+        $words['thousand'] = 'tysiąc';
+
+        if ($number == 0) {
+            return $words[0];
+        } else if ($number == 1000) {
+            return "tysiąc";
+        } else if ($number < 21) {
+            return $words[$number];
+        }else if(array_key_exists($number,$words)){
+            return $words[$number];
+        } else {
+            return self::numberToWords_pl(intval($number / 100)) . " " .  $words['hundred'] . " " . self::numberToWords_pl($number % 100);
+        }
+    }
+
+    //French
+    //---------------------------------------------------------------------------------------
+    static function numberToWords_fr($number) {
+        $number = (int)$number;
+        $frenchNumbers = array(
+            1 => 'un', 2 => 'deux', 3 => 'trois', 4 => 'quatre', 5 => 'cinq', 6 => 'six', 7 => 'sept', 8 => 'huit', 9 => 'neuf', 10 => 'dix', 11 => 'onze', 12 => 'douze', 13 => 'treize', 14 => 'quatorze', 15 => 'quinze', 16 => 'seize', 17 => 'dix-sept', 18 => 'dix-huit', 19 => 'dix-neuf', 20 => 'vingt', 30 => 'trente', 40 => 'quarante', 50 => 'cinquante', 60 => 'soixante', 70 => 'soixante-dix', 80 => 'quatre-vingts', 90 => 'quatre-vingt-dix'
+        );
+
+        if (!is_numeric($number)) {
+            return false;
+        }
+
+        if (($number >= 0 && (int) $number < 0) || (int) $number < 1 || (int) $number > 1000) {
+            return false;
+        }
+
+        if ($number < 21) {
+            return $frenchNumbers[$number];
+        } elseif ($number < 100) {
+            if ($number % 10 === 0) {
+                return $frenchNumbers[$number];
+            } else {
+                return $frenchNumbers[(int) ($number / 10) * 10] . '-' . $frenchNumbers[$number % 10];
+            }
+        } elseif ($number < 1000) {
+            if ($number % 100 === 0) {
+                return $frenchNumbers[(int) ($number / 100)] . ' cents';
+            } elseif ($number % 100 < 21) {
+                return $frenchNumbers[(int) ($number / 100)] . ' cent-' . $frenchNumbers[$number % 100];
+            } else {
+                return $frenchNumbers[(int) ($number / 100)] . ' cent-' . self::numberToWords_fr($number % 100);
+            }
+        } elseif ($number === 1000) {
+            return "mille";
+        }
+
+        return false;
+    }
+    //Italian
+    //---------------------------------------------------------------------------------------
+    static function numberToWords_it($number)
+    {
+        $number = (int)$number;
+        $words = array(
+            'zero',
+            'uno',
+            'due',
+            'tre',
+            'quattro',
+            'cinque',
+            'sei',
+            'sette',
+            'otto',
+            'nove',
+            'dieci',
+            'undici',
+            'dodici',
+            'tredici',
+            'quattordici',
+            'quindici',
+            'sedici',
+            'diciassette',
+            'diciotto',
+            'diciannove',
+            'venti',
+            30 => 'trenta',
+            40 => 'quaranta',
+            50 => 'cinquanta',
+            60 => 'sessanta',
+            70 => 'settanta',
+            80 => 'ottanta',
+            90 => 'novanta'
+        );
+
+        if (!is_numeric($number) || $number < 0 || $number > 1000) {
+            return false;
+        }
+
+        if ($number < 20) {
+            return $words[$number];
+
+        } elseif ($number < 100) {
+
+            $tens = ((int)($number / 10)) * 10;
+
+            return $words[$tens] . '-' . $words[$number % 10];
+
+        } else {
+
+            $hundreds = ((int)($number / 100));
+
+            return $words[$hundreds] . ' cento' . (($hundreds == 1) ? '' : '') . self::numberToWords_it($number % 100);
+
+        }
+
+        return false; // default return value - change it according to your needs.
+    }
+
+    //Portuguese
+    //---------------------------------------------------------------------------------------
+    static function numberToWords_pt($number) {
+        $number = (int)$number;
+        $dictionary  = array(1 =>'um', 2 =>'dois', 3 =>'três', 4 =>'quatro', 5 =>'cinco', 6 =>'seis', 7 =>'sete', 8 =>'oito', 9 =>'nove', 10 =>'dez',
+            11 => 'onze', 12 => 'doze', 13 => 'treze', 14 => 'quatorze', 15 => 'quinze', 16 => 'dezesseis', 17 => 'dezessete', 18 => 'dezoito', 19 => 'dezenove',
+            20 => 'vinte', 30 => 'trinta', 40 => 'quarenta', 50 => 'cinquenta', 60 => 'sessenta', 70 => 'setenta', 80 => 'oitenta', 90 => 'noventa', 100 => 'cem');
+
+        if (!is_numeric($number) || $number < 1 || $number > 999) {
+            return false;
+        }
+
+        if ($number <= 20) {
+            return $dictionary[$number];
+        } elseif ($number < 100) {
+            return $dictionary[10 * floor($number/10)] . (($number % 10 != 0) ? ' e ' : '') . $dictionary[$number % 10];
+        } else {
+            return $dictionary[floor($number / 100)] . (($number % 100 != 0) ? ' e ' : '') . self::numberToWords_pt($number % 100);
+        }
+    }
+
+    //Spanish
+    //---------------------------------------------------------------------------------------
+    static function numberToWords_es($numero) {
+        $numero = (int)$numero;
+        $matriz = array(1 => 'uno', 2 => 'dos', 3 => 'tres', 4 => 'cuatro', 5 => 'cinco', 6 => 'seis', 7 => 'siete', 8 => 'ocho', 9 => 'nueve', 10 => 'diez', 11 => 'once', 12 => 'doce', 13 => 'trece', 14 => 'catorce', 15 => 'quince', 20 => 'veinte', 30 => 'treinta', 40 => 'cuarenta', 50 => 'cincuenta', 60 => 'sesenta', 70 => 'setenta', 80 => 'ochenta', 90 => 'noventa');
+        if ($numero <= 15) {
+            return $matriz[$numero];
+        } elseif ($numero < 20) {
+            return $matriz[15] . self::numberToWords_es($numero - 15);
+        } elseif ($numero < 30) {
+            return $matriz[20] . self::numberToWords_es($numero - 20);
+        } elseif ($numero < 40) {
+            return $matriz[30] . self::numberToWords_es($numero - 30);
+        } elseif ($numero < 50) {
+            return $matriz[40] . self::numberToWords_es($numero - 40);
+        } elseif ($numero < 60) {
+            return $matriz[50] . self::numberToWords_es($numero - 50);
+        } elseif ($numero < 70) {
+            return $matriz[60] . self::numberToWords_es($numero - 60);
+        } elseif ($numero < 80) {
+            return $matriz[70] . self::numberToWords_es($numero - 70);
+        } elseif ($numero < 90) {
+            return $matriz[80] . self::numberToWords_es($numero - 80);
+        } elseif ($numero < 100) {
+            return $matriz[90] . self::numberToWords_es($numero - 90);
+        } elseif ($numero == 100) {
+            return "cien";
+        } elseif ($numero < 200) {
+            return "ciento " . self::numberToWords_es($numero - 100);
+        } elseif ($numero < 300) {
+            return "doscientos " . self::numberToWords_es($numero - 200);
+        } elseif ($numero < 400) {
+            return "trescientos " . self::numberToWords_es($numero - 300);
+        } elseif ($numero < 500) {
+            return "cuatrocientos " . self::numberToWords_es($numero - 400);
+        } elseif ($numero < 600) {
+            return "quinientos " . self::numberToWords_es($numero - 500);
+        } elseif ($numero < 700) {
+            return "seiscientos " . self::numberToWords_es($numero - 600);
+        } elseif ($numero < 800) {
+            return "setecientos " . self::numberToWords_es($numero - 700);
+        } elseif ($numero < 900) {
+            return "ochocientos " . self::numberToWords_es($numero - 800);
+        } elseif ($numero < 1000) {
+            return "novecientos " . self::numberToWords_es($numero - 900);
+
+        } elseif ($numero == 1000) {
+            return "mil";
+        } else {
+            return false;
+        }
+    }
+
+
+
+    //Basque
+    //---------------------------------------------------------------------------------------
+    static function numberToWords_eu($number) {
+        $number = (int)$number;
+        $dictionary  = array(0 => 'zero', 1 => 'bat', 2 => 'bi', 3 => 'hiru', 4 => 'lau', 5 => 'bost', 6 => 'sei', 7 => 'zazpi', 8 => 'zortzi', 9 => 'bederatzi', 10 => 'hamar', 11 => 'hamaika', 12 => 'hamabi', 20 => 'hogei', 30 => 'berrogei', 40 => 'laurogei', 50 => 'bostogei', 60 => 'seixogei', 70 => 'zazpirogei', 80 => 'zortzigarogei', 90 => 'bederatzigarogei', 100 => 'ekin');
+
+        if($number == 0) {
+            return $dictionary[$number];
+        } else if($number < 13) {
+            return $dictionary[$number];
+        } else if($number < 20) {
+            return $dictionary[10] . " " . $dictionary[$number - 10];
+        } else if($number < 100) {
+            return $dictionary[$number - ($number % 10)] . " " . $dictionary[$number % 10];
+        } else if($number < 1000) {
+            return $dictionary[$number / 100] . " " . $dictionary[100] . " " . self::numberToWords_eu($number % 100);
+        } else {
+            return false;
+        }
+    }
+
+    //Ukranian
+    //---------------------------------------------------------------------------------------
+    static function numberToWords_uk($number){
+        $numbers = ["1" => "один", 2 => "два", "3" => "три", "4" => "чотири", "5" => "п’ять",
+            "6" => "шість", "7" => "сім", "8" => "вісім", "9" => "дев’ять", "10" => "десять", "11" => "одинадцять",
+            "12" => "дванадцять", "13" => "тринадцять", "14" => "чотирнадцять", "15" => "п’ятнадцять", "16" => "шістнадцять",
+            "17" => "сімнадцять", "18" => "вісімнадцять", "19" => "дев’ятнадцять", "20" => "двадцять", "30" => "тридцять", "40" => "сорок",
+            "50" => "п’ятдесят", "60" => "шістдесят", "70" => "сімдесят",
+            "80" => "вісімдесят", "90" => "дев’яносто", "100" => "сто"];
+        if(array_key_exists($number,$numbers)){
+            return $numbers[$number];
+        }else{
+            return false;
+        }
+    }
+
+    //German
+    //---------------------------------------------------------------------------------------
+    static function numberToWords_de($number){
+        $numbers = ["1"=>"eins","2"=>"zwei","3"=>"drei","4"=>"vier","5"=>"fünf","6"=>"sechs","7"=>"sieben","8"=>"acht","9"=>"neun","10"=>"zehn","11"=>"elf","12"=>"zwölf","13"=>"dreizehn","14"=>"vierzehn","15"=>"fünfzehn","16"=>"sechzehn","17"=>"siebzehn","18"=>"achtzehn","19"=>"neunzehn","20"=>"zwanzig","21"=>"einundzwanzig","22"=>"zweiundzwanzig","23"=>"dreiundzwanzig","24"=>"vierundzwanzig","25"=>"fünfundzwanzig","26"=>"sechsundzwanzig","27"=>"siebenundzwanzig","28"=>"achtundzwanzig","29"=>"neunundzwanzig","30"=>"dreissig","31"=> "einunddreissig", "32" => "zweiunddreißig", "33" => "dreiunddreißig", "34" => "vierunddreißig", "35" => "fünfunddreißig", "36" => "sechsunddreißig", "37" => "siebenunddreißig", "38" => "achtunddreißig", "39" => "neununddreißig", "40" => "vierzig", "41" => "einundvierzig", "42" => "zweiundvierzig", "43" => "dreiundvierzig", "44" => "vierundvierzig", "45" => "fünfundvierzig", "46" => "sechsundvierzig", "47" => "siebenundvierzig", "48" => "achtundvierzig", "49" => "neunundvierzig", "50" => "fünfzig",
+            "51"=>"einundfünfzig","52"=>"zweiundfünfzig","53"=>"dreiundfünfzig","54"=>"vierundfünfzig","55"=>"fünfundfünfzig","56"=>"sechsundfünfzig","57"=>"siebenundfünfzig","58"=>"achtundfünfzig","59"=>"neunundfünfzig","60"=>"sechzig","61"=> "einundsechzig", "62" => "zweiundsechzig", "63" => "dreiundsechzig", "64" => "vierundsechzig", "65" => "fünfundsechzig", "66" => "sechsundsechzig", "67" => "siebenundsechzig", "68" => "achtundsechzig", "69" => "neunundsechzig", "70" => "siebzig", "71" => "einundsiebzig", "72" => "zweiundsiebzig", "73" => "dreiundsiebzig", "74" => "vierundsiebzig", "75" => "fünfundsiebzig", "76" => "sechsundsiebzig", "77" => "siebenundsiebzig", "78" => "achtundsiebzig", "79" => "neunundsiebzig",
+            "80"=>"achtzig","81"=>"einundachtzig","82"=>"zweiundachtzig","83"=>"dreiundachtzig","84"=>"vierundachtzig","85"=>"fünfundachtzig","86"=>"sechsundachtzig","87"=>"siebenundachtzig","88"=>"achtundachtzig","89"=>"neunundachtzig","90"=>"neunzig","91"=> "einundneunzig",
+            "92" => "zweiundneunzig", "93" => "dreiundneunzig", "94" => "vierundneunzig", "95" => "fünfundneunzig", "96" => "sechsundneunzig", "97" => "siebenundneunzig", "98" => "achtundneunzig", "99" => "neunundneunzig", "100" => "ein hundert"];
+        if(array_key_exists($number,$numbers)){
+            return $numbers[$number];
+        }else{
+            return false;
+        }
+    }
 
     /*
-    * This converts any number-digits in the passage, if found in the target, to number-words
+    * This converts any eszetts in the passage, if found in the target, to ss
     *
     *
     * @param string $passage the passage text
@@ -90,12 +491,20 @@ class alphabetconverter {
      * @param string $target the text to run the conversion on
      * @return string the converted text
      */
-    public static function numbers_to_words_convert($passage,$targettext){
+    public static function numbers_to_words_convert($passage,$targettext,$shortlang){
         $passagewords=self::fetchWordArray($passage);
-        $conversions = self::fetch_number_conversions($passagewords);
+        $conversions = self::fetch_number_conversions($passagewords,$shortlang);
 
         foreach($conversions as $conversion){
-            $targettext = str_replace($conversion['digits'],$conversion['words'],$targettext);
+            //english returns an array of conversion words for varieties eg 2015 two thousand fifteen, twenty fifteen
+            if(is_array($conversion['words'])) {
+                foreach ($conversion['words'] as $convset) {
+                    $targettext = str_replace($convset['digits'], $convset['words'], $targettext);
+                }
+            }else{
+                $targettext = str_replace($conversion['digits'], $conversion['words'], $targettext);
+            }
+
         }
         return $targettext;
     }
@@ -108,14 +517,84 @@ class alphabetconverter {
      * @return string the converted text
      *
      */
-    public static function words_to_numbers_convert($passage,$targettext){
+    public static function words_to_numbers_convert($passage,$targettext,$shortlang){
         $passagewords=self::fetchWordArray($passage);
-        $conversions = self::fetch_number_conversions($passagewords);
+        $conversions = self::fetch_number_conversions($passagewords,$shortlang);
 
         foreach($conversions as $conversion){
-            $targettext = str_replace($conversion['words'],$conversion['digits'],$targettext);
+
+            //english returns an array of conversion words for varieties eg 2015 two thousand fifteen, twenty fifteen
+            if(is_array($conversion['words'])) {
+                foreach ($conversion['words'] as $digits => $words) {
+                    $targettext = str_replace($words, $digits, $targettext);
+                }
+            }else{
+                $targettext = str_replace($conversion['words'],$conversion['digits'],$targettext);
+            }
         }
         return $targettext;
+    }
+
+    /*
+   * This fetches an array of digits and word number equivalents
+   * @param mixed $passagewords the passage text or an array of passage words
+   * @return array the digit to word conversions array
+   */
+    public static function fetch_number_conversions($passagewords,$shortlang)
+    {
+
+        //its possible to call this function with just the passage as text,
+        // which might be useful for callers who want the conversions array to pass to JS and not to run the conversion
+        if (!is_array($passagewords)) {
+            $passagewords = self::fetchWordArray($passagewords);
+        }
+
+        $conversions =[];
+        foreach ($passagewords as $candidate) {
+            //plain numbers
+            $numberwords=false;
+            if (is_numeric($candidate)) {
+                switch($shortlang) {
+                    case 'en':
+                        $numberwords = self::numberToWords_en($candidate);
+                        break;
+                    case 'uk':
+                        $numberwords = self::numberToWords_uk($candidate);
+                        break;
+                    case 'es':
+                        $numberwords = self::numberToWords_es($candidate);
+                        break;
+                    case 'de':
+                        $numberwords = self::numberToWords_de($candidate);
+                        break;
+                    case 'fr':
+                        $numberwords = self::numberToWords_fr($candidate);
+                        break;
+                    case 'pt':
+                        $numberwords = self::numberToWords_pt($candidate);
+                        break;
+                    case 'pl':
+                        $numberwords = self::numberToWords_pl($candidate);
+                        break;
+                    case 'eu':
+                        $numberwords = self::numberToWords_eu($candidate);
+                        break;
+                    case 'fi':
+                        $numberwords = self::numberToWords_fi($candidate);
+                        break;
+                    case 'ru':
+                        $numberwords = self::numberToWords_ru($candidate);
+                        break;
+                    case 'it':
+                        $numberwords = self::numberToWords_it($candidate);
+                        break;
+                }
+                if($numberwords!==false){
+                    $conversions[] =['digits'=>$candidate,'words'=>$numberwords];
+                }
+            }//end of is numeric
+        }//end of passagewords loop
+        return $conversions;
     }
 
     /*
@@ -123,7 +602,7 @@ class alphabetconverter {
      * @param mixed $passagewords the passage text or an array of passage words
      * @return array the digit to word conversions array
      */
-    public static function fetch_number_conversions($passagewords){
+    public static function numberToWords_en($passagewords){
 
         //its possible to call this function with just the passage as text,
         // which might be useful for callers who want the conversions array to pass to JS and not to run the conversion
@@ -148,7 +627,7 @@ class alphabetconverter {
                     $conversions[] = ['digits'=>$candidate,'words'=>$no_and_numberwords];
                 }
 
-            //dollar numbers [currently $ is stripped before we get here. sorry. no currencies]
+                //dollar numbers [currently $ is stripped before we get here. sorry. no currencies]
             }elseif(\core_text::strpos($candidate,'$')===0 && \core_text::strlen($candidate)>1){
                 if($candidate=='$1'){
                     $conversions[] = ['digits'=>$candidate,'words'=>'one dollar'];
@@ -160,7 +639,7 @@ class alphabetconverter {
                     }
                 }
 
-            //eras/decades
+                //eras/decades
             }else{
                 $startbit = \core_text::substr($candidate,0,\core_text::strlen($candidate)-1);
                 if(is_numeric($startbit) && $startbit .'s' == $candidate){
@@ -265,12 +744,12 @@ class alphabetconverter {
         $num = (int) $num;
         $words = array();
         $list1 = array('', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven',
-                'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'
+            'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'
         );
         $list2 = array('', 'ten', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety', 'hundred');
         $list3 = array('', 'thousand', 'million', 'billion', 'trillion', 'quadrillion', 'quintillion', 'sextillion', 'septillion',
-                'octillion', 'nonillion', 'decillion', 'undecillion', 'duodecillion', 'tredecillion', 'quattuordecillion',
-                'quindecillion', 'sexdecillion', 'septendecillion', 'octodecillion', 'novemdecillion', 'vigintillion'
+            'octillion', 'nonillion', 'decillion', 'undecillion', 'duodecillion', 'tredecillion', 'quattuordecillion',
+            'quindecillion', 'sexdecillion', 'septendecillion', 'octodecillion', 'novemdecillion', 'vigintillion'
         );
         $num_length = strlen($num);
         $levels = (int) (($num_length + 2) / 3);
@@ -351,39 +830,39 @@ class alphabetconverter {
 
     public static function convert_words_to_suji($words){
 
-            $arr = array();
-            $arr[1000000000000] = '兆';
-            $arr[100000000] = '億';
-            $arr[10000] = '万';
-            $arr[1000] = '千';
-            $arr[100] = '百';
-            $arr[10] = '十';
-            $arr[9] = '九';
-            $arr[8] = '八';
-            $arr[7] = '七';
-            $arr[6] = '六';
-            $arr[5] = '五';
-            $arr[4] = '四';
-            $arr[3] = '三';
-            $arr[2] = '二';
-            $arr[1] = '一';
+        $arr = array();
+        $arr[1000000000000] = '兆';
+        $arr[100000000] = '億';
+        $arr[10000] = '万';
+        $arr[1000] = '千';
+        $arr[100] = '百';
+        $arr[10] = '十';
+        $arr[9] = '九';
+        $arr[8] = '八';
+        $arr[7] = '七';
+        $arr[6] = '六';
+        $arr[5] = '五';
+        $arr[4] = '四';
+        $arr[3] = '三';
+        $arr[2] = '二';
+        $arr[1] = '一';
 
-            $arrayWithNumbers = mb_str_split($words);
-            $suji = null;
-            foreach($arrayWithNumbers as $jpKanji){
-                $keyVal = array_search($jpKanji, $arr);
-                if($keyVal===false){continue;}
-                if( $suji== null){
-                    $suji= $keyVal;
+        $arrayWithNumbers = mb_str_split($words);
+        $suji = null;
+        foreach($arrayWithNumbers as $jpKanji){
+            $keyVal = array_search($jpKanji, $arr);
+            if($keyVal===false){continue;}
+            if( $suji== null){
+                $suji= $keyVal;
+            }else{
+                if($keyVal < 10){
+                    $suji = $suji + $keyVal;
                 }else{
-                    if($keyVal < 10){
-                        $suji = $suji + $keyVal;
-                    }else{
-                        $suji = $suji * $keyVal;
-                    }
+                    $suji = $suji * $keyVal;
                 }
             }
-            return $suji;
+        }
+        return $suji;
     }
 
     public static function convert_suji_to_words($suji){

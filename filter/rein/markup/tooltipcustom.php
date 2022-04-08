@@ -1,0 +1,2 @@
+<p>This paragraph contains <strong><span id="tip1" class="tip-trigger">a tip trigger with no title attribute and an ID of <code>tip1</code>.</span></strong></p>
+<div id="tip-source-tip1" class="tip-content">This custom tooltip content element has class <code>tip-content</code> and ID <code>tip-source-tip1</code>.</div>

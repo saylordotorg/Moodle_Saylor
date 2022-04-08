@@ -190,7 +190,17 @@ class comprehensiontest
                 }
                 //YT Clip
                 if(!empty(trim($item->{constants::YTVIDEOID}))){
-                    $testitem->itemytvideoid=$item->{constants::YTVIDEOID};
+                    $ytvideoid = trim($item->{constants::YTVIDEOID});
+                    //if its a YT URL we want to parse the id from it
+                    if(\core_text::strlen($ytvideoid)>11){
+                        $urlbits=[];
+                        preg_match('/^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/', $ytvideoid, $urlbits);
+                        if($urlbits && count($urlbits)>7){
+                            $ytvideoid=$urlbits[7];
+                        }
+                    }
+                        //
+                    $testitem->itemytvideoid=$ytvideoid;
                     $testitem->itemytvideostart=$item->{constants::YTVIDEOSTART};
                     $testitem->itemytvideoend=$item->{constants::YTVIDEOEND};
                 }
@@ -338,15 +348,17 @@ class comprehensiontest
 
                     //multi audio stores answers differently, and
                    // at least for now there should be no difference between display and sentence
+                    $sentences = [];
                     if($testitem->type === constants::TYPE_MULTIAUDIO) {
-                        $sentences = [];
                         for($anumber=1;$anumber<=constants::MAXANSWERS;$anumber++) {
                             if(!empty(trim($item->{constants::TEXTANSWER . $anumber}))) {
                                 $sentences[] = $item->{constants::TEXTANSWER . $anumber};
                             }
                         }
                     }else {
-                        $sentences = explode(PHP_EOL, $testitem->customtext1);
+                        if(isset($testitem->customtext1)) {
+                            $sentences = explode(PHP_EOL, $testitem->customtext1);
+                        }
                     }
 
                     //build a sentences object for mustache and JS

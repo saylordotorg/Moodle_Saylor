@@ -423,6 +423,26 @@ class helper
             }
         }
     }
+    /*
+     * Remove any accents and chars that would mess up the transcript//passage matching
+     */
+    public static function deaccent_item($moduleinstance, $theitem){
+        switch($theitem->type) {
+            case constants::TYPE_SPEECHCARDS:
+            case constants::TYPE_LISTENREPEAT:
+            case constants::TYPE_MULTIAUDIO:
+            case constants::TYPE_SHORTANSWER:
+
+                $theitem->customtext1 = utils::remove_accents_and_poormatchchars($theitem->customtext1,$moduleinstance->ttslanguage);
+                if($theitem->type == constants::TYPE_MULTIAUDIO){
+                    $theitem->customtext1 = utils::remove_accents_and_poormatchchars($theitem->customtext1,$moduleinstance->ttslanguage);
+                    $theitem->customtext1 = utils::remove_accents_and_poormatchchars($theitem->customtext1,$moduleinstance->ttslanguage);
+                    $theitem->customtext1 = utils::remove_accents_and_poormatchchars($theitem->customtext1,$moduleinstance->ttslanguage);
+                }
+        }
+        return $theitem;
+
+    }
 
     public static function update_create_langmodel($moduleinstance, $olditem, $newitem){
         //if we need to generate a DeepSpeech model for this, then lets do that now:

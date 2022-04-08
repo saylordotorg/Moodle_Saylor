@@ -194,6 +194,10 @@ $string['ta-in'] = 'Tamil';
 $string['te-in'] = 'Telegu';
 $string['tr-tr'] = 'Turkish';
 
+$string['uk-ua'] = 'Ukranian';
+$string['eu-es'] = 'Basque';
+$string['fi-fi'] = 'Finnish';
+
 $string['sv-se'] = 'Swedish';
 $string['nb-no'] = 'Norwegian';
 $string['pl-pl'] = 'Polish';

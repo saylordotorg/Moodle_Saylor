@@ -110,7 +110,8 @@ if ($mform->is_cancelled()) {
 
     //we want to create a polly record and speechmarks, if (!human_modelaudio && passage) && (passage change || voice change || speed change)
     $needspeechmarks =false;
-    if(empty($data->modelaudiourl) && !empty($data->passage) && $newpassagehash){
+    $havettsvoice = $data->ttsvoice != constants::TTS_NONE;
+    if(empty($data->modelaudiourl) && !empty($data->passage) && $newpassagehash && $havettsvoice){
         //if it has changed OR voice has changed we need to do some work
         if($oldrecord->passagehash!= ($data->region . '|' . $newpassagehash) ||
                 $oldrecord->ttsvoice != $data->ttsvoice ||

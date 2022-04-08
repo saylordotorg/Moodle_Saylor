@@ -76,6 +76,14 @@ define(['jquery', 'core/log', 'mod_readaloud/definitions'], function($, log, def
       this.controls.audioplayer[0].play();
     },
 
+    get_audio_time() {
+      return this.controls.audioplayer[0].currentTime;
+    },
+
+    set_audio_time(newtime) {
+      this.controls.audioplayer[0].currentTime=newtime;
+    },
+
     fetch_audio_url: function() {
       return this.controls.audioplayer.attr('src');
     },

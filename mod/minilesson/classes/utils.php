@@ -60,19 +60,25 @@ class utils{
  */
     public static function needs_lang_model($moduleinstance, $passage) {
         switch($moduleinstance->region){
+
+            case 'capetown':
+            case 'bahrain':
             case 'tokyo':
             case 'useast1':
             case 'dublin':
             case 'sydney':
-            case 'capetown':
-            case 'bahrain':
             default:
                 return (substr($moduleinstance->ttslanguage,0,2)=='en' ||
-                                substr($moduleinstance->ttslanguage,0,2)=='de' ||
-                                substr($moduleinstance->ttslanguage,0,2)=='fr' ||
-                                substr($moduleinstance->ttslanguage,0,2)=='es') && trim($passage)!=="";
-
-                break;
+                        substr($moduleinstance->ttslanguage,0,2)=='de' ||
+                        substr($moduleinstance->ttslanguage,0,2)=='fr' ||
+                        substr($moduleinstance->ttslanguage,0,2)=='ru' ||
+                        substr($moduleinstance->ttslanguage,0,2)=='eu' ||
+                        substr($moduleinstance->ttslanguage,0,2)=='pl' ||
+                        substr($moduleinstance->ttslanguage,0,2)=='fi' ||
+                        substr($moduleinstance->ttslanguage,0,2)=='it' ||
+                        substr($moduleinstance->ttslanguage,0,2)=='pt' ||
+                        substr($moduleinstance->ttslanguage,0,2)=='uk' ||
+                        substr($moduleinstance->ttslanguage,0,2)=='es') && trim($moduleinstance->passage)!=="";
         }
     }
 
@@ -133,19 +139,23 @@ class utils{
 
 
     /*
-     * Build a language model for this passage
+     * Build a language model for this text
      *
      */
     public static function fetch_lang_model($passage, $language, $region){
         $usepassage = self::fetch_clean_passage($passage);
         if($usepassage===false ){return false;}
 
-        //find numbers in the passage, and then replace those with words in the target text
-        switch (substr($language,0,2)){
-            case 'en':
-                //find digits in original passage, and convert number words to digits in the target passage
-                $usepassage=alphabetconverter::numbers_to_words_convert($usepassage,$usepassage);
-                break;
+        //get our 2 letter lang code
+        $shortlang = substr($language,0,2);
+
+        //find digits in original passage, and convert number words to digits in the target passage
+        $usepassage=alphabetconverter::numbers_to_words_convert($usepassage,$usepassage, $shortlang);
+
+
+        //other conversions
+        switch ($shortlang){
+
             case 'de':
                 //find eszetts in original passage, and convert ss words to eszetts in the target passage
                 $params["passage"]=alphabetconverter::eszett_to_ss_convert($usepassage,$usepassage);
@@ -154,7 +164,7 @@ class utils{
         }
 
         $conf= get_config(constants::M_COMPONENT);
-        if (!empty($conf->apiuser) && !empty($conf->apisecret)) {;
+        if (!empty($conf->apiuser) && !empty($conf->apisecret)) {
             $token = self::fetch_token($conf->apiuser, $conf->apisecret);
             //$token = self::fetch_token('russell', 'Password-123',true);
 
@@ -316,6 +326,21 @@ class utils{
 
     }
 
+    //De accent and other processing so our auto transcript will match the passage
+    public static function remove_accents_and_poormatchchars($text, $language){
+        switch($language){
+            case constants::M_LANG_UKUA:
+                $ret = str_replace(
+                    array("е́","о́","у́","а́","и́","я́","ю́","Е́","О́","У́","А́","И́","Я́","Ю́","“","”","'","́"),
+                    array("е","о","у","а","и","я","ю","Е","О","У","А","И","Я","Ю","\"","\"","’",""),
+                    $text
+                );
+                break;
+            default:
+                $ret = $text;
+        }
+        return $ret;
+    }
 
 
     //are we willing and able to transcribe submissions?
@@ -1007,7 +1032,10 @@ class utils{
            constants::M_LANG_NBNO => get_string('nb-no', constants::M_COMPONENT),
            constants::M_LANG_PLPL => get_string('pl-pl', constants::M_COMPONENT),
            constants::M_LANG_RORO => get_string('ro-ro', constants::M_COMPONENT),
-           constants::M_LANG_SVSE => get_string('sv-se', constants::M_COMPONENT)
+           constants::M_LANG_SVSE => get_string('sv-se', constants::M_COMPONENT),
+           constants::M_LANG_UKUA => get_string('uk-ua',constants::M_COMPONENT),
+           constants::M_LANG_EUES => get_string('eu-es',constants::M_COMPONENT),
+           constants::M_LANG_FIFI => get_string('fi-fi',constants::M_COMPONENT)
        );
    }
 

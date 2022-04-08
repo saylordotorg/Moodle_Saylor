@@ -179,22 +179,22 @@ class aigrade {
             $record = new \stdClass();
             $record->id = $this->recordid;
             $cleantranscript = diff::cleanText($transcript);
-
-            switch (substr($this->activitydata->ttslanguage,0,2)){
-                case 'en':
-                    //find digits in original passage, and convert number words to digits in the target passage
-                    $cleantranscript=alphabetconverter::words_to_numbers_convert($this->activitydata->passagesegments,$cleantranscript );
-                    break;
-                case 'de':
-                    //find eszetts in original passage, and convert ss words to eszetts in the target passage
-                    $cleantranscript=alphabetconverter::ss_to_eszett_convert($this->activitydata->passagesegments,$cleantranscript );
-                    break;
-
+            $shortlang = substr($this->activitydata->ttslanguage,0,2);
+            switch ($shortlang){
                 case 'ja':
                     //probably needs segmented transcript, more testing needed here and from external
                     $cleantranscript=alphabetconverter::words_to_suji_convert($this->activitydata->passagesegments,$transcript);
                     break;
+                case 'en':
+                default:
+                    //find digits in original passage, and convert number words to digits in the target passage
+                    $cleantranscript=alphabetconverter::words_to_numbers_convert($this->activitydata->passagesegments,$cleantranscript,$shortlang );
+            }
 
+            //for eszetts we need special processing
+            if($shortlang=='de') {
+                //find eszetts in original passage, and convert ss words to eszetts in the target passage
+                $cleantranscript = alphabetconverter::ss_to_eszett_convert($this->activitydata->passagesegments, $cleantranscript);
             }
 
             $record->transcript = $cleantranscript;

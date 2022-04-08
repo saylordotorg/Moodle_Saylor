@@ -114,6 +114,7 @@ define(['jquery', 'core/log', 'core/ajax', 'mod_readaloud/definitions', 'mod_rea
       var self = this;
 
       self.mak.on_reach_audio_break = function(sentence, oldbreak, newbreak, breaks) {
+       // log.debug(breaks);
         //do not get involved if we are not active
         //model audio karaoke is used elsewhere (shadow and preview) as well
         if (!self.activated) {
@@ -212,7 +213,14 @@ define(['jquery', 'core/log', 'core/ajax', 'mod_readaloud/definitions', 'mod_rea
           if (self.controls.hiddenplayer[0].playing) {
             self.controls.hiddenplayer[0].pause();
           }
-            self.controls.hiddenplayer[0].currentTime = self.currentAudioStart;
+          self.controls.hiddenplayer[0].currentTime = self.currentAudioStart;
+          //if the main page player has gone a bit forward, we can lose the first part of our next break, so we adjust that if we have to
+          //we dont want it hitting the same break repeatedly though, so we inc by .1 to get clear of that
+          log.debug('mak audio time', self.mak.get_audio_time());
+          log.debug('self current audio end', self.currentAudioEnd);
+          if(self.mak.get_audio_time() > self.currentAudioEnd+.1){
+            self.mak.set_audio_time(self.currentAudioEnd+.1)
+          }
             self.mak.play_audio();
         }
       });

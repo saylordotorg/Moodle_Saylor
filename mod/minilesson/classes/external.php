@@ -376,6 +376,11 @@ class mod_minilesson_external extends external_api {
             }else{
                 $olditem=false;
             }
+
+            //remove bad accents and things that mess up transcription (kind of like clear but permanent)
+            $data = \mod_minilesson\local\rsquestion\helper::deaccent_item($moduleinstance,$data);
+
+            //get passage hash
             $data->passagehash = \mod_minilesson\local\rsquestion\helper::update_create_langmodel($moduleinstance,$olditem,$data);
 
             //lets update the phonetics

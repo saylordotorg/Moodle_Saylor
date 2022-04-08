@@ -28,6 +28,7 @@ class modelaudio_renderer extends \plugin_renderer_base {
      }
 
     public function render_polly_url($moduleinstance,$token) {
+        if($moduleinstance->ttsvoice == constants::TTS_NONE){return '';}
         $slowpassage = utils::fetch_speech_ssml($moduleinstance->passage,$moduleinstance->ttsspeed);
         $ret = utils::fetch_polly_url($token,$moduleinstance->region,
                 $slowpassage,'ssml',$moduleinstance->ttsvoice);
@@ -67,6 +68,20 @@ class modelaudio_renderer extends \plugin_renderer_base {
      */
     public function show_recorder($moduleinstance, $token, $uploadaudio = false) {
         global $CFG,$USER;
+
+        //transcribevocab
+        $transcribevocab = 'none';
+        if(!empty($moduleinstance->passagehash) && !$moduleinstance->stricttranscribe){
+            $hashbits = explode('|',$moduleinstance->passagehash);
+            if(count($hashbits)==2){
+                $transcribevocab = $hashbits[1];
+            }else{
+                //in the early days there was no region prefix, so we just use the passagehash as is
+                $transcribevocab = $moduleinstance->passagehash;
+            }
+        }
+
+
         $recorderdiv = \html_writer::div('','',
                 array('id' => constants::M_RECORDERID,
                         'data-id' => constants::M_RECORDERID,
@@ -84,6 +99,7 @@ class modelaudio_renderer extends \plugin_renderer_base {
                         'data-timelimit' => 0,
                         'data-transcode' => "1",
                         'data-transcribe' => "1",
+                        'data-transcribevocab' => $transcribevocab,
                         'data-language'=> $moduleinstance->ttslanguage,
                         'data-expiredays' => "9999",
                         'data-region' => $moduleinstance->region,
