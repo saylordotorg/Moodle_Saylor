@@ -337,6 +337,12 @@ def plugins = [
       "url" : 'https://github.com/bobopinna/moodle-enrol_autoenrol.git',
       "branch" : 'master',
       "dest" : 'enrol/autoenrol'
+    ],
+    [
+        "name" : 'filter_rein',
+        "url" : 'https://github.com/dta121/moodle-filter_rein.git',
+        "branch": 'main',
+        "dest" : 'filter/rein'
     ]
 ]
 
