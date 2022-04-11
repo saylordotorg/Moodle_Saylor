@@ -114,6 +114,7 @@ $string['es-es'] = 'Spanish (ES)';
 $string['es-us'] = 'Spanish (US)';
 $string['fr-fr'] = 'French (FR.)';
 $string['fr-ca'] = 'French (CA)';
+$string['fil-ph'] = 'Filipino';
 $string['ko-kr'] = 'Korean(KR)';
 $string['pt-br'] = 'Portuguese(BR)';
 $string['it-it'] = 'Italian(IT)';
@@ -138,6 +139,11 @@ $string['ru-ru'] = 'Russian';
 $string['ta-in'] = 'Tamil';
 $string['te-in'] = 'Telegu';
 $string['tr-tr'] = 'Turkish';
+
+$string['uk-ua'] = 'Ukranian';
+$string['eu-es'] = 'Basque';
+$string['fi-fi'] = 'Finnish';
+$string['hu-hu'] = 'Hungarian';
 
 $string['sv-se'] = 'Swedish';
 $string['nb-no'] = 'Norwegian';

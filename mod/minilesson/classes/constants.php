@@ -248,6 +248,7 @@ const M_LANG_SVSE ='sv-SE';
 const M_LANG_UKUA ='uk-UA';
 const M_LANG_EUES ='eu-ES';
 const M_LANG_FIFI ='fi-FI';
+const M_LANG_HUHU='hu-HU';
 
 const M_PROMPT_SEPARATE=0;
 const M_PROMPT_RICHTEXT=1;

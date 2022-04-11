@@ -60,6 +60,9 @@ const M_LANG_HIIN = 'hi-IN';
 const M_LANG_ENIN = 'en-IN';
 const M_LANG_ESES = 'es-ES';
 
+const M_LANG_DADK = 'da-DK';
+const M_LANG_FILPH = 'fil-PH';
+
 const M_LANG_ARAE ='ar-AE';
 const M_LANG_ARSA ='ar-SA';
 const M_LANG_ZHCN ='zh-CN';
@@ -83,6 +86,10 @@ const M_LANG_NBNO ='nb-NO';
 const M_LANG_PLPL ='pl-PL';
 const M_LANG_RORO ='ro-RO';
 const M_LANG_SVSE ='sv-SE';
+const M_LANG_UKUA ='uk-UA';
+const M_LANG_EUES ='eu-ES';
+const M_LANG_FIFI ='fi-FI';
+const M_LANG_HUHU ='hu-HU';
 
 const TRANSCRIBER_NONE = 0;
 const TRANSCRIBER_AUTO = 1;

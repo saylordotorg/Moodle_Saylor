@@ -536,7 +536,8 @@ class alphabetconverter {
     }
 
     /*
-   * This is just rule based heuristics, keep adding rules when you need 'em
+   * This fetches an array of digits and word number equivalents
+     *
    * @param mixed $passagewords the passage text or an array of passage words
    * @return array the digit to word conversions array
    */

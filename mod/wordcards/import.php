@@ -75,8 +75,9 @@ if ($data = $form->get_data()) {
 				$insertdata->definition = trim($cols[1]);
 				//voices
                 $voices = utils::get_tts_voices($mod->get_mod()->ttslanguage);
-				if(!empty($cols[2]) && array_key_exists(trim($cols[2]),$voices) && trim($cols[2])!='auto') {
-                    $insertdata->ttsvoice = trim($cols[2]);
+				if(!empty($cols[2]) && in_array(trim($cols[2]),$voices) && trim($cols[2])!='auto') {
+				    $voice = array_search(trim($cols[2]),$voices);
+                    $insertdata->ttsvoice = $voice;
                 }else{
                     $insertdata->ttsvoice = utils::fetch_auto_voice($mod->get_mod()->ttslanguage);
                 }

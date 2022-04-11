@@ -77,6 +77,8 @@ class utils {
                             substr($moduleinstance->ttslanguage,0,2)=='it' ||
                             substr($moduleinstance->ttslanguage,0,2)=='pt' ||
                             substr($moduleinstance->ttslanguage,0,2)=='uk' ||
+                            substr($moduleinstance->ttslanguage,0,2)=='ro' ||
+                            substr($moduleinstance->ttslanguage,0,2)=='hu' ||
                             substr($moduleinstance->ttslanguage,0,2)=='es') && trim($moduleinstance->passage)!=="";
         }
     }
@@ -158,7 +160,7 @@ class utils {
         global $CFG;
 
         $conf= get_config(constants::M_COMPONENT);
-        if (!empty($conf->apiuser) && !empty($conf->apisecret)) {;
+        if (!empty($conf->apiuser) && !empty($conf->apisecret)) {
             $token = self::fetch_token($conf->apiuser, $conf->apisecret);
             //$token = self::fetch_token('russell', 'Password-123',true);
 
@@ -1984,21 +1986,25 @@ class utils {
                 //constants::M_LANG_TAIN => [],
                 //constants::M_LANG_TEIN => [],
                 constants::M_LANG_TRTR => ['Filiz'=>'Filiz'],
-                constants::M_LANG_ZHCN => ['Zhiyu'],
+                constants::M_LANG_ZHCN => ['Zhiyu'=>'Zhiyu'],
 
-                constants::M_LANG_NBNO => ['Liv'=>'Liv'],
-                constants::M_LANG_PLPL => ['Ewa'=>'Ewa','Maja'=>'Maja','Jacek'=>'Jacek','Jan'=>'Jan'],
-                constants::M_LANG_RORO => ['Carmen'=>'Carmen'],
-                constants::M_LANG_SVSE => ['Astrid'=>'Astrid']
+            constants::M_LANG_NBNO => ['Liv'=>'Liv','nb-NO-Wavenet-B'=>'Lars_g'],
+            constants::M_LANG_PLPL => ['Ewa'=>'Ewa','Maja'=>'Maja','Jacek'=>'Jacek','Jan'=>'Jan'],
+            constants::M_LANG_RORO => ['Carmen'=>'Carmen','ro-RO-Wavenet-A'=>'Sorina_g'],
+            constants::M_LANG_SVSE => ['Astrid'=>'Astrid'],
+            constants::M_LANG_UKUA => ['uk-UA-Wavenet-A'=>'Katya_g'],
+            constants::M_LANG_FILPH => ['fil-PH-Wavenet-A'=>'Darna_g','fil-PH-Wavenet-B'=>'Reyna_g','fil-PH-Wavenet-C'=>'Bayani_g','fil-PH-Wavenet-D'=>'Ernesto_g'],
+            constants::M_LANG_FIFI => ['fi-FI-Wavenet-A'=>'Kaarina_g'],
+            constants::M_LANG_HUHU => ['hu-HU-Wavenet-A'=>'Eszter_g']
         );
 
 
         $lang_options = self::get_lang_options();
         $ret=[];
         foreach($alllang as $lang=>$voices){
-            foreach($voices as $voice){
-             $neuraltag = in_array($voice,constants::M_NEURALVOICES) ? ' (+)' : '';
-             $ret[$voice]=$voice . $neuraltag . ' - (' . $lang_options[$lang] . ')';
+            foreach($voices as $v=>$voicename){
+             $neuraltag = in_array($v,constants::M_NEURALVOICES) ? ' (+)' : '';
+             $ret[$v]=$voicename . $neuraltag . ' - (' . $lang_options[$lang] . ')';
             }
         }
         $ret = array_merge(array(constants::TTS_NONE => get_string('nottsvoice',constants::M_COMPONENT)), $ret);
@@ -2049,7 +2055,8 @@ class utils {
                 constants::M_LANG_SVSE => get_string('sv-se', constants::M_COMPONENT),
                 constants::M_LANG_UKUA => get_string('uk-ua',constants::M_COMPONENT),
                 constants::M_LANG_EUES => get_string('eu-es',constants::M_COMPONENT),
-                constants::M_LANG_FIFI => get_string('fi-FI',constants::M_COMPONENT)
+                constants::M_LANG_FIFI => get_string('fi-fi',constants::M_COMPONENT),
+                constants::M_LANG_HUHU => get_string('hu-hu',constants::M_COMPONENT)
         );
         /*
           return array(

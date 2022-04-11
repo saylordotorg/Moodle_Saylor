@@ -15,22 +15,22 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * block_completion_progress data generator
+ * Definition of Journal scheduled tasks.
  *
- * @package    block_completion_progress
- * @category   test
- * @copyright  2018 Michael Aherne
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   mod_journal
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-/**
- * Completion progress block data generator class
- *
- * @package    block_completion_progress
- * @category   test
- * @copyright  2018 Michael Aherne
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-class block_completion_progress_generator extends testing_block_generator {
+defined('MOODLE_INTERNAL') || die();
 
-}
+$tasks = array(
+    array(
+        'classname' => 'mod_journal\task\cron_task',
+        'blocking' => 0,
+        'minute' => '*',
+        'hour' => '*',
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '*'
+    )
+);

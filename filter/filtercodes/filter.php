@@ -480,6 +480,28 @@ class filter_filtercodes extends moodle_text_filter {
     }
 
     /**
+     * Course completion progress percentage.
+     *
+     * @return int completion progress percentage
+     */
+    function completionprogress() {
+        static $progresspercent;
+        if (!isset($progresspercent)) {
+            global $PAGE;
+            $course = $PAGE->course;
+            $progresspercent = -1; // Disabled: -1.
+            if ($course->enablecompletion == 1
+                    && isloggedin()
+                    && !isguestuser()
+                    && context_system::instance() != 'page-site-index') {
+                $progresspercent = (int) \core_completion\progress::get_course_progress_percentage($course);
+            }
+        }
+
+        return $progresspercent;
+    }
+
+    /**
      * Main filter function called by Moodle.
      *
      * @param string $text   Content to be filtered.
@@ -788,6 +810,42 @@ class filter_filtercodes extends moodle_text_filter {
             unset($cards, $users, $sql, $info, $prewrap, $postwrap, $cardformat);
         }
 
+        // Tag: {lang}.
+        if (stripos($text, '{lang}') !== false) {
+            // Replace with 2-letter current primary language.
+            $replace['/\{lang\}/i'] = substr(current_language(), 0, 2);
+        }
+
+        // Tag: {idnumber}.
+        if (stripos($text, '{idnumber}') !== false) {
+            $replace['/\{idnumber\}/i'] = isloggedin() && !isguestuser() ? $USER->idnumber : '';
+        }
+
+        // Tag: {coursegradepercent} - Calculate and display current overall course grade as a percentage.
+        if (stripos($text, '{coursegradepercent}') !== false) {
+            require_once($CFG->libdir . '/gradelib.php');
+            require_once($CFG->dirroot . '/grade/querylib.php');
+            $gradeobj = grade_get_course_grade($USER->id, $PAGE->course->id);
+            if (!empty($grademax = floatval($gradeobj->item->grademax))) {
+                // Avoid divide by 0 error if no grades have been defined.
+                $grade = (int) ($gradeobj->grade / floatval($grademax) * 100) ?? 0;
+            } else {
+                $grade = 0;
+            }
+            $replace['/\{coursegradepercent\}/i'] = $grade;
+        }
+
+        // Course completion progress percentage as a number.
+        if (stripos($text, '{courseprogresspercent}') !== false) {
+            $progress = $this->completionprogress();
+            if ($progress != -1) { // Is enabled.
+                $replace['/\{courseprogresspercent\}/i'] = $progress;
+            } else {
+                $replace['/\{courseprogresspercent\}/i'] = '';
+            }
+            unset($progress);
+        }
+
         // Apply all of the filtercodes so far.
         $newtext = null;
         if (count($replace) > 0) {
@@ -965,11 +1023,6 @@ class filter_filtercodes extends moodle_text_filter {
         // Tag: {department}.
         if (stripos($text, '{department}') !== false) {
             $replace['/\{department\}/i'] = isloggedin() && !isguestuser() ? $USER->department : '';
-        }
-
-        // Tag: {idnumber}.
-        if (stripos($text, '{idnumber}') !== false) {
-            $replace['/\{idnumber\}/i'] = isloggedin() && !isguestuser() ? $USER->idnumber : '';
         }
 
         // Tag: {firstaccessdate} or {firstaccessdate dateTimeFormat}.
@@ -1203,20 +1256,6 @@ class filter_filtercodes extends moodle_text_filter {
 
         // Any {course*} or %7Bcourse*%7D tags.
         if (stripos($text, '{course') !== false || stripos($text, '%7Bcourse') !== false) {
-
-            // Tag: {coursegradepercent} - Calculate and display current overall course grade as a percentage.
-            if (stripos($text, '{coursegradepercent}') !== false) {
-                require_once($CFG->libdir . '/gradelib.php');
-                require_once($CFG->dirroot . '/grade/querylib.php');
-                $gradeobj = grade_get_course_grade($USER->id, $PAGE->course->id);
-                if (!empty($grademax = floatval($gradeobj->item->grademax))) {
-                    // Avoid divide by 0 error if no grades have been defined.
-                    $grade = (int) ($gradeobj->grade / floatval($grademax) * 100) ?? 0;
-                } else {
-                    $grade = 0;
-                }
-                $replace['/\{coursegradepercent\}/i'] = $grade;
-            }
 
             // Custom Course Fields - First implemented in Moodle 3.7.
             if ($CFG->branch >= 37) {
@@ -1607,34 +1646,34 @@ class filter_filtercodes extends moodle_text_filter {
             }
 
             // Tag: {courseprogress} and {courseprogressbar}.
-            // Course progress percentage as text.
             if (stripos($text, '{courseprogress') !== false) {
-                $comppercent = -1; // Disabled: -1.
-                if ($PAGE->course->enablecompletion == 1
-                        && isloggedin()
-                        && !isguestuser()
-                        && context_system::instance() != 'page-site-index') {
-                    $comppc = \core_completion\progress::get_course_progress_percentage($PAGE->course);
-                    // Course completion progress percentage.
-                    $comppercent = number_format($comppc, 0);
-                    if (stripos($text, '{courseprogress}') !== false) {
+                $progress = $this->completionprogress();
+
+                // Course completion progress percentage as formatted text.
+                if (stripos($text, '{courseprogress}') !== false) {
+                    if ($progress != -1) { // Is enabled.
                         $replace['/\{courseprogress\}/i'] = '<span class="sr-only">'
                                 . get_string('aria:courseprogress', 'block_myoverview') . '</span> '
-                                . get_string('completepercent', 'block_myoverview', $comppercent);
+                                . get_string('completepercent', 'block_myoverview', $progress);
+                    } else {
+                        $replace['/\{courseprogress\}/i'] = '';
                     }
-                    // Course completion progress bar.
-                    if (stripos($text, '{courseprogressbar}') !== false) {
-                        $replace['/\{courseprogressbar\}/i'] = '
-                                <div class="progress">
-                                    <div class="progress-bar bar" role="progressbar" aria-valuenow="' . $comppercent
-                                        . '" style="width: ' . $comppercent . '%" aria-valuemin="0" aria-valuemax="100">
-                                    </div>
-                                </div>';
-                    }
-                } else {
-                    $replace['/\{courseprogress\}/i'] = '';
-                    $replace['/\{courseprogressbar\}/i'] = '';
                 }
+
+                // Course completion progress bar.
+                if (stripos($text, '{courseprogressbar}') !== false) {
+                    if ($progress != -1) { // Is enabled.
+                        $replace['/\{courseprogressbar\}/i'] = '
+                            <div class="progress">
+                                <div class="progress-bar bar" role="progressbar" aria-valuenow="' . $progress
+                                    . '" style="width: ' . $progress . '%" aria-valuemin="0" aria-valuemax="100">
+                                </div>
+                            </div>';
+                    } else {
+                        $replace['/\{courseprogressbar\}/i'] = '';
+                    }
+                }
+                unset($progress);
             }
 
             // Tag: {coursecards} and {coursecards <categoryid>}.
@@ -1754,10 +1793,12 @@ class filter_filtercodes extends moodle_text_filter {
                 $title = $match[3]; // Text label.
                 $percent = get_string('percents', '', $value);
                 switch($type) { // Type of chart.
-                    case 'radial': // Tag: {chart radial} - Display a radial (circle) chart.
+                    case 'radial': // Tag: {chart radial 99 Label to be displayed} - Display a radial (circle) chart.
                         $chart = new \core\chart_pie();
                         $chart->set_doughnut(true); // Calling set_doughnut(true) we display the chart as a doughnut.
-                        $chart->set_title($title);
+                        if (!empty($title)) {
+                            $chart->set_title($title);
+                        }
                         $series = new \core\chart_series('Percentage', [min($value, 100), 100 - min($value, 100)]);
                         $chart->add_series($series);
                         $chart->set_labels(['Completed', 'Remaining']);
@@ -1766,10 +1807,12 @@ class filter_filtercodes extends moodle_text_filter {
                         }
                         $html = $OUTPUT->render_chart($chart, false);
                         break;
-                    case 'pie': // Tag: {chart pie} - Display a pie chart.
+                    case 'pie': // Tag: {chart pie 99 Label to be displayed} - Display a pie chart.
                         $chart = new \core\chart_pie();
                         $chart->set_doughnut(false); // Calling set_doughnut(true) we display the chart as a doughnut.
-                        $chart->set_title($title);
+                        if (!empty($title)) {
+                            $chart->set_title($title);
+                        }
                         $series = new \core\chart_series('Percentage', [min($value, 100), 100 - min($value, 100)]);
                         $chart->add_series($series);
                         $chart->set_labels(['Completed', 'Remaining']);
@@ -1778,20 +1821,17 @@ class filter_filtercodes extends moodle_text_filter {
                         }
                         $html = $OUTPUT->render_chart($chart, false);
                         break;
-                    case 'progressbar': // Tag: {chart progressbar} - Display a horizontal progres bar.
+                    case 'progressbar': // Tag: {chart progressbar 99 Label to be displayed} - Display a horizontal progres bar.
                         $html = '
                         <div class="progress mb-0">
                             <div class="fc-progress progress-bar bar" role="progressbar" aria-valuenow="' . $value
                                 . '" style="width: ' . $value . '%" aria-valuemin="0" aria-valuemax="100">
                             </div>
-                        </div>
-                        <div class="small">';
-                        if ($CFG->branch >= 310) {
-                            $html .= get_string('labelvalue', 'moodle', ['label' => $title, 'value' => $percent]);
-                        } else {
-                            $html .= $title . ' : ' . $percent;
+                        </div>';
+                        if (!empty($title)) {
+                            $html .= '<div class="small">' . get_string('chartprogressbarlabel', 'filter_filtercodes',
+                                    ['label' => $title, 'value' => $percent]) . '</div>';
                         }
-                        $html .= '</div>';
                         break;
                     default:
                         $html = '';
@@ -2394,12 +2434,6 @@ class filter_filtercodes extends moodle_text_filter {
             $replace['/\{hr\}/i'] = '<hr>';
         }
 
-        // Tag: {lang}.
-        if (stripos($text, '{lang}') !== false) {
-            // Replace with 2-letter current primary language.
-            $replace['/\{lang\}/i'] = substr(current_language(), 0, 2);
-        }
-
         // Tag: {langx xx}.
         if (stripos($text, '{langx ') !== false) {
             $replace['/\{langx\s+(.*)\}(.*)\{\/langx\}/isuU'] = '<span lang="$1">$2</span>';
@@ -2543,29 +2577,29 @@ class filter_filtercodes extends moodle_text_filter {
                 }
             }
 
-            // Tag: {ifwebservice}.
-            if (stripos($text, '{/ifwebservice}') !== false) {
+            // Tag: {ifmobile}.
+            if (stripos($text, '{/ifmobile}') !== false) {
                 // If this is a web service or the Moodle mobile app...
                 if ($this->iswebservice()) {
                     // Yes, just remove the tags.
-                    $replace['/\{ifwebservice\}/i'] = '';
-                    $replace['/\{\/ifwebservice\}/i'] = '';
+                    $replace['/\{ifmobile\}/i'] = '';
+                    $replace['/\{\/ifmobile\}/i'] = '';
                 } else {
                     // Not from web services, remove tags and content.
-                    $replace['/\{ifwebservice\}(.*)\{\/ifwebservice\}/isuU'] = '';
+                    $replace['/\{ifmobile\}(.*)\{\/ifmobile\}/isuU'] = '';
                 }
             }
 
-            // Tag: {ifnotwebservice}.
-            if (stripos($text, '{/ifnotwebservice}') !== false) {
+            // Tag: {ifnotmobile}.
+            if (stripos($text, '{/ifnotmobile}') !== false) {
                 // If this is a web service or the Moodle mobile app...
                 if (!$this->iswebservice()) {
                     // Yes, just remove the tags.
-                    $replace['/\{ifnotwebservice\}/i'] = '';
-                    $replace['/\{\/ifnotwebservice\}/i'] = '';
+                    $replace['/\{ifnotmobile\}/i'] = '';
+                    $replace['/\{\/ifnotmobile\}/i'] = '';
                 } else {
                     // Not from web services, remove tags and content.
-                    $replace['/\{ifnotwebservice\}(.*)\{\/ifnotwebservice\}/isuU'] = '';
+                    $replace['/\{ifnotmobile\}(.*)\{\/ifnotmobile\}/isuU'] = '';
                 }
             }
 

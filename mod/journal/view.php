@@ -54,9 +54,9 @@ $journalname = format_string($journal->name, true, array('context' => $context))
 
 // Header.
 $PAGE->set_url('/mod/journal/view.php', array('id' => $id));
-$PAGE->navbar->add($journalname);
 $PAGE->set_title($journalname);
 $PAGE->set_heading($course->fullname);
+$PAGE->force_settings_menu();
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading($journalname);
@@ -103,19 +103,21 @@ if ($timenow > $timestart) {
 
         if ($canadd) {
             echo $OUTPUT->single_button('edit.php?id='.$cm->id, get_string('startoredit', 'journal'), 'get',
-                array("class" => "singlebutton journalstart"));
+                array("class" => "singlebutton journalstart mb-3", "primary" => 1));
         }
     }
 
     // Display entry.
     if ($entry = $DB->get_record('journal_entries', array('userid' => $USER->id, 'journal' => $journal->id))) {
+        echo "<div>";
         if (empty($entry->text)) {
             echo '<p align="center"><b>'.get_string('blankentry', 'journal').'</b></p>';
         } else {
             echo journal_format_entry_text($entry, $course, $cm);
         }
+        echo "</div>";
     } else {
-        echo '<span class="warning">'.get_string('notstarted', 'journal').'</span>';
+        echo '<div><span class="warning">'.get_string('notstarted', 'journal').'</span></div>';
     }
 
     echo $OUTPUT->box_end();
@@ -144,7 +146,7 @@ if ($timenow > $timestart) {
     }
 
     // Feedback.
-    if (!empty($entry->entrycomment) or !empty($entry->rating)) {
+    if (!empty($entry->entrycomment) or (!empty($entry->rating) and !$entry->rating)) {
         $grades = make_grades_menu($journal->grade);
         echo $OUTPUT->heading(get_string('feedback'));
         journal_print_feedback($course, $entry, $grades);

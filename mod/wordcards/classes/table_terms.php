@@ -29,6 +29,7 @@ class mod_wordcards_table_terms extends table_sql {
     public function __construct($uniqueid, $mod) {
         parent::__construct($uniqueid);
         $this->mod = $mod;
+        $this->voices = utils::get_tts_voices($mod->get_mod()->ttslanguage);
 
         // Define columns.
         $this->define_columns(array(
@@ -69,6 +70,19 @@ class mod_wordcards_table_terms extends table_sql {
         $this->sortable(true, 'term', SORT_ASC);
         $this->no_sorting('actions');
         $this->collapsible(false);
+    }
+
+    /**
+     * Formats the column.
+     *
+     * @param stdClass $row Table row.
+     * @return string Output produced.
+     */
+    protected function col_ttsvoice($row)
+    {
+        global $OUTPUT;
+        return $this->voices[$row->ttsvoice];
+
     }
 
     /**

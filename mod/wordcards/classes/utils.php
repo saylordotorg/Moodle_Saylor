@@ -671,13 +671,14 @@ class utils{
   public static function fetch_auto_voice($langcode){
         $voices = self::get_tts_voices($langcode);
         $autoindex = array_rand($voices);
-        return $voices[$autoindex];
+        return $autoindex;
   }
 
   public static function get_tts_voices($langcode, $showall=false){
       $alllang= array(
               constants::M_LANG_ARAE => ['Zeina'],
           //constants::M_LANG_ARSA => [],
+                constants::M_LANG_DADK => ["Naja"=>"Naja","Mads"=>"Mads"],
               constants::M_LANG_DEDE => ['Hans'=>'Hans','Marlene'=>'Marlene', 'Vicki'=>'Vicki'],
           //constants::M_LANG_DECH => [],
               constants::M_LANG_ENUS => ['Joey'=>'Joey','Justin'=>'Justin','Kevin'=>'Kevin','Matthew'=>'Matthew','Ivy'=>'Ivy',
@@ -709,12 +710,16 @@ class utils{
           //constants::M_LANG_TAIN => [],
           //constants::M_LANG_TEIN => [],
               constants::M_LANG_TRTR => ['Filiz'=>'Filiz'],
-              constants::M_LANG_ZHCN => ['Zhiyu'],
+              constants::M_LANG_ZHCN => ['Zhiyu'=>'Zhiyu'],
 
-              constants::M_LANG_NBNO => ['Liv'=>'Liv'],
-              constants::M_LANG_PLPL => ['Ewa'=>'Ewa','Maja'=>'Maja','Jacek'=>'Jacek','Jan'=>'Jan'],
-              constants::M_LANG_RORO => ['Carmen'=>'Carmen'],
-              constants::M_LANG_SVSE => ['Astrid'=>'Astrid']
+          constants::M_LANG_NBNO => ['Liv'=>'Liv','nb-NO-Wavenet-B'=>'Lars_g'],
+          constants::M_LANG_PLPL => ['Ewa'=>'Ewa','Maja'=>'Maja','Jacek'=>'Jacek','Jan'=>'Jan'],
+          constants::M_LANG_RORO => ['Carmen'=>'Carmen','ro-RO-Wavenet-A'=>'Sorina_g'],
+          constants::M_LANG_SVSE => ['Astrid'=>'Astrid'],
+          constants::M_LANG_UKUA => ['uk-UA-Wavenet-A'=>'Katya_g'],
+          constants::M_LANG_FILPH => ['fil-PH-Wavenet-A'=>'Darna_g','fil-PH-Wavenet-B'=>'Reyna_g','fil-PH-Wavenet-C'=>'Bayani_g','fil-PH-Wavenet-D'=>'Ernesto_g'],
+          constants::M_LANG_FIFI => ['fi-FI-Wavenet-A'=>'Kaarina_g'],
+          constants::M_LANG_HUHU => ['hu-HU-Wavenet-A'=>'Eszter_g']
       );
       if(array_key_exists($langcode,$alllang)&& !$showall) {
           return $alllang[$langcode];
@@ -723,15 +728,15 @@ class utils{
 
           //add current language first
           foreach($alllang[$langcode] as $v=>$thevoice){
-              $neuraltag = in_array($thevoice,constants::M_NEURALVOICES) ? ' (+)' : '';
-              $usearray[$thevoice] = get_string(strtolower($langcode), constants::M_COMPONENT) . ': ' . $thevoice . $neuraltag;
+              $neuraltag = in_array($v,constants::M_NEURALVOICES) ? ' (+)' : '';
+              $usearray[$v] = get_string(strtolower($langcode), constants::M_COMPONENT) . ': ' . $thevoice . $neuraltag;
           }
           //then all the rest
           foreach($alllang as $lang=>$voices){
               if($lang==$langcode){continue;}
               foreach($voices as $v=>$thevoice){
-                  $neuraltag = in_array($thevoice,constants::M_NEURALVOICES) ? ' (+)' : '';
-                  $usearray[$thevoice] = get_string(strtolower($lang), constants::M_COMPONENT) . ': ' . $thevoice . $neuraltag;
+                  $neuraltag = in_array($v,constants::M_NEURALVOICES) ? ' (+)' : '';
+                  $usearray[$v] = get_string(strtolower($lang), constants::M_COMPONENT) . ': ' . $thevoice . $neuraltag;
               }
           }
           return $usearray;
@@ -934,6 +939,7 @@ class utils{
                constants::M_LANG_ESUS => get_string('es-us', constants::M_COMPONENT),
                constants::M_LANG_ESES => get_string('es-es', constants::M_COMPONENT),
                constants::M_LANG_FAIR => get_string('fa-ir', constants::M_COMPONENT),
+               constants::M_LANG_FILPH => get_string('fil-ph', constants::M_COMPONENT),
                constants::M_LANG_FRCA => get_string('fr-ca', constants::M_COMPONENT),
                constants::M_LANG_FRFR => get_string('fr-fr', constants::M_COMPONENT),
                constants::M_LANG_HIIN => get_string('hi-in', constants::M_COMPONENT),
@@ -952,10 +958,14 @@ class utils{
                constants::M_LANG_TRTR => get_string('tr-tr', constants::M_COMPONENT),
                constants::M_LANG_ZHCN => get_string('zh-cn', constants::M_COMPONENT),
 
-           constants::M_LANG_NBNO => get_string('nb-no', constants::M_COMPONENT),
-           constants::M_LANG_PLPL => get_string('pl-pl', constants::M_COMPONENT),
-           constants::M_LANG_RORO => get_string('ro-ro', constants::M_COMPONENT),
-           constants::M_LANG_SVSE => get_string('sv-se', constants::M_COMPONENT)
+               constants::M_LANG_NBNO => get_string('nb-no', constants::M_COMPONENT),
+               constants::M_LANG_PLPL => get_string('pl-pl', constants::M_COMPONENT),
+               constants::M_LANG_RORO => get_string('ro-ro', constants::M_COMPONENT),
+               constants::M_LANG_SVSE => get_string('sv-se', constants::M_COMPONENT),
+               constants::M_LANG_UKUA => get_string('uk-ua',constants::M_COMPONENT),
+               constants::M_LANG_EUES => get_string('eu-es',constants::M_COMPONENT),
+               constants::M_LANG_FIFI => get_string('fi-fi',constants::M_COMPONENT),
+               constants::M_LANG_HUHU => get_string('hu-hu',constants::M_COMPONENT)
        );
    }
 
@@ -972,8 +982,17 @@ class utils{
             case 'sydney':
             default:
             return (substr($mod->get_mod()->ttslanguage,0,2)=='en' ||
-                            substr($mod->get_mod()->ttslanguage,0,2)=='de' ||
-                            substr($mod->get_mod()->ttslanguage,0,2)=='fr' ||
+                    substr($mod->get_mod()->ttslanguage,0,2)=='de' ||
+                    substr($mod->get_mod()->ttslanguage,0,2)=='fr' ||
+                    substr($mod->get_mod()->ttslanguage,0,2)=='ru' ||
+                    substr($mod->get_mod()->ttslanguage,0,2)=='eu' ||
+                    substr($mod->get_mod()->ttslanguage,0,2)=='pl' ||
+                    substr($mod->get_mod()->ttslanguage,0,2)=='fi' ||
+                    substr($mod->get_mod()->ttslanguage,0,2)=='it' ||
+                    substr($mod->get_mod()->ttslanguage,0,2)=='pt' ||
+                    substr($mod->get_mod()->ttslanguage,0,2)=='uk' ||
+                    substr($mod->get_mod()->ttslanguage,0,2)=='ro' ||
+                    substr($mod->get_mod()->ttslanguage,0,2)=='hu' ||
                             substr($mod->get_mod()->ttslanguage,0,2)=='es') && $mod->get_terms();
         }
     }
