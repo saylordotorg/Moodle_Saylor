@@ -32,7 +32,7 @@ use \mod_readaloud\utils;
 $id = optional_param('id', 0, PARAM_INT); // course_module ID, or
 $n = optional_param('n', 0, PARAM_INT);  // readaloud instance ID
 $action = optional_param('action', 'none', PARAM_TEXT);  // readaloud instance ID
-$uploadaudio = optional_param('uploadaudio', 'false', PARAM_TEXT); //Is this a savebutton2(upload)
+$uploadaudio = optional_param('uploadaudio', 'false', PARAM_TEXT); //From model audio form (flags, to show upload)
 
 
 

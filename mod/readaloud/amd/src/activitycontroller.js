@@ -93,7 +93,7 @@ define(['jquery', 'jqueryui', 'core/log', 'mod_readaloud/definitions',
 
         setuplandr: function(){
             var landr_opts={modelaudiokaraoke: modelaudiokaraoke, cmid: this.cmid, language: this.activitydata.language,
-                region: this.activitydata.region, phonetics: this.activitydata.phonetics, ds_only: this.activitydata.ds_only};
+                region: this.activitydata.region, phonetics: this.activitydata.phonetics, stt_guided: this.activitydata.stt_guided};
             landr.init(landr_opts);
         },
 
@@ -218,12 +218,10 @@ define(['jquery', 'jqueryui', 'core/log', 'mod_readaloud/definitions',
             });
             dd.controls.startlandrbutton.click(function(e){
                 dd.dolandrlayout();
-                landr.shadow=false;
             });
             dd.controls.startlandrbutton.keypress(function(e){
                 if (e.which == 32 || e.which == 13 ) {
                     dd.dolandrlayout();
-                    landr.shadow=false;
                     e.preventDefault();
                 }
             });

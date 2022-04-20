@@ -24,6 +24,7 @@
           <FIELD NAME="showqtitles" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
           <FIELD NAME="richtextprompt" TYPE="int" LENGTH="2" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
           <FIELD NAME="foriframe" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="intended to be iframed"/>
+          <FIELD NAME="lessonkey" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="An identifier for the lesson that reports may use"/>
           <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" />
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false"/>
 		<FIELD NAME="viewstart" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false"/>

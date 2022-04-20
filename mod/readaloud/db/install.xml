@@ -17,6 +17,7 @@
                 <FIELD NAME="passagehash" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="The hash of the passage"/>
                 <FIELD NAME="passageformat" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false"
                        COMMENT="Format of the passage field (MOODLE, HTML, MARKDOWN...)"/>
+                <FIELD NAME="passagekey" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="An identifier for the passage that reports may use"/>
                 <FIELD NAME="phonetic" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" COMMENT="Phonetic rendition of passage."/>
                 <FIELD NAME="alternatives" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" COMMENT="Alternatives"/>
                 <FIELD NAME="welcome" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" COMMENT="Welcome text"/>
@@ -59,6 +60,9 @@
                 <FIELD NAME="stricttranscribe" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
                 <FIELD NAME="foriframe" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="intended to be iframed"/>
                 <FIELD NAME="masterinstance" TYPE="int" LENGTH="2" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
+                <FIELD NAME="usecorpus" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Use a corpus scorer instead of passage scorer"/>
+                <FIELD NAME="corpushash" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="The hash of the corpus"/>
+                <FIELD NAME="corpusrange" TYPE="int" LENGTH="4" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
                 <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false"/>
                 <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false"/>
 				<FIELD NAME="viewstart" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true"  DEFAULT="0" SEQUENCE="false"/>
@@ -86,6 +90,10 @@
                 <FIELD NAME="sessionerrors" TYPE="text" LENGTH="8192" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" COMMENT="json string of errors"/>
                 <FIELD NAME="sessionendword" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false"/>
                 <FIELD NAME="errorcount" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false"/>
+                <FIELD NAME="selfcorrections" TYPE="text" LENGTH="8192" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" COMMENT="json string of self corrections"/>
+                <FIELD NAME="sccount" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="number of self corrections"/>
+                <FIELD NAME="qscore" TYPE="int" LENGTH="4" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
+                <FIELD NAME="qdetails" TYPE="text" LENGTH="8192" NOTNULL="false" UNSIGNED="true" SEQUENCE="false"  COMMENT="details of the quiz session"/>
                 <FIELD NAME="dontgrade" TYPE="int" LENGTH="2" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
                 <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false"/>
                 <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false"/>
@@ -110,6 +118,8 @@
                 <FIELD NAME="sessionmatches" TYPE="text" LENGTH="8192" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" COMMENT="json string of matches"/>
                 <FIELD NAME="sessionendword" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false"/>
                 <FIELD NAME="errorcount" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false"/>
+                <FIELD NAME="selfcorrections" TYPE="text" LENGTH="8192" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" COMMENT="json string of self corrections"/>
+                <FIELD NAME="sccount" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="number of self corrections"/>
                 <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false"/>
                 <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false"/>
             </FIELDS>

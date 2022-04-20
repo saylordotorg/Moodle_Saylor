@@ -168,8 +168,8 @@ $string['nosubscriptions'] = "There is no current subscription for this site/plu
 
 $string['transcriber'] = 'Transcriber';
 $string['transcriber_details'] = 'The transcription engine to use';
-$string['transcriber_auto'] = 'Hybrid STT (Browser STT + Poodll STT))';
-$string['transcriber_poodll'] = 'Use Poodll STT';
+$string['transcriber_auto'] = 'Open STT (Strict)';
+$string['transcriber_poodll'] = 'Guided STT (Poodll)';
 $string['enabletts_details'] = 'TTS is currently not implemented';
 $string['ttslanguage'] = 'Target Language';
 $string['ttsvoice'] = 'TTS Voice';

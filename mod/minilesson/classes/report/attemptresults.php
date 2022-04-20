@@ -120,10 +120,6 @@ class attemptresults extends basereport
 
         }
 
-
-
-
-
         if ($record) {
                 //heading data
                 $this->headingdata= $record;

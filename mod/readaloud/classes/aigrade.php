@@ -179,7 +179,7 @@ class aigrade {
             $record = new \stdClass();
             $record->id = $this->recordid;
             $cleantranscript = diff::cleanText($transcript);
-            $shortlang = substr($this->activitydata->ttslanguage,0,2);
+            $shortlang = utils::fetch_short_lang($this->activitydata->ttslanguage);
             switch ($shortlang){
                 case 'ja':
                     //probably needs segmented transcript, more testing needed here and from external

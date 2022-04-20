@@ -104,6 +104,15 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configselect(constants::M_COMPONENT . "/$name",
         $label, $details, $default, $options));
 
+    // Reports Table
+    $name = 'reportstable';
+    $label = get_string($name, constants::M_COMPONENT);
+    $details = get_string($name . '_details', constants::M_COMPONENT);
+    $default = constants::M_USE_DATATABLES;
+    $options = utils::fetch_options_reportstable();
+    $settings->add(new admin_setting_configselect(constants::M_COMPONENT . "/$name",
+        $label, $details, $default, $options));
+
 
     $settings->add(new admin_setting_configtext(constants::M_COMPONENT .  '/itemsperpage',
         get_string('itemsperpage', constants::M_COMPONENT), get_string('itemsperpage_details', constants::M_COMPONENT), 10, PARAM_INT));

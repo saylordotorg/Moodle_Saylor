@@ -1,3 +1,15 @@
+2.0.83 (Build 2022041600)
+- Reworked transcription mode to strict and guided
+- Added corpus scorer
+- Put some DB fields in place for comprehension quiz
+- Added passage key for use in reports
+- Fixed broken number converter
+
+2.0.82 (Build 2022041300)
+ - added Poodll STT for Hungarian and Romanian
+ - Added shadow mode to listen and speak
+ - fixed logging issue
+
 2.0.81 (Build 2022040601)
  - fixed bug with polish numbers
 

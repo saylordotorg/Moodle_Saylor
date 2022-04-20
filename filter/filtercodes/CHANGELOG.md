@@ -1,8 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [2.2.8] 2022-04-08 (DEV)
+## [2.3.0] 2022-04-19
 ### Added
+- New {ifhasarolename roleshortname}{/ifhasarolename} tags.
+- Sample ALPHA code in the documentation to patch Moodle 4.0 themes for support in the custom menu.
 - New {courseprogresspercent} tag.
 - New {ifmobile}{/ifmobile} tags.
 - New {ifnotmobile}{/ifnotmobile} tags.
@@ -42,12 +44,13 @@ All notable changes to this project will be documented in this file.
 - New {userscountrycount} tag.
 - Missing support for {supportname}, {supportemail} and {supportpage} tags.
 - Known limitation in README.md regarding Moodle's 'Download course content' feature.
-- Compatible with Moodle 4.0 (ALPHA) - Note: Custom menu patch does not work in 4.0 yet.
+- Compatibility with Moodle 4.0
 ### Updated
+- Improve parsing of {scrape} tag. Improper syntax will no longer make Moodle crash, the tag just won't work properly.
 - {lang}, {idnumber} and {coursegradepercent} tags can now be used within other tags for example.
 - {coursesummary} tag is now processed through Moodle filters for multi-language support.
 - Fixed {coursecards catid}.
-- Many tags that didn't work if it contained a line break now work correctly.
+- Fixed many tags that did not work if they contained a line break.
 - Tag %7Bcoursecontextid%7D now works.
 - Fix-166,168,191 multiple instances of date/time related tags (firstaccessdate, coursestartdate, courseenddate, coursecompletiondate, now)
 - {coursesactive} no longer count courses that are before start date or after end date, if any.
@@ -63,7 +66,9 @@ All notable changes to this project will be documented in this file.
 - Refactored the {coursecards} code. No longer displays empty list.
 - Fixed {ifprofile_field_...} tag visibility and clarified documentation.
 - {coursecards} no longer displays hidden courses or those whose end-dates are past, unless you are an administrator.
-- Results fron {course_field_shortname} and {course_fields} are now both processed through Moodle filters.
+- Results from {course_field_shortname} and {course_fields} are now processed through Moodle filters.
+- Updated the documentation and fix typos.
+- Tested to be compatible up to and including Moodle 4.0.
 - Updated copyright notice to include 2022.
 
 ## [2.2.1] 2021-05-25

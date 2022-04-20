@@ -32,7 +32,7 @@ define(['jquery', 'core/log','core/notification', 'mod_minilesson/ttaudiohelper'
         browserrec: null,
         usebrowserrec: false,
         currentTime: 0,
-        ds_only: false,
+        stt_guided: false,
 
         //for making multiple instances
         clone: function () {
@@ -45,7 +45,7 @@ define(['jquery', 'core/log','core/notification', 'mod_minilesson/ttaudiohelper'
 
             this.uniqueid=opts['uniqueid'];
             this.callback=opts['callback'];
-            this.ds_only = opts['ds_only'] ? opts['ds_only'] : false;
+            this.stt_guided = opts['stt_guided'] ? opts['stt_guided'] : false;
             this.prepare_html();
             this.controls.recordercontainer.show();
             this.register_events();
@@ -116,7 +116,7 @@ define(['jquery', 'core/log','core/notification', 'mod_minilesson/ttaudiohelper'
 
 
             //If browser rec (Chrome Speech Rec) (and ds is optiona)
-            if(browserRec.will_work_ok() && ! this.ds_only){
+            if(browserRec.will_work_ok() && ! this.stt_guided){
                 //Init browserrec
                 log.debug("using browser rec");
                 this.browserrec = browserRec.clone();
@@ -154,7 +154,7 @@ define(['jquery', 'core/log','core/notification', 'mod_minilesson/ttaudiohelper'
         prepare_html: function(){
             this.controls.recordercontainer =$('#ttrec_container_' + this.uniqueid);
             this.controls.recorderbutton = $('#' + this.uniqueid + '_recorderdiv');
-            this.passagehash =this.controls.recorderbutton.data('passagehash');
+            this.passagehash = this.controls.recorderbutton.data('passagehash');
             this.region=this.controls.recorderbutton.data('region');
             this.lang=this.controls.recorderbutton.data('lang');
             this.asrurl=this.controls.recorderbutton.data('asrurl');
@@ -302,7 +302,13 @@ define(['jquery', 'core/log','core/notification', 'mod_minilesson/ttaudiohelper'
             var blobname = this.uniqueid + Math.floor(Math.random() * 100) +  '.wav';
             bodyFormData.append('audioFile', blob, blobname);
             bodyFormData.append('scorer', this.passagehash);
+            if(this.stt_guided) {
+                bodyFormData.append('strictmode', 'false');
+            }else{
+                bodyFormData.append('strictmode', 'true');
+            }
             bodyFormData.append('lang', this.lang);
+            bodyFormData.append('wwwroot', M.cfg.wwwroot);
 
             var oReq = new XMLHttpRequest();
             oReq.open("POST", this.asrurl, true);

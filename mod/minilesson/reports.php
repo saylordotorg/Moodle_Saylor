@@ -142,6 +142,16 @@ switch ($showreport){
         $formdata->groupmenu = true;
         break;
 
+    //list view of attempts and grades and action links
+    case 'courseattempts':
+        $report = new \mod_minilesson\report\courseattempts();
+        $formdata = new stdClass();
+        $formdata->moduleid = $moduleinstance->id;
+        $formdata->courseid = $moduleinstance->course;
+        $formdata->modulecontextid = $modulecontext->id;
+        $formdata->groupmenu = true;
+        break;
+
 
     //list view of attempts and grades and action links
     case 'attemptresults':
@@ -224,7 +234,44 @@ switch($format){
 		$reportrenderer->render_section_csv($reporttitle, $report->fetch_name(), $report->fetch_head(), $reportrows, $report->fetch_fields());
 		exit;
 	default:
-		
+
+        if($config->reportstable == constants::M_USE_DATATABLES){
+            $pagetitle =get_string('reports', constants::M_COMPONENT);
+            $reportrows = $report->fetch_formatted_rows(true);
+            $allrowscount = $report->fetch_all_rows_count();
+
+            //css must be required before header sent out
+            $PAGE->requires->css( new \moodle_url('https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css'));
+            echo $renderer->header($moduleinstance, $cm, $mode, null, get_string('reports', constants::M_COMPONENT));
+            //echo $renderer->heading($pagetitle);
+            //echo $renderer->navigation($moduleinstance, 'reports');
+            echo $extraheader;
+            echo $groupmenu;
+            echo $reportrenderer->render_section_html($reportheading, $report->fetch_name(), $report->fetch_head(), $reportrows,
+                $report->fetch_fields());
+        }else{
+            $pagetitle =get_string('reports', constants::M_COMPONENT);
+            $reportrows = $report->fetch_formatted_rows(true, $paging);
+            $allrowscount = $report->fetch_all_rows_count();
+
+            $pagingbar = $reportrenderer->show_paging_bar($allrowscount, $paging, $PAGE->url);
+            echo $renderer->header($moduleinstance, $cm, $mode, null, get_string('reports', constants::M_COMPONENT));
+            //echo $renderer->heading($pagetitle);
+            //echo $renderer->navigation($moduleinstance, 'reports');
+            echo $extraheader;
+            echo $groupmenu;
+            echo $pagingbar;
+            echo $reportrenderer->render_section_html($reportheading, $report->fetch_name(), $report->fetch_head(), $reportrows,
+                $report->fetch_fields());
+            echo $pagingbar;
+        }
+        echo $reportrenderer->show_reports_footer($moduleinstance,$cm,$formdata,$showreport);
+        //back to course button if not in frame
+        if(!$config->enablesetuptab) {
+            echo $renderer->backtotopbutton($course->id);
+        }
+        echo $renderer->footer();
+	    /*
 		$reportrows = $report->fetch_formatted_rows(true,$paging);
 		$allrowscount = $report->fetch_all_rows_count();
 		$pagingbar = $reportrenderer->show_paging_bar($allrowscount, $paging,$PAGE->url);
@@ -240,4 +287,5 @@ switch($format){
             echo $renderer->backtotopbutton($course->id);
         }
 		echo $renderer->footer();
+	    */
 }

@@ -9,7 +9,13 @@
             <div class="col-md-1">
                     <button class="ttsdialog_button btn btn-secondary" ><i class="fa fa-play"></i></button>
             </div>
-            <div class="col-md-11 ttsdialog_text"></div>
+
+            <div class="col-md-11">
+                <div class="row ttsdialog_actorplusline">
+                <div class="col-md-1 ttsdialog_actor rolenone"><i class="fa fa-lg fa-user" aria-hidden="true"></i></div>
+                <div class="col-md-11 ttsdialog_text"></div>
+                </div>
+            </div>
         {{/itemttsdialogvisible}}
         {{^itemttsdialogvisible}}
             <div class="col-md-12" style="text-align: center">
@@ -36,6 +42,7 @@
         var player = $('#' + '{{uniqid}}_ttsdialogplayer .ttsdialog_audioplayer');
         var speakertext = $('#' + '{{uniqid}}_ttsdialogplayer .ttsdialog_text');
         var playbutton = $('#' + '{{uniqid}}_ttsdialogplayer .ttsdialog_button');
+        var actor = $('#' + '{{uniqid}}_ttsdialogplayer .ttsdialog_actor');
 
         player[0].addEventListener('ended', nextPlay);
 
@@ -59,16 +66,51 @@
                 currentline =-1;
                 playbutton.html(stoppedstate);
                 speakertext.text(" ");
+                switchActor('none');
                 return;
             }
             player.attr('src',dialoglines.eq(currentline).data('audiourl'));
-            if(dialoglines.eq(currentline).data('speaker')=='soundeffect'){
+            var speaker = dialoglines.eq(currentline).data('speaker');
+            if(speaker=='soundeffect'){
+                switchActor('none');
                 speakertext.text(' ');
             }else{
+                switchActor(speaker);
                 speakertext.text(dialoglines.eq(currentline).data('speakertext'));
             }
 
             player[0].play();
+        }
+
+        function switchActor(speaker){
+            switch(speaker){
+                case 'none':
+                    actor.removeClass('rolea');
+                    actor.removeClass('roleb');
+                    actor.removeClass('rolec');
+                    actor.addClass('rolenone');
+                    break;
+
+                case 'a':
+                    actor.removeClass('rolenone');
+                    actor.removeClass('roleb');
+                    actor.removeClass('rolec');
+                    actor.addClass('rolea');
+                    break;
+                case 'b':
+                    actor.removeClass('rolenone');
+                    actor.removeClass('rolea');
+                    actor.removeClass('rolec');
+                    actor.addClass('roleb');
+                    break;
+                case 'c':
+                    actor.removeClass('rolenone');
+                    actor.removeClass('rolea');
+                    actor.removeClass('roleb');
+                    actor.addClass('rolec');
+                    break;
+            }
+
         }
 
         <!-- script type="text/javascript" -->

@@ -45,7 +45,7 @@ if ($id) {
     print_error(0,'You must specify a course_module ID or an instance ID');
 }
 
-$PAGE->set_url(constants::M_URL . '/gradesadmin.php',
+$PAGE->set_url(constants::M_URL . '/admintab.php',
         array('id' => $cm->id));
 require_login($course, true, $cm);
 $modulecontext = context_module::instance($cm->id);
@@ -55,7 +55,7 @@ require_capability('mod/readaloud:manage', $modulecontext);
 //Get an admin settings 
 $config = get_config(constants::M_COMPONENT);
 
-//if the alternatives form was submittes
+//if the alternatives form was submitted
 $alternatives_form = new \mod_readaloud\form\alternatives();
 $adata = $alternatives_form->get_data();
 if ($adata) {
@@ -63,10 +63,47 @@ if ($adata) {
     $action = 'machineregradeall';
 }
 
+//if the guidedtranscription form was submitted
+$gt_form = new \mod_readaloud\form\guidedtranscriptionform();
+$gt_data = $gt_form->get_data();
+if ($gt_data) {
+    if($gt_data->usecorpus == constants::GUIDEDTRANS_CORPUS &&
+        (empty($moduleinstance->corpushash) || $gt_data->corpusrange != $moduleinstance->corpusrange)){
+        $gt_data->corpushash = utils::fetch_current_corpushash($moduleinstance,$gt_data->corpusrange);
+    }
+
+    $updatefields = ['usecorpus','corpusrange'];
+    if($gt_data->corpushash){
+        $updatefields[] = 'corpushash';
+    }
+    switch($gt_data->applysettingsrange){
+        case constants::APPLY_ACTIVITY:
+            foreach($updatefields as $thefield) {
+                $DB->set_field(constants::M_TABLE, $thefield, $gt_data->{$thefield}, array('id'=> $moduleinstance->id,'ttslanguage' => $moduleinstance->ttslanguage));
+            }
+            break;
+        case constants::APPLY_COURSE:
+            foreach($updatefields as $thefield) {
+                $DB->set_field(constants::M_TABLE, $thefield, $gt_data->{$thefield}, array('course' => $moduleinstance->course, 'ttslanguage' => $moduleinstance->ttslanguage));
+            }
+            break;
+        case constants::APPLY_SITE:
+            foreach($updatefields as $thefield) {
+                $DB->set_field(constants::M_TABLE, $thefield, $gt_data->{$thefield}, array('ttslanguage' => $moduleinstance->ttslanguage));
+            }
+            break;
+    }
+
+    $url = new \moodle_url(constants::M_URL . '/admintab.php',
+        array('id' => $cm->id,
+            'action' => 'menu'));
+    redirect($url, get_string('usecorpuschanged', constants::M_COMPONENT), 5);
+}
+
 switch ($action) {
 
     case 'machineregradeall':
-        $url = new \moodle_url(constants::M_URL . '/gradesadmin.php',
+        $url = new \moodle_url(constants::M_URL . '/admintab.php',
                 array('id' => $cm->id,
                         'action' => 'menu'));
         $ai_evals = $DB->get_records(constants::M_AITABLE, array('readaloudid' => $moduleinstance->id));
@@ -89,7 +126,7 @@ switch ($action) {
         }
         break;
     case 'pushalltogradebook':
-        $url = new \moodle_url(constants::M_URL . '/gradesadmin.php',
+        $url = new \moodle_url(constants::M_URL . '/admintab.php',
                 array('id' => $cm->id,
                         'action' => 'menu'));
         if (($moduleinstance->machgrademethod == constants::MACHINEGRADE_HYBRID ||
@@ -98,6 +135,14 @@ switch ($action) {
             readaloud_update_grades($moduleinstance);
         }
         redirect($url, get_string('machinegradespushed', constants::M_COMPONENT), 5);
+        break;
+
+    case 'pushcorpus':
+        $url = new \moodle_url(constants::M_URL . '/admintab.php',
+            array('id' => $cm->id,
+                'action' => 'menu'));
+        utils::push_corpus($moduleinstance,$moduleinstance->corpusrange);
+        redirect($url, get_string('corpuspushed', constants::M_COMPONENT), 5);
         break;
 
     case 'menu':
@@ -116,7 +161,7 @@ if($config->enablesetuptab){
     $PAGE->set_pagelayout('course');
 }
 
-$mode = "gradesadmin";
+$mode = "admintab";
 
 //This puts all our display logic into the renderer.php files in this plugin
 $renderer = $PAGE->get_renderer(constants::M_COMPONENT);
@@ -125,10 +170,10 @@ $renderer = $PAGE->get_renderer(constants::M_COMPONENT);
 $mistranscriptions = utils::fetch_all_mistranscriptions($moduleinstance->id);
 $table_of_mistranscriptions = $renderer->show_all_mistranscriptions($mistranscriptions);
 
-echo $renderer->header($moduleinstance, $cm, $mode, null, get_string('gradesadmin', constants::M_COMPONENT));
+echo $renderer->header($moduleinstance, $cm, $mode, null, get_string('admintab', constants::M_COMPONENT));
 
-echo $renderer->show_gradesadmin_heading(get_string('gradesadmintitle', constants::M_COMPONENT),
-        get_string('gradesadmininstructions', constants::M_COMPONENT));
+echo $renderer->show_admintab_heading(get_string('admintabtitle', constants::M_COMPONENT),
+        get_string('admintabinstructions', constants::M_COMPONENT));
 
 //This is the estimate of errors based on comparing human grades to machine grades
 //echo $renderer->show_currenterrorestimate(utils::estimate_errors($moduleinstance->id));
@@ -142,6 +187,21 @@ $mform->display();
 //echo $renderer->show_machineregradeallbutton($moduleinstance);
 
 echo $table_of_mistranscriptions;
+
+//guided transcription
+$gt_title = get_string("guidedtranscriptionadmin", constants::M_COMPONENT);
+echo $renderer->heading($gt_title, 4);
+
+echo html_writer::div(get_string("guidedtransinstructions", constants::M_COMPONENT),'mod_readaloud_gtinstructions');
+
+$gform = new \mod_readaloud\form\guidedtranscriptionform(null, array());
+$gt_data = new \stdClass();
+//id is cmid on this page, so we use n as the id of the instance, so to make sure we arrive back here ok, we add n
+$moduleinstance->n = $moduleinstance->id;
+$gform->set_data($moduleinstance);
+$gform->display();
+
+echo $renderer->show_pushcorpusdetails($moduleinstance);
 
 //This shows button that pushes all updated machine grades to gradebook
 echo $renderer->show_pushalltogradebook($moduleinstance);

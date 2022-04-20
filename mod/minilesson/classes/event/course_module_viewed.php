@@ -25,6 +25,8 @@
 namespace mod_minilesson\event;
 defined('MOODLE_INTERNAL') || die();
 
+use \mod_minilesson\constants;
+
 /**
  * The mod_minilesson course module viewed event class.
  *
@@ -41,7 +43,15 @@ class course_module_viewed extends \core\event\course_module_viewed {
     protected function init() {
         $this->data['crud'] = 'r';
         $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
-        $this->data['objecttable'] = 'minilesson';
+        $this->data['objecttable'] = constants::M_TABLE;
     }
+    public static function get_objectid_mapping() {
+        return array('db' => constants::M_TABLE, 'restore' => 'minilesson');
+    }
+    public static function get_other_mapping() {
+        // Nothing to map.
+        return false;
+    }
+
 }
 

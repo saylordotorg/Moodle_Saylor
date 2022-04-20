@@ -513,7 +513,7 @@ function readaloud_add_instance(stdClass $readaloud, mod_readaloud_mod_form $mfo
 
     //we want to process the hashcode and lang model if it makes sense
     if(utils::needs_lang_model($readaloud)){
-        $passagehash = utils::fetch_passagehash($readaloud);
+        $passagehash = utils::fetch_passagehash($readaloud->passage,$readaloud->ttslanguage);
         if($passagehash){
             $readaloud->passagehash =$passagehash;
             //build a lang model
@@ -592,7 +592,7 @@ function readaloud_update_instance(stdClass $readaloud, mod_readaloud_mod_form $
     $readaloud->passagesegments = $thepassagesegments;
 
     $readaloud->passagehash = $oldrecord->passagehash;
-    $newpassagehash = utils::fetch_passagehash($readaloud);
+    $newpassagehash = utils::fetch_passagehash($readaloud->passage,$readaloud->ttslanguage);
     if($newpassagehash){
         //check if it has changed, if not do not waste time processing it
         if($oldrecord->passagehash!= ($readaloud->region . '|' . $newpassagehash)) {
@@ -642,6 +642,21 @@ function readaloud_update_instance(stdClass $readaloud, mod_readaloud_mod_form $
     }
 
     $success = $DB->update_record(constants::M_TABLE, $readaloud);
+
+    //if the region has changed we might need a new corpushash
+    if($readaloud->region != $oldrecord->region && $readaloud->usecorpus==constants::GUIDEDTRANS_CORPUS){
+        if(utils::needs_lang_model($readaloud)) {
+            $currenthash = $oldrecord->corpushash;
+            $allpassages = utils::fetch_current_corpus($readaloud, $readaloud->corpusrange);
+            $temphash = utils::fetch_passagehash($allpassages, $readaloud->ttslanguage);
+            if($currenthash != ($readaloud->region . '|' . $temphash)) {
+                utils::push_corpus($readaloud, $readaloud->corpusrange);
+            }else{
+                $DB->update_record(constants::M_TABLE,
+                    array('id'=>$readaloud->id, 'corpushash'=>$currenthash));
+            }
+        }
+    }
 
     readaloud_grade_item_update($readaloud);
     if (class_exists('\core_completion\api')) {

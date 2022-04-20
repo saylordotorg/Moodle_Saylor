@@ -29,6 +29,19 @@ class constants {
     //classes for use in CSS
     const M_CLASS = 'mod_readaloud';
 
+    //Guided transcription uses the passage or a combination of passages (corpus)
+    const GUIDEDTRANS_PASSAGE = 0;
+    const GUIDEDTRANS_CORPUS = 1;
+    //corpus (combination of packages) covers the whole site or just the course
+    const CORPUSRANGE_SITE = 0;
+    const CORPUSRANGE_COURSE = 1;
+    //when pushing a setting, apply it activity, course or site wide
+    const APPLY_ACTIVITY = 0;
+    const APPLY_COURSE = 1;
+    const APPLY_SITE = 2;
+
+
+
     //audio recorders
     const REC_READALOUD = 'readaloud';
     const REC_ONCE = 'once';
@@ -143,7 +156,7 @@ class constants {
     const M_GRADING_FORM_ACCURACY = 'mod_readaloud_grading_form_accuracy';
     const M_GRADING_FORM_SESSIONENDWORD = 'mod_readaloud_grading_form_sessionendword';
     const M_GRADING_FORM_SESSIONERRORS = 'mod_readaloud_grading_form_sessionerrors';
-    const M_GRADESADMIN_CONTAINER = 'mod_readaloud_gradesadmin_cont';
+    const M_ADMINTAB_CONTAINER = 'mod_readaloud_admintab_cont';
     const M_HIDDEN_PLAYER = 'mod_readaloud_hidden_player';
     const M_HIDDEN_PLAYER_BUTTON = 'mod_readaloud_hidden_player_button';
     const M_HIDDEN_PLAYER_BUTTON_ACTIVE = 'mod_readaloud_hidden_player_button_active';
@@ -209,10 +222,12 @@ class constants {
 
     const TTS_NONE='ttsnone';
 
-    const TRANSCRIBER_NONE = 0;
-    const TRANSCRIBER_AUTO = 1;
-    const TRANSCRIBER_POODLL = 2;
-    const TRANSCRIBER_AMAZONSTREAMING =4;
+    const TRANSCRIBER_GUIDED = 0;
+    const TRANSCRIBER_STRICT = 1;
+
+    //no longer used
+    const TRANSCRIBER_NONE = 0; //defunct
+    const TRANSCRIBER_AMAZONSTREAMING =4; //defunct
 
     const M_STARTPREVIEW= 'mod_readaloud_button_startpreview';
     const M_STARTLANDR= 'mod_readaloud_button_startlandr';

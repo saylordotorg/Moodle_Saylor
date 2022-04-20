@@ -157,7 +157,7 @@ class mod_readaloud_external extends external_api {
 
         //Fetch phonetics and segments
         list($transcript_phonetic,$transcript) = utils::fetch_phones_and_segments($transcript,$language,$region);
-        $shortlang = substr($language,0,2);
+        $shortlang = utils::fetch_short_lang($language);
 
         //conv. number words to digits (if that is what they originally were)
         switch ($shortlang){

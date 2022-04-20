@@ -47,7 +47,12 @@ class report_renderer extends \plugin_renderer_base
         $reports[] = array('button'=>$this->render($incompleteattemptsreport),
             'text'=>get_string('incompleteattemptsreport_explanation', constants::M_COMPONENT));
 
-
+        //course attempts report
+        $courseattemptsreport= new \single_button(
+            new \moodle_url(constants::M_URL . '/reports.php', array('report' => 'courseattempts', 'id' => $cm->id, 'n' => $moduleinstance->id)),
+            get_string('courseattemptsreport', constants::M_COMPONENT), 'get');
+        $reports[] = array('button'=>$this->render($courseattemptsreport),
+            'text'=>get_string('courseattemptsreport_explanation', constants::M_COMPONENT));
 
         $data=['reports' => $reports];
         $ret= $this->render_from_template('mod_minilesson/reportsmenu', $data);
@@ -145,20 +150,23 @@ class report_renderer extends \plugin_renderer_base
             return $this->render_empty_section_html($sectiontitle);
         }
 
+        $config=get_config(constants::M_COMPONENT);
+
         //set up our table and head attributes
         $tableattributes = array('class' => 'generaltable ' . constants::M_CLASS . '_table');
         $headrow_attributes = array('class' => constants::M_CLASS . '_headrow');
 
         $htmltable = new \html_table();
+        $tableid = \html_writer::random_id(constants::M_COMPONENT);
+        $htmltable->id = $tableid;
         $htmltable->attributes = $tableattributes;
 
-
-        $htr = new \html_table_row();
-        $htr->attributes = $headrow_attributes;
+        $headcells=[];
         foreach ($head as $headcell) {
-            $htr->cells[] = new \html_table_cell($headcell);
+            $headcells[] = new \html_table_cell($headcell);
         }
-        $htmltable->data[] = $htr;
+        $htmltable->head = $head;
+
 
         foreach ($rows as $row) {
             $htr = new \html_table_row();
@@ -174,6 +182,18 @@ class report_renderer extends \plugin_renderer_base
         }
         $html = $this->output->heading($sectiontitle, 4);
         $html .= \html_writer::table($htmltable);
+
+        //if datatables set up datatables
+        if($config->reportstable == constants::M_USE_DATATABLES) {
+            $tableprops = [];
+            $tableprops['paging']=true;
+            $tableprops['pageLength']=10;
+            $opts = Array();
+            $opts['tableid'] = $tableid;
+            $opts['tableprops'] = $tableprops;
+            $this->page->requires->js_call_amd(constants::M_COMPONENT . "/datatables", 'init', array($opts));
+        }
+
         return $html;
 
     }

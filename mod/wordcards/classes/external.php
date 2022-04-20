@@ -28,9 +28,9 @@ class mod_wordcards_external extends external_api {
 
     }
     public static function check_by_phonetic($spoken, $correct, $language){
-        $language = substr($language,0,2);
-        $spokenphonetic = utils::convert_to_phonetic($spoken,$language);
-        $correctphonetic = utils::convert_to_phonetic($correct,$language);
+        $shortlang = utils::fetch_short_lang($language);
+        $spokenphonetic = utils::convert_to_phonetic($spoken,$shortlang);
+        $correctphonetic = utils::convert_to_phonetic($correct,$shortlang);
         $similar_percent = 0;
         $similar_chars = similar_text($correctphonetic,$spokenphonetic,$similar_percent);
         return round($similar_percent,0);

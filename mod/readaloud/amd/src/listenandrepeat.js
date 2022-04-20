@@ -29,16 +29,21 @@ define(['jquery', 'core/log', 'core/ajax', 'mod_readaloud/definitions', 'mod_rea
       self.language = props.language;
       self.region = props.region;
       self.phonetics = props.phonetics;
-      self.ds_only = props.ds_only;
-      self.shadow = props.shadow;
+      self.stt_guided = props.stt_guided;
+      self.shadow = false;//props.shadow;
       self.ttr={};
 
       //recorder stuff
       var theCallback =function(message) {
           switch (message.type) {
             case 'recordingstarted':
-              if (self.shadow === true) {
+              if (self.controls.shadowplaycheckbox.is(":checked")) {
+                self.shadow = true;
+                log.debug('shadow is true');
                 self.controls.playbutton.trigger('click');
+              }else{
+                log.debug('shadow is false');
+                self.shadow=false;
               }
               //hide the self model player (though it may not be here) because we do not want it playing old stuff into mic
               self.controls.playselfbutton.hide();
@@ -49,7 +54,7 @@ define(['jquery', 'core/log', 'core/ajax', 'mod_readaloud/definitions', 'mod_rea
                   if (self.shadow === true){
                     self.controls.hiddenplayer[0].pause();
                   }
-                  if(self.ds_only || self.ttr.usebrowserrec===false){
+                  if(self.stt_guided || self.ttr.usebrowserrec===false){
                     self.controls.playselfbutton.show();
                   }
                   break;
@@ -72,7 +77,7 @@ define(['jquery', 'core/log', 'core/ajax', 'mod_readaloud/definitions', 'mod_rea
         //init tt recorder
       var opts = {};
       opts.uniqueid = 'readaloud_ttrecorder';
-      opts.ds_only = self.ds_only;
+      opts.stt_guided = self.stt_guided;
       opts.callback = theCallback;
       opts.shadow = true;
       self.ttr = ttrecorder.clone();
@@ -101,7 +106,7 @@ define(['jquery', 'core/log', 'core/ajax', 'mod_readaloud/definitions', 'mod_rea
       self.controls.hiddenplayer = $('#mod_readaloud_landr_hiddenplayer');
       self.controls.hiddenselfplayer = $('#mod_readaloud_landr_hiddenselfplayer');
       self.controls.playbutton = $('#mod_readaloud_landr_modalplay');
-      self.controls.shadowplaybutton = $('#mod_readaloud_landr_modalshadowplay');
+      self.controls.shadowplaycheckbox = $('#mod_readaloud_landr_shadow');
       self.controls.skipbutton = $('#mod_readaloud_landr_modalskip');
       self.controls.finishedbutton = $("#mod_readaloud_landr_modalfinished");
       self.controls.playselfbutton = $("#mod_readaloud_landr_modalplayself");

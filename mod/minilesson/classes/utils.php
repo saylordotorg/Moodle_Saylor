@@ -69,19 +69,20 @@ class utils{
             case 'dublin':
             case 'sydney':
             default:
-                return (substr($moduleinstance->ttslanguage,0,2)=='en' ||
-                        substr($moduleinstance->ttslanguage,0,2)=='de' ||
-                        substr($moduleinstance->ttslanguage,0,2)=='fr' ||
-                        substr($moduleinstance->ttslanguage,0,2)=='ru' ||
-                        substr($moduleinstance->ttslanguage,0,2)=='eu' ||
-                        substr($moduleinstance->ttslanguage,0,2)=='pl' ||
-                        substr($moduleinstance->ttslanguage,0,2)=='fi' ||
-                        substr($moduleinstance->ttslanguage,0,2)=='it' ||
-                        substr($moduleinstance->ttslanguage,0,2)=='pt' ||
-                        substr($moduleinstance->ttslanguage,0,2)=='uk' ||
-                        substr($moduleinstance->ttslanguage,0,2)=='hu' ||
-                        substr($moduleinstance->ttslanguage,0,2)=='ro' ||
-                        substr($moduleinstance->ttslanguage,0,2)=='es') && trim($passage)!=="";
+                $shortlang = self::fetch_short_lang($moduleinstance->ttslanguage);
+                return ($shortlang=='en' ||
+                        $shortlang=='de' ||
+                        $shortlang=='fr' ||
+                        $shortlang=='ru' ||
+                        $shortlang=='eu' ||
+                        $shortlang=='pl' ||
+                        $shortlang=='fi' ||
+                        $shortlang=='it' ||
+                        $shortlang=='pt' ||
+                        $shortlang=='uk' ||
+                        $shortlang=='hu' ||
+                        $shortlang=='ro' ||
+                        $shortlang=='es') && trim($passage)!=="";
         }
     }
 
@@ -94,11 +95,12 @@ class utils{
         $cleanpassage = self::fetch_clean_passage($passage);
 
         //number or odd char converter
-        if(substr($ttslanguage,0,2)=='en' || substr($ttslanguage,0,2)=='de' ){
+        $shortlang = self::fetch_short_lang($ttslanguage);
+        if($shortlang=='en' || $shortlang=='de' ){
             //find numbers in the passage, and then replace those with words in the target text
-            switch (substr($ttslanguage,0,2)){
+            switch ($shortlang){
                 case 'en':
-                    $cleanpassage=alphabetconverter::numbers_to_words_convert($cleanpassage,$cleanpassage);
+                    $cleanpassage=alphabetconverter::numbers_to_words_convert($cleanpassage,$cleanpassage, $shortlang);
                     break;
                 case 'de':
                     $cleanpassage=alphabetconverter::eszett_to_ss_convert($cleanpassage,$cleanpassage);
@@ -112,6 +114,13 @@ class utils{
         }else{
             return false;
         }
+    }
+
+    public static function fetch_short_lang($longlang){
+        if(\core_text::strlen($longlang)<=2){return $longlang;}
+        if($longlang=="fil-PH"){return "fil";}
+        $shortlang = substr($longlang,0,2);
+        return $shortlang;
     }
 
     /*
@@ -150,7 +159,7 @@ class utils{
         if($usepassage===false ){return false;}
 
         //get our 2 letter lang code
-        $shortlang = substr($language,0,2);
+        $shortlang = self::fetch_short_lang($language);
 
         //find digits in original passage, and convert number words to digits in the target passage
         $usepassage=alphabetconverter::numbers_to_words_convert($usepassage,$usepassage, $shortlang);
@@ -833,6 +842,12 @@ class utils{
         return $ret . $service;
     }
 
+    public static function fetch_options_reportstable() {
+        $options = array(constants::M_USE_DATATABLES => get_string("reporttableajax", constants::M_COMPONENT),
+            constants::M_USE_PAGEDTABLES => get_string("reporttablepaged", constants::M_COMPONENT));
+        return $options;
+    }
+
     public static function fetch_options_transcribers() {
         $options = array(constants::TRANSCRIBER_AUTO => get_string("transcriber_auto", constants::M_COMPONENT),
             constants::TRANSCRIBER_POODLL => get_string("transcriber_poodll", constants::M_COMPONENT));
@@ -1157,6 +1172,12 @@ class utils{
             $mform->addElement('select', 'richtextprompt', get_string('prompttype', constants::M_COMPONENT), $prompttypes);
             $mform->addHelpButton('richtextprompt', 'prompttype', constants::M_COMPONENT);
             $mform->setDefault('richtextprompt', $config->prompttype);
+
+            // Add passagekey
+            $mform->addElement('text', 'lessonkey', get_string('lessonkey', constants::M_COMPONENT), array('size' => '8'));
+            $mform->setType('lessonkey', PARAM_TEXT);
+            $mform->setDefault('lessonkey', '');
+            $mform->addHelpButton('lessonkey', 'lessonkey', constants::M_COMPONENT);
 
                  
             //activity opens closes

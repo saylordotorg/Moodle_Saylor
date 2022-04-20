@@ -464,7 +464,7 @@ div.mod_readaloud_feedback_cont.mod_readaloud_postattempt {
   background-color: grey;
 }
 
-div.mod_readaloud_gradesadmin_cont {
+div.mod_readaloud_admintab_cont {
   margin-bottom: 20px;
   margin-top: 20px;
 }
@@ -692,4 +692,23 @@ div.mod_readaloud_attemptsummarytable {
   100% {-webkit-mask-position:left}
 }
 
+.mod_readaloud_gtinstructions {
+  margin: 8px;
+}
+
+.readaloud_reportsmenu_box {
+  text-align: center;
+  display: flex;
+}
+
+.readaloud_reportsmenu_item {
+  height: 80px;
+  width: 150px;
+  margin: 10px;
+}
+
+.readaloud_reportsmenu_itembutton button{
+  height: 80px;
+  width: 150px;
+}
 

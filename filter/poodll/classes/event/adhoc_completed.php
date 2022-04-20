@@ -64,12 +64,20 @@ class adhoc_completed extends \core\event\base {
                 'relateduserid' => $userid,
                 'other' => $taskvars
         );
-        /** @var extension_granted $event */
+
         $event = self::create($data);
         //the filerecord data might not be sufficient here ...for now we skip it
-        // $event->add_record_snapshot('files', $filerecord);
+        // $event->add_record_snapshot('files', $filerecord);vbox
 
         return $event;
+    }
+
+    public static function get_objectid_mapping() {
+        return array('db' => 'files', 'restore' => \core\event\base::NOT_MAPPED);
+    }
+    public static function get_other_mapping() {
+        // Nothing to map.
+        return false;
     }
 
     /**

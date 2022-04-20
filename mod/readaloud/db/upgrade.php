@@ -683,6 +683,57 @@ function xmldb_readaloud_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2022040200, 'readaloud');
     }
 
+    if ($oldversion < 2022041605){
+        $table = new xmldb_table(constants::M_AITABLE);
+
+        // Adding fields to ai results table.
+        $fields= array();
+        $fields[] = new xmldb_field('selfcorrections', XMLDB_TYPE_TEXT, null, null, null, null);
+        $fields[] = new xmldb_field('sccount', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, 0);
+
+        // Add fields
+        foreach($fields as $field) {
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+
+        $table = new xmldb_table(constants::M_USERTABLE);
+
+        // Adding fields to attempt table.
+        $fields= array();
+        $fields[] = new xmldb_field('selfcorrections', XMLDB_TYPE_TEXT, null, null, null, null);
+        $fields[] = new xmldb_field('sccount', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, 0);
+        $fields[]=  new xmldb_field('qscore', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, 0);
+        $fields[] = new xmldb_field('qdetails', XMLDB_TYPE_TEXT, 8192, null, null, null);
+        // Add fields
+        foreach($fields as $field) {
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+
+        $table = new xmldb_table(constants::M_TABLE);
+        $fields=[];
+        $fields[] = new xmldb_field('usecorpus', XMLDB_TYPE_INTEGER, 2, null,XMLDB_NOTNULL, null, constants::GUIDEDTRANS_PASSAGE);
+        $fields[] =new xmldb_field('corpushash', XMLDB_TYPE_CHAR, '255', null, null, null );
+        $fields[] =new xmldb_field('passagekey', XMLDB_TYPE_CHAR, '255', null, null, null );
+        $fields[]=  new xmldb_field('corpusrange', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, constants::CORPUSRANGE_SITE);
+
+        // Add fields
+        foreach ($fields as $field) {
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+
+        //set all transcriber to "guided" (before was 1) chrome:strict stt:guided or 2) stt:guided - ie all mixed up
+        $DB->set_field(constants::M_TABLE,'transcriber',constants::TRANSCRIBER_GUIDED);
+        set_config('transcriber', constants::TRANSCRIBER_GUIDED,constants::M_COMPONENT).
+
+        upgrade_mod_savepoint(true, 2022041605, 'readaloud');
+    }
+
     // Final return of upgrade result (true, all went good) to Moodle.
     return true;
 }

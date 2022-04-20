@@ -303,6 +303,23 @@ function xmldb_minilesson_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2022032900, 'minilesson');
     }
 
+    // Add lessonkey  to minilesson table
+    if ($oldversion < 2022041800) {
+        $table = new xmldb_table(constants::M_TABLE);
+
+        // Define fields ,lessonkey,to be added to minilesson
+        $fields=[];
+        $fields[] = new xmldb_field('lessonkey', XMLDB_TYPE_CHAR, '255', null);
+
+        // Add fields
+        foreach ($fields as $field) {
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+        upgrade_mod_savepoint(true, 2022041800, 'minilesson');
+    }
+
     // Final return of upgrade result (true, all went good) to Moodle.
     return true;
 }

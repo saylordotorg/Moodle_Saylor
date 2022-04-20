@@ -56,21 +56,22 @@ class backup_readaloud_activity_structure_step extends backup_activity_structure
                 'grade', 'gradeoptions', 'machgrademethod','sessionscoremethod', 'maxattempts', 'mingrade',
                 'ttslanguage','ttsvoice','ttsspeed','enablepreview','enableshadow','enablelandr' ,'transcriber', 'modelaudiourl','modelaudiobreaks',
                 'modelaudiotrans','modelaudiofulltrans','modelaudiomatches',
-                'enableai', 'allowearlyexit','expiredays' ,'region', 'activitylink','submitrawaudio','stricttranscribe','recorder','foriframe','timecreated', 'timemodified'
+                'enableai', 'allowearlyexit','expiredays' ,'region', 'activitylink','submitrawaudio','stricttranscribe','recorder','foriframe',
+                'usecorpus','corpushash','passagekey','corpusrange','timecreated', 'timemodified'
         ));
 
         //attempts
         $attempts = new backup_nested_element('attempts');
         $attempt = new backup_nested_element('attempt', array('id'), array(
                 constants::M_MODNAME . "id", "courseid", "userid", "status", "filename", "wpm", "accuracy",
-                "sessionscore", "sessiontime", "sessionerrors", "sessionendword", "errorcount","dontgrade", "timecreated", "timemodified"
+                "sessionscore", "sessiontime", "sessionerrors", "sessionendword", "errorcount","selfcorrections","sccount","qscore","qdetails","dontgrade", "timecreated", "timemodified"
         ));
 
         //ai results
         $airesults = new backup_nested_element('airesults');
         $airesult = new backup_nested_element('airesult', array('id'), array(
                 constants::M_MODNAME . "id", "courseid", "attemptid", "transcript", "fulltranscript", "wpm", "accuracy",
-                "sessionscore", "sessiontime", "sessionerrors", "sessionmatches", "sessionendword", "errorcount", "timecreated",
+                "sessionscore", "sessiontime", "sessionerrors", "sessionmatches", "sessionendword", "errorcount","selfcorrections","sccount", "timecreated",
                 "timemodified"
         ));
 

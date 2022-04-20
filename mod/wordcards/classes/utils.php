@@ -676,7 +676,7 @@ class utils{
 
   public static function get_tts_voices($langcode, $showall=false){
       $alllang= array(
-              constants::M_LANG_ARAE => ['Zeina'],
+              constants::M_LANG_ARAE => ['Zeina'=>'Zeina'],
           //constants::M_LANG_ARSA => [],
                 constants::M_LANG_DADK => ["Naja"=>"Naja","Mads"=>"Mads"],
               constants::M_LANG_DEDE => ['Hans'=>'Hans','Marlene'=>'Marlene', 'Vicki'=>'Vicki'],
@@ -969,6 +969,13 @@ class utils{
        );
    }
 
+    public static function fetch_short_lang($longlang){
+        if(\core_text::strlen($longlang)<=2){return $longlang;}
+        if($longlang=="fil-PH"){return "fil";}
+        $shortlang = substr($longlang,0,2);
+        return $shortlang;
+    }
+
     /*
      * Do we need to build a language model for this passage?
      *
@@ -981,19 +988,20 @@ class utils{
             case 'dublin':
             case 'sydney':
             default:
-            return (substr($mod->get_mod()->ttslanguage,0,2)=='en' ||
-                    substr($mod->get_mod()->ttslanguage,0,2)=='de' ||
-                    substr($mod->get_mod()->ttslanguage,0,2)=='fr' ||
-                    substr($mod->get_mod()->ttslanguage,0,2)=='ru' ||
-                    substr($mod->get_mod()->ttslanguage,0,2)=='eu' ||
-                    substr($mod->get_mod()->ttslanguage,0,2)=='pl' ||
-                    substr($mod->get_mod()->ttslanguage,0,2)=='fi' ||
-                    substr($mod->get_mod()->ttslanguage,0,2)=='it' ||
-                    substr($mod->get_mod()->ttslanguage,0,2)=='pt' ||
-                    substr($mod->get_mod()->ttslanguage,0,2)=='uk' ||
-                    substr($mod->get_mod()->ttslanguage,0,2)=='ro' ||
-                    substr($mod->get_mod()->ttslanguage,0,2)=='hu' ||
-                            substr($mod->get_mod()->ttslanguage,0,2)=='es') && $mod->get_terms();
+                $shortlang = self::fetch_short_lang($mod->get_mod()->ttslanguage);
+            return ($shortlang=='en' ||
+                    $shortlang=='de' ||
+                    $shortlang=='fr' ||
+                    $shortlang=='ru' ||
+                    $shortlang=='eu' ||
+                    $shortlang=='pl' ||
+                    $shortlang=='fi' ||
+                    $shortlang=='it' ||
+                    $shortlang=='pt' ||
+                    $shortlang=='uk' ||
+                    $shortlang=='ro' ||
+                    $shortlang=='hu' ||
+                            $shortlang=='es') && $mod->get_terms();
         }
     }
 

@@ -25,6 +25,7 @@
 namespace mod_readaloud\event;
 defined('MOODLE_INTERNAL') || die();
 
+use \mod_readaloud\constants;
 /**
  * The mod_readaloud course module viewed event class.
  *
@@ -41,7 +42,15 @@ class course_module_viewed extends \core\event\course_module_viewed {
     protected function init() {
         $this->data['crud'] = 'r';
         $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
-        $this->data['objecttable'] = 'readaloud';
+        $this->data['objecttable'] = constants::M_TABLE;
+    }
+
+    public static function get_objectid_mapping() {
+        return array('db' => constants::M_TABLE, 'restore' => 'readaloud');
+    }
+    public static function get_other_mapping() {
+        // Nothing to map.
+        return false;
     }
 }
 

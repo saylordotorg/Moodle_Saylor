@@ -14,9 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-
-defined('MOODLE_INTERNAL') || die();
-
+/**
+ * mod_journal lib file
+ *
+ * @package    mod_journal
+ * @copyright  2014 David Monllao <david.monllao@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 /**
  * Given an object containing all the necessary data,
@@ -95,7 +99,12 @@ function journal_delete_instance($id) {
     return $result;
 }
 
-
+/**
+ * List of feature supported
+ *
+ * @param int $feature Feature constant
+ * @return bool|null True if feature is supported, falsy if it is not
+ */
 function journal_supports($feature) {
     switch($feature) {
         case FEATURE_MOD_INTRO:
@@ -123,17 +132,34 @@ function journal_supports($feature) {
     }
 }
 
-
+/**
+ * Return list of actions for the view
+ *
+ * @return array Array of actions
+ */
 function journal_get_view_actions() {
     return array('view', 'view all', 'view responses');
 }
 
-
+/**
+ * Return list of actions for the post method
+ *
+ * @return array Array of actions
+ */
 function journal_get_post_actions() {
     return array('add entry', 'update entry', 'update feedback');
 }
 
 
+/**
+ * User outline
+ *
+ * @param stdClass $course Course object
+ * @param stdClass $user User object
+ * @param stdClass $mod Mod object
+ * @param stdClass $journal Journal object
+ * @return stdClass|null User outline object or null
+ */
 function journal_user_outline($course, $user, $mod, $journal) {
 
     global $DB;
@@ -150,7 +176,15 @@ function journal_user_outline($course, $user, $mod, $journal) {
     return null;
 }
 
-
+/**
+ * User complete check
+ *
+ * @param stdClass $course Course object
+ * @param stdClass $user User object
+ * @param stdClass $mod Mod object
+ * @param stdClass $journal Journal object
+ * @return void
+ */
 function journal_user_complete($course, $user, $mod, $journal) {
 
     global $DB, $OUTPUT;
@@ -182,8 +216,6 @@ function journal_user_complete($course, $user, $mod, $journal) {
  * that has occurred in journal activities and print it out.
  * Return true if there was output, or false if there was none.
  *
- * @global stdClass $DB
- * @global stdClass $OUTPUT
  * @param stdClass $course
  * @param bool $viewfullnames
  * @param int $timestart
@@ -339,9 +371,8 @@ function journal_scale_used ($journalid, $scaleid) {
 
 /**
  * Checks if scale is being used by any instance of journal
- *
  * This is used to find out if scale used anywhere
- * @param $scaleid int
+ * @param int $scaleid Scale id
  * @return boolean True if the scale is used by any journal
  */
 function journal_scale_used_anywhere($scaleid) {
@@ -368,8 +399,8 @@ function journal_reset_course_form_definition(&$mform) {
 /**
  * Course reset form defaults.
  *
- * @param object $course
- * @return array
+ * @param object $course Course object
+ * @return array Array with defaults
  */
 function journal_reset_course_form_defaults($course) {
     return array('reset_journal' => 1);
@@ -378,7 +409,7 @@ function journal_reset_course_form_defaults($course) {
 /**
  * Removes all entries
  *
- * @param object $data
+ * @param object $data Data array
  */
 function journal_reset_userdata($data) {
 
@@ -402,8 +433,14 @@ function journal_reset_userdata($data) {
     return $status;
 }
 
+/**
+ * Print journal overview
+ *
+ * @param array $courses Courses array
+ * @param array $htmlarray HTML array
+ * @return void
+ */
 function journal_print_overview($courses, &$htmlarray) {
-
     global $USER, $CFG, $DB;
 
     if (!get_config('journal', 'overview')) {
@@ -458,6 +495,13 @@ function journal_print_overview($courses, &$htmlarray) {
     }
 }
 
+/**
+ * Get user grade
+ *
+ * @param stdClass $journal Journal object
+ * @param integer $userid User id
+ * @return array Array of grades
+ */
 function journal_get_user_grades($journal, $userid=0) {
     global $DB;
 
@@ -549,7 +593,7 @@ function journal_update_grades($journal=null, $userid=0, $nullifnone=true) {
  * Create grade item for given journal
  *
  * @param object $journal object with extra cmidnumber
- * @param mixed optional array/object of grade(s); 'reset' means reset grades in gradebook
+ * @param mixed $grades optional array/object of grade(s); 'reset' means reset grades in gradebook
  * @return int 0 if ok, error code otherwise
  */
 function journal_grade_item_update($journal, $grades=null) {
@@ -602,8 +646,13 @@ function journal_grade_item_delete($journal) {
     return grade_update('mod/journal', $journal->course, 'mod', 'journal', $journal->id, 0, null, array('deleted' => 1));
 }
 
-
-
+/**
+ * Return array of users who completed journal
+ *
+ * @param stdClass $journal Journal object
+ * @param int $currentgroup Group id
+ * @return array Array of users
+ */
 function journal_get_users_done($journal, $currentgroup) {
     global $DB;
 
@@ -645,6 +694,9 @@ function journal_get_users_done($journal, $currentgroup) {
 
 /**
  * Counts all the journal entries (optionally in a given group)
+ * @param stdClass $journal Journal object
+ * @param int $groupid Group id
+ * @return int Number of entries
  */
 function journal_count_entries($journal, $groupid = 0) {
     global $DB;
@@ -686,16 +738,28 @@ function journal_count_entries($journal, $groupid = 0) {
     return count($journals);
 }
 
+/**
+ * Get list of graded unmailed users
+ *
+ * @param int $cutofftime Timestamp
+ * @return array Array of users
+ */
 function journal_get_unmailed_graded($cutofftime) {
     global $DB;
 
     $sql = "SELECT je.*, j.course, j.name FROM {journal_entries} je
             JOIN {journal} j ON je.journal = j.id
-            WHERE je.mailed = '0' AND je.timemarked < ? AND je.timemarked > 0 
+            WHERE je.mailed = '0' AND je.timemarked < ? AND je.timemarked > 0
             AND (je.rating <> -1 OR (je.entrycomment IS NOT NULL AND trim(je.entrycomment) <> ?))";
     return $DB->get_records_sql($sql, array($cutofftime, ''));
 }
 
+/**
+ * Log info
+ *
+ * @param stdClass $log Log object
+ * @return stdClass|null Log object
+ */
 function journal_log_info($log) {
     global $DB;
 
@@ -710,8 +774,8 @@ function journal_log_info($log) {
 /**
  * Returns the journal instance course_module id
  *
- * @param integer $journal
- * @return object
+ * @param integer $journalid Journal id
+ * @return object Course module object
  */
 function journal_get_coursemodule($journalid) {
 
@@ -723,9 +787,17 @@ function journal_get_coursemodule($journalid) {
 }
 
 
-
+/**
+ * Print user entry
+ *
+ * @param object $course Course object
+ * @param object $user User object
+ * @param object $entry Entry object
+ * @param array $teachers Teachers array
+ * @param array $grades Grades array
+ * @return void
+ */
 function journal_print_user_entry($course, $user, $entry, $teachers, $grades) {
-
     global $USER, $OUTPUT, $DB, $CFG;
 
     require_once($CFG->dirroot.'/lib/gradelib.php');
@@ -788,7 +860,8 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades) {
 
         // Grade selector.
         $attrs['id'] = 'r' . $entry->id;
-        echo html_writer::label(fullname($user)." ".get_string('gradenoun'), 'r'.$entry->id, true, array('class' => 'accesshide'));
+        $gradestring = get_string_manager()->string_exists('gradenoun', 'moodle') ? get_string('gradenoun') : get_string('grade');
+        echo html_writer::label(fullname($user)." ".$gradestring, 'r'.$entry->id, true, array('class' => 'accesshide'));
         echo html_writer::select($grades, 'r'.$entry->id, $entry->rating, get_string("nograde").'...', $attrs);
         echo $hiddengradestr;
         // Rewrote next three lines to show entry needs to be regraded due to resubmission.
@@ -814,6 +887,14 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades) {
 
 }
 
+/**
+ * Print feedback
+ *
+ * @param object $course Course object
+ * @param object $entry Entry object
+ * @param array $grades Grades array
+ * @return void
+ */
 function journal_print_feedback($course, $entry, $grades) {
 
     global $CFG, $DB, $OUTPUT;
@@ -821,7 +902,7 @@ function journal_print_feedback($course, $entry, $grades) {
     require_once($CFG->dirroot.'/lib/gradelib.php');
 
     if (! $teacher = $DB->get_record('user', array('id' => $entry->teacher))) {
-        print_error('Weird journal error');
+        throw new \moodle_exception(get_string('Weird journal error'));
     }
 
     echo '<table class="feedbackbox">';
@@ -845,7 +926,8 @@ function journal_print_feedback($course, $entry, $grades) {
     // Gradebook preference.
     $gradinginfo = grade_get_grades($course->id, 'mod', 'journal', $entry->journal, array($entry->userid));
     if (!empty($gradinginfo->items[0]->grades[$entry->userid]->str_long_grade)) {
-        echo get_string('gradenoun').': ';
+        $gradestring = get_string_manager()->string_exists('gradenoun', 'moodle') ? get_string('gradenoun') : get_string('grade');
+        echo $gradestring.': ';
         echo $gradinginfo->items[0]->grades[$entry->userid]->str_long_grade;
     } else {
         print_string('nograde');
@@ -912,6 +994,14 @@ function journal_pluginfile($course, $cm, $context, $filearea, $args, $forcedown
     send_stored_file($file, null, 0, $forcedownload, $options);
 }
 
+/**
+ * Format entry text
+ *
+ * @param object $entry Entry object
+ * @param object $course Course object
+ * @param object $cm Course module object
+ * @return string Formatted text
+ */
 function journal_format_entry_text($entry, $course = false, $cm = false) {
 
     if (!$cm) {

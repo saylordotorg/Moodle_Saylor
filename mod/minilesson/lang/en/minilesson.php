@@ -44,7 +44,6 @@ $string['minilesson:manage'] = 'Can manage MiniLesson instances';
 $string['minilesson:canpreview'] = 'Can preview MiniLesson activities';
 $string['minilesson:evaluate'] = 'Can evaluate student MiniLesson attempts';
 $string['minilesson:submit'] = 'Can submit MiniLesson attempts';
-$string['privacy:metadata'] = 'The Poodll MiniLesson plugin does store personal data.';
 $string['tryagain'] = 'Try again';
 
 $string['id']='ID';
@@ -294,6 +293,9 @@ $string['privacy:metadata:transcriptpurpose']='The recording short transcripts.'
 $string['privacy:metadata:fulltranscriptpurpose']='The full transcripts of recordings.';
 $string['privacy:metadata:cloudpoodllcom:userid']='The MiniLesson plugin includes the moodle userid in the urls of recordings and transcripts';
 $string['privacy:metadata:cloudpoodllcom']='The MiniLesson plugin stores recordings in AWS S3 buckets via cloud.poodll.com.';
+$string['privacy:metadata'] = 'The Poodll MiniLesson plugin does store personal data.';
+$string['privacy:metadata:moduleid'] = 'The unique identifier of a MiniLesson activity instance.';
+$string['privacy:metadata:errorcount']='The error count of a users MiniLesson attempt.';
 
 //rsquestions
 $string['durationgradesettings'] = 'Grade Settings ';
@@ -314,7 +316,7 @@ $string['addingitem'] = 'Adding a new lesson item';
 $string['editingitem'] = 'Editing a lesson item';
 $string['createaitem'] = 'Create a lesson item';
 $string['item'] = 'Item';
-$string['newitem'] = 'Item: untitled';
+$string['newitem'] = 'Item: {$a}';
 $string['itemtitle'] = 'Item Title';
 $string['itemcontents'] = 'Item Text';
 $string['answer'] = 'Answer';
@@ -387,8 +389,8 @@ $string['shortanswer']='Short Answer';
 $string['transcriber'] = 'Transcriber';
 $string['transcriber_details'] = 'The transcription engine to use';
 $string['transcriber_none'] = 'No transcription';
-$string['transcriber_auto'] = 'Hybrid STT (Browser STT + Poodll STT))';
-$string['transcriber_poodll'] = 'Use Poodll STT';
+$string['transcriber_auto'] = 'Open STT (Strict)';
+$string['transcriber_poodll'] = 'Guided STT (Poodll)';
 
 
 $string['pagelayout'] = 'Page layout';
@@ -560,3 +562,23 @@ $string['addttsdialog'] = "Add TTS Dialog";
 $string['totalscore'] = 'Total Score:';
 $string['score'] = 'Score';
 $string['questiontext'] = 'Question';
+$string['ttsdialoginstructions']="Choose the speaker voices for roles A,B and C and enter the dialog. Begin each dialog line with the speaker role + ')'. e.g A) Hello. Sound effect lines begin with >> e.g >>seagulls";
+
+$string['courseattempts'] = 'Course Attempts';
+$string['courseattemptsreport'] = 'Course Attempts Report';
+$string['courseattemptsheading'] = 'Course Attempts Report';
+$string['courseattemptsreport_explanation']='All minilesson attempts in the course';
+$string['studentid']="St. No.";
+$string['studentname']="Student Name";
+$string['activityname']="Lesson Name.";
+$string['itemcount']="No. of items";
+$string['correctcount']="No. of correct items";
+$string['lessonkey']="Lesson Key";
+$string['lessonkey_details'] =
+    'The lesson key is just a tag that will be exported to csv with some reports to make post processing those reports in a spreadsheet easier. It is fine to leave it empty.';
+$string['lessonkey_help'] =
+    'The lesson key is just a tag that will be exported to csv with some reports to make post processing those reports in a spreadsheet easier.';
+$string['reportstable']="Reports Style";
+$string['reportstable_details']="Ajax tables are faster to use and can sort data. Paged tables load faster but are harder to navigate with.";
+$string['reporttableajax']="Ajax Tables";
+$string['reporttablepaged']="Paged Tables";

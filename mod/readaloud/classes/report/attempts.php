@@ -119,7 +119,7 @@ class attempts extends basereport {
             $alldatasql = "SELECT tu.* FROM {" . constants::M_USERTABLE . "} tu " .
                     " INNER JOIN {groups_members} gm ON tu.userid=gm.userid " .
                     " WHERE gm.groupid $groupswhere AND tu.readaloudid=?  AND tu.dontgrade = 0 ";
-            $alldataparams[]=$formdata->readaloudid;
+            $allparams[]=$formdata->readaloudid;
             $alldata = $DB->get_records_sql($alldatasql, $allparams);
         }else{
             $alldata = $DB->get_records(constants::M_USERTABLE, array('readaloudid' => $formdata->readaloudid));

@@ -115,11 +115,24 @@ if ($ADMIN->fulltree) {
             get_string('allowearlyexit', constants::M_COMPONENT),
             get_string('allowearlyexit_defaultdetails', constants::M_COMPONENT), 1));
 
-    $settings->add(new admin_setting_configcheckbox(constants::M_COMPONENT . '/submitrawaudio',
-            get_string('submitrawaudio', constants::M_COMPONENT), get_string('submitrawaudio_details', constants::M_COMPONENT), 0));
 
-    $settings->add(new admin_setting_configcheckbox(constants::M_COMPONENT . '/stricttranscribe',
-            get_string('stricttranscribe', constants::M_COMPONENT), get_string('stricttranscribe_details', constants::M_COMPONENT), 0));
+    // Passage Transcriber options
+    $name = 'stricttranscribe';
+    $label = get_string($name, constants::M_COMPONENT);
+    $details = get_string($name . '_details', constants::M_COMPONENT);
+    $default = constants::TRANSCRIBER_GUIDED;
+    $options = utils::fetch_options_transcribers();
+    $settings->add(new admin_setting_configselect(constants::M_COMPONENT . "/$name",
+        $label, $details, $default, $options));
+
+    // Line Transcriber options
+    $name = 'transcriber';
+    $label = get_string($name, constants::M_COMPONENT);
+    $details = get_string($name . '_details', constants::M_COMPONENT);
+    $default = constants::TRANSCRIBER_GUIDED;
+    $options = utils::fetch_options_transcribers();
+    $settings->add(new admin_setting_configselect(constants::M_COMPONENT . "/$name",
+        $label, $details, $default, $options));
 
     $settings->add(new admin_setting_configcheckbox(constants::M_COMPONENT . '/enablepreview',
             get_string('enablepreview', constants::M_COMPONENT),
@@ -195,15 +208,6 @@ if ($ADMIN->fulltree) {
     $details = "";
     $default = "Amy";
     $options = \mod_readaloud\utils::fetch_ttsvoice_options();
-    $settings->add(new admin_setting_configselect(constants::M_COMPONENT . "/$name",
-            $label, $details, $default, $options));
-
-    // Transcriber options
-    $name = 'transcriber';
-    $label = get_string($name, constants::M_COMPONENT);
-    $details = get_string($name . '_details', constants::M_COMPONENT);
-    $default = constants::TRANSCRIBER_AUTO;
-    $options = utils::fetch_options_transcribers();
     $settings->add(new admin_setting_configselect(constants::M_COMPONENT . "/$name",
             $label, $details, $default, $options));
 

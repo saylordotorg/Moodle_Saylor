@@ -32,6 +32,9 @@ const M_NOITEMS_CONT= 'mod_minilesson_noitems_cont';
 const M_ITEMS_CONT= 'mod_minilesson_items_cont';
 const M_ITEMS_TABLE= 'mod_minilesson_qpanel';
 
+const M_USE_DATATABLES=0;
+const M_USE_PAGEDTABLES=1;
+
 const M_NEURALVOICES = array("Amy","Emma","Brian","Olivia","Aria","Ayanda","Ivy","Joanna","Kendra","Kimberly",
         "Salli","Joey","Justin","Kevin","Matthew","Camila","Lupe", "Gabrielle", "Vicki", "Seoyeon","Takumi", "Lucia","Lea","Bianca");
 

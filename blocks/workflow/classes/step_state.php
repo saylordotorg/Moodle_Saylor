@@ -22,9 +22,6 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die('Direct access to this script is forbidden.');
-
-
 /**
  * state class
  *
@@ -485,10 +482,13 @@ class block_workflow_step_state {
      * @param object $context, the workflow context
      */
     public function get_all_users_and_their_roles($roles, $context) {
-        global $CFG, $DB;
+        global $DB;
         if (!$roles) {
             return null;
         }
+
+        $fields = \core_user\fields::for_identity($context);
+        $fieldssql = $fields->get_sql('u');
 
         list ($sortorder, $notused) = users_order_by_sql('u');
         $roleinfo = role_get_names($context);
@@ -497,14 +497,15 @@ class block_workflow_step_state {
             $rolenames[$role->shortname] = $role->localname;
         }
         list($roleids, $params) = $DB->get_in_or_equal(array_keys($roles));
-        $sql = "SELECT u.*, r.shortname
+        $sql = "SELECT u.* {$fieldssql->selects}, r.shortname
                 FROM {user} u
+                {$fieldssql->joins}
                 JOIN {role_assignments} ra ON u.id=ra.userid
                 JOIN {role} r ON r.id = ra.roleid
                 WHERE ra.roleid $roleids AND ra.contextid = ? ORDER BY $sortorder, r.sortorder";
         $params[] = $context->id;
 
-        $userroles = $DB->get_recordset_sql($sql, $params);
+        $userroles = $DB->get_recordset_sql($sql, array_merge($fieldssql->params, $params));
 
         $users = array();
         foreach ($userroles as $userrole) {

@@ -136,6 +136,15 @@ switch ($showreport) {
         $formdata->groupmenu = true;
         break;
 
+    case 'courseattempts':
+        $report = new \mod_readaloud\report\courseattempts();
+        $formdata = new stdClass();
+        $formdata->readaloudid = $moduleinstance->id;
+        $formdata->courseid = $moduleinstance->course;
+        $formdata->modulecontextid = $modulecontext->id;
+        $formdata->groupmenu = true;
+        break;
+
     case 'attemptssummary':
         $report = new \mod_readaloud\report\attemptssummary();
         $formdata = new stdClass();

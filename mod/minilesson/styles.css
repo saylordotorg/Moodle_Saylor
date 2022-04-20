@@ -1752,6 +1752,7 @@ div.mod_minilesson_feedback_cont.mod_minilesson_postattempt {
 .mod_minilesson_itemaudio_cont,
 .mod_minilesson_itemiframe_cont,
 .mod_minilesson_itemttsaudio_cont,
+.mod_minilesson_itemttsdialog_cont,
 .mod_minilesson_itemytclip_cont {
   width: 100%;
   margin-top: 10px;
@@ -1999,9 +2000,30 @@ span.mod_minilesson_finishedanswer {
 .mod_minilesson_spokenandcorrect.minilesson_success {
   background-color: lightgreen;
 }
-
-.ttsdialog_text {
+.ttsdialog_actorplusline {
   border: 1px solid darkgray;
   background-color: white;
+}
+.ttsdialog_text {
+  background-color: white;
   min-height: 30px;
+  display: flex;
+  align-items: center;
+}
+
+.ttsdialog_actor {
+  margin: auto;
+  text-align: center;
+}
+.ttsdialog_actor.rolea {
+  color: blue;
+}
+.ttsdialog_actor.roleb {
+  color: green;
+}
+.ttsdialog_actor.rolec {
+  color: orange;
+}
+.ttsdialog_actor.rolenone {
+  opacity: 0;
 }

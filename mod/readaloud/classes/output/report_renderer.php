@@ -33,10 +33,19 @@ class report_renderer extends \plugin_renderer_base {
                         array('report' => 'attemptssummary', 'id' => $cm->id, 'n' => $moduleinstance->id)),
                 get_string('attemptssummaryreport', constants::M_COMPONENT), 'get');
         $reports[]=$this->render($attemptssummary);
+        $reports[] = array('button'=>$this->render($attemptssummary),
+            'text'=>get_string('attemptssummary_explanation', constants::M_COMPONENT));
 
+        $courseattempts = new \single_button(
+            new \moodle_url(constants::M_URL . '/reports.php',
+                array('report' => 'courseattempts', 'id' => $cm->id, 'n' => $moduleinstance->id)),
+            get_string('courseattemptsreport', constants::M_COMPONENT), 'get');
+        $reports[]=$this->render($courseattempts);
+        $reports[] = array('button'=>$this->render($courseattempts),
+            'text'=>get_string('courseattempts_explanation', constants::M_COMPONENT));
 
-
-        $ret = \html_writer::div(implode('<br />',$reports), constants::M_CLASS . '_listbuttons');
+        $data=['reports' => $reports];
+        $ret= $this->render_from_template('mod_readaloud/reportsmenu', $data);
 
         return $ret;
     }

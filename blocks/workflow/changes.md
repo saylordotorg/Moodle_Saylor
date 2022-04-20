@@ -1,5 +1,12 @@
 # Change log for the Workflow block
 
+## Changes in 2.3
+
+* This version works with Moodle 4.0.
+* Update to display custom profile fields in the places where user identity is shown.
+* Improve the wording of some error strings.
+
+
 ## Changes in 2.2
 
 * Improved test data generators (mainly for the benefit of other OU plugins which integrate with this).

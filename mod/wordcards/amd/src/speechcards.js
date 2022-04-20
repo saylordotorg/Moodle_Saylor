@@ -211,7 +211,7 @@ define([
         //init tt recorder
         var opts = {};
         opts.uniqueid = recid;
-        opts.ds_only = that.props.ds_only;
+        opts.stt_guided = that.props.stt_guided;
         opts.callback = theCallback;
         ttrecorder.clone().init(opts);
 

@@ -68,9 +68,12 @@ if (has_capability('mod/readaloud:manage', $context)) {
     if(isset($CFG->readaloud_experimental) && $CFG->readaloud_experimental) {
         $row[] = new tabobject('rsquestions', "$CFG->wwwroot/mod/readaloud/rsquestion/rsquestions.php?id=$cm->id", get_string('rsquestions', constants::M_COMPONENT), get_string('managersquestions', constants::M_COMPONENT));
     }
-    $row[] = new tabobject('gradesadmin', "$CFG->wwwroot/mod/readaloud/gradesadmin.php?id=$cm->id",
-        get_string('gradesadmin', constants::M_COMPONENT), get_string('viewgradesadmin', constants::M_COMPONENT));
+    //model audio
     $row[] = new tabobject('modelaudio', "$CFG->wwwroot/mod/readaloud/modelaudio.php?id=$cm->id", get_string('modelaudio', constants::M_COMPONENT), get_string('modelaudio', constants::M_COMPONENT));
+    //admin tab
+    $row[] = new tabobject('admintab', "$CFG->wwwroot/mod/readaloud/admintab.php?id=$cm->id",
+        get_string('admintab', constants::M_COMPONENT), get_string('viewadmintab', constants::M_COMPONENT));
+
 }
 
 if (has_capability('mod/readaloud:pushtoclones', $context) && $moduleinstance->masterinstance) {

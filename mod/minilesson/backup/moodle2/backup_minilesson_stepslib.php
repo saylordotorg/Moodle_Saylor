@@ -53,7 +53,8 @@ class backup_minilesson_activity_structure_step extends backup_activity_structur
             'course','name','intro','introformat','timelimit',
                 //'welcome','welcomeformat',
             'grade','gradeoptions','maxattempts','mingrade','richtextprompt',
-            'ttslanguage','transcriber','region','activitylink','pagelayout','showqtitles','foriframe','timecreated','timemodified','viewstart','viewend'
+            'ttslanguage','transcriber','region','activitylink','pagelayout','showqtitles','foriframe',
+            'lessonkey','timecreated','timemodified','viewstart','viewend'
 			));
 
 		

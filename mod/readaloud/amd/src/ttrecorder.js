@@ -32,7 +32,7 @@ define(['jquery', 'core/log', 'mod_readaloud/ttaudiohelper', 'core/notification'
             browserrec: null,
             usebrowserrec: false,
             currentTime: 0,
-            ds_only: false,
+            stt_guided: false,
 
             //for making multiple instances
             clone: function () {
@@ -45,7 +45,7 @@ define(['jquery', 'core/log', 'mod_readaloud/ttaudiohelper', 'core/notification'
 
                 this.uniqueid=opts['uniqueid'];
                 this.callback=opts['callback'];
-                this.ds_only = opts['ds_only'] ? opts['ds_only'] : false;
+                this.stt_guided = opts['stt_guided'] ? opts['stt_guided'] : false;
                 this.shadow = opts['shadow'];
                 this.prepare_html();
                 this.controls.recordercontainer.show();
@@ -116,7 +116,7 @@ define(['jquery', 'core/log', 'mod_readaloud/ttaudiohelper', 'core/notification'
 
 
                 //If browser rec (Chrome Speech Rec) (and ds is optiona)
-                if(browserRec.will_work_ok() && ! this.ds_only){
+                if(browserRec.will_work_ok() && ! this.stt_guided){
                     //Init browserrec
                     log.debug("using browser rec");
                     this.browserrec = browserRec.clone();
@@ -321,6 +321,12 @@ define(['jquery', 'core/log', 'mod_readaloud/ttaudiohelper', 'core/notification'
                 bodyFormData.append('audioFile', blob, blobname);
                 bodyFormData.append('scorer', this.passagehash);
                 bodyFormData.append('lang', this.lang);
+                bodyFormData.append('wwwroot', M.cfg.wwwroot);
+                if(this.stt_guided) {
+                    bodyFormData.append('strictmode', 'false');
+                }else{
+                    bodyFormData.append('strictmode', 'true');
+                }
 
                 var oReq = new XMLHttpRequest();
                 oReq.open("POST", this.asrurl, true);

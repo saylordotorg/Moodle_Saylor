@@ -1,5 +1,8 @@
 Change List
 =========
+Version 3.1.53 (Build 2022041300)
+- fixed warning message from logs of adhoc tasks
+
 Version 3.1.52 (Build 2022032400)
 - added custom course fields to filter variables
 - added highest month to usage report

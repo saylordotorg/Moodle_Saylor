@@ -25,6 +25,8 @@
 namespace mod_wordcards\event;
 defined('MOODLE_INTERNAL') || die();
 
+use \mod_wordcards\constants;
+
 /**
  * The mod_wordcards course module viewed event class.
  *
@@ -41,7 +43,14 @@ class course_module_viewed extends \core\event\course_module_viewed {
     protected function init() {
         $this->data['crud'] = 'r';
         $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
-        $this->data['objecttable'] = 'wordcards';
+        $this->data['objecttable'] = constants::M_TABLE;
+    }
+    public static function get_objectid_mapping() {
+        return array('db' => constants::M_TABLE, 'restore' => 'wordcards');
+    }
+    public static function get_other_mapping() {
+        // Nothing to map.
+        return false;
     }
 }
 

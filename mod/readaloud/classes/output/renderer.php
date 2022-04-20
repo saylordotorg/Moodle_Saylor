@@ -261,13 +261,10 @@ class renderer extends \plugin_renderer_base {
 
         //If there is no remote transcriber
         //we do not want to get users hopes up by trying to fetch a transcript with ajax
-        switch($moduleinstance->transcriber){
-            case constants::TRANSCRIBER_AMAZONSTREAMING:
-            case constants::TRANSCRIBER_NONE:
-                $remotetranscribe = false;
-                break;
-            default:
-                $remotetranscribe = true;
+        if(utils::can_transcribe($moduleinstance)){
+            $remotetranscribe = false;
+        }else{
+            $remotetranscribe = true;
         }
 
 
@@ -344,11 +341,27 @@ class renderer extends \plugin_renderer_base {
      */
     public function show_machineregradeallbutton($moduleinstance) {
         $options = [];
-        $button = $this->output->single_button(new \moodle_url(constants::M_URL . '/gradesadmin.php',
+        $button = $this->output->single_button(new \moodle_url(constants::M_URL . '/admintab.php',
                 array('n' => $moduleinstance->id, 'action' => 'machineregradeall')),
                 get_string('machineregradeall', constants::M_COMPONENT), 'post', $options);
 
-        $ret = \html_writer::div($button, constants::M_GRADESADMIN_CONTAINER);
+        $ret = \html_writer::div($button, constants::M_ADMINTAB_CONTAINER);
+        return $ret;
+    }
+
+    /**
+     *
+     */
+    public function show_pushcorpusdetails($moduleinstance) {
+
+
+        $pushcorpusdetails =  \html_writer::div(get_string('pushcorpus_details', constants::M_COMPONENT));
+        $options=[];
+        $pushcorpusbutton = $this->output->single_button(new \moodle_url(constants::M_URL . '/admintab.php',
+            array('n' => $moduleinstance->id, 'action' => 'pushcorpus')),
+            get_string('pushcorpus_button', constants::M_COMPONENT), 'post', $options);
+
+        $ret = \html_writer::div($pushcorpusdetails . $pushcorpusbutton, constants::M_ADMINTAB_CONTAINER);
         return $ret;
     }
 
@@ -367,11 +380,11 @@ class renderer extends \plugin_renderer_base {
         } else {
             $options = array('disabled' => 'disabled');
         }
-        $button = $this->output->single_button(new \moodle_url(constants::M_URL . '/gradesadmin.php',
+        $button = $this->output->single_button(new \moodle_url(constants::M_URL . '/admintab.php',
                 array('n' => $moduleinstance->id, 'action' => 'pushalltogradebook')),
                 get_string('pushalltogradebook', constants::M_COMPONENT), 'post', $options);
 
-        $ret = \html_writer::div($heading . $button, constants::M_GRADESADMIN_CONTAINER);
+        $ret = \html_writer::div($heading . $button, constants::M_ADMINTAB_CONTAINER);
         return $ret;
     }
 
@@ -483,8 +496,9 @@ class renderer extends \plugin_renderer_base {
 
         //passagehash if not empty will be region|hash eg tokyo|2353531453415134545
         //but we only send the hash up so we strip the region
-        if(!empty($moduleinstance->passagehash)){
-            $hashbits = explode('|',$moduleinstance->passagehash);
+        $thefullhash = $moduleinstance->usecorpus==constants::GUIDEDTRANS_CORPUS ? $moduleinstance->corpushash : $moduleinstance->passagehash;
+        if(!empty($thefullhash)){
+            $hashbits = explode('|',$thefullhash);
             if(count($hashbits)==2){
                 $data['passagehash']  = $hashbits[1];
             }
@@ -505,7 +519,7 @@ class renderer extends \plugin_renderer_base {
      */
     public function show_currenterrorestimate($errorestimate) {
         $message = get_string("currenterrorestimate", constants::M_COMPONENT, $errorestimate);
-        $ret = \html_writer::div($message, constants::M_GRADESADMIN_CONTAINER);
+        $ret = \html_writer::div($message, constants::M_ADMINTAB_CONTAINER);
         return $ret;
 
     }
@@ -519,7 +533,7 @@ class renderer extends \plugin_renderer_base {
     /**
      *  Show grades admin heading
      */
-    public function show_gradesadmin_heading($showtitle, $showinstructions) {
+    public function show_admintab_heading($showtitle, $showinstructions) {
         $thetitle = $this->output->heading($showtitle, 3, 'main');
         $displaytext = \html_writer::div($thetitle, constants::M_CLASS . '_center');
         $displaytext .= $this->output->box_start();
@@ -701,16 +715,8 @@ class renderer extends \plugin_renderer_base {
 
         //We no longer want to use AWS streaming transcription.
         switch ($moduleinstance->transcriber){
-            case constants::TRANSCRIBER_AMAZONSTREAMING :
-                $moduleinstance->transcriber = constants::TRANSCRIBER_AUTO;
-                //this flag tells AWS not to send to amazon transcribe
-               // $transcribe = "0";
-               // $hints->streamingtranscriber = 'aws';
-               // $speechevents = '1';
-               // break;
-            case constants::TRANSCRIBER_AUTO:
-            case constants::TRANSCRIBER_POODLL:
-            case constants::TRANSCRIBER_NONE:
+            case constants::TRANSCRIBER_STRICT:
+            case constants::TRANSCRIBER_GUIDED:
             default:
                 $transcribe = $can_transcribe ? $moduleinstance->transcriber : "0";
                 $speechevents="0";
@@ -721,8 +727,9 @@ class renderer extends \plugin_renderer_base {
         //get passage hash as key for transcription vocab
         //we sneakily add "[region]|" when we save passage hash .. so if user changes region ..we re-generate lang model
         $transcribevocab = 'none';
-        if(!empty($moduleinstance->passagehash) && !$moduleinstance->stricttranscribe){
-            $hashbits = explode('|',$moduleinstance->passagehash);
+        $thefullhash = $moduleinstance->usecorpus==constants::GUIDEDTRANS_CORPUS ? $moduleinstance->corpushash : $moduleinstance->passagehash;
+        if(!empty($thefullhash) && !$moduleinstance->stricttranscribe){
+            $hashbits = explode('|',$thefullhash);
             if(count($hashbits)==2){
                 $transcribevocab = $hashbits[1];
             }else{
@@ -826,10 +833,10 @@ class renderer extends \plugin_renderer_base {
 
         $recopts['transcriber']=$moduleinstance->transcriber;
         //this will force browser recognition to use Poodll (not chrome or other browser speech)
-        if($recopts['transcriber']==constants::TRANSCRIBER_POODLL){
-            $recopts['ds_only'] = true;
+        if($recopts['transcriber']==constants::TRANSCRIBER_GUIDED){
+            $recopts['stt_guided'] = true;
         }else {
-            $recopts['ds_only'] = false;
+            $recopts['stt_guided'] = false;
         }
 
         $recopts['language']=$moduleinstance->ttslanguage;

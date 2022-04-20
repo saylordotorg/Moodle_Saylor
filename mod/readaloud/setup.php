@@ -89,7 +89,7 @@ if ($mform->is_cancelled()) {
     //we want to process the hashcode and lang model if it makes sense
     $oldrecord = $DB->get_record(constants::M_TABLE,array('id'=>$data->id));
     $data->passagehash = $oldrecord->passagehash;
-    $newpassagehash = utils::fetch_passagehash($data);
+    $newpassagehash = utils::fetch_passagehash($data->passage,$data->ttslanguage);
     if(utils::needs_lang_model($data)){
         if($newpassagehash){
             //check if it has changed, if not do not waste time processing it
