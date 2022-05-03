@@ -297,6 +297,12 @@ def plugins = [
       "dest" : 'blocks/advnotifications'
     ],
     [
+        "name" : 'filter_rein',
+        "url" : 'https://github.com/dta121/moodle-filter_rein.git',
+        "branch": 'main',
+        "dest" : 'filter/rein'
+    ],
+    [
       "name" : 'availability_role',
       "url" : 'https://github.com/moodleuulm/moodle-availability_role.git',
       "branch" : 'master',
@@ -339,11 +345,12 @@ def plugins = [
       "dest" : 'enrol/autoenrol'
     ],
     [
-        "name" : 'filter_rein',
-        "url" : 'https://github.com/dta121/moodle-filter_rein.git',
-        "branch": 'main',
-        "dest" : 'filter/rein'
+      "name" : 'availability_cohort',
+      "url" : 'https://github.com/moodle-an-hochschulen/moodle-availability_cohort.git',
+      "branch" : 'master',
+      "dest" : 'availability/condition/cohort'
     ]
+
 ]
 
 def StashMoodle(moodle_version) {
