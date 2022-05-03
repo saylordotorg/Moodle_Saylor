@@ -350,7 +350,6 @@ def plugins = [
       "branch" : 'master',
       "dest" : 'availability/condition/cohort'
     ]
-
 ]
 
 def StashMoodle(moodle_version) {
