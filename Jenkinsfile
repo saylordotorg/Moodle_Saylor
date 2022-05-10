@@ -499,6 +499,12 @@ def plugins = [
       "url" : 'https://github.com/moodle-an-hochschulen/moodle-availability_cohort.git',
       "branch" : 'master',
       "dest" : 'availability/condition/cohort'
+    ],
+    [
+      "name" : 'filter_filtercodes',
+      "url" : 'https://github.com/michael-milette/moodle-filter_filtercodes.git',
+      "branch" : 'master',
+      "dest" : 'filter/filtercodes'
     ]
 ]
 
