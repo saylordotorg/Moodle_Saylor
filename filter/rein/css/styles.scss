@@ -1,0 +1,12 @@
+//
+// Imports all plugin CSS files for compression
+//
+// Run the following command to compile all CSS into the appropriate file
+// sass -t compressed styles.scss styles.css
+//
+
+// Imports
+@import "ui-tooltip";
+@import "Aristo";
+@import "swiper";
+@import "rein";

@@ -1,0 +1,30 @@
+Documentation for rein.js Filter CSS Directory
+==============================================
+This directory contains all CSS files loaded by the filter.  For compression, they are processed during development using SASS. 
+
+To Install SASS
+---------------
+# Install Ruby.
+# Run `gem install sass`.
+
+To Compress
+-----------
+To compile the compressed styles.css file, run the following command from the `/css` directory:
+    sass -t compressed styles.scss styles.css
+
+If additional files are added, these files should have their extension changed to .scss.
+styles.scss also needs to be edited to @import the new file.  Place the imports in the order
+in which the files should be loaded (last file to load is listed as last import).
+
+The sass command compresses all .scss files into a single file.  This file is then cached and served to the client by the filter.
+
+Normally this compile step should be a part of the development process, run any time
+that any of the .scss files is changed, and committed to the repo.  There may be times when
+it is necessary to run sass during integration.  Possible scenarios are when two separate
+work in progress branches modify .scss files.
+
+During the compression process, SASS will create a .sass-cache subdirectory and write cached .scssc files there. The plugin's .gitignore is set to ignore this subdirectory.
+
+
+
+

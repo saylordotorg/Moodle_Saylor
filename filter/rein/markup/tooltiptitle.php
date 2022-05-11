@@ -1,0 +1,1 @@
+<p>This is a paragraph of sample content. <span title="This tooltip is generated from the element title attribute." class="tip-trigger">Mouse over this tooltip trigger.</span></p>

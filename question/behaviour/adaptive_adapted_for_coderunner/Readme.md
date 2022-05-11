@@ -19,6 +19,9 @@ For full install instructions, see the
 [CodeRunner install instructions](https://github.com/trampgeek/moodle-qtype_coderunner/blob/master/Readme.md).
 
 ## CHANGE HISTORY
+13/04/22: V1.4.2. Bug fix: a regrade while the sandbox was down, or after a
+question author had set the time limit to more than the sandbox would accept,
+caused submissions to be lost when a Check immediately followed a Precheck.
 23/11/21: V1.4.1. Add support for "Give up" button (Time Hunt). Add 'graderstate'
 functionality for use by combinator template graders.
 

@@ -48,7 +48,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * expirethreshold => How many minutes before expire need to send notify
      * enrolstartdate => When start to enrol
      * enrolenddate => When stop to enrol
-     * customint1 => Enrol on course access or on login
+     * customint1 => Enrol on course access, on login or with user confirmation
      * customint2 => -- NOT USED -- Old group field filter
      * customint3 => Longtime no see unenrol
      * customint4 => New enrolment enabled
@@ -106,6 +106,15 @@ class enrol_autoenrol_plugin extends enrol_plugin {
     }
 
     /**
+     * We are a good plugin and don't invent our own UI/validation code path.
+     *
+     * @return boolean
+     */
+    public function use_standard_editing_ui() {
+        return true;
+    }
+
+    /**
      * Must show enrolme link.
      *
      * @param stdClass $instance
@@ -135,44 +144,36 @@ class enrol_autoenrol_plugin extends enrol_plugin {
         return parent::get_unenrolself_link($instance);
     }
 
-
     /**
-     * Attempt to automatically enrol current user in course without any interaction,
-     * calling code has to make sure the plugin and instance are active.
+     * Return information for enrolment instance containing list of parameters required
+     * for enrolment, name of enrolment plugin etc.
      *
-     * This should return either a timestamp in the future or false.
-     *
-     * @param stdClass $instance course enrol instance
-     *
-     * @return bool|int false means not enrolled, integer means timeend
-     * @throws coding_exception
+     * @param stdClass $instance enrolment instance
+     * @return stdClass instance info.
      */
-    public function try_autoenrol(stdClass $instance) {
-        global $USER, $CFG;
+    public function get_enrol_info(stdClass $instance) {
+        global $USER;
 
-        if (!defined('ENROL_DO_NOT_SEND_EMAIL')) {
-            define('ENROL_DO_NOT_SEND_EMAIL', 0);
-        }
+        $instanceinfo = new stdClass();
+        $instanceinfo->id = $instance->id;
+        $instanceinfo->courseid = $instance->courseid;
+        $instanceinfo->type = $this->get_name();
+        $instanceinfo->name = $this->get_instance_name($instance);
+        $instanceinfo->status = $this->enrol_allowed($instance, $USER);
 
-        if (($CFG->branch < 32) || ($instance->customint7 == ENROL_DO_NOT_SEND_EMAIL)) {
-            if ($this->user_autoenrol($instance, $USER)) {
-                return 0;
-            }
-        }
-        return false;
+        return $instanceinfo;
     }
-
 
     /**
      * Custom function, checks to see if user fulfills
      * our requirements before enrolling them.
      *
-     * @param object $user
      * @param stdClass $instance
+     * @param object $user
      *
      * @return bool
      */
-    public function enrol_allowed($user, stdClass $instance) {
+    public function enrol_allowed(stdClass $instance, $user) {
         global $DB;
 
         if (isguestuser()) {
@@ -272,7 +273,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
         if ($instance->enrol !== 'autoenrol') {
             throw new coding_exception('Invalid enrol instance type!');
         }
-        if ($this->enrol_allowed($user, $instance)) {
+        if ($this->enrol_allowed($instance, $user)) {
             $timestart = time();
             if ($instance->enrolperiod) {
                 $timeend = $timestart + $instance->enrolperiod;
@@ -740,7 +741,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
     public function enrol_page_hook(stdClass $instance) {
         global $USER, $OUTPUT;
 
-        if (!$this->enrol_allowed($USER, $instance)) {
+        if (!$this->enrol_allowed($instance, $USER)) {
             return false;
         }
 

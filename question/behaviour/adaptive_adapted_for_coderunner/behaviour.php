@@ -18,8 +18,8 @@
  * Question behaviour for the old adaptive mode.
  *
  * @package    qbehaviour
- * @subpackage adaptive
- * @copyright  2009 The Open University
+ * @subpackage adaptive_adapted_for_coderunner
+ * @copyright  2009 The Open University, 2022 The University of Canterbury.
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -85,7 +85,7 @@ class qbehaviour_adaptive_adapted_for_coderunner extends qbehaviour_adaptive {
         return parent::get_state_string($showcorrectness);
     }
 
-    
+
     // Override default adaptive behaviour's save method to use the grand-parental
     // (question_behaviour_with_save) method instead of the parental
     // (question_behaviour_adaptive) if the question's hidecheck is true.
@@ -160,12 +160,12 @@ class qbehaviour_adaptive_adapted_for_coderunner extends qbehaviour_adaptive {
         list($fraction, $state) = $this->grade_response($pendingstep, $isprecheck);
 
         // First, handle a failed grading attempt (sandbox down?).
+        // We know it's not exactly the same response twice in a row, so
+        // safest to mark the step invalid, but keep it. This is mostly of
+        // concern if the sandbox is down during a regrade.
         if ($state == question_state::$invalid) {
             $pendingstep->set_state(question_state::$invalid);
-            if ($this->qa->get_state() != question_state::$invalid) {
-                $status = question_attempt::KEEP;
-            }
-            return $status;
+            return question_attempt::KEEP;
         }
 
         if ($prevstep->get_state() == question_state::$complete) {

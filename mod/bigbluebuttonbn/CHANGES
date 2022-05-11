@@ -1,3 +1,16 @@
-3.0-alpha.1 (2021091407)
+3.0rc1 (2021101004)
+
+Bug: Fix for Reverts credentials back to default after upgrade (CONTRIB-8930).
+Bug: Fix for code precheck errors for 3.0-beta.1 (CONTRIB-8929).
+
+3.0-beta.1 (2021101003)
+
+Matching code with moodle/master after release of Moodle 4.0.
+
+3.0-alpha.2 (2021101002)
+
+Matching code with moodle/master before release of Moodle 4.0.
+
+3.0-alpha.1 (2021101001)
 
 Matching code with moodle/master after inception to core.

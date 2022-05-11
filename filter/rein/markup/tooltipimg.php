@@ -1,0 +1,1 @@
+<img class="tip-trigger" src="imgpath/kiwi_question.png" width="200" height="150" alt="This tooltip is generated from the element alt attribute." />

@@ -25,6 +25,10 @@ async function monitorHtmlAreaChange(htmlParser) {
     $(htmlParser).find(".html-parser.html-area").on('change keyup paste input', function () {
         console.info('Registered HTML Parser HTML area change:', $(htmlParser).find(".html-parser.html-area").val());
         renderHtmlParser(htmlParser);
+
+        // Also resize the editor so it fills the full area in case someone has resized.
+        let htmlEditor = ace.edit($(htmlParser).find(".html-question.ace_editor").prop('id'));
+        htmlEditor.resize();
     });
 }
 
@@ -32,6 +36,10 @@ async function monitorCssAreaChange(htmlParser) {
     $(htmlParser).find(".html-parser.css-area").on('change keyup paste input', function () {
         console.info('Registered HTML Parser CSS area change:', $(htmlParser).find(".html-parser.css-area").val());
         renderHtmlParser(htmlParser);
+
+        // Also resize the editor so it fills the full area in case someone has resized.
+        let cssEditor = ace.edit($(htmlParser).find(".css-question.ace_editor").prop('id'));
+        cssEditor.resize();
     });
 }
 
@@ -39,7 +47,11 @@ async function monitorJsAreaChange(htmlParser) {
     $(htmlParser).find(".html-parser.js-area").on('change keyup paste input', function () {
         console.info('Registered HTML Parser JS area change:', $(htmlParser).find(".html-parser.js-area").val());
         renderHtmlParser(htmlParser);
-    })
+
+        // Also resize the editor so it fills the full area in case someone has resized.
+        let jsEditor = ace.edit($(htmlParser).find(".js-question.ace_editor").prop('id'));
+        jsEditor.resize();
+    });
 }
 
 require(['jquery'], function ($) {

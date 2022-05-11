@@ -117,8 +117,8 @@ $string['completionvalidatestate'] = 'Validate completion';
 $string['completionvalidatestatetriggered'] = 'Validate completion has been triggered.';
 
 $string['completionview'] = 'Require view';
-$string['completionview_desc'] = 'Student must join a room or play a recording to complete it.';
-$string['completionview_event_desc'] = 'Has joined the room or played a recording {$a} time(s)';
+$string['completionview_desc'] = 'Student must view the Room to complete it.';
+$string['completionview_event_desc'] = 'Has viewed the Room page.';
 $string['sendnotification'] = 'Send notification';
 
 $string['minute'] = 'minute';
@@ -126,16 +126,10 @@ $string['minutes'] = 'minutes';
 
 $string['config_general'] = 'General settings';
 $string['config_general_description'] = 'These settings are always used.';
-$string['config_server_url'] = 'BigBlueButton server URL';
-$string['config_server_url_description'] = 'The default credentials are for a <a href="https://bigbluebutton.org/free-bigbluebutton-service-for-moodle/" target="_blank">free BigBlueButton service for Moodle (opens in new window)</a> provided by Blindside Networks with restrictions as follows:
-<ol>
-<li>The maximum length for each session is 60 minutes</li>
-<li>The maximum number of concurrent users per session is 25</li>
-<li>Recordings expire after seven (7) days and are not downloadable</li>
-<li>Student webcams are only visible to the moderator.</li>
-</ol>';
-$string['config_shared_secret'] = 'BigBlueButton shared secret';
-$string['config_shared_secret_description'] = 'The security secret of your BigBlueButton server. The default secret is for a free BigBlueButton server provided by Blindside Networks.';
+$string['config_server_url'] = 'BigBlueButton Server URL';
+$string['config_server_url_description'] = 'The URL of your BigBlueButton server must end with /bigbluebutton/. (This default URL is for a BigBlueButton server provided by Blindside Networks that you can use for testing.)';
+$string['config_shared_secret'] = 'BigBlueButton Shared Secret';
+$string['config_shared_secret_description'] = 'The security salt of your BigBlueButton server.  (This default salt is for a BigBlueButton server provided by Blindside Networks that you can use for testing.)';
 
 $string['config_recording'] = 'Recording';
 $string['config_recording_description'] = 'These settings are feature specific';
@@ -199,8 +193,8 @@ $string['config_voicebridge_editable_description'] = 'A conference voice bridge 
 
 $string['config_preuploadpresentation'] = 'Pre-upload presentation';
 $string['config_preuploadpresentation_description'] = 'These settings enable or disable options in the UI and also define default values for these options. The feature works only if the Moodle server is accessible to BigBlueButton.';
-$string['config_preuploadpresentation_enabled'] = 'Pre-upload presentation';
-$string['config_preuploadpresentation_enabled_description'] = 'If enabled, an option is provided in the BigBlueButton activity settings to upload presentation files ready for use in the room.';
+$string['config_preuploadpresentation_editable'] = 'Pre-uploading presentation editable';
+$string['config_preuploadpresentation_editable_description'] = 'Preupload presentation feature is editable in the UI when the room or conference is added or updated.';
 
 $string['config_presentation_default'] = 'Default presentation file';
 $string['config_presentation_default_description'] = 'A file may be provided for use in all rooms.';

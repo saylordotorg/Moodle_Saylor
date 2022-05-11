@@ -30,10 +30,10 @@ use mod_bigbluebuttonbn\recording;
 class config {
 
     /** @var string Default bigbluebutton server url */
-    public const DEFAULT_SERVER_URL = 'https://test-moodle.blindsidenetworks.com/bigbluebutton/';
+    public const DEFAULT_SERVER_URL = 'http://test-install.blindsidenetworks.com/bigbluebutton/';
 
     /** @var string Default bigbluebutton server shared secret */
-    public const DEFAULT_SHARED_SECRET = '0b21fcaf34673a8c3ec8ed877d76ae34';
+    public const DEFAULT_SHARED_SECRET = '8cd8ef52e8e101574e400365b55e11a6';
 
     /**
      * Returns moodle version.
@@ -64,7 +64,7 @@ class config {
             'waitformoderator_cache_ttl' => '60',
             'userlimit_default' => '0',
             'userlimit_editable' => false,
-            'preuploadpresentation_enabled' => false,
+            'preuploadpresentation_editable' => false,
             'sendnotifications_enabled' => false,
             'recordingready_enabled' => false,
             'recordingstatus_enabled' => false,
@@ -176,7 +176,7 @@ class config {
                'waitformoderator_editable' => self::get('waitformoderator_editable'),
                'userlimit_default' => self::get('userlimit_default'),
                'userlimit_editable' => self::get('userlimit_editable'),
-               'preuploadpresentation_enabled' => self::get('preuploadpresentation_enabled'),
+               'preuploadpresentation_editable' => self::get('preuploadpresentation_editable'),
                'sendnotifications_enabled' => self::get('sendnotifications_enabled'),
                'recordings_enabled' => self::get('recordings_enabled'),
                'meetingevents_enabled' => self::get('meetingevents_enabled'),

@@ -15,7 +15,7 @@
     "url": "https://github.com/gjb2048/moodle-format_grid/issues"
   },
   "devDependencies": {
-    "grunt": "~1.4.0",
+    "grunt": "1.5.2",
     "grunt-exec": "~3.0.0",
     "grunt-contrib-jshint": "~3.0.0",
     "grunt-contrib-uglify": "~5.0.0"
