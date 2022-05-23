@@ -1,0 +1,9 @@
+// Adds the necessary margin to the unordered list in the book resource to match the ordered list margin
+
+#page-mod-book-view {
+  #region-main {
+    ul {
+      margin-left: 2em;
+    }
+  }
+}
