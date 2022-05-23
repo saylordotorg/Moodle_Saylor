@@ -1,5 +1,5 @@
 /* jshint ignore:start */
-define(['jquery','jqueryui', 'core/log','mod_minilesson/definitions','mod_minilesson/quizhelper','mod_minilesson/pollyhelper'], function($, jqui, log, def,  quizhelper,polly) {
+define(['jquery', 'core/log','mod_minilesson/definitions','mod_minilesson/quizhelper','mod_minilesson/pollyhelper'], function($,  log, def,  quizhelper,polly) {
 
     "use strict"; // jshint ;_;
 

@@ -1,6 +1,6 @@
 /* jshint ignore:start */
-define(['jquery', 'jqueryui', 'core/log', 'filter_poodll/utils_amd'],
-    function ($, jqui, log, utils) {
+define(['jquery','core/log', 'filter_poodll/utils_amd'],
+    function ($,  log, utils) {
 
         "use strict"; // jshint ;_;
 

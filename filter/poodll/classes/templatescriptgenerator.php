@@ -110,8 +110,8 @@ class templatescriptgenerator {
                 case true:
 
                     //Create the dependency stuff in the output js
-                    $requires = array("'" . 'jquery' . "'", "'" . 'jqueryui' . "'", "'" . 'core/templates' . "'");
-                    $params = array('$', 'jqui','templates');
+                    $requires = array("'" . 'jquery' . "'", "'" . 'core/templates' . "'");
+                    $params = array('$','templates');
 
                     if ($requiredjs) {
                         $requires[] = "'" . $requiredjs . "'";
@@ -187,19 +187,12 @@ class templatescriptgenerator {
         $shim->{$jquery_shimkey} = $jquery_shimconfig;
         $paths->{$jquery_shimkey} = $CFG->wwwroot . '/filter/poodll/3rdparty/jquery/jquery-1.12.4.min';
 
-        //Add a path to  a separetely loaded jqueryui for shimmed libraries
-        //could not get jqueryui to work here. But I left it in the hope, somebody, someday, somewhere can.
-        $jqueryui_shimconfig = new \stdClass();
-        $jqueryui_shimconfig->deps = array($jquery_shimkey);
-        $jqueryui_shimkey = 'shim-jqueryui';
-        $shim->{$jqueryui_shimkey} = $jqueryui_shimconfig;
-        $paths->{$jqueryui_shimkey} = $CFG->wwwroot . '/filter/poodll/3rdparty/jqueryui/jquery-ui.min';
 
         //add a path for the required js ibrary
         $paths->{$shimkey} = $shimpath;
         $oneshimconfig = new \stdClass();
         $oneshimconfig->exports = $shimexport;
-        $oneshimconfig->deps = array($jquery_shimkey, $jqueryui_shimkey);
+        $oneshimconfig->deps = array($jquery_shimkey);
         $shim->{$shimkey} = $oneshimconfig;
 
         //buuld the actual function that will set up our shim

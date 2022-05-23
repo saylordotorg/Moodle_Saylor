@@ -127,10 +127,18 @@ if($config->enablesetuptab){
     $PAGE->set_pagelayout('course');
 }
 
-//load glide
-//$PAGE->requires->css(new moodle_url('https://cdn.jsdelivr.net/npm/glidejs@2.1.0/dist/css/glide.core.min.css'));
-//load google font never works ... why?
-//$PAGE->requires->css(new moodle_url('https//fonts.googleapis.com/css2',array('family'=>'Orbitron','display'=>'swap')));
+switch ($practicetype) {
+
+    case mod_wordcards_module::PRACTICETYPE_SPEECHCARDS:
+    case mod_wordcards_module::PRACTICETYPE_SPEECHCARDS_REV:
+        //this library is licensed with the hippocratic license (https://github.com/EthicalSource/hippocratic-license/)
+        //which is high minded but not GPL3 compat. so cant be distributed with plugin. Hence we load it from CDN
+        if($config->animations==constants::M_ANIM_FANCY) {
+            $PAGE->requires->css(new moodle_url('https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css'));
+        }
+        break;
+    default:
+}
 
 $renderer = $PAGE->get_renderer('mod_wordcards');
 

@@ -306,8 +306,8 @@ function filter_poodll_uploadfile($filedata, $fileextension, $mediatype, $action
             $file->delete();
 
             //check there is no metadata prefixed to the base 64. From OL widgets, none, from JS yes
-            $metapos = strPos($filedata, ",");
-            if ($metapos > 10 && $metapos < 30) {
+            $metapos = strrpos($filedata, ",");
+            if ($metapos) {
                 $filedata = substr($filedata, $metapos + 1);
             }
 
@@ -327,11 +327,8 @@ function filter_poodll_uploadfile($filedata, $fileextension, $mediatype, $action
 
         //check there is no metadata prefixed to the base 64. From OL widgets, none, from JS yes
         //if so it will look like this: data:image/png;base64,iVBORw0K
-        //we remove it, there must be a better way of course ...
-        //$metapos = strPos($filedata,";base64,");
-        $metapos = strPos($filedata, ",");
-        if ($metapos !==false && $metapos <100) {
-            //$trunced = substr($filedata,0,$metapos+8);
+        $metapos = strrpos($filedata, ",");
+        if ($metapos) {
             $filedata = substr($filedata, $metapos + 1);
 
         }

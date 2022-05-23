@@ -262,25 +262,31 @@ abstract class baseform extends \moodleform {
             }
 
             //Question TTS Dialog
-            $this->add_static_text('ttsdialog_instructions',null,get_string('ttsdialoginstructions', constants::M_COMPONENT));
+
+            $ttsdialog_instructions_array=array();
+            $ttsdialog_instructions_array[] =& $mform->createElement('static', 'ttsdialog_instructions', null,get_string('ttsdialoginstructions', constants::M_COMPONENT));
+            $mform->addGroup($ttsdialog_instructions_array, 'ttsdialog_grp','', array(' '), false);
+            //Moodle cant hide static text elements with hideif (why?) , so we wrap it in a group
+            //$this->add_static_text('ttsdialog_instructions',null,get_string('ttsdialoginstructions', constants::M_COMPONENT));
+
             $this->add_voiceselect(constants::TTSDIALOGVOICEA,get_string('ttsdialogvoicea',constants::M_COMPONENT));
             $this->add_voiceselect(constants::TTSDIALOGVOICEB,get_string('ttsdialogvoiceb',constants::M_COMPONENT));
             $this->add_voiceselect(constants::TTSDIALOGVOICEC,get_string('ttsdialogvoicec',constants::M_COMPONENT));
-            $mform->addElement('textarea', constants::TTSDIALOG, get_string('ttsdialog', constants::M_COMPONENT), array('wrap'=>'virtual','style'=>'width: 100%;'));
+            $mform->addElement('textarea', constants::TTSDIALOG, get_string('ttsdialog', constants::M_COMPONENT), array('wrap'=>'virtual','style'=>'width: 100%;','placeholder'=>'A) Hello&#10;B) Goodbye'));
             $mform->setType(constants::TTSDIALOG, PARAM_RAW);
             $mform->addElement('advcheckbox',constants::TTSDIALOGVISIBLE,get_string('ttsdialogvisible',constants::M_COMPONENT),get_string('ttsdialogvisible_desc', constants::M_COMPONENT));
             $mform->setDefault(constants::TTSDIALOGVISIBLE, 1);
 
 
             if($m35){
-                $mform->hideIf('ttsdialog_instructions', 'addttsdialog', 'neq', 1);
+                $mform->hideIf('ttsdialog_grp', 'addttsdialog', 'neq', 1);
                 $mform->hideIf(constants::TTSDIALOGVOICEA, 'addttsdialog', 'neq', 1);
                 $mform->hideIf(constants::TTSDIALOGVOICEB, 'addttsdialog', 'neq', 1);
                 $mform->hideIf(constants::TTSDIALOGVOICEC, 'addttsdialog', 'neq', 1);
                 $mform->hideIf(constants::TTSDIALOG, 'addttsdialog', 'neq', 1);
                 $mform->hideIf(constants::TTSDIALOGVISIBLE, 'addttsdialog', 'neq', 1);
             }else {
-                $mform->disabledIf('ttsdialog_instructions', 'addttsdialog', 'neq', 1);
+                $mform->disabledIf('ttsdialog_grp', 'addttsdialog', 'neq', 1);
                 $mform->disabledIf(constants::TTSDIALOGVOICEA, 'addttsdialog', 'neq', 1);
                 $mform->disabledIf(constants::TTSDIALOGVOICEB, 'addttsdialog', 'neq', 1);
                 $mform->disabledIf(constants::TTSDIALOGVOICEC, 'addttsdialog', 'neq', 1);
@@ -305,8 +311,7 @@ abstract class baseform extends \moodleform {
 
     protected final function add_static_text($name, $label = null,$text='') {
 
-        $this->_form->addElement('static', $name, $label,
-                $text);
+        $this->_form->addElement('static',$name, $label, $text);
 
     }
 
@@ -482,18 +487,20 @@ abstract class baseform extends \moodleform {
      * @param string $label, null means default
      * @return void
      */
-    protected final function add_voiceselect($name, $label = null, $showif=false) {
+    protected final function add_voiceselect($name, $label = null, $hideif_field=false,$hideif_value=false) {
         global $CFG;
         $showall =true;
         $allvoiceoptions = utils::get_tts_voices($this->moduleinstance->ttslanguage,$showall);
         $somevoiceoptions = utils::get_tts_voices($this->moduleinstance->ttslanguage,!$showall);
         $defaultvoice =array_pop($somevoiceoptions );
         $this->add_dropdown($name, $label,$allvoiceoptions,$defaultvoice);
-        $m35 = $CFG->version >= 2018051700;
-        if($m35){
-            $this->_form->hideIf($name, $showif, 'neq', 1);
-        }else {
-            $this->_form->disabledIf($name, $showif, 'neq', 1);
+        if($hideif_field !== false) {
+            $m35 = $CFG->version >= 2018051700;
+            if ($m35) {
+                $this->_form->hideIf($name, $hideif_field, 'eq', $hideif_value);
+            } else {
+                $this->_form->disabledIf($name, $hideif_field, 'eq', $hideif_value);
+            }
         }
     }
 
@@ -503,15 +510,18 @@ abstract class baseform extends \moodleform {
      * @param string $label, null means default
      * @return void
      */
-    protected final function add_voiceoptions($name, $label = null,  $showif=false) {
+    protected final function add_voiceoptions($name, $label = null,  $hideif_field=false,$hideif_value=false) {
         global $CFG;
         $voiceoptions = utils::get_tts_options();
         $this->add_dropdown($name, $label,$voiceoptions);
         $m35 = $CFG->version >= 2018051700;
-        if($m35){
-            $this->_form->hideIf($name, $showif, 'neq', 1);
-        }else {
-            $this->_form->disabledIf($name, $showif, 'neq', 1);
+        if($hideif_field !== false) {
+            $m35 = $CFG->version >= 2018051700;
+            if ($m35) {
+                $this->_form->hideIf($name, $hideif_field, 'eq', $hideif_value);
+            } else {
+                $this->_form->disabledIf($name, $hideif_field, 'eq', $hideif_value);
+            }
         }
     }
 

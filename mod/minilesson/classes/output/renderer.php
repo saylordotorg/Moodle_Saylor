@@ -244,6 +244,7 @@ class renderer extends \plugin_renderer_base {
         $steps = json_decode($latestattempt->sessiondata)->steps;
 
         //prepare results fopr display
+        if(!is_array($steps)){$steps = utils::remake_steps_as_array($steps);}
         $results = array_filter($steps, function($step){return $step->hasgrade;});
         $useresults=[];
         foreach($results as $result){
@@ -508,6 +509,8 @@ class renderer extends \plugin_renderer_base {
 
         $recopts['courseurl']=$CFG->wwwroot . '/course/view.php?id=' .
             $moduleinstance->course  . '#section-'. ($cm->section-1);
+
+        $recopts['useanimatecss']=$config->animations==constants::M_ANIM_FANCY;
 
         //the activity URL for returning to on finished
         $activityurl = new \moodle_url(constants::M_URL . '/view.php',

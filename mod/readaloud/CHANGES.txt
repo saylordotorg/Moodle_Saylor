@@ -1,9 +1,15 @@
-2.0.83 (Build 2022041600)
+2.0.84 (Build 2022050200)
+- Removed JQuery UI which was breaking Moodle 4.0 dock
+- Made Listen and Repeat recorder more 'accessible'
+- Fixed issue with activity being closed if open date set, but close data not set
+
+2.0.83 (Build 2022042300)
 - Reworked transcription mode to strict and guided
 - Added corpus scorer
 - Put some DB fields in place for comprehension quiz
 - Added passage key for use in reports
 - Fixed broken number converter
+- Fixed calc of attempts/max attempts when shadow mode not set to grade
 
 2.0.82 (Build 2022041300)
  - added Poodll STT for Hungarian and Romanian

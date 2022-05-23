@@ -74,7 +74,7 @@ if (!empty($mod->get_mod()->intro)) {
 if($hasopenclosedates){
     $current_time=time();
     $closed = false;
-    if ( $current_time>$moduleinstance->viewend){
+    if ( $current_time>$moduleinstance->viewend && $moduleinstance->viewend>0){
         echo get_string('activityisclosed',constants::M_COMPONENT);
         $closed = true;
     }elseif($current_time<$moduleinstance->viewstart){

@@ -1,4 +1,4 @@
-define(['jquery', 'jqueryui', 'core/log'], function ($, jqui, log) {
+define(['jquery', 'core/log'], function ($,  log) {
     "use strict"; // jshint ;_;
 
     log.debug('Poodll Dialog: initialising');
@@ -27,11 +27,11 @@ define(['jquery', 'jqueryui', 'core/log'], function ($, jqui, log) {
         },
 
         open: function () {
-            this.dlgbox.toggle('slide', {direction: 'left'}, 400);
+            this.dlgbox.slideDown(400);
         },
         close: function () {
             var self = this;
-            this.dlgbox.toggle('slide', {direction: 'left', complete: self.onclose}, 400);
+            this.dlgbox.slideUp(400);
         },
 
         onclose: function () {

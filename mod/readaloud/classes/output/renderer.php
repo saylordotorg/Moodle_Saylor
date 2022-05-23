@@ -262,9 +262,9 @@ class renderer extends \plugin_renderer_base {
         //If there is no remote transcriber
         //we do not want to get users hopes up by trying to fetch a transcript with ajax
         if(utils::can_transcribe($moduleinstance)){
-            $remotetranscribe = false;
-        }else{
             $remotetranscribe = true;
+        }else{
+            $remotetranscribe = false;
         }
 
 
@@ -718,7 +718,7 @@ class renderer extends \plugin_renderer_base {
             case constants::TRANSCRIBER_STRICT:
             case constants::TRANSCRIBER_GUIDED:
             default:
-                $transcribe = $can_transcribe ? $moduleinstance->transcriber : "0";
+                $transcribe = $can_transcribe ? "1" : "0";
                 $speechevents="0";
         }
 

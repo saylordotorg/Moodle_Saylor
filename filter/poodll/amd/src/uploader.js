@@ -131,7 +131,7 @@ define(['jquery', 'core/log', 'filter_poodll/upskin_plain'], function ($, log, u
 
         //fetch file extension from the filetype
         fetchFileExtension: function (filetype) {
-            var ext = "mp3";
+            var ext = "";
             //in the case of a string like this:
             // "audio/webm;codecs=opus" we do not the codecs
             if(filetype.indexOf(';')>0){
@@ -186,6 +186,7 @@ define(['jquery', 'core/log', 'filter_poodll/upskin_plain'], function ($, log, u
                 case "video/quicktime":
                     ext = "mov";
                     break;
+                case "video/x-matroska":
                 case "video/webm":
                     ext = "webm";
                     break;
@@ -195,6 +196,14 @@ define(['jquery', 'core/log', 'filter_poodll/upskin_plain'], function ($, log, u
                 case "video/ogg":
                     ext = "ogg";
                     break;
+            }
+            //if we get here we have an unknown mime type, just guess based on the mediatype
+            if(ext===""){
+                if(filetype.indexOf('video')>-1){
+                    ext = "mp4";
+                }else{
+                    ext = "mp3";
+                }
             }
             return ext;
         },

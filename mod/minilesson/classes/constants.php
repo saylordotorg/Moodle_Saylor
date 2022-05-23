@@ -121,6 +121,7 @@ const TEXTPROMPT_DOTS = 0;
 const LISTENORREAD = 'customint2';
 const LISTENORREAD_READ = 0;
 const LISTENORREAD_LISTEN = 1;
+const LISTENORREAD_LISTENANDREAD = 2;
 
 const LAYOUT = 'layout';
 const LAYOUT_AUTO = 0;
@@ -269,5 +270,8 @@ const M_PUSH_LEVEL =4;
   
 const M_QUIZ_FINISHED = "mod_minilesson_quiz_finished";
 const M_QUIZ_REATTEMPT = "mod_minilesson_quiz_reattempt";
+
+const M_ANIM_FANCY = 0;
+const M_ANIM_PLAIN = 1;
 
 }

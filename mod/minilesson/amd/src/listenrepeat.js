@@ -1,5 +1,12 @@
-define(['jquery', 'core/log', 'core/ajax', 'mod_minilesson/definitions', 'mod_minilesson/pollyhelper', 'mod_minilesson/cloudpoodllloader','mod_minilesson/ttrecorder'],
-    function($, log, ajax, def, polly, cloudpoodll, ttrecorder) {
+define(['jquery',
+      'core/log',
+      'core/ajax',
+      'mod_minilesson/definitions',
+      'mod_minilesson/pollyhelper',
+      'mod_minilesson/cloudpoodllloader',
+      'mod_minilesson/ttrecorder',
+      'mod_minilesson/animatecss'
+    ], function($, log, ajax, def, polly, cloudpoodll, ttrecorder, anim) {
   "use strict"; // jshint ;_;
 
   log.debug('MiniLesson listen and repeat: initialising');
@@ -50,6 +57,12 @@ define(['jquery', 'core/log', 'core/ajax', 'mod_minilesson/definitions', 'mod_mi
         self.itemdata = itemdata;
         self.quizhelper = quizhelper;
         self.index = index;
+
+        //anim
+        var animopts = {};
+        animopts.useanimatecss= quizhelper.useanimatecss;
+        anim.init(animopts);
+
         self.register_events();
         self.setvoice();
         self.getItems();
@@ -94,17 +107,20 @@ define(['jquery', 'core/log', 'core/ajax', 'mod_minilesson/definitions', 'mod_mi
           $(this).val(landr_targetWord);
         });
 
-        //move on after 3s
-        setTimeout(function() {
+
           if (self.game.pointer < self.items.length - 1) {
-            self.items[self.game.pointer].answered = true;
-            self.items[self.game.pointer].correct = false;
-            self.game.pointer++;
-            self.nextPrompt();
+            //move on after short time to next prompt
+            setTimeout(function() {
+              self.items[self.game.pointer].answered = true;
+              self.items[self.game.pointer].correct = false;
+              self.game.pointer++;
+              self.nextPrompt();
+            }, 2200);
+          //end question
           } else {
             self.end();
           }
-        }, 3000);
+
       });
       
     },
@@ -187,11 +203,9 @@ define(['jquery', 'core/log', 'core/ajax', 'mod_minilesson/definitions', 'mod_mi
           setTimeout(function() {
             self.game.pointer++;
             self.nextPrompt();
-          }, 3000);
+          }, 2200);
         } else {
-          setTimeout(function() {
             self.end();
-          }, 3000);
         }
 
       } else {
@@ -205,10 +219,17 @@ define(['jquery', 'core/log', 'core/ajax', 'mod_minilesson/definitions', 'mod_mi
             $("#" + self.itemdata.uniqueid + "_container .landr_feedback[data-idx='" + obj.wordnumber + "']").addClass("fa fa-check");
           }
         });
+        var thereply = $("#" + self.itemdata.uniqueid + "_container .landr_reply_" + self.game.pointer);
+        anim.do_animate(thereply,'shakeX animate__faster').then(
+          function(){$("#" + self.itemdata.uniqueid + "_container .landr_ctrl-btn").prop("disabled", false);}
+        );
         //shake the screen
+        /*
         $("#" + self.itemdata.uniqueid + "_container .landr_reply_" + self.game.pointer).effect("shake", function() {
           $("#" + self.itemdata.uniqueid + "_container .landr_ctrl-btn").prop("disabled", false);
         });
+
+         */
 
       }
       //show all the correct words
@@ -252,22 +273,13 @@ define(['jquery', 'core/log', 'core/ajax', 'mod_minilesson/definitions', 'mod_mi
     },
     end: function() {
       var self = this;
-
-      var numCorrect = self.items.filter(function(e) {
-        return e.correct;
-      }).length;
-
-      var totalNum = self.items.length;
-
-      $("#" + self.itemdata.uniqueid + "_container .landr_results").html("TOTAL<br/>" + numCorrect + "/" + totalNum).show();
-      
       $(".minilesson_nextbutton").prop("disabled",true);
       setTimeout(function() {
         
         $(".minilesson_nextbutton").prop("disabled",false);
         self.next_question();
         
-      }, 2000);
+      }, 2200);
 
     },
     start: function() {
@@ -328,10 +340,10 @@ define(['jquery', 'core/log', 'core/ajax', 'mod_minilesson/definitions', 'mod_mi
       }).join(" ");
 
       $("#" + self.itemdata.uniqueid + "_container .landr_title").html(progress);
-      $(".landr_prompt_" + self.game.pointer).toggle("slide", {
-        direction: 'left'
-      });
-
+      var newprompt = $(".landr_prompt_" + self.game.pointer);
+      anim.do_animate(newprompt,'zoomIn animate__faster','in').then(
+          function(){}
+      );
       self.nextReply();
 
     },
@@ -354,9 +366,15 @@ define(['jquery', 'core/log', 'core/ajax', 'mod_minilesson/definitions', 'mod_mi
       code += "<div style='margin-right:90px;' class='landr_speech landr_right'>" + landr_targetWordsCode + "</div>";
       code += "</div>";
       $("#" + self.itemdata.uniqueid + "_container .landr_game").append(code);
+      var newreply = $(".landr_reply_" + self.game.pointer);
+      anim.do_animate(newreply,'zoomIn animate__faster','in').then(
+          function(){}
+      );
+      /*
       $(".landr_reply_" + self.game.pointer).toggle("slide", {
         direction: 'right'
       });
+       */
       $("#" + self.itemdata.uniqueid + "_container .landr_ctrl-btn").prop("disabled", false);
       if(!self.quizhelper.mobile_user()){
         setTimeout(function(){

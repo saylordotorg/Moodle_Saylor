@@ -181,7 +181,12 @@ define(['jquery', 'core/log', 'mod_readaloud/ttaudiohelper', 'core/notification'
 
             register_events: function(){
                 var that = this;
+
                 this.controls.recordercontainer.click(function(){
+                    that.toggleRecording();
+                });
+
+                this.controls.recordercontainer.keypress(function(){
                     that.toggleRecording();
                 });
 

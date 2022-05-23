@@ -266,25 +266,38 @@ class utils{
         $moduleinstance  = $DB->get_record(constants::M_MODNAME, array('id' => $cm->instance), '*', MUST_EXIST);
         $attempts = $DB->get_records(constants::M_ATTEMPTSTABLE,array('moduleid'=>$moduleinstance->id,'userid'=>$USER->id),'id DESC');
 
+        //get or create attempt
         if(!$attempts){
             $latestattempt = self::create_new_attempt($moduleinstance->course, $moduleinstance->id);
         }else{
             $latestattempt = reset($attempts);
         }
 
-
+        //get or create sessiondata
         if(empty($latestattempt->sessiondata)){
             $sessiondata = new \stdClass();
             $sessiondata->steps = [];
         }else{
             $sessiondata = json_decode($latestattempt->sessiondata);
         }
+
+        //if sessiondata is not an array, reconstruct it as an array
+        if(!is_array($sessiondata->steps)){
+            $sessiondata->steps = self::remake_steps_as_array($sessiondata->steps);
+        }
+        //add our latest step to session
         $sessiondata->steps[$stepdata->index]=$stepdata;
+
 
         //grade quiz results
         $comp_test =  new comprehensiontest($cm);
-        //there should never be more steps than items .. but there have been occasions ...
-        if($comp_test->fetch_item_count() <= count($sessiondata->steps)) {
+        $totalitems = $comp_test->fetch_item_count();
+
+        //close out the attempt and update the grade
+        //there should never be more steps than items
+        //[hack] but there seem to be times when there are fewer( when an update_step_grade failed or didnt arrive),
+        // so we also allow the final item. Though it's not ideal because we will have missed one or more
+        if($totalitems <= count($sessiondata->steps) || $stepdata->index==$totalitems-1) {
             $newgrade=true;
             $latestattempt->sessionscore = self::calculate_session_score($sessiondata->steps);
             $latestattempt->status =constants::M_STATE_COMPLETE;
@@ -307,6 +320,26 @@ class utils{
 
         //return_to_page($result,$message,$returndata);
         return [$result,$message,$returndata];
+    }
+
+    //JSON stringify functions will make objects(not arrays) if keys are not sequential
+    //sometimes we seem to miss a step. Remedying that with this function prevents an all out disaster.
+    // But we should not miss steps
+    public static function remake_steps_as_array($stepsobject){
+        if(is_array($stepsobject)) {
+            return $stepsobject;
+        }else{
+            $steps = [];
+            foreach ($stepsobject as $key => $value)
+            {
+                if(is_numeric($key)){
+                    $key=intval($key);
+                    $steps[$key] = $value;
+                }
+
+            }
+            return $steps;
+        }
     }
 
     public static function calculate_session_score($steps){
@@ -854,6 +887,12 @@ class utils{
         return $options;
     }
 
+    public static function fetch_options_animations(){
+        return array(
+            constants::M_ANIM_FANCY=> get_string('anim_fancy', constants::M_COMPONENT),
+            constants::M_ANIM_PLAIN => get_string('anim_plain', constants::M_COMPONENT));
+    }
+
     public static function fetch_options_textprompt() {
         $options = array(constants::TEXTPROMPT_DOTS => get_string("textprompt_dots", constants::M_COMPONENT),
                 constants::TEXTPROMPT_WORDS => get_string("textprompt_words", constants::M_COMPONENT));
@@ -867,7 +906,8 @@ class utils{
 
     public static function fetch_options_listenorread() {
         $options = array(constants::LISTENORREAD_READ => get_string("listenorread_read", constants::M_COMPONENT),
-                constants::LISTENORREAD_LISTEN => get_string("listenorread_listen", constants::M_COMPONENT));
+                constants::LISTENORREAD_LISTEN => get_string("listenorread_listen", constants::M_COMPONENT),
+                    constants::LISTENORREAD_LISTENANDREAD => get_string("listenorread_listenandread", constants::M_COMPONENT));
         return $options;
     }
 

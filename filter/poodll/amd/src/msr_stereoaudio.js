@@ -29,6 +29,11 @@ define(['jquery',
             },
 
             start: function (timeSlice, audioctx) {
+                //should start be called more than once, bad things could happen, so stop and then start
+                if(this.timeout!==0){
+                    this.stop();
+                }
+
                 timeSlice = timeSlice || 1000;
                 var that = this;
 
@@ -45,7 +50,8 @@ define(['jquery',
             stop: function () {
                 if (this.mediaRecorder) {
                     this.mediaRecorder.stop();
-                    clearTimeout(this.timeout);
+                    clearInterval(this.timeout);
+                    this.timeout =0;
                 }
             },
             pause: function () {

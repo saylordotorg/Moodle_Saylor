@@ -1,8 +1,8 @@
 /* jshint ignore:start */
-define(['jquery','jqueryui', 'core/log','core/templates','mod_minilesson/definitions','mod_minilesson/modalformhelper',
+define(['jquery', 'core/log','core/templates','mod_minilesson/definitions','mod_minilesson/modalformhelper',
         'mod_minilesson/modaldeletehelper','mod_minilesson/moveitemhelper','mod_minilesson/modalpreviewhelper',
         'mod_minilesson/duplicateitemhelper','mod_minilesson/datatables'],
-    function($, jqui, log, templates, def, mfh, mdh, mih, mph,dplh, datatables) {
+    function($,  log, templates, def, mfh, mdh, mih, mph,dplh, datatables) {
 
     "use strict"; // jshint ;_;
 

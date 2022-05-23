@@ -1,4 +1,4 @@
-define(['jquery', 'jqueryui', 'core/log'], function ($, jqui, log) {
+define(['jquery', 'core/log'], function ($, log) {
     "use strict"; // jshint ;_;
 
     log.debug('Poodll util drag drop: initialising');

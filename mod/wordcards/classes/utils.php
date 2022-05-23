@@ -923,6 +923,12 @@ class utils{
               constants::M_FRONTFACEFLIP_DEF => get_string('definition', constants::M_COMPONENT));
   }
 
+    public static function fetch_options_animations(){
+        return array(
+            constants::M_ANIM_FANCY=> get_string('anim_fancy', constants::M_COMPONENT),
+            constants::M_ANIM_PLAIN => get_string('anim_plain', constants::M_COMPONENT));
+    }
+
    public static function get_lang_options() {
        return array(
                constants::M_LANG_ARAE => get_string('ar-ae', constants::M_COMPONENT),

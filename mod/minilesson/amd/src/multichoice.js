@@ -74,8 +74,6 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'mod_minilesson/poll
         
         //highlight selected answers
         $("#" + itemdata.uniqueid + "_option" + checked).addClass('minilesson_mc_selected');
-
-
         var percent = checked == itemdata.correctanswer ? 100 : 0;
         
         $(".minilesson_nextbutton").prop("disabled", true);

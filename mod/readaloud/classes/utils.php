@@ -1979,7 +1979,7 @@ class utils {
     
     public static function fetch_ttsvoice_options($langcode=''){
         $alllang= array(
-                constants::M_LANG_ARAE => ['Zeina'],
+                constants::M_LANG_ARAE => ['Zeina'=>'Zeina'],
                 //constants::M_LANG_ARSA => [],
                 constants::M_LANG_DADK => ["Naja"=>"Naja","Mads"=>"Mads"],
                 constants::M_LANG_DEDE => ['Hans'=>'Hans','Marlene'=>'Marlene', 'Vicki'=>'Vicki'],

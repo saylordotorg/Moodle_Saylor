@@ -1,6 +1,12 @@
-define(['jquery', 'jqueryui', 'core/log', 'core/ajax', 'mod_minilesson/definitions', 'mod_minilesson/pollyhelper',
-  'mod_minilesson/cloudpoodllloader','mod_minilesson/ttrecorder'
-], function($, jqui, log, Ajax, def, polly, cloudpoodll, ttrecorder) {
+define(['jquery',
+    'core/log',
+    'core/ajax',
+    'mod_minilesson/definitions',
+    'mod_minilesson/pollyhelper',
+    'mod_minilesson/cloudpoodllloader',
+    'mod_minilesson/ttrecorder',
+    'mod_minilesson/animatecss',
+], function($,  log, Ajax, def, polly, cloudpoodll, ttrecorder, anim) {
   "use strict"; // jshint ;_;
 
   /*
@@ -47,6 +53,11 @@ define(['jquery', 'jqueryui', 'core/log', 'core/ajax', 'mod_minilesson/definitio
             app.displayterms[i] = itemdata.sentences[i].prompt;
           }
           app.language = itemdata.language;
+
+         //anim
+          var animopts = {};
+          animopts.useanimatecss=quizhelper.useanimatecss;
+          anim.init(animopts);
 
           this.init_controls();
           this.initComponents();
@@ -172,9 +183,17 @@ log.debug('correct:',correct_clean);
         },
 
         writeCurrentTerm: function() {
+            /*
             app.controls.slider.toggle("slide",{direction:"left"});
             app.controls.slider.text(app.displayterms[app.pointer - 1]);
             app.controls.slider.toggle("slide",{direction:"right"})
+             */
+            anim.do_animate(app.controls.slider,'zoomOut animate__faster','out').then(
+                function(){
+                    app.controls.slider.text(app.displayterms[app.pointer - 1]);
+                    anim.do_animate(app.controls.slider,'zoomIn animate__faster','in');
+                }
+            );
         },
 
         flagCorrectAndTransition: function() {

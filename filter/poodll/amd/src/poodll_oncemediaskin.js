@@ -1,7 +1,7 @@
 /* jshint ignore:start */
-define(['jquery', 'jqueryui', 'core/log', 'filter_poodll/utils_amd', 'filter_poodll/upskin_radial',
+define(['jquery','core/log', 'filter_poodll/utils_amd', 'filter_poodll/upskin_radial',
         'filter_poodll/anim_hwave_mic', 'filter_poodll/dlg_devicesettings'],
-    function ($, jqui, log, utils, upskin_radial, hwave, settings) {
+    function ($, log, utils, upskin_radial, hwave, settings) {
 
         "use strict"; // jshint ;_;
 

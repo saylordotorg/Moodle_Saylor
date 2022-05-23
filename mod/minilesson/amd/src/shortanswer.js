@@ -1,6 +1,11 @@
-define(['jquery', 'core/log', 'mod_minilesson/definitions', 'mod_minilesson/pollyhelper','mod_minilesson/cloudpoodllloader',
-      'mod_minilesson/ttrecorder'],
-    function($, log, def, polly,cloudpoodll, ttrecorder) {
+define(['jquery',
+      'core/log',
+      'mod_minilesson/definitions',
+      'mod_minilesson/pollyhelper',
+      'mod_minilesson/cloudpoodllloader',
+      'mod_minilesson/ttrecorder',
+      'mod_minilesson/animatecss'],
+    function($, log, def, polly,cloudpoodll, ttrecorder, anim) {
   "use strict"; // jshint ;_;
 
   /*
@@ -18,7 +23,12 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'mod_minilesson/poll
      },
 
     init: function(index, itemdata, quizhelper) {
-   //   this.prepare_audio(itemdata);
+
+      //anim
+      var animopts = {};
+      animopts.useanimatecss=quizhelper.useanimatecss;
+      anim.init(animopts);
+
       this.register_events(index, itemdata, quizhelper);
       this.init_components(index, itemdata, quizhelper);
     },
@@ -157,7 +167,11 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'mod_minilesson/poll
               return;
             }else{
               //shake the screen
-              $("#" + itemdata.uniqueid + "_correctanswer").effect("shake");
+              var theanswer = $("#" + itemdata.uniqueid + "_correctanswer");
+              anim.do_animate(theanswer,'rubberBand animate__faster').then(
+                  function() {}
+              );
+              //$("#" + itemdata.uniqueid + "_correctanswer").effect("shake");
             }
         } //end of switch message type
       }; //end of callback declaration

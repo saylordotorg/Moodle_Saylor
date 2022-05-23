@@ -39,8 +39,15 @@ async function monitorJsAreaChange(htmlParser) {
     $(htmlParser).find(".html-parser.js-area").on('change keyup paste input', function () {
         console.info('Registered HTML Parser JS area change:', $(htmlParser).find(".html-parser.js-area").val());
         renderHtmlParser(htmlParser);
-    })
+    });
 }
+
+async function monitorEditorResize(editorElement, callback) {
+  // Create a resizeObserver to monitor when an editor element is resized.
+  var resizeObserver = new ResizeObserver(() => callback() );
+  resizeObserver.observe(editorElement);
+};
+
 
 require(['jquery'], function ($) {
     $(window).on('load', function() {
@@ -134,6 +141,18 @@ require(['jquery'], function ($) {
                     monitorHtmlAreaChange(htmlParser);
                     monitorCssAreaChange(htmlParser);
                     monitorJsAreaChange(htmlParser);
+
+                    // Begin monitoring of the editors and resize the ACE editor if the div element changes size.
+                    monitorEditorResize(document.getElementById($(htmlParser).find(".html-question.ace_editor").prop('id')), function() {
+                        htmlEditor.resize();
+                    });
+                    monitorEditorResize(document.getElementById($(htmlParser).find(".css-question.ace_editor").prop('id')), function() {
+                        cssEditor.resize();
+                    });
+                    monitorEditorResize(document.getElementById($(htmlParser).find(".js-question.ace_editor").prop('id')), function() {
+                        jsEditor.resize();
+                    });
+
                 });
 
             });

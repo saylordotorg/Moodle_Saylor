@@ -1,5 +1,17 @@
 Change List
 =========
+Version 3.1.56 (Build 202205XX00)
+- Fixed templates for super interactive audio and video (no jqueryui and now no longer resizable)
+
+Version 3.1.56 (Build 2022050300)
+- tweak to audio recording for an odd case where 2 x each 1s of recording get written to the audio file
+
+Version 3.1.55 (Build 2022042300)
+- removed JQuery UI from Poodll code so would not break M4.0 dock
+
+Version 3.1.54 (Build 2022042300)
+- fixed broken mime type handling, manifested if remote or ffmpeg conversion was not turned on
+
 Version 3.1.53 (Build 2022041300)
 - fixed warning message from logs of adhoc tasks
 

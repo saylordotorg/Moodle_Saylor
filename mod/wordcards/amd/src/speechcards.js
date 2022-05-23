@@ -8,14 +8,14 @@
 
 define([
   'jquery',
-  'jqueryui',
   'core/ajax',
   'core/log',
   'mod_wordcards/a4e',
   'mod_wordcards/cloudpoodllloader',
   'mod_wordcards/ttrecorder',
-  'core/templates'
-], function($, jqui, Ajax, log, a4e, cloudpoodll, ttrecorder, templates) {
+  'core/templates',
+  'mod_wordcards/animatecss',
+], function($, Ajax, log, a4e, cloudpoodll, ttrecorder, templates, anim) {
 
   var app = {
     passmark: 75,
@@ -44,9 +44,16 @@ define([
         log.debug('No config found on page. Giving up.');
         return;
       }
+
+    //anim
+     var animopts = {};
+     animopts.useanimatecss=props.useanimatecss;
+     anim.init(animopts);
+
       app.jsondata = jsondata;
       app.props = props;
       app.process(jsondata);
+
 
 
       a4e.register_events();
@@ -86,17 +93,31 @@ define([
         switch(direction){
             case '<':
                 app.set_pointer(app.pointer - 1);
-                app.controls.slider.toggle("slide",{direction:"right"});
-                app.controls.slider.text(app.terms[app.pointer - 1].term);
-                app.controls.slider.toggle("slide",{direction:"left"})
+                anim.do_animate(app.controls.slider,'zoomOut animate__faster','out').then(
+                    function(){
+                        app.controls.slider.text(app.terms[app.pointer - 1].term);
+                        anim.do_animate(app.controls.slider,'zoomIn animate__faster','in');
+                    }
+                );
+           /*
+                app.controls.slider.slideUp(400,
+                    function(){
+                        app.controls.slider.text(app.terms[app.pointer - 1].term);
+                        app.controls.slider.slideDown();
+                    }
+                );
+             */
                 app.update_header();
                 break;
             case '>':
             default:
                 app.set_pointer(app.pointer + 1);
-                app.controls.slider.toggle("slide",{direction:"left"});
-                app.controls.slider.text(app.terms[app.pointer - 1].term);
-                app.controls.slider.toggle("slide",{direction:"right"});
+                anim.do_animate(app.controls.slider,'zoomOut animate__faster','out').then(
+                    function(){
+                        app.controls.slider.text(app.terms[app.pointer - 1].term);
+                        anim.do_animate(app.controls.slider,'zoomIn animate__faster','in');
+                    }
+                );
                 app.update_header();
         }
     },

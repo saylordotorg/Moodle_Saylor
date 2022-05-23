@@ -356,6 +356,7 @@ class renderer extends \plugin_renderer_base {
         $opts['appid']=constants::M_COMPONENT;
         $opts['modid']= $mod->get_id();
         $opts['expiretime']=300;//max expire time is 300 seconds
+        $opts['useanimatecss'] = get_config(constants::M_COMPONENT,'animations')==constants::M_ANIM_FANCY;
 
         if($mod->get_mod()->transcriber == constants::TRANSCRIBER_POODLL){
             //this will force browser recognition to use Poodll (not chrome or other browser speech)

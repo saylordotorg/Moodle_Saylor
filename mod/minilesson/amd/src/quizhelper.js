@@ -37,6 +37,8 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'core/templates', 'c
         this.backtocourse = activitydata.backtocourse;
         this.stt_guided = activitydata.stt_guided;
         this.wwwroot = activitydata.wwwroot;
+        this.useanimatecss  = activitydata.useanimatecss;
+
         this.prepare_html();
         this.init_questions(this.quizdata,polly);
         this.register_events();
@@ -240,13 +242,15 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'core/templates', 'c
         this.stepresults.push(stepdata);
 
         //push results to server
-        await Ajax.call([{
+        var ret = await Ajax.call([{
           methodname: 'mod_minilesson_report_step_grade',
           args: {
             cmid: dd.cmid,
             step: JSON.stringify(stepdata),
           }
-        }]);
+        }])[0];
+        log.debug("report_step_grade success: " + ret);
+
       },
 
 

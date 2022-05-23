@@ -1,8 +1,8 @@
 /* jshint ignore:start */
-define(['jquery', 'jqueryui', 'core/log', 'mod_readaloud/definitions',
+define(['jquery', 'core/log', 'mod_readaloud/definitions',
         'mod_readaloud/recorderhelper', 'mod_readaloud/modelaudiokaraoke',
         'core/ajax','core/notification','mod_readaloud/smallreporthelper','mod_readaloud/listenandrepeat'],
-    function ($, jqui, log, def, recorderhelper, modelaudiokaraoke, Ajax, notification, smallreporthelper, landr) {
+    function ($, log, def, recorderhelper, modelaudiokaraoke, Ajax, notification, smallreporthelper, landr) {
 
     "use strict"; // jshint ;_;
 

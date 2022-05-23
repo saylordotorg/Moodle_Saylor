@@ -1,5 +1,11 @@
-define(['jquery', 'core/log', 'mod_minilesson/definitions', 'mod_minilesson/pollyhelper',
-    'mod_minilesson/cloudpoodllloader','mod_minilesson/ttrecorder'], function($, log, def, polly,cloudpoodll, ttrecorder) {
+define(['jquery',
+    'core/log',
+    'mod_minilesson/definitions',
+    'mod_minilesson/pollyhelper',
+    'mod_minilesson/cloudpoodllloader',
+    'mod_minilesson/ttrecorder',
+    'mod_minilesson/animatecss'
+    ], function($, log, def, polly,cloudpoodll, ttrecorder,anim) {
   "use strict"; // jshint ;_;
 
   /*
@@ -19,6 +25,12 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'mod_minilesson/poll
      },
 
     init: function(index, itemdata, quizhelper) {
+
+      //anim
+      var animopts = {};
+        animopts.useanimatecss=quizhelper.useanimatecss;
+      anim.init(animopts);
+
       this.prepare_audio(itemdata);
       this.register_events(index, itemdata, quizhelper);
       this.init_components(index, itemdata, quizhelper);
@@ -202,6 +214,14 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'mod_minilesson/poll
                                 }, 2000);
                             }
                         } //end of if check_by_phonetic result
+
+                        //whatever was spoken was off, so give a visual indication of that
+                        //shake the screen
+                        var therecorder = $("#ttrec_container_" + itemdata.uniqueid);
+                        anim.do_animate(therecorder,'shakeX animate__faster').then(
+                            function() {}
+                        );
+
                     }); //end of check by phonetic
 
             } //end of switch message type

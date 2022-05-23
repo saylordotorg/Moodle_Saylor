@@ -27,6 +27,9 @@ const CLOUDPOODLL = 'https://cloud.poodll.com';
 const M_FRONTFACEFLIP_DEF = 0;
 const M_FRONTFACEFLIP_TERM = 1;
 
+const M_ANIM_FANCY = 0;
+const M_ANIM_PLAIN = 1;
+
 const M_LC_TERMTERM = 0;
 const M_LC_TERMDEF = 1;
 

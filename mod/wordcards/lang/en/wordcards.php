@@ -369,3 +369,7 @@ $string['lc_termterm']="Audio: term, Options: terms";
 $string['lc_termdef']="Audio: term, Options: definitions";
 $string['lcoptions']="Listen and Choose options";
 $string['lcoptions_details']="Display multi-choice options as word terms , or word definitions";
+$string['animations']="Animations";
+$string['animations_details']="Transitions between item subtypes are animated. If fancy animation causes trouble, choose plain.";
+$string['anim_fancy']="Fancy animation";
+$string['anim_plain']="Plain animation";

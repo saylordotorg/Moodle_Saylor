@@ -472,7 +472,8 @@ class comprehensiontest
                 case constants::TYPE_MULTICHOICE:
                     //multichoice also needs sentences if we are listening. Its a bit of double up but we do that here.
                     $testitem->sentences = [];
-                    if($item->{constants::LISTENORREAD}==constants::LISTENORREAD_LISTEN) {
+                    if($item->{constants::LISTENORREAD}==constants::LISTENORREAD_LISTEN ||
+                        $item->{constants::LISTENORREAD}==constants::LISTENORREAD_LISTENANDREAD) {
                         $testitem->audiocontent = 1;
                     }
                     for ($anumber = 1; $anumber <= constants::MAXANSWERS; $anumber++) {
@@ -515,7 +516,7 @@ class comprehensiontest
                 }
             }
 
-            //add out item to test
+            //add our item to test
             $testitems[]=$testitem;
 
         }//end of loop

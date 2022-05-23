@@ -1,5 +1,6 @@
 /* jshint ignore:start */
-define(['jquery', 'jqueryui', 'core/log', 'filter_poodll/utils_amd', 'filter_poodll/dlg_devicesettings', 'filter_poodll/anim_progress_bar_fresh', 'filter_poodll/anim_hwave_fresh', 'filter_poodll/anim_hwave_timer', 'filter_poodll/upskin_text'], function ($, jqui, log, utils, settings, anim_progress_bar, hwave, hwave_timer, upskin) {
+define(['jquery','core/log', 'filter_poodll/utils_amd', 'filter_poodll/dlg_devicesettings', 'filter_poodll/anim_progress_bar_fresh', 'filter_poodll/anim_hwave_fresh', 'filter_poodll/anim_hwave_timer', 'filter_poodll/upskin_text'],
+    function ($, log, utils, settings, anim_progress_bar, hwave, hwave_timer, upskin) {
 
     "use strict"; // jshint ;_;
 

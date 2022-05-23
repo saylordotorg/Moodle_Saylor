@@ -1,6 +1,6 @@
 /* jshint ignore:start */
-define(['jquery', 'jqueryui', 'core/log', 'filter_poodll/utils_amd', 'filter_poodll/upskin_radial', 'filter_poodll/util_dragdrop'],
-    function ($, jqui, log, utils, upskin_radial, dd) {
+define(['jquery', 'core/log', 'filter_poodll/utils_amd', 'filter_poodll/upskin_radial', 'filter_poodll/util_dragdrop'],
+    function ($,  log, utils, upskin_radial, dd) {
 
         "use strict"; // jshint ;_;
 

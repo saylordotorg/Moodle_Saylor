@@ -171,4 +171,13 @@ if ($ADMIN->fulltree) {
     $default = 6;
     $settings->add(new admin_setting_configtext(constants::M_COMPONENT . "/$name",
         $label, $details, $default, PARAM_INT));
+
+    //animations
+    $name = 'animations';
+    $label = get_string($name, constants::M_COMPONENT);
+    $details = get_string($name . '_details', constants::M_COMPONENT);
+    $default = constants::M_ANIM_FANCY ;
+    $options = utils::fetch_options_animations();
+    $settings->add(new admin_setting_configselect(constants::M_COMPONENT . "/$name",
+        $label, $details, $default, $options));
 }

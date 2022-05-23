@@ -97,8 +97,8 @@ class mod_minilesson_external extends external_api {
 
     public static function report_step_grade($cmid,$step){
         $stepdata = json_decode($step);
-        $ret= utils::update_step_grade($cmid,$stepdata);
-        return true;
+        list($success,$message,$returndata)= utils::update_step_grade($cmid,$stepdata);
+        return $success;
     }
     public static function report_step_grade_returns() {
         return new external_value(PARAM_BOOL);

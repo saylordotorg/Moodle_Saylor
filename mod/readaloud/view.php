@@ -109,7 +109,15 @@ $ai_evals = \mod_readaloud\utils::get_aieval_byuser($moduleinstance->id, $USER->
 $canattempt = true;
 $canpreview = has_capability('mod/readaloud:preview', $modulecontext);
 if (!$canpreview && $moduleinstance->maxattempts > 0) {
-    if ($attempts && count($attempts) >= $moduleinstance->maxattempts) {
+    $gradeableattempts=0;
+    if($attempts) {
+        foreach ($attempts as $candidate) {
+            if ($candidate->dontgrade == 0) {
+                $gradeableattempts++;
+            }
+        }
+    }
+    if ($attempts && $gradeableattempts >= $moduleinstance->maxattempts) {
         $canattempt = false;
     }
 }
@@ -201,10 +209,10 @@ if($hasopenclosedates){
     echo $renderer->show_open_close_dates($moduleinstance);
     $current_time=time();
     $closed = false;
-    if ( $current_time>$moduleinstance->viewend){
+    if ( $current_time>$moduleinstance->viewend && $moduleinstance->viewend>0){
         echo get_string('activityisclosed',constants::M_COMPONENT);
         $closed = true;
-    }elseif($current_time<$moduleinstance->viewstart){
+    }elseif($current_time<$moduleinstance->viewstart && $moduleinstance->viewstart>0 ){
         echo get_string('activityisnotopenyet',constants::M_COMPONENT);
         $closed = true;
     }

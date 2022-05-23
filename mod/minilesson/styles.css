@@ -1056,22 +1056,6 @@ div.mod_minilesson_feedback_cont.mod_minilesson_postattempt {
   background-position: center;
 }
 
-.glide__wrapper {
-  overflow: hidden;
-  pointer-events: none;
-}
-
-.glide__slide {
-  height: 150px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.glide {
-  height: 150px !important;
-}
-
 .minilesson-poodllspeechcards_box {
   text-align: center;
   width: 60%;
@@ -1766,6 +1750,8 @@ div.mod_minilesson_feedback_cont.mod_minilesson_postattempt {
 .mod_minilesson_itemtextarea_cont {
   width: 100%;
   margin-top: 10px;
+  padding: 5px;
+  border: 1px solid grey;
 }
 
 .mod_minilesson_iframe_responsive {
@@ -1826,6 +1812,7 @@ div.mod_minilesson_feedback_cont.mod_minilesson_postattempt {
   background-color: white;
   cursor: pointer;
   font-size: 1.33em;
+  overflow: auto;
 }
 
 .mc_playbutton_container {

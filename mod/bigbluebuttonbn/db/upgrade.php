@@ -28,8 +28,6 @@ use mod_bigbluebuttonbn\plugin;
 use mod_bigbluebuttonbn\local\config;
 use mod_bigbluebuttonbn\task\upgrade_recordings_task;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Performs data migrations and updates on upgrade.
  *
@@ -395,16 +393,6 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
 
         // Bigbluebuttonbn savepoint reached.
         upgrade_mod_savepoint(true, 2021083100, 'bigbluebuttonbn');
-    }
-
-    if ($oldversion < 2021091408) {
-        // Change BigBliueButton Server credentials to new defaults if test-install is being used.
-        if (config::get('server_url') == 'http://test-install.blindsidenetworks.com/bigbluebutton/') {
-            set_config('bigbluebuttonbn_server_url', config::DEFAULT_SERVER_URL);
-            set_config('bigbluebuttonbn_shared_secret', config::DEFAULT_SHARED_SECRET);
-        }
-        // Bigbluebuttonbn savepoint reached.
-        upgrade_mod_savepoint(true, 2021091408, 'bigbluebuttonbn');
     }
 
     if ($oldversion < 2021101003) {

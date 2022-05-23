@@ -440,7 +440,9 @@ $string['textprompt_words'] = 'Show full text';
 $string['textprompt_dots'] = 'Show dots instead of letters';
 $string['listenorread'] = "Display options as";
 $string['listenorread_read'] = 'plain text';
-$string['listenorread_listen']= 'audio players';
+$string['listenorread_listen']= 'audio players + dots';
+$string['listenorread_listenandread']= 'audio players + plain text';
+
 
 $string['gradenow']= 'Grade Now';
 
@@ -582,3 +584,8 @@ $string['reportstable']="Reports Style";
 $string['reportstable_details']="Ajax tables are faster to use and can sort data. Paged tables load faster but are harder to navigate with.";
 $string['reporttableajax']="Ajax Tables";
 $string['reporttablepaged']="Paged Tables";
+$string['anim_fancy']="Fancy animation";
+$string['anim_plain']="Plain animation";
+$string['animations']="Animations";
+$string['animations_details']="Transitions between item subtypes are animated. If fancy animation causes trouble, choose plain.";
+
