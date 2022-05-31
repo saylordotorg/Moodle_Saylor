@@ -364,16 +364,20 @@ define(['jquery', 'core/log', 'filter_poodll/utils_amd',
 
             //do all our stream stuff
             navigator.mediaDevices.getDisplayMedia(mediaConstraints)
-                .then(async function(displayStream){
+                .then(function(displayStream){
                     // check for a user audio selected device
                     if (ip.useraudiodeviceid) {
                         var audiodeviceid = ip.useraudiodeviceid.valueOf();
                         mediaConstraints.audio.deviceId = audiodeviceid ? {exact: audiodeviceid} : undefined;
                     }
-                    var voiceStream = await navigator.mediaDevices.getUserMedia({ audio: mediaConstraints.audio, video: false });
-                    var tracks = [...displayStream.getTracks(), ...voiceStream.getAudioTracks()]
-                    var stream = new MediaStream(tracks);
-                    onMediaSuccess(stream);
+
+                    navigator.mediaDevices.getUserMedia({ audio: mediaConstraints.audio, video: false }).then(
+                        function(voiceStream) {
+                            var tracks = displayStream.getTracks().concat(voiceStream.getAudioTracks());
+                            var stream = new MediaStream(tracks);
+                            onMediaSuccess(stream);
+                        }
+                    )
                 })
                 .catch(function (e) {
                     that.onMediaError(e, ip);

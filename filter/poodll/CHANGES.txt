@@ -1,7 +1,8 @@
 Change List
 =========
-Version 3.1.56 (Build 202205XX00)
+Version 3.1.57 (Build 2022052700)
 - Fixed templates for super interactive audio and video (no jqueryui and now no longer resizable)
+- Fixed broken JS on M3.6 and M3.7 as a result of build incompatibilities
 
 Version 3.1.56 (Build 2022050300)
 - tweak to audio recording for an odd case where 2 x each 1s of recording get written to the audio file
