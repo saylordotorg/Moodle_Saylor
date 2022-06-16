@@ -1,3 +1,7 @@
+### Version 2.134 of the Moodle Gapfill question type Jun 2022
+Fix for duplicated draggables when used in the mobile apps. Thanks to Nicholas Stefanski for reporting this
+and for contributing a code solution.
+
 ### Version 2.133 of the Moodle Gapfill question type Mar 2022
 Missing space around or in non English feedback. Where the language was not
 English and there is more than one correct answer the space was missing around

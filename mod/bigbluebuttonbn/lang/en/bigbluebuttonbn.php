@@ -153,10 +153,6 @@ $string['config_recordings'] = 'Show recordings';
 $string['config_recordings_description'] = 'These settings are feature specific';
 $string['config_recordings_general'] = 'Show recording settings';
 $string['config_recordings_general_description'] = 'These settings are used only when showing recordings';
-$string['config_recordings_deleted_default'] = 'Include recordings from deleted activities enabled by default';
-$string['config_recordings_deleted_default_description'] = 'If enabled, the recording table will include recordings of any activities which have since been deleted.';
-$string['config_recordings_deleted_editable'] = 'Include recordings from deleted activities feature can be edited';
-$string['config_recordings_deleted_editable_description'] = 'Include recordings from deleted activities by default can be edited when the instance is added or updated.';
 $string['config_recordings_imported_default'] = 'Show only imported links enabled by default';
 $string['config_recordings_imported_default_description'] = 'If enabled the recording table will include only the imported links to recordings.';
 $string['config_recordings_imported_editable'] = 'Show only imported links feature can be edited';
@@ -359,7 +355,6 @@ $string['mod_form_field_notification_created_help'] = 'Send a notification to al
 $string['mod_form_field_notification_modified_help'] = 'Send a notification to all users enrolled to let them know that this activity has been updated';
 $string['mod_form_field_notification_msg_at'] = 'at';
 $string['mod_form_field_recordings_html'] = 'Show the table in plain HTML';
-$string['mod_form_field_recordings_deleted'] = 'Include recordings from deleted activities';
 $string['mod_form_field_recordings_imported'] = 'Show only imported links';
 $string['mod_form_field_recordings_preview'] = 'Show recording preview';
 $string['mod_form_field_recordallfromstart'] = 'Record all from start';
@@ -604,3 +599,18 @@ $string['userlimitreached'] = 'The number of users allowed in a session has been
 $string['waitformoderator'] = 'Waiting for a moderator to join.';
 
 $string['recordingurlnotfound'] = 'The recording URL is invalid.';
+
+// Deprecated strings still needed for older BBB versions using 3.11 language packs.
+$string['mod_form_field_notification_msg_created'] = 'added';
+$string['mod_form_field_notification_msg_modified'] = 'updated';
+$string['email_body_notification_meeting_has_been'] = 'has been';
+$string['email_body_notification_meeting_details'] = 'Details';
+$string['email_body_notification_meeting_title'] = 'Title';
+$string['email_body_notification_meeting_description'] = 'Description';
+$string['email_body_notification_meeting_start_date'] = 'Start date';
+$string['email_body_notification_meeting_end_date'] = 'End date';
+$string['email_body_notification_meeting_by'] = 'by';
+$string['email_body_recording_ready_for'] = 'There is a recording ready for';
+$string['email_body_recording_ready_in_course'] = 'in the course';
+$string['email_footer_sent_by'] = 'This automatic notification message was sent by';
+$string['email_footer_sent_from'] = 'from the course';
