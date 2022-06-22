@@ -17,7 +17,6 @@
 
 /**
  * Action for adding/editing a attempt.
- * replace i) MOD_solo eg MOD_CST, then ii) solo eg cst, then iii) attempt eg attempt
  *
  * @package mod_solo
  * @copyright  2014 Justin Hunt
@@ -37,13 +36,18 @@ global $USER,$DB;
 // first get the nfo passed in to set up the page
 $attemptid = optional_param('attemptid',0 ,PARAM_INT);
 $id     = required_param('id', PARAM_INT);         // Course Module ID
-$type  = optional_param('type', constants::STEP_NONE, PARAM_INT);
+$stepno  = optional_param('stepno', constants::STEP_NONE, PARAM_INT);
 $action = optional_param('action','edit',PARAM_TEXT);
 
 // get the objects we need
 $cm = get_coursemodule_from_id(constants::M_MODNAME, $id, 0, false, MUST_EXIST);
 $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
 $moduleinstance = $DB->get_record(constants::M_MODNAME, array('id' => $cm->instance), '*', MUST_EXIST);
+if($stepno<2){
+    $type = constants::M_STEP_PREPARE;
+}else {
+    $type = $moduleinstance->{'step' . $stepno};
+}
 
 //make sure we are logged in and can see this form
 require_login($course, false, $cm);
@@ -51,7 +55,7 @@ $context = context_module::instance($cm->id);
 require_capability('mod/solo:view', $context);
 
 //set up the page object
-$PAGE->set_url('/mod/solo/attempt/manageattempts.php', array('attemptid'=>$attemptid, 'id'=>$id, 'type'=>$type));
+$PAGE->set_url('/mod/solo/attempt/manageattempts.php', array('attemptid'=>$attemptid, 'id'=>$id, 'stepno'=>$stepno));
 $PAGE->set_title(format_string($moduleinstance->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($context);
@@ -87,6 +91,7 @@ if ($attemptid) {
 $redirecturl = new moodle_url('/mod/solo/view.php', array('id'=>$cm->id));
 //just init this when we need it.
 $topichelper=false;
+$attempthelper = new \mod_solo\attempthelper($cm);
 
 //handle delete actions
 if($action == 'confirmdelete'){
@@ -101,7 +106,7 @@ if($action == 'confirmdelete'){
     /////// Delete attempt NOW////////
 }elseif ($action == 'delete'){
     require_sesskey();
-    $success = \mod_solo\attempt\helper::delete_attempt($moduleinstance,$attemptid,$context);
+    $attempthelper->delete_attempt($attemptid);
     redirect($redirecturl);
 }
 
@@ -120,7 +125,7 @@ if($hasopenclosedates){
     echo $renderer->box($renderer->show_open_close_dates($moduleinstance), 'generalbox');
     $current_time=time();
     $closed = false;
-    if ( $current_time>$moduleinstance->viewend){
+    if ( $current_time>$moduleinstance->viewend && $moduleinstance->viewend>0){
         echo get_string('activityisclosed',constants::M_COMPONENT);
         $closed = true;
     }elseif($current_time<$moduleinstance->viewstart){
@@ -134,7 +139,7 @@ if($hasopenclosedates){
     }
 }
 
-echo $attempt_renderer->add_edit_page_links($moduleinstance, $attempt,$type,$cm,$context);
+echo $attempt_renderer->add_edit_page_links($moduleinstance, $attempt,$stepno,$cm,$context);
 
 echo html_writer::start_div(constants::M_COMPONENT .'_step' . $type);
 
@@ -142,6 +147,7 @@ echo html_writer::start_div(constants::M_COMPONENT .'_step' . $type);
 $stepcontent = $moduleinstance;
 $stepcontent->attemptid = $attemptid;
 $stepcontent->type = $type;
+$stepcontent->stepno = $stepno;
 $stepcontent->cmid = $cm->id;
 $stepcontent->nexturl = $redirecturl;
 if(!empty($moduleinstance->targetwords)) {
@@ -166,7 +172,16 @@ if(!empty(trim($moduleinstance->topictts))){
 
 //Prepare YT Clip
 if(!empty(trim($moduleinstance->topicytid))){
-    $topicmedia['itemytvideoid']=$moduleinstance->topicytid;
+    $ytvideoid = trim($moduleinstance->topicytid);
+    //if its a YT URL we want to parse the id from it
+    if(\core_text::strlen($ytvideoid)>11){
+        $urlbits=[];
+        preg_match('/^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/', $ytvideoid, $urlbits);
+        if($urlbits && count($urlbits)>7){
+            $ytvideoid=$urlbits[7];
+        }
+    }
+    $topicmedia['itemytvideoid']=$ytvideoid;
     $topicmedia['itemytvideostart']=$moduleinstance->topicytstart;
     $topicmedia['itemytvideoend']=$moduleinstance->topicytend;
 }
@@ -181,14 +196,17 @@ if($mediaurls && count($mediaurls)>0){
         switch($file_parts['extension'])
         {
             case "jpg":
+            case "jepg":
             case "png":
             case "gif":
             case "bmp":
             case "svg":
+            case "webp":
                 $topicmedia['itemimage'] = $mediaurl;
                 break;
 
             case "mp4":
+            case "m4v":
             case "mov":
             case "webm":
             case "ogv":
@@ -198,6 +216,7 @@ if($mediaurls && count($mediaurls)>0){
             case "mp3":
             case "ogg":
             case "wav":
+            case "m4a":
                 $topicmedia['itemaudio'] = $mediaurl;
                 break;
 
@@ -212,14 +231,14 @@ if($mediaurls && count($mediaurls)>0){
 //specific step data and then render
 switch($type) {
 
-    case constants::STEP_USERSELECTIONS:
+    case constants::STEP_PREPARE:
 
         //there is only one contentitem in the array , it just seems the neatest way to pass a big chunk of data to a partial
         $stepcontent->contentitems = [$topicmedia];
         echo $renderer->render_from_template(constants::M_COMPONENT . '/stepprepare', $stepcontent);
 
         break;
-    case constants::STEP_AUDIORECORDING:
+    case constants::STEP_MEDIARECORDING:
 
         $media = 'audio';
         if ($media=='video') {
@@ -228,21 +247,57 @@ switch($type) {
         else{
             $stepcontent->recordaudio = 1;
         }
+
         //there is only one contentitem in the array , it just seems the neatest way to pass a big chunk of data to a partial
         $stepcontent->contentitems = [$topicmedia];
+        $transcribestep = utils::fetch_step_no($moduleinstance,constants::M_STEP_TRANSCRIBE);
+        if($stepno > $transcribestep && $transcribestep!==false){
+            //flag this is post transcription
+            $stepcontent->posttranscribing = true;
+
+            //if we already have a transcript then we need to show that (or a blank)
+            if(isset($attempt->selftranscript)&&!empty($attempt->selftranscript)){
+                $stepcontent->selftranscript=$attempt->selftranscript;
+            }else{
+                $stepcontent->selftranscript='';
+            }
+        }
         $stepcontent->rec = utils::fetch_recorder_data($cm, $moduleinstance, $media, $token);
         echo $renderer->render_from_template(constants::M_COMPONENT . '/stepmediarecord', $stepcontent);
         break;
 
     case constants::STEP_SELFTRANSCRIBE:
-
-        $stepcontent->audiofilename=$attempt->filename;
+        $recordstepno = utils::fetch_step_no($moduleinstance,constants::M_STEP_RECORD);
+        //if we have a selftranscript set it
         if(isset($attempt->selftranscript)&&!empty($attempt->selftranscript)){
             $stepcontent->selftranscript=$attempt->selftranscript;
         }else{
+            //otherwise make a blank one
             $stepcontent->selftranscript='';
+            //in the case that this is a re-try and they already entered a pre-transcript, we load that up again
+            if($stepno < $recordstepno && $recordstepno!==false) {
+                $oldattempt = $attempthelper->fetch_latest_complete_attempt();
+                if($oldattempt && $oldattempt->id !== $attempt->id){
+                    $stepcontent->selftranscript=$oldattempt->selftranscript;
+                    //we really ought to do something to make sure we dont get suggestions for
+                }
+            }
         }
-        echo $renderer->render_from_template(constants::M_COMPONENT . '/stepselftranscribe', $stepcontent);
+
+
+        //if we are transcribing first and then talking, we want to do things a bit differently
+        if($stepno<$recordstepno){
+            $stepcontent->contentitems = [$topicmedia];
+            $stepcontent->activityid =$moduleinstance->id;
+            $stepcontent->prerecording=true;
+            echo $renderer->render_from_template(constants::M_COMPONENT . '/stepselftranscribe', $stepcontent);
+        }else{
+            //we will need an audio file to transcribe from
+            $stepcontent->audiofilename=$attempt->filename;
+            echo $renderer->render_from_template(constants::M_COMPONENT . '/stepselftranscribe', $stepcontent);
+        }
+
+
         break;
         
     case constants::STEP_MODEL:
@@ -259,7 +314,16 @@ switch($type) {
 
         //Prepare YT Clip
         if(!empty(trim($moduleinstance->modelytid))){
-            $modelmedia['itemytvideoid']=$moduleinstance->modelytid;
+            $modelytvideoid = trim($moduleinstance->modelytid);
+            //if its a YT URL we want to parse the id from it
+            if(\core_text::strlen($modelytvideoid)>11){
+                $urlbits=[];
+                preg_match('/^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/', $modelytvideoid, $urlbits);
+                if($urlbits && count($urlbits)>7){
+                    $modelytvideoid=$urlbits[7];
+                }
+            }
+            $modelmedia['itemytvideoid']= $modelytvideoid;
             $modelmedia['itemytvideostart']=$moduleinstance->modelytstart;
             $modelmedia['itemytvideoend']=$moduleinstance->modelytend;
         }

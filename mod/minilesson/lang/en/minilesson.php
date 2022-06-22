@@ -190,7 +190,7 @@ $string['ms-my'] = 'Malay';
 $string['pt-pt'] = 'Portuguese (PT)';
 $string['ru-ru'] = 'Russian';
 $string['ta-in'] = 'Tamil';
-$string['te-in'] = 'Telegu';
+$string['te-in'] = 'Telugu';
 $string['tr-tr'] = 'Turkish';
 
 $string['uk-ua'] = 'Ukranian';
@@ -588,4 +588,14 @@ $string['anim_fancy']="Fancy animation";
 $string['anim_plain']="Plain animation";
 $string['animations']="Animations";
 $string['animations_details']="Transitions between item subtypes are animated. If fancy animation causes trouble, choose plain.";
-
+$string['confirmchoice_formlabel']="Must attempt (no skip)";
+$string['confirmchoice']="Next <i class='fa fa-arrow-right'></i>";
+$string['containerwidth_details']="Sets the max-width of the minilesson activity container in view mode.";
+$string['containerwidth_help']="Sets the max-width of the minilesson activity container in view mode.";
+$string['containerwidth']="Container width";
+$string['contwidth-compact']="Compact";
+$string['contwidth-wide']="Wide";
+$string['contwidth-full']="Full";
+$string['lessonfont']="Custom font";
+$string['lessonfont_help']="A font name that will override site default for this minilesson when displayed. Must be exact in spelling and case. eg Andika or Comic Sans MS";
+$string['advanced']="Advanced";

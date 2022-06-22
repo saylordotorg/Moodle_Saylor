@@ -300,6 +300,7 @@ class utils{
 
     public static function mb_count_words($string, $language, $format=0)
     {
+
         //wordcount will be different for different languages
         switch($language){
             //arabic
@@ -310,20 +311,32 @@ class utils{
                 switch($format){
 
                     case 1:
-                        $wordcount = explode(' ', $string);
+                        $ret = explode(' ', $string);
                         break;
                     case 0:
                     default:
-                        $wordcount = substr_count($string, ' ') + 1;
+                        $ret = substr_count($string, ' ') + 1;
                 }
 
                 break;
             //others
             default:
-                $wordcount = str_word_count($string,$format);
+                $words = diff::fetchWordArray($string);
+                $wordcount = count($words);
+                //$wordcount = str_word_count($string,$format);
+                switch($format){
+
+                    case 1:
+                        $ret = $words;
+                        break;
+                    case 0:
+                    default:
+                       $ret = $wordcount;
+                }
+
         }
 
-        return $wordcount;
+        return $ret;
     }
 
     /**
@@ -375,6 +388,189 @@ class utils{
         $mywords = explode(PHP_EOL,$attempt->mywords);
         $alltargetwords = array_unique(array_merge($targetwords, $mywords));
         return $alltargetwords;
+    }
+
+    public static function process_attempt($moduleinstance, $attempt, $contextid, $cmid, $trace=false){
+        global $DB;
+
+        $cm = get_coursemodule_from_id(constants::M_MODNAME, $cmid, 0, false, MUST_EXIST);
+        $attempthelper = new \mod_solo\attempthelper($cm);
+        $requiresgrading = ($attempt->grade==0 && $attempt->manualgraded==0);
+
+        //if we do not have transcripts, try to fetch them
+        $hastranscripts = !empty($attempt->jsontranscript);
+        if(!$hastranscripts) {
+            $attempt_with_transcripts = self::retrieve_transcripts_from_s3($attempt);
+            $hastranscripts = $attempt_with_transcripts !== false;
+
+            //if we are calling from cron, just return here
+            if (!$hastranscripts && $trace) {
+                $trace->output("Transcript not ready yet");
+                return false;
+            }
+
+            //if we fetched the transcript, and this activity has no manual self transcript, use the the auto transcript as manual
+            $transcribestep = self::fetch_step_no($moduleinstance, constants::STEP_SELFTRANSCRIBE);
+            if ($transcribestep === false && $hastranscripts) {
+                $attempt->selftranscript = $attempt_with_transcripts->transcript;
+                $DB->update_record(constants::M_ATTEMPTSTABLE, array('id' => $attempt->id, 'selftranscript' => $attempt->selftranscript));
+            }
+            $attempt = $DB->get_record(constants::M_ATTEMPTSTABLE, array('id' => $attempt->id));
+        }
+
+        //this should run down the aitranscript constructor and do the diffs if the passage arrives late or on time, but not redo
+        if($hastranscripts && !empty($attempt->selftranscript)){
+            $autotranscript=$attempt->transcript;
+            $aitranscript = new \mod_solo\aitranscript($attempt->id,
+                $contextid, $attempt->selftranscript,
+                $attempt->transcript,
+                $attempt->jsontranscript);
+            // $attempt = $attempthelper->fetch_latest_complete_attempt();
+        }
+
+        //update statistics and grammar correction if we need to
+        self::process_all_stats($moduleinstance, $attempt, $contextid);
+        //fetch grammar correction or use existing one
+        $attempt->grammarcorrection = self::process_grammar_correction($moduleinstance,$attempt);
+
+        //if we have an ungraded activity, lets grade it
+        if($hastranscripts && $requiresgrading) {
+            $stats=self::fetch_stats($attempt,$moduleinstance);
+            utils::autograde_attempt($attempt->id, $stats);
+            $attempt = $DB->get_record(constants::M_ATTEMPTSTABLE, array('id' => $attempt->id));
+        }
+
+        return $attempt;
+    }
+
+    public static function process_all_stats($moduleinstance, $attempt, $contextid){
+             global $DB;
+
+             //if we already have stats, then yay
+            if($DB->get_records(constants::M_STATSTABLE,['attemptid'=>$attempt->id])){
+                return;
+            }
+            $stats = utils::calculate_stats($attempt->selftranscript, $attempt, $moduleinstance->ttslanguage);
+            if ($stats) {
+                $stats = utils::fetch_sentence_stats($attempt->selftranscript,$stats, $moduleinstance->ttslanguage);
+                $stats = utils::fetch_word_stats($attempt->selftranscript,$moduleinstance->ttslanguage,$stats);
+                $stats = utils::calc_grammarspell_stats($attempt->selftranscript,$moduleinstance->region,
+                    $moduleinstance->ttslanguage,$stats);
+
+                utils::save_stats($stats, $attempt);
+            }
+
+            //recalculate AI data, if the selftranscription is altered AND we have a jsontranscript
+            if($attempt->jsontranscript){
+                $passage = $attempt->selftranscript;
+                $aitranscript = new \mod_solo\aitranscript($attempt->id, $contextid,$passage,$attempt->transcript, $attempt->jsontranscript);
+                $aitranscript->recalculate($passage,$attempt->transcript, $attempt->jsontranscript);
+            }
+    }
+
+    public static function process_grammar_correction($moduleinstance,$attempt){
+        global $DB;
+
+        if(!empty($attempt->grammarcorrection)){
+            return $attempt->grammarcorrection;
+        }
+        //If this is English then lets see if we can get a grammar correction
+       // if(!empty($attempt->selftranscript) && utils::is_english($moduleinstance)){
+        if(!empty($attempt->selftranscript)){
+            if(empty($attempt->grammarcorrection)) {
+                $siteconfig = get_config(constants::M_COMPONENT);
+                $token = utils::fetch_token($siteconfig->apiuser, $siteconfig->apisecret);
+                $grammarcorrection = utils::fetch_grammar_correction($token, $moduleinstance->region,$moduleinstance->ttslanguage, $attempt->selftranscript);
+                if ($grammarcorrection) {
+                    $attempt->grammarcorrection = $grammarcorrection;
+                    $DB->update_record(constants::M_ATTEMPTSTABLE, array('id'=>$attempt->id,'grammarcorrection'=>$attempt->grammarcorrection));
+                }
+            }
+        }
+        return $attempt->grammarcorrection;
+    }
+
+    public static function fetch_grammar_correction_diff($selftranscript,$correction){
+
+
+        //turn the passage and transcript into an array of words
+        $alternatives = diff::fetchAlternativesArray('');
+        $wildcards = diff::fetchWildcardsArray($alternatives);
+        $passagebits = diff::fetchWordArray($selftranscript);
+        $transcriptbits = diff::fetchWordArray($correction);
+
+
+        //fetch sequences of transcript/passage matched words
+        // then prepare an array of "differences"
+        $passagecount = count($passagebits);
+        $transcriptcount = count($transcriptbits);
+        $language = constants::M_LANG_ENUS;
+        $sequences = diff::fetchSequences($passagebits,$transcriptbits,$alternatives,$language);
+
+        //fetch diffs
+        $diffs = diff::fetchDiffs($sequences, $passagecount,$transcriptcount);
+        $diffs = diff::applyWildcards($diffs,$passagebits,$wildcards);
+
+
+        //from the array of differences build error data, match data, markers, scores and metrics
+        $errors = new \stdClass();
+        $matches = new \stdClass();
+        $currentword=0;
+        $lastunmodified=0;
+        //loop through diffs
+        foreach($diffs as $diff){
+            $currentword++;
+            switch($diff[0]){
+                case Diff::UNMATCHED:
+                    //we collect error info so we can count and display them on passage
+                    $error = new \stdClass();
+                    $error->word=$passagebits[$currentword-1];
+                    $error->wordnumber=$currentword;
+                    $errors->{$currentword}=$error;
+                    break;
+
+                case Diff::MATCHED:
+                    //we collect match info so we can play audio from selected word
+                    $match = new \stdClass();
+                    $match->word=$passagebits[$currentword-1];
+                    $match->pposition=$currentword;
+                    $match->tposition = $diff[1];
+                    $match->audiostart=0;//not meaningful when processing corrections
+                    $match->audioend=0;//not meaningful when processing corrections
+                    $match->altmatch=$diff[2];//not meaningful when processing corrections
+                    $matches->{$currentword}=$match;
+                    $lastunmodified = $currentword;
+                    break;
+
+                default:
+                    //do nothing
+                    //should never get here
+
+            }
+        }
+        $sessionendword = $lastunmodified;
+
+        //discard errors that happen after session end word.
+        $errorcount = 0;
+        $finalerrors = new \stdClass();
+        foreach($errors as $key=>$error) {
+            if ($key < $sessionendword) {
+                $finalerrors->{$key} = $error;
+                $errorcount++;
+            }
+        }
+        //finalise and serialise session errors
+        $sessionerrors = json_encode($finalerrors);
+        $sessionmatches = json_encode($matches);
+
+        return [$sessionerrors,$sessionmatches];
+
+    }
+
+
+    public static function is_english($moduleinstance){
+        return strpos($moduleinstance->ttslanguage,'en')===0;
+
     }
 
     //we leave it up to the grading logic how/if it adds the ai grades to gradebook
@@ -750,12 +946,13 @@ class utils{
     }
 
     //register an adhoc task to pick up transcripts
-    public static function register_aws_task($activityid, $attemptid,$modulecontextid){
+    public static function register_aws_task($activityid, $attemptid,$modulecontextid, $cmid){
         $s3_task = new \mod_solo\task\solo_s3_adhoc();
         $s3_task->set_component('mod_solo');
 
         $customdata = new \stdClass();
         $customdata->activityid = $activityid;
+        $customdata->cmid = $cmid;
         $customdata->attemptid = $attemptid;
         $customdata->modulecontextid = $modulecontextid;
         $customdata->taskcreationtime = time();
@@ -763,27 +960,6 @@ class utils{
         $s3_task->set_custom_data($customdata);
         // queue it
         \core\task\manager::queue_adhoc_task($s3_task);
-        return true;
-    }
-
-
-    public static function toggle_topic_selected($topicid, $activityid) {
-        global $DB;
-
-        // Require view and make sure the user did not previously mark as seen.
-        $params = ['moduleid' => $activityid, 'topicid' => $topicid];
-        $selected = $DB->record_exists(constants::M_SELECTEDTOPIC_TABLE, $params);
-
-        if($selected){
-            $DB->delete_records(constants::M_SELECTEDTOPIC_TABLE, $params);
-        }else{
-            $entry = new \stdClass();
-            $entry->topicid=$topicid;
-            $entry->moduleid=$activityid;
-            $entry->timemodified=time();
-
-            $DB->insert_record(constants::M_SELECTEDTOPIC_TABLE, $entry);
-        }
         return true;
     }
 
@@ -1080,6 +1256,23 @@ class utils{
         return $rec_options;
     }
 
+    public static function fetch_total_step_count($moduleinstance,$context){
+        for($step=2;$step<6;$step++){
+
+            switch($moduleinstance->{'step' . $step}){
+                case constants::STEP_NONE:
+                    return $step-1;
+                case constants::STEP_MODEL:
+                    if(self::has_modelanswer($moduleinstance, $context)===false){
+                        return $step-1;
+                    }
+                    break;
+            }
+        }
+        //This would mean all steps are set
+        return 5;
+    }
+
     public static function has_modelanswer($moduleinstance, $context){
         if(!empty(trim($moduleinstance->modelytid))) {return true;}
         if(!empty(trim($moduleinstance->modeliframe))) {return true;}
@@ -1095,9 +1288,9 @@ class utils{
 
     public static function get_steplabel($step){
         switch($step){
-            case constants::STEP_USERSELECTIONS:
+            case constants::STEP_PREPARE:
                 return get_string('userselections', constants::M_COMPONENT);
-            case constants::STEP_AUDIORECORDING:
+            case constants::STEP_MEDIARECORDING:
                 return get_string('audiorecording', constants::M_COMPONENT);
             case constants::STEP_SELFTRANSCRIBE:
                 return get_string('selftranscribe', constants::M_COMPONENT);
@@ -1157,18 +1350,19 @@ class utils{
 
     public static function fetch_options_transcribers() {
         $options =
-                array(constants::TRANSCRIBER_AMAZONTRANSCRIBE => get_string("transcriber_amazontranscribe", constants::M_COMPONENT),
-                       // constants::TRANSCRIBER_AMAZONSTREAMING => get_string("transcriber_amazonstreaming", constants::M_COMPONENT),
-                       // constants::TRANSCRIBER_GOOGLECLOUDSPEECH => get_string("transcriber_googlecloud", constants::M_COMPONENT)
-              );
+                array(constants::TRANSCRIBER_OPEN => get_string("transcriber_open", constants::M_COMPONENT));
         return $options;
     }
 
     public static function get_lang_options() {
+
+        //we decided to limit this to what we can process and use langtool for:
+        //https://dev.languagetool.org/languages
+
         return array(
-                constants::M_LANG_ARAE => get_string('ar-ae', constants::M_COMPONENT),
-                constants::M_LANG_ARSA => get_string('ar-sa', constants::M_COMPONENT),
-                constants::M_LANG_DADK => get_string('da-dk', constants::M_COMPONENT),
+             //   constants::M_LANG_ARAE => get_string('ar-ae', constants::M_COMPONENT),
+             //   constants::M_LANG_ARSA => get_string('ar-sa', constants::M_COMPONENT),
+             //   constants::M_LANG_DADK => get_string('da-dk', constants::M_COMPONENT),
                 constants::M_LANG_DEDE => get_string('de-de', constants::M_COMPONENT),
                 constants::M_LANG_DECH => get_string('de-ch', constants::M_COMPONENT),
                 constants::M_LANG_ENUS => get_string('en-us', constants::M_COMPONENT),
@@ -1180,29 +1374,34 @@ class utils{
                 constants::M_LANG_ENAB => get_string('en-ab', constants::M_COMPONENT),
                 constants::M_LANG_ESUS => get_string('es-us', constants::M_COMPONENT),
                 constants::M_LANG_ESES => get_string('es-es', constants::M_COMPONENT),
-                constants::M_LANG_FAIR => get_string('fa-ir', constants::M_COMPONENT),
+             //   constants::M_LANG_FAIR => get_string('fa-ir', constants::M_COMPONENT),
+             //   constants::M_LANG_FILPH => get_string('fil-ph', constants::M_COMPONENT),
                 constants::M_LANG_FRCA => get_string('fr-ca', constants::M_COMPONENT),
                 constants::M_LANG_FRFR => get_string('fr-fr', constants::M_COMPONENT),
-                constants::M_LANG_HIIN => get_string('hi-in', constants::M_COMPONENT),
-                constants::M_LANG_HEIL => get_string('he-il', constants::M_COMPONENT),
-                constants::M_LANG_IDID => get_string('id-id', constants::M_COMPONENT),
+             //   constants::M_LANG_HIIN => get_string('hi-in', constants::M_COMPONENT),
+             //   constants::M_LANG_HEIL => get_string('he-il', constants::M_COMPONENT),
+             //   constants::M_LANG_IDID => get_string('id-id', constants::M_COMPONENT),
                 constants::M_LANG_ITIT => get_string('it-it', constants::M_COMPONENT),
               //  constants::M_LANG_JAJP => get_string('ja-jp', constants::M_COMPONENT),
               //  constants::M_LANG_KOKR => get_string('ko-kr', constants::M_COMPONENT),
-                constants::M_LANG_MSMY => get_string('ms-my', constants::M_COMPONENT),
+              //  constants::M_LANG_MSMY => get_string('ms-my', constants::M_COMPONENT),
                 constants::M_LANG_NLNL => get_string('nl-nl', constants::M_COMPONENT),
                 constants::M_LANG_PTBR => get_string('pt-br', constants::M_COMPONENT),
                 constants::M_LANG_PTPT => get_string('pt-pt', constants::M_COMPONENT),
                 constants::M_LANG_RURU => get_string('ru-ru', constants::M_COMPONENT),
-                constants::M_LANG_TAIN => get_string('ta-in', constants::M_COMPONENT),
-                constants::M_LANG_TEIN => get_string('te-in', constants::M_COMPONENT),
-                constants::M_LANG_TRTR => get_string('tr-tr', constants::M_COMPONENT),
+              //  constants::M_LANG_TAIN => get_string('ta-in', constants::M_COMPONENT),
+              //  constants::M_LANG_TEIN => get_string('te-in', constants::M_COMPONENT),
+              //  constants::M_LANG_TRTR => get_string('tr-tr', constants::M_COMPONENT),
              //   constants::M_LANG_ZHCN => get_string('zh-cn', constants::M_COMPONENT)
 
-              //  constants::M_LANG_NBNO => get_string('nb-no', constants::M_COMPONENT),
-              //  constants::M_LANG_PLPL => get_string('pl-pl', constants::M_COMPONENT),
-              //  constants::M_LANG_RORO => get_string('ro-ro', constants::M_COMPONENT),
-              //  constants::M_LANG_SVSE => get_string('sv-se', constants::M_COMPONENT)
+             //   constants::M_LANG_NBNO => get_string('nb-no', constants::M_COMPONENT),
+                constants::M_LANG_PLPL => get_string('pl-pl', constants::M_COMPONENT),
+            //    constants::M_LANG_RORO => get_string('ro-ro', constants::M_COMPONENT),
+            //    constants::M_LANG_SVSE => get_string('sv-se', constants::M_COMPONENT),
+                constants::M_LANG_UKUA => get_string('uk-ua',constants::M_COMPONENT),
+            //    constants::M_LANG_EUES => get_string('eu-es',constants::M_COMPONENT),
+            //    constants::M_LANG_FIFI => get_string('fi-fi',constants::M_COMPONENT),
+            //    constants::M_LANG_HUHU => get_string('hu-hu',constants::M_COMPONENT)
         );
     }
 
@@ -1314,7 +1513,7 @@ class utils{
         $gradefordisplay = null;
         $gradeddate = null;
         $grader = null;
-        $gradingmanager = \get_grading_manager($modulecontext, 'mod_solo', 'solo');
+        $gradingmanager = \get_grading_manager($modulecontext, constants::M_COMPONENT, 'solo');
         $gradingdisabled = false;
         $gradeid =$attempt->id;
 
@@ -1395,7 +1594,7 @@ class utils{
         //necessary for M3.3
         require_once($CFG->dirroot .'/grade/grading/lib.php');
 
-        $gradingmanager = \get_grading_manager($context, 'mod_solo', 'solo');
+        $gradingmanager = \get_grading_manager($context, constants::M_COMPONENT, 'solo');
         $gradinginstance = null;
         if ($gradingmethod = $gradingmanager->get_active_method()) {
             $controller = $gradingmanager->get_controller($gradingmethod);
@@ -1434,9 +1633,33 @@ class utils{
         return (json_last_error() == JSON_ERROR_NONE);
     }
 
+    public static function fetch_options_steps(){
+        $ret = array(constants::M_STEP_NONE=>get_string('step_none',constants::M_COMPONENT),
+            constants::M_STEP_RECORD=>get_string('step_record',constants::M_COMPONENT),
+            constants::M_STEP_TRANSCRIBE=>get_string('step_transcribe',constants::M_COMPONENT),
+            constants::M_STEP_MODEL=>get_string('step_model',constants::M_COMPONENT));
+        return $ret;
+    }
+
+    public static function fetch_options_sequences(){
+        $ret = array(constants::M_SEQ_PRTM=>get_string('seq_PRTM',constants::M_COMPONENT),
+            constants::M_SEQ_PRM=>get_string('seq_PRM',constants::M_COMPONENT),
+            constants::M_SEQ_PTRM=>get_string('seq_PTRM',constants::M_COMPONENT));
+        return $ret;
+    }
+    public static function fetch_step_no($moduleinstance, $type){
+        $steps = [2,3,4,5];
+        foreach($steps as $step){
+            if($moduleinstance->{'step' . $step}==$type){
+                return $step;
+            }
+        }
+        return false;
+    }
+
     public static function get_tts_voices($langcode='en-US',$showall=true) {
         $alllang = array(
-                constants::M_LANG_ARAE => ['Zeina'],
+                constants::M_LANG_ARAE => ['Zeina'=>'Zeina'],
             //constants::M_LANG_ARSA => [],
                 constants::M_LANG_DEDE => ['Hans' => 'Hans', 'Marlene' => 'Marlene', 'Vicki' => 'Vicki'],
             //constants::M_LANG_DECH => [],
@@ -1467,12 +1690,18 @@ class utils{
             //constants::M_LANG_TAIN => [],
             //constants::M_LANG_TEIN => [],
                 constants::M_LANG_TRTR => ['Filiz' => 'Filiz'],
-                constants::M_LANG_ZHCN => ['Zhiyu'],
+                constants::M_LANG_ZHCN => ['Zhiyu'=>'Zhiyu'],
 
-                constants::M_LANG_NBNO => ['Liv'=>'Liv'],
+                constants::M_LANG_NBNO => ['Liv'=>'Liv','nb-NO-Wavenet-B'=>'Lars_g'],
                 constants::M_LANG_PLPL => ['Ewa'=>'Ewa','Maja'=>'Maja','Jacek'=>'Jacek','Jan'=>'Jan'],
-                constants::M_LANG_RORO => ['Carmen'=>'Carmen'],
-                constants::M_LANG_SVSE => ['Astrid'=>'Astrid']
+                constants::M_LANG_RORO => ['Carmen'=>'Carmen','ro-RO-Wavenet-A'=>'Sorina_g'],
+                constants::M_LANG_SVSE => ['Astrid'=>'Astrid'],
+                constants::M_LANG_UKUA => ['uk-UA-Wavenet-A'=>'Katya_g'],
+                constants::M_LANG_FILPH => ['fil-PH-Wavenet-A'=>'Darna_g','fil-PH-Wavenet-B'=>'Reyna_g','fil-PH-Wavenet-C'=>'Bayani_g','fil-PH-Wavenet-D'=>'Ernesto_g'],
+                constants::M_LANG_FIFI => ['fi-FI-Wavenet-A'=>'Kaarina_g'],
+                constants::M_LANG_HUHU => ['hu-HU-Wavenet-A'=>'Eszter_g']
+
+
         );
         if (array_key_exists($langcode, $alllang) && !$showall) {
             return $alllang[$langcode];
@@ -1481,7 +1710,7 @@ class utils{
 
             //add current language first
             foreach ($alllang[$langcode] as $v => $thevoice) {
-                $usearray[$thevoice] = get_string(strtolower($langcode), constants::M_COMPONENT) . ': ' . $thevoice;
+                $usearray[$v] = get_string(strtolower($langcode), constants::M_COMPONENT) . ': ' . $thevoice;
             }
             //then all the rest
             foreach ($alllang as $lang => $voices) {
@@ -1489,7 +1718,7 @@ class utils{
                     continue;
                 }
                 foreach ($voices as $v => $thevoice) {
-                    $usearray[$thevoice] = get_string(strtolower($lang), constants::M_COMPONENT) . ': ' . $thevoice;
+                    $usearray[$v] = get_string(strtolower($lang), constants::M_COMPONENT) . ': ' . $thevoice;
                 }
             }
             return $usearray;
@@ -1515,13 +1744,10 @@ class utils{
         $rec->widgetid = \html_writer::random_id(constants::M_WIDGETID);
 
         switch ($moduleinstance->transcriber){
-            case constants::TRANSCRIBER_AMAZONSTREAMING :
-                $moduleinstance->transcriber = constants::TRANSCRIBER_AMAZONTRANSCRIBE;
-            case constants::TRANSCRIBER_AMAZONTRANSCRIBE:
-            case constants::TRANSCRIBER_GOOGLECLOUDSPEECH:
+            case constants::TRANSCRIBER_OPEN:
             case constants::TRANSCRIBER_NONE:
             default:
-            $can_transcribe = \mod_solo\utils::can_transcribe($moduleinstance);
+            $can_transcribe = self::can_transcribe($moduleinstance);
             $rec->transcribe = $can_transcribe ? $moduleinstance->transcriber : "0";
             $rec->subtitle=$rec->transcribe;
             $rec->speechevents="0";
@@ -1609,7 +1835,7 @@ class utils{
     }
 
     //fetch the MP3 URL of the text we want read aloud
-    public static function fetch_grammar_correction($token,$region,$passage) {
+    public static function fetch_grammar_correction($token,$region,$ttslanguage,$passage) {
         global $USER;
 
         //The REST API we are calling
@@ -1622,6 +1848,7 @@ class utils{
         $params['action'] = 'request_grammar_correction';
         $params['appid'] = 'mod_solo';
         $params['prompt'] = $passage;//urlencode($passage);
+        $params['language'] = $ttslanguage;
         $params['subject'] = 'none';
         $params['region'] = $region;
         $params['owner'] = hash('md5',$USER->username);
@@ -1721,6 +1948,59 @@ class utils{
         }
     }
 
+    public static function sequence_to_steps($moduleinstance){
+        switch($moduleinstance->activitysteps){
+
+            case constants::M_SEQ_PRM:
+                $moduleinstance->step2=constants::M_STEP_RECORD;
+                $moduleinstance->step3=constants::M_STEP_MODEL;
+                $moduleinstance->step4=constants::M_STEP_NONE;
+                $moduleinstance->step5=constants::M_STEP_NONE;
+                break;
+            case constants::M_SEQ_PTRM:
+                $moduleinstance->step2=constants::M_STEP_TRANSCRIBE;
+                $moduleinstance->step3=constants::M_STEP_RECORD;
+                $moduleinstance->step4=constants::M_STEP_MODEL;
+                $moduleinstance->step5=constants::M_STEP_NONE;
+                break;
+            case constants::M_SEQ_PRMT:
+                $moduleinstance->step2=constants::M_STEP_RECORD;
+                $moduleinstance->step3=constants::M_STEP_MODEL;
+                $moduleinstance->step4=constants::M_STEP_TRANSCRIBE;
+                $moduleinstance->step5=constants::M_STEP_NONE;
+                break;
+            case constants::M_SEQ_PRTM:
+            default:
+                $moduleinstance->step2=constants::M_STEP_RECORD;
+                $moduleinstance->step3=constants::M_STEP_TRANSCRIBE;
+                $moduleinstance->step4=constants::M_STEP_MODEL;
+                $moduleinstance->step5=constants::M_STEP_NONE;
+                break;
+        }
+        unset($moduleinstance->activitysteps);
+        return $moduleinstance;
+    }
+
+    public static function steps_to_sequence($moduleinstance){
+        //this just uses function sequence_to_steps to figure out the sequence (activitysteps)
+        $sequences = [constants::M_SEQ_PRM,constants::M_SEQ_PTRM,constants::M_SEQ_PRMT,constants::M_SEQ_PRTM];
+        foreach ($sequences as $sequence){
+            $fakemodule = new \stdClass();
+            $fakemodule->activitysteps=$sequence;
+            $fakemodule = self::sequence_to_steps($fakemodule);
+            if($fakemodule->step2 == $moduleinstance->step2
+                && $fakemodule->step3 == $moduleinstance->step3
+                && $fakemodule->step4 == $moduleinstance->step4
+                && $fakemodule->step5 == $moduleinstance->step5){
+                $moduleinstance->activitysteps = $sequence;
+                return $moduleinstance;
+            }
+        }
+        //if we got here just default to PRTM
+        $moduleinstance->activitysteps = constants::M_SEQ_PRTM;
+        return $moduleinstance;
+    }
+
     public static function add_mform_elements($mform, $context,$setuptab=false) {
         global $CFG;
         $config = get_config(constants::M_COMPONENT);
@@ -1764,6 +2044,11 @@ class utils{
         $mform->addHelpButton('speakingtopic', 'speakingtopic', constants::M_MODNAME);
         //$mform->addRule('speakingtopic', get_string('required'), 'required', null, 'client');
 
+        //Sequence of activities
+        $options = self::fetch_options_sequences();
+        $mform->addElement('select','activitysteps',get_string('activitysteps', constants::M_COMPONENT), $options,array());
+        $mform->setDefault('activitysteps',constants::M_SEQ_PRTM);
+
         //display media options for speaking prompt
 //--------------------------------------------------------
       self::prepare_content_toggle('topic',$mform,$context);
@@ -1771,19 +2056,19 @@ class utils{
 
 
 	    $name = 'activityopenscloses';
-        $label = get_string($name, 'solo');
+        $label = get_string($name, constants::M_COMPONENT);
         $mform->addElement('header', $name, $label);
         $mform->setExpanded($name, false);
         //-----------------------------------------------------------------------------
 
         $name = 'viewstart';
-        $label = get_string($name, "solo");
+        $label = get_string($name, constants::M_COMPONENT);
         $mform->addElement('date_time_selector', $name, $label, $dateoptions);
         $mform->addHelpButton($name, $name,constants::M_COMPONENT);
         
 
         $name = 'viewend';
-        $label = get_string($name, "solo");
+        $label = get_string($name, constants::M_COMPONENT);
         $mform->addElement('date_time_selector', $name, $label, $dateoptions);
         $mform->addHelpButton($name, $name ,constants::M_COMPONENT);
 
@@ -1813,6 +2098,18 @@ class utils{
         $mform->setType('gradewordgoal', PARAM_INT);
         $mform->setDefault('gradewordgoal',60);
         $mform->addHelpButton('gradewordgoal', 'gradewordgoal', constants::M_MODNAME);
+
+        //Enable Grammar Suggestions
+        $mform->addElement('selectyesno', 'enablesuggestions', get_string('enablesuggestions', constants::M_MODNAME));
+        $mform->setType('enablesuggestions', PARAM_INT);
+        $mform->setDefault('enablesuggestions',1);
+        $mform->addHelpButton('enablesuggestions', 'enablesuggestions', constants::M_MODNAME);
+
+        //TTS on pre-audio transcribe
+        $mform->addElement('selectyesno', 'enabletts', get_string('enabletts', constants::M_MODNAME));
+        $mform->setType('enabletts', PARAM_INT);
+        $mform->setDefault('enabletts',1);
+        $mform->addHelpButton('enabletts', 'enabletts', constants::M_MODNAME);
 
         //Model Answer
         $mform->addElement('header', 'modelanswerheader', get_string('modelanswerheader', constants::M_COMPONENT));
@@ -1856,7 +2153,7 @@ class utils{
         $label = get_string($name, constants::M_COMPONENT);
         $options = \mod_solo\utils::fetch_options_transcribers();
         $mform->addElement('select', $name, $label, $options);
-        $mform->setDefault($name,constants::TRANSCRIBER_AMAZONTRANSCRIBE);// $config->{$name});
+        $mform->setDefault($name,constants::TRANSCRIBER_OPEN);// $config->{$name});
 
         //region
         $regionoptions = \mod_solo\utils::get_region_options();
@@ -1876,8 +2173,11 @@ class utils{
         $mform->setDefault('multipleattempts',$config->multipleattempts);
 
         //allow post attempt edit
-        $mform->addElement('advcheckbox', 'postattemptedit', get_string('postattemptedit', constants::M_COMPONENT), get_string('postattemptedit_details', constants::M_COMPONENT));
+        $mform->addElement('hidden','postattemptedit');
         $mform->setDefault('postattemptedit',false);
+        $mform->setType('postattemptedit',PARAM_BOOL);
+       // $mform->addElement('advcheckbox', 'postattemptedit', get_string('postattemptedit', constants::M_COMPONENT), get_string('postattemptedit_details', constants::M_COMPONENT));
+       // $mform->setDefault('postattemptedit',false);
 
         //To auto grade or not to autograde
         $mform->addElement('advcheckbox', 'enableautograde', get_string('enableautograde', constants::M_COMPONENT), get_string('enableautograde_details', constants::M_COMPONENT));

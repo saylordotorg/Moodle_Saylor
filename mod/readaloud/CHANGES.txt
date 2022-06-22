@@ -1,3 +1,9 @@
+2.0.86 (Build 2022060500)
+ - Added a better free trial and rebuilt JS for < M.3.8
+
+2.0.85 (Build 2022053100)
+- Added custom font
+
 2.0.84 (Build 2022050200)
 - Removed JQuery UI which was breaking Moodle 4.0 dock
 - Made Listen and Repeat recorder more 'accessible'
@@ -240,7 +246,7 @@ Version 2.0.74 (Build 2021122200)
 -added sessionscoremethod setting for strict and normal grading modes
 
 2.0.22 (Build 2020012300)
--added languages(arabic, chinese, portuguese, japanese, tamil, telegu, dutch, farsi, wales english, ireland english, scotland english, russian, turkish, malay, indonesian,hebrew, swiss german)
+-added languages(arabic, chinese, portuguese, japanese, tamil, Telugu, dutch, farsi, wales english, ireland english, scotland english, russian, turkish, malay, indonesian,hebrew, swiss german)
 -added user tagging
 -fixed SQL bug in grading which occurs if FULL_GROUP_BY is set in mysql or in postgresql
 

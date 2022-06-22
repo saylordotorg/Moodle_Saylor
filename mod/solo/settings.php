@@ -92,6 +92,14 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configcheckbox(constants::M_COMPONENT .  '/enableai',
         get_string('enableai', constants::M_COMPONENT), get_string('enableai_details',constants::M_COMPONENT), 1));
 
+    $settings->add(new admin_setting_configcheckbox(constants::M_COMPONENT .  '/enablesuggestions',
+        get_string('default_enablesuggestions', constants::M_COMPONENT), get_string('enablesuggestions_details',constants::M_COMPONENT), 1));
+
+    $settings->add(new admin_setting_configcheckbox(constants::M_COMPONENT .  '/enabletts',
+        get_string('default_enabletts', constants::M_COMPONENT), get_string('enabletts_details',constants::M_COMPONENT), 0));
+
+    $settings->add(new admin_setting_configcheckbox(constants::M_COMPONENT .  '/enablegallery',
+        get_string('enablegallery', constants::M_COMPONENT), get_string('enablegallery_details',constants::M_COMPONENT), 0));
 
     $regions = \mod_solo\utils::get_region_options();
     $settings->add(new admin_setting_configselect(constants::M_COMPONENT .  '/awsregion',
@@ -111,7 +119,7 @@ if ($ADMIN->fulltree) {
     $name = 'transcriber';
     $label = get_string($name, constants::M_COMPONENT);
     $details = get_string($name . '_details', constants::M_COMPONENT);
-    $default = constants::TRANSCRIBER_AMAZONTRANSCRIBE;
+    $default = constants::TRANSCRIBER_OPEN;
     $options = utils::fetch_options_transcribers();
     $settings->add(new admin_setting_configselect(constants::M_COMPONENT . "/$name",
             $label, $details, $default, $options));

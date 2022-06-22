@@ -57,7 +57,7 @@ define(['jquery', 'core/log', 'mod_readaloud/definitions'], function($, log, def
 
     sort_breaks: function() {
       this.breaks.sort(function(a, b) {
-        return a.audiotime - b.audiotime
+        return a.audiotime - b.audiotime;
       });
     },
 
@@ -76,11 +76,11 @@ define(['jquery', 'core/log', 'mod_readaloud/definitions'], function($, log, def
       this.controls.audioplayer[0].play();
     },
 
-    get_audio_time() {
+    get_audio_time: function() {
       return this.controls.audioplayer[0].currentTime;
     },
 
-    set_audio_time(newtime) {
+    set_audio_time: function(newtime) {
       this.controls.audioplayer[0].currentTime=newtime;
     },
 

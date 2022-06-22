@@ -70,61 +70,73 @@ class attempt_renderer extends \plugin_renderer_base {
         //init buttons
         $buttons = [];
 
-        //Step One Button (user selections)
-        $pbutton = new \stdClass();
-        $pbutton->label=get_string('attempt_partone', constants::M_COMPONENT);
-        $pbutton->url = new \moodle_url(constants::M_URL . '/attempt/manageattempts.php',
-                array('id' => $this->page->cm->id, 'attemptid' => $attemptid, 'type' => constants::STEP_USERSELECTIONS));
-        $pbutton->class=$buttonclass . ($thisstep == constants::STEP_USERSELECTIONS ? '_activemenubutton' : '_completemenubutton');
-        $buttons[]=$pbutton;
+     //Prepare Menu Button / We need this but its always number one and not a part of the steps kept in db sequence fields
+     $pbutton = new \stdClass();
+     $pbutton->label = get_string('attempt_prepare', constants::M_COMPONENT);
+     $pbutton->url = new \moodle_url(constants::M_URL . '/attempt/manageattempts.php',
+         array('id' => $this->page->cm->id, 'attemptid' => $attemptid, 'type' => constants::STEP_PREPARE));
+     $pbutton->class = $buttonclass . ($thisstep == 1 ? '_activemenubutton' : '_completemenubutton');
+     $buttons[] = $pbutton;
+
+     $steps = [2,3,4,5];
+     foreach($steps as $step) {
+            switch($solo->{'step' . $step}) {
+                case constants::M_STEP_RECORD:
+                //Mediarecord Menu Button
+                    $rbutton = new \stdClass();
+                    $rbutton->label = get_string('attempt_record', constants::M_COMPONENT);
+                    if ($latestattempt && ($latestattempt->completedsteps+1) >= $step) {
+                        $recordstep = utils::fetch_step_no($solo,constants::M_STEP_RECORD);
+                        $rbutton->url = new \moodle_url('/mod/solo/attempt/manageattempts.php',
+                        array('id' => $this->page->cm->id, 'attemptid' => $attemptid, 'type' => constants::STEP_MEDIARECORDING,'stepno'=>$recordstep));
+                        $rbutton->class = $buttonclass . ($thisstep == $step ? '_activemenubutton' : '_completemenubutton');
+                    }
+                    else {
+                            $rbutton->url = "#";
+                            $rbutton->class = $buttonclass . '_deadmenubutton';
+                    }
+                    $buttons[] = $rbutton;
+                    break;
+
+                case constants::M_STEP_TRANSCRIBE:
+                    //Self Transcribe Menu Button
+                    $stbutton = new \stdClass();
+                    $stbutton->label = get_string('attempt_transcribe', constants::M_COMPONENT);
+                    if ($latestattempt && ($latestattempt->completedsteps +1) >=  $step) {
+                        $transcribestep = utils::fetch_step_no($solo,constants::M_STEP_TRANSCRIBE);
+                        $stbutton->url = new \moodle_url('/mod/solo/attempt/manageattempts.php',
+                            array('id' => $this->page->cm->id, 'attemptid' => $attemptid, 'type' => constants::STEP_SELFTRANSCRIBE,'stepno'=>$transcribestep));
+                        $stbutton->class = $buttonclass . ($thisstep == $step ? '_activemenubutton' : '_completemenubutton');
+                    } else {
+                        $stbutton->url = "#";
+                        $stbutton->class = $buttonclass . '_deadmenubutton';
+                    }
+                    $buttons[] = $stbutton;
+                    break;
+
+                case constants::M_STEP_MODEL:
+                    //Model Answer Menu Button
+                    if (utils::has_modelanswer($solo, $context)) {
+                        $mabutton = new \stdClass();
+                        $mabutton->label = get_string('attempt_model', constants::M_COMPONENT);
+                        if ($latestattempt && ($latestattempt->completedsteps+1) >=  $step) {
+                            $modelstep = utils::fetch_step_no($solo,constants::M_STEP_MODEL);
+                            $mabutton->url = new \moodle_url('/mod/solo/attempt/manageattempts.php',
+                                array('id' => $this->page->cm->id, 'attemptid' => $attemptid, 'type' => constants::STEP_MODEL,'stepno'=>$modelstep));
+                            $mabutton->class = $buttonclass . ($thisstep == $step ? '_activemenubutton' : '_completemenubutton');
+                        } else {
+                            $mabutton->url = "#";
+                            $mabutton->class = $buttonclass . '_deadmenubutton';
+                        }
+                        $buttons[] = $mabutton;
+                    }
+            }//end of switch
+        }//end of for each
 
 
-     //Step Two Button (conversation recording)
-     $rbutton = new \stdClass();
-     $rbutton->label=get_string('attempt_parttwo', constants::M_COMPONENT);
-     if($latestattempt && $latestattempt->completedsteps>=constants::STEP_USERSELECTIONS) {
-         $rbutton->url = new \moodle_url('/mod/solo/attempt/manageattempts.php',
-                 array('id' => $this->page->cm->id, 'attemptid' => $attemptid, 'type' => constants::STEP_AUDIORECORDING));
-         $rbutton->class=$buttonclass . ($thisstep == constants::STEP_AUDIORECORDING ? '_activemenubutton' : '_completemenubutton');
-     }else{
-         $rbutton->url="#";
-         $rbutton->class = $buttonclass .'_deadmenubutton';
-     }
-     $buttons[]=$rbutton;
-
-     //Step Three Button (self transcribe)
-     $stbutton = new \stdClass();
-     $stbutton->label=get_string('attempt_partthree', constants::M_COMPONENT);
-     if($latestattempt && $latestattempt->completedsteps>=constants::STEP_AUDIORECORDING) {
-         $stbutton->url = new \moodle_url('/mod/solo/attempt/manageattempts.php',
-                 array('id' => $this->page->cm->id, 'attemptid' => $attemptid, 'type' => constants::STEP_SELFTRANSCRIBE));
-         $stbutton->class=$buttonclass . ($thisstep == constants::STEP_SELFTRANSCRIBE ? '_activemenubutton' : '_completemenubutton');
-     }else{
-         $stbutton->url="#";
-         $stbutton->class = $buttonclass .'_deadmenubutton';
-     }
-     $buttons[]=$stbutton;
-
-
-     //Step Four Button (model answer)
-     if(utils::has_modelanswer($solo, $context)) {
-         $mabutton = new \stdClass();
-         $mabutton->label = get_string('attempt_partfour', constants::M_COMPONENT);
-         if ($latestattempt && $latestattempt->completedsteps >= constants::STEP_SELFTRANSCRIBE) {
-             $mabutton->url = new \moodle_url('/mod/solo/attempt/manageattempts.php',
-                 array('id' => $this->page->cm->id, 'attemptid' => $attemptid, 'type' => constants::STEP_MODEL));
-             $mabutton->class = $buttonclass . ($thisstep == constants::STEP_MODEL ? '_activemenubutton' : '_completemenubutton');
-         } else {
-             $mabutton->url = "#";
-             $mabutton->class = $buttonclass . '_deadmenubutton';
-         }
-         $buttons[] = $mabutton;
-     }
-
-
-     return $this->output->render_from_template( constants::M_COMPONENT . '/activityintrobuttons', ['introcontent'=>$introcontent, 'buttons'=>$buttons]);
-    //$buttonsdiv = \html_writer::div(implode($glue, $parts),constants::M_COMPONENT .'_mbuttons');
-    // return $this->output->box($output . $buttonsdiv, 'generalbox firstpageoptions');
+         return $this->output->render_from_template( constants::M_COMPONENT . '/activityintrobuttons', ['introcontent'=>$introcontent, 'buttons'=>$buttons]);
+        //$buttonsdiv = \html_writer::div(implode($glue, $parts),constants::M_COMPONENT .'_mbuttons');
+        // return $this->output->box($output . $buttonsdiv, 'generalbox firstpageoptions');
     }
 
     function show_userattemptsummary($moduleinstance,$attempt,$aidata, $stats){
@@ -183,7 +195,7 @@ class attempt_renderer extends \plugin_renderer_base {
         return $ret;
     }
 
-    function show_summarypassageandstats($attempt,$aidata,$stats,$autotranscriptready){
+    function show_summarypassageandstats($attempt,$aidata,$stats,$autotranscriptready, $selftranscribe){
         //mark up our passage for review
         //if we have ai we need all the js and markup, otherwise we just need the formated transcript
         $ret='';
@@ -193,6 +205,7 @@ class attempt_renderer extends \plugin_renderer_base {
         $tdata['grammarerrors'] = utils::fetch_grammarerrors($stats,$attempt->selftranscript);
         if($tdata['spellingerrors']){$tdata['hasspellingerrors']=true;}
         if($tdata['grammarerrors']){$tdata['hasgrammarerrors']=true;}
+        if($selftranscribe){$tdata['selftranscribe']=true; }
         if($aidata) {
             $simpleselftranscript='';
             if(!empty($attempt->selftranscript)){
@@ -219,7 +232,7 @@ class attempt_renderer extends \plugin_renderer_base {
 
         //if we have a correction, send that out too
         if(!empty($attempt->grammarcorrection)){
-            list($grammarerrors,$grammarmatches) = $this->fetch_grammar_correction_diff($simpleselftranscript, $attempt->grammarcorrection);
+            list($grammarerrors,$grammarmatches) = utils::fetch_grammar_correction_diff($simpleselftranscript, $attempt->grammarcorrection);
             $js_opts_html = \mod_solo\aitranscriptutils::prepare_corrections_amd($grammarerrors,$grammarmatches);
             $markedupcorrections = \mod_solo\aitranscriptutils::render_passage($attempt->grammarcorrection,'corrections');
             $markedupcorrections .= $js_opts_html;
@@ -231,82 +244,6 @@ class attempt_renderer extends \plugin_renderer_base {
         return $ret;
     }
 
-    function fetch_grammar_correction_diff($selftranscript,$correction){
-
-
-        //turn the passage and transcript into an array of words
-        $alternatives = diff::fetchAlternativesArray('');
-        $wildcards = diff::fetchWildcardsArray($alternatives);
-        $passagebits = diff::fetchWordArray($selftranscript);
-        $transcriptbits = diff::fetchWordArray($correction);
-
-
-        //fetch sequences of transcript/passage matched words
-        // then prepare an array of "differences"
-        $passagecount = count($passagebits);
-        $transcriptcount = count($transcriptbits);
-        $language = constants::M_LANG_ENUS;
-        $sequences = diff::fetchSequences($passagebits,$transcriptbits,$alternatives,$language);
-
-        //fetch diffs
-        $diffs = diff::fetchDiffs($sequences, $passagecount,$transcriptcount);
-        $diffs = diff::applyWildcards($diffs,$passagebits,$wildcards);
-
-
-        //from the array of differences build error data, match data, markers, scores and metrics
-        $errors = new \stdClass();
-        $matches = new \stdClass();
-        $currentword=0;
-        $lastunmodified=0;
-        //loop through diffs
-        foreach($diffs as $diff){
-            $currentword++;
-            switch($diff[0]){
-                case Diff::UNMATCHED:
-                    //we collect error info so we can count and display them on passage
-                    $error = new \stdClass();
-                    $error->word=$passagebits[$currentword-1];
-                    $error->wordnumber=$currentword;
-                    $errors->{$currentword}=$error;
-                    break;
-
-                case Diff::MATCHED:
-                    //we collect match info so we can play audio from selected word
-                    $match = new \stdClass();
-                    $match->word=$passagebits[$currentword-1];
-                    $match->pposition=$currentword;
-                    $match->tposition = $diff[1];
-                    $match->audiostart=0;//not meaningful when processing corrections
-                    $match->audioend=0;//not meaningful when processing corrections
-                    $match->altmatch=$diff[2];//not meaningful when processing corrections
-                    $matches->{$currentword}=$match;
-                    $lastunmodified = $currentword;
-                    break;
-
-                default:
-                    //do nothing
-                    //should never get here
-
-            }
-        }
-        $sessionendword = $lastunmodified;
-
-        //discard errors that happen after session end word.
-        $errorcount = 0;
-        $finalerrors = new \stdClass();
-        foreach($errors as $key=>$error) {
-            if ($key < $sessionendword) {
-                $finalerrors->{$key} = $error;
-                $errorcount++;
-            }
-        }
-        //finalise and serialise session errors
-        $sessionerrors = json_encode($finalerrors);
-        $sessionmatches = json_encode($matches);
-
-        return [$sessionerrors,$sessionmatches];
-
-    }
 
     function show_myreports($moduleinstance,$cm){
 
@@ -379,7 +316,7 @@ class attempt_renderer extends \plugin_renderer_base {
             $itemtitle = get_string('attempt_partone', constants::M_COMPONENT);
             if($attempt->completedsteps >= constants::STEP_NONE) {
                 $editurl = new \moodle_url($actionurl,
-                        array('id' => $cm->id, 'attemptid' => $attempt->id, 'type' => constants::STEP_USERSELECTIONS));
+                        array('id' => $cm->id, 'attemptid' => $attempt->id, 'type' => constants::STEP_PREPARE));
                 $edituserselections = \html_writer::link($editurl, $itemtitle);
                 $parts[] = $edituserselections;
             }else{
@@ -387,9 +324,9 @@ class attempt_renderer extends \plugin_renderer_base {
             }
 
             $itemtitle = get_string('attempt_parttwo', constants::M_COMPONENT);
-            if($attempt->completedsteps >= constants::STEP_USERSELECTIONS) {
+            if($attempt->completedsteps >= constants::STEP_PREPARE) {
                 $editurl = new \moodle_url($actionurl,
-                        array('id' => $cm->id, 'attemptid' => $attempt->id, 'type' => constants::STEP_AUDIORECORDING));
+                        array('id' => $cm->id, 'attemptid' => $attempt->id, 'type' => constants::STEP_MEDIARECORDING));
                 $editaudio = \html_writer::link($editurl,$itemtitle);
                 $parts[] = $editaudio;
             }else{
@@ -397,7 +334,7 @@ class attempt_renderer extends \plugin_renderer_base {
             }
 
             $itemtitle = get_string('attempt_partthree', constants::M_COMPONENT);
-            if($attempt->completedsteps >= constants::STEP_AUDIORECORDING) {
+            if($attempt->completedsteps >= constants::STEP_MEDIARECORDING) {
                     $editurl = new \moodle_url($actionurl,
                             array('id' => $cm->id, 'attemptid' => $attempt->id, 'type' => constants::STEP_SELFTRANSCRIBE));
                     $edittranscript = \html_writer::link($editurl, $itemtitle);

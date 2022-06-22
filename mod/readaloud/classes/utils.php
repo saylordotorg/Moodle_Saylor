@@ -2354,6 +2354,15 @@ class utils {
         $mform->addElement('select', 'maxattempts', get_string('maxattempts', constants::M_COMPONENT), $attemptoptions);
 
 
+        // Appearance.
+        $mform->addElement('header', 'advancedheader', get_string('advancedheader', constants::M_COMPONENT));
+
+        // Adding the customfont field
+        $mform->addElement('text', 'customfont', get_string('customfont', constants::M_COMPONENT), array('size'=>'64'));
+        $mform->addHelpButton('customfont', 'customfont', constants::M_COMPONENT);
+        $mform->setType('customfont', PARAM_TEXT);
+
+
         //sessionscore options
         $sessionscoreoptions = \mod_readaloud\utils::get_sessionscore_options();
         $mform->addElement('select', 'sessionscoremethod', get_string('sessionscoremethod', constants::M_COMPONENT),

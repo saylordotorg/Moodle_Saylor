@@ -171,6 +171,13 @@ if($attempts) {
     $latest_aigrade = false;
 }
 
+//if we need a non standard font we can do that from here
+if(!empty($moduleinstance->customfont)){
+    if(!in_array($moduleinstance->customfont,constants::M_STANDARD_FONTS)){
+        $PAGE->requires->css(new moodle_url('https://fonts.googleapis.com/css?family=' . $moduleinstance->customfont));
+    }
+}
+
 //From here we actually display the page.
 //if we are teacher we see tabs. If student we just see the activity
 echo $renderer->header($moduleinstance, $cm, $mode, null, get_string('view', constants::M_COMPONENT));
@@ -286,6 +293,12 @@ echo $renderer->show_wheretonext($moduleinstance);
 //show listen and repeat dialog
 echo $renderer->show_landr($moduleinstance, $token);
 
+//show quiz
+/*
+$comprehensiontest = new \mod_readaloud\comprehensiontest($cm);
+$items = $comprehensiontest->fetch_items();
+echo $renderer->show_quiz($moduleinstance,$items);
+*/
 echo $renderer->fetch_activity_amd($cm, $moduleinstance,$token);
 
 //return to menu button

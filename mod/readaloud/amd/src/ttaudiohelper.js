@@ -116,14 +116,15 @@ define(['jquery', 'core/log', 'mod_readaloud/ttwavencoder'], function ($, log, w
             this.therecorder.update_audio('isRecording',false);
             this.audioContext.close();
             this.processor.disconnect();
-            this.tracks.forEach(track => track.stop());
+            this.tracks.forEach(function(track){track.stop();});
             this.onStop(this.encoder.finish());
         },
 
         getBuffers: function(event) {
             var buffers = [];
-            for (var ch = 0; ch < 2; ++ch)
+            for (var ch = 0; ch < 2; ++ch) {
                 buffers[ch] = event.inputBuffer.getChannelData(ch);
+            }
             return buffers;
         },
 

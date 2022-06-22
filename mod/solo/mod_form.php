@@ -94,8 +94,8 @@ class mod_solo_mod_form extends moodleform_mod {
 	public function data_preprocessing(&$form_data) {
         if ($this->current->instance) {
             $form_data = (array) utils::prepare_file_and_json_stuff((object) $form_data, $this->context);
+            $form_data = (array) utils::steps_to_sequence((object)$form_data);
         }
-
 	}
 
     /**

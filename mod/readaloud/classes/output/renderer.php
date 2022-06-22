@@ -180,7 +180,16 @@ class renderer extends \plugin_renderer_base {
       
       return $ret; 
     }
-  
+
+    public function show_quiz ($moduleinstance, $items){
+        global $CFG;
+        $data=[];
+        $data['items']=$items;
+
+        //finally render template and return
+        return $this->render_from_template('mod_readaloud/quiz', $data);
+    }
+
     public function show_menubuttons ($moduleinstance, $canattempt) {
       
       global $CFG;
@@ -209,6 +218,9 @@ class renderer extends \plugin_renderer_base {
         if(!$canattempt) {
             $data['cantattempt'] = 1;
         }
+        //no quiz
+        $data['noquiz'] = 1;
+
         //finally render template and return
         return $this->render_from_template('mod_readaloud/bigbuttonmenu', $data);
 

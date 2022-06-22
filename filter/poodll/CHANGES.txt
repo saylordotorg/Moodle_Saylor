@@ -1,5 +1,9 @@
 Change List
 =========
+Version 3.1.58 (Build 2022060500)
+- Added better free trial link
+- Rebuilt JS for < M.8 versions
+
 Version 3.1.57 (Build 2022052700)
 - Fixed templates for super interactive audio and video (no jqueryui and now no longer resizable)
 - Fixed broken JS on M3.6 and M3.7 as a result of build incompatibilities

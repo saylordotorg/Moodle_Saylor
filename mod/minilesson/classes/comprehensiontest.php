@@ -496,6 +496,9 @@ class comprehensiontest
                         }
                     }
 
+                    //multichoice also has a confirm choice option we need to include
+                    $testitem->confirmchoice = $item->{constants::CONFIRMCHOICE};
+
                     break;
                 case constants::TYPE_PAGE:
                 case constants::TYPE_SMARTFRAME:

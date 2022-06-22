@@ -30,6 +30,17 @@ const M_CLASS_TOPICSCHECKBOX = 'topicscheckbox';
 const M_PLUGINSETTINGS ='/admin/settings.php?section=modsettingsolo';
 
 const M_USE_DATATABLES=true;
+const M_STEP_NONE=0;
+const M_STEP_PREPARE=1;
+const M_STEP_RECORD=2;
+const M_STEP_TRANSCRIBE=3;
+const M_STEP_MODEL=4;
+
+//sequence of steps (P.repare, R.ecord, T.ranscribe, M.odel)
+const M_SEQ_PRTM=0;
+const M_SEQ_PRM=1;
+const M_SEQ_PTRM=2;
+const M_SEQ_PRMT=3;
 
 //AI Transcript constants
 const M_AI_PARENTFIELDNAME = 'solo';
@@ -63,8 +74,8 @@ const SKIN_UPLOAD = 'upload';
 
 //Constants for Attempt Steps
 const STEP_NONE=0;
-const STEP_USERSELECTIONS= 1;
-const STEP_AUDIORECORDING= 2;
+const STEP_PREPARE= 1;
+const STEP_MEDIARECORDING= 2;
 const STEP_SELFTRANSCRIBE= 3;
 const STEP_MODEL= 4;
 //later we need to make this variable
@@ -101,10 +112,8 @@ const STREAMINGTRANSCRIPTFIELD='streamingtranscript';
 const RECORDERORPLAYERFIELD='recorderorplayer';
 
 const TRANSCRIBER_NONE = 0;
-const TRANSCRIBER_AMAZONTRANSCRIBE = 1;
-const TRANSCRIBER_GOOGLECLOUDSPEECH = 2;
-const TRANSCRIBER_GOOGLECHROME = 3;
-const TRANSCRIBER_AMAZONSTREAMING =4;
+const TRANSCRIBER_OPEN = 1;
+
 
 const M_TOPICLEVEL_CUSTOM =1;
 const M_TOPICLEVEL_COURSE =0;
@@ -127,6 +136,7 @@ const M_LANG_DEDE = 'de-DE';
 const M_LANG_ITIT = 'it-IT';
 const M_LANG_PTBR = 'pt-BR';
 const M_LANG_DADK = 'da-DK';
+const M_LANG_FILPH = 'fil-PH';
 const M_LANG_KOKR = 'ko-KR';
 const M_LANG_HIIN = 'hi-IN';
 const M_LANG_ARAE ='ar-AE';
@@ -152,6 +162,11 @@ const M_LANG_NBNO ='nb-NO';
 const M_LANG_PLPL ='pl-PL';
 const M_LANG_RORO ='ro-RO';
 const M_LANG_SVSE ='sv-SE';
+
+const M_LANG_UKUA ='uk-UA';
+const M_LANG_EUES ='eu-ES';
+const M_LANG_FIFI ='fi-FI';
+const M_LANG_HUHU ='hu-HU';
 
 const M_HIDDEN_PLAYER = 'mod_solo_hidden_player';
 const M_HIDDEN_PLAYER_BUTTON = 'mod_solo_hidden_player_button';

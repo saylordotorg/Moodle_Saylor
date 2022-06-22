@@ -91,7 +91,7 @@ define(['jquery',
           sentences[i].sentence=quizhelper.cleanText(sentences[i].sentence);
       }
 
-      var theCallback = async function(message) {
+      var theCallback = function(message) {
 
         switch (message.type) {
           case 'recording':
@@ -127,7 +127,7 @@ define(['jquery',
             //this is an expensive call since it goes out to the server and possibly to the cloud
             if(!matched) {
               for (x = 0; x < sentences.length; x++) {
-                var similarity = await quizhelper.checkByPhonetic(sentences[x].sentence, spoken, sentences[x].phonetic, itemdata.language);
+                var similarity = quizhelper.checkByPhonetic(sentences[x].sentence, spoken, sentences[x].phonetic, itemdata.language);
                 if (!similarity || similarity < app.passmark) {
                   //keep looking
                 } else {
@@ -142,7 +142,7 @@ define(['jquery',
             //we do not do a passage match check , but this is how we would ..
               if(!matched ) {
                 for (x = 0; x < sentences.length; x++) {
-                  var ajaxresult = await quizhelper.comparePassageToTranscript(sentences[x].sentence, spoken, sentences[x].phonetic, itemdata.language);
+                  var ajaxresult = quizhelper.comparePassageToTranscript(sentences[x].sentence, spoken, sentences[x].phonetic, itemdata.language);
                   var result = JSON.parse(ajaxresult);
                   var haserror=false;
                   for (var i=0;i<result.length;i++){

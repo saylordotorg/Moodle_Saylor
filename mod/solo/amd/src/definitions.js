@@ -36,6 +36,8 @@ This file contains class and ID definitions.
         smallreportplaceholderspinner: 'mod_solo_placeholderspinner',
         cloudpoodllurl: 'https://cloud.poodll.com',
         //cloudpoodllurl: 'http://localhost/moodle',
+        grammarsuggestionscont: 'mod_solo_corrections_cont',
+        checkgrammarbutton: 'mod_solo_checkgrammarbutton'
 
     };//end of return value
 });

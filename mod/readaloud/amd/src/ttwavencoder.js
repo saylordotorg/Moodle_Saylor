@@ -31,12 +31,13 @@ define(['jquery', 'core/log'], function ($, log) {
                 nCh = this.numChannels,
                 view = new DataView(new ArrayBuffer(len * nCh * 2)),
                 offset = 0;
-            for (var i = 0; i < len; ++i)
+            for (var i = 0; i < len; ++i) {
                 for (var ch = 0; ch < nCh; ++ch) {
                     var x = buffer[ch][i] * 0x7fff;
                     view.setInt16(offset, x < 0 ? Math.max(x, -0x8000) : Math.min(x, 0x7fff), true);
                     offset += 2;
                 }
+            }
             this.dataViews.push(view);
             this.numSamples += len;
         },

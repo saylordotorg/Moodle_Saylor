@@ -150,6 +150,8 @@ class passage_renderer extends \plugin_renderer_base {
     }
 
     public function render_passage($passage,$language,  $containerclass=false, $extraclasses=false) {
+        global $DB;
+        $moduleinstance  = $DB->get_record('readaloud', array('id' => $this->page->cm->instance), '*', MUST_EXIST);
 
         // load the HTML document
         $doc = new \DOMDocument;
@@ -227,11 +229,15 @@ class passage_renderer extends \plugin_renderer_base {
         //for some languages we do not want spaces. Japanese, Chinese. For now this is manual
         //TODO auto determine when to use collapsespaces
         $extraclasses = $extraclasses ?  ' ' . $extraclasses : '';
+        $attributes = [];
+        if(!empty($moduleinstance->customfont)){
+            $attributes['style']="font-family: '$moduleinstance->customfont', serif;";
+        }
         //there should no longer be different container classes. remove this soon: Justin 2020-5-31
         if($containerclass) {
-            $ret = \html_writer::div($usepassage, $containerclass . $extraclasses);
+            $ret = \html_writer::div($usepassage, $containerclass . $extraclasses, $attributes);
         }else{
-            $ret = \html_writer::div($usepassage,  constants::M_PASSAGE_CONTAINER . $extraclasses);
+            $ret = \html_writer::div($usepassage,  constants::M_PASSAGE_CONTAINER . $extraclasses,$attributes);
         }
         return $ret;
     }

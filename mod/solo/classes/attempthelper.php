@@ -70,21 +70,22 @@ class attempthelper
         if(!$userid){
             $userid = $USER->id;
         }
-
+        $totalsteps = utils::fetch_total_step_count($this->mod,$this->context);
         $attempts = $DB->get_records(constants::M_ATTEMPTSTABLE,
                 array(constants::M_MODNAME => $this->mod->id,'userid'=>$userid),
                 'id DESC');
 
         if($attempts){
+
             foreach ($attempts as $attempt){
-                if($attempt->completedsteps==constants::STEP_SELFTRANSCRIBE ||$attempt->completedsteps==constants::STEP_MODEL){
+                if($attempt->completedsteps>=$totalsteps){
                     return $attempt;
                 }
             }
         }else{
             return false;
         }
-           }
+    }
 
     public function fetch_latest_attempt($userid=false){
         global $DB, $USER;
@@ -113,6 +114,23 @@ class attempthelper
                 array('id'=>$attemptid, 'solo'=>$this->mod->id,'completedsteps'=>constants::STEP_SELFTRANSCRIBE),
                 'timemodified DESC');
         return $attempt;
+    }
+
+    //Delete an attempt
+    public function delete_attempt($attemptid) {
+        global $DB;
+
+        //delete stats for this attempt (why check it exists?)
+        $oldstats =$DB->get_record(constants::M_STATSTABLE,
+            array('solo'=>   $this->mod->id,'attemptid'=>$attemptid));
+        if($oldstats) {
+            $DB->delete_records(constants::M_STATSTABLE, array('id'=>$oldstats->id));
+        }
+        //delete AI data for this attempt
+        $DB->delete_records(constants::M_AITABLE, array('attemptid'=>$attemptid));
+        //delete Attempt
+        $DB->delete_records(constants::M_ATTEMPTSTABLE, array('id'=>$attemptid));
+
     }
 
 
@@ -170,61 +188,37 @@ class attempthelper
 
             //type specific settings
             switch($data->activitytype) {
-                case constants::STEP_USERSELECTIONS:
+                case constants::STEP_PREPARE:
                     $newattempt->topictargetwords = $this->mod->targetwords;
                     break;
 
-                case constants::STEP_AUDIORECORDING:
+                case constants::STEP_MEDIARECORDING:
+
                     $rerecording = $attempt && $newattempt->filename
                         && $attempt->filename != $newattempt->filename;
+                    $transcribestep = utils::fetch_step_no($this->mod,constants::M_STEP_TRANSCRIBE);
+                    $recordstep = utils::fetch_step_no($this->mod,constants::M_STEP_RECORD);
+                    $audio_before_transcription = $recordstep < $transcribestep && $transcribestep!==false;
 
                     //if rerecording we want to clear old AI data out
                     //as well as self transcript and force us back to self transcript
                     if($rerecording) {
                         utils::clear_ai_data($this->mod->id, $newattempt->id);
-                        utils::remove_stats($newattempt);
-                        $newattempt->selftranscript="";
+                        if($audio_before_transcription){
+                            utils::remove_stats($newattempt);
+                            $newattempt->selftranscript = "";
+                        }
                         $newattempt->completedsteps = $step;
                     }
                     //if rerecording, or we are in "new" mode (first recording) we register our AWS task
                     if($rerecording || !$edit){
-                        utils::register_aws_task($this->mod->id, $newattempt->id, $this->context->id);
+                        utils::register_aws_task($this->mod->id, $newattempt->id, $this->context->id, $this->cm->id);
                     }
 
 
                     break;
                 case constants::STEP_SELFTRANSCRIBE:
-                    //if the user has altered their self transcript, we ought to recalc all the stats and ai data
-                    $st_altered = $attempt && $newattempt->selftranscript
-                        && $attempt->selftranscript != $newattempt->selftranscript;
-                    if($st_altered) {
-                        $stats = utils::calculate_stats($newattempt->selftranscript, $attempt, $this->mod->ttslanguage);
-                        if ($stats) {
-                            $stats = utils::fetch_sentence_stats($newattempt->selftranscript,$stats, $this->mod->ttslanguage);
-                            $stats = utils::fetch_word_stats($newattempt->selftranscript,$this->mod->ttslanguage,$stats);
-                            $stats = utils::calc_grammarspell_stats($newattempt->selftranscript,$this->mod->region,
-                                $this->mod->ttslanguage,$stats);
-
-                            utils::save_stats($stats, $attempt);
-                        }
-
-                        //If this is English then lets see if we can get a grammar correction
-                        if(!empty($newattempt->selftranscript) && $this->is_english()){
-                            $siteconfig = get_config(constants::M_COMPONENT);
-                            $token= utils::fetch_token($siteconfig->apiuser,$siteconfig->apisecret);
-                            $grammarcorrection = utils::fetch_grammar_correction($token, $this->mod->region, $newattempt->selftranscript);
-                            if($grammarcorrection){
-                                $newattempt->grammarcorrection=$grammarcorrection;
-                            }
-                        }
-
-                        //recalculate AI data, if the selftranscription is altered AND we have a jsontranscript
-                        if($attempt->jsontranscript){
-                            $passage = $newattempt->selftranscript;
-                            $aitranscript = new \mod_solo\aitranscript($attempt->id, $this->context->id,$passage,$attempt->transcript, $attempt->jsontranscript);
-                            $aitranscript->recalculate($passage,$attempt->transcript, $attempt->jsontranscript);
-                        }
-                    }
+                    //do nothing much at this point
                     break;
                 case constants::STEP_MODEL:
                 default:
@@ -243,7 +237,9 @@ class attempthelper
             }
 
             //if we just finished the last step then lets indicate this activity complete in the Moodle sense.
-            if($step==constants::STEP_FINAL){
+            $totalsteps= utils::fetch_total_step_count($this->mod,$this->context);
+
+            if($step==$totalsteps){
                 //notify completion handler that we are finished
                 $completion=new \completion_info($this->course);
                 if($completion->is_enabled($this->cm) && $this->mod->completionallsteps) {
@@ -262,20 +258,16 @@ class attempthelper
 
     }
 
-    public function is_english(){
-        switch($this->mod->ttslanguage){
-            case constants::M_LANG_ENUS:
-            case constants::M_LANG_ENAB:
-            case constants::M_LANG_ENGB:
-            case constants::M_LANG_ENIE:
-            case constants::M_LANG_ENWL:
-            case constants::M_LANG_ENIN:
-                return true;
-
-            default;
-                return false;
+    public function has_modelanswer(){
+        if(!empty(trim($this->mod->modelytid))) {return true;}
+        if(!empty(trim($this->mod->modeliframe))) {return true;}
+        if(!empty(trim($this->mod->modeltts))) {return true;}
+        $itemid=0;
+        $filearea='modelmedia';
+        $mediaurls = utils::fetch_media_urls($this->context->id,$filearea,$itemid);
+        if($mediaurls && count($mediaurls)>0) {
+            return true;
         }
+        return false;
     }
-
-
 }//end of class

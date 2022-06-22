@@ -1,0 +1,14 @@
+<a class="mod_solo_checkgrammarbutton" href="#">{{#str}}checkgrammarandspelling, mod_solo{{/str}}</a>
+<div id='mod_solo_corrections_cont' class='mod_solo_corrections_cont'>
+
+</div>
+
+{{#js}}
+    require([
+    "jquery",
+    "core/log",
+    "mod_solo/grammarsuggestions",
+    ], function ($,log,grammarsuggestions) {
+        grammarsuggestions.init({{activityid}});
+    });
+{{/js}}

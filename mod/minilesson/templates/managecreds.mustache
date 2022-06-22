@@ -2,7 +2,10 @@
     <!-- If API user then show a link + js to poke creds in -->
     {{#apiuser}}<a href="#" class="cloudpoodll_poke_creds">{{#str}}fillcredentials, mod_minilesson{{/str}}</a>{{/apiuser}}
     <!-- if no API user then the user sees a link to a page which will allow them to take a free trial -->
-    {{^apiuser}}<a href="{{{apppath}}}/fetchcbpage.php" target="_blank">{{#str}}freetrial, mod_minilesson{{/str}} [&#x2197;]</a>{{/apiuser}}
+    {{^apiuser}}
+        <a href="https://poodll.com/try-poodll" target="_blank">{{#str}}freetrial, mod_minilesson{{/str}} [&#x2197;]</a>
+        <!-- a href="{{{apppath}}}/fetchcbpage.php" target="_blank">{{#str}}freetrial, mod_minilesson{{/str}} [&#x2197;]</a -->
+    {{/apiuser}}
 </div>
 {{^element.frozen}}
     {{#js}}

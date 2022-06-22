@@ -1,5 +1,11 @@
-Version 1.0.41(Build 202205XXXX)
- -added some styling to text block in content area
+Version 1.0.42(Build 2022060500)
+ - Added better free trial link
+ -Rebuilt JS for < M3.8
+
+Version 1.0.41(Build 2022053100)
+ - added some styling to text block in content area
+ - added an option to confirm submission in multichoice
+ - added a quiz container width setting (compact, wide or full)
 
 Version 1.0.40(Build 2022050200)
 - Removed JQuery UI which was breaking Moodle 4.0 dock

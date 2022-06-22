@@ -55,7 +55,8 @@ class backup_solo_activity_structure_step extends backup_activity_structure_step
             'topicytid','topicytstart','topicytend','modeltts','modelttsvoice','modeliframe','modelytid','modelytstart','modelytend',
             'ttslanguage','recorderskin','recordertype','enableai','enabletranscribe','expiredays','region','transcriber','multiattempts',
                 'enabletranscription','enablesharing','enableautograde','gradewordgoal','autogradeoptions','completionallsteps',
-                'postattemptedit','foriframe','timecreated','timemodified','viewstart','viewend'
+                'postattemptedit','step2','step3','step4','step5','foriframe','timecreated','timemodified','viewstart','viewend',
+            'enablesuggestions','enabletts'
 			));
 
         // attempt

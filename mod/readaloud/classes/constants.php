@@ -250,5 +250,11 @@ class constants {
     const M_PUSH_GRADESETTINGS = 8;
 
     const M_USE_DATATABLES=true;
+
+    const M_STANDARD_FONTS = ["Arial", "Arial Black", "Verdana", "Tahoma", "Trebuchet MS", "Impact",
+        "Times New Roman", "Didot", "Georgia", "American Typewriter", "Andalé Mono", "Courier",
+        "Lucida Console", "Monaco", "Bradley Hand", "Brush Script MT", "Luminari", "Comic Sans MS"];
+
+    const M_GOOGLE_FONTS = ["Andika"];
   
 }

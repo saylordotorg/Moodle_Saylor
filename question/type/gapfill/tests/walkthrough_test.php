@@ -38,12 +38,15 @@ require_once($CFG->dirroot . '/question/type/gapfill/tests/helper.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class walkthrough_test extends \qbehaviour_walkthrough_test_base {
-
+    /**
+     * This checks that the bug from line 130 of questiontype is fixed
+     * that line should read
+     * if (!in_array($a->answer, $question->allanswers,true)) {
+     * Without the final true only one draggable will display
+     *
+     * @covers ::not_exctly_sure()
+     */
     public function test_draggable_items() {
-        /* This checks that the bug from line 130 of questiontype is fixed
-          that line should read
-          if (!in_array($a->answer, $question->allanswers,true)) {
-          Without the final true only one draggable will display */
         $questiontext = "[1.0] [1.00]";
         $options = [
             'disableregex' => 1,
@@ -58,7 +61,11 @@ class walkthrough_test extends \qbehaviour_walkthrough_test_base {
         $this->check_output_contains('1.0');
         $this->check_output_contains('1.00');
     }
-
+    /**
+     * Confirm data for mobile app is in page
+     *
+     * @covers ::app_connect()
+     */
     public function test_app_connect() {
         global $PAGE;
 
@@ -72,7 +79,11 @@ class walkthrough_test extends \qbehaviour_walkthrough_test_base {
         $html = $renderer->app_connect($gapfill, 'randomstring');
         $this->assertStringContainsString('gapfill_singleuse', $html, ' missing gapfill singleuse tag');
     }
-
+    /**
+     * Confirm dropdowns appear
+     *
+     * @covers ::render_question()
+     */
     public function test_dropdowns() {
         $questiontext = "The [cat] sat on the [mat]";
         $options = [
@@ -87,7 +98,11 @@ class walkthrough_test extends \qbehaviour_walkthrough_test_base {
         $this->assertStringContainsString('select type', $html, ' missing select tags tag');
     }
 
-
+    /**
+     * Deferred feedback q behaviour
+     *
+     * @covers ::not_entirely_sure()
+     */
     public function test_deferred_feedback_unanswered() {
 
         // Create a gapfill question.
@@ -117,7 +132,11 @@ class walkthrough_test extends \qbehaviour_walkthrough_test_base {
         $this->check_current_state(\question_state::$gaveup);
         $this->check_current_mark(null);
     }
-
+    /**
+     * Deferred q behaviour with correct response
+     *
+     * @covers ::no_idea()
+     */
     public function test_deferred_with_correct() {
         // Create a gapfill question.
         $gapfill = helper::make_question();
@@ -139,7 +158,12 @@ class walkthrough_test extends \qbehaviour_walkthrough_test_base {
         $this->check_current_mark(2);
         $this->quba->finish_all_questions();
     }
-
+    /**
+     * Deferred feedback q behaviour
+     * with incorrect response
+     *
+     * @covers ::not_entirely_sure()
+     */
     public function test_deferred_with_incorrect() {
 
         // Create a gapfill question.
@@ -161,15 +185,15 @@ class walkthrough_test extends \qbehaviour_walkthrough_test_base {
         $this->check_current_state(\question_state::$gradedwrong);
         $this->check_current_mark(0);
     }
-
+    /**
+     * Tests a feature introduced with Gapfill 1.8 where
+     * the | operator will be recognised as a separator for
+     * multiple options when regex is turned off. Useful where
+     * the answers contain characters considered special by
+     * the regex parser.
+     * @covers ::not_entirely_sure()
+     */
     public function test_no_regex_or() {
-        /* Tests a feature introduced with Gapfill 1.8 where
-         * the | operator will be recognised as a separator for
-         * multiple options when regex is turned off. Useful where
-         * the answers contain characters considered special by
-         * the regex parser.
-         */
-
         $questiontext = "A programming question with multiple
                 correct answers to a single field
                 [getSize();| printSize();| 7/2]. The handling of
@@ -193,7 +217,11 @@ class walkthrough_test extends \qbehaviour_walkthrough_test_base {
         $this->check_current_state(\question_state::$gradedright);
         $this->check_current_mark(1);
     }
-
+    /**
+     * Deferred q behaviour with partially correct response
+     *
+     * @covers ::no_idea()
+     */
     public function test_deferred_with_partially_correct() {
 
         // Create a gapfill question.
@@ -215,7 +243,11 @@ class walkthrough_test extends \qbehaviour_walkthrough_test_base {
         $this->check_current_state(\question_state::$gradedpartial);
         $this->check_current_mark(1);
     }
-
+    /**
+     * Deferred q behaviour with blank/empty gaps
+     *
+     * @covers ::no_idea()
+     */
     public function test_deferred_with_blanks() {
         // Create a gapfill question.
         $questiontext = "The [cat] sat on the [mat]";
@@ -232,13 +264,16 @@ class walkthrough_test extends \qbehaviour_walkthrough_test_base {
         $this->check_current_state(\question_state::$gradedpartial);
         $this->check_current_mark(1);
     }
-
+    /**
+     * Testing extended characters, including a word that ends with an accent
+     * there were issues using strtolower which only works with plain ascci.
+     * This has been replaced with Moodles own core_text::strtolower($answergiven,'UTF-8');
+     * A full test would include regex on and off and case sensitivity on and off
+     *
+     * @covers  ::all_grading_methods()
+     */
     public function test_extended_characters() {
-        /* Testing extended characters, including a word that ends with an accent
-         * there were issues using strtolower which only works with plain ascci.
-         * This has been replaced with Moodles own core_text::strtolower($answergiven,'UTF-8');
-         * A full test would include regex on and off and case sensitivity on and off
-         */
+
         $questiontext = "Moscow is the capital of [Россия], The French word for boy is [garçon]. A word that
                 ends with an accent is [andrà]  ";
         $gapfill = helper::make_question( $questiontext);
@@ -254,7 +289,11 @@ class walkthrough_test extends \qbehaviour_walkthrough_test_base {
         $this->check_current_state(\question_state::$gradedright);
         $this->check_current_mark(3);
     }
-
+    /**
+     * Interactive q behaviour with correct responses
+     *
+     * @covers ::no_idea()
+     */
     public function test_interactive_with_correct() {
 
         // Create a gapfill question.
@@ -307,6 +346,11 @@ class walkthrough_test extends \qbehaviour_walkthrough_test_base {
         $this->quba->finish_all_questions();
         $this->check_current_state(\question_state::$gradedright);
     }
+    /**
+     * suppressing linting
+     *
+     * @covers ::no_idea()
+     */
     public function test_interactive_wildcard_with_correct() {
         // Create a gapfill question.
         $questiontext = " The [cat|dog] sat on the [mat] ";
@@ -368,6 +412,11 @@ class walkthrough_test extends \qbehaviour_walkthrough_test_base {
         // Finish the attempt.
     }
 
+    /**
+     * suppressing linting
+     *
+     * @covers ::no_idea()
+     */
     public function test_disableregex() {
         $questiontext = 'for([$i]=0;$<10;$i++)';
         $options = [
@@ -389,7 +438,11 @@ class walkthrough_test extends \qbehaviour_walkthrough_test_base {
         $this->check_current_mark(1);
         $this->quba->finish_all_questions();
     }
-
+    /**
+     * suppressing linting
+     *
+     * @covers ::no_idea()
+     */
     public function test_interactive_discard_duplicates() {
         /* this is for the scenario where you have multiple fields
          * and each field could take any value. The marking is designed
@@ -437,7 +490,11 @@ What are the colors of the Olympic medals?
         $this->check_current_mark(2);
         $this->check_step_count(2);
     }
-
+    /**
+     * suppressing linting
+     *
+     * @covers ::no_idea()
+     */
     public function test_no_duplicate_draggables() {
         $qtext = 'Bicycles have [wheels]. Cars have [wheels|engines].';
         $gapfill = helper::make_question($qtext);
@@ -445,6 +502,11 @@ What are the colors of the Olympic medals?
         // Confirm draggables are unique, i.e. wheels appears only once.
         $this->assertEquals(2, count($gapfill->allanswers));
     }
+    /**
+     * suppressing linting
+     *
+     * @covers ::no_idea()
+     */
     public function test_get_letter_hints() {
         $gapfill = helper::make_question();
         $gapfill->hints = [
@@ -468,6 +530,11 @@ What are the colors of the Olympic medals?
         /* add another letter of the correct answer */
         $this->assertEquals($hint['value'], 'ca');
     }
+    /**
+     * suppressing linting
+     *
+     * @covers ::no_idea()
+     */
     public function test_interactive_grade_for_blank() {
         /* this is for the scenario where you have multiple fields
          * and each field could take any value. The marking is designed
@@ -536,7 +603,11 @@ What are the colors of the Olympic medals?
 
         $this->quba->finish_all_questions();
     }
-
+    /**
+     * suppressing linting
+     *
+     * @covers ::no_idea()
+     */
     public function test_matching_divs() {
         $questiontext = "The [cat] sat on the [mat]";
         // Defaults to optionsaftertext being false.
@@ -557,6 +628,11 @@ What are the colors of the Olympic medals?
         $divends = substr_count($html, "</div>");
         $this->assertEquals($divstarts, $divends, ' Mismatch in opening and closing div tags');
     }
+    /**
+     * suppressing linting
+     *
+     * @covers ::no_idea()
+     */
     public function test_get_aftergap_text() {
         $questiontext = "The [cat] sat on the [mat]";
         $gapfill = helper::make_question( $questiontext);
@@ -574,6 +650,11 @@ What are the colors of the Olympic medals?
         $this->assertStringNotContainsString("[mat]", $html );
 
     }
+    /**
+     * suppressing linting
+     *
+     * @covers ::no_idea()
+     */
     public function test_deferred_grade_for_blank() {
         /* this is for the scenario where you have multiple fields
          * and each field could take any value. The marking is designed
@@ -612,7 +693,11 @@ What are the colors of the Olympic medals?
         $this->check_current_state(\question_state::$gradedright);
         $this->quba->finish_all_questions();
     }
-
+    /**
+     * suppressing linting
+     *
+     * @covers ::no_idea()
+     */
     public function test_immediatefeedback_with_correct() {
 
         // Create a gapfill question.
@@ -643,6 +728,11 @@ What are the colors of the Olympic medals?
         $this->check_current_mark(2);
         // Finish the attempt.
     }
+    /**
+     * suppressing linting
+     *
+     * @covers ::no_idea()
+     */
     public function test_get_gapsize() {
         $gapfill = helper::make_question( "");
         $this->assertEquals($gapfill->get_size("one"), 3);

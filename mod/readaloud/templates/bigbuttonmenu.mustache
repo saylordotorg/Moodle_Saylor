@@ -34,4 +34,13 @@
             </div>
         </div>
     </div>
+    <div>
+        <div id='mod_readaloud_button_startquiz' class='mode-chooser quiz {{#noquiz}}no-show{{/noquiz}}' {{^noquiz}}tabindex='0'{{/noquiz}}>
+            <div class='mode-chooser-label'>
+                <b>{{#str}}quiz , mod_readaloud{{/str}}</b>:
+                {{#str}}quizhelp , mod_readaloud{{/str}}
+                {{#quizcompleted}}<span class="mod_readaloud_menubutton_warning">{{#str}}quizcompletedwarning , mod_readaloud{{/str}}</span>{{/quizcompleted}}
+            </div>
+        </div>
+    </div>
 </div>

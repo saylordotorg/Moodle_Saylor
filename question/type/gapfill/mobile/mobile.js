@@ -59,9 +59,8 @@ var result = {
             var i;
             for (i = 0; i < draggables.length; i++) {
                 // If singleuse is set some fields may be hidden .
-               draggables[i].classList.remove('hide');
-              /* Optionsaftertext reference is to stop the listener being applied twice */
-                if (draggables[i].id && !this.question.optionsaftertext) {
+                draggables[i].classList.remove('hide');
+                if (draggables[i].id) {
                     draggables[i].addEventListener('click', function() {
                         self.LastItemClicked = pickAnswerOption(draggables, event);
                     });

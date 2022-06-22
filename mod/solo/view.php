@@ -91,19 +91,16 @@ if($config->enablesetuptab && empty($moduleinstance->speakingtopic)){
 $start_or_continue=false;
 if(count($attempts)==0){
     $start_or_continue=true;
-    $nextstep = constants::STEP_USERSELECTIONS;
+    $nextstep = 1;
     $attemptid = 0;
 } elseif($reattempt==1){
     $start_or_continue=true;
-    $nextstep = constants::STEP_USERSELECTIONS;
+    $nextstep = 1;
     $attemptid = 0;
 }else{
     $latestattempt = $attempt = $attempthelper->fetch_latest_attempt();
-    if(utils::has_modelanswer($moduleinstance, $context)){
-        $totalsteps=4;
-    }else{
-        $totalsteps=3;
-    }
+    $totalsteps = utils::fetch_total_step_count($moduleinstance,$context);
+
     if ($latestattempt && $latestattempt->completedsteps < $totalsteps){
         $start_or_continue=true;
         $nextstep=$latestattempt->completedsteps+1;
@@ -114,11 +111,12 @@ if(count($attempts)==0){
 //either redirect to a form handler for the attempt step, or show our attempt summary
 if($start_or_continue) {
     $redirecturl = new moodle_url(constants::M_URL . '/attempt/manageattempts.php',
-            array('id'=>$cm->id, 'attemptid' => $attemptid, 'type' => $nextstep));
+            array('id'=>$cm->id, 'attemptid' => $attemptid, 'stepno' => $nextstep));
     redirect($redirecturl);
 
 
 }else{
+
 
     //if we need datatables we need to set that up before calling $renderer->header
     $tableid = '' . constants::M_CLASS_ITEMTABLE . '_' . '_opts_9999';
@@ -131,30 +129,13 @@ if($start_or_continue) {
 
     $attempt = $attempthelper->fetch_latest_complete_attempt();
     $stats=false;
+
+
     if($attempt) {
-        $requiresgrading = ($attempt->grade==0 && $attempt->manualgraded==0);
-        //try to pull transcripts if we have none. Why wait for cron?
-        $hastranscripts = !empty($attempt->jsontranscript);
-        if(!$hastranscripts){
-            $attempt_with_transcripts = utils::retrieve_transcripts_from_s3($attempt);
-            $hastranscripts = $attempt_with_transcripts !==false;
-            if($hastranscripts && !empty($attempt->selftranscript)){
-                $autotranscript=$attempt_with_transcripts->transcript;
-                $aitranscript = new \mod_solo\aitranscript($attempt_with_transcripts->id,
-                        $context->id, $attempt->selftranscript,
-                        $attempt_with_transcripts->transcript,
-                        $attempt_with_transcripts->jsontranscript);
-                $attempt = $attempthelper->fetch_latest_complete_attempt();
-            }
-        }
+        //do all the processing (grades, diffs, etc) if needed and return the attempt
+        $attempt = utils::process_attempt($moduleinstance,$attempt,$context->id,$cm->id);
 
         $stats=utils::fetch_stats($attempt,$moduleinstance);
-        //if we have an ungraded activity, lets grade it
-        if($requiresgrading) {
-            utils::autograde_attempt($attempt->id, $stats);
-        }
-
-
         $aidata = $DB->get_record(constants::M_AITABLE,array('attemptid'=>$attempt->id));
 
 
@@ -178,16 +159,15 @@ if($start_or_continue) {
             }
             echo $attempt_renderer->show_teachereval($rubricresults,$feedback,$evaluator);
             $autotranscriptready=true;
-            echo $attempt_renderer->show_summarypassageandstats($attempt,$aidata, $stats,$autotranscriptready);
+            $selftranscribe = utils::fetch_step_no($moduleinstance, constants::STEP_SELFTRANSCRIBE) !==false;
+            echo $attempt_renderer->show_summarypassageandstats($attempt,$aidata, $stats,$autotranscriptready,$selftranscribe);
 
-        }else if($attempt){
+        }elseif($attempt){
             echo $attempt_renderer->show_placeholdereval($attempt->id);
             $autotranscriptready=false;
             //we decided to make it real obvious if the reslt was not ready yet
             //echo $attempt_renderer->show_summarypassageandstats($attempt,$aidata, $stats,$autotranscriptready);
         }
-
-
 
         //myreports
        // echo $attempt_renderer->show_myreports($moduleinstance,$cm);
@@ -205,12 +185,20 @@ if($start_or_continue) {
         $tdata->reattempturl=$reattempturl->out();
     }
     if($attempt) {
-
+        //we no longer allow post attempt edit, they just have to take another attempt
+        /*
         if ($moduleinstance->postattemptedit || has_capability('mod/solo:manageattempts', $context)) {
+            //if they are going back in to edit then, to what step should we take them?
+            if($moduleinstance->step3 != constants::M_STEP_MODEL && $moduleinstance->step3 != constants::M_STEP_NONE){
+                $editstep= 3;
+            }else{
+                $editstep= 2;
+            }
             $postattemptediturl = new \moodle_url('/mod/solo/attempt/manageattempts.php',
-                    array('id' => $cm->id, 'attemptid' => $attempt->id, 'type' => constants::STEP_SELFTRANSCRIBE));
+                    array('id' => $cm->id, 'attemptid' => $attempt->id, 'stepno' => $editstep));
             $tdata->postattemptediturl=$postattemptediturl->out();
         }
+        */
     }
     //show back to course button if we are not in an LTI window
     if(!$config->enablesetuptab) {
@@ -218,6 +206,7 @@ if($start_or_continue) {
         $tdata->backtocourse = true;
     }
 
-    echo $renderer->render_from_template(constants::M_COMPONENT . '/postattemptbuttons', $tdata);
+   echo $renderer->render_from_template(constants::M_COMPONENT . '/postattemptbuttons', $tdata);
+
 }
 echo $renderer->footer();

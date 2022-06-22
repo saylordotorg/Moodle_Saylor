@@ -247,7 +247,7 @@ $string['ms-my'] = 'Malay';
 $string['pt-pt'] = 'Portuguese (PT)';
 $string['ru-ru'] = 'Russian';
 $string['ta-in'] = 'Tamil';
-$string['te-in'] = 'Telegu';
+$string['te-in'] = 'Telugu';
 $string['tr-tr'] = 'Turkish';
 
 $string['uk-ua'] = 'Ukranian';
@@ -440,6 +440,7 @@ $string['previewhelp'] = "Listen to a speaker read the passage aloud. You do not
 $string['normalhelp'] = "Read the passage aloud. Speak at a speed that is natural for you.";
 $string['shadowhelp'] = "Read the passage aloud, along with the teacher. You should wear headphones.";
 $string['landrhelp'] = "Listen to the speaker. Repeat after each sentence and check your pronunciation.";
+$string['quizhelp'] = "Read the passage silently. Then answer the questions about the passafe.";
 $string['playbutton'] = "Play";
 $string['stopbutton'] = "Stop";
 
@@ -530,6 +531,7 @@ $string['avgtotaltime'] = 'Av. Duration';
 $string['nodataavailable'] = 'No data available';
 $string['quiz'] = 'Quiz';
 $string['waiting']='-- waiting --';
+$string['quizcompletedwarning'] = "Quiz completed. Tap to review.";
 
 
 $string['notmasterinstance']='You can not push passage or alternatives unless master instance is checked in activity settings.';
@@ -635,6 +637,11 @@ $string['oralreadingscore_p'] = 'Oral Reading Score(%)';
 $string['reportsmenutoptext']="Review attempts onn ReadAloud activities using the reports below.";
 $string['courseattempts_explanation']="All the attempts on ReadAloud activities within this course";
 $string['attemptssummary_explanation']="A summary of ReadAloud attempts per user in this activity.";
+
+$string['customfont']="Custom font";
+$string['customfont_help']="A font name that will override site default for this passage when displayed. Must be exact in spelling and case. eg Andika or Comic Sans MS";
+$string['advancedheader']="Advanced";
+
 
 
 

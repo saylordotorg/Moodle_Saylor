@@ -166,7 +166,7 @@ define(['jquery', 'core/log', 'core/ajax', 'mod_readaloud/definitions', 'mod_rea
           if (oldbreak.breaknumber == breaks[breaks.length - 1].breaknumber) {
             self.controls.finishedbutton.show();
             self.controls.skipbutton.hide();
-            self.oldBreak.isfinalbreak=true
+            self.oldBreak.isfinalbreak=true;
           } else {
             self.controls.finishedbutton.hide();
             self.controls.skipbutton.show();
@@ -178,7 +178,7 @@ define(['jquery', 'core/log', 'core/ajax', 'mod_readaloud/definitions', 'mod_rea
           }));
         }
 
-      }
+      };
 
     },
 
@@ -224,7 +224,7 @@ define(['jquery', 'core/log', 'core/ajax', 'mod_readaloud/definitions', 'mod_rea
           log.debug('mak audio time', self.mak.get_audio_time());
           log.debug('self current audio end', self.currentAudioEnd);
           if(self.mak.get_audio_time() > self.currentAudioEnd+.1){
-            self.mak.set_audio_time(self.currentAudioEnd+.1)
+            self.mak.set_audio_time(self.currentAudioEnd+.1);
           }
             self.mak.play_audio();
         }
@@ -263,9 +263,9 @@ define(['jquery', 'core/log', 'core/ajax', 'mod_readaloud/definitions', 'mod_rea
         }
         $(".mod_readaloud_modal_target_word[data-index='" + idx + "']").addClass(thisClass);
         if(comparison.length == wordsmatched){
-            setTimeout(function(){self.controls.skipbutton.trigger('click')},600);
+            setTimeout(function(){self.controls.skipbutton.trigger('click');},600);
         }
-      })
+      });
 
     },
     getComparison: function(cmid, passage, transcript,passagephonetic, callback) {
@@ -289,7 +289,7 @@ define(['jquery', 'core/log', 'core/ajax', 'mod_readaloud/definitions', 'mod_rea
           }
         },
         fail: function(err) {
-          console.log(err);
+          log.debug(err);
         }
       }]);
 

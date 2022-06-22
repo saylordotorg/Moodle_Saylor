@@ -31,6 +31,26 @@ define(['jquery', 'core/log'], function ($, log) {
                 var opts = JSON.parse(configcontrol.value);
                 log.debug(opts);
                 $(theid).remove();
+
+
+                if (opts['sessionerrors'] !== '') {
+                    this.options.suggestedwords = JSON.parse(opts['sessionerrors']);
+                } else {
+                    this.options.suggestedwords = {};
+                }
+                if (opts['sessionmatches'] !== '') {
+                    this.options.grammarmatches = JSON.parse(opts['sessionmatches']);
+                } else {
+                    this.options.grammarmatches  = {};
+                }
+
+
+            } else if(config.hasOwnProperty('sessionerrors') &&
+                config.hasOwnProperty('sessionmatches')){
+
+                    this.options.suggestedwords = JSON.parse(config['sessionerrors']);
+                    this.options.grammarmatches = JSON.parse(config['sessionmatches']);
+
             } else {
                 //if there is no config we might as well give up
                 log.debug('Corrections Markup js: No config found on page. Giving up.');
@@ -39,19 +59,6 @@ define(['jquery', 'core/log'], function ($, log) {
 
             //register the controls
             this.register_controls();
-
-
-            if (opts['sessionerrors'] !== '') {
-                this.options.suggestedwords = JSON.parse(opts['sessionerrors']);
-            } else {
-                this.options.suggestedwords = {};
-            }
-            if (opts['sessionmatches'] !== '') {
-                this.options.grammarmatches = JSON.parse(opts['sessionmatches']);
-            } else {
-                this.options.grammarmatches  = {};
-            }
-
 
             log.debug(this.options);
 

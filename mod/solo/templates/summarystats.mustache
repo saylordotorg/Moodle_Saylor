@@ -12,7 +12,9 @@
           <!-- <tr><td>{{#str}}stats_autogrammarscore, mod_solo{{/str}}</td><td>{{s.autogrammarscore}}%</td></tr> -->
           <!-- <tr><td>{{#str}}stats_autospellscore, mod_solo{{/str}}</td><td>{{s.autospellscore}}%</td></tr> -->
           <tr> <td>{{#str}}stats_targetwords, mod_solo{{/str}}</td><td>{{s.targetwords}}/{{s.totaltargetwords}}</td></tr>
-          <tr><td>{{#str}}stats_aiaccuracy, mod_solo{{/str}}</td><td>{{s.aiaccuracy}}%</td></tr>
+          {{#selftranscribe}}
+            <tr><td>{{#str}}stats_aiaccuracy, mod_solo{{/str}}</td><td>{{s.aiaccuracy}}%</td></tr>
+          {{/selftranscribe}}
           </tbody>
         </table>
     </div>

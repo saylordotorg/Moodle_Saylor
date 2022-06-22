@@ -89,7 +89,11 @@ class questiontype_test extends \advanced_testcase {
         return $q;
     }
 
-
+    /**
+     * Test the behaviour of save_question method.
+     *
+     * @covers ::save_question
+     */
     public function test_save_question() {
         $this->resetAfterTest();
         global $DB;
@@ -119,18 +123,42 @@ class questiontype_test extends \advanced_testcase {
         $this->assertEquals('mat', $answerfields[1]['value']);
         $this->qtype->get_question_options($question);
     }
+     /**
+      * Test the valuue returned by name  method.
+      *
+      * @covers ::name()
+      */
     public function test_name() {
         $this->assertEquals($this->qtype->name(), 'gapfill');
     }
 
+    /**
+     * Test response of can_analyse_responses
+     * Which determines if this question type can perform a frequency analysis of student responses.
+     *
+     *  If it returns true, it must implement the get_possible_responses method, and  question_definition class must
+     *  implement the classify_response method.
+     *
+     * @covers ::can_analyse_responses()
+     */
     public function test_can_analyse_responses() {
         $this->assertFalse($this->qtype->can_analyse_responses());
     }
 
-    public function test_squestionid_column_name() {
+    /**
+     * Test the valuue returned by questionid_column_name()
+     *
+     * @covers ::questionid_column_name()
+     */
+    public function test_questionid_column_name() {
         $this->assertEquals($this->qtype->questionid_column_name(), 'question');
     }
 
+    /**
+     * Test the valuue returned by extra_question_fields()
+     *
+     * @covers ::extra_question_fields()
+     */
     public function test_extra_question_fields() {
         $extraquestionfields = array('question_gapfill', 'answerdisplay', 'delimitchars',
             'casesensitive', 'noduplicates', 'disableregex', 'fixedgapsize', 'optionsaftertext', 'letterhints', 'singleuse');

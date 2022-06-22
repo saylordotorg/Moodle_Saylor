@@ -21,6 +21,7 @@ class multichoiceform extends baseform
             constants::LISTENORREAD,constants::LISTENORREAD_READ);
         $this->add_voiceoptions(constants::POLLYOPTION,get_string('choosevoiceoption',constants::M_COMPONENT),
             constants::LISTENORREAD,constants::LISTENORREAD_READ);
+        $this->add_confirmchoice(constants::CONFIRMCHOICE,get_string('confirmchoice_formlabel',constants::M_COMPONENT));
 
         $this->add_correctanswer();
         $this->add_textboxresponse(1,'answer1',true);

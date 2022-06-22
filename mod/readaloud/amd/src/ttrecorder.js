@@ -206,7 +206,7 @@ define(['jquery', 'core/log', 'mod_readaloud/ttaudiohelper', 'core/notification'
 
                     //div content WHEN?
                     that.controls.recorderbutton.html(that.recordBtnContent());
-                }
+                };
 
             },
 
@@ -341,14 +341,14 @@ define(['jquery', 'core/log', 'mod_readaloud/ttaudiohelper', 'core/notification'
                         callback(JSON.parse(oReq.response));
                     } else {
                         callback({data: {result: "error"}});
-                        console.error(oReq.error);
+                        log.debug(oReq.error);
                     }
                 };
                 try {
                     oReq.send(bodyFormData);
                 }catch(err){
                     callback({data: {result: "error"}});
-                    console.error(err);
+                    log.debug(err);
                 }
             },
 

@@ -28,40 +28,47 @@ use mod_solo\aitranscript;
  */
 class external extends external_api {
 
-    public static function toggle_topic_selected($topicid, $activityid) {
+    public static function check_grammar($text, $activityid) {
         global $DB, $USER;
 
-        $params = self::validate_parameters(self::toggle_topic_selected_parameters(), [
-            'topicid' => $topicid,
+        $params = self::validate_parameters(self::check_grammar_parameters(), [
+            'text' => $text,
             'activityid' => $activityid]);
         extract($params);
 
-        $topic = $DB->get_record(constants::M_TOPIC_TABLE, ['id' => $topicid], '*', MUST_EXIST);
         $mod = $DB->get_record(constants::M_TABLE, ['id' => $activityid], '*', MUST_EXIST);
-        if (!$topic || !$mod) {
-            return false;
-        }
-        $cm = get_coursemodule_from_instance(constants::M_MODNAME, $topic->moduleid, 0, false, MUST_EXIST);
-        $context = context_module::instance($cm->id);
-
-        self::validate_context($context);
-        if (!has_capability('mod/solo:selecttopics', $context)) {
-            return false;
+        if (!$mod) {
+            return "";
         }
 
-        $success = utils::toggle_topic_selected($topic->id, $mod->id);
-        return $success;
+        $siteconfig = get_config(constants::M_COMPONENT);
+        $token = utils::fetch_token($siteconfig->apiuser, $siteconfig->apisecret);
+        $suggestions = utils::fetch_grammar_correction($token,$mod->region,$mod->ttslanguage,$text);
+        if($suggestions==$text || empty($suggestions)){
+            return "";
+        }
+
+        //if we have suggestions, mark those up and return them
+        list($grammarerrors,$grammarmatches) = utils::fetch_grammar_correction_diff($text, $suggestions);
+        $markedupsuggestions = \mod_solo\aitranscriptutils::render_passage($suggestions,'corrections');
+        $ret = [];
+        $ret['grammarerrors'] = $grammarerrors;
+        $ret['grammarmatches'] = $grammarmatches;
+        $ret['suggestions'] = $markedupsuggestions;
+
+        return json_encode($ret);
+
     }
 
-    public static function toggle_topic_selected_parameters() {
+    public static function check_grammar_parameters() {
         return new external_function_parameters([
-            'topicid' => new external_value(PARAM_INT),
+            'text' => new external_value(PARAM_TEXT),
             'activityid' => new external_value(PARAM_INT)
         ]);
     }
 
-    public static function toggle_topic_selected_returns() {
-        return new external_value(PARAM_BOOL);
+    public static function check_grammar_returns() {
+        return new external_value(PARAM_RAW);
     }
 
     public static function get_grade_submission_parameters() {

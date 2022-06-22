@@ -367,7 +367,7 @@ class renderer extends \plugin_renderer_base {
     /**
      *  Show quiz container
      */
-    public function show_quiz($comp_test){
+    public function show_quiz($comp_test,$moduleinstance){
 
         //quiz data
         $quizdata = $comp_test->fetch_test_data_for_js();
@@ -382,8 +382,13 @@ class renderer extends \plugin_renderer_base {
 
         $placeholderdiv = \html_writer::div('',constants::M_QUIZ_PLACEHOLDER . ' ' . constants::M_QUIZ_SKELETONBOX,
             array('id'=>constants::M_QUIZ_PLACEHOLDER));
-        $quizdiv = \html_writer::div($finisheddiv.implode('',$itemshtml) ,constants::M_QUIZ_CONTAINER,
-            array('id'=>constants::M_QUIZ_CONTAINER));
+
+        $quizclass = constants::M_QUIZ_CONTAINER . ' ' . constants::M_COMPONENT . '_' . $moduleinstance->containerwidth;
+        $quizattributes = array('id'=>constants::M_QUIZ_CONTAINER);
+        if(!empty($moduleinstance->lessonfont)){
+            $quizattributes['style']="font-family: '$moduleinstance->lessonfont', serif;";
+        }
+        $quizdiv = \html_writer::div($finisheddiv.implode('',$itemshtml) ,$quizclass, $quizattributes);
       
         $ret = $placeholderdiv  . $quizdiv;
         return $ret;

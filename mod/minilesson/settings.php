@@ -104,6 +104,14 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configselect(constants::M_COMPONENT . "/$name",
         $label, $details, $default, $options));
 
+    $name = 'containerwidth';
+    $label = get_string($name, constants::M_COMPONENT);
+    $details = get_string($name . '_details', constants::M_COMPONENT);
+    $default = constants::M_CONTWIDTH_COMPACT;
+    $options = utils::get_containerwidth_options();
+    $settings->add(new admin_setting_configselect(constants::M_COMPONENT . "/$name",
+        $label, $details, $default, $options));
+
     // Reports Table
     $name = 'reportstable';
     $label = get_string($name, constants::M_COMPONENT);

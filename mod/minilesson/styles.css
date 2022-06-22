@@ -276,8 +276,15 @@ div.mod_minilesson_postattempt .mod_minilesson_grading_unreadspace {
 
 .mod_minilesson_quiz_cont {
   display: none;
-  max-width: 750px;
   margin: auto;
+}
+
+.mod_minilesson_quiz_cont.mod_minilesson_compact {
+  max-width: 750px;
+}
+
+.mod_minilesson_quiz_cont.mod_minilesson_wide {
+  max-width: 1200px;
 }
 
 div.mod_minilesson_feedback_cont.mod_minilesson_postattempt {
@@ -1810,6 +1817,17 @@ div.mod_minilesson_feedback_cont.mod_minilesson_postattempt {
   border: 1px solid black;
   border-radius: 5px;
   background-color: white;
+  cursor: pointer;
+  font-size: 1.33em;
+  overflow: auto;
+}
+.minilesson_mc_confirmchoice {
+  text-align: center;
+  background-color: blue;
+  color: white;
+  padding: 10px;
+  border: 1px solid black;
+  border-radius: 5px;
   cursor: pointer;
   font-size: 1.33em;
   overflow: auto;

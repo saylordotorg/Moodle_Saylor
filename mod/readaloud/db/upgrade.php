@@ -612,7 +612,7 @@ function xmldb_readaloud_upgrade($oldversion) {
     if ($oldversion < 2021090300) {
         $table = new xmldb_table(constants::M_TABLE);
 
-        // Define alternatives field to be added to minilesson
+        // Define field to be added to readaloud
         $fields=[];
         $fields[] = new xmldb_field('passagesegments', XMLDB_TYPE_TEXT, null, null, null, null);
 
@@ -732,6 +732,23 @@ function xmldb_readaloud_upgrade($oldversion) {
         set_config('transcriber', constants::TRANSCRIBER_GUIDED,constants::M_COMPONENT).
 
         upgrade_mod_savepoint(true, 2022041605, 'readaloud');
+    }
+
+    // Add customfont  to readaloud table
+    if ($oldversion < 2022053100) {
+        $table = new xmldb_table(constants::M_TABLE);
+
+        // Define fields customfont,to be added to readaloud
+        $fields=[];
+        $fields[] = new xmldb_field('customfont', XMLDB_TYPE_CHAR, '255', null, null, null,null);
+
+        // Add fields
+        foreach ($fields as $field) {
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+        upgrade_mod_savepoint(true, 2022053100, 'readaloud');
     }
 
     // Final return of upgrade result (true, all went good) to Moodle.

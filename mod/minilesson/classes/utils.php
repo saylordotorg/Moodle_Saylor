@@ -1111,6 +1111,15 @@ class utils{
 
     }
 
+    public static function get_containerwidth_options() {
+        return array(
+            constants::M_CONTWIDTH_COMPACT => get_string('contwidth-compact', constants::M_COMPONENT),
+            constants::M_CONTWIDTH_WIDE => get_string('contwidth-wide', constants::M_COMPONENT),
+            constants::M_CONTWIDTH_FULL => get_string('contwidth-full', constants::M_COMPONENT)
+        );
+
+    }
+
         public static function add_mform_elements($mform, $context,$cmid, $setuptab=false) {
             global $CFG, $COURSE;
 			  $dateoptions = array('optional' => true);
@@ -1207,11 +1216,25 @@ class utils{
             $mform->addElement('select', 'region', get_string('region', constants::M_COMPONENT), $regionoptions);
             $mform->setDefault('region',$config->awsregion);
 
+
             //prompt types
             $prompttypes = \mod_minilesson\utils::get_prompttype_options();
             $mform->addElement('select', 'richtextprompt', get_string('prompttype', constants::M_COMPONENT), $prompttypes);
             $mform->addHelpButton('richtextprompt', 'prompttype', constants::M_COMPONENT);
             $mform->setDefault('richtextprompt', $config->prompttype);
+
+
+            //advanced
+            $name = 'advanced';
+            $label = get_string($name, 'minilesson');
+            $mform->addElement('header', $name, $label);
+            $mform->setExpanded($name, false);
+
+            // Adding the lessonfont field
+            $mform->addElement('text', 'lessonfont', get_string('lessonfont', constants::M_COMPONENT), array('size'=>'64'));
+            $mform->addHelpButton('lessonfont', 'lessonfont', constants::M_COMPONENT);
+            $mform->setType('lessonfont', PARAM_TEXT);
+
 
             // Add passagekey
             $mform->addElement('text', 'lessonkey', get_string('lessonkey', constants::M_COMPONENT), array('size' => '8'));
@@ -1219,7 +1242,12 @@ class utils{
             $mform->setDefault('lessonkey', '');
             $mform->addHelpButton('lessonkey', 'lessonkey', constants::M_COMPONENT);
 
-                 
+            //container width
+            $widthoptions = \mod_minilesson\utils::get_containerwidth_options();
+            $mform->addElement('select', 'containerwidth', get_string('containerwidth', constants::M_COMPONENT), $widthoptions);
+            $mform->addHelpButton('containerwidth', 'containerwidth', constants::M_COMPONENT);
+            $mform->setDefault('containerwidth', $config->containerwidth);
+
             //activity opens closes
         $name = 'activityopenscloses';
         $label = get_string($name, 'minilesson');

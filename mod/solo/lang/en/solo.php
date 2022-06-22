@@ -129,6 +129,7 @@ $string['en-au'] = 'English (Aus.)';
 $string['en-gb'] = 'English (GB)';
 $string['fr-ca'] = 'French (Can.)';
 $string['fr-fr'] = 'French (FR)';
+$string['fil-ph'] = 'Filipino';
 $string['it-it'] = 'Italian (IT)';
 $string['pt-br'] = 'Portuguese (BR)';
 $string['en-in'] = 'English (IN)';
@@ -154,8 +155,13 @@ $string['ms-my'] = 'Malay';
 $string['pt-pt'] = 'Portuguese (PT)';
 $string['ru-ru'] = 'Russian';
 $string['ta-in'] = 'Tamil';
-$string['te-in'] = 'Telegu';
+$string['te-in'] = 'Telugu';
 $string['tr-tr'] = 'Turkish';
+
+$string['uk-ua'] = 'Ukranian';
+$string['eu-es'] = 'Basque';
+$string['fi-fi'] = 'Finnish';
+$string['hu-hu'] = 'Hungarian';
 
 $string['sv-se'] = 'Swedish';
 $string['nb-no'] = 'Norwegian';
@@ -285,6 +291,7 @@ $string['attemptname'] = 'Attempt';
 $string['nodataavailable'] = 'No data available';
 $string['transcriber'] = 'Transcriber';
 $string['transcriber_details'] = 'The transcription engine to use. ';
+$string['transcriber_open'] = 'Open transcription';
 $string['transcriber_amazontranscribe'] = 'Regular transcription(AWS)';
 $string['transcriber_amazonstreaming'] = 'Instant Transcription(AWS)';
 $string['transcriber_googlechrome'] = 'Instant transcription (Chrome only)';
@@ -315,6 +322,8 @@ $string['topictargetwords'] = 'Target Words';
 $string['targetwords'] = 'Target Words';
 $string['tips'] = 'Tips';
 $string['targettime'] = 'Target time';
+$string['targetspeakingtime'] = 'Target Speaking Time';
+$string['type'] = 'Type';
 $string['confirmtopicdelete'] = 'Do you really want to delete topic: {$a}';
 $string['choosetopic'] = 'Choose Topic';
 $string['topicinstructions']='Add or edit topics. Custom topics will only be available here. Course level topics will be available course wide. Selected topics will be available for students to choose from in this activity. ';
@@ -336,26 +345,24 @@ $string['chooseusers'] = 'Choose Partner(s)';
 $string['users'] = 'Partners';
 $string['topic'] = 'Topic';
 
-$string['attempt_partone'] = '1: Prepare';
-$string['attempt_partone_title'] = '1: Prepare to Speak';
-$string['attempt_parttwo'] = '2: Record';
-$string['attempt_partthree'] = '3: Transcribe';
-$string['attempt_partfour'] = '4: Model Answer';
-$string['attempt_partfive'] = '5: Review';
-$string['attempt_partone_instructions'] = 'Choose your partners, topic, target words and target speaking time from the options below. When you are ready, move to the next page and begin speaking';
-$string['attempt_parttwo_instructions'] = 'Use the recorder below to record yourself. Try to use the target words. Good luck.';
-$string['attempt_partthree_instructions'] = 'Listen to your recording and enter what you said in the editor below. Do not change what you said, when you type it.';
-$string['attempt_partfour_instructions'] = 'Check the model answer. Do you think it is a good answer?';
-$string['attempt_partfive_instructions'] = 'Compare the transcript you entered, to the automatically generated transcript. Are there many differences? Could you improve your speaking? Enter your self review in the text fields below.';
+$string['attempt_prepare'] = 'Prepare';
+$string['attempt_prepare_title'] = 'Prepare to Speak';
+$string['attempt_record'] = 'Record';
+$string['attempt_transcribe'] = 'Type';
+$string['attempt_model'] = 'Model Answer';
+$string['attempt_review'] = 'Review';
 
 $string['step_preparetitle']='Prepare';
 $string['step_prepareinstructions']='Check the speaking topic, target words and target speaking time from the options below. When you are ready, move to the next page and begin speaking';
 $string['step_mediarecordtitle']='Record';
 $string['step_mediarecordinstructions']='Use the recorder below to record yourself. Try to use the target words. Good luck.';
+$string['step_posttranscriberecordinstructions']='Use the recorder below to record yourself speaking.';
 $string['step_typetitle']='Enter Text';
 $string['step_typeinstructions']='Use the recorder below to record yourself. Try to use the target words. Good luck.';
 $string['step_selftranscribetitle']='Transcribe';
 $string['step_selftranscribeinstructions']='Listen to your recording and enter what you said in the editor below. Do not change what you said, when you type it.';
+$string['step_prerecord_transcribeinstructions']='Check the instructions and speaking targets, then type your response in the text editor below.';
+
 $string['step_modeltitle']='Model Answer';
 $string['step_modelinstructions']='Check the model answer below.';
 
@@ -551,6 +558,8 @@ $string['rating_good'] = 'Good Job';
 $string['rating_verygood'] = 'Very Good';
 $string['rating_excellent'] = 'Excellent !';
 $string['toggleplayinstructions']='(Press ESC key to start and stop the audio player.)';
+$string['prerecordtranscriptinstructions']='Enter your response in the text area below. In the next step you will read it aloud';
+
 
 //reattempt
 $string['reattempt'] = 'Try Again';
@@ -624,3 +633,31 @@ $string['modelanswerinstructions'] = "If you wish to display a model answer to s
 $string['audiorec_heading'] = "Audio Recorder";
 $string['videorec_heading'] = "Video Recorder";
 $string['grammarcorrection'] = "Suggested Corrections";
+$string['step_none'] = 'None';
+$string['step_record'] = 'Record';
+$string['step_transcribe'] = 'Self Transcribe';
+$string['step_model'] = 'Model';
+$string['seq_PRTM']='Prepare -> Record -> Transcribe -> Model (if set)';
+$string['seq_PRMT']='Prepare -> Record -> Model -> Transcript';
+$string['seq_PRM']='Prepare -> Record -> Model (if set)';
+$string['seq_PTRM']='Prepare -> Transcribe -> Record -> Model (if set)';
+$string['activitysteps'] = "Activity Steps";
+$string['preloadtranscript'] = 'Preload transcript';
+$string['preloadtranscript_details'] = 'Preload transcript into transcript editor, so the student the student just has to edit it. NB the transcript can take several minutes to become available.';
+
+$string['enabletts'] = 'Enable TTS';
+$string['enabletts_help'] = 'Allow students to hear their transcript read aloud by a TTS voice';
+$string['enabletts_details'] = 'Allow students to hear their transcript read aloud by a TTS voice';
+$string['default_enabletts'] = 'Enable TTS (default)';
+
+
+$string['enablesuggestions'] = 'Enable AI Suggestions';
+$string['enablesuggestions_help'] = 'Allow AI to suggest a more correct version of the student transcript. Results can be unpredictable. So it is not currently connected with grading. ';
+$string['enablesuggestions_details'] = 'Allow AI to suggest a more correct version of the student transcript. Results can be unpredictable. So it is not currently connected with grading. ';
+$string['default_enablesuggestions'] = 'Enable AI Suggestions (default)';
+
+$string['enablegallery'] = 'Enable Gallery';
+$string['enablegallery_help'] = 'Allow students to hear other student submissions on the topic';
+$string['enablegallery_details'] = 'Allow students to hear other student submissions on the topic';
+$string['nosuggestions'] = "No suggestions.";
+$string['checkgrammarandspelling'] = 'Check grammar and spelling';

@@ -1,6 +1,6 @@
 /* jshint ignore:start */
-define(['jquery','jqueryui', 'core/log','mod_solo/definitions'],
-    function($, jqui, log, def) {
+define(['jquery', 'core/log','mod_solo/definitions'],
+    function($, log, def) {
 
     "use strict"; // jshint ;_;
 

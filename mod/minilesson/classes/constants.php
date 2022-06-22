@@ -102,6 +102,7 @@ const CUSTOMDATA = 'customdata';
 const CUSTOMINT = 'customint';
 const POLLYVOICE = 'customtext5';
 const POLLYOPTION = 'customint4';
+const CONFIRMCHOICE = 'customint3';
 const TEXTQUESTION_FILEAREA = 'itemarea';
 const TEXTANSWER_FILEAREA ='customtextfilearea';
 const PASSAGEPICTURE='passagepicture';
@@ -273,5 +274,14 @@ const M_QUIZ_REATTEMPT = "mod_minilesson_quiz_reattempt";
 
 const M_ANIM_FANCY = 0;
 const M_ANIM_PLAIN = 1;
+
+const M_CONTWIDTH_COMPACT = 'compact';
+const M_CONTWIDTH_WIDE = 'wide';
+const M_CONTWIDTH_FULL = 'full';
+const M_STANDARD_FONTS = ["Arial", "Arial Black", "Verdana", "Tahoma", "Trebuchet MS", "Impact",
+"Times New Roman", "Didot", "Georgia", "American Typewriter", "Andalé Mono", "Courier",
+"Lucida Console", "Monaco", "Bradley Hand", "Brush Script MT", "Luminari", "Comic Sans MS"];
+
+const M_GOOGLE_FONTS = ["Andika"];
 
 }

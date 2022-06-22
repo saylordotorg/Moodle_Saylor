@@ -8,11 +8,11 @@
 
 $functions = array(
 
-        'mod_solo_toggle_topic_selected' => array(
+        'mod_solo_check_grammar' => array(
                 'classname'   => '\mod_solo\external',
-                'methodname'  => 'toggle_topic_selected',
-                'description' => 'Select/deselect a topic for a mod',
-                'capabilities'=> 'mod/solo:selecttopics',
+                'methodname'  => 'check_grammar',
+                'description' => 'check grammar',
+                'capabilities'=> 'mod/solo:view',
                 'type'        => 'read',
                 'ajax'        => true,
         ),

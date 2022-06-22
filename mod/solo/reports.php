@@ -207,7 +207,8 @@ switch ($showreport){
                     }
                     echo $attempt_renderer->show_teachereval( $rubricresults,$feedback, $evaluator);
                     $autotranscriptready=true;
-                    echo $attempt_renderer->show_summarypassageandstats($attempt,$aidata, $stats,$autotranscriptready);
+                    $selftranscribe = utils::fetch_step_no($moduleinstance, constants::STEP_SELFTRANSCRIBE) !==false;
+                    echo $attempt_renderer->show_summarypassageandstats($attempt,$aidata, $stats,$autotranscriptready, $selftranscribe);
 
                 }
                 //close the summary results div

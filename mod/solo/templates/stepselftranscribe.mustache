@@ -5,23 +5,47 @@
 {{! we set the title and instructions}}
 <div class="container">
 
+
     <div class="row">
         <div class="col-sm-12 mx-auto">
             <div class="solo_stepinstructions">
-                {{#str}}step_selftranscribeinstructions, mod_solo{{/str}}
+                {{^prerecording}}
+                    {{#str}}step_selftranscribeinstructions, mod_solo{{/str}}
+                {{/prerecording}}
+                {{#prerecording}}
+                    {{#str}}step_prerecord_transcribeinstructions, mod_solo{{/str}}
+                {{/prerecording}}
             </div>
         </div>
     </div>
 
+
+    {{#prerecording}}
+        {{>mod_solo/stepprompt}}
+    {{/prerecording}}
+
     <div class="row">
         <div class="col-sm">
             <div class='mod_solo_transcripteditor'>
-                {{>mod_solo/audioplayer}}
-                <div class='mod_solo_maybereloadaudio'>{{#str}}toggleplayinstructions, mod_solo{{/str}}</div>
+                {{#audiofilename}}
+                    {{>mod_solo/audioplayer}}
+                    <div class='mod_solo_maybereloadaudio'>{{#str}}toggleplayinstructions, mod_solo{{/str}}</div>
+                {{/audiofilename}}
+                {{^audiofilename}}
+                    <div class='mod_solo_maybereloadaudio'>{{#str}}prerecordtranscriptinstructions, mod_solo{{/str}}</div>
+                {{/audiofilename}}
                 <textarea name="selftranscript" id="{{uniqid}}_selftranscript" class="form-control" rows="5" cols="80">{{selftranscript}}</textarea>
             </div>
         </div>
     </div>
+
+    {{#prerecording}}
+        <div class="row">
+            <div class="col-sm">
+                {{>mod_solo/grammarsuggestions}}
+            </div>
+        </div>
+    {{/prerecording}}
 
     <div class="row">
         <div class="col-sm-6 mx-auto mod_solo_stepsubmit">
@@ -44,7 +68,7 @@
                     data.activitytype = 3; // {{type}}
                     var cmid={{cmid}};
                     var id={{id}};
-                    var step=3;
+                    var step={{stepno}};
                     var action = 'submitstep';
 
                    var ret = Ajax.call([{

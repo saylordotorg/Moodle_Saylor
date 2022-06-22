@@ -1,3 +1,17 @@
+Version 1.0.19 (Build 2022061001)
+- Added different activity sequences ( ... that's big)
+- Added non-English suggestions and AJAX suggestions
+- added TTS / Suggestions / Gallery settings (not implemented)
+
+Version 1.0.18 (Build 2022060500)
+- fixed broken delete attempt
+- added defaults to vide start and view end
+- added a better free trial link and rebuild js for < M3.8
+
+Version 1.0.39(Build 2022041800)
+- Removed JQuery UI which was breaking Moodle 4.0 dock
+- Fixed issue with activity being closed if open date set, but close data not set
+
 1.0.17 (Build 2022032000)
 - fixed issue in get_course_moduleinfo that could kill backup and restore
 - tweaked polly stuff

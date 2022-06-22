@@ -526,6 +526,19 @@ abstract class baseform extends \moodleform {
     }
 
     /**
+     * Convenience function: Adds a dropdown list of voice options
+     *
+     * @param string $label, null means default
+     * @return void
+     */
+    protected final function add_confirmchoice($name, $label = null) {
+        global $CFG;
+        if(empty($label)){$label = get_string('confirmchoice_formlabel', constants::M_COMPONENT);}
+        $this->_form->addElement('selectyesno', $name,$label);
+        $this->_form->setDefault( $name,0);
+    }
+
+    /**
      * Convenience function: Adds a dropdown list of tts language
      *
      * @param string $label, null means default

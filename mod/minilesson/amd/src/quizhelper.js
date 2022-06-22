@@ -119,7 +119,7 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'core/templates', 'c
             var html = "<div class='minilesson_quiz_progress_line' style='" + linestyles + "'></div>";
 
             slice.forEach(function (i) {
-                html += "<div class='minilesson_quiz_progress_item " + (i == current ? 'minilesson_quiz_progress_item_current' : '') + " " + (i < current ? 'minilesson_quiz_progress_item_completed' : '') + "'>" + (i + 1) + "</div>";
+                html += "<div class='minilesson_quiz_progress_item " + (i === current ? 'minilesson_quiz_progress_item_current' : '') + " " + (i < current ? 'minilesson_quiz_progress_item_completed' : '') + "'>" + (i + 1) + "</div>";
             });
         }else {
              if(current > total-6){
@@ -136,7 +136,7 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'core/templates', 'c
               }
             var html = "<div class='minilesson_quiz_progress_line' style='" + linestyles + "'></div>";
               slice.forEach(function (i) {
-                  html += "<div class='minilesson_quiz_progress_item " + (i == current ? 'minilesson_quiz_progress_item_current' : '') + " " + (i < current ? 'minilesson_quiz_progress_item_completed' : '') + "'>" + (i + 1) + "</div>";
+                  html += "<div class='minilesson_quiz_progress_item " + (i === current ? 'minilesson_quiz_progress_item_current' : '') + " " + (i < current ? 'minilesson_quiz_progress_item_completed' : '') + "'>" + (i + 1) + "</div>";
               });
               //end marker
             html += "<div class='minilesson_quiz_progress_finalitem'>" + (total) + "</div>";
@@ -147,7 +147,7 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'core/templates', 'c
 
       },
 
-      do_next: async function(stepdata){
+      do_next: function(stepdata){
         var dd = this;
         //get current question
         var currentquizdataindex =   stepdata.index;
@@ -158,7 +158,7 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'core/templates', 'c
 
         //post grade
          // log.debug("reporting step grade");
-        await dd.report_step_grade(stepdata);
+        dd.report_step_grade(stepdata);
          // log.debug("reported step grade");
         //hide current question
         var theoldquestion = $("#" + currentitem.uniqueid + "_container");
@@ -235,19 +235,20 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'core/templates', 'c
         
       },
 
-      report_step_grade: async function(stepdata) {
+      report_step_grade: function(stepdata) {
         var dd = this;
 
         //store results locally
         this.stepresults.push(stepdata);
 
         //push results to server
-        var ret = await Ajax.call([{
+        var ret = Ajax.call([{
           methodname: 'mod_minilesson_report_step_grade',
           args: {
             cmid: dd.cmid,
             step: JSON.stringify(stepdata),
-          }
+          },
+          async: false
         }])[0];
         log.debug("report_step_grade success: " + ret);
 
@@ -310,7 +311,7 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'core/templates', 'c
                 shorter = s1;
             }
             var longerLength = longer.length;
-            if (longerLength == 0) {
+            if (longerLength === 0) {
                 return 100;
             }
             return 100 * ((longerLength - this.editDistance(longer, shorter)) / parseFloat(longerLength));
@@ -319,16 +320,16 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'core/templates', 'c
             s1 = s1.toLowerCase();
             s2 = s2.toLowerCase();
 
-            var costs = new Array();
+            var costs = [];
             for (var i = 0; i <= s1.length; i++) {
                 var lastValue = i;
                 for (var j = 0; j <= s2.length; j++) {
-                    if (i == 0)
+                    if (i === 0)
                         costs[j] = j;
                     else {
                         if (j > 0) {
                             var newValue = costs[j - 1];
-                            if (s1.charAt(i - 1) != s2.charAt(j - 1))
+                            if (s1.charAt(i - 1) !== s2.charAt(j - 1))
                                 newValue = Math.min(Math.min(newValue, lastValue),
                                     costs[j]) + 1;
                             costs[j - 1] = lastValue;
@@ -352,15 +353,16 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'core/templates', 'c
         //this will return the promise, the result of which is an integer 100 being perfect match, 0 being no match
         checkByPhonetic: function(passage, transcript, passagephonetic, language) {
             return Ajax.call([{
-                'methodname': 'mod_minilesson_check_by_phonetic',
-                'args': {
+                methodname: 'mod_minilesson_check_by_phonetic',
+                args: {
                     'spoken': transcript,
                     'correct': passage,
                     'language': language,
                     'phonetic': passagephonetic,
                     'region': this.region,
                     'cmid': this.cmid
-                }
+                },
+                async: false
             }])[0];
 
         },
@@ -376,7 +378,8 @@ define(['jquery', 'core/log', 'mod_minilesson/definitions', 'core/templates', 'c
                    language: language,
                    region: this.region,
                    cmid: this.cmid
-               }
+               },
+              async: false
            }])[0];
        }
     }; //end of return value

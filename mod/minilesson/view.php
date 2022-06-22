@@ -121,6 +121,14 @@ if($config->animations==constants::M_ANIM_FANCY) {
     $PAGE->requires->css(new moodle_url('https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css'));
 }
 
+//if we need a non standard font we can do that from here
+if(!empty($moduleinstance->lessonfont)){
+    if(!in_array($moduleinstance->lessonfont,constants::M_STANDARD_FONTS)){
+        $PAGE->requires->css(new moodle_url('https://fonts.googleapis.com/css?family=' . $moduleinstance->lessonfont));
+    }
+}
+
+
 
 //From here we actually display the page.
 //if we are teacher we see tabs. If student we just see the quiz
@@ -157,7 +165,7 @@ if($hasopenclosedates){
 if($latestattempt->status==constants::M_STATE_COMPLETE){
     echo $renderer->show_finished_results($comp_test,$latestattempt,$cm, $canattempt);
 }else if($itemcount > 0) {
-    echo $renderer->show_quiz($comp_test);
+    echo $renderer->show_quiz($comp_test,$moduleinstance);
     $previewid=0;
     echo $renderer->fetch_activity_amd($cm, $moduleinstance,$previewid,$canattempt);
 }else{

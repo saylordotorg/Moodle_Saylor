@@ -47,8 +47,8 @@ class solo_s3_adhoc extends \core\task\adhoc_task {
 	     global $DB;
 		$trace = new \text_progress_trace();
 
-		//CD should contain activityid / attemptid and modulecontextid
-		$cd =  $this->get_custom_data();
+		//CD should contain activityid / attemptid / #modulecontextid / #cmid
+         $cd =  $this->get_custom_data();
 		//$trace->output($cd->somedata)
 
          $activity = $DB->get_record(constants::M_TABLE,array('id'=>$cd->activityid));
@@ -71,29 +71,13 @@ class solo_s3_adhoc extends \core\task\adhoc_task {
                  return;
              }
 
-             $attempt_with_transcripts = utils::retrieve_transcripts_from_s3($attempt);
-             if($attempt_with_transcripts){
-                 $trace->output("Transcripts are fetched for " . $cd->attemptid . " ...all ok");
-                 //process transcripts (find matches etc)
-                 $selftranscript='';
-                 if(!empty($attempt_with_transcripts->selftranscript)){
-                     $selftranscript=$attempt_with_transcripts->selftranscript;
-                 }
-                 if(!empty($selftranscript)) {
-                     try {
-                         $aitranscript = new \mod_solo\aitranscript($attempt_with_transcripts->id,
-                                 $cd->modulecontextid, $selftranscript,
-                                 $attempt_with_transcripts->transcript,
-                                 $attempt_with_transcripts->jsontranscript);
-                     }catch(\Exception $e){
-                         $this->do_forever_fail('transcripts fetched but processing failed: ' .
-                                 $e->getMessage() .": attemptid:"  . $cd->attemptid,$trace);
-                     }
-                 }
-
-             }else{
+             //do all the processing (grades, diffs, etc) if needed and return the attempt
+             $attempt =  utils::process_attempt($activity,$attempt,$cd->modulecontextid,$cd->cmid,$trace);
+             if(!$attempt){
                  $this->do_retry('Transcripts are not ready yet',$trace,$cd);
-             }
+                 return;
+             };
+
 
          }else{
              $this->do_forever_fail('This attempt could not be found: ' . $cd->attemptid,$trace);

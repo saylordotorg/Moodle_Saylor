@@ -8,29 +8,38 @@
     <div class="row">
         <div class="col-sm-12 mx-auto">
             <div class="solo_stepinstructions">
-                {{#str}}step_mediarecordinstructions, mod_solo{{/str}}
+                {{^posttranscribing}}
+                    {{#str}}step_mediarecordinstructions, mod_solo{{/str}}
+                {{/posttranscribing}}
+                {{#posttranscribing}}
+                    {{#str}}step_posttranscriberecordinstructions, mod_solo{{/str}}
+                {{/posttranscribing}}
             </div>
         </div>
     </div>
 
-    <div class="row">
-        {{>mod_solo/snippetgoals}}
-    </div>
+    {{^posttranscribing}}
+        {{>mod_solo/stepprompt}}
+    {{/posttranscribing}}
 
-    <div class="row">
-        <div class="col-sm">
-            <div class="card">
-                <div class="card-header">
-                    {{#str}}speakingtopic, mod_solo{{/str}}
-                </div>
-                <div class="card-body">
-                    <div class="mod_solo_speakingtopic_readonly">
-                        {{speakingtopic}}
+    {{#posttranscribing}}
+        {{#selftranscript}}
+            <div class="row">
+                <div class="col-sm">
+                    <div class="card">
+                        <div class="card-header">
+                            {{#str}}selftranscript, mod_solo{{/str}}
+                        </div>
+                        <div class="card-body">
+                            <div class="mod_solo_audiorec_selftranscript_plain">
+                                {{selftranscript}}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
+        {{/selftranscript}}
+    {{/posttranscribing}}
 
     <div class="row">
         <div class="col-sm-6 mx-auto">
@@ -70,7 +79,7 @@
                     data.activitytype = 2; // {{type}}
                     var cmid={{rec.cmid}};
                     var id={{id}};
-                    var step=2;
+                    var step={{stepno}};
                     var action = 'submitstep';
 
                    var ret = Ajax.call([{

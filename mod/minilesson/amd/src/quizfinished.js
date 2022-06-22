@@ -22,7 +22,7 @@ define(['jquery', 'core/log','core/modal_factory','core/str','core/modal_events'
 
     },
 
-    register_events(){
+    register_events: function(){
         var that = this;
         $('body').on('click','.btn_finished_attempt',function(e) {
 
