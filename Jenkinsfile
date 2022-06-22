@@ -493,6 +493,12 @@ def plugins = [
       "url" : 'https://github.com/michael-milette/moodle-filter_filtercodes.git',
       "branch" : 'master',
       "dest" : 'filter/filtercodes'
+    ],
+    [
+        "name" : 'local_cohortauto',
+        "url" : 'https://github.com/catalyst/moodle-local_cohortauto.git',
+        "branch" : 'main',
+        "dest" : 'local/cohortauto'
     ]
 ]
 
