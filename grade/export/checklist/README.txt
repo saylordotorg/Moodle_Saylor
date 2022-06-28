@@ -6,6 +6,7 @@ http://moodle.org/plugins/view.php?plugin=mod_checklist
 
 ==Changes==
 
+* 2022-06-28 - Add missing tertiary navigation in M4.0 (to access other grade export plugins)
 * 2022-01-22 - Minor M4.0 compatibility fixes
 * 2021-04-10 - minor internal documenation update + switch from Travis to Github actions
 * 2020-10-17 - speed improvement when calculating user start date on the course

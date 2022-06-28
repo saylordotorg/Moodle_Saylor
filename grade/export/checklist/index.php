@@ -48,7 +48,13 @@ if (!$viewall && !$viewdistrict) {
 $strgrades = get_string('grades');
 $strchkgrades = get_string('pluginname', 'gradeexport_checklist');
 
-print_grade_page_head($COURSE->id, 'export', 'checklist', $strchkgrades);
+if (class_exists('\core_grades\output\export_action_bar')) {
+    // New tertiary navigation introduced in Moodle 4.0.
+    $actionbar = new \core_grades\output\export_action_bar($context, $PAGE->url, 'checklist');
+    print_grade_page_head($COURSE->id, 'export', 'checklist', $strchkgrades, false, false, true, null, null, null, $actionbar);
+} else {
+    print_grade_page_head($COURSE->id, 'export', 'checklist', $strchkgrades);
+}
 
 // Get list of appropriate checklists.
 $modinfo = get_fast_modinfo($course);

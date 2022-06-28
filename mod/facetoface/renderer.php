@@ -57,6 +57,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         $timenow = time();
 
         $table = new html_table();
+        $table->attributes['class'] = 'f2fsessionlist';
         $table->head = $tableheader;
         $table->data = array();
 
