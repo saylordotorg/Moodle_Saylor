@@ -499,6 +499,24 @@ def plugins = [
         "url" : 'https://github.com/catalyst/moodle-local_cohortauto.git',
         "branch" : 'main',
         "dest" : 'local/cohortauto'
+    ],
+    [
+        "name" : 'enrol_programs',
+        "url" : 'https://github.com/open-lms-open-source/moodle-enrol_programs.git',
+        "branch" : 'MOODLE_311_STABLE',
+        "dest" : 'enrol/programs'
+    ],
+    [
+        "name" : 'block_myprograms',
+        "url" : 'https://github.com/open-lms-open-source/moodle-block_myprograms.git',
+        "branch" : 'MOODLE_311_STABLE',
+        "dest" : 'blocks/myprograms'
+    ],
+    [
+        "name" : 'local_openlms',
+        "url" : 'https://github.com/open-lms-open-source/moodle-local_openlms.git',
+        "branch" : 'MOODLE_311_STABLE',
+        "dest" : 'local/openlms'
     ]
 ]
 
