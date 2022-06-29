@@ -366,7 +366,7 @@ def plugins = [
         "name" : 'block_dedication',
         "url" : 'https://bitbucket.org/ciceidev/moodle_block_dedication.git',
         "branch" : 'MOODLE_30_STABLE',
-        "dest" : 'block/dedication'
+        "dest" : 'blocks/dedication'
     ],
     [
         "name" : 'enrol_programs',
