@@ -19,64 +19,69 @@
  * @copyright  2020 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-define(['jquery', 'jqueryui', 'qtype_gapfill/jquery.ui.touch-punch-improved'], function($) {
-  return {
-    init: function(singleuse) {
-      $(".droptarget").on('dblclick', function() {
-        if (singleuse) {
-          dragShow(this);
-          $(this).val("");
-        }
-      });
 
-    /**
-     * Reveal draggables that are not
-     * the the current one
-     *
-     * @param {*} that
-     */
-      function dragShow(that) {
-        var draggables = $(".draggable");
-        var targetVal = $(that).val();
-        var i;
-        for (i = 0; i < draggables.length; i++) {
-          var sourceVal = draggables[i].textContent;
-          if (sourceVal == targetVal) {
-            $(draggables[i]).removeClass("hide");
-          }
-        }
-      }
-
-      $(".droptarget").on('keydown drop', function() {
+export const init = (singleuse) => {
+  Window.singleuse = singleuse;
+  var draggables = document.querySelectorAll('span[class*="draggable"]');
+  draggables.forEach(function(e) {
+    e.addEventListener('dragstart', dragStart);
+  });
+  document.querySelectorAll('input[class*="droptarget"]').forEach(function(e) {
+    e.addEventListener("dblclick", function() {
+      if (Window.singleuse) {
         dragShow(this);
-      });
+      }
+      this.value = "";
+    });
 
-      $(".draggable").draggable({
-        revert: false,
-        helper: 'clone',
-        cursor: 'pointer',
-        scroll: 'false',
-      });
+    e.addEventListener("drop", drop);
 
-      $(".droptarget").droppable({
-        hoverClass: 'active',
-        drop: function(event, ui) {
-          if ($(ui.draggable).hasClass('readonly')) {
-            return;
-          }
-          this.value = $(ui.draggable).text();
-          $(this).css("background-color", "white");
-          $(this).addClass("dropped");
-          if (singleuse) {
-            $(ui.draggable).addClass("hide");
-          }
-        }
-      });
-      $(".droptarget").dblclick(function() {
-        $(this).val("");
-        $(this).removeClass("dropped");
-        $(this).css("background-color", "white");
-     });
+  });
+  /**
+   *
+   * @param {*} that
+   */
+  function dragShow(that) {
+    var targetVal = that.value;
+    draggables.forEach(function(e) {
+      if (e.innerText.trim() === targetVal.trim()) {
+        e.classList.remove("hide");
+        that.value = "";
+      }
+    });
+  }
+
+  /**
+   * Stops strange things happening on ios drop event
+   * @param {*} e
+   */
+  document.addEventListener('dragover', function(e) {
+    e.preventDefault();
+  });
+
+
+  /**
+   *
+   * @param {*} e
+   */
+  function drop(e) {
+    dragShow(this);
+    e.target.value = e.dataTransfer.getData('text/plain');
+    var sourceId = e.dataTransfer.getData("sourceId");
+    var sourceEl = document.getElementById(sourceId);
+    if (Window.singleuse) {
+      sourceEl.classList.add('hide');
+      e.preventDefault();
     }
-  };
-});
+    e.preventDefault();
+  }
+  /**
+   *
+   * @param {*} e
+   */
+  function dragStart(e) {
+    e.dataTransfer.setData('text/plain', e.target.innerText);
+    e.dataTransfer.setData('sourceId', this.id);
+  }
+};
+

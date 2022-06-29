@@ -1,6 +1,9 @@
 ### Version 2.134 of the Moodle Gapfill question type Jun 2022
-Fix for duplicated draggables when used in the mobile apps. Thanks to Nicholas Stefanski for reporting this
-and for contributing a code solution.
+
+Fix for duplicated draggables when used in the mobile apps. Thanks to Nicholas Stefanski for reporting this and for contributing a code solution. 
+
+Added $CFG->wwwwroot in front of path to mobile css for where moodle home hangs of a folder from the 
+url.
 
 ### Version 2.133 of the Moodle Gapfill question type Mar 2022
 Missing space around or in non English feedback. Where the language was not
@@ -15,8 +18,8 @@ Fix renderer.php so the output complies with the validator at https://validator.
 My thanks to t-schroeder for raising this issue
 https://github.com/marcusgreen/moodle-qtype_gapfill/pull/77
 Which gave me the idea of validating the output.
-Fix for layout in optionsaftertext mode.
-Bump to version of Moodle required from 3.3 to 3.7, to make support easier.
+Fix for layout in optionsaftertext mode
+Bump to version of Moodle required from 3.3 to 3.7, to make support easier
 Updates to behat tests to work with Moodle 4.0. No further support for
 MS IE browser 11.
 
