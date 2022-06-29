@@ -13,6 +13,9 @@ To install from the plugins database go to https://moodle.org/plugins/qtype_gapf
 
 This question type was written by Marcus Green
 
+The latest source can be found at
+
+https://github.com/marcusgreen/moodle-qtype_gapfill
 
 Place the files in a directory
 
@@ -23,5 +26,3 @@ Where moodle is webroot for your install.
 Go to Site Administration/Notifications
 
 User documentation is at https://docs.moodle.org/en/Gapfill_question_type
-
-nice

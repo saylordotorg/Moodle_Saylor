@@ -80,7 +80,7 @@ var result = {
         };
 
         if (!this.question) {
-            logger.warn('Aborting because of no question received.');
+            this.CoreAppProvider.logger.warn('Aborting because of no question received.');
             return that.CoreQuestionHelperProvider.showComponentError(that.onAbort);
         }
         var div = document.createElement('div');
@@ -122,7 +122,7 @@ var result = {
         this.question.text = this.CoreDomUtilsProvider.getContentsOfElement(div, '.qtext');
 
         if (typeof this.question.text == 'undefined') {
-            this.logger.warn('Aborting because of an error parsing question.', this.question.name);
+            this.CoreAppProvider.logger.warn('Aborting because of an error parsing question.', this.question.name);
             return this.CoreQuestionHelperProvider.showComponentError(this.onAbort);
         }
         setTimeout(()=> {

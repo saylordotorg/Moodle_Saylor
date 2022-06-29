@@ -79,7 +79,6 @@ if ($id && !$s) {
 }
 
 require_course_login($course);
-$errorstr = '';
 $context = context_course::instance($course->id);
 $modulecontext = context_module::instance($cm->id);
 require_capability('mod/facetoface:editsessions', $context);
@@ -349,10 +348,6 @@ echo $OUTPUT->header();
 
 echo $OUTPUT->box_start();
 echo $OUTPUT->heading($heading);
-
-if (!empty($errorstr)) {
-    echo $OUTPUT->container(html_writer::tag('span', $errorstr, array('class' => 'errorstring')), array('class' => 'notifyproblem'));
-}
 
 if ($d) {
     $viewattendees = has_capability('mod/facetoface:viewattendees', $context);
