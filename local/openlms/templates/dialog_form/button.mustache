@@ -1,0 +1,42 @@
+{{!
+This file is part of Moodle - http://moodle.org/
+
+Moodle is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Moodle is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Moodle. If not, see
+<http: //www.gnu.org/licenses />.
+}}
+
+<button id="dialog-form-button-{{uniqid}}"
+  data-form-url="{{formurl}}" data-dialog-name="{{dialogname}}" data-after-submit="{{aftersubmit}}"
+  class="btn {{#primary}}btn-primary{{/primary}}{{^primary}}btn-secondary{{/primary}}">{{title}}</button>
+
+{{#js}}
+require([
+    'jquery',
+    'local_openlms/dialog_form',
+], function($, DialogForm) {
+    var actionButton = $('#dialog-form-button-' + "{{uniqid}}"),
+          formUrl = actionButton.data('form-url'),
+          dialogName = actionButton.data('dialog-name'),
+          afterSubmit = actionButton.data('after-submit');
+
+    actionButton.on('click', function() {
+        new DialogForm({
+            modalConfig: {title: dialogName},
+            triggerElement: actionButton,
+            formUrl: formUrl,
+            afterSubmit: afterSubmit,
+        });
+    });
+});
+{{/js}}
