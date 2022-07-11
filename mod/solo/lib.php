@@ -738,7 +738,9 @@ function mod_solo_output_fragment_rubric_grade_form($args) {
     $formdata = [];
     if (!empty($args->jsonformdata)) {
         $serialiseddata = json_decode($args->jsonformdata);
-        parse_str($serialiseddata, $formdata);
+        if(is_string($serialiseddata)) {
+            parse_str($serialiseddata, $formdata);
+        }
     }
 
     $sql = "select  pa.solo, pa.feedback, pa.id as attemptid
@@ -801,7 +803,9 @@ function mod_solo_output_fragment_simple_grade_form($args) {
     $formdata = [];
     if (!empty($args->jsonformdata)) {
         $serialiseddata = json_decode($args->jsonformdata);
-        parse_str($serialiseddata, $formdata);
+        if(is_string($serialiseddata)) {
+            parse_str($serialiseddata, $formdata);
+        }
     }
 
     $sql = "select  pa.solo, pa.feedback, pa.id as attemptid, pa.grade as grade

@@ -24,8 +24,6 @@
 
 namespace availability_cohort\privacy;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Privacy Subsystem for implementing null_provider.
  *

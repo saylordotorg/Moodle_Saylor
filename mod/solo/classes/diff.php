@@ -487,6 +487,15 @@ class diff{
         //i) default passage positions to unmatched and transcript position -1
         $diffs=array_fill(0, $passagelength, [self::UNMATCHED,-1,self::NOTALTERNATEMATCH]);
 
+        //if there is nothing in the passage then we just return the default diffs array
+        if($passagelength===0){
+            if($debug){
+                return [$diffs,[]];
+            }else{
+                return $diffs;
+            }
+        }
+
         //ii) sort sequences by length, transcript posn
         //long sequences sort higher, and are placed in the diff array first
         usort($sequences, array('\\' . constants::M_COMPONENT . '\diff','cmp'));
@@ -610,6 +619,12 @@ class diff{
      * e.g "The artists are this close to us." so we can accept it.
      */
     public static function applyWildcards($diffs,$passagebits,$wildcards){
+        //do a sanity check
+        if(count($passagebits)===0){
+            return $diffs;
+        }
+
+
         $last_tposition=1;
         $last_p=0;
 

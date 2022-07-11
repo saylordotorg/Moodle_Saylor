@@ -4,6 +4,13 @@ moodle-local_boostnavigation
 Changes
 -------
 
+### v3.11-r2
+
+* 2022-06-26 - Make codechecker happy again
+* 2022-06-26 - Updated Moodle Plugin CI to latest upstream recommendations
+* 2022-06-26 - Add UPGRADE.md as internal upgrade documentation
+* 2022-06-26 - Update maintainers and copyrights in README.md.
+
 ### v3.11-r1
 
 * 2021-07-15 - Prepare compatibility for Moodle 3.11.

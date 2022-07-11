@@ -64,6 +64,12 @@
                 $('#' + '{{uniqid}}_button').click(function(){
                     var data = {};
                     data.selftranscript = $('#' + '{{uniqid}}_selftranscript').val();
+                    //lets not let people leave the page with an empty transcript
+                    if(data.selftranscript.trim()===''){
+                        Notification.alert('Important',"Please enter something in the textbox before leaving this page.")
+                        return false;
+                    }
+
                     data.attemptid ={{attemptid}};
                     data.activitytype = 3; // {{type}}
                     var cmid={{cmid}};

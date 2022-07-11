@@ -25,8 +25,6 @@
 
 namespace availability_role;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Availability role - Frontend form class
  *

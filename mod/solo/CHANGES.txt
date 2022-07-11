@@ -1,3 +1,6 @@
+Version 1.0.20 (Build 2022071100)
+- Fixed an issue that caused an error if the student did not enter a transcript (ie submitted an empty string)
+
 Version 1.0.19 (Build 2022061001)
 - Added different activity sequences ( ... that's big)
 - Added non-English suggestions and AJAX suggestions

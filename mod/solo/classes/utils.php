@@ -419,7 +419,10 @@ class utils{
         }
 
         //this should run down the aitranscript constructor and do the diffs if the passage arrives late or on time, but not redo
-        if($hastranscripts && !empty($attempt->selftranscript)){
+
+        //this line caused an error if the user entered a blank transcript. Do we need to check for empty?
+        //if($hastranscripts && !empty($attempt->selftranscript)){
+        if($hastranscripts){
             $autotranscript=$attempt->transcript;
             $aitranscript = new \mod_solo\aitranscript($attempt->id,
                 $contextid, $attempt->selftranscript,
@@ -726,7 +729,7 @@ class utils{
         $stats->aiaccuracy=-1;
 
         if(!$usetranscript || empty($usetranscript)){
-            return false;
+            return $stats;
         }
 
         $items = preg_split('/[!?.]+(?![0-9])/', $usetranscript);

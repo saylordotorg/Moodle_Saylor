@@ -25,8 +25,6 @@
 
 namespace availability_cohort;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Availability cohort - Condition class
  *

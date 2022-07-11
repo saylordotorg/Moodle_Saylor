@@ -1,0 +1,68 @@
+/* Style the rules and actions on the view/edit rules page. */
+.localprofile-rule-actions {
+    color: #888;
+}
+.localprofile-flash {
+    animation-duration: 1s;
+    animation-name: localprofile-flash;
+}
+
+@keyframes localprofile-flash {
+    from {
+        background-color: inherit;
+    }
+    25% {
+        background-color: #468847;
+    }
+    50% {
+        background-color: #468847;
+    }
+    to {
+        background-color: inherit;
+    }
+}
+.localprofile-combined {
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    margin: 5px;
+    padding: 20px;
+}
+.localprofile-combined .localprofile-fieldwrapper + .localprofile-fieldwrapper .localprofile-value {
+    display: none;
+}
+.localprofile-fieldwrapper.todelete,
+.localprofile-fieldwrapper.todelete span,
+.localprofile-fieldwrapper.todelete div,
+.localprofile-fieldwrapper.todelete fieldset,
+.localprofile-fieldwrapper.todelete label,
+.localprofile-fieldwrapper.todelete select,
+.localprofile-fieldwrapper.todelete input {
+    color: #c38a8a;
+    text-decoration: line-through solid currentColor;
+}
+.localprofile-fieldwrapper.todelete label.deleterule {
+    color: #888;
+    text-decoration: none;
+}
+
+/* Style the rules and actions on the view/edit rules page. */
+form #id_hiddenheading legend {
+    display: none;
+}
+
+/* Add some space to the admin page intro */
+.path-admin-local-profilecohort #intro {
+    margin-bottom: 1rem;
+}
+
+/* Style the Bootstrap collapse header on the cohort members page. */
+#profilecohort-cohortlist .card-header a {
+    background-repeat: no-repeat;
+    padding-left: 20px;
+}
+#profilecohort-cohortlist .card-header a.collapsed {
+    background-image: url([[pix:core|t/collapsed]]);
+}
+#profilecohort-cohortlist .card-header a:not(.collapsed) {
+    background-image: url([[pix:core|t/expanded]]);
+}

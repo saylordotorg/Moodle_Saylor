@@ -27,7 +27,7 @@ class aitranscript
             if ($record) {
                 $this->recordid = $record->id;
                 $this->aidata = $record;
-            } elseif($passage && $jsontranscript && $transcript) {
+            } elseif($passage!==false && $jsontranscript && $transcript) {
                 $this->recordid = self::create_record($this->attemptdata,$this->activitydata->course,$passage,$transcript,$jsontranscript);
                 if ($this->recordid) {
                     $record = $DB->get_record(constants::M_AITABLE, array('attemptid' => $attemptid));

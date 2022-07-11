@@ -130,9 +130,9 @@ class qtype_gapfill_renderer extends qtype_with_combined_feedback_renderer {
                 }
                  $cssclasses = $question->is_used($potentialanswer, $qa, $cssclasses);
                 /* the question->id is necessary to make a draggable potential answer unique for multi question quiz pages */
-                $answeroptions .= '<span id="pa:_' . $question->id . '_' . $potentialanswerid++
+                $answeroptions .= '<span draggable="true" id="pa:_' . $question->id . '_' . $potentialanswerid++
                     . '" class= "' . $cssclasses . '">' .
-                    $potentialanswer . "</span>";
+                    $potentialanswer . " </span>";
             }
         }
         $answeroptions = html_writer::tag('div', $answeroptions, array('class' => 'answeroptions'));
@@ -217,7 +217,7 @@ class qtype_gapfill_renderer extends qtype_with_combined_feedback_renderer {
             'name' => $inputname,
             'value' => $currentanswer,
             'id' => $inputname,
-            'size' => $size,
+            'size' => $size
         );
         /* When previewing after a quiz is complete */
         if ($options->readonly) {
