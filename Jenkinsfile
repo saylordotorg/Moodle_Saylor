@@ -75,12 +75,6 @@ def plugins = [
         "dest" : 'mod/accredible'
     ],
     [
-        "name" : 'report_myfeedback',
-        "url" : 'https://github.com/jgramp/moodle-report_myfeedback.git',
-        "branch" : 'master',
-        "dest" : 'report/myfeedback'
-    ],
-    [
         "name" : 'qtype_jme',
         "url" : 'https://github.com/jmvedrine/moodle-qtype_jme.git',
         "branch" : 'master',
