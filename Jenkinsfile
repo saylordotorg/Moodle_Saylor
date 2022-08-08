@@ -365,7 +365,7 @@ def plugins = [
     [
       "name" : 'availability_cohort',
       "url" : 'https://github.com/moodleuulm/moodle-availability_cohort.git',
-      "branch" : 'master',
+      "branch" : 'MOODLE_311_STABLE',
       "dest" : 'availability/condition/cohort'
     ],
     [
@@ -401,7 +401,7 @@ def plugins = [
     [
       "name" : 'availability_role',
       "url" : 'https://github.com/moodleuulm/moodle-availability_role.git',
-      "branch" : 'master',
+      "branch" : 'MOODLE_311_STABLE',
       "dest" : 'availability/condition/role'
     ],
     [
@@ -515,7 +515,7 @@ def plugins = [
     [
         "name" : 'local_profilecohort',
         "url" : 'https://github.com/moodle-an-hochschulen/moodle-local_profilecohort.git',
-        "branch" : 'master',
+        "branch" : 'MOODLE_311_STABLE',
         "dest" : 'local/profilecohort'
     ]
 ]
