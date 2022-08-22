@@ -77,7 +77,7 @@ def plugins = [
     [
         "name" : 'report_myfeedback',
         "url" : 'https://github.com/jgramp/moodle-report_myfeedback.git',
-        "branch" : 'master',
+        "branch" : 'main',
         "dest" : 'report/myfeedback'
     ],
     [
