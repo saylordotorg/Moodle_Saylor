@@ -30,7 +30,7 @@ require_once($CFG->dirroot . '/lib/formslib.php');
 use \mod_readaloud\constants;
 
 /**
- * Event observer for mod_readaloud
+ * Gradenow form for mod_readaloud
  *
  * @package    mod_readaloud
  * @copyright  2015 Justin Hunt (poodllsupport@gmail.com)
@@ -48,7 +48,10 @@ class gradenowform extends \moodleform {
         $mform->addElement('header', 'General', '');
 
         //do we show the next button
-        $shownext = $this->_customdata['shownext'];
+        $shownext =false;
+        if(isset($this->_customdata)) {
+            $shownext = $this->_customdata['shownext'];
+        }
         //$mform->addElement('text', 'name', 'BB', array('size'=>70));
 
         $buttonarray = array();

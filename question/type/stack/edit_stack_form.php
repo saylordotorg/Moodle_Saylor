@@ -28,7 +28,8 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/question/type/edit_question_form.php');
 require_once($CFG->dirroot . '/question/type/stack/question.php');
 require_once($CFG->dirroot . '/question/type/stack/questiontype.php');
-
+require_once($CFG->dirroot . '/question/type/stack/stack/prt.class.php');
+require_once($CFG->dirroot . '/question/type/stack/stack/potentialresponsetreestate.class.php');
 
 /**
  * Stack question editing form definition.
@@ -369,62 +370,83 @@ class qtype_stack_edit_form extends question_edit_form {
         $mform->setType($inputname . 'modelans', PARAM_RAW);
         $mform->addHelpButton($inputname . 'modelans', 'teachersanswer', 'qtype_stack');
         // We don't make modelans a required field in the formslib sense, because
-        // That stops the input sections collapsing by default. Instead, we enforce
+        // that stops the input sections collapsing by default. Instead, we enforce
         // that it is non-blank in the server-side validation.
 
         $mform->addElement('text', $inputname . 'boxsize', stack_string('boxsize'), array('size' => 3));
         $mform->setDefault($inputname . 'boxsize', $this->stackconfig->inputboxsize);
         $mform->setType($inputname . 'boxsize', PARAM_INT);
         $mform->addHelpButton($inputname . 'boxsize', 'boxsize', 'qtype_stack');
+        $mform->hideIf($inputname . 'boxsize', $inputname . 'type', 'in',
+            ['radio', 'checkbox', 'dropdown', 'boolean']);
 
         $mform->addElement('select', $inputname . 'insertstars',
                 stack_string('insertstars'), stack_options::get_insert_star_options());
         $mform->setDefault($inputname . 'insertstars', $this->stackconfig->inputinsertstars);
         $mform->addHelpButton($inputname . 'insertstars', 'insertstars', 'qtype_stack');
+        $mform->hideIf($inputname . 'insertstars', $inputname . 'type', 'in',
+            ['radio', 'checkbox', 'dropdown', 'boolean', 'string', 'notes'] );
 
         $mform->addElement('text', $inputname . 'syntaxhint', stack_string('syntaxhint'), array('size' => 20));
         $mform->setType($inputname . 'syntaxhint', PARAM_RAW);
+        $mform->setDefault($inputname . 'syntaxhint', '');
         $mform->addHelpButton($inputname . 'syntaxhint', 'syntaxhint', 'qtype_stack');
+        $mform->hideIf($inputname . 'syntaxhint', $inputname . 'type', 'in',
+            ['radio', 'checkbox', 'dropdown', 'boolean']);
 
         $mform->addElement('select', $inputname . 'syntaxattribute',
                 stack_string('syntaxattribute'), stack_options::get_syntax_attribute_options());
         $mform->setDefault($inputname . 'syntaxattribute', '0');
         $mform->addHelpButton($inputname . 'syntaxattribute', 'syntaxattribute', 'qtype_stack');
+        $mform->hideIf($inputname . 'syntaxattribute', $inputname . 'type', 'in',
+            ['radio', 'checkbox', 'dropdown', 'boolean']);
 
         $mform->addElement('text', $inputname . 'forbidwords', stack_string('forbidwords'), array('size' => 20));
         $mform->setType($inputname . 'forbidwords', PARAM_RAW);
         $mform->setDefault($inputname . 'forbidwords', $this->stackconfig->inputforbidwords);
         $mform->addHelpButton($inputname . 'forbidwords', 'forbidwords', 'qtype_stack');
+        $mform->hideIf($inputname . 'forbidwords', $inputname . 'type', 'in',
+            ['radio', 'checkbox', 'dropdown', 'boolean', 'string', 'notes']);
 
         $mform->addElement('text', $inputname . 'allowwords', stack_string('allowwords'), array('size' => 20));
         $mform->setType($inputname . 'allowwords', PARAM_RAW);
         $mform->setDefault($inputname . 'allowwords', '');
         $mform->addHelpButton($inputname . 'allowwords', 'allowwords', 'qtype_stack');
+        $mform->hideIf($inputname . 'allowwords', $inputname . 'type', 'in',
+            ['radio', 'checkbox', 'dropdown', 'boolean', 'string', 'notes']);
 
         $mform->addElement('selectyesno', $inputname . 'forbidfloat',
                 stack_string('forbidfloat'));
         $mform->setDefault($inputname . 'forbidfloat', $this->stackconfig->inputforbidfloat);
         $mform->addHelpButton($inputname . 'forbidfloat', 'forbidfloat', 'qtype_stack');
+        $mform->hideIf($inputname . 'forbidfloat', $inputname . 'type', 'in',
+            ['radio', 'checkbox', 'dropdown', 'boolean', 'string', 'notes']);
 
         $mform->addElement('selectyesno', $inputname . 'requirelowestterms',
                 stack_string('requirelowestterms'));
         $mform->setDefault($inputname . 'requirelowestterms', $this->stackconfig->inputrequirelowestterms);
         $mform->addHelpButton($inputname . 'requirelowestterms', 'requirelowestterms', 'qtype_stack');
+        $mform->hideIf($inputname . 'requirelowestterms', $inputname . 'type', 'in',
+            ['radio', 'checkbox', 'dropdown', 'boolean', 'string', 'notes']);
 
         $mform->addElement('selectyesno', $inputname . 'checkanswertype',
                 stack_string('checkanswertype'));
         $mform->setDefault($inputname . 'checkanswertype', $this->stackconfig->inputcheckanswertype);
         $mform->addHelpButton($inputname . 'checkanswertype', 'checkanswertype', 'qtype_stack');
+        $mform->hideIf($inputname . 'checkanswertype', $inputname . 'type', 'in',
+            ['radio', 'checkbox', 'dropdown', 'boolean', 'textarea', 'equiv', 'string', 'notes']);
 
         $mform->addElement('selectyesno', $inputname . 'mustverify',
                 stack_string('mustverify'));
         $mform->setDefault($inputname . 'mustverify', $this->stackconfig->inputmustverify);
         $mform->addHelpButton($inputname . 'mustverify', 'mustverify', 'qtype_stack');
+        $mform->hideIf($inputname . 'mustverify', $inputname . 'type', 'in', ['notes']);
 
         $mform->addElement('select', $inputname . 'showvalidation',
                 stack_string('showvalidation'), stack_options::get_showvalidation_options());
         $mform->setDefault($inputname . 'showvalidation', $this->stackconfig->inputshowvalidation);
         $mform->addHelpButton($inputname . 'showvalidation', 'showvalidation', 'qtype_stack');
+        $mform->hideIf($inputname . 'showvalidation', $inputname . 'type', 'in', ['notes']);
 
         $mform->addElement('text', $inputname . 'options', stack_string('inputextraoptions'), array('size' => 20));
         $mform->setType($inputname . 'options', PARAM_RAW);
@@ -458,7 +480,7 @@ class qtype_stack_edit_form extends question_edit_form {
         $mform->addHelpButton($prtname . 'autosimplify', 'autosimplifyprt', 'qtype_stack');
 
         $mform->addElement('select', $prtname . 'feedbackstyle',
-                stack_string('feedbackstyle'), stack_potentialresponse_tree::get_feedbackstyle_options());
+                stack_string('feedbackstyle'), stack_potentialresponse_tree_lite::get_feedbackstyle_options());
         $mform->setDefault($prtname . 'feedbackstyle', $this->stackconfig->feedbackstyle);
         $mform->addHelpButton($prtname . 'feedbackstyle', 'feedbackstyle', 'qtype_stack');
 
@@ -708,14 +730,9 @@ class qtype_stack_edit_form extends question_edit_form {
         $question->{$prtname . 'testoptions'}[$nodename] = $node->testoptions;
         $question->{$prtname . 'quiet'      }[$nodename] = $node->quiet;
 
-        // 0 + bit is to eliminate excessive decimal places from the DB.
         $question->{$prtname . 'truescoremode' }[$nodename] = $node->truescoremode;
-        $question->{$prtname . 'truescore'     }[$nodename] = 0 + $node->truescore;
-        $penalty = $node->truepenalty;
-        if ('' != trim($penalty)) {
-            $penalty = 0 + $penalty;
-        }
-        $question->{$prtname . 'truepenalty'   }[$nodename] = $penalty;
+        $question->{$prtname . 'truescore'     }[$nodename] = stack_utils::fix_trailing_zeros($node->truescore);
+        $question->{$prtname . 'truepenalty'   }[$nodename] = stack_utils::fix_trailing_zeros($node->truepenalty);
         $question->{$prtname . 'truenextnode'  }[$nodename] = $node->truenextnode;
         $question->{$prtname . 'trueanswernote'}[$nodename] = $node->trueanswernote;
         $question->{$prtname . 'truefeedback'  }[$nodename] = $this->prepare_text_field(
@@ -723,12 +740,8 @@ class qtype_stack_edit_form extends question_edit_form {
                 $node->truefeedbackformat, $node->id, 'prtnodetruefeedback');
 
         $question->{$prtname . 'falsescoremode' }[$nodename] = $node->falsescoremode;
-        $question->{$prtname . 'falsescore'     }[$nodename] = 0 + $node->falsescore;
-        $penalty = $node->falsepenalty;
-        if ('' != trim($penalty)) {
-            $penalty = 0 + $penalty;
-        }
-        $question->{$prtname . 'falsepenalty'   }[$nodename] = $penalty;
+        $question->{$prtname . 'falsescore'     }[$nodename] = stack_utils::fix_trailing_zeros($node->falsescore);
+        $question->{$prtname . 'falsepenalty'   }[$nodename] = stack_utils::fix_trailing_zeros($node->falsepenalty);
         $question->{$prtname . 'falsenextnode'  }[$nodename] = $node->falsenextnode;
         $question->{$prtname . 'falseanswernote'}[$nodename] = $node->falseanswernote;
         $question->{$prtname . 'falsefeedback'  }[$nodename] = $this->prepare_text_field(

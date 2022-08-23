@@ -216,6 +216,7 @@ $string['forever'] = 'Never expire';
 $string['en-us'] = 'English (US)';
 $string['es-us'] = 'Spanish (US)';
 $string['en-au'] = 'English (Aus.)';
+$string['en-ph'] = 'English (Phil.)';
 $string['en-gb'] = 'English (GB)';
 $string['fr-ca'] = 'French (Can.)';
 $string['fr-fr'] = 'French (FR)';

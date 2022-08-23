@@ -32,26 +32,44 @@ $('#{{AUTOID}}').data('playtime', {{canplaycount}});
 var aplayer = $('#' + "{{AUTOID}}").children().first();
 var fa = $('#' + "{{AUTOID}}" + ' .fa');
 var thestate =$('#' + "{{AUTOID}}" + '_state'); 
-var thetime = $('#' + "{{AUTOID}}" + '_time'); 
+var thetime = $('#' + "{{AUTOID}}" + '_time');
+ var playtimer = $('#' + "{{AUTOID}}");
+
       
 var details = parser.parse('{{AUTOID}}_original', 'audio');
 aplayer.attr('src',details.mediaurl); // mediaurl, subtitlesurl, sources
 
-$(fa).removeClass('fa-minus');
+ $(fa).removeClass('fa-minus');
 
-//set status
-thestate.text('- ready -');
+ //set status
+ thestate.text('- ready -');
 
 
-// setting base volume for audio player
-aplayer[0].volume = 0.2;
+ // setting base volume for audio player
+ aplayer[0].volume = 0.2;
+
+ //cookies if in strict mode
+ var cookiename = details.mediaurl + '_' + "{{URLPARAM:attempt}}"+ '_' + "{{URLPARAM:cmid}}";
+ console.log(cookiename);
+ console.log(getCookie(cookiename));
+ if("{{quiz_strict_mode}}"=="true" && "{{URLPARAM:attempt}}" !=""){
+   var prevplaycount = getCookie(cookiename);
+   if(prevplaycount!==null){
+    playtimer.data('playtime',prevplaycount);
+    if(prevplaycount==="0"){
+       disableSubsequentPlays();
+    }
+   }
+ }
+
+
 
 
 
 // Append Playtime text
 $('#' + "{{AUTOID}}" + '_playtime').empty();
- var playtimer = $('#' + "{{AUTOID}}").data('playtime');
-$('#' + "{{AUTOID}}" + '_playtime').append('Remaining plays: '+playtimer +'x');
+ var remainingplays = playtimer.data('playtime');
+$('#' + "{{AUTOID}}" + '_playtime').append('Remaining plays: '+remainingplays +'x');
 
 
 
@@ -67,10 +85,14 @@ $('#' + "{{AUTOID}}" + '_vol-down').click(function(){
 });
 
  aplayer[0].addEventListener('ended', function(){
-      var playtimer = $('#' + "{{AUTOID}}");
      $('#' + "{{AUTOID}}" + '_playtime').empty();
      var currentplaycount = playtimer.data('playtime');
        currentplaycount--;
+      //if cookies are enabled set the play count in the cookie
+     if("{{quiz_strict_mode}}"=="true" && "{{URLPARAM:attempt}}" !="" ){
+         setCookie(cookiename,currentplaycount,1);
+     }
+
       playtimer.data('playtime',currentplaycount );
 
      $(fa).removeClass('fa-circle-o-notch');
@@ -83,9 +105,7 @@ $('#' + "{{AUTOID}}" + '_vol-down').click(function(){
          $('#' + "{{AUTOID}}" + '_playtime').append('Remaining plays: '+currentplaycount+'x');
          $(fa).addClass('fa-play');
      }else{
-        $('#' + "{{AUTOID}}" + '_playtime').append('Remaining plays: 0');
-        $(fa).addClass('fa-minus');
-        $('#' + "{{AUTOID}}").data("disabled", true);
+        disableSubsequentPlays();
      }//end of if currentplaycount > 0
 
  });//end of ended listener
@@ -97,6 +117,23 @@ $('#' + "{{AUTOID}}" + '_vol-down').click(function(){
         if(currentplaycount==0){return;}
 		play_audio();
 });//end of click event
+
+ function disableSubsequentPlays(){
+  $('#' + "{{AUTOID}}" + '_playtime').append('Remaining plays: 0');
+  $(fa).addClass('fa-minus');
+  $('#' + "{{AUTOID}}").data("disabled", true);
+ }
+
+ function setCookie(key, value, expiry) {
+   var expires = new Date();
+   expires.setTime(expires.getTime() + (expiry * 24 * 60 * 60 * 1000));
+   document.cookie = key + '=' + value + ';expires=' + expires.toUTCString();
+ }
+
+ function getCookie(key) {
+   var keyValue = document.cookie.match('(^|;) ?' + key + '=([^;]*)(;|$)');
+   return keyValue ? keyValue[2] : null;
+ }
 
 
 function play_audio(){
@@ -113,6 +150,7 @@ aplayer.bind('durationchange',function(){thetime.text(poodll_mp_fetchtime(aplaye
 
 //time display function
 function poodll_mp_sec2time(seconds){
+    if(seconds=='Infinity'){return "00:00:00";}
     var date = new Date(null);
     date.setSeconds(seconds); 
     return date.toISOString().substr(11, 8);

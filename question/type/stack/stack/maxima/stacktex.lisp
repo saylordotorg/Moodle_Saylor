@@ -457,3 +457,16 @@
 (defprop $true  "\\mathbf{!BOOLTRUE!}"  texword)
 (defprop $false "\\mathbf{!BOOLFALSE!}" texword)
 
+
+;; *************************************************************************************************
+;; Added 20 Feb 2022.
+;; Remove %_C and %_E for display purposes.  The Maxima function %_ce_rem is defined in utils.mac
+
+(defmfun $tex1 (x) (reduce #'strcat (tex ($%_ce_rem x) nil nil 'mparen 'mparen)))
+
+;; *************************************************************************************************
+;; Added 30 May 2022.
+;; Allow Maxima to interigate the texword database directly.
+;; Copied directly from tex-atom.
+(defmfun $get_texword (x) (or (get x 'texword) (get (get x 'reversealias) 'texword)))
+

@@ -328,6 +328,7 @@ class utils {
             case constants::M_LANG_ENUS:
             case constants::M_LANG_ENAB:
             case constants::M_LANG_ENAU:
+            case constants::M_LANG_ENPH:
             case constants::M_LANG_ENNZ:
             case constants::M_LANG_ENZA:
             case constants::M_LANG_ENIN:
@@ -2048,6 +2049,7 @@ class utils {
                 constants::M_LANG_ENUS => get_string('en-us', constants::M_COMPONENT),
                 constants::M_LANG_ENGB => get_string('en-gb', constants::M_COMPONENT),
                 constants::M_LANG_ENAU => get_string('en-au', constants::M_COMPONENT),
+                constants::M_LANG_ENPH => get_string('en-ph', constants::M_COMPONENT),
                 constants::M_LANG_ENNZ => get_string('en-nz', constants::M_COMPONENT),
                 constants::M_LANG_ENZA => get_string('en-za', constants::M_COMPONENT),
                 constants::M_LANG_ENIN => get_string('en-in', constants::M_COMPONENT),

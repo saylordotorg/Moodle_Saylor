@@ -28,7 +28,8 @@ class stack_matrix_input extends stack_input {
         'nounits' => false,
         'simp' => false,
         'allowempty' => false,
-        'consolidatesubscripts' => false
+        'consolidatesubscripts' => false,
+        'checkvars' => 0
     );
 
     public function adapt_to_model_answer($teacheranswer) {

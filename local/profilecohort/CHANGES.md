@@ -4,6 +4,15 @@ moodle-local_profilecohort
 Changes
 -------
 
+### v3.11-r4
+
+* 2022-08-05 - get_all_user_name_fields() is deprecated, solves #45
+
+### v3.11-r3
+
+* 2022-07-10 - Add Visual checks section to UPGRADE.md
+* 2022-07-10 - Add Capabilities section to README.md
+
 ### v3.11-r2
 
 * 2022-06-26 - Make codechecker happy again

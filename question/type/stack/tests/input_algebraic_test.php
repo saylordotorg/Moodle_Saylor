@@ -38,6 +38,7 @@ require_once(__DIR__ . '/../stack/input/factory.class.php');
 
 /**
  * @group qtype_stack
+ * @covers \stack_algebraic_input
  */
 class input_algebraic_test extends qtype_stack_testcase {
 
@@ -277,6 +278,30 @@ class input_algebraic_test extends qtype_stack_testcase {
         $this->assertEquals('nounnot false xor nounnot(false)', $state->contentsmodified);
         $this->assertEquals('\[ {\rm not}\left( \mathbf{False} \right)\,{\mbox{ xor }}\, ' .
                 '{\rm not}\left( \mathbf{False} \right) \]', $state->contentsdisplayed);
+    }
+
+    public function test_validate_student_response_ex() {
+        /* The variable ex is used an argument to some Maxima functions and as a local variable. */
+        $options = new stack_options();
+        $el = stack_input_factory::make('algebraic', 'sans1', '3*ex+2*ey+5*ez');
+        $state = $el->validate_student_response(array('sans1' => '3*ex+2*ey+5*ez'), $options,
+            '3*ex+2*ey+5*ez',
+            new stack_cas_security(false, '', '', array('tans')));
+        $this->assertEquals(stack_input::VALID, $state->status);
+        $this->assertEquals('', $state->note);
+        $this->assertEquals('', $state->errors);
+        $this->assertEquals('3*ex+2*ey+5*ez', $state->contentsmodified);
+        $this->assertEquals('\[ 3\cdot {\it ex}+2\cdot {\it ey}+5\cdot {\it ez} \]',
+            $state->contentsdisplayed);
+
+        $el->set_parameter('showValidation', 1);
+        $vr = '<div class="stackinputfeedback standard" id="sans1_val"><p>Your last answer was interpreted as ' .
+            'follows: <span class="filter_mathjaxloader_equation"><span class="nolink">' .
+            '\[ 3\cdot {\it ex}+2\cdot {\it ey}+5\cdot {\it ez} \]</span></span></p>' .
+            '<input type="hidden" name="sans1_val" value="3*ex+2*ey+5*ez" />The variables found in your answer ' .
+            'were: <span class="filter_mathjaxloader_equation"><span class="nolink">' .
+            '\( \left[ {\it ex} , {\it ey} , {\it ez} \right]\)</span></span> </div>';
+        $this->assertEquals($vr, $el->replace_validation_tags($state, 'sans1', '[[validation:sans1]]'));
     }
 
     public function test_validate_student_lowest_terms_1() {
@@ -1542,6 +1567,20 @@ class input_algebraic_test extends qtype_stack_testcase {
                 . '<code>(1,-1)</code>', $el->get_teacher_answer_display('ntuple(1,-1)', '\left(1, -1\right)'));
     }
 
+    public function test_validate_student_response_ntuple_forbid() {
+        $options = new stack_options();
+        $el = stack_input_factory::make('algebraic', 'sans1', '[1,2]');
+        $el->set_parameter('forbidWords', 'ntuple');
+        $state = $el->validate_student_response(array('sans1' => '(1,2)'), $options, '[1,2]',
+            new stack_cas_security(false, '', '', array('ta')));
+        $this->assertEquals($state->status, stack_input::INVALID);
+        $this->assertEquals($state->contentsmodified, 'ntuple(1,2)');
+        $this->assertEquals($state->contentsdisplayed,
+            '<span class="stacksyntaxexample">(1,2)</span>');
+        $this->assertEquals('forbiddenFunction', $state->note);
+        $this->assertEquals('Coordinates are not permitted in this input.', $state->errors);
+    }
+
     public function test_validate_consolidatesubscripts() {
         $options = new stack_options();
         $el = stack_input_factory::make('algebraic', 'state', 'M_1');
@@ -1551,5 +1590,38 @@ class input_algebraic_test extends qtype_stack_testcase {
         $this->assertEquals(stack_input::VALID, $state->status);
         $this->assertEquals('M1', $state->contentsmodified);
         $this->assertEquals('\[ M_{1} \]', $state->contentsdisplayed);
+    }
+
+    public function test_validate_checkvars() {
+        $options = new stack_options();
+        $el = stack_input_factory::make('algebraic', 'ans2', 'a+b+c');
+
+        $el->set_parameter('options', 'checkvars:1');
+        $state = $el->validate_student_response(array('ans2' => 'x^2+z'), $options, 'a+b+c',
+            new stack_cas_security());
+        $this->assertEquals(stack_input::INVALID, $state->status);
+        $this->assertEquals('x^2+z', $state->contentsmodified);
+        $this->assertEquals('\[ x^2+z \]', $state->contentsdisplayed);
+        $this->assertEquals('', $state->note);
+        $this->assertEquals('These variables are not needed: x, z.', $state->errors);
+
+        $el->set_parameter('options', 'checkvars:2');
+        $state = $el->validate_student_response(array('ans2' => 'x^2+z'), $options, 'a+b+c',
+            new stack_cas_security());
+        $this->assertEquals(stack_input::INVALID, $state->status);
+        $this->assertEquals('x^2+z', $state->contentsmodified);
+        $this->assertEquals('\[ x^2+z \]', $state->contentsdisplayed);
+        $this->assertEquals('', $state->note);
+        $this->assertEquals('These variables are missing: a, b, c.', $state->errors);
+
+        $el->set_parameter('options', 'checkvars:3');
+        $state = $el->validate_student_response(array('ans2' => 'x^2+z'), $options, 'a+b+c',
+            new stack_cas_security());
+        $this->assertEquals(stack_input::INVALID, $state->status);
+        $this->assertEquals('x^2+z', $state->contentsmodified);
+        $this->assertEquals('\[ x^2+z \]', $state->contentsdisplayed);
+        $this->assertEquals('', $state->note);
+        $this->assertEquals('These variables are not needed: x, z. ' .
+            'These variables are missing: a, b, c.', $state->errors);
     }
 }

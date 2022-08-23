@@ -21,14 +21,13 @@ Feature: Grade a test response for a pattern match question
       | questioncategory | qtype    | name         | template |
       | Test questions   | pmatch   | My first pattern match question | listen    |
     And the default question test responses exist for question "My first pattern match question"
-    And I log in as "teacher"
 
   @javascript
   Scenario: Grade an existing test response for pattern match question.
     # Check responses are listed correctly
-    Given I am on the pattern match test responses page for question "My first pattern match question"
-    Then I should see "testing one two three four" in the "#qtype-pmatch-testquestion_r0_c5" "css_element"
-    When I set the field with xpath "//form[@id='attemptsform']//table[@id='responses']//td[@id='qtype-pmatch-testquestion_r0_c0']//input" to "1"
+    When I am on the "My first pattern match question" "qtype_pmatch > test responses" page logged in as teacher
+    And I should see "testing one two three four" in the "#qtype-pmatch-testquestion_r0_c5" "css_element"
+    And I click on "Select response" "checkbox" in the "testing one two three four" "table_row"
     And I press "Test selected responses"
     Then I should see "Pattern-match question testing tool: Testing question: My first pattern match question"
     And I should see "Processing response 1 of 1: testing one two three four."
@@ -45,5 +44,5 @@ Feature: Grade a test response for a pattern match question
 
     # Now test changing the human mark
     And I should see "1" in the "#qtype-pmatch-testquestion_r0_c4" "css_element"
-    When I click on "//form[@id='attemptsform']//table[@id='responses']//td[@id='qtype-pmatch-testquestion_r0_c4']//a" "xpath_element"
+    When I click on "a.updater-ef" "css_element" in the "testing one two three four" "table_row"
     Then I should see "0" in the "#qtype-pmatch-testquestion_r0_c4" "css_element"

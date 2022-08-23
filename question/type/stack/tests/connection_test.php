@@ -23,13 +23,12 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once(__DIR__ . '/../locallib.php');
 require_once(__DIR__ . '/fixtures/test_base.php');
-require_once(__DIR__ . '/../stack/cas/castext.class.php');
 require_once(__DIR__ . '/../stack/cas/keyval.class.php');
 
-// Unit tests for {@link stack_cas_text}.
 
 /**
  * @group qtype_stack
+ * @covers \stack_connection_helper
  */
 class connection_test extends qtype_stack_testcase {
 

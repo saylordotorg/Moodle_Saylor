@@ -5,15 +5,13 @@ past development history is documented on [Development history](Development_hist
 
 How to report bugs and make suggestions is described on the [community](../About/Community.md) page.
 
-## Version 4.4
+## Version 4.5
 
-1. Caching validation.
-2. Compiled PRTs.
-3. CASText2.
+TODO: List of long lasting issues dealt with, that might need to be notified/closed, note that some of these have connecting issues:
+ #671, #420
 
-## Maxima side PRTs.
-
-* Change behaviour of UnitsAbsolute in response to discussion of issue #448.
+1. Error messages: use caserror.class more fully to use user information to target error messages.
+2. Remove all "cte" code from Maxima - mostly install.
 
 ## For "inputs 2"?
 

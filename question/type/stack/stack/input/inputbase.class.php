@@ -43,7 +43,7 @@ abstract class stack_input {
     /**
      * @var string the name of the input.
      * This name has two functions
-     *  (1) it is the name of thename of the POST variable that the input from this
+     *  (1) it is the name of the POST variable that the input from this
      *  element will be submitted as.
      *  (2) it is the name of the CAS variable to which the student's answer is assigned.
      *  Note, that during authoring, the teacher simply types [[input:name]] in the question stem to
@@ -114,7 +114,7 @@ abstract class stack_input {
     protected $rawcontents = array();
 
     /**
-     * Decide if the input is being used at run-time or just constructed elswhere.
+     * Decide if the input is being used at runtime or just constructed elsewhere.
      * @var bool.
      */
     protected $runtime = true;
@@ -264,6 +264,12 @@ abstract class stack_input {
                 case 'consolidatesubscripts':
                     if (!(is_bool($arg))) {
                         $this->errors[] = stack_string('numericalinputoptboolerr', array('opt' => $option, 'val' => $arg));
+                    }
+                    break;
+
+                case 'checkvars':
+                    if (!($arg === false || is_numeric($arg))) {
+                        $this->errors[] = stack_string('numericalinputoptinterr', array('opt' => $option, 'val' => $arg));
                     }
                     break;
 
@@ -705,7 +711,7 @@ abstract class stack_input {
             if (array_key_exists($index, $errors) && '' == $errors[$index]) {
                 $cs->set_cas_validation_context($this->name.$index, $this->get_parameter('lowestTerms', false),
                         $ta, $ivalidationmethod,
-                    $this->get_extra_option('simp', false));
+                        $this->get_extra_option('simp', false),  $this->get_extra_option('checkvars', 0));
                 $sessionvars[] = $cs;
             }
         }
@@ -716,7 +722,7 @@ abstract class stack_input {
         if ($valid && $answer->get_valid()) {
             $answer->set_cas_validation_context($this->name, $this->get_parameter('lowestTerms', false),
                     $teacheranswer, $validationmethod,
-                    $this->get_extra_option('simp', false));
+                    $this->get_extra_option('simp', false),  $this->get_extra_option('checkvars', 0));
             // Evaluate both the answer, and the validation context separately.
             // This allows us to display 1/0 type errors without actually evaluating them.
             $sessionvars[] = $answer;
@@ -779,11 +785,16 @@ abstract class stack_input {
         // Answers may not contain the ? character.  CAS-strings may, but answers may not.
         // It is very useful for teachers to be able to add in syntax hints.
         // We make sure +- -> #pm# here so that +- can be interpreted at +(-....).
-        if ($valid && $answerd->is_correctly_evaluated()) {
-            $interpretedanswer = $answerd->get_evaluationform();
-        } else {
-            $interpretedanswer = $answerd->get_inputform(true, 1, false);
-        }
+        $params = array('inputform' => true,
+                        'qmchar' => false,
+                        'pmchar' => 1,
+                        'nosemicolon' => true,
+                        'keyless' => true,
+                        'dealias' => true, // This is needed to stop pi->%pi etc.
+                        'nounify' => 1,
+                        'nontuples' => false
+        );
+        $interpretedanswer = $answerd->ast_to_string(null, $params);
         // TODO: apply a filter to check the ast!
         if (!(strpos($interpretedanswer, '?') === false) ||
             !(strpos($interpretedanswer, 'QMCHAR') === false)) {
@@ -953,7 +964,7 @@ abstract class stack_input {
         }
 
         // Construct one final "answer" as a single maxima object.
-        $answer = $this->caslines_to_answer($caslines);
+        $answer = $this->caslines_to_answer($caslines, $basesecurity);
 
         return array($valid, $errors, $notes, $answer, $caslines);
     }
@@ -986,7 +997,7 @@ abstract class stack_input {
         $additionalvars = array();
 
         if (array_key_exists('floatnum', $this->extraoptions) && $this->extraoptions['floatnum']) {
-            $additionalvars['floatnum'] = stack_ast_container::make_from_teacher_source('floatnump('.$this->name.')',
+            $additionalvars['floatnum'] = stack_ast_container::make_from_teacher_source('simp_floatnump('.$this->name.')',
                     '', new stack_cas_security(), array());
         }
 
@@ -1319,8 +1330,18 @@ abstract class stack_input {
         $cs = stack_ast_container::make_from_teacher_source($value, '', new stack_cas_security(), array());
         $cs->set_nounify(0);
         $val = '';
+
+        $params = array('checkinggroup' => true,
+            'qmchar' => false,
+            'pmchar' => 1,
+            'nosemicolon' => true,
+            'keyless' => true,
+            'dealias' => false, // This is needed to stop pi->%pi etc.
+            'nounify' => 0,
+            'nontuples' => false
+        );
         if ($cs->get_valid()) {
-            $value = $cs->get_evaluationform();
+            $value = $cs->ast_to_string(null, $params);
         }
         return $this->maxima_to_response_array($value);
     }

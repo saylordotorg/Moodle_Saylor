@@ -1,6 +1,14 @@
+Version 1.0.44(2022082200)
+- Fixed issue with Arabic Voice "Zeina" not working
+- Added 2 new Arabic voices
+
+Version 1.0.43(2022073100)
+- Fixed issue with shortanswer grading most answers as correct
+- Fixed issue with TTS Dialog Voice C not working
+
 Version 1.0.42(Build 2022060500)
  - Added better free trial link
- -Rebuilt JS for < M3.8
+ - Rebuilt JS for < M3.8
 
 Version 1.0.41(Build 2022053100)
  - added some styling to text block in content area

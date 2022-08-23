@@ -1,3 +1,6 @@
+Version 1.0.21 (Build 2022072100)
+- Fixed issue introduced in 1.0.20 if cron successfully retrieved the auto transcript before the self transcript was complete.
+
 Version 1.0.20 (Build 2022071100)
 - Fixed an issue that caused an error if the student did not enter a transcript (ie submitted an empty string)
 

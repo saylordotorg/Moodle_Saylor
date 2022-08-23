@@ -53,19 +53,17 @@ class testquestion_controller {
 
     public function __construct($question, $context) {
         $this->question = $question;
-        $this->testresponses = \qtype_pmatch\testquestion_responses::create_for_question($question);
+        $this->testresponses = testquestion_responses::create_for_question($question);
         $this->context = $context;
-        $pagesize = optional_param('pagesize', self::DEFAULT_PAGE_SIZE, PARAM_INT);
-        $page = optional_param('page', 0, PARAM_INT);
-        $this->options = new \qtype_pmatch\testquestion_options($question);
-        $this->optionsform = new \qtype_pmatch\testquestion_options_form($this->get_base_url());
-        $this->responsestable = new \qtype_pmatch\testquestion_table($question,
+        $this->options = new testquestion_options($question);
+        $this->optionsform = new testquestion_options_form($this->get_base_url());
+        $this->responsestable = new testquestion_table($question,
                 $this->testresponses, $this->options);
         // Initiate download dropdown list.
         $this->responsestable->is_downloading('');
     }
 
-    public function handle_display_options_form () {
+    public function handle_display_options_form(): string {
         // Handle any options form submission.
         if ($fromform = $this->optionsform->get_data()) {
             $this->options->process_settings_from_form($fromform);
@@ -74,10 +72,10 @@ class testquestion_controller {
         }
         $this->optionsform->set_data($this->options->get_initial_form_data());
         // Print the options form.
-        print $this->optionsform->display();
+        return $this->optionsform->render();
     }
 
-    public function handle_responses_table_form() {
+    public function handle_responses_table_form(): void {
         // Handle any attempts form submission.
         $this->process_response_table_actions($this->options->get_url());
         // Note the attempts form is wrapped around this responses table - see wrap_html_start().
@@ -90,7 +88,7 @@ class testquestion_controller {
      */
     protected function get_base_url() {
         return new \moodle_url('/question/type/pmatch/testquestion.php',
-                array('id' => $this->question->id));
+                ['id' => $this->question->id]);
     }
 
     /**
@@ -100,9 +98,9 @@ class testquestion_controller {
     protected function process_response_table_actions($redirecturl) {
         global $OUTPUT;
         if (optional_param('test', 0, PARAM_BOOL) && confirm_sesskey()) {
-            if ($responseids = optional_param_array('responseid', array(), PARAM_INT)) {
+            if ($responseids = optional_param_array('responseid', [], PARAM_INT)) {
                 $this->print_grading_responses_progressbar($responseids);
-                \qtype_pmatch\testquestion_responses::save_rule_matches($this->question, $responseids);
+                testquestion_responses::save_rule_matches($this->question, $responseids);
                 echo $OUTPUT->continue_button($redirecturl);
                 echo $OUTPUT->footer();
                 exit;
@@ -110,9 +108,9 @@ class testquestion_controller {
         }
 
         if (optional_param('delete', 0, PARAM_BOOL) && confirm_sesskey()) {
-            if ($responseids = optional_param_array('responseid', array(), PARAM_INT)) {
+            if ($responseids = optional_param_array('responseid', [], PARAM_INT)) {
                 question_require_capability_on($this->question, 'edit');
-                \qtype_pmatch\testquestion_responses::delete_responses_by_ids($responseids);
+                testquestion_responses::delete_responses_by_ids($responseids);
                 echo get_string('testquestiondeletedresponses', 'qtype_pmatch');
                 echo $OUTPUT->continue_button($redirecturl);
                 echo $OUTPUT->footer();
@@ -134,7 +132,7 @@ class testquestion_controller {
             $row++;
             \qtype_pmatch\testquestion_responses::grade_response($response, $this->question);
             $pbar->update($row, $rowcount, get_string('processingxofy', 'qtype_pmatch',
-                    array('row' => $row, 'total' => $rowcount, 'response' => $response->response)));
+                    ['row' => $row, 'total' => $rowcount, 'response' => $response->response]));
         }
     }
 

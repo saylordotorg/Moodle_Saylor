@@ -85,7 +85,7 @@ class mod_wordcards_external extends external_api {
     public static function report_successful_association_parameters() {
         return new external_function_parameters([
             'termid' => new external_value(PARAM_INT),
-            'isfreemode' => new external_value(PARAM_BOOL, 'True if free mode is being used', VALUE_OPTIONAL)
+            'isfreemode' => new external_value(PARAM_BOOL, 'True if free mode is being used', VALUE_DEFAULT,0)
         ]);
     }
 
@@ -121,7 +121,7 @@ class mod_wordcards_external extends external_api {
         return new external_function_parameters([
             'term1id' => new external_value(PARAM_INT),
             'term2id' => new external_value(PARAM_INT),
-            'isfreemode' => new external_value(PARAM_BOOL, 'True if free mode is being used', VALUE_OPTIONAL)
+            'isfreemode' => new external_value(PARAM_BOOL, 'True if free mode is being used', VALUE_DEFAULT,0)
         ]);
     }
 

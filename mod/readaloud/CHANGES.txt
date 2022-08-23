@@ -1,3 +1,8 @@
+2.0.87 (Build 2022072400)
+- Added en-PH
+- Fixed issue with completion from adhoc task in ReadAloud
+- Fixed issue with manual grading when there was no auto transcript available
+
 2.0.86 (Build 2022060500)
  - Added a better free trial and rebuilt JS for < M.3.8
 

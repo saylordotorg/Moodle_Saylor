@@ -39,11 +39,11 @@ require_once($CFG->dirroot  . '/course/modlib.php');
  */
 class facetoface_test extends advanced_testcase {
     /**
-     * @test
-     *
      * Test to check facetoface is added properly.
+     *
+     * @covers \facetoface_add_instance
      */
-    public function add_facetofaceactivity() {
+    public function test_add_facetofaceactivity() {
         global $DB;
 
         $this->resetAfterTest();

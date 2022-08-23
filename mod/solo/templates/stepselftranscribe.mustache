@@ -66,7 +66,7 @@
                     data.selftranscript = $('#' + '{{uniqid}}_selftranscript').val();
                     //lets not let people leave the page with an empty transcript
                     if(data.selftranscript.trim()===''){
-                        Notification.alert('Important',"Please enter something in the textbox before leaving this page.")
+                        Notification.alert('{{#str}}important, mod_solo{{/str}}',"{{#str}}noemptyselftranscript, mod_solo{{/str}}");
                         return false;
                     }
 
