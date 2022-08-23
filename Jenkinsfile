@@ -203,7 +203,7 @@ def plugins = [
     [
         "name" : 'qtype_coderunner',
         "url" : 'https://github.com/trampgeek/moodle-qtype_coderunner.git',
-        "branch" : 'master',
+        "branch" : 'MOODLE_3X_STABLE',
         "dest" : 'question/type/coderunner'
     ],
     [
@@ -335,7 +335,7 @@ def plugins = [
     [
       "name" : 'availability_role',
       "url" : 'https://github.com/moodle-an-hochschulen/moodle-availability_role.git',
-      "branch" : 'master',
+      "branch" : 'MOODLE_311_STABLE',
       "dest" : 'availability/condition/role'
     ],
     [
@@ -347,7 +347,7 @@ def plugins = [
     [
       "name" : 'availability_cohort',
       "url" : 'https://github.com/moodle-an-hochschulen/moodle-availability_cohort.git',
-      "branch" : 'master',
+      "branch" : 'MOODLE_311_STABLE',
       "dest" : 'availability/condition/cohort'
     ],
     [
