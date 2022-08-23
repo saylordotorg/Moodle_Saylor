@@ -1,0 +1,146 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_threesixo/questionnaire
+
+    Moodle template to the template library
+
+    The purpose of this template is build the entire page for the template library (by including smaller templates).
+
+    Classes required for JS:
+    * none
+
+    Data attributes required for JS:
+    * none
+
+    Context variables required for this template:
+    * status
+    * statusclass
+    * scalelabels
+    * ratedquestions
+    * scales
+
+    Example context (json):
+    {
+        "status": "In progress",
+        "statusclass": "badge-info",
+        "ratedquestions": [
+            { "questionid" : 1, "question": "Treats co-workers with courtesy and respect." },
+            { "questionid" : 2, "question": "Has a positive attitude." },
+            { "questionid" : 3, "question": "Has initiative needed without relying on co-workers unnecessarily." },
+            { "questionid" : 4, "question": "Can capably lead projects effectively." },
+            { "questionid" : 5, "question": "Possesses strong technical skills for their position." }
+        ],
+        "scales": [
+            { "scale" : 1, "scalelabel": "1", "description": "Strongly disagree" },
+            { "scale" : 2, "scalelabel": "2", "description": "Disagree" },
+            { "scale" : 3, "scalelabel": "3", "description": "Somewhat disagree" },
+            { "scale" : 4, "scalelabel": "4", "description": "Somewhat agree" },
+            { "scale" : 5, "scalelabel": "5", "description": "Agree"},
+            { "scale" : 6, "scalelabel": "6", "description": "Strongly agree" },
+            { "scale" : 0, "scalelabel": "N/A", "description": "Not applicable" }
+        ]
+    }
+}}
+<div class="card">
+    <div class="card-body" data-region="status">
+        <span class="badge {{statusclass}}">{{ status }}</span>
+    </div>
+</div>
+<table class="table table-striped"
+       data-region="questionnaire"
+       data-threesixtyid="{{threesixtyid}}"
+       data-anonymous="{{anonymous}}"
+       data-fromuserid="{{fromuserid}}"
+       data-touserid="{{touserid}}"
+       data-tousername="{{tousername}}">
+    {{#hasratedquestions}}
+        <tr role="none">
+            <th role="none">
+                <div class="row rtl-compatible" role="row">
+                    <div class="col-md-5" role="columnheader">
+                        <div class="sr-only">
+                            {{#str}}question, mod_threesixo{{/str}}
+                        </div>
+                    </div>
+                    {{#scales}}
+                        <div class="col-md-1 hideoverflow text-center" title="{{description}}" role="columnheader">
+                            <span class="d-sm-none">{{scalelabel}} - </span>{{description}}
+                        </div>
+                    {{/scales}}
+                </div>
+            </th>
+        </tr>
+        {{#ratedquestions}}
+        <tr role="none">
+            <td role="none">
+                <div class="row rtl-compatible" data-region="question-row" role="row">
+                    <div class="col-md-5" role="rowheader" id="question-{{questionid}}">
+                        {{question}}
+                    </div>
+                    <div class="col-md-7" role="none">
+                        <div class="container">
+                            <div class="row" data-region="question-item" data-itemid="{{id}}" role="radiogroup" aria-labelledby="question-{{questionid}}">
+                                {{#scales}}
+                                    <div class="col text-center">
+                                        <input class="threesixo_questionnaire_question" type="radio" name="question-{{questionid}}" value="{{scale}}" id="option-{{questionid}}-{{scale}}"/>
+                                        <label for="option-{{questionid}}-{{scale}}" class="scaleoptionlabel btn btn-secondary" data-region="rating-scale-option" data-questionid="{{questionid}}" data-value="{{scale}}" data-radio-button="option-{{questionid}}-{{scale}}">
+                                            <span aria-hidden="true">{{scalelabel}}</span>
+                                            <span class="sr-only">{{description}}</span>
+                                        </label>
+                                    </div>
+                                {{/scales}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        {{/ratedquestions}}
+    {{/hasratedquestions}}
+    {{#hascommentquestions}}
+        <tr>
+            <th>
+                {{#str}}comments, mod_threesixo{{/str}}
+            </th>
+        </tr>
+        {{#commentquestions}}
+        <tr>
+            <td>
+                <div class="row rtl-compatible">
+                    <div class="col-md-5">
+                        {{question}}
+                    </div>
+                    <div class="col-md-7" data-region="question-item" data-itemid="{{id}}">
+                        <textarea placeholder="{{#str}}entercomment, mod_threesixo{{/str}}" class="form-control" cols="50" rows="5" data-region="comment-item" data-itemid="{{id}}">{{value}}</textarea>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        {{/commentquestions}}
+    {{/hascommentquestions}}
+</table>
+<div>
+    <button class="btn btn-primary" id="submit-feedback">{{#str}}submit{{/str}}</button>
+    <button class="btn btn-secondary" id="save-feedback">{{#str}}savechanges{{/str}}</button>
+    <a class="btn btn-secondary" id="cancel-feedback" href="{{returnurl}}">{{#str}}cancel{{/str}}</a>
+</div>
+{{#js}}
+    require(['mod_threesixo/questionnaire'], function(questionnaire) {
+        questionnaire.init();
+    });
+{{/js}}
