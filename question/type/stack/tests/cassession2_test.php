@@ -164,7 +164,7 @@ class cassession2_test extends qtype_stack_testcase {
 
     public function test_feedback() {
         $simpoff = stack_ast_container::make_from_teacher_source('simp:false', 'test_answernote()', new stack_cas_security());
-        $validation = stack_ast_container::make_from_teacher_source('stack_validate_typeless([2/4], true, true,"~a")',
+        $validation = stack_ast_container::make_from_teacher_source('stack_validate_typeless([2/4], true, 1/2, "~a", 0, true)',
                 'test_answernote()', new stack_cas_security());
 
         $session = new stack_cas_session2([$simpoff, $validation]);
@@ -211,7 +211,7 @@ class cassession2_test extends qtype_stack_testcase {
         // Add the shared stuff there naturelly before those...
         $basesession->prepend_to_session($prtsession);
 
-        // Now then lets make some statements. No options now.
+        // Now then let's make some statements. No options now.
         $sans = 'ans1';
         $tans = 'ta';
 
@@ -227,7 +227,7 @@ class cassession2_test extends qtype_stack_testcase {
         $prtsession->add_statement($tans);
         $prtsession->add_statement($result);
 
-        // Instanttiate.
+        // Instantiate.
         $prtsession->instantiate();
 
         // Check parameters.
@@ -2019,10 +2019,9 @@ class cassession2_test extends qtype_stack_testcase {
                     '', new stack_cas_security(), array());
         }
 
-        $expected = '([Root] ([Op: :] ([Id] ta), ([FunctionCall: ([Id] ev)] ' .
-            '([FunctionCall: ([Id] taylor)] ([Op: *] ([Int] 10), ' .
-            '([FunctionCall: ([Id] cos)] ([Op: *] ([Int] 2), ([Id] x)))),([Id] x),([Op: /] ' .
-            '([Id] %pi), ([Int] 4)),([Int] 2)),([Id] simp))))';
+        $expected = '([Root] ([Op: :] ([Id] ta), ([FunctionCall: ([Id] ev)] ([FunctionCall: ([Id] %_E)] ([FunctionCall: ' .
+            '([Id] %_E)] ([FunctionCall: ([Id] taylor)] ([Op: *] ([Int] 10), ([FunctionCall: ([Id] cos)] ' .
+            '([Op: *] ([Int] 2), ([Id] x)))),([Id] x),([Op: /] ([Id] %pi), ([Int] 4)),([Int] 2)))),([Id] simp))))';
         $this->assertEquals($expected, $s1[0]->get_ast_test());
 
         $options = new stack_options();
@@ -2226,6 +2225,12 @@ class cassession2_test extends qtype_stack_testcase {
         $s = new stack_cas_session2($s1, $options, 0);
         $s->instantiate();
 
+        $a = array();
+        foreach ($s->get_contextvariables() as $i => $v) {
+            $a[$i] = $v->get_evaluationform();
+        }
+        $this->assertEquals(array('(%_C(ordergreat),ordergreat(x,y,z))'), $a);
+
         foreach ($t1 as $i => $t) {
             $this->assertEquals($t[1], $s1[$i]->get_value());
         }
@@ -2242,5 +2247,177 @@ class cassession2_test extends qtype_stack_testcase {
         $at1->instantiate();
         $cs = $at1->get_by_key('p1');
         $this->assertEquals("b^2#pm#c", $cs->get_value());
+    }
+
+    public function test_eval_in_block() {
+        $qv = "f:ev(2*x,x=2);\n" .
+            "ev(g:3*x,x=3);\n" .
+            "h:5*x,x=5;\n".
+            "k:36;";
+        $qv = new stack_cas_keyval($qv, null, 123);
+        $this->assertTrue($qv->get_valid());
+
+        $session = $qv->get_session();
+        $s1 = stack_ast_container::make_from_teacher_source('[f,g,h,k]', '', new stack_cas_security(), array());
+        $session->add_statement($s1);
+        $this->assertTrue($session->get_valid());
+
+        $session->instantiate();
+        $this->assertTrue($session->is_instantiated());
+
+        $this->assertEquals('[4,9,25,36]', $s1->get_value());
+    }
+
+    public function test_confirm_induced_timeout() {
+        $qv = "p1:2^(2^100)-1;\n" .
+              "p2:factor(p1);\n";
+        $qv = new stack_cas_keyval($qv, null, 123);
+        $this->assertTrue($qv->get_valid());
+
+        $session = $qv->get_session();
+        $s1 = stack_ast_container::make_from_teacher_source('[p1,p2]', '', new stack_cas_security(), array());
+        $session->add_statement($s1);
+        $this->assertTrue($session->get_valid());
+
+        $session->instantiate();
+        $this->assertFalse($session->is_instantiated());
+        $this->assertEquals('TIMEDOUT', $s1->get_errors());
+    }
+
+    public function test_complex_number_display() {
+
+        // These test cases get wrapped in the general display_complex(ex) function to test the default conversion.
+        $cases = array();
+        $cases[] = array('3+2*%i', '3+2\,\mathrm{i}');
+        $cases[] = array('-3+2*%i', '-3+2\,\mathrm{i}');
+        $cases[] = array('-3-2*%i', '-3-2\,\mathrm{i}');
+        $cases[] = array('3-2*%i', '3-2\,\mathrm{i}');
+        $cases[] = array('1+%i', '1+\mathrm{i}');
+        $cases[] = array('1-%i', '1-\mathrm{i}');
+        $cases[] = array('3/2+%i', '\frac{3}{2}+\mathrm{i}');
+        $cases[] = array('(3+2*%i)/2', '\frac{3}{2}+\mathrm{i}');
+        $cases[] = array('%i', '\mathrm{i}');
+        $cases[] = array('-%i', '-\mathrm{i}');
+        $cases[] = array('a+b*%i', 'a+\mathrm{i}\,b');
+        $cases[] = array('-a+b*%i', '-a+\mathrm{i}\,b');
+        $cases[] = array('a-b*%i', 'a-\mathrm{i}\,b');
+        $cases[] = array('%i * 3/5', '\frac{3}{5}\,\mathrm{i}');
+        // Note this is not displayed as \frac{\mathrm{i}}{5} by design.
+        $cases[] = array('%i/5', '\frac{1}{5}\,\mathrm{i}');
+        $cases[] = array('%i/sqrt(2)', '\frac{1}{\sqrt{2}}\,\mathrm{i}');
+        // Note this function simplifies its arguments.
+        $cases[] = array('2*%i/sqrt(2)', '\sqrt{2}\,\mathrm{i}');
+        $cases[] = array('%i * p/q', '\mathrm{i}\,\frac{p}{q}');
+        $cases[] = array('%i * sqrt(2)', '\sqrt{2}\,\mathrm{i}');
+        $cases[] = array('%i * sqrt(2)/5', '\frac{\sqrt{2}}{5}\,\mathrm{i}');
+        $cases[] = array('%i * %pi', '\pi\,\mathrm{i}');
+        $cases[] = array('%i * 2*%pi', '2\cdot \pi\,\mathrm{i}');
+        $cases[] = array('%i * 2*%pi/3', '\frac{2\cdot \pi}{3}\,\mathrm{i}');
+
+        $s1 = array();
+        foreach ($cases as $k => $case) {
+            $s1[] = stack_ast_container::make_from_teacher_source('display_complex(' . $case[0] . ')',
+                '', new stack_cas_security(), array());
+        }
+        $options = new stack_options();
+        $options->set_option('simplify', false);
+        $session = new stack_cas_session2($s1, $options, 0);
+        $this->assertTrue($session->get_valid());
+
+        $session->instantiate();
+        $this->assertTrue($session->is_instantiated());
+
+        foreach ($cases as $k => $case) {
+            $this->assertEquals($case[1], $s1[$k]->get_display());
+        }
+
+        $cases = array();
+        $cases[] = array('disp_complex(3,2)', '3+2\,\mathrm{i}');
+        $cases[] = array('disp_complex(2/4,1)', '\frac{2}{4}+1\,\mathrm{i}');
+        $cases[] = array('disp_complex(0,2)', '0+2\,\mathrm{i}');
+        $cases[] = array('disp_complex(0,1)', '0+1\,\mathrm{i}');
+        // This is not displayed as i/2 by design.
+        $cases[] = array('disp_complex(null,1/2)', '\frac{1}{2}\,\mathrm{i}');
+        $cases[] = array('disp_complex(null,2)', '2\,\mathrm{i}');
+        $cases[] = array('disp_complex(null,-2)', '-2\,\mathrm{i}');
+        $cases[] = array('disp_complex(1,null)', '1+\mathrm{i}');
+        $cases[] = array('disp_complex(1,-null)', '1-\mathrm{i}');
+        $cases[] = array('disp_complex(null,-null)', '-\mathrm{i}');
+        $cases[] = array('disp_complex(a,b)', 'a+\mathrm{i}\,b');
+        // This simplifies the second argumet in order to pull out the unary minus.
+        // This is a feature, not a bug!
+        $cases[] = array('disp_complex(a,(-b^2)/b)', 'a-\mathrm{i}\,b');
+        $cases[] = array('disp_complex(a,b^2/b)', 'a+\mathrm{i}\,\frac{b^2}{b}');
+
+        $s1 = array();
+        foreach ($cases as $k => $case) {
+            $s1[] = stack_ast_container::make_from_teacher_source($case[0], '', new stack_cas_security(), array());
+        }
+        $options = new stack_options();
+        $options->set_option('simplify', false);
+        $session = new stack_cas_session2($s1, $options, 0);
+        $this->assertTrue($session->get_valid());
+
+        $session->instantiate();
+        $this->assertTrue($session->is_instantiated());
+
+        foreach ($cases as $k => $case) {
+            $this->assertEquals($case[1], $s1[$k]->get_display());
+        }
+    }
+
+    public function test_complex_number_display_options() {
+
+        // These test cases get wrapped in the general display_complex(ex) function to test the default conversion.
+        $cases = array();
+        $cases[] = array('3+2*%i', '3+2\,\mathrm{j}');
+        $cases[] = array('-3+2*%i', '-3+2\,\mathrm{j}');
+        $cases[] = array('-3-2*%i', '-3-2\,\mathrm{j}');
+        $cases[] = array('3-2*%i', '3-2\,\mathrm{j}');
+        $cases[] = array('1+%i', '1+\mathrm{j}');
+        $cases[] = array('1-%i', '1-\mathrm{j}');
+
+        $cases[] = array('-3+2*%j', '-3+2\,\mathrm{j}');
+
+        $s1 = array();
+        foreach ($cases as $k => $case) {
+            $s1[] = stack_ast_container::make_from_teacher_source('display_complex(' . $case[0] . ')',
+                '', new stack_cas_security(), array());
+        }
+        $options = new stack_options();
+        $options->set_option('simplify', false);
+        $options->set_option('complexno', 'j');
+        $session = new stack_cas_session2($s1, $options, 0);
+        $this->assertTrue($session->get_valid());
+
+        $session->instantiate();
+        $this->assertTrue($session->is_instantiated());
+
+        foreach ($cases as $k => $case) {
+            $this->assertEquals($case[1], $s1[$k]->get_display());
+        }
+    }
+
+    public function test_parens_display() {
+
+        $cases = array();
+        $cases[] = array('disp_parens(display_complex(1+%i))*x^2+disp_parens(display_complex(1-%i))',
+        '\left( 1+\mathrm{i} \right)\cdot x^2+\left( 1-\mathrm{i} \right)');
+
+        $s1 = array();
+        foreach ($cases as $k => $case) {
+            $s1[] = stack_ast_container::make_from_teacher_source($case[0], '', new stack_cas_security(), array());
+        }
+        $options = new stack_options();
+        $options->set_option('simplify', false);
+        $session = new stack_cas_session2($s1, $options, 0);
+        $this->assertTrue($session->get_valid());
+
+        $session->instantiate();
+        $this->assertTrue($session->is_instantiated());
+
+        foreach ($cases as $k => $case) {
+            $this->assertEquals($case[1], $s1[$k]->get_display());
+        }
     }
 }

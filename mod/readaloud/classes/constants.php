@@ -176,6 +176,7 @@ class constants {
     const M_LANG_ENUS = 'en-US';
     const M_LANG_ENGB = 'en-GB';
     const M_LANG_ENAU = 'en-AU';
+    const M_LANG_ENPH = 'en-PH';
     const M_LANG_ENNZ = 'en-NZ';
     const M_LANG_ENZA = 'en-ZA';
     const M_LANG_ENIN = 'en-IN';

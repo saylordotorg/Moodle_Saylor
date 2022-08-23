@@ -99,7 +99,7 @@ class setupform extends \moodleform {
 
     }
 
-public function validation($data, $files) {
+    public function validation($data, $files) {
         $errors = parent::validation($data, $files);
            
           if (!empty($data['viewend'])) {
@@ -112,6 +112,4 @@ public function validation($data, $files) {
 
         return $errors;
     }
-}
-
 }

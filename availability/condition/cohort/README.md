@@ -1,7 +1,7 @@
 moodle-availability_cohort
 ==========================
 
-[![Moodle Plugin CI](https://github.com/moodle-an-hochschulen/moodle-availability_cohort/workflows/Moodle%20Plugin%20CI/badge.svg?branch=master)](https://github.com/moodle-an-hochschulen/moodle-availability_cohort/actions?query=workflow%3A%22Moodle+Plugin+CI%22+branch%3Amaster)
+[![Moodle Plugin CI](https://github.com/moodle-an-hochschulen/moodle-availability_cohort/workflows/Moodle%20Plugin%20CI/badge.svg?branch=MOODLE_311_STABLE)](https://github.com/moodle-an-hochschulen/moodle-availability_cohort/actions?query=workflow%3A%22Moodle+Plugin+CI%22+branch%3AMOODLE_311_STABLE)
 
 Moodle availability plugin which lets users restrict resources, activities and sections based on cohorts.
 
@@ -43,6 +43,12 @@ After installing the plugin, it is ready to use without the need for any configu
 Teachers (and other users with editing rights) can add the "cohort" availability condition to activities / resources / sections in their courses. While adding the condition, they have to define the cohort in which students are a member in to access the activity / resource / section.
 
 If you want to learn more about using availability plugins in Moodle, please see https://docs.moodle.org/en/Restrict_access.
+
+
+Capabilities
+------------
+
+This plugin does not add any additional capabilities.
 
 
 How this plugin works / Pitfalls

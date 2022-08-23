@@ -58,11 +58,12 @@ The other major difference is that we support multiple authentication factor **t
 `master` is considered stable and supports these versions, with the caveat of backporting the API's needed.
 A minimum of PHP7.0 is required to run this plugin.
 
-| Moodle Version    |  Branch      | Patches              |
-|-------------------|--------------|----------------------|
-| Moodle 3.8 -3.9   | master       | None                 |
-| Moodle 3.7        | master       | MDL-66340            |
-| Moodle 3.5-3.6    | master       | MDL-66340, MDL-60470 |
+| Version         |  Branch      | Patches              |
+|-----------------|--------------|----------------------|
+| Moodle 3.8 -3.9 | master       | None                 |
+| Moodle 3.7      | master       | MDL-66340            |
+| Moodle 3.5-3.6  | master       | MDL-66340, MDL-60470 |
+| Totara 12-15    | master       | MDL-66340, MDL-60470 |
 
 ## Installation
 
@@ -306,7 +307,7 @@ php admin/cli/cfg.php --component=tool_mfa --name=enabled --set=0
 
 If you have issues please log them in github here
 
-https://github.com/catalyst/moodle-auth_saml2/issues
+https://github.com/catalyst/moodle-tool_mfa/issues
 
 Please note our time is limited, so if you need urgent support or want to
 sponsor a new feature then please contact Catalyst IT Australia:

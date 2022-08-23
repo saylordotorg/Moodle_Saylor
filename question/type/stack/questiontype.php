@@ -29,10 +29,16 @@ require_once($CFG->libdir . '/questionlib.php');
 require_once(__DIR__ . '/stack/input/factory.class.php');
 require_once(__DIR__ . '/stack/answertest/controller.class.php');
 require_once(__DIR__ . '/stack/cas/keyval.class.php');
-require_once(__DIR__ . '/stack/cas/castext.class.php');
+require_once(__DIR__ . '/stack/cas/castext2/castext2_evaluatable.class.php');
+require_once(__DIR__ . '/stack/cas/castext2/castext2_static_replacer.class.php');
 require_once(__DIR__ . '/stack/questiontest.php');
+require_once(__DIR__ . '/stack/prt.class.php');
+require_once(__DIR__ . '/stack/potentialresponsetreestate.class.php');
+require_once(__DIR__ . '/stack/prt.class.php');
 require_once(__DIR__ . '/stack/graphlayout/graph.php');
 require_once(__DIR__ . '/lang/multilang.php');
+require_once(__DIR__ . '/stack/prt.class.php');
+
 
 /**
  * Stack question type class.
@@ -67,7 +73,30 @@ class qtype_stack extends question_type {
 
         $fromform->penalty = stack_utils::fix_approximate_thirds($fromform->penalty);
 
-        return parent::save_question($question, $fromform);
+        // This odd looking guard clause exists because moodle core test case generator
+        // functions return a question without an id.
+        $oldid = 0;
+        if (property_exists($question, 'id')) {
+            $oldid = $question->id;
+        }
+
+        $new = parent::save_question($question, $fromform);
+        // Earlier than Moodle 4.0.
+        if (stack_determine_moodle_version() < 400) {
+            return $new;
+        }
+        $newid = $new->id;
+
+        // Copy over test cases.
+        $testcases = $this->load_question_tests($oldid);
+        $this->save_question_tests($newid, $testcases);
+
+        // Copy over deployed seeds.
+        foreach ($this->get_question_deployed_seeds($oldid) as $seed) {
+            $this->deploy_variant($newid, $seed);
+        }
+
+        return $new;
     }
 
     /**
@@ -280,7 +309,7 @@ class qtype_stack extends question_type {
                 $node->truescoremode       = $fromform->{$prtname . 'truescoremode'}[$nodename];
                 $node->truescore           = $fromform->{$prtname . 'truescore'}[$nodename];
                 $node->truepenalty         = stack_utils::fix_approximate_thirds(
-                                $fromform->{$prtname . 'truepenalty'}[$nodename]);
+                    $fromform->{$prtname . 'truepenalty'}[$nodename]);
                 $node->truenextnode        = $fromform->{$prtname . 'truenextnode'}[$nodename];
                 $node->trueanswernote      = $fromform->{$prtname . 'trueanswernote'}[$nodename];
                 $node->truefeedback        = $this->import_or_save_files(
@@ -290,7 +319,7 @@ class qtype_stack extends question_type {
                 $node->falsescoremode      = $fromform->{$prtname . 'falsescoremode'}[$nodename];
                 $node->falsescore          = $fromform->{$prtname . 'falsescore'}[$nodename];
                 $node->falsepenalty        = stack_utils::fix_approximate_thirds(
-                                $fromform->{$prtname . 'falsepenalty'}[$nodename]);
+                    $fromform->{$prtname . 'falsepenalty'}[$nodename]);
                 $node->falsenextnode       = $fromform->{$prtname . 'falsenextnode'}[$nodename];
                 $node->falseanswernote     = $fromform->{$prtname . 'falseanswernote'}[$nodename];
                 $node->falsefeedback        = $this->import_or_save_files(
@@ -403,19 +432,28 @@ class qtype_stack extends question_type {
 
         $noders = $DB->get_recordset('qtype_stack_prt_nodes',
                 array('questionid' => $question->id),
-                'prtname, ' . $DB->sql_cast_char2int('nodename'));
+                'prtname, nodename');
         foreach ($noders as $node) {
+            if (!property_exists($question->prts[$node->prtname], 'nodes')) {
+                $question->prts[$node->prtname]->nodes = [];
+            }
             $question->prts[$node->prtname]->nodes[$node->nodename] = $node;
         }
         $noders->close();
 
-        $question->deployedseeds = $DB->get_fieldset_sql('
+        $question->deployedseeds = $this->get_question_deployed_seeds($question->id);
+
+        return true;
+    }
+
+    protected function get_question_deployed_seeds($qid) {
+        global $DB;
+
+        return $DB->get_fieldset_sql('
                 SELECT seed
                   FROM {qtype_stack_deployed_seeds}
                  WHERE questionid = ?
-              ORDER BY id', array($question->id));
-
-        return true;
+              ORDER BY id', array($qid));
     }
 
     protected function initialise_question_instance(question_definition $question, $questiondata) {
@@ -500,50 +538,12 @@ class qtype_stack extends question_type {
 
         $prtnames = array_keys($this->get_prt_names_from_question($question->questiontext, $question->specificfeedback));
         foreach ($prtnames as $name) {
-            $prtdata = $questiondata->prts[$name];
-            $nodes = array();
-            foreach ($prtdata->nodes as $key => $nodedata) {
-                $sans = stack_ast_container::make_from_teacher_source('PRSANS' . $key . ':' . $nodedata->sans,
-                        '', new stack_cas_security());
-                $tans = stack_ast_container::make_from_teacher_source('PRTANS' . $key . ':' . $nodedata->tans,
-                        '', new stack_cas_security());
-
-                if (is_null($nodedata->falsepenalty) || $nodedata->falsepenalty === '') {
-                    $falsepenalty = $questiondata->penalty;
-                } else {
-                    $falsepenalty = $nodedata->falsepenalty;
-                }
-                if (is_null($nodedata->truepenalty) || $nodedata->truepenalty === '') {
-                    $truepenalty = $questiondata->penalty;
-                } else {
-                    $truepenalty = $nodedata->truepenalty;
-                }
-
-                $node = new stack_potentialresponse_node($sans, $tans,
-                        $nodedata->answertest, $nodedata->testoptions, (bool) $nodedata->quiet, '', $nodedata->id);
-                $node->add_branch(0, $nodedata->falsescoremode, $nodedata->falsescore,
-                        $falsepenalty, $nodedata->falsenextnode,
-                        $nodedata->falsefeedback, $nodedata->falsefeedbackformat, $nodedata->falseanswernote);
-                $node->add_branch(1, $nodedata->truescoremode, $nodedata->truescore,
-                        $truepenalty, $nodedata->truenextnode,
-                        $nodedata->truefeedback, $nodedata->truefeedbackformat, $nodedata->trueanswernote);
-                $nodes[$nodedata->nodename] = $node;
-            }
-
-            if ($prtdata->feedbackvariables) {
-                $feedbackvariables = new stack_cas_keyval($prtdata->feedbackvariables);
-                $feedbackvariables = $feedbackvariables->get_session();
-            } else {
-                $feedbackvariables = null;
-            }
-
             $prtvalue = 0;
             if (!$allformative) {
                 $prtvalue = $prtdata->value / $totalvalue;
             }
-            $question->prts[$name] = new stack_potentialresponse_tree($name, '',
-                    (bool) $prtdata->autosimplify, $prtvalue,
-                    $feedbackvariables, $nodes, (string) $prtdata->firstnodename, (int) $prtdata->feedbackstyle);
+            $question->prts[$name] = new stack_potentialresponse_tree_lite($questiondata->prts[$name],
+                $prtvalue, $question);
         }
 
         $question->deployedseeds = array_values($questiondata->deployedseeds);
@@ -1079,10 +1079,10 @@ class qtype_stack extends question_type {
         foreach ($q->prts as $index => $prt) {
             foreach ($prt->get_nodes_summary() as $nodeid => $choices) {
                 $parts[$index . '-' . $nodeid] = array(
-                    $choices->falsenote => new question_possible_response(
-                            $choices->falsenote, $choices->falsescore * $prt->get_value()),
-                    $choices->truenote => new question_possible_response(
-                            $choices->truenote, $choices->truescore * $prt->get_value()),
+                    $choices->falseanswernote => new question_possible_response(
+                            $choices->falseanswernote, $choices->falsescore * $prt->get_value()),
+                    $choices->trueanswernote => new question_possible_response(
+                            $choices->trueanswernote, $choices->truescore * $prt->get_value()),
                     null              => question_possible_response::no_response(),
                 );
             }
@@ -1198,15 +1198,15 @@ class qtype_stack extends question_type {
                 $output .= "        <testoptions>{$format->xml_escape($node->testoptions)}</testoptions>\n";
                 $output .= "        <quiet>{$node->quiet}</quiet>\n";
                 $output .= "        <truescoremode>{$node->truescoremode}</truescoremode>\n";
-                $output .= "        <truescore>{$node->truescore}</truescore>\n";
-                $output .= "        <truepenalty>{$node->truepenalty}</truepenalty>\n";
+                $output .= "        <truescore>{$format->xml_escape($node->truescore)}</truescore>\n";
+                $output .= "        <truepenalty>{$format->xml_escape($node->truepenalty)}</truepenalty>\n";
                 $output .= "        <truenextnode>{$node->truenextnode}</truenextnode>\n";
                 $output .= "        <trueanswernote>{$format->xml_escape($node->trueanswernote)}</trueanswernote>\n";
                 $output .= $this->export_xml_text($format, 'truefeedback', $node->truefeedback, $node->truefeedbackformat,
                                 $contextid, 'prtnodetruefeedback', $node->id, '        ');
                 $output .= "        <falsescoremode>{$node->falsescoremode}</falsescoremode>\n";
-                $output .= "        <falsescore>{$node->falsescore}</falsescore>\n";
-                $output .= "        <falsepenalty>{$node->falsepenalty}</falsepenalty>\n";
+                $output .= "        <falsescore>{$format->xml_escape($node->falsescore)}</falsescore>\n";
+                $output .= "        <falsepenalty>{$format->xml_escape($node->falsepenalty)}</falsepenalty>\n";
                 $output .= "        <falsenextnode>{$node->falsenextnode}</falsenextnode>\n";
                 $output .= "        <falseanswernote>{$format->xml_escape($node->falseanswernote)}</falseanswernote>\n";
                 $output .= $this->export_xml_text($format, 'falsefeedback', $node->falsefeedback, $node->falsefeedbackformat,
@@ -1758,6 +1758,13 @@ class qtype_stack extends question_type {
             }
         }
 
+        // These particular castrings must not end in a semicolon, (unlike keyvals!).
+        $tvalue = trim($value);
+        $tvalue = substr($tvalue, strlen($tvalue) - 1);
+        if ($tvalue === ';') {
+            $errors[$fieldname][] = stack_string('nosemicolon');
+        }
+
         return $errors;
     }
 
@@ -1774,7 +1781,10 @@ class qtype_stack extends question_type {
             $errors[$fieldname][] = stack_string('forbiddendoubledollars');
         }
 
-        $castext = new stack_cas_text($value, $session, $this->seed);
+        // The castext2_evaluatable-class is much simpler for validation use.
+        // Could ask the utils class directly for the internal casstrings,
+        // but why when the evaluatable-class already does that.
+        $castext = castext2_evaluatable::make_from_source($value, 'validation-' . $fieldname);
         if (!$castext->get_valid()) {
             $errors[$fieldname][] = $castext->get_errors();
             return $errors;
@@ -1823,7 +1833,7 @@ class qtype_stack extends question_type {
      * This is done last, and separate from the other validation for two reasons:
      * 1. The rest of the validation is organised to validate the form in order,
      *    to match the way the form is defined. Here we need to validate in the
-     *    order that the CAS is evaluated at run-time.
+     *    order that the CAS is evaluated at runtime.
      * 2. This is the slowest part of validation, so we only do it at the end if
      *    everything else is OK.
      *
@@ -2043,7 +2053,7 @@ class qtype_stack extends question_type {
         if (stack_ans_test_controller::required_atoptions($atname)) {
             $opt = trim($fromform[$prtname . 'testoptions'][$nodekey]);
 
-            if ('' === trim($opt)) {
+            if ('' === trim($opt) && stack_ans_test_controller::required_atoptions($atname) === true) {
                 $errors[$nodegroup][] = stack_string('testoptionsrequired');
 
             } else if (strlen($opt) > 255) {
@@ -2064,13 +2074,17 @@ class qtype_stack extends question_type {
             $branchgroup = $prtname . 'nodewhen' . $branch . '[' . $nodekey . ']';
 
             $score = $fromform[$prtname . $branch . 'score'][$nodekey];
-            if (!is_numeric($score) || $score < 0 || $score > 1) {
-                 $errors[$branchgroup][] = stack_string('scoreerror');
+            if (is_numeric($score)) {
+                if ($score < 0 || $score > 1) {
+                    $errors[$branchgroup][] = stack_string('scoreerror');
+                }
             }
 
             $penalty = $fromform[$prtname . $branch . 'penalty'][$nodekey];
-            if ('' != $penalty && (!is_numeric($penalty) || $penalty < 0 || $penalty > 1)) {
-                $errors[$branchgroup][] = stack_string('penaltyerror2');
+            if ('' != $penalty && is_numeric($penalty)) {
+                if ($penalty < 0 || $penalty > 1) {
+                    $errors[$branchgroup][] = stack_string('penaltyerror2');
+                }
             }
 
             $answernote = $fromform[$prtname . $branch . 'answernote'][$nodekey];
@@ -2226,9 +2240,17 @@ class qtype_stack extends question_type {
                 } else {
                     $right = $falsenextnode[$key] + 1;
                 }
+                $ts = $truescore[$key];
+                if (is_numeric($ts)) {
+                    $ts = round($ts, 2);
+                }
+                $fs = $falsescore[$key];
+                if (is_numeric($fs)) {
+                    $fs = round($fs, 2);
+                }
                 $graph->add_node($key + 1, $left, $right,
-                        $truescoremode[$key] . round($truescore[$key], 2),
-                        $falsescoremode[$key] . round($falsescore[$key], 2),
+                        $truescoremode[$key] . $ts,
+                        $falsescoremode[$key] . $fs,
                         '#fgroup_id_' . $prtname . 'node_' . $key);
 
                 $lastkey = max($lastkey, $key);
@@ -2264,8 +2286,8 @@ class qtype_stack extends question_type {
                     $right = $node->falsenextnode + 1;
                 }
                 $graph->add_node($node->nodename + 1, $left, $right,
-                        $node->truescoremode . round($node->truescore, 2),
-                        $node->falsescoremode . round($node->falsescore, 2),
+                        $node->truescoremode . $node->truescore,
+                        $node->falsescoremode . $node->falsescore,
                         '#fgroup_id_' . $prtname . 'node_' . $node->nodename);
             }
             $graph->layout();
@@ -2300,11 +2322,16 @@ class qtype_stack extends question_type {
         $inputkeys = array();
         if (is_array($inputs)) {
             foreach ($inputs as $input) {
-                $inputkeys[] = $input->name;
+                $inputkeys[$input->name] = $input->name;
             }
         } else {
             return array();
         }
+
+        // Note in real use we would simply read this from the compiled-cache
+        // and would let it find out if need be, but the assumption is that
+        // at this moment it is not possible. Basically:
+        // $question->get_cached('required')[$prtname].
 
         // TODO fix this. At the moment it only considers the data from the unedited
         // question. We should take into account any changes made since the
@@ -2318,19 +2345,18 @@ class qtype_stack extends question_type {
         }
         $prt = $question->prts[$prtname];
 
-        $prtnodes = array();
-        foreach ($prt->nodes as $name => $node) {
-            $sans = stack_ast_container::make_from_teacher_source($node->sans, '', new stack_cas_security());
-            $tans = stack_ast_container::make_from_teacher_source($node->tans, '', new stack_cas_security());
-            $prtnode = new stack_potentialresponse_node($sans, $tans, $node->answertest, $node->testoptions);
-            $prtnode->add_branch(1, '+', 0, '', -1, $node->truefeedback, $node->truefeedbackformat, '');
-            $prtnode->add_branch(0, '+', 0, '', -1, $node->falsefeedback, $node->falsefeedbackformat, '');
-            $prtnodes[$name] = $prtnode;
-        }
-        $feedbackvariables = new stack_cas_keyval($prt->feedbackvariables);
-        $potentialresponsetree = new stack_potentialresponse_tree(
-                '', '', false, 0, $feedbackvariables->get_session(), $prtnodes, (string) $prt->firstnodename, 1);
-        return $potentialresponsetree->get_required_variables($inputkeys);
-    }
+        // Safe to hard-wire the value as 1 here as this PRT is not used for scoreing.
+        $prt = new stack_potentialresponse_tree_lite($prt, 1, $question);
 
+        // Just do the full compile it does all the checking including feedback.
+        $compile['required'] = array();
+        try {
+            $compile = $prt->compile($inputkeys, [], 0.0, new stack_cas_security(), '/p/0');
+        } catch (Exception $e) {
+            // Avoids dealing with an error in the PRT definition that a latter part handles.
+            return array();
+        }
+
+        return array_keys($compile['required']);
+    }
 }

@@ -56,7 +56,7 @@ define('MDL_F2F_CANCEL_TEXT', 10);    // Send just a plan email 8+2.
 define('MDL_F2F_CANCEL_ICAL', 9);     // Send just a combined text/ical message 8+1.
 
 // Name of the custom field where the manager's email address is stored.
-define('MDL_MANAGERSEMAIL_FIELD', 'managersemail');
+define('F2F_MDL_MANAGERSEMAIL_FIELD', 'managersemail');
 
 // Custom field related constants.
 define('CUSTOMFIELD_DELIMITER', '##SEPARATOR##');
@@ -198,7 +198,7 @@ function facetoface_cost($userid, $sessionid, $sessiondata, $htmloutput=true) {
  * @param  int $duration duration in hours
  * @return string
  */
-function format_duration($duration) {
+function facetoface_format_duration($duration) {
     $components = explode(':', $duration);
 
     // Default response.
@@ -405,7 +405,7 @@ function facetoface_delete_instance($id) {
 /**
  * Prepare the user data to go into the database.
  */
-function cleanup_session_data($session) {
+function facetoface_cleanup_session_data($session) {
 
     // Convert hours (expressed like "1.75" or "2" or "3.5") to minutes.
     $session->duration = facetoface_hours_to_minutes($session->duration);
@@ -443,7 +443,7 @@ function facetoface_add_session($session, $sessiondates) {
     global $USER, $DB;
 
     $session->timecreated = time();
-    $session = cleanup_session_data($session);
+    $session = facetoface_cleanup_session_data($session);
 
     $eventname = $DB->get_field('facetoface', 'name,id', array('id' => $session->facetoface));
 
@@ -479,7 +479,7 @@ function facetoface_update_session($session, $sessiondates) {
     global $DB;
 
     $session->timemodified = time();
-    $session = cleanup_session_data($session);
+    $session = facetoface_cleanup_session_data($session);
 
     $transaction = $DB->start_delegated_transaction();
     $DB->update_record('facetoface_sessions', $session);
@@ -778,7 +778,7 @@ function facetoface_email_substitutions($msg, $facetofacename, $reminderperiod, 
     $msg = str_replace(get_string('placeholder:sessiondate', 'facetoface'), $sessiondate, $msg);
     $msg = str_replace(get_string('placeholder:starttime', 'facetoface'), $starttime, $msg);
     $msg = str_replace(get_string('placeholder:finishtime', 'facetoface'), $finishtime, $msg);
-    $msg = str_replace(get_string('placeholder:duration', 'facetoface'), format_duration($data->duration), $msg);
+    $msg = str_replace(get_string('placeholder:duration', 'facetoface'), facetoface_format_duration($data->duration), $msg);
     if (empty($data->details)) {
         $msg = str_replace(get_string('placeholder:details', 'facetoface'), '', $msg);
     } else {
@@ -1396,7 +1396,7 @@ function facetoface_download_attendees($facetofacename, $session, $attendees, $f
                         break;
                     case 'checkbox':
                         // 1 = Yes, 0 = No
-                        $data = empty($data) ?  "\u{2610}" : "\u{2611}";
+                        $data = empty($data) ? "\u{2610}" : "\u{2611}";
                         $format['align'] = 'center';
                         break;
                     case 'datetime':
@@ -2134,11 +2134,10 @@ function facetoface_user_cancel($session, $userid=false, $forcecancel=false, &$e
  * @param class $facetoface record from the facetoface table
  * @param class $session record from the facetoface_sessions table
  * @param integer $userid ID of the recipient of the email
- * @param string $htmlmessage Html message
  * @returns string Error message (or empty string if successful)
  */
 function facetoface_send_notice($postsubject, $posttext, $posttextmgrheading,
-                                $notificationtype, $facetoface, $session, $userid, $htmlmessage) {
+                                $notificationtype, $facetoface, $session, $userid) {
     global $CFG, $DB;
 
     $user = $DB->get_record('user', array('id' => $userid));
@@ -2310,11 +2309,8 @@ function facetoface_send_confirmation_notice($facetoface, $session, $userid, $no
     // Set invite bit.
     $notificationtype |= MDL_F2F_INVITE;
 
-    // Set HTML Body.
-    $htmlmessage = $facetoface->confirmationmessage;
-
     return facetoface_send_notice($postsubject, $posttext, $posttextmgrheading,
-                                  $notificationtype, $facetoface, $session, $userid, $htmlmessage);
+                                  $notificationtype, $facetoface, $session, $userid);
 }
 
 /**
@@ -2369,7 +2365,7 @@ function facetoface_check_signup($facetofaceid) {
  */
 function facetoface_get_manageremail($userid) {
     global $DB;
-    $fieldid = $DB->get_field('user_info_field', 'id', array('shortname' => MDL_MANAGERSEMAIL_FIELD));
+    $fieldid = $DB->get_field('user_info_field', 'id', array('shortname' => F2F_MDL_MANAGERSEMAIL_FIELD));
     if ($fieldid) {
         return $DB->get_field('user_info_data', 'data', array('userid' => $userid, 'fieldid' => $fieldid));
     } else {
@@ -3588,7 +3584,7 @@ function facetoface_print_session($session, $showcapacity, $calendaroutput=false
     }
 
     if (!empty($session->duration)) {
-        $table->data[] = array(get_string('duration', 'facetoface'), format_duration($session->duration));
+        $table->data[] = array(get_string('duration', 'facetoface'), facetoface_format_duration($session->duration));
     }
     if (!empty($session->normalcost)) {
         $table->data[] = array(get_string('normalcost', 'facetoface'), format_cost($session->normalcost));

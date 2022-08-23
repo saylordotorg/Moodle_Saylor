@@ -27,4 +27,9 @@ Manual tests
 ------------
 
 * There aren't any manual tests needed to upgrade this plugin.
-* However, it might be advisable to have a look at the output of the plugin in the activity condition GUI as Moodle themes can always change small details in this area.
+
+
+Visual checks
+-------------
+
+* It might be advisable to have a look at the output of the plugin in the activity condition GUI as Moodle themes can always change small details in this area.

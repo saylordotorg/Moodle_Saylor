@@ -66,6 +66,9 @@ stack_reset(not_used) := block(
   OPT_OUTPUT: "LaTeX",
   PLOT_TAGS: true,
 
+  /* Records the number of the plot. */
+  STACK_PLOT_UNIQUE_NUMBER: 0,
+
   true
 )$
 
@@ -146,25 +149,28 @@ matchfix("|", "|");
 /* Load STACK packages                */
 /* ********************************** */
 
+/* This must come before stacktex.lisp as the latter relies on compiled functions in utils.mac. */
+load("utils.mac");
+load("errortostring.lisp");
+
 load("assessment.mac");
 load("noun_simp.mac");
 load("inequalities.mac");
 load("intervals.mac");
 load("stackunits.mac");
-load("stacktex.lisp");
 load("stackstrings.mac");
+
+load("stacktex.lisp");
+/* Ensure back compatability with versions before 5.41.0. */
+if is(MAXIMA_VERSION_NUM<40.1) then load("stacktex40.lisp");
+if is(MAXIMA_VERSION_NUM<44.0) then load("stack44.mac");
 
 /* This file is a modified core Maxima function with local variable name clashes fixed. */
 load("trigrat.lisp");
 load("trigtools");
 
 load("sregex");
-/* Ensure back compatability with versions before 5.41.0. */
-if is(MAXIMA_VERSION_NUM<40.1) then load("stacktex40.lisp");
-if is(MAXIMA_VERSION_NUM<44.0) then load("stack44.mac");
-load("utils.mac");
 load("numericaltest.mac");
-load("errortostring.lisp");
 
 load("local.mac");
 
@@ -181,8 +187,10 @@ alias(cosech,csch);                /* Corresponds to current student expectation
 alias(sgn,signum);                 /* Corresponds to current student expectations. */
 texput(signum, "\\mathrm{sgn}");
 
+declare ("#", commutative);
+
 simplify(ex) := ev(fullratsimp(ex), simp);      /* Allows simplify to be something. */
-degree(ex,v) := ev(hipow(expand(ex), v), simp); /* See notes on hipow.              */
+degree(ex, v) := ev(hipow(expand(ex), v), simp); /* See notes on hipow.              */
 
 
 make_complexJ(OPT_COMPLEXJ) := block(
@@ -572,6 +580,14 @@ _APPEND_ERR(err_list, reference) := if ev(stackmap_has_key(%ERR, %stmt), simp)
  else
   %ERR:stackmap_set(%ERR, %stmt, [[err_list,reference]])$
 
+_UNDO_ERR(err_list, reference) := block([%_tmp],
+  if (ev(stackmap_has_key(%ERR, %stmt), simp)) then (
+    %_tmp: stackmap_get(%ERR,%stmt),
+    %_tmp: delete([err_list,reference], %_tmp),
+    %ERR: stackmap_set(%ERR, %stmt, %_tmp)
+  )
+)$
+
 /* Function to attach a note to the current statement. */
 _APPEND_NOTE(note) := if ev(stackmap_has_key(%NOTES, %stmt), simp)
  then
@@ -620,6 +636,20 @@ _CS2dv(_k,_v) := block([%_tmp],
  0)$
 _CS2dvv(_k,_v) := (_CS2v(_k,_v),_CS2dv(_k,_v),0)$
 
+_CS2out() := (
+ _RESPONSE : stackmap_set(_RESPONSE, "timeout", false),
+ _RESPONSE : stackmap_set(_RESPONSE, "values", _VALUES),
+ if length(%ERR) > 1 then
+   _RESPONSE : stackmap_set(_RESPONSE, "errors", %ERR),
+ if length(%NOTES) > 1 then
+   _RESPONSE : stackmap_set(_RESPONSE, "notes", %NOTES),
+ if length(%FEEDBACK) > 1 then
+   _RESPONSE : stackmap_set(_RESPONSE, "feedback", %FEEDBACK),
+ print("STACK-OUTPUT-BEGINS>"),
+ print(stackjson_stringify(_RESPONSE)),
+ print("<STACK-OUTPUT-ENDS")
+)$
+
 /* ********************************** */
 /* Display                            */
 /* ********************************** */
@@ -633,17 +663,19 @@ _CS2dvv(_k,_v) := (_CS2v(_k,_v),_CS2dv(_k,_v),0)$
 stack_disp(expr, exprm) := block([str:"", expru],
     /* LaTeX display */
     if OPT_OUTPUT = "LaTeX" then
-        if not(ev(elementp(exprm, {"", "i", "d", "id"}), simp)) then print(concat("ERROR: illegal delimiter option found: ", exprm)),
+        if not(ev(elementp(exprm, {"", "i", "d", "id", "i{", "{"}), simp)) then print(concat("ERROR: illegal delimiter option found: ", exprm)),
     /* Fine tune display, e.g. sort out display of atoms like theta0. */
-    expru: expr,
+    expru: %_ce_rem(expr),
     if not(stack_disp_control_structurep(expr)) then block(
         expru: unary_minus_sort(expr),
         expru: stack_disp_sub_script(expru)),
 
-    str: block([expstr, offset, ld, rd],
+    str: block([expstr, ld, rd],
         ld: "",
         rd: "",
         if exprm = "i" then block(ld: "\\(", rd:"\\)"),
+        if exprm = "i{" then block(ld: "\\({", rd:"}\\)"),
+        if exprm = "{" then block(ld: "{", rd:"}"),
         if exprm = "id" then block(ld: "\\(\\displaystyle ", rd:"\\)"),
         if exprm = "d" then block(ld: "\\[", rd:"\\]"),
         mminusbp100(true),
@@ -702,6 +734,8 @@ stack_disp_sub_script(ex) := block([s],
  /* Now deal with supscripts. */
  if not(atom(ex)) then return(apply(op(ex), maplist(stack_disp_sub_script, args(ex)))),
  if simp_numberp(ex) or stringp(ex) or ex or not(ex) then return(ex),
+ /* Check for an explicit entry in the texput database for this atom. */
+ if stringp(get_texword(ex)) then return(ex),
  s: string(ex),
  s: split(s, "_"),
  /* If we can't parse the string back, just use the string. */
@@ -886,13 +920,28 @@ StackBasicReturn(validity, result, note) := [validity, result, StackAddNote("", 
 /* ******************************************* */
 
 /* List of variables, without some specific tokens in. */
-stack_validate_listofvars(ex) := block([lvars],
-   lvars:ev(setify(listofvars(ex)), simp),
-   lvars:ev(setdifference(lvars,{null, QMCHAR, EMPTYANSWER}), simp),
-   lvars:ev(sort(listify(lvars)), simp)
+stack_validate_listofvars(_exunlikelyatom) := block([lvars],
+    lvars:ev(setify(listofvars(_exunlikelyatom)), simp),
+    lvars:ev(setdifference(lvars,{null, QMCHAR, EMPTYANSWER}), simp),
+    lvars:ev(sort(listify(lvars)), simp)
 )$
 
-stack_validate(expr, LowestTerms, TAns, fltfmt) := block([simp:false, exs, SameType, fvs, fvs1, fvs2],
+stack_validate_checkvars(sexpr, texpr, chkopt) := block([%_sansvar,%_tansvar,%_extras,%_errstr],
+    if is(chkopt = 0) then return(""),
+    %_sansvar:setify(stack_validate_listofvars(sexpr)),
+    %_tansvar:setify(stack_validate_listofvars(texpr)),
+    %_extras: setdifference(%_sansvar, %_tansvar),
+    %_missing:setdifference(%_tansvar, %_sansvar),
+    %_errstr: "",
+    if ev(length(%_extras) > 0 and mod(chkopt, 2) = 1,simp) then
+      %_errstr:StackAddFeedback(%_errstr, "ValidateVarsSpurious" , stack_disp_comma_separate(listify(%_extras))),
+    if ev(length(%_missing) > 0 and (mod(chkopt, 4)-mod(chkopt, 2)) = 2, simp) then
+      %_errstr:StackAddFeedback(%_errstr, "ValidateVarsMissing" , stack_disp_comma_separate(listify(%_missing))),
+    /* A non-empty string means invalid. */
+    return(%_errstr)
+)$
+
+stack_validate(expr, LowestTerms, TAns, fltfmt, chkopt) := block([simp:false, exs, SameType, fvs, fvs1, fvs2, chkvars],
   /* If we have a float format, then use it. */
   if not(is(fltfmt=false)) then
     stackfltfmt:fltfmt,
@@ -908,6 +957,9 @@ stack_validate(expr, LowestTerms, TAns, fltfmt) := block([simp:false, exs, SameT
   SameType:ATSameTypefun(expr, TAns),
   if ev(is(SameType[2]=false),simp) then print(SameType[4])
     else (_RESET_NOTES(),_RESET_FEEDBACK()),
+  /* Check variables in the answer. */
+  chkvars:stack_validate_checkvars(expr, TAns, chkopt),
+  if ev(not(is(chkvars="")), simp) then print(chkvars),
   /* Check for malformed real sets. */
   if realset_surface_p(expr) then block([ret],
     ret:interval_validate_realset(expr),
@@ -933,7 +985,7 @@ stack_validate(expr, LowestTerms, TAns, fltfmt) := block([simp:false, exs, SameT
 )$
 
 /* Validate an expression without type checking. Floats and mathematical errors only. */
-stack_validate_typeless(expr, LowestTerms, Equiv, fltfmt) := block([simp:false, exs, fvs, fvs1, fvs2],
+stack_validate_typeless(expr, LowestTerms, TAns, fltfmt, chkopt, Equiv) := block([simp:false, exs, fvs, fvs1, fvs2],
   /* If we have a float format, then use it. */
   if not(is(fltfmt=false)) then
     stackfltfmt:fltfmt,
@@ -945,6 +997,9 @@ stack_validate_typeless(expr, LowestTerms, Equiv, fltfmt) := block([simp:false, 
   ),
   if length(expr)#1 then print(StackAddFeedback("", "CommaError", string(expr), string(setify(expr)))),
   expr: first(expr),
+  /* Check variables in the answer. */
+  chkvars:stack_validate_checkvars(expr, TAns, chkopt),
+  if ev(not(is(chkvars="")), simp) then print(chkvars),
   /* Check for malformed real sets. */
   if realset_surface_p(expr) then block([ret],
     ret:interval_validate_realset(expr),
@@ -1029,7 +1084,9 @@ set_plot_option([adapt_depth, 10]);
 set_plot_option([gnuplot_default_term_command, ""]);
 
 plot(ex, [ra]) :=  /*stack_web_plot*/
-    block([simp:true, tfn, tfnp1, tfnp2, tfnp3, afn, ufn, lvs, preamble, sysp, sysr, filename, tn, alt, altc, alttext, ral, ralforbid, pltargs, plotfunmake, plotdebug, plotgrid2d, size, psize, plot_size, plot_tags, stack_mtell_quiet],
+    block([simp:true, tfn, tfnp1, tfnp2, tfnp3, afn, ufn, lvs, preamble, sysp, sysr,
+        filename, tn, alt, altc, alttext, ral, ralforbid, pltargs, plotfunmake, plotdebug,
+        plotgrid2d, size, psize, plot_size, plot_tags, stack_mtell_quiet, plotpid],
     stack_mtell_quiet:true,
     plotdebug: false,
     /* Check for grid2d  in the plotoptions. */
@@ -1043,7 +1100,7 @@ plot(ex, [ra]) :=  /*stack_web_plot*/
     /* Remove logarithms to other bases from expressions. */
     if not(freeof(lg, ex)) then
         ex:ev(ex, lg=logbasesimp),
-    lvs: listofvars(ex),
+    lvs: listofvars(%_ce_rem(ex)),
     lvs: sublist(lvs, lambda([ex], not(ex = discrete or ex = parametric))),
     if length(lvs)>1 then
        error("Plot error: Can't create a plot with more than one variable, whereas you have: \\(",string(lvs),"\\)"),
@@ -1083,8 +1140,11 @@ plot(ex, [ra]) :=  /*stack_web_plot*/
         error("Plot error: STACK does not currently support the following plot2d options: \\(",string(ralforbid),"\\)"),
     /********************************************/
     /* Create a unique identifier for the plot. */
+    plotpid:errcatch(?getpid()),
+    if (emptyp(plotpid) or not(integerp(first(plotpid)))) then plotpid:"pid-missing" else plotpid:string(first(plotpid)),
     tn: string(absolute_real_time()),
-    filename:concat("stackplot","-",tn,"-",string(rand(10^8))),
+    STACK_PLOT_UNIQUE_NUMBER:STACK_PLOT_UNIQUE_NUMBER + 1,
+    filename:concat("stackplot", "-", plotpid, "-", string(STACK_PLOT_UNIQUE_NUMBER), "-", tn,"-",string(rand(10^8))),
     /* Sort out the name of the image file and its url. */
     afn: concat("'", IMAGE_DIR, filename, ".", PLOT_TERMINAL, "'"),
     if PLOT_TERMINAL="svg" then
@@ -1092,7 +1152,6 @@ plot(ex, [ra]) :=  /*stack_web_plot*/
     ufn: concat("<img src='", URL_BASE, filename, ".", PLOT_TERMINAL, "' alt='", str_to_html(alttext), "' width='", string(plot_size[1]), "' />"),
     if plot_tags then
         ufn: concat("<div class='stack_plot'>", ufn, "</div>"),
-    ufn: concat(" <html>", ufn, "</html> "),
     /* Sort out plot_options and preamble*/
     preamble: "",
     if not(member(xlabel, maplist(first, ral))) then ral: append(ral, [[xlabel, ""]]),
@@ -1157,17 +1216,23 @@ set output ", afn),
 /* A general, all purpose answer test based maximum simplification.
    This function is a wrapper for AtAlgEquivfun(SA,SB)
 */
-ATAlgEquiv(SA,SB) := block([simp:true, ret, newret, SAN],
+ATAlgEquiv(SA,SB) := block([simp:true, ret, newret, SAN, SBN],
     /* Turn on simplification and error catch */
-    if is(_EC(errcatch(SA:ev(SA, simp, nouns, rat)), "") = false) then
+    if is(_EC(errcatch(SA:ev(stack_noteq_single_solve(SA), simp, nouns, rat)), "") = false) then
         return([false, false, StackAddNote("", "ATAlgEquiv_STACKERROR_SAns"), ""]),
-    SAN:copy(SA), /* Need this for when we have lists etc. */
-    if is(_EC(errcatch(SB:ev(SB, simp, nouns, rat)), "") = false) then
+    /* We need a copy here because lists are passed by reference and the colouring of incorrect entries
+       causes problems when the values are used later in a PRT.  This problem did not occur with single call answer tests. */
+    SAN:copy(SA),
+    if is(_EC(errcatch(SB:ev(stack_noteq_single_solve(SB), simp, nouns, rat)), "") = false) then
         return([false, false, StackAddNote("", "ATAlgEquiv_STACKERROR_TAns"),""]),
     /* Start recursive process */
-    ret:ATAlgEquivfun(SA, SB),
+    SBN:copy(SB),
+    /* Start recursive process */
+    ret:ATAlgEquivfun(SAN, SBN),
     /* Can we find a permutation of the variables? */
     if ret[2]=0 then block([p1],
+        /* Start with a clean copy of SA to remove any texcolor. */
+        SAN:copy(SA),
         p1:subst_equiv(SAN, SB, []),
         /* Actually, at this point 2008/7/7, we don't want to give this feedback.  Just leave an answer note. */
         /* if p1#[] and p1#false then ret:[ret[1], ret[2], StackAddNote(ret[3], concat("ATAlgEquiv_Subst ", string(p1))), StackAddFeedback(ret[4], "Subst", stack_disp(p1, "d"))] */
@@ -1178,18 +1243,23 @@ ATAlgEquiv(SA,SB) := block([simp:true, ret, newret, SAN],
 
 /* An algebraic equivalence test which does not evaluate noun forms, but does other simplifications.
 */
-ATAlgEquivNouns(SA,SB) := block([simp:true, ret, newret, SAN],
+ATAlgEquivNouns(SA,SB) := block([simp:true, ret, newret, SAN, SBN],
     /* Turn on simplification and error catch */
     if is(_EC(errcatch(SA:ev(SA, simp, rat)), "") = false) then
         return([false, false, StackAddNote("", "ATAlgEquivNouns_STACKERROR_SAns"), ""]),
-    SAN:copy(SA), /* Need this for when we have lists etc. */
+    /* We need a copy here because lists are passed by reference and the coloring of incorrect entries
+       causes problems when the values are used later in a PRT.  This problem did not occur with single call answer tests. */
+    SAN:copy(SA),
     if is(_EC(errcatch(SB:ev(SB, simp, rat)), "") = false) then
         return([false, false, StackAddNote("", "ATAlgEquivNouns_STACKERROR_TAns"),""]),
+    SBN:copy(SB),
     /* Start recursive process */
-    ret:ATAlgEquivfun(SA, SB),
+    ret:ATAlgEquivfun(SAN, SBN),
     /* Can we find a permutation of the variables? */
     if ret[2]=0 then block([p1],
-        p1:subst_equiv(SAN, SB),
+        /* Start with a clean copy of SA to remove any texcolor. */
+        SAN:copy(SA),
+        p1:subst_equiv(SAN, SBN),
         /* Actually, at this point 2008/7/7, we don't want to give this feedback.  Just leave an answer note. */
         /* if p1#[] and p1#false then ret:[ret[1], ret[2], StackAddNote(ret[3], concat("ATAlgEquiv_Subst ", string(p1))), StackAddFeedback(ret[4], "Subst", stack_disp(p1, "d"))] */
         if p1#[] and p1#false then ret:[ret[1], ret[2], StackAddNote(ret[3], concat("ATAlgEquiv_Subst ", string(p1))), ret[4]]
@@ -1279,16 +1349,37 @@ ATAlgEquivfun(SA, SB) :=  block([SApoly, SBpoly, keepfloat, RawMark, FeedBack, A
        RawMark:true
     else if algebraic_equivalence(SA, SB) then
        RawMark:true
-    else block([SAd, SBd],
+    else block([SAd, SBd, exeq],
         /* algebraic_equivalence is not free, so only execute this when we need to do so. */
         SAd:exdowncase(SA),
         SBd:exdowncase(SB),
-        if (SAd#SA or SBd#SB) and algebraic_equivalence(SAd, SBd) then
+        /* If lower case variables are defined then this can throw an error here.  E.g. SA:1/B, but b:0 elsewhere....  */
+        exeq:errcatch(algebraic_equivalence(SAd, SBd)),
+        if is(exeq = []) then print("STACK: ignore previous error. (WrongCase)") else
+        if (SAd#SA or SBd#SB) and first(exeq) then
             AnswerNote:StackAddNote("", "ATAlgEquiv_WrongCase")
         ),
     ret:[Validity, RawMark, AnswerNote, FeedBack],
     return(ret)
     )$
+
+stack_noteq_single_solve(ex) := block(
+   if atom(ex) then return(ex),
+   if freeof("#", ex) then return(ex),
+   if not(safe_op(ex)="#") then return(apply(op(ex), map(stack_noteq_single_solve, args(ex)))),
+   /* Only attempt solving in single variables cases. */
+   if length(listofvars(ex))=1 then return(apply("nounand", map(lambda([ex2], subst("#","=",ex2)), solve(first(ex)=second(ex))))),
+   ex
+)$
+
+stack_noteq_single_remove(ex) := block(
+   if atom(ex) then return(ex),
+   if freeof("#", ex) then return(ex),
+   if not(safe_op(ex)="#") then return(apply(op(ex), map(stack_noteq_single_remove, args(ex)))),
+   /* Only attempt solving in single variables cases. */
+   if length(listofvars(ex))=1 then return((first(ex)<second(ex) nounor first(ex)>second(ex))),
+   ex
+)$
 
 /* An answer test based on two lists for SA and SB */
 ATList(SA,SB) := block([AddFeedBack, SAN, SAl, SBl, ret, retnew, kloop, AnsNotes],
@@ -1328,7 +1419,7 @@ ATList(SA,SB) := block([AddFeedBack, SAN, SAl, SBl, ret, retnew, kloop, AnsNotes
     return(ret)
 )$
 
-/* An answer test based on two sets of real numbers */
+/* An answer test based on two sets of real numbers. */
 ATRealSet(SA, SB) := block(
     /* Tidy up intervals as much as possible. Some tidying might be possible even with realset_soft_p rather than realsets.*/
     SA:interval_tidy(SA),
@@ -1499,6 +1590,7 @@ ATInequality(SA, SB) := block([RawMark, FeedBack, AnswerNote, SA1, SB1, samex],
     ),
     /* Now try to give some basic feedback: potential for more work to recurse over complex expressions... */
     if safe_op(SA) = ">"  and safe_op(SB) =">=" then block(
+        RawMark:false,
         AnswerNote:StackAddNote("", "ATInequality_strict"),
         FeedBack:StackAddFeedback("", "ATInequality_strict")
     ),
@@ -1724,10 +1816,167 @@ ATStringSloppy(SA, SB) := block([RawMark, FeedBack, AnswerNote, SAsimp, SBsimp, 
     return([true, false, AnswerNote, FeedBack])
 )$
 
+/* ********************************** */
+/* Levenshtein distance               */
+/* ********************************** */
 
-/* A wrapper for an all purpose answer test which checks things are of the
-   same "type".   Based upon the results of AtAlgEquivfun(SA,SB)
+/*
+  levenshtein
+  s,t: strings to compare
+  Returns integer d, the Levensthein distance between s and t.
+  author Achim Eichhorn Achim.Eichhorn(at)hs-esslingen.de
 */
+levenshtein(s, t) := block([m, n, XY, i, j, d, temp],
+    if(s=t) then return(0.0), /* Equal strings result in 0, nothing to do. */
+    m:slength(s),
+    n:slength(t),
+    XY: matrix(makelist(i,i,0,n), makelist(0,i,1,n+1)),
+    for i:1 thru m do (
+        XY[2][1]:i,
+        for j:1 thru n do(
+            c:if(cequal(charat(s,i), charat(t,j))) then 0 else 1,
+            XY[2][j+1]:min(XY[2][j]+1, XY[1][j+1]+1, XY[1][j]+c)
+        ),
+        /* swap */
+        XY:rowswap(XY, 1, 2)
+      ),
+    d:XY[1][n+1],
+    return(d)
+)$
+
+/*
+  levenshtein_plv: weights the levenshtein distance between 0 (unequal) and 1 (equal).
+  s,t: strings to compare
+  Returns the weighted Levensthein distance of s and t.
+  author Achim Eichhorn Achim.Eichhorn(at)hs-esslingen.de
+*/
+levenshtein_plv(s, t) := 1.0-levenshtein(s, t)/max(slength(s), slength(t))$
+
+/*
+  levenshtein_compare_strings
+  needle: user input
+  haystack: list of possible answers.
+  returns list, list[1]=score, list[2]=index of which string of haystack was the best match.
+  author Achim Eichhorn Achim.Eichhorn(at)hs-esslingen.de
+*/
+levenshtein_compare_strings(needle, haystack):=block([maxscore, index, i, score],
+    maxscore:0.0,
+    index:1,
+    for i:1 thru length(haystack) do(
+        score:levenshtein_plv(needle, haystack[i]),
+        if(score >= maxscore) then block (maxscore:score, index:i)
+    ),
+    return([decimalplaces(maxscore, 5), index])
+)$
+
+ATLevenshtein(SA, SB, SO) := block([RawMark, FeedBack, AnswerNote, SAsimp, SBsimp, SBsimpmod, SOsimp, tol,
+        levupper, levwhitespace, allowf, denyf],
+    RawMark:true, FeedBack:"", AnswerNote:"",
+    /* Turn on simplification and error catch. */
+    if (is(_EC(errcatch(SAsimp:ev(SA, simp, nouns)), "") = false)) then
+        return([false,false,StackAddNote("","ATString_STACKERROR_SAns"),""]),
+    if (is(_EC(errcatch(SBsimp:ev(SB, simp, nouns)), "") = false)) then
+        return([false,false,StackAddNote("","ATString_STACKERROR_TAns"),""]),
+    if (is(_EC(errcatch(SOsimp:ev(SO, simp, nouns)), "") = false)) then
+        return([false,false,StackAddNote("","ATString_STACKERROR_TAns"),""]),
+
+    if not(stringp(SAsimp)) then
+        return(StackBasicReturn(false, false, "ATLevenshtein_SA_not_string")),
+    /* The teacher's answer must be the [allow,deny] lists of strings. */
+    if not(listp(SBsimp)) then
+        return(StackBasicReturn(false, false, "ATLevenshtein_SB_malformed")),
+    if not(is(length(SBsimp)=2)) or not(listp(first(SBsimp))) or not(listp(second(SBsimp))) or not(all_listp(stringp, flatten(SBsimp))) then
+        return(StackBasicReturn(false, false, "ATLevenshtein_SB_malformed")),
+    if emptyp(first(SBsimp)) then
+        return(StackBasicReturn(false, false, "ATLevenshtein_SB_malformed")),
+
+    /* Sort out options. */
+    tol:SOsimp,
+    levupper:true,
+    levwhitespace:true,
+    if listp(SOsimp) then block(
+        tol:first(SOsimp),
+        SOsimp:setify(rest(SOsimp)),
+        if elementp(CASE, SOsimp) then levupper:false,
+        if elementp(WHITESPACE, SOsimp) then levwhitespace:false
+    ), 
+
+    if not(numberp(tol)) then
+        return(StackBasicReturn(false, false, "ATLevenshtein_tol_not_number")),
+    if not(booleanp(levupper)) then
+        return(StackBasicReturn(false, false, "ATLevenshtein_upper_not_boolean")),
+
+    SBsimpmod:SBsimp,
+    /* Pre-process strings to upper case. */
+    if (levupper=true) then block(
+        SAsimp:supcase(SAsimp),
+        SBsimpmod:maplist(lambda([ex2], maplist(supcase, ex2)), SBsimpmod)
+    ),
+    /* Tidy whitespace. */
+    if (levwhitespace=true) then block(
+        SAsimp:ssquish(SAsimp),
+        SBsimpmod:maplist(lambda([ex2], maplist(ssquish, ex2)), SBsimpmod)
+    ),
+
+    /* Find the closest allow string. */
+    allowf:levenshtein_compare_strings(SAsimp, first(SBsimpmod)),
+    allowf:[first(allowf), SBsimp[1][second(allowf)]],
+    /* Find the closest deny string. */
+    denyf:[0, []],
+    if not(emptyp(second(SBsimp))) then block(
+        denyf:levenshtein_compare_strings(SAsimp, second(SBsimpmod)),
+        denyf:[first(denyf), SBsimp[2][second(denyf)]]
+    ),
+
+    if debug then print(allowf),
+    if debug then print(denyf),
+
+    AnswerNote:sconcat(": ", string([allowf, denyf])),
+    /* Are we closer to a deny string? */
+    if first(allowf)<first(denyf) then
+        return([true, false, StackAddNote("ATLevenshtein_deny", AnswerNote), ""]),
+    /* Are we sufficiently close to an allow string? */
+    if is(first(allowf)<tol) then
+        return([true, false, StackAddNote("ATLevenshtein_far", AnswerNote), ""]),
+
+    /* Is this basically a perfect match? */
+    if first(allowf)>=0.9999 then
+        return([true, true, StackAddNote("ATLevenshtein_true", AnswerNote), ""]),
+
+    return([true, true, StackAddNote("ATLevenshtein_match", AnswerNote), StackAddFeedback("", "ATLevenshtein_match", stack_disp(second(allowf), "i"))])
+)$
+
+/* **************************************** */
+/* Helper functions for string manipulation */
+/* **************************************** */
+
+/* Remove all the characters from the string rem from the string st.
+   Useful for removing all punctuation characters.  */
+sremove_chars(rem, st) := sremove_chars_helper(charlist(rem), st)$
+sremove_chars_helper(remlist, st) := if emptyp(remlist) then st else sremove_chars_helper(rest(remlist), sremove(first(remlist), st))$
+
+/* 
+   (1) Replace all tab and newline characters with spaces.
+   (2) Trim spaces from each end.
+   (3) Remove all multiple spaces and replace with a single space.
+
+   (This is called str_squish in the R language, and squish in other languages.).
+*/
+ssquish(st) := block(
+    st:ssubst(" ", tab, st), 
+    st:ssubst(" ", newline, st),
+    st:strim(" ", st), 
+    /* while is(slength(st)>slength(st:ssubst(" ", "  ", st))) do true,*/
+    st:regex_subst(" ", "\\s+", st),
+    st
+)$
+
+/* **************************************** */
+/* A wrapper for an all purpose answer test 
+   which checks things are of the same "type".
+   Based upon the results of AtAlgEquivfun(SA,SB)
+*/
+/* **************************************** */
 ATSameType(SA, SB) := block([ret],
     ret:ATSameTypefun(SA,SB),
     /* This test gives no feedback */
@@ -1736,10 +1985,6 @@ ATSameType(SA, SB) := block([ret],
     return([true, ret[2], ret[3], ret[4]])
 )$
 
-
-/* A general, all purpose answer test which checks things are of the
-   same "type".   Based upon the results of AtAlgEquivfun(SA,SB)
-*/
 ATSameTypefun(SA, SB) := block([simp:true, ret],
     /* Turn on simplification and error catch */
     SA:errcatch(ev(SA, simp, nouns)),
@@ -2039,7 +2284,13 @@ ATSysEquivGrob(GA, GB, SA, varlist) := block([retl, ret, kloop],
 
 /* An answer test based on the Maxima's notion of equals. */
 ATCasEqual(SA,SB) :=
-    block([keepfloat:true, Validity:true, RawMark:false, FeedBack:"", AnswerNote:"", SAA, SBB],
+    block([keepfloat:true, Validity:true, RawMark:false, FeedBack:"", AnswerNote:"", SAA, SBB, SAN, SBN],
+    SAN:copy(SA),
+    SBN:copy(SB),
+
+    /* Strip out previous simplificiation. */
+    SAN:parse_string(string(SAN)),
+    SBN:parse_string(string(SBN)),
 
     SAA:errcatch(ev(SA, simp, nouns)),
     if (is(SAA=[STACKERROR]) or is(SAA=[])) then return([false,false,StackAddNote("","ATCASEqual_STACKERROR_SAns"),""]),
@@ -2047,19 +2298,19 @@ ATCasEqual(SA,SB) :=
     if (is(SBB=[STACKERROR]) or is(SBB=[])) then return([false,false,StackAddNote("","ATCASEqual_STACKERROR_TAns"),""]),
 
     /* Now actually apply this test */
-    if equals_commute_associate(sa,sb) then
+    if equals_commute_associate(SAN,SBN) then
         (RawMark:true, AnswerNote:"")
     else
         (RawMark:false, AnswerNote:StackAddNote("","ATEqualComAss (AlgEquiv-true)")),
 
-    if SA=SB then
+    if SAN=SBN then
        return([Validity, true, StackAddNote("","ATCASEqual_true"), FeedBack]),
 
     /* We need to check things are of the same type */
-    ret:ATSameTypefun(SA,SB),
+    ret:ATSameTypefun(SAN,SBN),
     if ret[2]=false then
         return([true, false, StackAddNote("ATCASEqual ", StackTrimNote(ret[3])), ret[4]]),
-    ret:block([simp:true, ret], ATAlgEquivfun(SA, SB)),
+    ret:block([simp:true, ret], ATAlgEquivfun(SAN, SBN)),
     if ret[2]=true then
         return([true, false, StackAddNote("ATCASEqual (AlgEquiv-true)", StackTrimNote(ret[3])), ""]),
 
@@ -2338,7 +2589,7 @@ ATPartFrac(SA, SB, SO) := block([negdistrib, Validity, rawmk, fb, ansnote, ret, 
 /* (i) partfrac returns terms like (1+n)^-1 not 1/(1+n), */
 /* which are problematic with simp:false.                */
 /* (ii) ATEqualComAss does not accept -1/(1-n) = 1/(n-1) */
-PartFracfun(sExpr, tExpr, wrt) := block([val, rawmk, ansnote, fb],
+PartFracfun(sExpr, tExpr, wrt) := block([val, rawmk, ansnote, fb, ret],
     val:true, rawmk:true, fb: "", ansnote: "",
     ret:[val, rawmk, ansnote, fb],
     if algebraic_equivalence(sExpr, tExpr) then block([topOp, list],
@@ -2400,10 +2651,13 @@ PartFracfun(sExpr, tExpr, wrt) := block([val, rawmk, ansnote, fb],
 
 /* Is ex a single rational expression in the correct form?  */
 /* p/q^n, where q is an irreducible term in v, over the rationals Q, disregarding the special case of a numerical factor? */
+/* We also make sure we can't do long division to divide p by p^n first. */
 /* Returns true/false */
 PartFrac_term_p(ex, v) := block([n1, d1, ret],
  n1:num(ex),
  d1:denom(ex),
+ /* Can we divide through? */
+ if is((degree(d1, v) < degree(n1, v)) and degree(d1, v) > 0) then return(false),  
  /* Ignore any power here. */
  if safe_op(d1)="^" then d1:first(args(d1)),
  /* Terms of the form n1/(v-a)^m must have a numerical n1! */ 
@@ -3103,7 +3357,10 @@ table_difference(T1, T2) := table_zip_with(lambda([ex1,ex2], if ex1=ex2 then ex1
 /* Slight hack to compile these functions and hence suppress warnings. */
 load(linearalgebra);
 
+/* Initialise the language-code delivery, for special cases. */
+%_STACK_LANG: "en"$
+is_lang(code):=ev(is(%_STACK_LANG=code),simp=true)$
+
 /* Stack expects some output with the version number the output happens at */
 /* maximalocal.mac after additional library loading */
-stackmaximaversion:2022060100$
-
+stackmaximaversion:2022071300$

@@ -163,7 +163,16 @@ define(['jquery', 'core/log', 'mod_readaloud/definitions', 'mod_readaloud/popove
                     if (m.options.aidata && m.options.aidata.sessiontime) {
                         m.options.totalseconds = m.options.aidata.sessiontime;
                     } else {
-                        m.options.totalseconds = Math.round($('#' + m.cd.audioplayerclass).prop('duration'));
+                        var audioplayer = $('#' + m.cd.audioplayerclass);
+                        var duration = audioplayer.prop('duration');
+                        //this can fail if audio is not loaded yet. Lets wait for it to load and reset stuff
+                        //its better not to need this, but calcs all fail if we do not know the recording time
+                        if(isNaN(duration)) {
+                            m.options.totalseconds = 0;
+                            audioplayer.on('durationchange', processloadedaudio);
+                        }else{
+                            m.options.totalseconds = Math.round(duration);
+                        }
                     }
                 } else {
                     m.options.totalseconds = m.options.timelimit;
@@ -173,17 +182,7 @@ define(['jquery', 'core/log', 'mod_readaloud/definitions', 'mod_readaloud/popove
                 m.processscores();
             };
 
-
-            //we used to use the audio player time, but we try not to, and anyway its best not to
-            //depend on a duration being available. Audio might expire
-            /*
-            var audioplayer = $('#' + this.cd.audioplayerclass);
-            if (audioplayer.prop('readyState') < 1 && this.options.allowearlyexit) {
-                audioplayer.on('loadedmetadata', processloadedaudio);
-            } else {
-                processloadedaudio();
-            }
-            */
+            //processloaded audio
             processloadedaudio();
 
             //init our popover helper which sets up the button events

@@ -274,7 +274,13 @@ function readaloud_update_grades($moduleinstance, $userid = 0, $nullifnone = tru
         if (class_exists('\core_completion\api')) {
             require_once("{$CFG->libdir}/completionlib.php");
             $completionexpected = (empty($moduleinstance->completionexpected) ? null : $moduleinstance->completionexpected);
-            \core_completion\api::update_completion_date_event($moduleinstance->coursemodule, 'readaloud', $moduleinstance->id,
+            if(isset($moduleinstance->coursemodule)){
+                $cmid = $moduleinstance->coursemodule;
+            }else{
+                $cm = get_coursemodule_from_instance('readaloud', $moduleinstance->id, $moduleinstance->course, false, MUST_EXIST);
+                $cmid =$cm->id;
+            }
+            \core_completion\api::update_completion_date_event($cmid, 'readaloud', $moduleinstance->id,
                 $completionexpected);
         }
         readaloud_grade_item_update($moduleinstance, $grades);

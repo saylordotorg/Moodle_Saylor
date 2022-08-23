@@ -110,7 +110,8 @@ class passagehelper {
         $errorcount = utils::count_sessionerrors($formdata->sessionerrors);
         $updatedattempt->errorcount = $errorcount;
 
-        $DB->update_record(constants::M_USERTABLE, $updatedattempt);
+        $ret = $DB->update_record(constants::M_USERTABLE, $updatedattempt);
+        return $ret;
     }
 
     public function attemptdetails($property) {

@@ -20,7 +20,7 @@ This plugin requires Moodle 3.9+
  1. Goto "Administration" > "Advanced features", and ensure that "Enable completion tracking" is set to yes.
  2. Make sure "Enable completion tracking" is set to "yes" in the course settings.
  3. Goto "Administration" > "Course administration" > "Course completion", and configure the the conditions required for course completion. Note: you must set some conditions, you cannot just set the "completion requirements" option at the top. Save.
- 4. Goto "Administration" > "Course adminiatration". Make sure you can now "Course completion" listed under "reports". If you cannot see this report then course completion has not been set correctly.
+ 4. Goto "Administration" > "Course administration". Make sure you can now "Course completion" listed under "reports". If you cannot see this report then course completion has not been set correctly.
  5. Start restricting
 
 # Theme support

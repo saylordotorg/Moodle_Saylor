@@ -661,3 +661,5 @@ $string['enablegallery_help'] = 'Allow students to hear other student submission
 $string['enablegallery_details'] = 'Allow students to hear other student submissions on the topic';
 $string['nosuggestions'] = "No suggestions.";
 $string['checkgrammarandspelling'] = 'Check grammar and spelling';
+$string['important'] = 'Important';
+$string['noemptyselftranscript'] = 'Please enter something in the textbox before leaving this page.';

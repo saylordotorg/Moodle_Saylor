@@ -397,7 +397,16 @@ class utils{
         $attempthelper = new \mod_solo\attempthelper($cm);
         $requiresgrading = ($attempt->grade==0 && $attempt->manualgraded==0);
 
-        //if we do not have transcripts, try to fetch them
+        //if we do not have a self transcript, and yet we require a self transcript,
+        // and if we are calling from cron, we send the task back
+        //this will happen if crons runs while the student is still typing and after the transcript has finishined processing
+        $transcribestep = self::fetch_step_no($moduleinstance, constants::STEP_SELFTRANSCRIBE);
+        if(empty($attempt->selftranscript) && $transcribestep !==false){
+            $trace->output("Self Transcript not ready yet. quitting");
+            return false;
+        }
+
+        //if we do not have automatic transcripts, try to fetch them
         $hastranscripts = !empty($attempt->jsontranscript);
         if(!$hastranscripts) {
             $attempt_with_transcripts = self::retrieve_transcripts_from_s3($attempt);
@@ -410,7 +419,6 @@ class utils{
             }
 
             //if we fetched the transcript, and this activity has no manual self transcript, use the the auto transcript as manual
-            $transcribestep = self::fetch_step_no($moduleinstance, constants::STEP_SELFTRANSCRIBE);
             if ($transcribestep === false && $hastranscripts) {
                 $attempt->selftranscript = $attempt_with_transcripts->transcript;
                 $DB->update_record(constants::M_ATTEMPTSTABLE, array('id' => $attempt->id, 'selftranscript' => $attempt->selftranscript));

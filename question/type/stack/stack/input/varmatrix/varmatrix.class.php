@@ -30,6 +30,7 @@ class stack_varmatrix_input extends stack_input {
         'dealias' => false, // This is needed to stop pi->%pi etc.
         'nounify' => true,
         'varmatrix' => true,
+        'checkvars' => 0
     );
 
     protected $extraoptions = array(

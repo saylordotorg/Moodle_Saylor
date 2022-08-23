@@ -28,8 +28,10 @@
 // phpcs:disable moodle.Files.MoodleInternal.MoodleInternalGlobalState,moodle.Files.RequireLogin.Missing
 require(__DIR__ . '/../../config.php');
 
+use Firebase\JWT\Key;
 use mod_bigbluebuttonbn\broker;
 use mod_bigbluebuttonbn\instance;
+use mod_bigbluebuttonbn\local\config;
 use mod_bigbluebuttonbn\meeting;
 
 global $PAGE, $USER, $CFG, $SESSION, $DB;
@@ -39,7 +41,9 @@ $params = $_REQUEST;
 $broker = new broker();
 $error = $broker->validate_parameters($params);
 if (!empty($error)) {
-    header('HTTP/1.0 400 Bad Request. ' . $error);
+    $msg = 'HTTP/1.0 400 Bad Request. ' . $error;
+    debugging($msg, DEBUG_DEVELOPER);
+    header($msg);
     return;
 }
 
@@ -47,7 +51,9 @@ $action = $params['action'];
 
 $instance = instance::get_from_instanceid($params['bigbluebuttonbn']);
 if (empty($instance)) {
-    header('HTTP/1.0 410 Gone. The activity may have been deleted');
+    $msg = 'HTTP/1.0 410 Gone. The activity may have been deleted';
+    debugging($msg, DEBUG_DEVELOPER);
+    header($msg);
     return;
 }
 
@@ -56,15 +62,17 @@ $PAGE->set_context($instance->get_context());
 try {
     switch (strtolower($action)) {
         case 'recording_ready':
-            broker::recording_ready($instance, $params);
+            broker::process_recording_ready($instance, $params);
             return;
         case 'meeting_events':
             // When meeting_events callback is implemented by BigBlueButton, Moodle receives a POST request
             // which is processed in the function using super globals.
-            meeting::meeting_events($instance);
+            broker::process_meeting_events($instance);
             return;
     }
-    header("HTTP/1.0 400 Bad request. The action '{$action}' does not exist");
+    $msg = "HTTP/1.0 400 Bad request. The action '{$action}' does not exist";
 } catch (Exception $e) {
-    header('HTTP/1.0 500 Internal Server Error. ' . $e->getMessage());
+    $msg = 'HTTP/1.0 500 Internal Server Error. ' . $e->getMessage();
 }
+debugging($msg, DEBUG_DEVELOPER);
+header($msg);

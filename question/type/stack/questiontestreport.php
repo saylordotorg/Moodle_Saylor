@@ -27,6 +27,7 @@
 
 require_once(__DIR__.'/../../../config.php');
 require_once($CFG->libdir . '/questionlib.php');
+require_once(__DIR__ . '/vle_specific.php');
 
 // Get the parameters from the URL.
 $questionid = required_param('questionid', PARAM_INT);
@@ -72,9 +73,14 @@ if (empty($question->deployedseeds)) {
     }
 }
 
+if (stack_determine_moodle_version() < 400) {
+    $qurl = question_preview_url($questionid, null, null, null, null, $context);
+} else {
+    $qurl = qbank_previewquestion\helper::question_preview_url($questionid, null, null, null, null, $context);
+}
+
 echo html_writer::tag('p', $out . ' ' .
-        $OUTPUT->action_icon(question_preview_url($questionid, null, null, null, null, $context),
-        new pix_icon('t/preview', get_string('preview'))));
+    $OUTPUT->action_icon($qurl, new pix_icon('t/preview', get_string('preview'))));
 
 // Display a representation of the question, variables and PRTs for easy reference.
 echo $OUTPUT->heading(stack_string('questiontext'), 3);
@@ -105,9 +111,9 @@ foreach ($question->prts as $prtname => $prt) {
     $offlinemaxima[$prtname] = $prt->get_maxima_representation();
 
     foreach ($nodes as $key => $node) {
-        $nodesummary1[$prtname] .= ($key + 1). ': ' . $node->test . "\n";
-        $nodesummary2[$prtname] .= $node->truenote . "\n";
-        $nodesummary3[$prtname] .= $node->falsenote . "\n";
+        $nodesummary1[$prtname] .= ($key + 1). ': ' . $node->answertest . "\n";
+        $nodesummary2[$prtname] .= $node->trueanswernote . "\n";
+        $nodesummary3[$prtname] .= $node->falseanswernote . "\n";
     }
 
     $graph = $prt->get_prt_graph();
@@ -117,32 +123,54 @@ foreach ($question->prts as $prtname => $prt) {
 flush();
 
 // Later we only display inputs relevant to a particular PTR, so we sort out prt input requirements here.
-$allinputs = array_keys($question->inputs);
-$inputsbyprt = array();
-foreach ($question->prts as $prtname => $prt) {
-    $inputsbyprt[$prtname] = $prt->get_required_variables($allinputs);
-}
+$inputsbyprt = $question->get_cached('required');
 
-$query = 'SELECT qa.*, qas_last.*
-FROM {question_attempts} qa
-LEFT JOIN {question_attempt_steps} qas_last ON qas_last.questionattemptid = qa.id
-/* attach another copy of qas to those rows with the most recent timecreated,
-   using method from https://stackoverflow.com/a/28090544 */
-LEFT JOIN {question_attempt_steps} qas_prev
-ON qas_last.questionattemptid = qas_prev.questionattemptid
-AND (qas_last.sequencenumber < qas_prev.sequencenumber
-OR (qas_last.sequencenumber = qas_prev.sequencenumber
-AND qas_last.id < qas_prev.id))
-LEFT JOIN {user} u ON qas_last.userid = u.id
-WHERE
-qas_prev.timecreated IS NULL
-AND qa.questionid = ' . $questionid . '
-ORDER BY u.username, qas_last.timecreated';
+if (stack_determine_moodle_version() < 400) {
+
+    $query = 'SELECT qa.*, qas_last.*
+        FROM {question_attempts} qa
+        LEFT JOIN {question_attempt_steps} qas_last ON qas_last.questionattemptid = qa.id
+        /* attach another copy of qas to those rows with the most recent timecreated,
+        using method from https://stackoverflow.com/a/28090544 */
+        LEFT JOIN {question_attempt_steps} qas_prev
+        ON qas_last.questionattemptid = qas_prev.questionattemptid
+        AND (qas_last.sequencenumber < qas_prev.sequencenumber
+        OR (qas_last.sequencenumber = qas_prev.sequencenumber
+        AND qas_last.id < qas_prev.id))
+        LEFT JOIN {user} u ON qas_last.userid = u.id
+        WHERE
+        qas_prev.timecreated IS NULL
+        AND qa.questionid = ' . $questionid . '
+        ORDER BY u.username, qas_last.timecreated';
+
+} else {
+    // In moodle 4 we look at all attemps at all versions.
+    // Otherwise an edit, regrade and re-analysis becomes impossible.
+    $query = 'SELECT qa.*, qas_last.*
+    FROM {question_attempts} qa
+    LEFT JOIN {question_attempt_steps} qas_last ON qas_last.questionattemptid = qa.id
+    /* attach another copy of qas to those rows with the most recent timecreated,
+    using method from https://stackoverflow.com/a/28090544 */
+    LEFT JOIN {question_attempt_steps} qas_prev
+    ON qas_last.questionattemptid = qas_prev.questionattemptid
+    AND (qas_last.sequencenumber < qas_prev.sequencenumber
+    OR (qas_last.sequencenumber = qas_prev.sequencenumber
+    AND qas_last.id < qas_prev.id))
+    LEFT JOIN {user} u ON qas_last.userid = u.id
+    LEFT JOIN {question} q ON q.id = (SELECT qv.questionid FROM {question_versions} qv
+                                  JOIN {question_bank_entries} qbe ON qbe.id = qv.questionbankentryid
+                                  WHERE qbe.id = (SELECT be.id FROM {question_bank_entries} be
+                                                  JOIN {question_versions} v ON v.questionbankentryid = be.id
+                                                  WHERE v.questionid = ' . $questionid . ')
+                                 )
+    WHERE
+    qas_prev.timecreated IS NULL
+    ORDER BY u.username, qas_last.timecreated';
+}
 
 global $DB;
 
 $result = $DB->get_records_sql($query);
-
 $summary = array();
 foreach ($result as $qattempt) {
     if (!array_key_exists($qattempt->variant, $summary)) {
@@ -161,6 +189,18 @@ foreach ($result as $qattempt) {
 foreach ($summary as $vkey => $variant) {
     arsort($variant);
     $summary[$vkey] = $variant;
+}
+
+// Match up variants to answer notes.
+$questionnotes = array();
+foreach (array_keys($summary) as $variant) {
+    $questionnotes[$variant] = $variant;
+
+    $question = question_bank::load_question($questionid);
+    $question->start_attempt(new question_attempt_step(), $variant);
+    $notesummary = $question->get_question_summary();
+    // TODO check for duplicate notes.
+    $questionnotes[$variant] = stack_ouput_castext($notesummary);
 }
 
 // Create blank arrays in which to store data.
@@ -234,7 +274,7 @@ foreach ($summary as $variant => $vdata) {
             foreach ($qprts as $prt => $notused) {
                 // Only create an input summary of the inputs required for this PRT.
                 $inputsummary = '';
-                foreach ($inputsbyprt[$prt] as $input) {
+                foreach ($inputsbyprt[$prt] as $input => $alsonotused) {
                     if (array_key_exists($input, $inputvals)) {
                         $inputsummary .= $inputvals[$input] . '; ';
                     }
@@ -438,7 +478,6 @@ echo html_writer::end_tag('table');
 if (array_keys($summary) !== array()) {
     echo html_writer::tag('h3', stack_string('basicreportvariants'));
 }
-
 foreach (array_keys($summary) as $variant) {
     $sumout = '';
     foreach ($prtreport[$variant] as $prt => $idata) {
@@ -465,14 +504,13 @@ foreach (array_keys($summary) as $variant) {
         $sumout .= "\n";
     }
     if (trim($sumout) !== '') {
-        echo html_writer::tag('h3', $variant);
+        echo html_writer::tag('h3', $questionnotes[$variant]);
         echo html_writer::tag('pre', $sumout);
     }
 }
 
 
 foreach (array_keys($summary) as $variant) {
-    // TODO: how do we go from a variant to a seed (if there is one....)?
     $sumout = '';
     foreach ($inputreport[$variant] as $input => $idata) {
         $sumouti = '';
@@ -499,7 +537,7 @@ foreach (array_keys($summary) as $variant) {
         }
     }
     if (trim($sumout) !== '') {
-        echo html_writer::tag('h3', $variant);
+        echo html_writer::tag('h3', $questionnotes[$variant]);
         echo html_writer::tag('pre', $sumout);
     }
 }

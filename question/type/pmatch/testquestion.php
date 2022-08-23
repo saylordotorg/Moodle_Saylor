@@ -34,10 +34,13 @@
  * @copyright 2016 The Open University
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-define('NO_OUTPUT_BUFFERING', true);
 
 // Login is checked in qtype_pmatch_setup_question_test_page but CodeChecker can't see that.
-// @codingStandardsIgnoreLine
+// phpcs:disable moodle.Files.RequireLogin.Missing
+// phpcs:disable moodle.Files.MoodleInternal.MoodleInternalGlobalState
+
+const NO_OUTPUT_BUFFERING = true;
+
 require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->libdir . '/questionlib.php');
 require_once($CFG->dirroot . '/question/type/pmatch/lib.php');
@@ -45,21 +48,21 @@ require_once($CFG->dirroot . '/question/type/pmatch/classes/output/testquestion_
 
 $questionid = required_param('id', PARAM_INT);
 $download = optional_param('download', '', PARAM_RAW);
-$questiondata = $DB->get_record('question', array('id' => $questionid), '*', MUST_EXIST);
+$questiondata = $DB->get_record('question', ['id' => $questionid], '*', MUST_EXIST);
 if ($questiondata->qtype != 'pmatch') {
     throw new coding_exception('That is not a pattern-match question.');
 }
+/** @var qtype_pmatch_question $question */
 $question = question_bank::load_question($questionid);
 
 // Process any other URL parameters, and do require_login.
 list($context, $urlparams) = qtype_pmatch_setup_question_test_page($question);
 
-$url = new moodle_url('/question/type/pmatch/testquestion.php', array('id' => $questionid));
+$url = new moodle_url('/question/type/pmatch/testquestion.php', ['id' => $questionid]);
 $PAGE->set_pagelayout('popup');
-$PAGE->set_url('/question/type/pmatch/testquestion.php', array('id' => $questionid));
+$PAGE->set_url($url);
 
 // Check permissions after initialising $PAGE so messages (not exceptions) can be rendered.
-$canview = question_has_capability_on($questiondata, 'view');
 try {
     question_require_capability_on($questiondata, 'view');
 } catch (moodle_exception $e) {
@@ -93,6 +96,6 @@ echo $output->get_display_options_form($controller);
 echo $output->get_responses_heading($question);
 echo $output->get_grade_summary($question);
 
-echo $output->get_responses_table_form($controller);
+$output->get_responses_table_form($controller);
 
 echo $output->footer();
