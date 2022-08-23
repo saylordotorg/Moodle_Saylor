@@ -393,12 +393,6 @@ def plugins = [
       "dest" : 'blocks/advnotifications'
     ],
     [
-      "name" : 'availability_role',
-      "url" : 'https://github.com/moodleuulm/moodle-availability_role.git',
-      "branch" : 'MOODLE_311_STABLE',
-      "dest" : 'availability/condition/role'
-    ],
-    [
       "name" : 'tool_trigger',
       "url" : 'https://github.com/catalyst/moodle-tool_trigger.git',
       "branch" : 'master',
@@ -473,7 +467,7 @@ def plugins = [
     [
       "name" : 'availability_cohort',
       "url" : 'https://github.com/moodle-an-hochschulen/moodle-availability_cohort.git',
-      "branch" : 'master',
+      "branch" : 'MOODLE_311_STABLE',
       "dest" : 'availability/condition/cohort'
     ],
     [
