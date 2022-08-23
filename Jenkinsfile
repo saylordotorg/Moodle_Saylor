@@ -197,7 +197,7 @@ def plugins = [
     [
         "name" : 'qtype_coderunner',
         "url" : 'https://github.com/trampgeek/moodle-qtype_coderunner.git',
-        "branch" : 'master',
+        "branch" : 'MOODLE_3X_STABLE',
         "dest" : 'question/type/coderunner'
     ],
     [
