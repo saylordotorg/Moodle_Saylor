@@ -505,6 +505,12 @@ def plugins = [
         "url" : 'https://github.com/moodle-an-hochschulen/moodle-local_profilecohort.git',
         "branch" : 'MOODLE_311_STABLE',
         "dest" : 'local/profilecohort'
+    ],
+    [
+        "name" : 'mod_threesixo',
+        "url" : 'https://github.com/junpataleta/moodle-mod_threesixo.git',
+        "branch" : 'master',
+        "dest" : 'mod/threesixo'
     ]
 ]
 
