@@ -1,8 +1,8 @@
 @ou @ou_vle @qtype @qtype_pmatch
-Feature: Test all the basic functionality of testquestion question type
-  In order evaluate students understanding
+Feature: Basic test of the question testing tool
+  In order have confidence in my pattern-match questions
   As an teacher
-  I need to create and preview pattern match questions.
+  I need to be able to test them
 
   Background:
     Given the following "courses" exist:
@@ -21,18 +21,24 @@ Feature: Test all the basic functionality of testquestion question type
       | questioncategory | qtype    | name         | template |
       | Test questions   | pmatch   | My first pattern match question | listen    |
     And the default question test responses exist for question "My first pattern match question"
-    And I log in as "teacher"
-    And I am on "Course 1" course homepage
-    And I navigate to "Question bank" in current page administration
-    When I choose "Preview" action for "My first pattern match question" in the question bank
-    And I switch to "questionpreview" window
+
+  @javascript
+  Scenario: Navigate to the Test this question page from preview
+    When I am on the "My first pattern match question" "core_question > preview" page logged in as teacher
     And I click on "Test this question" "link"
+    Then I should see "Pattern-match question testing tool: Testing question: My first pattern match question"
+
+  @javascript
+  Scenario: Navigate to the Test this question page from the question bank
+    When I am on the "Course 1" "core_question > course question bank" page logged in as teacher
+    And I choose "Pattern-match testing tool" action for "My first pattern match question" in the question bank
+    Then I should see "Pattern-match question testing tool: Testing question: My first pattern match question"
 
   @javascript
   Scenario: Test basic functionality of testquestion
-    # Confirm list responses is correct.
-    And I should see "Pattern-match question testing tool: Testing question: My first pattern match question"
-    And I should see "What to include in the report"
+    When I am on the "My first pattern match question" "qtype_pmatch > test responses" page logged in as teacher
+    Then I should see "Pattern-match question testing tool: Testing question: My first pattern match question"
+    And I should see "Show responses that are"
     And I should see "Showing the responses for the selected question: My first pattern match question"
     And I should see "Sample responses: 13"
     And I should see "Marked correctly: 0 (0%)"
@@ -42,22 +48,22 @@ Feature: Test all the basic functionality of testquestion question type
   @javascript
   Scenario: Test edit response.
     # Confirm can edit inplace the response.
-    Given I am on the pattern match test responses page for question "My first pattern match question"
+    When I am on the "My first pattern match question" "qtype_pmatch > test responses" page logged in as teacher
     Then I should see "testing one two three four"
     When I follow "Edit response"
     Then I should see "Escape to cancel, Enter when finished"
     When I set the field "Edit response" to ""
-    And I press key "13" in the field "Edit response"
+    And I press the enter key
     Then I should see "The response cannot be blank"
     And I click on "OK" "button" in the "Error" "dialogue"
     When I follow "Edit response"
     And I set the field "Edit response" to "testing"
-    And I press key "13" in the field "Edit response"
+    And I press the enter key
     Then I should see "Duplicate responses are not allowed"
     And I click on "OK" "button" in the "Error" "dialogue"
     When I follow "Edit response"
     And I set the field "Edit response" to "New improved response"
-    And I press key "13" in the field "Edit response"
+    And I press the enter key
     Then I should not see "testing one two three four"
     And I should see "New improved response"
     And I reload the page

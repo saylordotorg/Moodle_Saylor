@@ -25,8 +25,6 @@
 
 namespace availability_cohort;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Availability cohort - Condition class
  *
@@ -200,7 +198,9 @@ class condition extends \core_availability\condition {
      */
     public function include_after_restore($restoreid, $courseid, \base_logger $logger,
         $name, \base_task $task) {
-        global $DB;
+        global $DB, $CFG;
+
+        require_once($CFG->dirroot.'/cohort/lib.php');
 
         // Load the restore controller.
         $restorecontroller = \restore_controller::load_controller($restoreid);

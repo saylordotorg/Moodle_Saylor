@@ -14,30 +14,30 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace qtype_pmatch;
 
-/**
- * This file contains of the pmatch library using files of examples.
- *
- * @package   qtype_pmatch
- * @copyright 2012 The Open University
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
+use pmatch_expression;
+use pmatch_options;
+use pmatch_parsed_string;
 
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/question/type/pmatch/pmatchlib.php');
 
-
 /**
  * Test driver class that tests the pmatch library by loading examples from
  * text files in the examples folder.
  *
+ * @package   qtype_pmatch
  * @copyright 2012 The Open University
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @group     qtype_pmatch
+ *
+ * @covers \pmatch_expression
+ * @covers \pmatch_options
+ * @covers \pmatch_parsed_string
  */
-class qtype_pmatch_examples_test extends basic_testcase {
+class examples_test extends \basic_testcase {
     /** @var string where to look for examples. */
     protected $examplesdir = 'examples';
 
@@ -53,17 +53,18 @@ class qtype_pmatch_examples_test extends basic_testcase {
     /**
      * Get a list of all the pairs of example files <name>.rules.txt and
      * <name>.responses.csv in the examples folder.
+     *
      * @return array of full path names .../examples/<name>. The extension needs
-     * to be added back to get the actual files.
+     *     to be added back to get the actual files.
      */
-    protected function get_examples_list() {
+    protected function get_examples_list(): array {
         $examplespath = dirname(__FILE__) . '/' . $this->examplesdir;
         $files = glob($examplespath . '/*.rules.txt');
         if (!$files) {
-            return array();
+            return [];
         }
 
-        $examples = array();
+        $examples = [];
         foreach ($files as $path) {
             $example = preg_replace('/\.rules\.txt$/', '', $path);
             if (is_readable($example . '.rules.txt') && is_readable($example . '.responses.csv')) {
@@ -76,20 +77,19 @@ class qtype_pmatch_examples_test extends basic_testcase {
 
     /**
      * Run all the tests one one pair of example files.
-     * @param string one of the paths returned by {@link get_examples_list()}.
+     *
+     * @param string $name one of the paths returned by {@link get_examples_list()}.
      */
-    protected function run_tests_from($name) {
+    protected function run_tests_from(string $name) {
         $expression = new pmatch_expression(file_get_contents($name . '.rules.txt'));
         if (!$expression->is_valid()) {
             $this->fail('Error parsing match rules in ' . $name . '.rules.txt' .
                     '. Error message: ' . $expression->get_parse_error());
-            return;
         }
 
         $handle = fopen($name . '.responses.csv', 'r');
         if (!$handle) {
             $this->fail('Could not open responses file ' . $name . '.responses.csv');
-            return;
         }
 
         $row = -1;
@@ -106,15 +106,14 @@ class qtype_pmatch_examples_test extends basic_testcase {
             if (count($data) < 2 || !is_numeric($data[1])) {
                 $this->fail('Skipping bad line in responses file '.
                             '(file ' . $name . '.responses.csv, line ' . ($row + 1) . ').');
-                continue;
             }
             $options = new pmatch_options();
             switch (count($data)) {
-                case 5 :
+                case 5:
                     $options->worddividers = $data[4];
-                case 4 :
+                case 4: // Fall through.
                     $options->sentencedividers = $data[3];
-                case 3 :
+                case 3: // Fall through.
                     (bool)$options->ignorecase = $data[2];
             }
 

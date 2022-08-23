@@ -14,22 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Contains the helper class for the pmatch question type tests.
- *
- * @package   qtype_pmatch
- * @copyright 2013 The Open University
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 use qtype_pmatch\local\spell\qtype_pmatch_null_spell_checker;
 use qtype_pmatch\local\spell\qtype_pmatch_spell_checker;
-
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Question maker for unit tests for the pmatch question definition class.
  *
+ * @package   qtype_pmatch
  * @copyright 2013 The Open University
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -47,7 +38,7 @@ class qtype_pmatch_test_helper extends question_test_helper {
      *      basic_testcase ($this in the test code) to check.
      * @return qtype_pmatch_question
      */
-    public static function make_a_pmatch_question($applydictionarycheck = false) {
+    public static function make_a_pmatch_question($applydictionarycheck = false): qtype_pmatch_question {
         if ($applydictionarycheck) {
             self::skip_test_if_no_spellcheck($applydictionarycheck, 'en');
         }
@@ -59,14 +50,14 @@ class qtype_pmatch_test_helper extends question_test_helper {
         $pm->generalfeedback = 'Generalfeedback: Tom, Dick or Harry are all possible answers.';
         $pm->pmatchoptions = new pmatch_options();
         $pm->modelanswer = 'Tom';
-        $pm->answers = array(
+        $pm->answers = [
             13 => new question_answer(13, 'match_w(Tom|Harry)', 1.0,
                 'Either Tom or Harry is a very good answer.', FORMAT_HTML),
             14 => new question_answer(14,
                                       'match_w(Dick)', 0.8, 'Dick is an OK good answer.', FORMAT_HTML),
             15 => new question_answer(15,
                                       'match_w(Felicity)', 0.0, 'No, no, no! That is a bad answer.', FORMAT_HTML),
-        );
+        ];
         $pm->qtype = question_bank::get_qtype('pmatch');
         $pm->applydictionarycheck = $applydictionarycheck ? 'en_GB' :
                 qtype_pmatch_spell_checker::DO_NOT_CHECK_OPTION;
@@ -81,45 +72,45 @@ class qtype_pmatch_test_helper extends question_test_helper {
     /**
      * @return stdClass data to create a pattern match question.
      */
-    public function get_pmatch_question_form_data_listen() {
+    public function get_pmatch_question_form_data_listen(): stdClass {
         $fromform = new stdClass();
 
         $fromform->name = 'My first pattern match question';
-        $fromform->questiontext = array('text' => 'Listen, translate and write.', 'format' => FORMAT_HTML);
+        $fromform->questiontext = ['text' => 'Listen, translate and write.', 'format' => FORMAT_HTML];
         $fromform->defaultmark = 1.0;
-        $fromform->generalfeedback = array('text' => 'This is the simplest aromatic molecule.', 'format' => FORMAT_HTML);
+        $fromform->generalfeedback = ['text' => 'This is the simplest aromatic molecule.', 'format' => FORMAT_HTML];
         $fromform->allowsubscript = 0;
         $fromform->allowsuperscript = 0;
-         $fromform->synonymsdata = array(
-            array(
+        $fromform->synonymsdata = [
+            [
                 'word' => 'any',
                 'synonyms' => 'testing\|one\|two\|three\|four',
-            ),
-        );
+            ],
+        ];
 
         $fromform->extenddictionary = '';
         $fromform->sentencedividers = '.?!';
         $fromform->converttospace = ',;:';
         $fromform->modelanswer = 'testing one two three four';
-        $fromform->answer = array('match (testing one two three four)');
-        $fromform->fraction = array('1');
-        $fromform->feedback = array(
-                array('text' => 'Well done!', 'format' => FORMAT_HTML),
-        );
+        $fromform->answer = ['match (testing one two three four)'];
+        $fromform->fraction = ['1'];
+        $fromform->feedback = [
+                ['text' => 'Well done!', 'format' => FORMAT_HTML],
+        ];
 
-        $fromform->otherfeedback = array('text' => 'Sorry, no.', 'format' => FORMAT_HTML);
+        $fromform->otherfeedback = ['text' => 'Sorry, no.', 'format' => FORMAT_HTML];
         $fromform->penalty = 0.3333333;
 
-        $fromform->hint = array(
-            array(
+        $fromform->hint = [
+            [
                 'text' => 'Please try again.',
                 'format' => FORMAT_HTML,
-            ),
-            array(
+            ],
+            [
                 'text' => 'Use a calculator if necessary.',
                 'format' => FORMAT_HTML,
-            ),
-        );
+            ],
+        ];
 
         return $fromform;
     }
@@ -127,7 +118,7 @@ class qtype_pmatch_test_helper extends question_test_helper {
     /**
      * @return stdClass data to create a pattern match question.
      */
-    public function get_pmatch_question_form_data_frogtoad() {
+    public function get_pmatch_question_form_data_frogtoad(): stdClass {
         $fromform = new stdClass();
 
         $fromform->name = 'Frog but not toad';
@@ -178,7 +169,7 @@ class qtype_pmatch_test_helper extends question_test_helper {
      *
      * @return stdClass data to create a pattern match question.
      */
-    public function get_pmatch_question_form_data_spanish() {
+    public function get_pmatch_question_form_data_spanish(): stdClass {
         $fromform = new stdClass();
 
         $fromform->name = 'Spanish question';
@@ -224,7 +215,7 @@ class qtype_pmatch_test_helper extends question_test_helper {
      *
      * @return stdClass the question data.
      */
-    public static function get_pmatch_question_data_test0() {
+    public static function get_pmatch_question_data_test0(): stdClass {
         question_bank::load_question_definition_classes('pmatch');
         $qdata = new stdClass();
         test_question_maker::initialise_question_data($qdata);

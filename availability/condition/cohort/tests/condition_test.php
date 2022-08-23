@@ -23,9 +23,7 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-use availability_cohort\condition;
+namespace availability_cohort;
 
 /**
  * Unit tests for the condition.
@@ -35,7 +33,7 @@ use availability_cohort\condition;
  *              based on code of availability_group 2014 The Open University
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class availability_cohort_condition_testcase extends advanced_testcase {
+class condition_test extends \advanced_testcase {
     /**
      * Load required classes.
      */
@@ -73,7 +71,7 @@ class availability_cohort_condition_testcase extends advanced_testcase {
         // Check if available (when not available).
         $this->assertFalse($cond->is_available(false, $info, true, $user->id));
         $information = $cond->get_description(false, false, $info);
-        $this->assertRegExp('~You belong to .*<strong>Cohort 1</strong>~', $information);
+        $this->assertMatchesRegularExpression('~You belong to .*<strong>Cohort 1</strong>~', $information);
         $this->assertTrue($cond->is_available(true, $info, true, $user->id));
 
         // Add user to cohorts and refresh cache.
@@ -85,7 +83,7 @@ class availability_cohort_condition_testcase extends advanced_testcase {
         $this->assertTrue($cond->is_available(false, $info, true, $user->id));
         $this->assertFalse($cond->is_available(true, $info, true, $user->id));
         $information = $cond->get_description(false, true, $info);
-        $this->assertRegExp('~do <strong>not</strong> belong to .*<strong>Cohort 1</strong>~', $information);
+        $this->assertMatchesRegularExpression('~do <strong>not</strong> belong to .*<strong>Cohort 1</strong>~', $information);
 
         // Check cohort 2 works also.
         $cond = new condition((object)array('id' => (int)$cohort2->id));
@@ -96,13 +94,13 @@ class availability_cohort_condition_testcase extends advanced_testcase {
         $this->assertTrue($cond->is_available(false, $info, true, $user->id));
         $this->assertFalse($cond->is_available(true, $info, true, $user->id));
         $information = $cond->get_description(false, true, $info);
-        $this->assertRegExp('~do <strong>not</strong> belong to <strong>any cohort</strong>~', $information);
+        $this->assertMatchesRegularExpression('~do <strong>not</strong> belong to <strong>any cohort</strong>~', $information);
 
         // Cohort that doesn't exist uses 'missing' text.
         $cond = new condition((object)array('id' => $cohort2->id + 1000));
         $this->assertFalse($cond->is_available(false, $info, true, $user->id));
         $information = $cond->get_description(false, false, $info);
-        $this->assertRegExp('~You belong to.*\(Missing cohort\)~', $information);
+        $this->assertMatchesRegularExpression('~You belong to.*\(Missing cohort\)~', $information);
     }
 
     /**
@@ -115,7 +113,7 @@ class availability_cohort_condition_testcase extends advanced_testcase {
         try {
             $cond = new condition($structure);
             $this->fail();
-        } catch (coding_exception $e) {
+        } catch (\coding_exception $e) {
             $this->assertStringContainsString('Invalid ->id', $e->getMessage());
         }
 

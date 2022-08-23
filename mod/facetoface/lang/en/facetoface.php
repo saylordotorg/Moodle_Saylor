@@ -269,7 +269,7 @@ $string['notificationemail'] = 'Email Notification only';
 $string['notificationical'] = 'iCalendar Appointment only';
 $string['noticedeleteconfirm'] = 'Delete site notice \'{$a->name}\'?<br/><blockquote>{$a->text}</blockquote>';
 $string['noticetext'] = 'Notice text';
-$string['noteinfo'] ='During the last site upgrade the face-to-face module has been modified. It now
+$string['noteinfo'] = 'During the last site upgrade the face-to-face module has been modified. It now
 requires session custom fields to have unique shortnames. Since some of your
 custom fields had duplicate shortnames, they have been renamed to remove
 duplicates (see table below). This could impact on your email messages if you

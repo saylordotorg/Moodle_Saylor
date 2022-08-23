@@ -4,6 +4,22 @@ moodle-availability_role
 Changes
 -------
 
+### v3.11-r4
+
+* 2022-07-12 - Fix availability form styling (which didn't use Bootstrap styles up to now)
+
+### v3.11-r3
+
+* 2022-07-10 - Add Visual checks section to UPGRADE.md
+* 2022-07-10 - Add Capabilities section to README.md
+
+### v3.11-r2
+
+* 2022-06-26 - Make codechecker happy again
+* 2022-06-26 - Updated Moodle Plugin CI to latest upstream recommendations
+* 2022-06-26 - Add UPGRADE.md as internal upgrade documentation
+* 2022-06-26 - Update maintainers and copyrights in README.md.
+
 ### v3.11-r1
 
 * 2021-06-13 - Prepare compatibility for Moodle 3.11.
