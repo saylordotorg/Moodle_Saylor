@@ -93,10 +93,11 @@ class stack_equiv_input extends stack_input {
         }
 
         $attributes = array(
-            'name' => $fieldname,
-            'id'   => $fieldname,
-            'rows' => max(3, count($rows) + 1),
-            'cols' => min($boxwidth, 50),
+            'class' => 'equivinput',
+            'name'  => $fieldname,
+            'id'    => $fieldname,
+            'rows'  => max(3, count($rows) + 1),
+            'cols'  => min($boxwidth, 50),
             'autocapitalize' => 'none',
             'spellcheck'     => 'false',
         );
@@ -468,7 +469,7 @@ class stack_equiv_input extends stack_input {
                     array('class' => 'alert alert-danger stackinputerror'));
         }
 
-        if ($this->get_parameter('showValidation', 1) == 1 && !($state->lvars === '' or $state->lvars === '[]')) {
+        if ($this->get_parameter('showValidation', 1) == 1 && !($state->lvars === '' || $state->lvars === '[]')) {
             $feedback .= $this->tag_listofvariables($state->lvars);
         }
 

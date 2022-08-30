@@ -297,6 +297,11 @@ function vpl_supports($feature) {
         case FEATURE_ADVANCED_GRADING :
             return false;
         default :
+            if (defined('FEATURE_MOD_PURPOSE')) {
+                if ($feature == FEATURE_MOD_PURPOSE) {
+                    return MOD_PURPOSE_ASSESSMENT;
+                }
+            }
             return null;
     }
 }
@@ -714,10 +719,10 @@ function vpl_extend_settings_navigation(settings_navigation $settings, navigatio
 
 function vpl_scale_used($vplid, $scaleid) {
     global $DB;
-    return $scaleid and $DB->record_exists( VPL, array (
+    return $scaleid && $DB->record_exists( VPL, [
             'id' => "$vplid",
             'grade' => "-$scaleid"
-    ) );
+    ] );
 }
 
 /**
@@ -729,12 +734,12 @@ function vpl_scale_used($vplid, $scaleid) {
  */
 function vpl_scale_used_anywhere($scaleid) {
     global $DB;
-    return $scaleid and $DB->record_exists( VPL, array (
+    return $scaleid && $DB->record_exists( VPL, [
             'grade' => "-$scaleid"
-    ) );
+    ] );
 }
 function vpl_get_view_actions() {
-    return array (
+    return [
             'view',
             'view all',
             'view all submissions',
@@ -750,10 +755,10 @@ function vpl_get_view_actions() {
             'view watermarks',
             'similarity form',
             'view previous'
-    );
+    ];
 }
 function vpl_get_post_actions() {
-    return array (
+    return [
             'save submision',
             'evaluate',
             'execution save keeplist',
@@ -764,7 +769,7 @@ function vpl_get_post_actions() {
             'remove grade',
             'upload submission',
             'variations form'
-    );
+    ];
 }
 
 /**

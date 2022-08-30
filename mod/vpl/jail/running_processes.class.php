@@ -24,50 +24,95 @@
  */
 
 /**
- * Only ONE task per user
+ * Class that manage the Table of running processes
  *
  * @author juanca
  */
 class vpl_running_processes {
     const TABLE = 'vpl_running_processes';
-    public static function get($userid, $vplid = false) {
+    /**
+     * Returns record of a running process (type run, debug or evaluate).
+     *
+     * @param int $userid User id of the process.
+     * @param ?int $vplid VPL activity id (optional).
+     * @param ?string $adminticket Admin ticket of the process (optional).
+     * @return (object|false) Record with the process information.
+     */
+    public static function get_run(int $userid, ?int $vplid = null, ?string $adminticket = null) {
         global $DB;
-        $params = array ( 'userid' => $userid);
-        if ( $vplid !== false ) {
+        $select = 'userid = :userid AND type <> 3';
+        $params = ['userid' => $userid];
+        if ( $vplid !== null ) {
+            $params['vpl'] = $vplid;
+            $select .= ' AND vpl = :vpl';
+        }
+        if ( $adminticket !== null ) {
+            $params['adminticket'] = $adminticket;
+            $select .= ' AND adminticket = :adminticket';
+        }
+        return $DB->get_record_select(self::TABLE, $select, $params);
+    }
+
+    /**
+     * For a user and (optional) a VPL activity returns directruns.
+     * @param int $userid
+     * @param (int|null) $vplid
+     * @return array processes records
+     */
+    public static function get_directrun(int $userid, ?int $vplid = null) {
+        global $DB;
+        $params = [ 'userid' => $userid, 'type' => 3 ];
+        if ($vplid !== null) {
             $params['vpl'] = $vplid;
         }
+        return $DB->get_records( self::TABLE, $params );
+    }
+
+    /**
+     * Returns process info by id.
+     * @param int $vplid VPL id.
+     * @param int $userid User id.
+     * @param int $id Process record id.
+     * @return object
+     */
+    public static function get_by_id(int $vplid, int $userid, int $id) {
+        global $DB;
+        $params = ['id' => $id, 'vpl' => $vplid, 'userid' => $userid];
         return $DB->get_record( self::TABLE, $params );
     }
-    public static function set($userid, $server, $vplid, $adminticket) {
+
+    /**
+     * Adds a proccess information to the vpl_running_processes DB table.
+     *
+     * @param Object $data {userid, server, vplid, adminticket}
+     * @return int Process id in the DB table
+     */
+    public static function set(object $data) {
         global $DB;
-        $info = new stdClass();
-        $info->userid = $userid;
-        $info->server = $server;
-        $info->vpl = $vplid;
-        $info->start_time = time();
-        $info->adminticket = $adminticket;
-        vpl_truncate_running_processes( $info );
-        return $DB->insert_record( self::TABLE, $info );
+        $data->start_time = time();
+        vpl_truncate_running_processes( $data );
+        return $DB->insert_record( self::TABLE, $data );
     }
-    public static function delete($userid, $vplid, $adminticket=false) {
+
+    public static function delete(int $userid, int $vplid, ?string $adminticket = null) {
         global $DB;
-        $parms = array('userid' => $userid, 'vpl' => $vplid);
-        if ($adminticket) {
+        $parms = ['userid' => $userid, 'vpl' => $vplid];
+        if ($adminticket !== null) {
             $parms['adminticket'] = $adminticket;
         }
         $DB->delete_records( self::TABLE, $parms );
     }
-    public static function lanched_processes($courseid) {
+    /**
+     * Returns records of processes registered in a course
+     * @param int $courseid ID of the course
+     * @return array[] Array of DB records.
+     */
+    public static function lanched_processes(int $courseid) {
         global $DB;
-        // Clean old processes.
-        // TODO: save the maximum time and delete based on it.
-        $old = time() - (60 * 60); // One hour.
-        $DB->delete_records_select(self::TABLE, "start_time < ?", array($old));
-
         $sql = 'SELECT {vpl_running_processes}.* FROM {vpl_running_processes}';
         $sql .= ' INNER JOIN {vpl} ON {vpl_running_processes}.vpl = {vpl}.id';
         $sql .= ' WHERE {vpl}.course = ?;';
-        $param = array ( $courseid );
+        $param = [ $courseid ];
         return $DB->get_records_sql( $sql, $param );
     }
 }

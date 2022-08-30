@@ -62,10 +62,10 @@ class prt_evaluatable implements cas_raw_value_extractor {
     // and replace them into the result once everything is complete.
     private $statics = null;
 
-    // Stores the human readable trace created at compile time.
+    // Stores the human-readable trace created at compile time.
     private $trace = array();
 
-    public function __construct(string $signature, $weight = 1, castext2_static_replacer $statics, $trace) {
+    public function __construct(string $signature, $weight, castext2_static_replacer $statics, $trace) {
         $this->signature = $signature;
         $this->weight = $weight;
         $this->errors = [];
@@ -186,7 +186,7 @@ class prt_evaluatable implements cas_raw_value_extractor {
                 // If it was flat.
                 $this->renderedfeedback  = stack_utils::maxima_string_to_php_string($this->feedback);
                 if ($this->statics !== null) {
-                    $this->evaluated = $this->statics->replace($this->evaluated);
+                    $this->renderedfeedback = $this->statics->replace($this->renderedfeedback);
                 }
             } else {
                 $value = castext2_parser_utils::unpack_maxima_strings($this->feedback);

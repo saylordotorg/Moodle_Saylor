@@ -34,11 +34,14 @@ require_once(dirname( __FILE__ ) . '/vpl_submission.class.php');
 class mod_vpl_webservice extends external_api {
     private static function initial_checks($id, $password) {
         $vpl = new mod_vpl( $id );
-        if (! $vpl->pass_network_check()) {
-            throw new Exception( get_string( 'opnotallowfromclient', VPL ) . ' ' . getremoteaddr() );
-        }
-        if (! $vpl->pass_password_check( $password )) {
-            throw new Exception( get_string( 'requiredpassword', VPL ) );
+        if (! $vpl->has_capability( VPL_GRADE_CAPABILITY )) {
+            if (! $vpl->pass_network_check()) {
+                $message = get_string( 'opnotallowfromclient', VPL ) . ' ' . getremoteaddr();
+                throw new Exception( $message );
+            }
+            if (! $vpl->pass_password_check( $password )) {
+                throw new Exception( get_string( 'requiredpassword', VPL ) );
+            }
         }
         return $vpl;
     }
@@ -122,7 +125,7 @@ class mod_vpl_webservice extends external_api {
             throw new Exception( get_string( 'notavailable' ) );
         }
         $instance = $vpl->get_instance();
-        if ($instance->example or $instance->restrictededitor) {
+        if ($instance->example || ($instance->restrictededitor && ! $vpl->has_capability(VPL_MANAGE_CAPABILITY))) {
             throw new Exception( get_string( 'notavailable' ) );
         }
         // Adapts to the file format VPL3.2.
@@ -133,6 +136,7 @@ class mod_vpl_webservice extends external_api {
         }
         mod_vpl_edit::save( $vpl, $USER->id, $files );
     }
+
     public static function save_returns() {
         return null;
     }
@@ -143,34 +147,42 @@ class mod_vpl_webservice extends external_api {
     public static function open_parameters() {
         return new external_function_parameters( array (
                 'id' => new external_value( PARAM_INT, 'Activity id (course_module)', VALUE_REQUIRED ),
-                'password' => new external_value( PARAM_RAW, 'Activity password', VALUE_DEFAULT, '' )
+                'password' => new external_value( PARAM_RAW, 'Activity password', VALUE_DEFAULT, '' ),
+                'userid' => new external_value( PARAM_INT, 'User ID', VALUE_DEFAULT, -1 )
         ) );
     }
-    public static function open($id, $password) {
+    public static function open($id, $password, $userid) {
         global $USER;
-        self::validate_parameters( self::open_parameters(), array (
+        self::validate_parameters( self::open_parameters(), [
                 'id' => $id,
-                'password' => $password
-        ) );
+                'password' => $password,
+                'userid' => $userid
+        ] );
         $vpl = self::initial_checks( $id, $password );
         $vpl->require_capability( VPL_VIEW_CAPABILITY );
+        if ($userid == -1) {
+            $userid = $USER->id;
+        } else {
+            $vpl->require_capability( VPL_GRADE_CAPABILITY );
+        }
         if (! $vpl->is_visible()) {
             throw new Exception( get_string( 'notavailable' ) );
         }
         $compilationexecution = new stdClass();
-        $files = mod_vpl_edit::get_submitted_files( $vpl, $USER->id, $compilationexecution );
+        $files = mod_vpl_edit::get_submitted_files( $vpl, $userid, $compilationexecution );
         // Adapt array of name => value content to format array of objects {name, data}.
         $files = mod_vpl_edit::files2object( $files );
-        $ret = array (
+        $ret = [
                 'files' => $files,
                 'compilation' => '',
                 'evaluation' => '',
                 'grade' => ''
-        );
-        if ($compilationexecution && $vpl->get_instance()->evaluate) {
-            $ret['compilation'] = $compilationexecution->compilation;
-            $ret['evaluation'] = $compilationexecution->evaluation;
-            $ret['grade'] = $compilationexecution->grade;
+        ];
+        $attributes = ['compilation', 'evaluation', 'grade'];
+        foreach ($attributes as $attribute) {
+            if (isset($compilationexecution->$attribute)) {
+                $ret[$attribute] = $compilationexecution->$attribute;
+            }
         }
         return $ret;
     }
@@ -204,16 +216,15 @@ class mod_vpl_webservice extends external_api {
         $vpl = self::initial_checks( $id, $password );
         $vpl->require_capability( VPL_SUBMIT_CAPABILITY );
         $instance = $vpl->get_instance();
-        if (! $vpl->is_submit_able()) {
-            throw new Exception( get_string( 'notavailable' ) );
-        }
-        if ($instance->example or ! $instance->evaluate) {
-            throw new Exception( get_string( 'notavailable' ) );
+        if (! $vpl->has_capability(VPL_GRADE_CAPABILITY)) {
+            if (! $vpl->is_submit_able()) {
+                throw new Exception( get_string( 'notavailable' ) );
+            }
+            if ($instance->example || ! $instance->evaluate) {
+                throw new Exception( get_string( 'notavailable' ) );
+            }
         }
         $res = mod_vpl_edit::execute( $vpl, $USER->id, 'evaluate' );
-        if ( empty($res->monitorPath) ) {
-            throw new Exception( get_string( 'notavailable' ) );
-        }
         $monitorurl = 'ws://' . $res->server . ':' . $res->port . '/' . $res->monitorPath;
         $smonitorurl = 'wss://' . $res->server . ':' . $res->securePort . '/' . $res->monitorPath;
         return array ( 'monitorURL' => $monitorurl, 'smonitorURL' => $smonitorurl  );
@@ -253,18 +264,27 @@ if the websocket client send something to the server then the evaluation is stop
         $vpl = self::initial_checks( $id, $password );
         $vpl->require_capability( VPL_SUBMIT_CAPABILITY );
         $instance = $vpl->get_instance();
-        if (! $vpl->is_submit_able()) {
-            throw new Exception( get_string( 'notavailable' ) );
-        }
-        if ($instance->example or $instance->restrictededitor or ! $instance->evaluate) {
-            throw new Exception( get_string( 'notavailable' ) );
+        if (! $vpl->has_capability(VPL_GRADE_CAPABILITY)) {
+            if (! $vpl->is_submit_able()) {
+                throw new Exception( get_string( 'notavailable' ) );
+            }
+            if ($instance->example || ! $instance->evaluate) {
+                throw new Exception( get_string( 'notavailable' ) );
+            }
         }
         $compilationexecution = mod_vpl_edit::retrieve_result( $vpl, $USER->id );
-        return array (
-                'compilation' => $compilationexecution->compilation,
-                'evaluation' => $compilationexecution->evaluation,
-                'grade' => $compilationexecution->grade
-        );
+        $ret = [
+            'compilation' => '',
+            'evaluation' => '',
+            'grade' => ''
+        ];
+        $attributes = ['compilation', 'evaluation', 'grade'];
+        foreach ($attributes as $attribute) {
+            if (isset($compilationexecution->$attribute)) {
+                $ret[$attribute] = $compilationexecution->$attribute;
+            }
+        }
+        return $ret;
     }
     public static function get_result_returns() {
         return new external_single_structure( array (

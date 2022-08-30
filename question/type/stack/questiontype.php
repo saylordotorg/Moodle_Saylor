@@ -537,10 +537,11 @@ class qtype_stack extends question_type {
         }
 
         $prtnames = array_keys($this->get_prt_names_from_question($question->questiontext, $question->specificfeedback));
+
         foreach ($prtnames as $name) {
             $prtvalue = 0;
             if (!$allformative) {
-                $prtvalue = $prtdata->value / $totalvalue;
+                $prtvalue = $questiondata->prts[$name]->value / $totalvalue;
             }
             $question->prts[$name] = new stack_potentialresponse_tree_lite($questiondata->prts[$name],
                 $prtvalue, $question);
@@ -1644,7 +1645,7 @@ class qtype_stack extends question_type {
                 $errors['questiontext'][] = stack_string('inputnameform', $inputname);
             }
 
-            if ($fromform[$inputname . 'mustverify'] and $fromform[$inputname . 'showvalidation'] == 0) {
+            if ($fromform[$inputname . 'mustverify'] && $fromform[$inputname . 'showvalidation'] == 0) {
                 $errors[$inputname . 'mustverify'][] = stack_string('mustverifyshowvalidation');
             }
 

@@ -83,7 +83,7 @@ class stack_cas_keyval {
 
     private function validate($inputs) {
 
-        if (empty($this->raw) or '' == trim($this->raw) or null == $this->raw) {
+        if (empty($this->raw) || '' == trim($this->raw) || null == $this->raw) {
             $this->valid = true;
             return true;
         }
@@ -152,8 +152,9 @@ class stack_cas_keyval {
         $this->valid   = true;
         $this->statements   = array();
         foreach ($ast->items as $item) {
-            $cs = stack_ast_container::make_from_teacher_ast($item, '', $this->security);
+            // Include might have brought in some comments. Even after we removed them from the source.
             if ($item instanceof MP_Statement) {
+                $cs = stack_ast_container::make_from_teacher_ast($item, '', $this->security);
                 $op = '';
                 if ($item->statement instanceof MP_Operation) {
                     $op = $item->statement->op;
@@ -166,10 +167,10 @@ class stack_cas_keyval {
                     $cs = stack_ast_container_silent::make_from_teacher_ast($item, '',
                             $this->security);
                 }
+                $this->valid = $this->valid && $cs->get_valid();
+                $this->errors = array_merge($this->errors, $cs->get_errors('objects'));
+                $this->statements[] = $cs;
             }
-            $this->valid = $this->valid && $cs->get_valid();
-            $this->errors = array_merge($this->errors, $cs->get_errors('objects'));
-            $this->statements[] = $cs;
         }
 
         // Allow reference to inputs in the values of the question variables (otherwise we can't use them)!
@@ -328,9 +329,11 @@ class stack_cas_keyval {
         $errors = [];
         $answernotes = [];
         $filteroptions = ['998_security' => ['security' => 't'],
-            '601_castext' => ['context' => $contextname, 'errclass' => $this->errclass]];
+            '601_castext' => ['context' => $contextname, 'errclass' => $this->errclass],
+            '995_ev_modification' => ['flags' => true]];
         $pipeline = stack_parsing_rule_factory::get_filter_pipeline(['601_castext',
-            '602_castext_simplifier', '680_gcl_sconcat', '996_call_modification', '998_security', '999_strict'],
+            '602_castext_simplifier', '680_gcl_sconcat', '995_ev_modification',
+            '996_call_modification', '998_security', '999_strict'],
             $filteroptions, true);
         $tostringparams = ['nosemicolon' => true, 'pmchar' => 1];
         $securitymodel = $this->security;

@@ -88,7 +88,12 @@ try {
             break;
         case 'update':
             $files = mod_vpl_edit::filesfromide( $actiondata->files );
-            $result->response = mod_vpl_edit::update( $vpl, $userid, $files);
+            $filestodelete = isset($actiondata->filestodelete) ? $actiondata->filestodelete : [];
+            $result->response = mod_vpl_edit::update($vpl,
+                                                     $userid,
+                                                     $actiondata->processid,
+                                                     $files,
+                                                     $filestodelte);
             break;
         case 'resetfiles':
             $files = mod_vpl_edit::get_requested_files( $vpl );
@@ -112,19 +117,23 @@ try {
         case 'run':
         case 'debug':
         case 'evaluate':
-            if (! $instance->$action and ! $vpl->has_capability( VPL_GRADE_CAPABILITY )) {
+            if (! $instance->$action && ! $vpl->has_capability( VPL_GRADE_CAPABILITY )) {
                 throw new Exception( get_string( 'notavailable' ) );
             }
             $result->response = mod_vpl_edit::execute( $vpl, $userid, $action, $actiondata );
             break;
         case 'retrieve':
-            $result->response = mod_vpl_edit::retrieve_result( $vpl, $userid );
+            $result->response = mod_vpl_edit::retrieve_result( $vpl, $userid, $actiondata->processid );
             break;
         case 'cancel':
-            $result->response = mod_vpl_edit::cancel( $vpl, $userid );
+            $result->response = mod_vpl_edit::cancel( $vpl, $userid, $actiondata->processid );
             break;
         case 'getjails':
             $result->response->servers = vpl_jailserver_manager::get_https_server_list( $vpl->get_instance()->jailservers );
+            break;
+        case 'directrun':
+            $files = mod_vpl_edit::filesfromide( $actiondata->files );
+            $result->response = mod_vpl_edit::directrun( $vpl, $userid, $actiondata->command, $files);
             break;
         default:
             throw new Exception( 'ajax action error: ' + $action );

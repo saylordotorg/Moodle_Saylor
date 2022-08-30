@@ -1194,14 +1194,15 @@ class qtype_stack_question extends question_graded_automatically_with_countback
     }
 
     /**
-     * @return bool whether this question uses randomisation.
+     * @return bool Whether this question uses randomisation.
      */
     public function has_random_variants() {
         return $this->random_variants_check($this->questionvariables);
     }
 
     /**
-     * @return bool Actual test of whether this question uses randomisation.
+     * @param string Input text (raw keyvals) to check for random functions.
+     * @return bool Actual test of whether text uses randomisation.
      */
     public static function random_variants_check($text) {
         return preg_match('~\brand~', $text) || preg_match('~\bmultiselqn~', $text);
@@ -1590,7 +1591,7 @@ class qtype_stack_question extends question_graded_automatically_with_countback
      */
     public function get_cached(string $key) {
         global $DB;
-        if ($this->compiledcache !== null and isset($this->compiledcache['FAIL'])) {
+        if ($this->compiledcache !== null && isset($this->compiledcache['FAIL'])) {
             // This question failed compilation, no need to try again in this request.
             // Make sure the error is back in the error list.
             $this->runtimeerrors[$this->compiledcache['FAIL']] = true;
@@ -1705,6 +1706,12 @@ class qtype_stack_question extends question_graded_automatically_with_countback
         $units = false;
         $forbiddenkeys = [];
         $sec = new stack_cas_security();
+
+        // Some counter resets to ensure that the result is the same even if
+        // we for some reason would compile twice in a session.
+        // Happens during first preview and can lead to cache being always out
+        // of sync if textdownload is in play.
+        stack_cas_castext2_textdownload::$countfiles = 1;
 
         // First handle the question variables.
         if ($questionvariables === null || trim($questionvariables) === '') {

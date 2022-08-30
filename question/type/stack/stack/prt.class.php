@@ -561,7 +561,7 @@ class stack_potentialresponse_tree_lite {
             $at .= ',' . $node->tans;
         }
 
-        if (stack_ans_test_controller::required_atoptions($node->answertest) === true or
+        if (stack_ans_test_controller::required_atoptions($node->answertest) === true ||
                 (stack_ans_test_controller::required_atoptions($node->answertest) === 'optional' &&
                 trim($node->testoptions) !== '')) {
             // Simplify these. Mainly the sigfigs as the test has a history of not doing it.
@@ -719,9 +719,16 @@ class stack_potentialresponse_tree_lite {
                     }
                 }
             }
-            $cs = stack_ast_container::make_from_teacher_source($ct->get_evaluationform(), $context . '/ft');
+            $cts = $ct->get_evaluationform();
+            // If it is a pure static string it is too simple for latter processing to detect static content.
+            // So we will add some wrapping to make it obvious.
+            if (mb_substr($cts, 0, 1) === '"') {
+                $cts = '["%root",' . $cts . ']';
+            }
+
+            $cs = stack_ast_container::make_from_teacher_source($cts, $context . '/ft');
             $usage = $cs->get_variable_usage($usage); // Update the references.
-            $body .= '_EC(errcatch(%PRT_FEEDBACK:castext_concat(%PRT_FEEDBACK,' . $ct->get_evaluationform() . ')),' .
+            $body .= '_EC(errcatch(%PRT_FEEDBACK:castext_concat(%PRT_FEEDBACK,' . $cts . ')),' .
                 stack_utils::php_string_to_maxima_string($context . '/ft') . ')';
         }
 
@@ -807,9 +814,17 @@ class stack_potentialresponse_tree_lite {
                     }
                 }
             }
-            $cs = stack_ast_container::make_from_teacher_source($ct->get_evaluationform(), $context . '/ff');
+
+            $cts = $ct->get_evaluationform();
+            // If it is a pure static string it is too simple for latter processing to detect static content.
+            // So we will add some wrapping to make it obvious.
+            if (mb_substr($cts, 0, 1) === '"') {
+                $cts = '["%root",' . $cts . ']';
+            }
+
+            $cs = stack_ast_container::make_from_teacher_source($cts, $context . '/ff');
             $usage = $cs->get_variable_usage($usage); // Update the references.
-            $body .= '_EC(errcatch(%PRT_FEEDBACK:castext_concat(%PRT_FEEDBACK,' . $ct->get_evaluationform() . ')),' .
+            $body .= '_EC(errcatch(%PRT_FEEDBACK:castext_concat(%PRT_FEEDBACK,' . $cts . ')),' .
                 stack_utils::php_string_to_maxima_string($context . '/ff') . ')';
         }
 

@@ -800,21 +800,32 @@ define(
             }
             return VPLUtil.showMessage(message, currentOptions);
         };
-
-        VPLUtil.requestAction = function(action, title, data, URL) {
+        /**
+         * Request an action to de server: save, run, debug, evaluate, update, getresult, etc.
+         * @param {string} action Name of action to request.
+         * @param {string} title The title that shows the progress dialog
+         * @param {object} data Data to send to the server
+         * @param {string} URL URL to the server entry point, lacking action
+         * @param {boolean} noDialog If true then no dialog is shown
+         * @returns {deferred} Defferred object
+         */
+        VPLUtil.requestAction = function(action, title, data, URL, noDialog) {
             var deferred = $.Deferred();
             var request = null;
             var xhr = false;
-            if (title === '') {
-                title = 'connecting';
-            }
-            var apb = new VPLUtil.progressBar(action, title, function() {
-                if (request.readyState != 4) {
-                    if (xhr && xhr.abort) {
-                        xhr.abort();
-                    }
+            var apb = false;
+            if (!noDialog) {
+                if (title === '') {
+                    title = 'connecting';
                 }
-            });
+                apb = new VPLUtil.progressBar(action, title, function() {
+                    if (request.readyState != 4) {
+                        if (xhr && xhr.abort) {
+                            xhr.abort();
+                        }
+                    }
+                });
+            }
             request = $.ajax({
                 beforeSend: function(jqXHR) {
                     xhr = jqXHR;
@@ -827,7 +838,9 @@ define(
                 contentType: "application/json; charset=utf-8",
                 dataType: "json"
             }).always(function() {
-                apb.close();
+                if (!noDialog) {
+                    apb.close();
+                }
             }).done(function(response) {
                 if (!response.success) {
                     deferred.reject(response.error);
@@ -836,9 +849,8 @@ define(
                 }
             }).fail(function(jqXHR, textStatus, errorThrown) {
                 var message = VPLUtil.str('connection_fail') + ': ' + textStatus;
-                if (debugMode) {
-                    message += '<br>' + errorThrown.message;
-                    message += '<br>' + jqXHR.responseText.substr(0, 80);
+                if (debugMode && errorThrown.message != undefined) {
+                    message += ': ' + errorThrown.message;
                 }
                 VPLUtil.log(message);
                 deferred.reject(message);
@@ -913,8 +925,18 @@ define(
             }
         };
         VPLUtil.monitorRunning = VPLUtil.returnFalse;
+        (function() {
+            var lastProccessID = -1;
+            VPLUtil.setProcessId = function(id) {
+                lastProccessID = id;
+            };
+            VPLUtil.getProcessId = function() {
+                return lastProccessID;
+            };
+        })();
         VPLUtil.webSocketMonitor = function(coninfo, title, running, externalActions) {
             VPLUtil.setProtocol(coninfo);
+            VPLUtil.setProcessId(coninfo.processid);
             var ws = null;
             var pb = null;
             var deferred = $.Deferred();
@@ -950,9 +972,10 @@ define(
                     }
                 },
                 'retrieve': function() {
+                    var data = {"processid": VPLUtil.getProcessId()};
                     pb.close();
                     delegated = true;
-                    VPLUtil.requestAction('retrieve', '', '', externalActions.ajaxurl)
+                    VPLUtil.requestAction('retrieve', '', data, externalActions.ajaxurl)
                     .done(
                         function(response) {
                             deferred.resolve();
@@ -969,6 +992,8 @@ define(
                 'close': function() {
                     VPLUtil.log('ws close message from jail');
                     ws.close();
+                    var data = {"processid": VPLUtil.getProcessId()};
+                    VPLUtil.requestAction('cancel', '', data, externalActions.ajaxurl, true);
                 }
             };
             try {
@@ -1045,6 +1070,84 @@ define(
                 return ws !== null && ws.readyState != WebSocket.CLOSED;
             };
             return deferred;
+        };
+
+        /**
+         * Run a command in a execution server with input/output using a WebSocket
+         * @param {string} URL to VPL editor services in Moodle server
+         * @param {string} command Command to run in execution server
+         * @param {array.<{name: string, contents: string, encoding: number}>} files
+         *         array of objects name, contents and encoding 0 => UTF-8, 1 => Base64
+         * @returns {object} deferred.
+         *         Use done() to set handler to receive the WebSocket. Use fail to set error handler.
+         */
+        VPLUtil.directRun = function(URL, command, files) {
+            var deferred = $.Deferred();
+            $.ajax({
+                async: true,
+                type: "POST",
+                url: URL + 'directrun',
+                'data': JSON.stringify({"command": command, "files": files}),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json"
+            }).done(function(result) {
+                if (!result.success) {
+                    deferred.reject(result.error);
+                } else {
+                    var response = result.response;
+                    VPLUtil.setProtocol(response);
+                    var ws = new WebSocket(response.executionURL);
+                    log.debug('Conecting with:' + response.executionURL);
+                    deferred.resolve({processid: response.processid, homepath: response.homepath, connection: ws});
+                }
+            }).fail(function(jqXHR, textStatus, errorThrown) {
+                var message = 'Connection fail' + ': ' + textStatus;
+                if (errorThrown.message != undefined) {
+                    message += ': ' + errorThrown.message;
+                }
+                log.debug(message);
+                deferred.reject(message);
+            });
+            return deferred;
+        };
+        /**
+         * Function to experiment with Direct run.
+         * Limits: one data send and 10 messages received and 10 minutes connected
+         * @param {string} URL to server
+         * @param {string} command Command to prepare direct run. Execution of command must generate vpl_execution
+         * @param {object} data to send to server
+         */
+         VPLUtil.directRunTest = function(URL, command, data) {
+            var files = [{name: 'a.c', contents: 'int main(){return 0;}', encoding: 0},
+                         {name: 'b.c', contents: 'int f(){return 1;}', encoding: 0}];
+            VPLUtil.directRun(URL, command, files)
+                .done(function(result) {
+                    var mcount = 0;
+                    result.connection.onopen = function() {
+                        log.debug("Ws open " + result.homepath + " processid " + result.processid);
+                        if (data != undefined) {
+                            result.connection.send(data);
+                        }
+                        setTimeout(function() { //  Close test if open for more than 10 minutes.
+                            result.connection.close();
+                        }, 60 * 10 * 1000);
+                    };
+                    result.connection.onmessage = function(event) {
+                        log.debug("WS Message (" + ++mcount + "): " + event.data);
+                        if (mcount >= 10) {
+                            result.connection.close();
+                        }
+                    };
+                    result.connection.onerror = function(event) {
+                        log.debug("WS error: " + event);
+                    };
+                    result.connection.onclose = function(event) {
+                        log.debug("WS close: " + event.code + " " + event.reason);
+                    };
+                })
+                .fail(function(message) {
+                    log.debug("Direct run fail. URL: " + URL + " command: " + command + " message: " + message);
+                });
         };
         VPLUtil.processResult = function(text, filenames, sh, noFormat, folding) {
             if (typeof text == 'undefined' || text.replace(/^\s+$/gm, '') == '') {

@@ -289,10 +289,14 @@ class mod_vpl_submission_CE extends mod_vpl_submission {
         $info = "#!/bin/bash\n";
         $info .= vpl_bash_export( 'VPL_LANG', vpl_get_lang( true ) );
         $info .= vpl_bash_export( 'MOODLE_USER_ID',  $subinstance->userid );
-        if (! $vpl->is_group_activity()) {
-            if ($user = $DB->get_record( 'user', array ( 'id' => $subinstance->userid ) )) {
-                $info .= vpl_bash_export( 'MOODLE_USER_NAME', $vpl->fullname( $user, false ) );
-                $info .= vpl_bash_export( 'MOODLE_USER_EMAIL', $user->email );
+        if ($user = $DB->get_record( 'user', array ( 'id' => $subinstance->userid ) )) {
+            $info .= vpl_bash_export( 'MOODLE_USER_NAME', $vpl->fullname( $user, false ) );
+            $info .= vpl_bash_export( 'MOODLE_USER_EMAIL', $user->email );
+        }
+        if ($vpl->is_group_activity()) {
+            if ($group = $DB->get_record( 'groups', array ( 'id' => $subinstance->groupid ) )) {
+                $info .= vpl_bash_export( 'MOODLE_GROUP_ID',  $subinstance->groupid );
+                $info .= vpl_bash_export( 'MOODLE_GROUP_NAME', $group->name );
             }
         }
         if ($type == 2) { // If evaluation add information.
@@ -353,23 +357,16 @@ class mod_vpl_submission_CE extends mod_vpl_submission {
         return $data;
     }
 
-    public function jailaction($server, $action, $data) {
-        if (! function_exists( 'xmlrpc_encode_request' )) {
-            throw new Exception( 'Inernal server error: PHP XMLRPC requiered' );
-        }
-
+    public static function jailaction($vpl, $server, $action, $data) {
         $plugin = new stdClass();
         require(dirname( __FILE__ ) . '/version.php');
         $pluginversion = $plugin->version;
         $data->pluginversion = $pluginversion;
-
-        $request = xmlrpc_encode_request( $action, $data, array (
-                'encoding' => 'UTF-8'
-        ) );
+        $request = vpl_jailserver_manager::get_action_request( $action, $data);
         $error = '';
         $response = vpl_jailserver_manager::get_response( $server, $request, $error );
         if ($response === false) {
-            $manager = $this->vpl->has_capability( VPL_MANAGE_CAPABILITY );
+            $manager = $vpl->has_capability( VPL_MANAGE_CAPABILITY );
             if ($manager) {
                 throw new Exception( get_string( 'serverexecutionerror', VPL ) . "\n" . $error );
             }
@@ -388,12 +385,12 @@ class mod_vpl_submission_CE extends mod_vpl_submission {
             }
             throw new Exception( $men );
         }
-        return $this->jailaction( $server, 'request', $data );
+        return self::jailaction($this->vpl, $server, 'request', $data );
     }
     public function jailreaction($action, $processinfo = false) {
         if ($processinfo === false) {
             $vplid = $this->vpl->get_instance()->id;
-            $processinfo = vpl_running_processes::get( $this->get_instance()->userid, $vplid);
+            $processinfo = vpl_running_processes::get_run( $this->get_instance()->userid, $vplid);
         }
         if ($processinfo === false) {
             throw new Exception( 'Process not found' );
@@ -401,7 +398,35 @@ class mod_vpl_submission_CE extends mod_vpl_submission {
         $server = $processinfo->server;
         $data = new stdClass();
         $data->adminticket = $processinfo->adminticket;
-        return $this->jailaction( $server, $action, $data );
+        return self::jailaction($this->vpl, $server, $action, $data );
+    }
+
+    /**
+     * Adapt files to send binary as base64.
+     * Modify atributes of $data object: files and fileencoding, modify filestodelete (must exists array)
+     *
+     * @param object $data Set atribute files and fileencoding, modify filestodelete (must exists array)
+     * @param array $files Array of files to adapt key=>filename value=>file data, remove values
+     */
+    public static function adaptbinaryfiles($data, &$files) {
+        $fileencoding = [];
+        $encodefiles = [];
+        if (empty($data->filestodelete)) {
+            $data->filestodelete = [];
+        }
+        foreach ($files as $filename => $filedata) {
+            if (vpl_is_binary( $filename )) {
+                $encodefiles[$filename . '.b64'] = base64_encode( $filedata );
+                $fileencoding[$filename . '.b64'] = 1;
+                $data->filestodelete[$filename . '.b64'] = 1;
+            } else {
+                $fileencoding[$filename] = 0;
+                $encodefiles[$filename] = $filedata;
+            }
+            $files[$filename] = '';
+        }
+        $data->files = $encodefiles;
+        $data->fileencoding = $fileencoding;
     }
 
     /**
@@ -434,22 +459,7 @@ class mod_vpl_submission_CE extends mod_vpl_submission {
         $maxmemory = $data->maxmemory;
         // Remove jailservers field.
         unset( $data->jailservers );
-        // Adapt files to send binary as base64.
-        $fileencoding = array();
-        $encodefiles = array ();
-        foreach ($data->files as $filename => $filedata) {
-            if (vpl_is_binary( $filename )) {
-                $encodefiles[$filename . '.b64'] = base64_encode( $filedata );
-                $fileencoding[$filename . '.b64'] = 1;
-                $data->filestodelete[$filename . '.b64'] = 1;
-            } else {
-                $fileencoding[$filename] = 0;
-                $encodefiles[$filename] = $filedata;
-            }
-            $data->files[$filename] = '';
-        }
-        $data->files = $encodefiles;
-        $data->fileencoding = $fileencoding;
+        self::adaptbinaryfiles($data, $data->files);
         $jailserver = '';
         $jailresponse = $this->jailrequestaction( $data, $maxmemory, $localservers, $jailserver );
         $parsed = parse_url( $jailserver );
@@ -470,54 +480,58 @@ class mod_vpl_submission_CE extends mod_vpl_submission {
         $response->wsProtocol = $plugincfg->websocket_protocol;
         $response->VNCpassword = substr( $jailresponse['executionticket'], 0, 8 );
         $instance = $this->get_instance();
-        vpl_running_processes::set( $instance->userid, $jailserver, $instance->vpl, $jailresponse['adminticket'] );
+        $process = new stdClass();
+        $process->userid = $instance->userid;
+        $process->vpl = $instance->vpl; // The vplid.
+        $process->adminticket = $jailresponse['adminticket'];
+        $process->server = $jailserver;
+        $process->type = $type;
+        $response->processid = vpl_running_processes::set($process);
         return $response;
     }
 
     /**
-     * Send update command to the jail
+     * Updates files in running task
      *
-     * @param mod_vpl $vpl. VPl instance to process. Default = null
-     * @param string[string] $files. Files to send
-     * @return boolean if update sent
+     * @param mod_vpl $vpl VPL instance
+     * @param int $userid
+     * @param int $processid
+     * @param string[string] $files internal format
+     * @throws Exception
+     * @return boolean True if updated
      */
-    public function update($vpl, $files) {
+
+    public static function update($vpl, $userid, $processid, $files,  $filestodelete = []) {
         $data = new stdClass();
         $data->files = $files;
-        $vplid = $this->vpl->get_instance()->id;
-        $processinfo = vpl_running_processes::get( $this->get_instance()->userid, $vplid );
-        if ($processinfo == null) { // No process to cancel.
+        $vplid = $vpl->get_instance()->id;
+        $processinfo = vpl_running_processes::get_by_id($vplid, $userid, $processid);
+        if ($processinfo == false) { // No process => no update.
             return false;
         }
         $server = $processinfo->server;
         $data = new stdClass();
-        $data->files = $files;
-        $fileencoding = array();
-        $encodefiles = array ();
-        foreach ($data->files as $filename => $filedata) {
-            if (vpl_is_binary( $filename )) {
-                $encodefiles[$filename . '.b64'] = base64_encode( $filedata );
-                $fileencoding[$filename . '.b64'] = 1;
-                $data->filestodelete[$filename . '.b64'] = 1;
-            } else {
-                $fileencoding[$filename] = 0;
-                $encodefiles[$filename] = $filedata;
-            }
-            $data->files[$filename] = '';
+        $data->filestodelete = [];
+        foreach ($filestodelete as $filename) {
+            $data->filestodelete[$filename] = 1;
         }
-        $data->files = $encodefiles;
-        $data->fileencoding = $fileencoding;
+        self::adaptbinaryfiles($data, $files);
         $data->adminticket = $processinfo->adminticket;
         try {
-            $response = $this->jailaction( $server, 'update', $data );
+            $response = self::jailaction($vpl, $server, 'update', $data );
         } catch ( Exception $e ) {
             return false;
         }
         return $response['update'] > 0;
     }
 
-    public function retrieveresult() {
-        $response = $this->jailreaction( 'getresult' );
+    public function retrieveresult($processid) {
+        $vplid = $this->vpl->get_instance()->id;
+        $processinfo = vpl_running_processes::get_by_id($vplid, $this->instance->userid, $processid);
+        if ($processinfo == false) { // No process found.
+            throw new Exception( get_string( 'serverexecutionerror', VPL ) );
+        }
+        $response = $this->jailreaction( 'getresult', $processinfo );
         if ($response === false) {
             throw new Exception( get_string( 'serverexecutionerror', VPL ) );
         }
@@ -543,10 +557,19 @@ class mod_vpl_submission_CE extends mod_vpl_submission {
         }
         return $response['running'] > 0;
     }
-    public function cancelprocess() {
+    /**
+     * Cancel running process
+     * @param int $processid
+     */
+    public function cancelprocess(int $processid = -1) {
         $vplid = $this->vpl->get_instance()->id;
-        $processinfo = vpl_running_processes::get( $this->get_instance()->userid, $vplid );
-        if ($processinfo == null) { // No process to cancel.
+        $userid = $this->get_instance()->userid;
+        if ($processid == -1) {
+            $processinfo = vpl_running_processes::get_run( $userid, $vplid);
+        } else {
+            $processinfo = vpl_running_processes::get_by_id( $vplid, $userid, $processid );
+        }
+        if ($processinfo == false) { // No process to cancel.
             return;
         }
         try {
@@ -555,6 +578,6 @@ class mod_vpl_submission_CE extends mod_vpl_submission {
             // No matter, consider that the process stopped.
             debugging( "Process in execution server not sttoped or not found", DEBUG_DEVELOPER );
         }
-        vpl_running_processes::delete( $this->get_instance()->userid, $vplid);
+        vpl_running_processes::delete( $userid, $vplid, $processinfo->adminticket);
     }
 }
