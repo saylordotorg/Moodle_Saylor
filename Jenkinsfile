@@ -377,7 +377,7 @@ def plugins = [
     [
       "name" : 'format_grid',
       "url" : 'https://github.com/gjb2048/moodle-format_grid.git',
-      "branch" : 'master',
+      "branch" : 'MOODLE_311',
       "dest" : 'course/format/grid'
     ],
     [
