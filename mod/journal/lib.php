@@ -127,6 +127,8 @@ function journal_supports($feature) {
             return true;
         case FEATURE_SHOW_DESCRIPTION:
             return true;
+        case FEATURE_MOD_PURPOSE:
+            return MOD_PURPOSE_COLLABORATION;
         default:
             return null;
     }
@@ -378,7 +380,7 @@ function journal_scale_used ($journalid, $scaleid) {
 function journal_scale_used_anywhere($scaleid) {
     global $DB;
 
-    if ($scaleid and $DB->get_records('journal', array('grade' => -$scaleid))) {
+    if ($scaleid && $DB->get_records('journal', array('grade' => -$scaleid))) {
         return true;
     } else {
         return false;
@@ -464,7 +466,7 @@ function journal_print_overview($courses, &$htmlarray) {
             $courses[$journal->course]->format = $DB->get_field('course', 'format', array('id' => $journal->course));
         }
 
-        if ($courses[$journal->course]->format == 'weeks' AND $journal->days) {
+        if ($courses[$journal->course]->format == 'weeks' && $journal->days) {
 
             $coursestartdate = $courses[$journal->course]->startdate;
 
@@ -684,7 +686,7 @@ function journal_get_users_done($journal, $currentgroup) {
         $canadd = has_capability('mod/journal:addentries', $context, $user);
         $entriesmanager = has_capability('mod/journal:manageentries', $context, $user);
 
-        if (!$entriesmanager and !$canadd) {
+        if (!$entriesmanager && !$canadd) {
             unset($journals[$key]);
         }
     }
@@ -695,25 +697,27 @@ function journal_get_users_done($journal, $currentgroup) {
 /**
  * Counts all the journal entries (optionally in a given group)
  * @param stdClass $journal Journal object
- * @param int $groupid Group id
+ * @param boolean|int|array $groupids Group id or array of ids. 0 or false = see all.
  * @return int Number of entries
  */
-function journal_count_entries($journal, $groupid = 0) {
+function journal_count_entries($journal, $groupids = 0) {
     global $DB;
 
     $cm = journal_get_coursemodule($journal->id);
     $context = context_module::instance($cm->id);
+    $journals = null;
 
-    if ($groupid) {     // How many in a particular group?
+    if (!empty($groupids)) {     // How many in a particular group?
+        $params = array($journal->id);
+        $sqlin = $DB->get_in_or_equal($groupids);
 
         $sql = "SELECT DISTINCT u.id FROM {journal_entries} j
                 JOIN {groups_members} g ON g.userid = j.userid
                 JOIN {user} u ON u.id = g.userid
-                WHERE j.journal = ? AND g.groupid = ?";
-        $journals = $DB->get_records_sql($sql, array($journal->id, $groupid));
+                WHERE j.journal = ? AND g.groupid $sqlin[0]";
+        $journals = $DB->get_records_sql($sql, array_merge($params, $sqlin[1]));
 
-    } else { // Count all the entries from the whole course.
-
+    } else if ($groupids === 0 || $groupids === false) { // Count all the entries from the whole course.
         $sql = "SELECT DISTINCT u.id FROM {journal_entries} j
                 JOIN {user} u ON u.id = j.userid
                 WHERE j.journal = ?";
