@@ -5,7 +5,7 @@
 def mysql_source_dbname = 'moodle'
 def mysql_dest_dbname = 'moodle_test'
 
-def moodle_version = 'MOODLE_311_STABLE'
+def moodle_version = 'MOODLE_400_STABLE'
 
 def plugins = [
     [
@@ -23,7 +23,7 @@ def plugins = [
     [
         "name" : 'format_flexsections',
         "url" : 'https://github.com/marinaglancy/moodle-format_flexsections.git',
-        "branch" : 'MOODLE_311_STABLE',
+        "branch" : 'MOODLE_400_STABLE',
         "dest" : 'course/format/flexsections'
     ],
     [
@@ -35,7 +35,7 @@ def plugins = [
     [
         "name" : 'format_topcoll',
         "url" : 'https://github.com/gjb2048/moodle-format_topcoll.git',
-        "branch" : 'MOODLE_311',
+        "branch" : 'master',
         "dest" : 'course/format/topcoll'
     ],
     [
@@ -377,7 +377,7 @@ def plugins = [
     [
       "name" : 'format_grid',
       "url" : 'https://github.com/gjb2048/moodle-format_grid.git',
-      "branch" : 'MOODLE_311',
+      "branch" : 'master',
       "dest" : 'course/format/grid'
     ],
     [
@@ -437,7 +437,7 @@ def plugins = [
     [
       "name" : 'mod_facetoface',
       "url" : 'https://github.com/catalyst/moodle-mod_facetoface.git',
-      "branch" : 'MOODLE_311_STABLE',
+      "branch" : 'MOODLE_400_STABLE',
       "dest" : 'mod/facetoface'
     ],
     [
@@ -449,7 +449,7 @@ def plugins = [
     [
       "name" : 'availability_role',
       "url" : 'https://github.com/moodle-an-hochschulen/moodle-availability_role.git',
-      "branch" : 'MOODLE_311_STABLE',
+      "branch" : 'MOODLE_400_STABLE',
       "dest" : 'availability/condition/role'
     ],
     [
@@ -467,7 +467,7 @@ def plugins = [
     [
       "name" : 'availability_cohort',
       "url" : 'https://github.com/moodle-an-hochschulen/moodle-availability_cohort.git',
-      "branch" : 'MOODLE_311_STABLE',
+      "branch" : 'MOODLE_400_STABLE',
       "dest" : 'availability/condition/cohort'
     ],
     [
