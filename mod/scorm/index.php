@@ -48,7 +48,6 @@ $PAGE->set_title($strscorms);
 $PAGE->set_heading($course->fullname);
 $PAGE->navbar->add($strscorms);
 echo $OUTPUT->header();
-echo $OUTPUT->heading($strscorms);
 
 $usesections = course_format_uses_sections($course->format);
 

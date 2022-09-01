@@ -38,6 +38,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once("{$CFG->libdir}/db/upgradelib.php");
+
 /**
  * Upgrade the recentlyaccesseditems db table.
  *
@@ -75,10 +77,18 @@ function xmldb_block_recentlyaccesseditems_upgrade($oldversion, $block) {
     // Automatically generated Moodle v3.9.0 release upgrade line.
     // Put any upgrade step following this.
 
-    // Automatically generated Moodle v3.10.0 release upgrade line.
-    // Put any upgrade step following this.
+    if ($oldversion < 2022030200) {
+        // Update all recentlyaccesseditems blocks in the my-index to be in the main side-post region.
+        upgrade_block_set_defaultregion('recentlyaccesseditems', '__default', 'my-index', 'side-post');
+        upgrade_block_savepoint(true, 2022030200, 'recentlyaccesseditems', false);
+    }
 
-    // Automatically generated Moodle v3.11.0 release upgrade line.
+    if ($oldversion < 2022041901) {
+        upgrade_block_set_my_user_parent_context('recentlyaccesseditems', '__default', 'my-index');
+        upgrade_block_savepoint(true, 2022041901, 'recentlyaccesseditems', false);
+    }
+
+    // Automatically generated Moodle v4.0.0 release upgrade line.
     // Put any upgrade step following this.
 
     return true;

@@ -55,10 +55,8 @@ Feature: Course level forum summary report
       | student2 | forum4 | discussion7 | Re d7   | Reply 8 | ##2020-02-04 13:50:00## |
 
   Scenario: Course forum summary report can be viewed by teacher and contains accurate data
-    When I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I follow "forum2"
-    And I navigate to "Forum summary report" in current page administration
+    When I am on the forum2 "forum activity" page logged in as teacher1
+    And I navigate to "Reports" in current page administration
     And I should see "Export posts"
     And the following should exist in the "forumreport_summary_table" table:
     # |                      | Discussions | Replies |                                 |                                |
@@ -95,9 +93,8 @@ Feature: Course level forum summary report
       | name     | <span class="multilang" lang="en">F-Eng</span><span class="multilang" lang="de">F-Ger</span> |
     When I am on the "C1" "Course" page logged in as "teacher1"
     And I follow "F-Eng"
-    And I navigate to "Forum summary report" in current page administration
-    Then I should see "Forum summary report - F-Eng"
-    And the "Forum selected" select box should contain "F-Eng"
+    And I navigate to "Reports" in current page administration
+    Then the "Forum selected" select box should contain "F-Eng"
 
   Scenario: Students given the view capability can view their own course report data
     Given the following "permission overrides" exist:
@@ -106,7 +103,7 @@ Feature: Course level forum summary report
     When I log in as "student1"
     And I am on "Course 1" course homepage
     And I follow "forum1"
-    And I navigate to "Forum summary report" in current page administration
+    And I navigate to "Reports" in current page administration
     And the following should exist in the "forumreport_summary_table" table:
     # |                      | Discussions | Replies |                                 |                                 |
       | First name / Surname | -2-         | -3-     | Earliest post                   | Most recent post                |

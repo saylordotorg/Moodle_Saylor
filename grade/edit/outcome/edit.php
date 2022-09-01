@@ -41,7 +41,7 @@ $PAGE->set_url($url);
 $PAGE->set_pagelayout('admin');
 
 $systemcontext = context_system::instance();
-$heading = null;
+$heading = get_string('addoutcome', 'grades');
 
 // a bit complex access control :-O
 if ($id) {
@@ -74,13 +74,11 @@ if ($id) {
     }
 
 } else if ($courseid){
-    $heading = get_string('addoutcome', 'grades');
     /// adding new outcome from course
     $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
     require_login($course);
     $context = context_course::instance($course->id);
     require_capability('moodle/grade:manage', $context);
-    navigation_node::override_active_url(new moodle_url('/grade/edit/outcome/course.php', array('id'=>$courseid)));
 
     $outcome_rec = new stdClass();
     $outcome_rec->standard = 0;
@@ -99,6 +97,12 @@ if ($id) {
 if (!$courseid) {
     require_once $CFG->libdir.'/adminlib.php';
     admin_externalpage_setup('outcomes');
+
+    $PAGE->set_primary_active_tab('siteadminnode');
+} else {
+    navigation_node::override_active_url(new moodle_url('/grade/edit/outcome/course.php', ['id' => $courseid]));
+    $PAGE->navbar->add(get_string('manageoutcomes', 'grades'),
+        new moodle_url('/grade/edit/outcome/index.php', ['id' => $courseid]));
 }
 
 // default return url
@@ -159,11 +163,9 @@ if ($mform->is_cancelled()) {
     redirect($returnurl);
 }
 
-if ($courseid) {
-    print_grade_page_head($courseid, 'outcome', 'edit', $heading);
-} else {
-    echo $OUTPUT->header();
-}
+$PAGE->navbar->add($heading, $url);
+
+print_grade_page_head($courseid ?: SITEID, 'outcome', 'edit', $heading, false, false, false);
 
 if (!grade_scale::fetch_all_local($courseid) && !grade_scale::fetch_all_global()) {
     echo $OUTPUT->confirm(get_string('noscales', 'grades'), $CFG->wwwroot.'/grade/edit/scale/edit.php?courseid='.$courseid, $returnurl);

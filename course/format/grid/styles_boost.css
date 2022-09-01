@@ -14,46 +14,17 @@
    along with Moodle.  If not, see <http://www.gnu.org/licenses/>. */
 
 /**
- * Grid Format - A topics based format that uses a grid of user selectable images to popup a light box of the section.
+ * Grid Format.
  *
  * @package    course/format
  * @subpackage grid
  * @version    See the value of '$plugin->version' in version.php.
- * @copyright  &copy; 2017 onwards G J Barnard in respect to modifications of standard topics format.
+ * @copyright  &copy; 2022 onwards G J Barnard in respect to modifications of standard topics format.
  * @author     G J Barnard - {@link http://about.me/gjbarnard} and
  *                           {@link http://moodle.org/user/profile.php?id=442195}
- * @author     Based on code originally written by Paul Krix and Julian Ridden.
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-body:not(.editing) #gridmiddle-column {
-    line-height: 1;
-}
-
-.course-content ul.gridicons li .icon_content.content_inside {
-    box-sizing: content-box;
-}
-
-div#gridshadebox_overlay {
-    z-index: 1000;
-}
-
-#gridshadebox_content.absolute {
-    z-index: 1000;
-}
-
-#gridshadebox_content.fit_to_window {
-    z-index: 1000;
-}
-
-#gridshadebox_content ul.gtopics .sectionname {
-    margin-top: .5rem;
-}
-
-#gridshadebox_close {
-    z-index: 1000;
-}
-
-body.format-grid.editing #region-main {
-    overflow-x: visible;
+.format-grid .course-content .single-section .section-navigation {
+    margin-bottom: 0;
 }

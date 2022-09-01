@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Grid Format - A topics based format that uses a grid of user selectable images to popup a light box of the section.
+ * Grid Format.
  *
  * @package    format_grid
  * @version    See the value of '$plugin->version' in version.php.
@@ -30,10 +30,11 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/course/format/lib.php'); // For format_base.
 
-class format_grid extends format_base {
+class format_grid extends core_courseformat\base {
+    // Used to determine the type of view URL to generate - parameter or anchor.
+    private $coursedisplay = COURSE_DISPLAY_MULTIPAGE;
 
     private $settings = null;
-    private $section0attop = null; // Boolean to state if section zero is at the top (true) or in the grid (false), if null then uninitialized.
 
     /**
      * Creates a new instance of class
@@ -45,6 +46,7 @@ class format_grid extends format_base {
      * @return format_grid
      */
     protected function __construct($format, $courseid) {
+        parent::__construct($format, $courseid);
         if ($courseid === 0) {
             global $COURSE;
             $courseid = $COURSE->id;  // Save lots of global $COURSE as we will never be the site course.
@@ -53,33 +55,18 @@ class format_grid extends format_base {
     }
 
     /**
-     * States if section 0 is at the top.
+     * Get the course display value for the current course.
      *
-     * @param stdClass $section Section object from database or just field course_sections section
-     * @return string The default value for the section name.
+     * @return int The current value (COURSE_DISPLAY_MULTIPAGE or COURSE_DISPLAY_SINGLEPAGE).
      */
-    public function is_section0_attop() {
-        if (is_null($this->section0attop)) {
-            $this->section0attop = \format_grid\toolbox::get_summary_visibility($this->courseid, $this)->showsummary == 1;
-        }
-        return $this->section0attop;
-    }
-
-    /**
-     * Returns the default section name for the format.
-     *
-     * @param stdClass $section Section object from database or just field course_sections section
-     * @return string The default value for the section name.
-     */
-    public function get_default_section_name($section) {
-        /* Follow the same logic so that this method is supported.  The MDL-51610 enchancement refactored things,
-          but that is not appropriate for us. */
-        return $this->get_section_name($section);
+    public function get_course_display(): int {
+        return $this->coursedisplay;
     }
 
     /**
      * Returns the format's settings and gets them if they do not exist.
-     * @param bool $invalidate Invalidate the existing known settings and get a fresh set.  Set when you know the settings have changed.
+     * @param bool $invalidate Invalidate the existing known settings and get a fresh set.  Set when you know the settings have
+     *                         changed.
      * @return array The settings as an array.
      */
     public function get_settings($invalidate = false) {
@@ -103,29 +90,20 @@ class format_grid extends format_base {
     }
 
     /**
-     * Returns the mapped value of the 'setshowsectiontitlesummaryposition' setting.
-     * @return string One of 'top', 'bottom', 'left' or 'right'.
+     * Returns true if this course format uses sections.
+     *
+     * @return bool
      */
-    public function get_set_show_section_title_summary_position() {
-        $settings = $this->get_settings();
-        $returnvalue = 'top';
+    public function uses_sections() {
+        return true;
+    }
 
-        switch($settings['setshowsectiontitlesummaryposition']) {
-            case 1:
-                $returnvalue = 'top';
-                break;
-            case 2:
-                $returnvalue = 'bottom';
-                break;
-            case 3:
-                $returnvalue = 'left';
-                break;
-            case 4:
-                $returnvalue = 'right';
-                break;
-        }
+    public function uses_course_index() {
+        return true;
+    }
 
-        return $returnvalue;
+    public function uses_indentation(): bool {
+        return false;
     }
 
     /**
@@ -135,23 +113,43 @@ class format_grid extends format_base {
      * @return string The section name.
      */
     public function get_section_name($section) {
-        $section = $this->get_section($section);
-        if (!empty($section->name)) {
-            return format_string($section->name, true, array('context' => self::get_context($this)));
-        } if ($section->section == 0) {
-            return get_string('topic0', 'format_grid');
+        $thesection = $this->get_section($section);
+        if ((string)$thesection->name !== '') {
+            return format_string($thesection->name, true,
+                ['context' => context_course::instance($this->courseid)]);
         } else {
-            return get_string('topic', 'format_grid').' '. $section->section;
+            return $this->get_default_section_name($thesection);
+        }
+    }
+
+
+    /**
+     * Returns the default section name for the topics course format.
+     *
+     * If the section number is 0, it will use the string with key = section0name from the course format's lang file.
+     * If the section number is not 0, the base implementation of course_format::get_default_section_name which uses
+     * the string with the key = 'sectionname' from the course format's lang file + the section number will be used.
+     *
+     * @param stdClass $section Section object from database or just field course_sections section
+     * @return string The default value for the section name.
+     */
+    public function get_default_section_name($section) {
+        if ($section->section == 0) {
+            // Return the general section.
+            return get_string('section0name', 'format_grid');
+        } else {
+            // Use course_format::get_default_section_name implementation which will display the section name in "Topic n" format.
+            return parent::get_default_section_name($section);
         }
     }
 
     /**
-     * Indicates this format uses sections.
+     * Generate the title for this section page.
      *
-     * @return bool Returns true
+     * @return string the page title
      */
-    public function uses_sections() {
-        return true;
+    public function page_title(): string {
+        return get_string('topicoutline');
     }
 
     /**
@@ -165,8 +163,9 @@ class format_grid extends format_base {
      * @return null|moodle_url
      */
     public function get_view_url($section, $options = array()) {
+        global $CFG;
         $course = $this->get_course();
-        $url = new moodle_url('/course/view.php', array('id' => $course->id));
+        $url = new moodle_url('/course/view.php', ['id' => $course->id]);
 
         $sr = null;
         if (array_key_exists('sr', $options)) {
@@ -186,17 +185,15 @@ class format_grid extends format_base {
                     $usercoursedisplay = COURSE_DISPLAY_SINGLEPAGE;
                 }
             } else {
-                $usercoursedisplay = $course->coursedisplay;
+                $usercoursedisplay = $this->coursedisplay;
             }
             if ($sectionno != 0 && $usercoursedisplay == COURSE_DISPLAY_MULTIPAGE) {
                 $url->param('section', $sectionno);
-            } else if ($sectionno == 0 && $usercoursedisplay == COURSE_DISPLAY_MULTIPAGE && (!$this->is_section0_attop())) {
-                $url->param('section', $sectionno);
-            } else if ($sectionno == 0 && $usercoursedisplay == COURSE_DISPLAY_MULTIPAGE && $this->is_section0_attop() &&
-                   ($this->get_settings()['setsection0ownpagenogridonesection'] == 2)) {
-                $url->param('section', $sectionno);
             } else {
-                $url->set_anchor('section-' . $sectionno);
+                if (empty($CFG->linkcoursesections) && !empty($options['navigation'])) {
+                    return null;
+                }
+                $url->set_anchor('section-'.$sectionno);
             }
         }
         return $url;
@@ -217,8 +214,47 @@ class format_grid extends format_base {
         return $ajaxsupport;
     }
 
+    public function supports_components() {
+        return true;
+    }
+
     /**
-     * Custom action after section has been moved in AJAX mode
+     * Loads all of the course sections into the navigation.
+     *
+     * @param global_navigation $navigation
+     * @param navigation_node $node The course node within the navigation
+     * @return void
+     */
+    public function extend_course_navigation($navigation, navigation_node $node) {
+        global $PAGE;
+        // If section is specified in course/view.php, make sure it is expanded in navigation.
+        if ($navigation->includesectionnum === false) {
+            $selectedsection = optional_param('section', null, PARAM_INT);
+            if ($selectedsection !== null && (!defined('AJAX_SCRIPT') || AJAX_SCRIPT == '0') &&
+                    $PAGE->url->compare(new moodle_url('/course/view.php'), URL_MATCH_BASE)) {
+                $navigation->includesectionnum = $selectedsection;
+            }
+        }
+
+        // Check if there are callbacks to extend course navigation.
+        parent::extend_course_navigation($navigation, $node);
+
+        // We want to remove the general section if it is empty.
+        $modinfo = get_fast_modinfo($this->get_course());
+        $sections = $modinfo->get_sections();
+        if (!isset($sections[0])) {
+            // The general section is empty to find the navigation node for it we need to get its ID.
+            $section = $modinfo->get_section_info(0);
+            $generalsection = $node->get($section->id, navigation_node::TYPE_SECTION);
+            if ($generalsection) {
+                // We found the node - now remove it.
+                $generalsection->remove();
+            }
+        }
+    }
+
+    /**
+     * Custom action after section has been moved in AJAX mode.
      *
      * Used in course/rest.php
      *
@@ -226,7 +262,7 @@ class format_grid extends format_base {
      */
     public function ajax_section_move() {
         global $PAGE;
-        $titles = array();
+        $titles = [];
         $course = $this->get_course();
         $modinfo = get_fast_modinfo($course);
         $renderer = $this->get_renderer($PAGE);
@@ -235,20 +271,20 @@ class format_grid extends format_base {
                 $titles[$number] = $renderer->section_title($section, $course);
             }
         }
-        return array('sectiontitles' => $titles, 'action' => 'move');
+        return ['sectiontitles' => $titles, 'action' => 'move'];
     }
 
     /**
-     * Returns the list of blocks to be automatically added for the newly created course
+     * Returns the list of blocks to be automatically added for the newly created course.
      *
      * @return array of default blocks, must contain two keys BLOCK_POS_LEFT and BLOCK_POS_RIGHT
      *     each of values is an array of block names (for left and right side columns)
      */
     public function get_default_blocks() {
-        return array(
-            BLOCK_POS_LEFT => array(),
-            BLOCK_POS_RIGHT => array('search_forums', 'news_items', 'calendar_upcoming', 'recent_activity')
-        );
+        return [
+            BLOCK_POS_LEFT => [],
+            BLOCK_POS_RIGHT => [],
+        ];
     }
 
     /**
@@ -280,14 +316,6 @@ class format_grid extends format_base {
                     'default' => $courseconfig->hiddensections,
                     'type' => PARAM_INT
                 ),
-                'coursedisplay' => array(
-                    'default' => $courseconfig->coursedisplay,
-                    'type' => PARAM_INT
-                ),
-                'imagecontaineralignment' => array(
-                    'default' => '-',
-                    'type' => PARAM_ALPHANUMEXT
-                ),
                 'imagecontainerwidth' => array(
                     'default' => 0,
                     'type' => PARAM_INT
@@ -300,126 +328,13 @@ class format_grid extends format_base {
                     'default' => 0,
                     'type' => PARAM_INT
                 ),
-                'bordercolour' => array(
-                    'default' => '-',
-                    'type' => PARAM_ALPHANUMEXT
-                ),
-                'borderwidth' => array(
-                    'default' => 0,
-                    'type' => PARAM_INT
-                ),
-                'borderradius' => array(
-                    'default' => 0,
-                    'type' => PARAM_INT
-                ),
-                'imagecontainerbackgroundcolour' => array(
-                    'default' => '-',
-                    'type' => PARAM_ALPHANUMEXT
-                ),
-                'currentselectedsectioncolour' => array(
-                    'default' => '-',
-                    'type' => PARAM_ALPHANUMEXT
-                ),
-                'currentselectedimagecontainertextcolour' => array(
-                    'default' => '-',
-                    'type' => PARAM_ALPHANUMEXT
-                ),
-                'currentselectedimagecontainercolour' => array(
-                    'default' => '-',
-                    'type' => PARAM_ALPHANUMEXT
-                ),
-                'hidesectiontitle' => array(
-                    'default' => 0,
-                    'type' => PARAM_INT
-                ),
-                'sectiontitlegridlengthmaxoption' => array(
-                    'default' => '-',
-                    'type' => PARAM_ALPHANUMEXT
-                ),
-                'sectiontitleboxposition' => array(
-                    'default' => 0,
-                    'type' => PARAM_INT
-                ),
-                'sectiontitleboxinsideposition' => array(
-                    'default' => 0,
-                    'type' => PARAM_INT
-                ),
-                'sectiontitleboxheight' => array(
-                    'default' => '-',
-                    'type' => PARAM_ALPHANUMEXT
-                ),
-                'sectiontitleboxopacity' => array(
-                    'default' => '-',
-                    'type' => PARAM_RAW
-                ),
-                'sectiontitlefontsize' => array(
-                    'default' => '-',
-                    'type' => PARAM_ALPHANUMEXT
-                ),
-                'sectiontitlealignment' => array(
-                    'default' => '-',
-                    'type' => PARAM_ALPHANUMEXT
-                ),
-                'sectiontitleinsidetitletextcolour' => array(
-                    'default' => '-',
-                    'type' => PARAM_ALPHANUMEXT
-                ),
-                'sectiontitleinsidetitlebackgroundcolour' => array(
-                    'default' => '-',
-                    'type' => PARAM_ALPHANUMEXT
-                ),
-                'showsectiontitlesummary' => array(
-                    'default' => 0,
-                    'type' => PARAM_INT
-                ),
-                'setshowsectiontitlesummaryposition' => array(
-                    'default' => 0,
-                    'type' => PARAM_INT
-                ),
-                'sectiontitlesummarymaxlength' => array(
-                    'default' => '-',
-                    'type' => PARAM_ALPHANUMEXT
-                ),
-                'sectiontitlesummarytextcolour' => array(
-                    'default' => '-',
-                    'type' => PARAM_ALPHANUMEXT
-                ),
-                'sectiontitlesummarybackgroundcolour' => array(
-                    'default' => '-',
-                    'type' => PARAM_ALPHANUMEXT
-                ),
-                'sectiontitlesummarybackgroundopacity' => array(
-                    'default' => '-',
-                    'type' => PARAM_RAW
-                ),
-                'newactivity' => array(
-                    'default' => 0,
-                    'type' => PARAM_INT
-                ),
                 'singlepagesummaryimage' => array(
-                    'default' => 0,
-                    'type' => PARAM_INT
-                ),
-                'fitsectioncontainertowindow' => array(
-                    'default' => 0,
-                    'type' => PARAM_INT
-                ),
-                'greyouthidden' => array(
-                    'default' => 0,
-                    'type' => PARAM_INT
-                ),
-                'setsection0ownpagenogridonesection' => array(
                     'default' => 0,
                     'type' => PARAM_INT
                 )
             );
         }
         if ($foreditform && !isset($courseformatoptions['coursedisplay']['label'])) {
-            /* Note: Because 'admin_setting_configcolourpicker' in 'settings.php' needs to use a prefixing '#'
-              this needs to be stripped off here if it's there for the format's specific colour picker. */
-            $defaults = $this->get_course_format_colour_defaults();
-            $context = self::get_context($this);
-
             if (is_null($courseconfig)) {
                 $courseconfig = get_config('moodlecourse');
             }
@@ -444,452 +359,49 @@ class format_grid extends format_base {
                             1 => new lang_string('hiddensectionsinvisible')
                         )
                     ),
-                ),
-                'coursedisplay' => array(
-                    'label' => new lang_string('coursedisplay'),
-                    'element_type' => 'select',
-                    'element_attributes' => array(
-                        array(
-                            COURSE_DISPLAY_SINGLEPAGE => new lang_string('coursedisplay_single'),
-                            COURSE_DISPLAY_MULTIPAGE => new lang_string('coursedisplay_multi')
-                        )
-                    ),
-                    'help' => 'coursedisplay',
-                    'help_component' => 'moodle'
                 )
             );
-            if (has_capability('format/grid:changeimagecontaineralignment', $context)) {
-                $imagecontaineralignmentvalues = $this->generate_default_entry(
-                    'imagecontaineralignment',
-                    '-',
-                    \format_grid\toolbox::get_horizontal_alignments()
-                );
-                $courseformatoptionsedit['imagecontaineralignment'] = array(
-                    'label' => new lang_string('setimagecontaineralignment', 'format_grid'),
-                    'help' => 'setimagecontaineralignment',
-                    'help_component' => 'format_grid',
-                    'element_type' => 'select',
-                    'element_attributes' => array($imagecontaineralignmentvalues)
-                );
-            } else {
-                $courseformatoptionsedit['imagecontaineralignment'] = array(
-                    'label' => '-', 'element_type' => 'hidden');
-            }
 
-            if (has_capability('format/grid:changeimagecontainersize', $context)) {
-                $imagecontainerwidthvalues = $this->generate_default_entry(
-                    'imagecontainerwidth',
-                    0,
-                    \format_grid\toolbox::get_image_container_widths()
-                );
-                $courseformatoptionsedit['imagecontainerwidth'] = array(
-                    'label' => new lang_string('setimagecontainerwidth', 'format_grid'),
-                    'help' => 'setimagecontainerwidth',
-                    'help_component' => 'format_grid',
-                    'element_type' => 'select',
-                    'element_attributes' => array($imagecontainerwidthvalues)
-                );
-                $imagecontainerratiovalues = $this->generate_default_entry(
-                    'imagecontainerratio',
-                    '-',
-                    \format_grid\toolbox::get_image_container_ratios()
-                );
-                $courseformatoptionsedit['imagecontainerratio'] = array(
-                    'label' => new lang_string('setimagecontainerratio', 'format_grid'),
-                    'help' => 'setimagecontainerratio',
-                    'help_component' => 'format_grid',
-                    'element_type' => 'select',
-                    'element_attributes' => array($imagecontainerratiovalues)
-                );
-            } else {
-                $courseformatoptionsedit['imagecontainerwidth'] = array(
-                    'label' => '-', 'element_type' => 'hidden');
-                $courseformatoptionsedit['imagecontainerratio'] = array(
-                    'label' => 0, 'element_type' => 'hidden');
-            }
+            // TODO - Use capabilities?
+            $imagecontainerwidthvalues = $this->generate_default_entry(
+                'imagecontainerwidth',
+                0,
+                \format_grid\toolbox::get_image_container_widths()
+            );
+            $courseformatoptionsedit['imagecontainerwidth'] = array(
+                'label' => new lang_string('imagecontainerwidth', 'format_grid'),
+                'help' => 'imagecontainerwidth',
+                'help_component' => 'format_grid',
+                'element_type' => 'select',
+                'element_attributes' => array($imagecontainerwidthvalues)
+            );
+            $imagecontainerratiovalues = $this->generate_default_entry(
+                'imagecontainerratio',
+                '-',
+                \format_grid\toolbox::get_image_container_ratios()
+            );
+            $courseformatoptionsedit['imagecontainerratio'] = array(
+                'label' => new lang_string('imagecontainerratio', 'format_grid'),
+                'help' => 'imagecontainerratio',
+                'help_component' => 'format_grid',
+                'element_type' => 'select',
+                'element_attributes' => array($imagecontainerratiovalues)
+            );
 
-            if (has_capability('format/grid:changeimageresizemethod', $context)) {
-                $imageresizemethodvalues = $this->generate_default_entry(
-                    'imageresizemethod',
-                    0,
-                    array(
-                        1 => new lang_string('scale', 'format_grid'), // Scale.
-                        2 => new lang_string('crop', 'format_grid')   // Crop.
-                    )
-                );
-                $courseformatoptionsedit['imageresizemethod'] = array(
-                    'label' => new lang_string('setimageresizemethod', 'format_grid'),
-                    'help' => 'setimageresizemethod',
-                    'help_component' => 'format_grid',
-                    'element_type' => 'select',
-                    'element_attributes' => array($imageresizemethodvalues)
-                );
-            } else {
-                $courseformatoptionsedit['imageresizemethod'] = array(
-                    'label' => 0, 'element_type' => 'hidden');
-            }
-
-            if (has_capability('format/grid:changeimagecontainerstyle', $context)) {
-                $courseformatoptionsedit['bordercolour'] = array(
-                    'label' => new lang_string('setbordercolour', 'format_grid'),
-                    'help' => 'setbordercolour',
-                    'help_component' => 'format_grid',
-                    'element_type' => 'gfcolourpopup',
-                    'element_attributes' => array(
-                        array(
-                            'defaultcolour' => $defaults['defaultbordercolour'],
-                            'value' => $defaults['defaultbordercolour']
-                        )
-                    )
-                );
-
-                $courseformatoptionsedit['borderwidth'] = array(
-                    'label' => new lang_string('setborderwidth', 'format_grid'),
-                    'help' => 'setborderwidth',
-                    'help_component' => 'format_grid',
-                    'element_type' => 'select',
-                    'element_attributes' => array(\format_grid\toolbox::get_border_widths())
-                );
-
-                $borderradiusvalues = $this->generate_default_entry(
-                    'borderradius',
-                    0,
-                    array(
-                        1 => new lang_string('off', 'format_grid'),
-                        2 => new lang_string('on', 'format_grid')
-                    )
-                );
-                $courseformatoptionsedit['borderradius'] = array(
-                    'label' => new lang_string('setborderradius', 'format_grid'),
-                    'help' => 'setborderradius',
-                    'help_component' => 'format_grid',
-                    'element_type' => 'select',
-                    'element_attributes' => array($borderradiusvalues)
-                );
-
-                $courseformatoptionsedit['imagecontainerbackgroundcolour'] = array(
-                    'label' => new lang_string('setimagecontainerbackgroundcolour', 'format_grid'),
-                    'help' => 'setimagecontainerbackgroundcolour',
-                    'help_component' => 'format_grid',
-                    'element_type' => 'gfcolourpopup',
-                    'element_attributes' => array(
-                        array(
-                            'defaultcolour' => $defaults['defaultimagecontainerbackgroundcolour'],
-                            'value' => $defaults['defaultimagecontainerbackgroundcolour']
-                        )
-                    )
-                );
-
-                $courseformatoptionsedit['currentselectedsectioncolour'] = array(
-                    'label' => new lang_string('setcurrentselectedsectioncolour', 'format_grid'),
-                    'help' => 'setcurrentselectedsectioncolour',
-                    'help_component' => 'format_grid',
-                    'element_type' => 'gfcolourpopup',
-                    'element_attributes' => array(
-                        array(
-                            'defaultcolour' => $defaults['defaultcurrentselectedsectioncolour'],
-                            'value' => $defaults['defaultcurrentselectedsectioncolour']
-                        )
-                    )
-                );
-
-                $courseformatoptionsedit['currentselectedimagecontainertextcolour'] = array(
-                    'label' => new lang_string('setcurrentselectedimagecontainertextcolour', 'format_grid'),
-                    'help' => 'setcurrentselectedimagecontainertextcolour',
-                    'help_component' => 'format_grid',
-                    'element_type' => 'gfcolourpopup',
-                    'element_attributes' => array(
-                        array(
-                            'defaultcolour' => $defaults['defaultcurrentselectedimagecontainertextcolour'],
-                            'value' => $defaults['defaultcurrentselectedimagecontainertextcolour']
-                        )
-                    )
-                );
-
-                $courseformatoptionsedit['currentselectedimagecontainercolour'] = array(
-                    'label' => new lang_string('setcurrentselectedimagecontainercolour', 'format_grid'),
-                    'help' => 'setcurrentselectedimagecontainercolour',
-                    'help_component' => 'format_grid',
-                    'element_type' => 'gfcolourpopup',
-                    'element_attributes' => array(
-                        array(
-                            'defaultcolour' => $defaults['defaultcurrentselectedimagecontainercolour'],
-                            'value' => $defaults['defaultcurrentselectedimagecontainercolour']
-                        )
-                    )
-                );
-            } else {
-                $courseformatoptionsedit['bordercolour'] = array(
-                    'label' => '-', 'element_type' => 'hidden');
-                $courseformatoptionsedit['borderwidth'] = array(
-                    'label' => 0, 'element_type' => 'hidden');
-                $courseformatoptionsedit['borderradius'] = array(
-                    'label' => 0, 'element_type' => 'hidden');
-                $courseformatoptionsedit['imagecontainerbackgroundcolour'] = array(
-                    'label' => '-', 'element_type' => 'hidden');
-                $courseformatoptionsedit['currentselectedsectioncolour'] = array(
-                    'label' => '-', 'element_type' => 'hidden');
-                $courseformatoptionsedit['currentselectedimagecontainertextcolour'] = array(
-                    'label' => '-', 'element_type' => 'hidden');
-                $courseformatoptionsedit['currentselectedimagecontainercolour'] = array(
-                    'label' => '-', 'element_type' => 'hidden');
-            }
-
-            if (has_capability('format/grid:changesectiontitleoptions', $context)) {
-                $hidesectiontitlevalues = $this->generate_default_entry(
-                    'hidesectiontitle',
-                    0,
-                    array(
-                        1 => new lang_string('no'), // No.
-                        2 => new lang_string('yes') // Yes.
-                    )
-                );
-                $courseformatoptionsedit['hidesectiontitle'] = array(
-                    'label' => new lang_string('hidesectiontitle', 'format_grid'),
-                    'element_type' => 'select',
-                    'element_attributes' => array($hidesectiontitlevalues),
-                    'help' => 'hidesectiontitle',
-                    'help_component' => 'format_grid'
-                );
-
-                $courseformatoptionsedit['sectiontitlegridlengthmaxoption'] = array(
-                    'label' => new lang_string('sectiontitlegridlengthmaxoption', 'format_grid'),
-                    'element_type' => 'text',
-                    'element_attributes' => array(array('size' => 3)),
-                    'help' => 'sectiontitlegridlengthmaxoption',
-                    'help_component' => 'format_grid'
-                );
-
-                $sectiontitleboxpositionvalues = $this->generate_default_entry(
-                    'sectiontitleboxposition',
-                    0,
-                    array(
-                        1 => new lang_string('sectiontitleboxpositioninside', 'format_grid'),
-                        2 => new lang_string('sectiontitleboxpositionoutside', 'format_grid')
-                    )
-                );
-                $courseformatoptionsedit['sectiontitleboxposition'] = array(
-                    'label' => new lang_string('sectiontitleboxposition', 'format_grid'),
-                    'element_type' => 'select',
-                    'element_attributes' => array($sectiontitleboxpositionvalues),
-                    'help' => 'sectiontitleboxposition',
-                    'help_component' => 'format_grid'
-                );
-
-                $sectiontitleboxinsidepositionvalues = $this->generate_default_entry(
-                    'sectiontitleboxinsideposition',
-                    0,
-                    array(
-                        1 => new lang_string('sectiontitleboxinsidepositiontop', 'format_grid'),
-                        2 => new lang_string('sectiontitleboxinsidepositionmiddle', 'format_grid'),
-                        3 => new lang_string('sectiontitleboxinsidepositionbottom', 'format_grid')
-                    )
-                );
-                $courseformatoptionsedit['sectiontitleboxinsideposition'] = array(
-                    'label' => new lang_string('sectiontitleboxinsideposition', 'format_grid'),
-                    'element_type' => 'select',
-                    'element_attributes' => array($sectiontitleboxinsidepositionvalues),
-                    'help' => 'sectiontitleboxinsideposition',
-                    'help_component' => 'format_grid'
-                );
-
-                $courseformatoptionsedit['sectiontitleboxheight'] = array(
-                    'label' => new lang_string('sectiontitleboxheight', 'format_grid'),
-                    'element_type' => 'text',
-                    'element_attributes' => array(array('size' => 3)),
-                    'help' => 'sectiontitleboxheight',
-                    'help_component' => 'format_grid'
-                );
-
-                $opacityvalues = array();
-                $opacityvalues['-'] = new lang_string('default', 'format_grid', get_config('format_grid', 'defaultsectiontitleboxopacity'));
-                $opacityvalues = array_merge($opacityvalues, \format_grid\toolbox::get_default_opacities());
-                $courseformatoptionsedit['sectiontitleboxopacity'] = array(
-                    'label' => new lang_string('sectiontitleboxopacity', 'format_grid'),
-                    'element_type' => 'select',
-                    'element_attributes' => array($opacityvalues),
-                    'help' => 'sectiontitleboxopacity',
-                    'help_component' => 'format_grid'
-                );
-
-                $sectiontitlefontsizevalues = $this->generate_default_entry(
-                    'sectiontitlefontsize',
-                    '-',
-                    \format_grid\toolbox::get_default_section_font_sizes()
-                );
-                $courseformatoptionsedit['sectiontitlefontsize'] = array(
-                    'label' => new lang_string('sectiontitlefontsize', 'format_grid'),
-                    'element_type' => 'select',
-                    'element_attributes' => array($sectiontitlefontsizevalues),
-                    'help' => 'sectiontitlefontsize',
-                    'help_component' => 'format_grid'
-                );
-
-                $sectiontitlealignmentvalues = $this->generate_default_entry(
-                    'sectiontitlealignment',
-                    '-',
-                    \format_grid\toolbox::get_horizontal_alignments()
-                );
-                $courseformatoptionsedit['sectiontitlealignment'] = array(
-                    'label' => new lang_string('sectiontitlealignment', 'format_grid'),
-                    'help' => 'sectiontitlealignment',
-                    'help_component' => 'format_grid',
-                    'element_type' => 'select',
-                    'element_attributes' => array($sectiontitlealignmentvalues)
-                );
-
-                $courseformatoptionsedit['sectiontitleinsidetitletextcolour'] = array(
-                    'label' => new lang_string('sectiontitleinsidetitletextcolour', 'format_grid'),
-                    'help' => 'sectiontitleinsidetitletextcolour',
-                    'help_component' => 'format_grid',
-                    'element_type' => 'gfcolourpopup',
-                    'element_attributes' => array(
-                        array(
-                            'defaultcolour' => $defaults['defaultsectiontitleinsidetitletextcolour'],
-                            'value' => $defaults['defaultsectiontitleinsidetitletextcolour']
-                        )
-                    )
-                );
-
-                $courseformatoptionsedit['sectiontitleinsidetitlebackgroundcolour'] = array(
-                    'label' => new lang_string('sectiontitleinsidetitlebackgroundcolour', 'format_grid'),
-                    'help' => 'sectiontitleinsidetitlebackgroundcolour',
-                    'help_component' => 'format_grid',
-                    'element_type' => 'gfcolourpopup',
-                    'element_attributes' => array(
-                        array(
-                            'defaultcolour' => $defaults['defaultsectiontitleinsidetitlebackgroundcolour'],
-                            'value' => $defaults['defaultsectiontitleinsidetitlebackgroundcolour']
-                        )
-                    )
-                );
-
-                $showsectiontitlesummaryvalues = $this->generate_default_entry(
-                    'showsectiontitlesummary',
-                    0,
-                    array(
-                        1 => new lang_string('no'), // No.
-                        2 => new lang_string('yes') // Yes.
-                    )
-                );
-                $courseformatoptionsedit['showsectiontitlesummary'] = array(
-                    'label' => new lang_string('showsectiontitlesummary', 'format_grid'),
-                    'element_type' => 'select',
-                    'element_attributes' => array($showsectiontitlesummaryvalues),
-                    'help' => 'showsectiontitlesummary',
-                    'help_component' => 'format_grid'
-                );
-
-                $setshowsectiontitlesummarypositionvalues = $this->generate_default_entry(
-                    'setshowsectiontitlesummaryposition',
-                    0,
-                    array(
-                        1 => new lang_string('top', 'format_grid'),
-                        2 => new lang_string('bottom', 'format_grid'),
-                        3 => new lang_string('left', 'format_grid'),
-                        4 => new lang_string('right', 'format_grid')
-                    )
-                );
-
-                $courseformatoptionsedit['setshowsectiontitlesummaryposition'] = array(
-                    'label' => new lang_string('setshowsectiontitlesummaryposition', 'format_grid'),
-                    'element_type' => 'select',
-                    'element_attributes' => array($setshowsectiontitlesummarypositionvalues),
-                    'help' => 'setshowsectiontitlesummaryposition',
-                    'help_component' => 'format_grid'
-                );
-
-                $courseformatoptionsedit['sectiontitlesummarymaxlength'] = array(
-                    'label' => new lang_string('sectiontitlesummarymaxlength', 'format_grid'),
-                    'element_type' => 'text',
-                    'element_attributes' => array(array('size' => 3)),
-                    'help' => 'sectiontitlesummarymaxlength',
-                    'help_component' => 'format_grid'
-                );
-
-                $courseformatoptionsedit['sectiontitlesummarytextcolour'] = array(
-                    'label' => new lang_string('sectiontitlesummarytextcolour', 'format_grid'),
-                    'help' => 'sectiontitlesummarytextcolour',
-                    'help_component' => 'format_grid',
-                    'element_type' => 'gfcolourpopup',
-                    'element_attributes' => array(
-                        array(
-                            'defaultcolour' => $defaults['defaultsectiontitlesummarytextcolour'],
-                            'value' => $defaults['defaultsectiontitlesummarytextcolour']
-                        )
-                    )
-                );
-
-                $courseformatoptionsedit['sectiontitlesummarybackgroundcolour'] = array(
-                    'label' => new lang_string('sectiontitlesummarybackgroundcolour', 'format_grid'),
-                    'help' => 'sectiontitlesummarybackgroundcolour',
-                    'help_component' => 'format_grid',
-                    'element_type' => 'gfcolourpopup',
-                    'element_attributes' => array(
-                        array(
-                            'defaultcolour' => $defaults['defaultsectiontitlesummarybackgroundcolour'],
-                            'value' => $defaults['defaultsectiontitlesummarybackgroundcolour']
-                        )
-                    )
-                );
-
-                $opacityvalues['-'] = new lang_string('default', 'format_grid', get_config('format_grid', 'defaultsectiontitlesummarybackgroundopacity'));
-                $courseformatoptionsedit['sectiontitlesummarybackgroundopacity'] = array(
-                    'label' => new lang_string('sectiontitlesummarybackgroundopacity', 'format_grid'),
-                    'element_type' => 'select',
-                    'element_attributes' => array($opacityvalues),
-                    'help' => 'sectiontitlesummarybackgroundopacity',
-                    'help_component' => 'format_grid'
-                );
-            } else {
-                $courseformatoptionsedit['hidesectiontitle'] = array(
-                    'label' => 0, 'element_type' => 'hidden');
-                $courseformatoptionsedit['sectiontitlegridlengthmaxoption'] = array(
-                    'label' => '-', 'element_type' => 'hidden');
-                $courseformatoptionsedit['sectiontitleboxposition'] = array(
-                    'label' => 0, 'element_type' => 'hidden');
-                $courseformatoptionsedit['sectiontitleboxinsideposition'] = array(
-                    'label' => 0, 'element_type' => 'hidden');
-                $courseformatoptionsedit['sectiontitleboxheight'] = array(
-                    'label' => '-', 'element_type' => 'hidden');
-                $courseformatoptionsedit['sectiontitleboxopacity'] = array(
-                    'label' => '-', 'element_type' => 'hidden');
-                $courseformatoptionsedit['sectiontitlefontsize'] = array(
-                    'label' => 0, 'element_type' => 'hidden');
-                $courseformatoptionsedit['sectiontitlealignment'] = array(
-                    'label' => '-', 'element_type' => 'hidden');
-                $courseformatoptionsedit['sectiontitleinsidetitletextcolour'] = array(
-                    'label' => '-', 'element_type' => 'hidden');
-                $courseformatoptionsedit['sectiontitleinsidetitlebackgroundcolour'] = array(
-                    'label' => '-', 'element_type' => 'hidden');
-                $courseformatoptionsedit['showsectiontitlesummary'] = array(
-                    'label' => 0, 'element_type' => 'hidden');
-                $courseformatoptionsedit['setshowsectiontitlesummaryposition'] = array(
-                    'label' => 0, 'element_type' => 'hidden');
-                $courseformatoptionsedit['sectiontitlesummarymaxlength'] = array(
-                    'label' => '-', 'element_type' => 'hidden');
-                $courseformatoptionsedit['sectiontitlesummarytextcolour'] = array(
-                    'label' => '-', 'element_type' => 'hidden');
-                $courseformatoptionsedit['sectiontitlesummarybackgroundcolour'] = array(
-                    'label' => '-', 'element_type' => 'hidden');
-                $courseformatoptionsedit['sectiontitlesummarybackgroundopacity'] = array(
-                    'label' => '-', 'element_type' => 'hidden');
-            }
-
-            $newactivityvalues = $this->generate_default_entry(
-                'newactivity',
+            $imageresizemethodvalues = $this->generate_default_entry(
+                'imageresizemethod',
                 0,
                 array(
-                    1 => new lang_string('no'), // No.
-                    2 => new lang_string('yes') // Yes.
+                    1 => new lang_string('scale', 'format_grid'), // Scale.
+                    2 => new lang_string('crop', 'format_grid')   // Crop.
                 )
             );
-            $courseformatoptionsedit['newactivity'] = array(
-                'label' => new lang_string('setnewactivity', 'format_grid'),
+            $courseformatoptionsedit['imageresizemethod'] = array(
+                'label' => new lang_string('imageresizemethod', 'format_grid'),
+                'help' => 'imageresizemethod',
+                'help_component' => 'format_grid',
                 'element_type' => 'select',
-                'element_attributes' => array($newactivityvalues),
-                'help' => 'setnewactivity',
-                'help_component' => 'format_grid'
+                'element_attributes' => array($imageresizemethodvalues)
             );
 
             $singlepagesummaryimagevalues = $this->generate_default_entry(
@@ -910,104 +422,10 @@ class format_grid extends format_base {
                 'help_component' => 'format_grid'
             );
 
-            $fitsectioncontainertowindowvalues = $this->generate_default_entry(
-                'fitsectioncontainertowindow',
-                0,
-                array(
-                    1 => new lang_string('no'), // No.
-                    2 => new lang_string('yes') // Yes.
-                )
-            );
-            $courseformatoptionsedit['fitsectioncontainertowindow'] = array(
-                'label' => new lang_string('setfitsectioncontainertowindow', 'format_grid'),
-                'help' => 'setfitsectioncontainertowindow',
-                'help_component' => 'format_grid',
-                'element_type' => 'select',
-                'element_attributes' => array($fitsectioncontainertowindowvalues)
-            );
-
-            $greyouthiddenvalues = $this->generate_default_entry(
-                'greyouthidden',
-                0,
-                array(
-                    1 => new lang_string('no'), // No.
-                    2 => new lang_string('yes') // Yes.
-                )
-            );
-            $courseformatoptionsedit['greyouthidden'] = array(
-                'label' => new lang_string('greyouthidden', 'format_grid'),
-                'help' => 'greyouthidden',
-                'help_component' => 'format_grid',
-                'element_type' => 'select',
-                'element_attributes' => array($greyouthiddenvalues)
-            );
-
-            if (has_capability('format/grid:changeimagecontainernavigation', $context)) {
-                $setsection0ownpagenogridonesectionvalues = $this->generate_default_entry(
-                    'setsection0ownpagenogridonesection',
-                    0,
-                    array(
-                        1 => new lang_string('no'), // No.
-                        2 => new lang_string('yes') // Yes.
-                    )
-                );
-                $courseformatoptionsedit['setsection0ownpagenogridonesection'] = array(
-                    'label' => new lang_string('setsection0ownpagenogridonesection', 'format_grid'),
-                    'help' => 'setsection0ownpagenogridonesection',
-                    'help_component' => 'format_grid',
-                    'element_type' => 'select',
-                    'element_attributes' => array($setsection0ownpagenogridonesectionvalues)
-                );
-            } else {
-                $courseformatoptionsedit['setsection0ownpagenogridonesection'] = array(
-                    'label' => 0, 'element_type' => 'hidden');
-            }
-
             $courseformatoptions = array_merge_recursive($courseformatoptions, $courseformatoptionsedit);
         }
 
         return $courseformatoptions;
-    }
-
-    protected function get_course_format_colour_defaults() {
-        $defaults = array();
-        $defaults['defaultbordercolour'] = get_config('format_grid', 'defaultbordercolour');
-        if ($defaults['defaultbordercolour'][0] == '#') {
-            $defaults['defaultbordercolour'] = substr($defaults['defaultbordercolour'], 1);
-        }
-        $defaults['defaultimagecontainerbackgroundcolour'] = get_config('format_grid', 'defaultimagecontainerbackgroundcolour');
-        if ($defaults['defaultimagecontainerbackgroundcolour'][0] == '#') {
-            $defaults['defaultimagecontainerbackgroundcolour'] = substr($defaults['defaultimagecontainerbackgroundcolour'], 1);
-        }
-        $defaults['defaultcurrentselectedsectioncolour'] = get_config('format_grid', 'defaultcurrentselectedsectioncolour');
-        if ($defaults['defaultcurrentselectedsectioncolour'][0] == '#') {
-            $defaults['defaultcurrentselectedsectioncolour'] = substr($defaults['defaultcurrentselectedsectioncolour'], 1);
-        }
-        $defaults['defaultcurrentselectedimagecontainertextcolour'] = get_config('format_grid', 'defaultcurrentselectedimagecontainertextcolour');
-        if ($defaults['defaultcurrentselectedimagecontainertextcolour'][0] == '#') {
-            $defaults['defaultcurrentselectedimagecontainertextcolour'] = substr($defaults['defaultcurrentselectedimagecontainertextcolour'], 1);
-        }
-        $defaults['defaultcurrentselectedimagecontainercolour'] = get_config('format_grid', 'defaultcurrentselectedimagecontainercolour');
-        if ($defaults['defaultcurrentselectedimagecontainercolour'][0] == '#') {
-            $defaults['defaultcurrentselectedimagecontainercolour'] = substr($defaults['defaultcurrentselectedimagecontainercolour'], 1);
-        }
-        $defaults['defaultsectiontitleinsidetitletextcolour'] = get_config('format_grid', 'defaultsectiontitleinsidetitletextcolour');
-        if ($defaults['defaultsectiontitleinsidetitletextcolour'][0] == '#') {
-            $defaults['defaultsectiontitleinsidetitletextcolour'] = substr($defaults['defaultsectiontitleinsidetitletextcolour'], 1);
-        }
-        $defaults['defaultsectiontitleinsidetitlebackgroundcolour'] = get_config('format_grid', 'defaultsectiontitleinsidetitlebackgroundcolour');
-        if ($defaults['defaultsectiontitleinsidetitlebackgroundcolour'][0] == '#') {
-            $defaults['defaultsectiontitleinsidetitlebackgroundcolour'] = substr($defaults['defaultsectiontitleinsidetitlebackgroundcolour'], 1);
-        }
-        $defaults['defaultsectiontitlesummarytextcolour'] = get_config('format_grid', 'defaultsectiontitlesummarytextcolour');
-        if ($defaults['defaultsectiontitlesummarytextcolour'][0] == '#') {
-            $defaults['defaultsectiontitlesummarytextcolour'] = substr($defaults['defaultsectiontitlesummarytextcolour'], 1);
-        }
-        $defaults['defaultsectiontitlesummarybackgroundcolour'] = get_config('format_grid', 'defaultsectiontitlesummarybackgroundcolour');
-        if ($defaults['defaultsectiontitlesummarybackgroundcolour'][0] == '#') {
-            $defaults['defaultsectiontitlesummarybackgroundcolour'] = substr($defaults['defaultsectiontitlesummarybackgroundcolour'], 1);
-        }
-        return $defaults;
     }
 
     /**
@@ -1035,9 +453,11 @@ class format_grid extends format_base {
      * @return array array of references to the added form elements.
      */
     public function create_edit_form_elements(&$mform, $forsection = false) {
-        global $CFG, $OUTPUT, $PAGE, $USER;
-        MoodleQuickForm::registerElementType('gfcolourpopup', "$CFG->dirroot/course/format/grid/js/gf_colourpopup.php",
-                'MoodleQuickForm_gfcolourpopup');
+        global $CFG;
+        MoodleQuickForm::registerElementType(
+            'sectionfilemanager',
+            "$CFG->dirroot/course/format/grid/form/sectionfilemanager.php",
+            'MoodleQuickForm_sectionfilemanager');
 
         $elements = parent::create_edit_form_elements($mform, $forsection);
 
@@ -1057,318 +477,8 @@ class format_grid extends format_base {
                 }
             }
         }
-        $context = self::get_context($this);
-
-        $changeimagecontaineralignment = has_capability('format/grid:changeimagecontaineralignment', $context);
-        $changeimagecontainernavigation = has_capability('format/grid:changeimagecontainernavigation', $context);
-        $changeimagecontainersize = has_capability('format/grid:changeimagecontainersize', $context);
-        $changeimageresizemethod = has_capability('format/grid:changeimageresizemethod', $context);
-        $changeimagecontainerstyle = has_capability('format/grid:changeimagecontainerstyle', $context);
-        $changesectiontitleoptions = has_capability('format/grid:changesectiontitleoptions', $context);
-        $resetall = is_siteadmin($USER); // Site admins only.
-
-        $elements[] = $mform->addElement('header', 'gfreset', get_string('gfreset', 'format_grid'));
-        $mform->addHelpButton('gfreset', 'gfreset', 'format_grid', '', true);
-
-        $bsfour = false;
-        if (strcmp($PAGE->theme->name, 'boost') === 0) {
-            $bsfour = true;
-        } else if (!empty($PAGE->theme->parents)) {
-            if (in_array('boost', $PAGE->theme->parents) === true) {
-                $bsfour = true;
-            }
-        } else if (strcmp($PAGE->theme->name, 'foundation') === 0) {
-            $bsfour = true;
-        }
-
-        $resetelements = array();
-
-        if (($changeimagecontaineralignment) ||
-            ($changeimagecontainernavigation) ||
-            ($changeimagecontainersize) ||
-            ($changeimageresizemethod) ||
-            ($changeimagecontainerstyle) ||
-            ($changesectiontitleoptions)) {
-
-            if ($changeimagecontaineralignment) {
-                if ($bsfour) {
-                    $checkboxname = get_string('resetimagecontaineralignment', 'format_grid');
-                    $resetelements[] = & $mform->createElement('checkbox', 'resetimagecontaineralignment', '', $checkboxname);
-                    $resetelements[] = & $mform->createElement('html', $OUTPUT->help_icon('resetimagecontaineralignment', 'format_grid'));
-                } else {
-                    $checkboxname = get_string('resetimagecontaineralignment', 'format_grid').
-                        $OUTPUT->help_icon('resetimagecontaineralignment', 'format_grid');
-                    $resetelements[] = & $mform->createElement('checkbox', 'resetimagecontaineralignment', '', $checkboxname);
-                }
-            }
-
-            if ($changeimagecontainernavigation) {
-                if ($bsfour) {
-                    $checkboxname = get_string('resetimagecontainernavigation', 'format_grid');
-                    $resetelements[] = & $mform->createElement('checkbox', 'resetimagecontainernavigation', '', $checkboxname);
-                    $resetelements[] = & $mform->createElement('html', $OUTPUT->help_icon('resetimagecontainernavigation', 'format_grid'));
-                } else {
-                    $checkboxname = get_string('resetimagecontainernavigation', 'format_grid').
-                        $OUTPUT->help_icon('resetimagecontainernavigation', 'format_grid');
-                    $resetelements[] = & $mform->createElement('checkbox', 'resetimagecontainernavigation', '', $checkboxname);
-                }
-            }
-
-            if ($changeimagecontainersize) {
-                if ($bsfour) {
-                    $checkboxname = get_string('resetimagecontainersize', 'format_grid');
-                    $resetelements[] = & $mform->createElement('checkbox', 'resetimagecontainersize', '', $checkboxname);
-                    $resetelements[] = & $mform->createElement('html', $OUTPUT->help_icon('resetimagecontainersize', 'format_grid'));
-                } else {
-                    $checkboxname = get_string('resetimagecontainersize', 'format_grid').
-                        $OUTPUT->help_icon('resetimagecontainersize', 'format_grid');
-                    $resetelements[] = & $mform->createElement('checkbox', 'resetimagecontainersize', '', $checkboxname);
-                }
-            }
-
-            if ($changeimageresizemethod) {
-                if ($bsfour) {
-                    $checkboxname = get_string('resetimageresizemethod', 'format_grid');
-                    $resetelements[] = & $mform->createElement('checkbox', 'resetimageresizemethod', '', $checkboxname);
-                    $resetelements[] = & $mform->createElement('html', $OUTPUT->help_icon('resetimageresizemethod', 'format_grid'));
-                } else {
-                    $checkboxname = get_string('resetimageresizemethod', 'format_grid').
-                        $OUTPUT->help_icon('resetimageresizemethod', 'format_grid');
-                    $resetelements[] = & $mform->createElement('checkbox', 'resetimageresizemethod', '', $checkboxname);
-                }
-            }
-
-            if ($changeimagecontainerstyle) {
-                if ($bsfour) {
-                    $checkboxname = get_string('resetimagecontainerstyle', 'format_grid');
-                    $resetelements[] = & $mform->createElement('checkbox', 'resetimagecontainerstyle', '', $checkboxname);
-                    $resetelements[] = & $mform->createElement('html', $OUTPUT->help_icon('resetimagecontainerstyle', 'format_grid'));
-                } else {
-                    $checkboxname = get_string('resetimagecontainerstyle', 'format_grid').
-                        $OUTPUT->help_icon('resetimagecontainerstyle', 'format_grid');
-                    $resetelements[] = & $mform->createElement('checkbox', 'resetimagecontainerstyle', '', $checkboxname);
-                }
-            }
-
-            if ($changesectiontitleoptions) {
-                if ($bsfour) {
-                    $checkboxname = get_string('resetsectiontitleoptions', 'format_grid');
-                    $resetelements[] = & $mform->createElement('checkbox', 'resetsectiontitleoptions', '', $checkboxname);
-                    $resetelements[] = & $mform->createElement('html', $OUTPUT->help_icon('resetsectiontitleoptions', 'format_grid'));
-                } else {
-                    $checkboxname = get_string('resetsectiontitleoptions', 'format_grid').
-                        $OUTPUT->help_icon('resetsectiontitleoptions', 'format_grid');
-                    $resetelements[] = & $mform->createElement('checkbox', 'resetsectiontitleoptions', '', $checkboxname);
-                }
-            }
-        }
-
-        if ($bsfour) {
-            $checkboxname = get_string('resetnewactivity', 'format_grid');
-            $resetelements[] = & $mform->createElement('checkbox', 'resetnewactivity', '', $checkboxname);
-            $resetelements[] = & $mform->createElement('html', $OUTPUT->help_icon('resetnewactivity', 'format_grid'));
-
-            $checkboxname = get_string('resetsinglepagesummaryimage', 'format_grid');
-            $resetelements[] = & $mform->createElement('checkbox', 'resetsinglepagesummaryimage', '', $checkboxname);
-            $resetelements[] = & $mform->createElement('html', $OUTPUT->help_icon('resetsinglepagesummaryimage', 'format_grid'));
-
-            $checkboxname = get_string('resetfitpopup', 'format_grid');
-            $resetelements[] = & $mform->createElement('checkbox', 'resetfitpopup', '', $checkboxname);
-            $resetelements[] = & $mform->createElement('html', $OUTPUT->help_icon('resetfitpopup', 'format_grid'));
-
-            $checkboxname = get_string('resetgreyouthidden', 'format_grid');
-            $resetelements[] = & $mform->createElement('checkbox', 'resetgreyouthidden', '', $checkboxname);
-            $resetelements[] = & $mform->createElement('html', $OUTPUT->help_icon('resetgreyouthidden', 'format_grid'));
-        } else {
-            $checkboxname = get_string('resetnewactivity', 'format_grid').
-                $OUTPUT->help_icon('resetnewactivity', 'format_grid');
-            $resetelements[] = & $mform->createElement('checkbox', 'resetnewactivity', '', $checkboxname);
-
-            $checkboxname = get_string('resetsinglepagesummaryimage', 'format_grid').
-                $OUTPUT->help_icon('resetsinglepagesummaryimage', 'format_grid');
-            $resetelements[] = & $mform->createElement('checkbox', 'resetsinglepagesummaryimage', '', $checkboxname);
-
-            $checkboxname = get_string('resetfitpopup', 'format_grid').
-                $OUTPUT->help_icon('resetfitpopup', 'format_grid');
-            $resetelements[] = & $mform->createElement('checkbox', 'resetpopup', '', $checkboxname);
-
-            $checkboxname = get_string('resetgreyouthidden', 'format_grid').
-                $OUTPUT->help_icon('resetgreyouthidden', 'format_grid');
-            $resetelements[] = & $mform->createElement('checkbox', 'resetgreyouthidden', '', $checkboxname);
-        }
-        $elements[] = $mform->addGroup($resetelements, 'resetgroup', get_string('resetgrp', 'format_grid'), null, false);
-
-        if ($resetall) {
-            $resetallelements = array();
-
-            if ($bsfour) {
-                $checkboxname = get_string('resetallimagecontaineralignment', 'format_grid');
-                $resetallelements[] = & $mform->createElement('checkbox', 'resetallimagecontaineralignment', '', $checkboxname);
-                $resetallelements[] = & $mform->createElement('html', $OUTPUT->help_icon('resetallimagecontaineralignment', 'format_grid'));
-
-                $checkboxname = get_string('resetallimagecontainernavigation', 'format_grid');
-                $resetallelements[] = & $mform->createElement('checkbox', 'resetallimagecontainernavigation', '', $checkboxname);
-                $resetallelements[] = & $mform->createElement('html', $OUTPUT->help_icon('resetallimagecontainernavigation', 'format_grid'));
-
-                $checkboxname = get_string('resetallimagecontainersize', 'format_grid');
-                $resetallelements[] = & $mform->createElement('checkbox', 'resetallimagecontainersize', '', $checkboxname);
-                $resetallelements[] = & $mform->createElement('html', $OUTPUT->help_icon('resetallimagecontainersize', 'format_grid'));
-
-                $checkboxname = get_string('resetallimageresizemethod', 'format_grid');
-                $resetallelements[] = & $mform->createElement('checkbox', 'resetallimageresizemethod', '', $checkboxname);
-                $resetallelements[] = & $mform->createElement('html', $OUTPUT->help_icon('resetallimageresizemethod', 'format_grid'));
-
-                $checkboxname = get_string('resetallimagecontainerstyle', 'format_grid');
-                $resetallelements[] = & $mform->createElement('checkbox', 'resetallimagecontainerstyle', '', $checkboxname);
-                $resetallelements[] = & $mform->createElement('html', $OUTPUT->help_icon('resetallimagecontainerstyle', 'format_grid'));
-
-                $checkboxname = get_string('resetallsectiontitleoptions', 'format_grid');
-                $resetallelements[] = & $mform->createElement('checkbox', 'resetallsectiontitleoptions', '', $checkboxname);
-                $resetallelements[] = & $mform->createElement('html', $OUTPUT->help_icon('resetallsectiontitleoptions', 'format_grid'));
-
-                $checkboxname = get_string('resetallnewactivity', 'format_grid');
-                $resetallelements[] = & $mform->createElement('checkbox', 'resetallnewactivity', '', $checkboxname);
-                $resetallelements[] = & $mform->createElement('html', $OUTPUT->help_icon('resetallnewactivity', 'format_grid'));
-
-                $checkboxname = get_string('resetallsinglepagesummaryimage', 'format_grid');
-                $resetelements[] = & $mform->createElement('checkbox', 'resetallsinglepagesummaryimage', '', $checkboxname);
-                $resetelements[] = & $mform->createElement('html', $OUTPUT->help_icon('resetallsinglepagesummaryimage', 'format_grid'));
-
-                $checkboxname = get_string('resetallfitpopup', 'format_grid');
-                $resetallelements[] = & $mform->createElement('checkbox', 'resetallfitpopup', '', $checkboxname);
-                $resetallelements[] = & $mform->createElement('html', $OUTPUT->help_icon('resetallfitpopup', 'format_grid'));
-
-                $checkboxname = get_string('resetallgreyouthidden', 'format_grid');
-                $resetallelements[] = & $mform->createElement('checkbox', 'resetallgreyouthidden', '', $checkboxname);
-                $resetallelements[] = & $mform->createElement('html', $OUTPUT->help_icon('resetallgreyouthidden', 'format_grid'));
-            } else {
-                $checkboxname = get_string('resetallimagecontaineralignment', 'format_grid').
-                    $OUTPUT->help_icon('resetallimagecontaineralignment', 'format_grid');
-                $resetallelements[] = & $mform->createElement('checkbox', 'resetallimagecontaineralignment', '', $checkboxname);
-
-                $checkboxname = get_string('resetallimagecontainernavigation', 'format_grid').
-                    $OUTPUT->help_icon('resetallimagecontainernavigation', 'format_grid');
-                $resetallelements[] = & $mform->createElement('checkbox', 'resetallimagecontainernavigation', '', $checkboxname);
-
-                $checkboxname = get_string('resetallimagecontainersize', 'format_grid').
-                    $OUTPUT->help_icon('resetallimagecontainersize', 'format_grid');
-                $resetallelements[] = & $mform->createElement('checkbox', 'resetallimagecontainersize', '', $checkboxname);
-
-                $checkboxname = get_string('resetallimageresizemethod', 'format_grid').
-                    $OUTPUT->help_icon('resetallimageresizemethod', 'format_grid');
-                $resetallelements[] = & $mform->createElement('checkbox', 'resetallimageresizemethod', '', $checkboxname);
-
-                $checkboxname = get_string('resetallimagecontainerstyle', 'format_grid').
-                    $OUTPUT->help_icon('resetallimagecontainerstyle', 'format_grid');
-                $resetallelements[] = & $mform->createElement('checkbox', 'resetallimagecontainerstyle', '', $checkboxname);
-
-                $checkboxname = get_string('resetallsectiontitleoptions', 'format_grid').
-                    $OUTPUT->help_icon('resetallsectiontitleoptions', 'format_grid');
-                $resetallelements[] = & $mform->createElement('checkbox', 'resetallsectiontitleoptions', '', $checkboxname);
-
-                $checkboxname = get_string('resetallnewactivity', 'format_grid').
-                    $OUTPUT->help_icon('resetallnewactivity', 'format_grid');
-                $resetallelements[] = & $mform->createElement('checkbox', 'resetallnewactivity', '', $checkboxname);
-
-                $checkboxname = get_string('resetallsinglepagesummaryimage', 'format_grid').
-                    $OUTPUT->help_icon('resetallsinglepagesummaryimage', 'format_grid');
-                $resetallelements[] = & $mform->createElement('checkbox', 'resetallsinglepagesummaryimage', '', $checkboxname);
-
-                $checkboxname = get_string('resetallfitpopup', 'format_grid').
-                    $OUTPUT->help_icon('resetallfitpopup', 'format_grid');
-                $resetallelements[] = & $mform->createElement('checkbox', 'resetallfitpopup', '', $checkboxname);
-
-                $checkboxname = get_string('resetallgreyouthidden', 'format_grid').
-                    $OUTPUT->help_icon('resetallgreyouthidden', 'format_grid');
-                $resetallelements[] = & $mform->createElement('checkbox', 'resetallgreyouthidden', '', $checkboxname);
-            }
-
-            $elements[] = $mform->addGroup($resetallelements, 'resetallgroup', get_string('resetallgrp', 'format_grid'), null,
-                false);
-        }
 
         return $elements;
-    }
-
-    /**
-     * Override if you need to perform some extra validation of the format options
-     *
-     * @param array $data array of ("fieldname"=>value) of submitted data
-     * @param array $files array of uploaded files "element_name"=>tmp_file_path
-     * @param array $errors errors already discovered in edit form validation
-     * @return array of "element_name"=>"error_description" if there are errors,
-     *         or an empty array if everything is OK.
-     *         Do not repeat errors from $errors param here
-     */
-    public function edit_form_validation($data, $files, $errors) {
-        $retr = array();
-
-        if ($this->validate_colour($data['bordercolour']) === false) {
-            $retr['bordercolour'] = get_string('colourrule', 'format_grid');
-        }
-        if ($this->validate_colour($data['imagecontainerbackgroundcolour']) === false) {
-            $retr['imagecontainerbackgroundcolour'] = get_string('colourrule', 'format_grid');
-        }
-        if ($this->validate_colour($data['currentselectedsectioncolour']) === false) {
-            $retr['currentselectedsectioncolour'] = get_string('colourrule', 'format_grid');
-        }
-        if ($this->validate_colour($data['currentselectedimagecontainercolour']) === false) {
-            $retr['currentselectedimagecontainercolour'] = get_string('colourrule', 'format_grid');
-        }
-        if ($data['sectiontitlegridlengthmaxoption'] < 0) {
-            $retr['sectiontitlegridlengthmaxoption'] = get_string('sectiontitlegridlengthmaxoptionrule', 'format_grid');
-        }
-        if ($this->validate_colour($data['sectiontitleinsidetitletextcolour']) === false) {
-            $retr['sectiontitleinsidetitletextcolour'] = get_string('colourrule', 'format_grid');
-        }
-        if ($this->validate_colour($data['sectiontitleinsidetitlebackgroundcolour']) === false) {
-            $retr['sectiontitleinsidetitlebackgroundcolour'] = get_string('colourrule', 'format_grid');
-        }
-        if (\format_grid\toolbox::validate_opacity($data['sectiontitleboxopacity']) === false) {
-            $retr['sectiontitleboxopacity'] = get_string('opacityrule', 'format_grid');
-        }
-        if (\format_grid\toolbox::validate_section_title_font_size($data['sectiontitlefontsize']) === false) {
-            $retr['sectiontitlefontsize'] = get_string('sectiontitlefontsizerule', 'format_grid');
-        }
-        if ($this->validate_colour($data['sectiontitlesummarytextcolour']) === false) {
-            $retr['sectiontitlesummarytextcolour'] = get_string('colourrule', 'format_grid');
-        }
-        if ($this->validate_colour($data['sectiontitlesummarybackgroundcolour']) === false) {
-            $retr['sectiontitlesummarybackgroundcolour'] = get_string('colourrule', 'format_grid');
-        }
-        if (\format_grid\toolbox::validate_opacity($data['sectiontitlesummarybackgroundopacity']) === false) {
-            $retr['sectiontitlesummarybackgroundopacity'] = get_string('opacityrule', 'format_grid');
-        }
-        return $retr;
-    }
-
-    /**
-     * Validates the colour that was entered by the user.
-     * Borrowed from 'admin_setting_configcolourpicker' in '/lib/adminlib.php'.
-     *
-     * I'm not completely happy with this solution as would rather embed in the colour
-     * picker code in the form, however I find this area rather fraut and I hear that
-     * Dan Poltawski (via MDL-42270) will be re-writing the forms lib so hopefully more
-     * developer friendly.
-     *
-     * Note: Colour names removed, but might consider putting them back in if asked, but
-     *       at the moment that would require quite a few changes and coping with existing
-     *       settings.  Either convert the names to hex or allow them as valid values and
-     *       fix the colour picker code and the CSS code in 'format.php' for the setting.
-     *
-     * Colour name to hex on: http://www.w3schools.com/cssref/css_colornames.asp.
-     *
-     * @param string $data the colour string to validate.
-     * @return true|false
-     */
-    private function validate_colour($data) {
-        if ($data == '-') {
-            return true;
-        } else if (preg_match('/^#?([[:xdigit:]]{3}){1,2}$/', $data)) {
-            return true;
-        } else {
-            return false;
-        }
     }
 
     /**
@@ -1385,111 +495,6 @@ class format_grid extends format_base {
      */
     public function update_course_format_options($data, $oldcourse = null) {
         global $DB; // MDL-37976.
-        /*
-         * Notes: Using 'unset' to really ensure that the reset form elements never get into the database.
-         *        This has to be done here so that the reset occurs after we have done updates such that the
-         *        reset itself is not seen as an update.
-         */
-        $resetimagecontaineralignment = false;
-        $resetimagecontainernavigation = false;
-        $resetimagecontainersize = false;
-        $resetimageresizemethod = false;
-        $resetimagecontainerstyle = false;
-        $resetsectiontitleoptions = false;
-        $resetnewactivity = false;
-        $resetsinglepagesummaryimage = false;
-        $resetfitpopup = false;
-        $resetgreyouthidden = false;
-        $resetallimagecontaineralignment = false;
-        $resetallimagecontainernavigation = false;
-        $resetallimagecontainersize = false;
-        $resetallimageresizemethod = false;
-        $resetallimagecontainerstyle = false;
-        $resetallsectiontitleoptions = false;
-        $resetallnewactivity = false;
-        $resetallsinglepagesummaryimage = false;
-        $resetallfitpopup = false;
-        $resetallgreyouthidden = false;
-        if (isset($data->resetimagecontaineralignment) == true) {
-            $resetimagecontaineralignment = true;
-            unset($data->resetimagecontaineralignment);
-        }
-        if (isset($data->resetimagecontainernavigation) == true) {
-            $resetimagecontainernavigation = true;
-            unset($data->resetimagecontainernavigation);
-        }
-        if (isset($data->resetimagecontainersize) == true) {
-            $resetimagecontainersize = true;
-            unset($data->resetimagecontainersize);
-        }
-        if (isset($data->resetimageresizemethod) == true) {
-            $resetimageresizemethod = true;
-            unset($data->resetimageresizemethod);
-        }
-        if (isset($data->resetimagecontainerstyle) == true) {
-            $resetimagecontainerstyle = true;
-            unset($data->resetimagecontainerstyle);
-        }
-        if (isset($data->resetsectiontitleoptions) == true) {
-            $resetsectiontitleoptions = true;
-            unset($data->resetsectiontitleoptions);
-        }
-        if (isset($data->resetnewactivity) == true) {
-            $resetnewactivity = true;
-            unset($data->resetnewactivity);
-        }
-        if (isset($data->resetsinglepagesummaryimage) == true) {
-            $resetsinglepagesummaryimage = true;
-            unset($data->resetsinglepagesummaryimage);
-        }
-        if (isset($data->resetfitpopup) == true) {
-            $resetfitpopup = true;
-            unset($data->resetfitpopup);
-        }
-        if (isset($data->resetgreyouthidden) == true) {
-            $resetgreyouthidden = true;
-            unset($data->resetgreyouthidden);
-        }
-        if (isset($data->resetallimagecontaineralignment) == true) {
-            $resetallimagecontaineralignment = true;
-            unset($data->resetallimagecontaineralignment);
-        }
-        if (isset($data->resetallimagecontainernavigation) == true) {
-            $resetallimagecontainernavigation = true;
-            unset($data->resetallimagecontainernavigation);
-        }
-        if (isset($data->resetallimagecontainersize) == true) {
-            $resetallimagecontainersize = true;
-            unset($data->resetallimagecontainersize);
-        }
-        if (isset($data->resetallimageresizemethod) == true) {
-            $resetallimageresizemethod = true;
-            unset($data->resetallimageresizemethod);
-        }
-        if (isset($data->resetallimagecontainerstyle) == true) {
-            $resetallimagecontainerstyle = true;
-            unset($data->resetallimagecontainerstyle);
-        }
-        if (isset($data->resetallsectiontitleoptions) == true) {
-            $resetallsectiontitleoptions = true;
-            unset($data->resetallsectiontitleoptions);
-        }
-        if (isset($data->resetallnewactivity) == true) {
-            $resetallnewactivity = true;
-            unset($data->resetallnewactivity);
-        }
-        if (isset($data->resetallsinglepagesummaryimage) == true) {
-            $resetallsinglepagesummaryimage = true;
-            unset($data->resetallsinglepagesummaryimage);
-        }
-        if (isset($data->resetallfitpopup) == true) {
-            $resetfitpopup = true;
-            unset($data->resetallfitpopup);
-        }
-        if (isset($data->resetallgreyouthidden) == true) {
-            $resetallgreyouthidden = true;
-            unset($data->resetallgreyouthidden);
-        }
 
         $currentsettings = $this->get_settings();
         $data = (array) $data;
@@ -1528,63 +533,93 @@ class format_grid extends format_base {
             }
         }
 
-        // Now we can do the reset.
-        $ourimageschanged = false;
-        if (($resetallimagecontaineralignment) ||
-            ($resetallimagecontainernavigation) ||
-            ($resetallimagecontainersize) ||
-            ($resetallimageresizemethod) ||
-            ($resetallimagecontainerstyle) ||
-            ($resetallsectiontitleoptions) ||
-            ($resetallnewactivity) ||
-            ($resetallsinglepagesummaryimage) ||
-            ($resetallfitpopup) ||
-            ($resetallgreyouthidden)) {
-            $ourimageschanged = $this->reset_grid_setting(0, $currentsettings, $resetallimagecontaineralignment,
-                $resetallimagecontainernavigation, $resetallimagecontainersize, $resetallimageresizemethod,
-                $resetallimagecontainerstyle, $resetallsectiontitleoptions, $resetallnewactivity,
-                $resetallsinglepagesummaryimage, $resetallfitpopup, $resetallgreyouthidden);
-            $changes = true;
-        } else if (
-            ($resetimagecontaineralignment) ||
-            ($resetimagecontainernavigation) ||
-            ($resetimagecontainersize) ||
-            ($resetimageresizemethod) ||
-            ($resetimagecontainerstyle) ||
-            ($resetsectiontitleoptions) ||
-            ($resetnewactivity) ||
-            ($resetsinglepagesummaryimage) ||
-            ($resetfitpopup) ||
-            ($resetgreyouthidden)) {
-            $ourimageschanged = $this->reset_grid_setting($this->courseid, $currentsettings, $resetimagecontaineralignment,
-                $resetimagecontainernavigation, $resetimagecontainersize, $resetimageresizemethod, $resetimagecontainerstyle,
-                $resetsectiontitleoptions, $resetnewactivity, $resetsinglepagesummaryimage, $resetfitpopup, $resetgreyouthidden);
-            $changes = true;
+        $newsettings = $this->get_settings(true); // Ensure we get the new values.
+
+        if (($currentsettings['imagecontainerwidth'] != $newsettings['imagecontainerwidth']) ||
+            ($currentsettings['imagecontainerratio'] != $newsettings['imagecontainerratio'])) {
+            $performimagecontainersize = true;
+        } else {
+            $performimagecontainersize = false;
         }
 
-        if (!$ourimageschanged) {
-            // A reset has not changed the images, so check if they need to be.
-            $newsettings = $this->get_settings(true); // Ensure we get the new values.
+        if (($currentsettings['imageresizemethod'] != $newsettings['imageresizemethod'])) {
+            $performimageresizemethod = true;
+        } else {
+            $performimageresizemethod = false;
+        }
 
-            if (($currentsettings['imagecontainerwidth'] != $newsettings['imagecontainerwidth']) ||
-                ($currentsettings['imagecontainerratio'] != $newsettings['imagecontainerratio'])) {
-                $performimagecontainersize = true;
-            } else {
-                $performimagecontainersize = false;
-            }
-
-            if (($currentsettings['imageresizemethod'] != $newsettings['imageresizemethod'])) {
-                $performimageresizemethod = true;
-            } else {
-                $performimageresizemethod = false;
-            }
-
-            if (($performimagecontainersize) || ($performimageresizemethod)) {
-                \format_grid\toolbox::update_displayed_images($this->courseid);
-            }
+        if (($performimagecontainersize) || ($performimageresizemethod)) {
+            \format_grid\toolbox::update_displayed_images($this->courseid);
         }
 
         return $changes;
+    }
+
+    public function section_format_options($foreditform = false) {
+        static $sectionformatoptions = false;
+        if ($sectionformatoptions === false) {
+            $sectionformatoptions = array(
+                'sectionimage_filemanager' => array(
+                    'default' => '',
+                    'type' => PARAM_RAW
+                ),
+                'sectionimagealttext' => array(
+                    'default' => '',
+                    'type' => PARAM_TEXT
+                ),
+                'sectionbreak' => array(
+                    'default' => 1, // No.
+                    'type' => PARAM_INT
+                ),
+                'sectionbreakheading' => array(
+                    'default' => '',
+                    'type' => PARAM_RAW
+                )
+            );
+        }
+        if ($foreditform && !isset($sectionformatoptions['sectionimage_filemanager']['label'])) {
+            $sectionformatoptionsedit = array(
+                'sectionimage_filemanager' => array(
+                    'label' => new lang_string('sectionimage', 'format_grid'),
+                    'help' => 'sectionimage',
+                    'help_component' => 'format_grid',
+                    'element_type' => 'sectionfilemanager',
+                    'element_attributes' => array(
+                        array(
+                            'course' => $this->course,
+                            'sectionid' => optional_param('id', 0, PARAM_INT)
+                        )
+                    )
+                ),
+                'sectionimagealttext' => array(
+                    'label' => new lang_string('sectionimagealttext', 'format_grid'),
+                    'help' => 'sectionimagealttext',
+                    'help_component' => 'format_grid',
+                    'element_type' => 'text'
+                ),
+                'sectionbreak' => array(
+                    'label' => new lang_string('sectionbreak', 'format_grid'),
+                    'help' => 'sectionbreak',
+                    'help_component' => 'format_grid',
+                    'element_type' => 'select',
+                    'element_attributes' => array(
+                        array(
+                            1 => new lang_string('no'),
+                            2 => new lang_string('yes')
+                        )
+                    ),
+                ),
+                'sectionbreakheading' => array(
+                    'label' => new lang_string('sectionbreakheading', 'format_grid'),
+                    'help' => 'sectionbreakheading',
+                    'help_component' => 'format_grid',
+                    'element_type' => 'textarea'
+                )
+            );
+            $sectionformatoptions = array_merge_recursive($sectionformatoptions, $sectionformatoptionsedit);
+        }
+
+        return $sectionformatoptions;
     }
 
     /**
@@ -1615,7 +650,7 @@ class format_grid extends format_base {
             return false;
         }
         if (parent::delete_section($section, $forcedeleteifnotempty)) {
-            \format_grid\toolbox::delete_image($section->id, self::get_contextid($this), $this->get_courseid());
+            \format_grid\toolbox::delete_image($section->id, $this->get_courseid());
             return true;
         }
         return false;
@@ -1634,214 +669,6 @@ class format_grid extends format_base {
     }
 
     /**
-     * Updates format options for a section
-     *
-     * Section id is expected in $data->id (or $data['id'])
-     * If $data does not contain property with the option name, the option will not be updated
-     *
-     * @param stdClass|array $data return value from {@link moodleform::get_data()} or array with data
-     *
-     * @return bool whether there were any changes to the options values
-     */
-    public function update_section_format_options($data) {
-        $data = (array) $data;
-
-        /* Resets the displayed image because changing the section name / details deletes the file.
-           See CONTRIB-4784. */
-        $sectionimage = \format_grid\toolbox::get_image($this->courseid, $data['id']);
-        if ($sectionimage) {
-            // Set up our table to get the displayed image back.  The 'auto repair' on page reload will do the rest.
-            global $DB;
-            $DB->set_field('format_grid_icon', 'displayedimageindex', 0, array('sectionid' => $sectionimage->sectionid));
-            // We know the file is normally deleted, but just in case...
-            $contextid = self::get_contextid($this);
-            $fs = get_file_storage();
-            $gridimagepath = \format_grid\toolbox::get_image_path();
-            \format_grid\toolbox::delete_displayed_image($contextid, $sectionimage, $gridimagepath, $fs);
-        }
-
-        return parent::update_section_format_options($data);
-    }
-
-    /**
-     * Resets the format setting to the default.
-     * @param int $courseid If not 0, then a specific course to reset.
-     * @param int $imagecontaineralignmentreset If true, reset the alignment to the default in the settings for the format.
-     * @param int $imagecontainernavigationreset If true, reset the alignment to the default in the settings for the format.
-     * @param int $imagecontainersizereset If true, reset the layout to the default in the settings for the format.
-     * @param int $imageresizemethodreset If true, reset the image resize method to the default in the settings for the format.
-     * @param int $imagecontainerstylereset If true, reset the colour to the default in the settings for the format.
-     * @param int $sectiontitleoptionsreset If true, reset the section title options to the default in the settings for the format.
-     * @param int $newactivityreset If true, reset the new activity to the default in the settings for the format.
-     * @param int $singlepagesummaryimagereset If true, reset the single page summary image to the default in the settings for the format.
-     * @param int $fitpopupreset If true, reset the fit popup to the default in the settings for the format.
-     * @param int $greyouthidden If true, reset the greyout hidden to the default in the settings for the format.
-     *
-     * @return bool If our images have changed.
-     */
-    private function reset_grid_setting($courseid, $ourcurrentsettings, $imagecontaineralignmentreset,
-        $imagecontainernavigationreset, $imagecontainersizereset, $imageresizemethodreset, $imagecontainerstylereset,
-        $sectiontitleoptionsreset, $newactivityreset, $singlepagesummaryimagereset, $fitpopupreset, $greyouthidden) {
-        global $DB, $USER;
-
-        $context = self::get_context($this);
-
-        if ($courseid == 0) {
-            $records = $DB->get_records('course', array('format' => $this->format), '', 'id');
-        } else {
-            $records = $DB->get_records('course', array('id' => $courseid, 'format' => $this->format), '', 'id');
-        }
-
-        $resetallifall = ((is_siteadmin($USER)) || ($courseid != 0)); // Will be true if reset all capability or a single course.
-
-        $updatedata = array();
-        $updateimagecontaineralignment = false;
-        $updateimagecontainernavigation = false;
-        $updateimagecontainersize = false;
-        $updateimageresizemethod = false;
-        $updateimagecontainerstyle = false;
-        $updatesectiontitleoptions = false;
-        $updatenewactivity = false;
-        $updatesinglepagesummaryimage = false;
-        $updatefitpopup = false;
-        $updategreyouthidden = false;
-        if ($imagecontaineralignmentreset && has_capability('format/grid:changeimagecontaineralignment', $context) && $resetallifall) {
-            $updatedata['imagecontaineralignment'] = '-';
-            $updateimagecontaineralignment = true;
-        }
-        if ($imagecontainernavigationreset && has_capability('format/grid:changeimagecontainernavigation', $context) && $resetallifall) {
-            $updatedata['setsection0ownpagenogridonesection'] = 0;
-            $updateimagecontainernavigation = true;
-        }
-        if ($imagecontainersizereset && has_capability('format/grid:changeimagecontainersize', $context) && $resetallifall) {
-            $updatedata['imagecontainerwidth'] = 0;
-            $updatedata['imagecontainerratio'] = '-';
-            $updateimagecontainersize = true;
-        }
-        if ($imageresizemethodreset && has_capability('format/grid:changeimageresizemethod', $context) && $resetallifall) {
-            $updatedata['imageresizemethod'] = 0;
-            $updateimageresizemethod = true;
-        }
-        if ($imagecontainerstylereset && has_capability('format/grid:changeimagecontainerstyle', $context) && $resetallifall) {
-            $updatedata['bordercolour'] = '-';
-            $updatedata['borderwidth'] = 0;
-            $updatedata['borderradius'] = 0;
-            $updatedata['imagecontainerbackgroundcolour'] = '-';
-            $updatedata['currentselectedsectioncolour'] = '-';
-            $updatedata['currentselectedimagecontainertextcolour'] = '-';
-            $updatedata['currentselectedimagecontainercolour'] = '-';
-            $updateimagecontainerstyle = true;
-        }
-        if ($sectiontitleoptionsreset && has_capability('format/grid:changesectiontitleoptions', $context) && $resetallifall) {
-            $updatedata['hidesectiontitle'] = 0;
-            $updatedata['sectiontitlegridlengthmaxoption'] = '-';
-            $updatedata['sectiontitleboxposition'] = 0;
-            $updatedata['sectiontitleboxinsideposition'] = 0;
-            $updatedata['sectiontitleboxheight'] = '-';
-            $updatedata['sectiontitleboxopacity'] = '-';
-            $updatedata['sectiontitlefontsize'] = '-';
-            $updatedata['sectiontitlealignment'] = '-';
-            $updatedata['sectiontitleinsidetitletextcolour'] = '-';
-            $updatedata['sectiontitleinsidetitlebackgroundcolour'] = '-';
-            $updatedata['showsectiontitlesummary'] = 0;
-            $updatedata['setshowsectiontitlesummaryposition'] = 0;
-            $updatedata['sectiontitlesummarymaxlength'] = '-';
-            $updatedata['sectiontitlesummarytextcolour'] = '-';
-            $updatedata['sectiontitlesummarybackgroundcolour'] = '-';
-            $updatedata['sectiontitlesummarybackgroundopacity'] = '-';
-            $updatesectiontitleoptions = true;
-        }
-        if ($newactivityreset && $resetallifall) {
-            $updatedata['newactivity'] = 0;
-            $updatenewactivity = true;
-        }
-        if ($singlepagesummaryimagereset && $resetallifall) {
-            $updatedata['singlepagesummaryimage'] = 0;
-            $updatesinglepagesummaryimage = true;
-        }
-        if ($fitpopupreset && $resetallifall) {
-            $updatedata['fitsectioncontainertowindow'] = 0;
-            $updatefitpopup = true;
-        }
-        if ($greyouthidden && $resetallifall) {
-            $updatedata['greyouthidden'] = 0;
-            $updategreyouthidden = true;
-        }
-
-        $ourimagesupdated = false;
-        foreach ($records as $record) {
-            if (($updateimagecontaineralignment) ||
-                ($updateimagecontainernavigation) ||
-                ($updateimagecontainersize) ||
-                ($updateimageresizemethod) ||
-                ($updateimagecontainerstyle) ||
-                ($updatesectiontitleoptions) ||
-                ($updatenewactivity) ||
-                ($updatefitpopup) ||
-                ($updategreyouthidden)) {
-
-                if ($record->id !== $this->courseid) {
-                    $courseformat = course_get_format($record->id);
-                } else {
-                    $courseformat = $this;
-                }
-                if (($updateimagecontainersize) || ($updateimageresizemethod)) {
-                    if ($record->id === $this->courseid) {
-                        $currentsettings = $ourcurrentsettings;
-                    } else {
-                        $currentsettings = $courseformat->get_settings();
-                    }
-                    $courseformat->update_format_options($updatedata);
-                    $newsettings = $courseformat->get_settings(true); // Ensure we get the new values.
-
-                    if (($updateimagecontainersize) &&
-                        (($currentsettings['imagecontainerwidth'] != $newsettings['imagecontainerwidth']) ||
-                         ($currentsettings['imagecontainerratio'] != $newsettings['imagecontainerratio']))) {
-                        $performimagecontainersize = true;
-                    } else {
-                        $performimagecontainersize = false;
-                    }
-
-                    if (($updateimageresizemethod) &&
-                        ($currentsettings['imageresizemethod'] != $newsettings['imageresizemethod'])) {
-                        $performimageresizemethod = true;
-                    } else {
-                        $performimageresizemethod = false;
-                    }
-
-                    if (($performimagecontainersize) || ($performimageresizemethod)) {
-                        \format_grid\toolbox::update_displayed_images($record->id);
-                        if ($record->id === $this->courseid) {
-                            $ourimagesupdated = true;
-                        }
-                    }
-                } else {
-                    $courseformat->update_format_options($updatedata);
-                }
-            }
-        }
-
-        return $ourimagesupdated;
-    }
-
-    // Grid specific methods...
-    /**
-     * Class instance update images callback.
-     */
-    public static function update_displayed_images_callback() {
-        \format_grid\toolbox::update_displayed_images_callback();
-    }
-
-    /**
-     * Returns a new instance of us so that specialised methods can be called.
-     * @param int $courseid The course id of the course.
-     * @return format_grid object.
-     */
-    public static function get_instance($courseid) {
-        return new format_grid('grid', $courseid);
-    }
-
-    /**
      * Prepares the templateable object to display section name.
      *
      * @param \section_info|\stdClass $section
@@ -1851,13 +678,13 @@ class format_grid extends format_base {
      * @param null|lang_string|string $editlabel
      * @return \core\output\inplace_editable
      */
-    public function inplace_editable_render_section_name($section, $linkifneeded = true, $editable = null, $edithint = null,
-            $editlabel = null) {
+    public function inplace_editable_render_section_name($section, $linkifneeded = true,
+            $editable = null, $edithint = null, $editlabel = null) {
         if (empty($edithint)) {
             $edithint = new lang_string('editsectionname', 'format_grid');
         }
         if (empty($editlabel)) {
-            $title = $this->get_section_name($section);
+            $title = get_section_name($section->course, $section);
             $editlabel = new lang_string('newsectionname', 'format_grid', $title);
         }
         return parent::inplace_editable_render_section_name($section, $linkifneeded, $editable, $edithint, $editlabel);
@@ -1886,18 +713,27 @@ class format_grid extends format_base {
     }
 
     public function section_action($section, $action, $sr) {
+        global $PAGE;
+
         if ($section->section && ($action === 'setmarker' || $action === 'removemarker')) {
-            // Format 'grid' allows to set and remove markers in addition to common section actions.
+            // Format 'topics' allows to set and remove markers in addition to common section actions.
             require_capability('moodle/course:setcurrentsection', context_course::instance($this->courseid));
             course_set_marker($this->courseid, ($action === 'setmarker') ? $section->section : 0);
             return null;
         }
 
         // For show/hide actions call the parent method and return the new content for .section_availability element.
-        global $PAGE;
         $rv = parent::section_action($section, $action, $sr);
         $renderer = $PAGE->get_renderer('format_grid');
-        $rv['section_availability'] = $renderer->section_availability($this->get_section($section));
+
+        if (!($section instanceof section_info)) {
+            $modinfo = course_modinfo::instance($this->courseid);
+            $section = $modinfo->get_section_info($section->section);
+        }
+        $elementclass = $this->get_output_classname('content\\section\\availability');
+        $availability = new $elementclass($this, $section);
+
+        $rv['section_availability'] = $renderer->render($availability);
         return $rv;
     }
 
@@ -1910,21 +746,70 @@ class format_grid extends format_base {
         $this->update_course_format_options($data);
     }
 
-    public static function get_context($us) {
-        global $SITE;
-
-        if ($SITE->id == $us->courseid) {
-            // Use the context of the page which should be the course category.
-            global $PAGE;
-            return $PAGE->context;
-        } else {
-            return context_course::instance($us->courseid);
-        }
+    /**
+     * Return the plugin configs for external functions.
+     *
+     * @return array the list of configuration settings
+     * @since Moodle 3.5
+     */
+    public function get_config_for_external() {
+        // Return everything (nothing to hide).
+        return $this->get_format_options();
     }
 
-    public static function get_contextid($us) {
-        return self::get_context($us)->id;
+    // Grid specific methods...
+    /**
+     * Class instance update images callback.
+     */
+    public static function update_displayed_images_callback() {
+        \format_grid\toolbox::update_displayed_images_callback();
     }
+}
+
+// Transposed from block_html_pluginfile.
+/**
+ * Form for editing HTML block instances.
+ *
+ * @copyright 2010 Petr Skoda (http://skodak.org)
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   format_grid
+ * @param stdClass $course course object
+ * @param stdClass $birecordorcm block instance record
+ * @param stdClass $context context object
+ * @param string $filearea file area
+ * @param array $args extra arguments
+ * @param bool $forcedownload whether or not force download
+ * @param array $options additional options affecting the file serving
+ * @return bool
+ */
+function format_grid_pluginfile($course, $birecordorcm, $context, $filearea, $args, $forcedownload, array $options=array()) {
+    if ($context->contextlevel != CONTEXT_COURSE) {
+        send_file_not_found();
+    }
+
+    // Check if user has capability to access course.
+    require_course_login($course);
+
+    if ($filearea !== 'displayedsectionimage') {
+        send_file_not_found();
+    }
+
+    $fs = get_file_storage();
+
+    $filename = $args[2];
+    $sectionid = $args[0];
+
+    $file = $fs->get_file($context->id, 'format_grid', 'displayedsectionimage', $sectionid, '/', $filename);
+    if (!$file || $file->is_directory()) {
+        send_file_not_found();
+    }
+
+    // NOTE:
+    // It would be nice to have file revisions here, for now rely on standard file lifetime,
+    // do not lower it because the files are displayed very often.  But... Grid format is using
+    // displayedsectionimage in the URL as a means to overcome this.
+    \core\session\manager::write_close();
+    send_stored_file($file, null, 0, $forcedownload, $options);
 }
 
 /**
@@ -1936,46 +821,12 @@ class format_grid extends format_base {
  * @return \core\output\inplace_editable
  */
 function format_grid_inplace_editable($itemtype, $itemid, $newvalue) {
-    global $CFG;
+    global $DB, $CFG;
     require_once($CFG->dirroot . '/course/lib.php');
     if ($itemtype === 'sectionname' || $itemtype === 'sectionnamenl') {
-        global $DB;
         $section = $DB->get_record_sql(
-                'SELECT s.* FROM {course_sections} s JOIN {course} c ON s.course = c.id WHERE s.id = ? AND c.format = ?',
-                array($itemid, 'grid'), MUST_EXIST);
+            'SELECT s.* FROM {course_sections} s JOIN {course} c ON s.course = c.id WHERE s.id = ? AND c.format = ?',
+            [$itemid, 'grid'], MUST_EXIST);
         return course_get_format($section->course)->inplace_editable_update_section_name($section, $itemtype, $newvalue);
     }
-}
-
-/**
- * Indicates this format uses sections.
- *
- * @return bool Returns true
- */
-function callback_grid_uses_sections() {
-    return true;
-}
-
-/**
- * Used to display the course structure for a course where format=grid
- *
- * This is called automatically by {@link load_course()} if the current course
- * format = weeks.
- *
- * @param array $path An array of keys to the course node in the navigation
- * @param stdClass $modinfo The mod info object for the current course
- * @return bool Returns true
- */
-function callback_grid_load_content(&$navigation, $course, $coursenode) {
-    return $navigation->load_generic_course_sections($course, $coursenode, 'grid');
-}
-
-/**
- * The string that is used to describe a section of the course
- * e.g. Topic, Week...
- *
- * @return string
- */
-function callback_grid_definition() {
-    return get_string('topic', 'format_grid');
 }

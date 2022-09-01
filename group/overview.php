@@ -195,10 +195,7 @@ $PAGE->set_heading($course->fullname);
 $PAGE->set_pagelayout('standard');
 echo $OUTPUT->header();
 
-// Add tabs
-$currenttab = 'overview';
-require('tabs.php');
-
+echo $OUTPUT->render_participants_tertiary_nav($course);
 /// Print overview
 echo $OUTPUT->heading(format_string($course->shortname, true, array('context' => $context)) .' '.$stroverview, 3);
 
@@ -228,7 +225,6 @@ echo $OUTPUT->render($select);
 
 /// Print table
 $printed = false;
-$hoverevents = array();
 foreach ($members as $gpgid=>$groupdata) {
     if ($groupingid and $groupingid != $gpgid) {
         if ($groupingid > 0 || $gpgid > 0) { // Still show 'not in group' when 'no grouping' selected.
@@ -251,13 +247,7 @@ foreach ($members as $gpgid=>$groupdata) {
         $options = new stdClass;
         $options->noclean = true;
         $options->overflowdiv = true;
-        $jsdescription = trim(format_text($description, $groups[$gpid]->descriptionformat, $options));
-        if (empty($jsdescription)) {
-            $line[] = $name;
-        } else {
-            $line[] = html_writer::tag('span', $name, array('class' => 'group_hoverdescription', 'data-groupid' => $gpid));
-            $hoverevents[$gpid] = get_string('descriptiona', null, $jsdescription);
-        }
+        $line[] = $name;
         $viewfullnames = has_capability('moodle/site:viewfullnames', $context);
         $fullnames = array();
         foreach ($users as $user) {
@@ -296,11 +286,6 @@ foreach ($members as $gpgid=>$groupdata) {
     }
     echo html_writer::table($table);
     $printed = true;
-}
-
-if (count($hoverevents)>0) {
-    $PAGE->requires->string_for_js('description', 'moodle');
-    $PAGE->requires->js_init_call('M.core_group.init_hover_events', array($hoverevents));
 }
 
 echo $OUTPUT->footer();

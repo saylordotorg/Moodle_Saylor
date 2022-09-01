@@ -236,6 +236,7 @@ class external_test extends externallib_advanced_testcase {
         $quiz1->groupingid = 0;
         $quiz1->hasquestions = 0;
         $quiz1->hasfeedback = 0;
+        $quiz1->completionpass = 0;
         $quiz1->autosaveperiod = get_config('quiz', 'autosaveperiod');
         $quiz1->introfiles = [];
 
@@ -247,6 +248,7 @@ class external_test extends externallib_advanced_testcase {
         $quiz2->groupingid = 0;
         $quiz2->hasquestions = 0;
         $quiz2->hasfeedback = 0;
+        $quiz2->completionpass = 0;
         $quiz2->autosaveperiod = get_config('quiz', 'autosaveperiod');
         $quiz2->introfiles = [];
 
@@ -317,7 +319,7 @@ class external_test extends externallib_advanced_testcase {
         // We only see a limited set of fields.
         $this->assertCount(4, $result['quizzes'][0]);
         $this->assertEquals($quiz2->id, $result['quizzes'][0]['id']);
-        $this->assertEquals($quiz2->coursemodule, $result['quizzes'][0]['coursemodule']);
+        $this->assertEquals($quiz2->cmid, $result['quizzes'][0]['coursemodule']);
         $this->assertEquals($quiz2->course, $result['quizzes'][0]['course']);
         $this->assertEquals($quiz2->name, $result['quizzes'][0]['name']);
         $this->assertEquals($quiz2->course, $result['quizzes'][0]['course']);
@@ -1621,7 +1623,7 @@ class external_test extends externallib_advanced_testcase {
         $this->assertEventContextNotUsed($event);
         $this->assertNotEmpty($event->get_name());
 
-        // Now, force the quiz with QUIZ_NAVMETHOD_SEQ (sequencial) navigation method.
+        // Now, force the quiz with QUIZ_NAVMETHOD_SEQ (sequential) navigation method.
         $DB->set_field('quiz', 'navmethod', QUIZ_NAVMETHOD_SEQ, array('id' => $quiz->id));
         // Quiz requiring preflightdata.
         $DB->set_field('quiz', 'password', 'abcdef', array('id' => $quiz->id));
@@ -1939,11 +1941,11 @@ class external_test extends externallib_advanced_testcase {
         $question = $questiongenerator->create_question('shortanswer', null, array('category' => $cat->id));
         quiz_add_quiz_question($question->id, $quiz);
 
-        // Add new question types in the category (for the random one).
         $question = $questiongenerator->create_question('truefalse', null, array('category' => $cat->id));
-        $question = $questiongenerator->create_question('essay', null, array('category' => $cat->id));
+        quiz_add_quiz_question($question->id, $quiz);
 
-        quiz_add_random_questions($quiz, 0, $cat->id, 1, false);
+        $question = $questiongenerator->create_question('essay', null, array('category' => $cat->id));
+        quiz_add_quiz_question($question->id, $quiz);
 
         $this->setUser($this->student);
 
@@ -1951,12 +1953,63 @@ class external_test extends externallib_advanced_testcase {
         $result = \external_api::clean_returnvalue(mod_quiz_external::get_quiz_required_qtypes_returns(), $result);
 
         $expected = array(
-            'questiontypes' => ['essay', 'numerical', 'random', 'shortanswer', 'truefalse'],
+            'questiontypes' => ['essay', 'numerical', 'shortanswer', 'truefalse'],
             'warnings' => []
         );
 
         $this->assertEquals($expected, $result);
 
+    }
+
+    /**
+     * Test get_quiz_required_qtypes for quiz with random questions
+     */
+    public function test_get_quiz_required_qtypes_random() {
+        $this->setAdminUser();
+
+        // Create a new quiz.
+        $quizgenerator = $this->getDataGenerator()->get_plugin_generator('mod_quiz');
+        $quiz = $quizgenerator->create_instance(['course' => $this->course->id]);
+
+        // Create some questions.
+        $questiongenerator = $this->getDataGenerator()->get_plugin_generator('core_question');
+
+        $cat = $questiongenerator->create_question_category();
+        $anothercat = $questiongenerator->create_question_category();
+
+        $question = $questiongenerator->create_question('numerical', null, ['category' => $cat->id]);
+        $question = $questiongenerator->create_question('shortanswer', null, ['category' => $cat->id]);
+        $question = $questiongenerator->create_question('truefalse', null, ['category' => $cat->id]);
+        // Question in a different category.
+        $question = $questiongenerator->create_question('essay', null, ['category' => $anothercat->id]);
+
+        // Add a couple of random questions from the same category.
+        quiz_add_random_questions($quiz, 0, $cat->id, 1, false);
+        quiz_add_random_questions($quiz, 0, $cat->id, 1, false);
+
+        $this->setUser($this->student);
+
+        $result = mod_quiz_external::get_quiz_required_qtypes($quiz->id);
+        $result = \external_api::clean_returnvalue(mod_quiz_external::get_quiz_required_qtypes_returns(), $result);
+
+        $expected = ['numerical', 'shortanswer', 'truefalse'];
+        ksort($result['questiontypes']);
+
+        $this->assertEquals($expected, $result['questiontypes']);
+
+        // Add more questions to the quiz, this time from the other category.
+        $this->setAdminUser();
+        quiz_add_random_questions($quiz, 0, $anothercat->id, 1, false);
+
+        $this->setUser($this->student);
+        $result = mod_quiz_external::get_quiz_required_qtypes($quiz->id);
+        $result = \external_api::clean_returnvalue(mod_quiz_external::get_quiz_required_qtypes_returns(), $result);
+
+        // The new question from the new category is returned as a potential random question for the quiz.
+        $expected = ['essay', 'numerical', 'shortanswer', 'truefalse'];
+        ksort($result['questiontypes']);
+
+        $this->assertEquals($expected, $result['questiontypes']);
     }
 
     /**
@@ -2034,7 +2087,7 @@ class external_test extends externallib_advanced_testcase {
      *
      * @return quiz
      */
-    private function prepare_sequential_quiz() {
+    private function prepare_sequential_quiz(): quiz {
         // Create a new quiz with 5 questions and one attempt started.
         // Create a new quiz with attempts.
         $quizgenerator = $this->getDataGenerator()->get_plugin_generator('mod_quiz');
@@ -2075,7 +2128,7 @@ class external_test extends externallib_advanced_testcase {
      * @return quiz_attempt
      * @throws \moodle_exception
      */
-    private function create_quiz_attempt_object($quizobj, $userid = null, $ispreview = false) {
+    private function create_quiz_attempt_object(quiz $quizobj, ?int $userid = null, ?bool $ispreview = false): quiz_attempt {
         global $USER;
         $timenow = time();
         // Now, do one attempt.

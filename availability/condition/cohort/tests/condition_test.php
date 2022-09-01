@@ -45,6 +45,9 @@ class condition_test extends \advanced_testcase {
 
     /**
      * Tests constructing and using condition.
+     *
+     * @covers \availability_cohort\condition::is_available()
+     * @covers \availability_cohort\condition::get_description()
      */
     public function test_usage() {
         global $CFG, $USER;
@@ -106,6 +109,8 @@ class condition_test extends \advanced_testcase {
     /**
      * Tests the constructor including error conditions. Also tests the
      * string conversion feature (intended for debugging only).
+     *
+     * @covers \availability_cohort\condition::__construct()
      */
     public function test_constructor() {
         // Invalid id (not int).
@@ -130,6 +135,8 @@ class condition_test extends \advanced_testcase {
 
     /**
      * Tests the save() function.
+     *
+     * @covers \availability_cohort\condition::save()
      */
     public function test_save() {
         $structure = (object)array('id' => 123);

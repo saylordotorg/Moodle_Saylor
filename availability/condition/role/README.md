@@ -1,7 +1,7 @@
 moodle-availability_role
 ========================
 
-[![Moodle Plugin CI](https://github.com/moodle-an-hochschulen/moodle-availability_role/workflows/Moodle%20Plugin%20CI/badge.svg?branch=MOODLE_311_STABLE)](https://github.com/moodle-an-hochschulen/moodle-availability_role/actions?query=workflow%3A%22Moodle+Plugin+CI%22+branch%3AMOODLE_311_STABLE)
+[![Moodle Plugin CI](https://github.com/moodle-an-hochschulen/moodle-availability_role/workflows/Moodle%20Plugin%20CI/badge.svg?branch=MOODLE_400_STABLE)](https://github.com/moodle-an-hochschulen/moodle-availability_role/actions?query=workflow%3A%22Moodle+Plugin+CI%22+branch%3AMOODLE_400_STABLE)
 
 Moodle availability plugin which lets users restrict resources, activities and sections based on roles
 
@@ -9,7 +9,7 @@ Moodle availability plugin which lets users restrict resources, activities and s
 Requirements
 ------------
 
-This plugin requires Moodle 3.11+
+This plugin requires Moodle 4.0+
 
 
 Motivation for this plugin

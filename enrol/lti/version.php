@@ -24,6 +24,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2021051701; // The current plugin version (Date: YYYYMMDDXX).
-$plugin->requires = 2021051100; // Requires this Moodle version.
+$plugin->version = 2022041901; // The current plugin version (Date: YYYYMMDDXX).
+$plugin->requires = 2022041200; // Requires this Moodle version.
 $plugin->component = 'enrol_lti'; // Full name of the plugin (used for diagnostics).
+$plugin->dependencies = [
+    'auth_lti' => 2022041200, // The auth_lti authentication plugin version 2021100500 or higher must be present.
+];

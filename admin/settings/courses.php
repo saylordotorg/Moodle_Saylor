@@ -88,6 +88,15 @@ if ($hassiteconfig or has_any_capability($capabilities, $systemcontext)) {
     $downloadcontentsitedefault->add_dependent_on('downloadcoursecontentallowed');
     $temp->add($downloadcontentsitedefault);
 
+    $temp->add(
+            new admin_setting_configtext(
+                'moodlecourse/participantsperpage',
+                new lang_string('participants:perpage', 'course'),
+                new lang_string('participants:perpage_help', 'course'),
+                20
+            )
+        );
+
     // Course format.
     $temp->add(new admin_setting_heading('courseformathdr', new lang_string('type_format', 'plugin'), ''));
 
@@ -109,7 +118,7 @@ if ($hassiteconfig or has_any_capability($capabilities, $systemcontext)) {
     $choices['0'] = new lang_string('hiddensectionscollapsed');
     $choices['1'] = new lang_string('hiddensectionsinvisible');
     $temp->add(new admin_setting_configselect('moodlecourse/hiddensections', new lang_string('hiddensections'),
-        new lang_string('coursehelphiddensections'), 0, $choices));
+        new lang_string('coursehelphiddensections'), 1, $choices));
 
     $choices = array();
     $choices[COURSE_DISPLAY_SINGLEPAGE] = new lang_string('coursedisplay_single');

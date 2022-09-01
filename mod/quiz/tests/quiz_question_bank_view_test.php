@@ -51,7 +51,7 @@ class quiz_question_bank_view_testcase extends advanced_testcase {
         $cm = get_coursemodule_from_instance('quiz', $quiz->id);
 
         // Create a question in the default category.
-        $contexts = new question_edit_contexts($context);
+        $contexts = new core_question\local\bank\question_edit_contexts($context);
         $cat = question_make_default_categories($contexts->all());
         $questiondata = $questiongenerator->create_question('numerical', null,
                 ['name' => 'Example question', 'category' => $cat->id]);
@@ -63,7 +63,15 @@ class quiz_question_bank_view_testcase extends advanced_testcase {
         // Generate the view.
         $view = new mod_quiz\question\bank\custom_view($contexts, new moodle_url('/'), $course, $cm, $quiz);
         ob_start();
-        $view->display('editq', 0, 20, $cat->id . ',' . $cat->contextid, false, false, false);
+        $pagevars = [
+            'qpage' => 0,
+            'qperpage' => 20,
+            'cat' => $cat->id . ',' . $context->id,
+            'recurse' => false,
+            'showhidden' => false,
+            'qbshowtext' => false
+        ];
+        $view->display($pagevars, 'editq');
         $html = ob_get_clean();
 
         // Verify the output includes the expected question.

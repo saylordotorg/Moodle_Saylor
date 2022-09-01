@@ -78,7 +78,7 @@ class edit_letter_form extends moodleform {
 
 //-------------------------------------------------------------------------------
         // buttons
-        $this->add_action_buttons(!$admin);
+        $this->add_action_buttons();
     }
 
 }

@@ -743,7 +743,7 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2017053000, 'facetoface');
     }
 
-    if ($oldversion < 2021113001) {
+    if ($oldversion < 2022031800) {
 
         // Define field confirmationmessageformat to be added to facetoface.
         $table = new xmldb_table('facetoface');
@@ -755,7 +755,7 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         }
 
         // Facetoface savepoint reached.
-        upgrade_mod_savepoint(true, 2021113001, 'facetoface');
+        upgrade_mod_savepoint(true, 2022031800, 'facetoface');
     }
 
     return $result;

@@ -166,7 +166,7 @@ function xmldb_lti_upgrade($oldversion) {
     // Automatically generated Moodle v3.9.0 release upgrade line.
     // Put any upgrade step following this.
 
-    if ($oldversion < 2020061501) {
+    if ($oldversion < 2021052501) {
 
         // Changing type of field instructorcustomparameters on table lti to text.
         $table = new xmldb_table('lti');
@@ -177,16 +177,10 @@ function xmldb_lti_upgrade($oldversion) {
         $dbman->change_field_type($table, $field);
 
         // Lti savepoint reached.
-        upgrade_mod_savepoint(true, 2020061501, 'lti');
+        upgrade_mod_savepoint(true, 2021052501, 'lti');
     }
 
-    // Automatically generated Moodle v3.10.0 release upgrade line.
-    // Put any upgrade step following this.
-
-    // Automatically generated Moodle v3.11.0 release upgrade line.
-    // Put any upgrade step following this.
-
-    if ($oldversion < 2021051701) {
+    if ($oldversion < 2022032900) {
         // This option 'Public key type' was added in MDL-66920, but no value was set for existing 1.3 tools.
         // Set a default of 'RSA Key' for those LTI 1.3 tools without a value, representing the only key type they
         // could use at the time of their creation. Existing tools which have since been resaved will not be impacted.
@@ -208,8 +202,11 @@ function xmldb_lti_upgrade($oldversion) {
         $recordset->close();
 
         // Lti savepoint reached.
-        upgrade_mod_savepoint(true, 2021051701, 'lti');
+        upgrade_mod_savepoint(true, 2022032900, 'lti');
     }
+
+    // Automatically generated Moodle v4.0.0 release upgrade line.
+    // Put any upgrade step following this.
 
     return true;
 }

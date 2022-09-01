@@ -30,7 +30,8 @@ require_once($CFG->dirroot.'/lib/tablelib.php');
 require_once($CFG->dirroot.'/notes/lib.php');
 require_once($CFG->dirroot.'/report/participation/locallib.php');
 
-define('DEFAULT_PAGE_SIZE', 20);
+$participantsperpage = intval(get_config('moodlecourse', 'participantsperpage'));
+define('DEFAULT_PAGE_SIZE', (!empty($participantsperpage) ? $participantsperpage : 20));
 define('SHOW_ALL_PAGE_SIZE', 5000);
 
 $id         = required_param('id', PARAM_INT); // course id.
@@ -67,8 +68,6 @@ if ($roleid != 0 and !$role = $DB->get_record('role', array('id'=>$roleid))) {
 require_login($course);
 $context = context_course::instance($course->id);
 require_capability('report/participation:view', $context);
-
-report_helper::save_selected_report($id, $url);
 
 $strparticipation = get_string('participationreport');
 $strviews         = get_string('views');

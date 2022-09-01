@@ -78,6 +78,13 @@ class cachestore_file extends cache_store implements cache_is_key_aware, cache_i
     protected $autocreate = false;
 
     /**
+     * Set to true if new cache revision directory needs to be created. Old directory will be purged asynchronously
+     * via Schedule task.
+     * @var bool
+     */
+    protected $asyncpurge = false;
+
+    /**
      * Set to true if a custom path is being used.
      * @var bool
      */
@@ -100,6 +107,13 @@ class cachestore_file extends cache_store implements cache_is_key_aware, cache_i
      * @var cache_definition
      */
     protected $definition;
+
+    /**
+     * Bytes read or written by last call to set()/get() or set_many()/get_many().
+     *
+     * @var int
+     */
+    protected $lastiobytes = 0;
 
     /**
      * A reference to the global $CFG object.
@@ -172,6 +186,12 @@ class cachestore_file extends cache_store implements cache_is_key_aware, cache_i
         } else {
             // Default: No, we will use multiple directories.
             $this->singledirectory = false;
+        }
+        // Check if directory needs to be purged asynchronously.
+        if (array_key_exists('asyncpurge', $configuration)) {
+            $this->asyncpurge = (bool)$configuration['asyncpurge'];
+        } else {
+            $this->asyncpurge = false;
         }
     }
 
@@ -264,10 +284,25 @@ class cachestore_file extends cache_store implements cache_is_key_aware, cache_i
      * @param cache_definition $definition
      */
     public function initialise(cache_definition $definition) {
+        global $CFG;
+
         $this->definition = $definition;
         $hash = preg_replace('#[^a-zA-Z0-9]+#', '_', $this->definition->get_id());
         $this->path = $this->filestorepath.'/'.$hash;
         make_writable_directory($this->path, false);
+
+        if ($this->asyncpurge) {
+            $timestampfile = $this->path . '/.lastpurged';
+            if (!file_exists($timestampfile)) {
+                touch($timestampfile);
+                @chmod($timestampfile, $CFG->filepermissions);
+            }
+            $cacherev = gmdate("YmdHis", filemtime($timestampfile));
+            // Update file path with new cache revision.
+            $this->path .= '/' . $cacherev;
+            make_writable_directory($this->path, false);
+        }
+
         if ($this->prescan && $definition->get_mode() !== self::MODE_REQUEST) {
             $this->prescan = false;
         }
@@ -334,6 +369,7 @@ class cachestore_file extends cache_store implements cache_is_key_aware, cache_i
      * @return mixed The data that was associated with the key, or false if the key did not exist.
      */
     public function get($key) {
+        $this->lastiobytes = 0;
         $filename = $key.'.cache';
         $file = $this->file_path_for_key($key);
         $ttl = $this->definition->get_ttl();
@@ -369,6 +405,7 @@ class cachestore_file extends cache_store implements cache_is_key_aware, cache_i
         } while (!feof($handle));
         // Unlock it.
         flock($handle, LOCK_UN);
+        $this->lastiobytes = strlen($data);
         // Return it unserialised.
         return $this->prep_data_after_read($data);
     }
@@ -384,10 +421,23 @@ class cachestore_file extends cache_store implements cache_is_key_aware, cache_i
      */
     public function get_many($keys) {
         $result = array();
+        $total = 0;
         foreach ($keys as $key) {
             $result[$key] = $this->get($key);
+            $total += $this->lastiobytes;
         }
+        $this->lastiobytes = $total;
         return $result;
+    }
+
+    /**
+     * Gets bytes read by last get() or get_many(), or written by set() or set_many().
+     *
+     * @return int Bytes read or written
+     * @since Moodle 4.0
+     */
+    public function get_last_io_bytes(): int {
+        return $this->lastiobytes;
     }
 
     /**
@@ -434,7 +484,9 @@ class cachestore_file extends cache_store implements cache_is_key_aware, cache_i
         $this->ensure_path_exists();
         $filename = $key.'.cache';
         $file = $this->file_path_for_key($key, true);
-        $result = $this->write_file($file, $this->prep_data_before_save($data));
+        $serialized = $this->prep_data_before_save($data);
+        $this->lastiobytes = strlen($serialized);
+        $result = $this->write_file($file, $serialized);
         if (!$result) {
             // Couldn't write the file.
             return false;
@@ -482,11 +534,14 @@ class cachestore_file extends cache_store implements cache_is_key_aware, cache_i
      */
     public function set_many(array $keyvaluearray) {
         $count = 0;
+        $totaliobytes = 0;
         foreach ($keyvaluearray as $pair) {
             if ($this->set($pair['key'], $pair['value'])) {
+                $totaliobytes += $this->lastiobytes;
                 $count++;
             }
         }
+        $this->lastiobytes = $totaliobytes;
         return $count;
     }
 
@@ -542,14 +597,38 @@ class cachestore_file extends cache_store implements cache_is_key_aware, cache_i
      * @return boolean True on success. False otherwise.
      */
     public function purge() {
+        global $CFG;
         if ($this->isready) {
-            $files = glob($this->glob_keys_pattern(), GLOB_MARK | GLOB_NOSORT);
-            if (is_array($files)) {
-                foreach ($files as $filename) {
-                    @unlink($filename);
+            // If asyncpurge = true, create a new cache revision directory and adhoc task to delete old directory.
+            if ($this->asyncpurge && isset($this->definition)) {
+                $hash = preg_replace('#[^a-zA-Z0-9]+#', '_', $this->definition->get_id());
+                $filepath = $this->filestorepath . '/' . $hash;
+                $timestampfile = $filepath . '/.lastpurged';
+                if (file_exists($timestampfile)) {
+                    $oldcacherev = gmdate("YmdHis", filemtime($timestampfile));
+                    $oldcacherevpath = $filepath . '/' . $oldcacherev;
+                    // Delete old cache revision file.
+                    @unlink($timestampfile);
+
+                    // Create adhoc task to delete old cache revision folder.
+                    $purgeoldcacherev = new \cachestore_file\task\asyncpurge();
+                    $purgeoldcacherev->set_custom_data(['path' => $oldcacherevpath]);
+                    \core\task\manager::queue_adhoc_task($purgeoldcacherev);
                 }
+                touch($timestampfile, time());
+                @chmod($timestampfile, $CFG->filepermissions);
+                $newcacherev = gmdate("YmdHis", filemtime($timestampfile));
+                $filepath .= '/' . $newcacherev;
+                make_writable_directory($filepath, false);
+            } else {
+                $files = glob($this->glob_keys_pattern(), GLOB_MARK | GLOB_NOSORT);
+                if (is_array($files)) {
+                    foreach ($files as $filename) {
+                        @unlink($filename);
+                    }
+                }
+                $this->keys = [];
             }
-            $this->keys = array();
         }
         return true;
     }
@@ -591,6 +670,9 @@ class cachestore_file extends cache_store implements cache_is_key_aware, cache_i
         if (isset($data->prescan)) {
             $config['prescan'] = $data->prescan;
         }
+        if (isset($data->asyncpurge)) {
+            $config['asyncpurge'] = $data->asyncpurge;
+        }
 
         return $config;
     }
@@ -614,6 +696,9 @@ class cachestore_file extends cache_store implements cache_is_key_aware, cache_i
         }
         if (isset($config['prescan'])) {
             $data['prescan'] = (bool)$config['prescan'];
+        }
+        if (isset($config['asyncpurge'])) {
+            $data['asyncpurge'] = (bool)$config['asyncpurge'];
         }
         $editform->set_data($data);
     }
@@ -783,5 +868,58 @@ class cachestore_file extends cache_store implements cache_is_key_aware, cache_i
             $return[] = substr(basename($file), 0, -6);
         }
         return $return;
+    }
+
+    /**
+     * Gets total size for the directory used by the cache store.
+     *
+     * @return int Total size in bytes
+     */
+    public function store_total_size(): ?int {
+        return get_directory_size($this->filestorepath);
+    }
+
+    /**
+     * Gets total size for a specific cache.
+     *
+     * With the file cache we can just look at the directory listing without having to
+     * actually load any files, so the $samplekeys parameter is ignored.
+     *
+     * @param int $samplekeys Unused
+     * @return stdClass Cache details
+     */
+    public function cache_size_details(int $samplekeys = 50): stdClass {
+        $result = (object)[
+            'supported' => true,
+            'items' => 0,
+            'mean' => 0,
+            'sd' => 0,
+            'margin' => 0
+        ];
+
+        // Find all the files in this cache.
+        $this->ensure_path_exists();
+        $files = glob($this->glob_keys_pattern(), GLOB_MARK | GLOB_NOSORT);
+        if ($files === false || count($files) === 0) {
+            return $result;
+        }
+
+        // Get the sizes and count of files.
+        $sizes = [];
+        foreach ($files as $file) {
+            $result->items++;
+            $sizes[] = filesize($file);
+        }
+
+        // Work out mean and standard deviation.
+        $total = array_sum($sizes);
+        $result->mean = $total / $result->items;
+        $squarediff = 0;
+        foreach ($sizes as $size) {
+            $squarediff += ($size - $result->mean) ** 2;
+        }
+        $squarediff /= $result->items;
+        $result->sd = sqrt($squarediff);
+        return $result;
     }
 }

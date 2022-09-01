@@ -2,37 +2,31 @@
 ============
 Topic based course format with an individual 'toggle' for each topic except 0.
 
-If you find an issue with the format, please see the 'Reporting Issues' section below or contact your Moodle administrator.
-
 This file contains general information about the format.  If you're reading this as an educator then you can learn about the format
-from the documentation on http://docs.moodle.org/39/en/Collapsed_Topics_course_format.  If you get stuck and your Moodle support
+from the documentation on http://docs.moodle.org/400/en/Collapsed_Topics_course_format.  If you get stuck and your Moodle support
 are unable to help / not sure what to do, then please go to https://moodle.org/mod/forum/view.php?id=47.  If you like the format,
 then please do spread the word to other educators.  The main page for the format is https://moodle.org/plugins/format_topcoll.
 
 Required version of Moodle
 ==========================
-This version works with Moodle 3.11 version 2021051700.00 (Build: 20210517) and above within the 3.11 branch until the
+This version works with Moodle 4.0 version 2022041900.00 (Build: 20220419) and above within the MOODLE_400_STABLE branch until the
 next release.
 
 Please ensure that your hardware and software complies with 'Requirements' in 'Installing Moodle' on
-'docs.moodle.org/311/en/Installing_Moodle'
+'docs.moodle.org/40/en/Installing_Moodle'
 
 Downloads and documentation
 ===========================
 The primary source for downloading this branch of the format is https://moodle.org/plugins/view.php?plugin=format_topcoll
-with 'Select Moodle version:' set at 'Moodle 3.11'.
+with 'Select Moodle version:' set at 'Moodle 4.0'.
 
-The secondary source is a tagged version with the v3.11 prefix on https://github.com/gjb2048/moodle-format_topcoll/tags
+The secondary source is a tagged version with the v4.0 prefix on https://github.com/gjb2048/moodle-format_topcoll/tags
 
 If you download from the development area - https://github.com/gjb2048/moodle-format_topcoll/ - consider that
 the code is unstable and not for use in production environments.  This is because I develop the next version in stages
 and use GitHub as a means of backup.  Therefore the code is not finished, subject to alteration and requires testing.
 
-Documented on http://docs.moodle.org/311/en/Collapsed_Topics_course_format
-
-Bespoke changes
-===============
-Would you like a bespoke Collapsed Topics? Contact me via www.gjbarnard.co.uk/contact/ for a competitive quote.
+Documented on http://docs.moodle.org/400/en/Collapsed_Topics_course_format
 
 Free software
 =============
@@ -51,24 +45,7 @@ Moodle community benefits.
 
 Support
 =======
-Collapsed Topics comes with NO support.  If you would like support from me (Gareth) then I'm happy to provide it
-for a fee (please see my contact details below).  Otherwise, the 'Courses and course formats' forum:
-https://moodle.org/mod/forum/view.php?id=47 is an excellent place to ask questions.
-
-Sponsorships
-============
-Collapsed Topics is provided to you for free, and if you want to express your gratitude for using this format, please consider
-sponsoring by:
-
-PayPal - Please contact me via my 'Moodle profile' (above) for details as I am an individual and therefore am unable to have
-'buy me now' buttons under their terms.
-
-Sponsorships may allow me to provide you with more or better features in less time.
-
-Sponsors
-========
-Sponsorships gratefully received with thanks from:
-Emerogork: Central Connecticut State University, USA
+Please see Support.md.
 
 Installation
 ============
@@ -233,38 +210,17 @@ Known Issues
 
 Reporting Issues
 ================
-Before reporting an issue, please ensure that you are running the latest version for your release of Moodle.  The primary
-release area is located on https://moodle.org/plugins/view.php?plugin=format_topcoll.  It is also essential that you are
-operating the required version of Moodle as stated at the top - this is because the format relies on core functionality that
-is out of its control.
-
-All Collapsed Topics does is integrate with the course page and control it's layout, therefore what may appear to be an issue
-with the format is in fact to do with a theme or core component.  Please be confident that it is an issue with Collapsed Topics
-but if in doubt, ask.
-
-I operate a policy that we will fix all genuine issues for free (this only applies to the code as supplied from the sources listed
-in 'Downloads and documentation' above.  Any changes / improvements you make are not covered and invalidate this policy for all of
-the code).  Improvements are at my discretion.  I am happy to make bespoke customisations / improvements for a negotiated fee.  I
-will endeavour to respond to all requests for support as quickly as possible, if you require a faster service then offering payment
-for the service will expedite the response.
-
-When reporting an issue you can post in the course format's forum on Moodle.org (currently 'moodle.org/mod/forum/view.php?id=47'), 
-on Moodle tracker 'tracker.moodle.org' ensuring that you chose the 'Non-core contributed modules' and 'Course Format: Topcoll'
-for the component or contact me direct (details at the bottom).
-
-It is essential that you provide as much information as possible, the critical information being the contents of the format's 
-version.php file.  Other version information such as specific Moodle version, theme name and version also helps.  A screen shot
-can be really useful in visualising the issue along with any files you consider to be relevant.
+Please see Support.md.
 
 Version Information
 ===================
-See Changes.md.
+Please see Changes.md.
 
 Thanks
 ======
 I would like to thank Anthony Borrow - arborrow@jesuits.net & anthony@moodle.org - for his invaluable input.
 
-Craig Grannell of Snub Communications who wrote the article on Collapsed Tables in .Net Magazine Issue 186 from whom
+Craig Grannell of Snub Communications who wrote the article on Collapsed Tables in .Net Magazine Issue 186 March 2009 from whom
 the original code is based and concept used with his permission.
 
 For the persistence upgrade I would like to thank all those who contributed to the

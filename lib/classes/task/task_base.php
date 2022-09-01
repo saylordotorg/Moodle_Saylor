@@ -24,6 +24,9 @@
  */
 namespace core\task;
 
+use core_component;
+use core_plugin_manager;
+
 /**
  * Abstract class for common properties of scheduled_task and adhoc_task.
  *
@@ -229,5 +232,22 @@ abstract class task_base {
      */
     public function get_pid() {
         return $this->pid;
+    }
+
+    /**
+     * Informs whether the task's component is enabled.
+     * @return bool true when enabled. false otherwise.
+     */
+    public function is_component_enabled(): bool {
+        $component = $this->get_component();
+
+        // An entire core component type cannot be explicitly disabled.
+        [$componenttype] = core_component::normalize_component($component);
+        if ($componenttype === 'core') {
+            return true;
+        } else {
+            $plugininfo = core_plugin_manager::instance()->get_plugin_info($component);
+            return $plugininfo && $plugininfo->is_enabled();
+        }
     }
 }

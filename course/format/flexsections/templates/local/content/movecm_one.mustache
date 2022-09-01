@@ -1,0 +1,122 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template format_flexsections/local/content/movecm_one
+
+    Displays the course index.
+
+    Example context (json):
+        {
+            "title": "General",
+            "id": 42,
+            "number": 1,
+            "sectionurl": "#",
+            "hascms": true,
+            "cms": [
+                {
+                    "name": "Glossary of characters",
+                    "id": "10",
+                    "url": "#"
+                },
+                {
+                    "name": "World Cinema forum",
+                    "id": "11",
+                    "url": "#"
+                },
+                {
+                    "name": "Announcements",
+                    "id": "12",
+                    "url": "#"
+                }
+            ],
+            "testingonly-make-mustache-lint-happy": 1
+        }
+}}
+{{#testingonly-make-mustache-lint-happy}}
+<div class="collapse-list" id="destination-selector" role="tree">
+{{/testingonly-make-mustache-lint-happy}}
+
+<div data-for="sectionnode"
+     role="treeitem"
+>
+    <div class="collapse-list-item d-flex p-0"
+         id="movemodalsection{{number}}"
+         data-for="section_item"
+    >
+        <a data-toggle="collapse"
+           href="#movemodalcollapse{{number}}"
+           aria-expanded="{{#contentcollapsed}}false{{/contentcollapsed}}{{^contentcollapsed}}true{{/contentcollapsed}}"
+           aria-controls="movemodalcollapse{{number}}"
+           class="collapse-list-link icons-collapse-expand {{#contentcollapsed}}collapsed{{/contentcollapsed}}"
+        >
+                <span class="collapsed-icon icon-no-margin mr-1"
+                      data-toggle="tooltip" title="{{#str}} expand, core {{/str}}">
+                    {{#pix}} t/collapsed, core {{/pix}}
+                    <span class="sr-only">{{#str}} expand, core {{/str}}</span>
+                </span>
+            <span class="expanded-icon icon-no-margin mr-1"
+                  data-toggle="tooltip" title="{{#str}} collapse, core {{/str}}">
+                    {{#pix}} t/expanded, core {{/pix}}
+                <span class="sr-only">{{#str}} collapse, core {{/str}}</span>
+                </span>
+        </a>
+        {{{title}}}
+    </div>
+    <div id="movemodalcollapse{{number}}"
+         class="collapse-list-item-content collapse pl-3 {{^contentcollapsed}}show{{/contentcollapsed}}"
+         aria-labelledby="movemodalsection{{number}}"
+         role="group"
+    >
+        <ul class="unlist" data-for="cmlist" data-id="{{id}}">
+            {{#hascms}}
+                {{#cms}}
+                    <li role="treeitem">
+                        <a class="collapse-list-link text-truncate"
+                           href="#"
+                           data-for="cm"
+                           data-id="{{id}}"
+                        >
+                            {{#str}} movebeforecm, format_flexsections, {{{name}}} {{/str}}
+                        </a>
+                    </li>
+                {{/cms}}
+            {{/hascms}}
+            <li role="treeitem">
+                <a class="collapse-list-link text-truncate"
+                   href="#"
+                   data-for="section"
+                   data-id="{{id}}"
+                >
+                    {{#hascms}}
+                        {{#str}} movecmendofsection, format_flexsections, {{{title}}} {{/str}}
+                    {{/hascms}}
+                    {{^hascms}}
+                        {{#str}} movecmsection, format_flexsections, {{{title}}} {{/str}}
+                    {{/hascms}}
+                </a>
+            </li>
+            {{#children}}
+                {{> format_flexsections/local/content/movecm_one }}
+            {{/children}}
+        </ul>
+
+    </div>
+</div>
+
+{{#testingonly-make-mustache-lint-happy}}
+</div>
+{{/testingonly-make-mustache-lint-happy}}

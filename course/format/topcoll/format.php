@@ -61,6 +61,7 @@ $context = context_course::instance($course->id);
 // Retrieve course format option fields and add them to the $course object.
 $courseformat = course_get_format($course);
 $course = $courseformat->get_course();
+$courseformatoptions = $courseformat->get_settings();
 
 if (($marker >= 0) && has_capability('moodle/course:setcurrentsection', $context) && confirm_sesskey()) {
     $course->marker = $marker;
@@ -68,28 +69,26 @@ if (($marker >= 0) && has_capability('moodle/course:setcurrentsection', $context
 }
 
 // Make sure all sections are created.
-course_create_sections_if_missing($course, range(0, $course->numsections));
+course_create_sections_if_missing($course, range(0, $courseformatoptions['numsections']));
 
 $renderer = $PAGE->get_renderer('format_topcoll');
 
+$content = '';
+$contentcontext = array(
+    'title' => $courseformat->page_title(),
+    'userisediting' => $PAGE->user_is_editing()
+);
 if (!empty($displaysection)) {
-    $renderer->print_single_section_page($course, null, null, null, null, $displaysection);
+    $courseformat->set_section_number($displaysection);
+    $content = $renderer->single_section_page($displaysection);
+    $contentcontext['sectionreturn'] = $displaysection;
 } else {
-    $defaulttogglepersistence = clean_param(get_config('format_topcoll', 'defaulttogglepersistence'), PARAM_INT);
-
-    if ($defaulttogglepersistence == 1) {
-        user_preference_allow_ajax_update('topcoll_toggle_' . $course->id, PARAM_RAW);
-        $userpreference = get_user_preferences('topcoll_toggle_' . $course->id);
-    } else {
-        $userpreference = null;
-    }
-
-    $defaultuserpreference = clean_param(get_config('format_topcoll', 'defaultuserpreference'), PARAM_INT);
-
-    $renderer->set_user_preference($userpreference, $defaultuserpreference, $defaulttogglepersistence);
-
-    $renderer->print_multiple_section_page($course, null, null, null, null);
+    $content = $renderer->multiple_section_page();
 }
+
+$contentcontext['content'] = $content;
+
+echo $renderer->render_from_template('format_topcoll/content', $contentcontext);
 
 // Include course format js module.
 $PAGE->requires->js('/course/format/topcoll/format.js');

@@ -34,7 +34,8 @@ use core_table\local\filter\filter;
 use core_table\local\filter\integer_filter;
 use core_table\local\filter\string_filter;
 
-define('DEFAULT_PAGE_SIZE', 20);
+$participantsperpage = intval(get_config('moodlecourse', 'participantsperpage'));
+define('DEFAULT_PAGE_SIZE', (!empty($participantsperpage) ? $participantsperpage : 20));
 
 $page         = optional_param('page', 0, PARAM_INT); // Which page to show.
 $perpage      = optional_param('perpage', DEFAULT_PAGE_SIZE, PARAM_INT); // How many per page.
@@ -87,7 +88,7 @@ $bulkoperations = has_capability('moodle/course:bulkmessaging', $context);
 
 $PAGE->set_title("$course->shortname: ".get_string('participants'));
 $PAGE->set_heading($course->fullname);
-$PAGE->set_pagetype('course-view-' . $course->format);
+$PAGE->set_pagetype('course-view-participants');
 $PAGE->set_docs_path('enrol/users');
 $PAGE->add_body_class('path-user');                     // So we can style it independently.
 $PAGE->set_other_editing_capability('moodle/course:manageactivities');
@@ -100,12 +101,27 @@ if ($node) {
 }
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string('participants'));
+
+$participanttable = new \core_user\table\participants("user-index-participants-{$course->id}");
+
+// Manage enrolments.
+$manager = new course_enrolment_manager($PAGE, $course);
+$enrolbuttons = $manager->get_manual_enrol_buttons();
+$enrolrenderer = $PAGE->get_renderer('core_enrol');
+$enrolbuttonsout = '';
+foreach ($enrolbuttons as $enrolbutton) {
+    $enrolbuttonsout .= $enrolrenderer->render($enrolbutton);
+}
+
+echo $OUTPUT->render_participants_tertiary_nav($course, html_writer::div($enrolbuttonsout, '', [
+    'data-region' => 'wrapper',
+    'data-table-uniqueid' => $participanttable->uniqueid,
+]));
+
+echo $OUTPUT->heading(get_string('enrolledusers', 'enrol'));
 
 $filterset = new \core_user\table\participants_filterset();
 $filterset->add_filter(new integer_filter('courseid', filter::JOINTYPE_DEFAULT, [(int)$course->id]));
-
-$participanttable = new \core_user\table\participants("user-index-participants-{$course->id}");
 
 $canaccessallgroups = has_capability('moodle/site:accessallgroups', $context);
 $filtergroupids = $urlgroupid ? [$urlgroupid] : [];
@@ -154,20 +170,6 @@ if ($roleid) {
         $filterset->add_filter(new integer_filter('roles', filter::JOINTYPE_DEFAULT, [$roleid]));
     }
 }
-
-// Manage enrolments.
-$manager = new course_enrolment_manager($PAGE, $course);
-$enrolbuttons = $manager->get_manual_enrol_buttons();
-$enrolrenderer = $PAGE->get_renderer('core_enrol');
-$enrolbuttonsout = '';
-foreach ($enrolbuttons as $enrolbutton) {
-    $enrolbuttonsout .= $enrolrenderer->render($enrolbutton);
-}
-
-echo html_writer::div($enrolbuttonsout, 'd-flex justify-content-end', [
-    'data-region' => 'wrapper',
-    'data-table-uniqueid' => $participanttable->uniqueid,
-]);
 
 // Render the user filters.
 $userrenderer = $PAGE->get_renderer('core_user');
@@ -307,13 +309,5 @@ echo html_writer::div($enrolbuttonsout, 'd-flex justify-content-end', [
     'data-region' => 'wrapper',
     'data-table-uniqueid' => $participanttable->uniqueid,
 ]);
-
-if ($newcourse == 1) {
-    $str = get_string('proceedtocourse', 'enrol');
-    // The margin is to make it line up with the enrol users button when they are both on the same line.
-    $classes = 'my-1';
-    $url = course_get_url($course);
-    echo $OUTPUT->single_button($url, $str, 'GET', array('class' => $classes));
-}
 
 echo $OUTPUT->footer();

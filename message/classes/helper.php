@@ -270,18 +270,17 @@ class helper {
 
         // Get providers preferences.
         foreach ($providers as $provider) {
-            foreach (array('loggedin', 'loggedoff') as $state) {
-                $linepref = get_user_preferences('message_provider_' . $provider->component . '_' . $provider->name
-                    . '_' . $state, '', $userid);
-                if ($linepref == '') {
-                    continue;
-                }
-                $lineprefarray = explode(',', $linepref);
-                $preferences->{$provider->component.'_'.$provider->name.'_'.$state} = array();
-                foreach ($lineprefarray as $pref) {
-                    $preferences->{$provider->component.'_'.$provider->name.'_'.$state}[$pref] = 1;
-                }
+            $linepref = get_user_preferences('message_provider_' . $provider->component . '_' . $provider->name
+                . '_enabled', '', $userid);
+            if ($linepref == '') {
+                continue;
             }
+            $lineprefarray = explode(',', $linepref);
+            $preferences->{$provider->component.'_'.$provider->name.'_enabled'} = [];
+            foreach ($lineprefarray as $pref) {
+                $preferences->{$provider->component.'_'.$provider->name.'_enabled'}[$pref] = 1;
+            }
+
         }
 
         return $preferences;
@@ -551,10 +550,7 @@ class helper {
         global $USER, $CFG, $PAGE;
 
         // Early bail out conditions.
-        if (empty($CFG->messaging) || !isloggedin() || isguestuser() || user_not_fully_set_up($USER) ||
-            get_user_preferences('auth_forcepasswordchange') ||
-            (!$USER->policyagreed && !is_siteadmin() &&
-                ($manager = new \core_privacy\local\sitepolicy\manager()) && $manager->is_defined())) {
+        if (empty($CFG->messaging) || !isloggedin() || isguestuser() || \core_user::awaiting_action()) {
             return '';
         }
 

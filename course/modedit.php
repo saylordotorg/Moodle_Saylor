@@ -138,6 +138,8 @@ if (!empty($type)) { //TODO: hopefully will be removed in 2.0
 }
 $PAGE->set_pagetype($pagepath);
 $PAGE->set_pagelayout('admin');
+$PAGE->add_body_class('limitedwidth');
+
 
 $modmoodleform = "$CFG->dirroot/mod/$module->name/mod_form.php";
 if (file_exists($modmoodleform)) {
@@ -200,13 +202,14 @@ if ($mform->is_cancelled()) {
     if (isset($navbaraddition)) {
         $PAGE->navbar->add($navbaraddition);
     }
+    $PAGE->activityheader->disable();
 
     echo $OUTPUT->header();
 
     if (get_string_manager()->string_exists('modulename_help', $module->name)) {
-        echo $OUTPUT->heading_with_help($pageheading, 'modulename', $module->name, 'icon');
+        echo $OUTPUT->heading_with_help($pageheading, 'modulename', $module->name, 'monologo');
     } else {
-        echo $OUTPUT->heading_with_help($pageheading, '', $module->name, 'icon');
+        echo $OUTPUT->heading_with_help($pageheading, '', $module->name, 'monologo');
     }
 
     $mform->display();

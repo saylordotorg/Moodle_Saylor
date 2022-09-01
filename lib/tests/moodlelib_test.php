@@ -2743,7 +2743,8 @@ EOF;
         $modulebytes = 10240;
         $result = get_max_upload_sizes($sitebytes, $coursebytes, $modulebytes);
 
-        $this->assertSame('Activity upload limit (10KB)', $result['0']);
+        $nbsp = "\xc2\xa0";
+        $this->assertSame("Activity upload limit (10{$nbsp}KB)", $result['0']);
         $this->assertCount(2, $result);
 
         // Test course limit smallest.
@@ -2752,7 +2753,7 @@ EOF;
         $modulebytes = 51200;
         $result = get_max_upload_sizes($sitebytes, $coursebytes, $modulebytes);
 
-        $this->assertSame('Course upload limit (10KB)', $result['0']);
+        $this->assertSame("Course upload limit (10{$nbsp}KB)", $result['0']);
         $this->assertCount(2, $result);
 
         // Test site limit smallest.
@@ -2761,7 +2762,7 @@ EOF;
         $modulebytes = 51200;
         $result = get_max_upload_sizes($sitebytes, $coursebytes, $modulebytes);
 
-        $this->assertSame('Site upload limit (10KB)', $result['0']);
+        $this->assertSame("Site upload limit (10{$nbsp}KB)", $result['0']);
         $this->assertCount(2, $result);
 
         // Test site limit not set.
@@ -2770,7 +2771,7 @@ EOF;
         $modulebytes = 51200;
         $result = get_max_upload_sizes($sitebytes, $coursebytes, $modulebytes);
 
-        $this->assertSame('Activity upload limit (50KB)', $result['0']);
+        $this->assertSame("Activity upload limit (50{$nbsp}KB)", $result['0']);
         $this->assertCount(3, $result);
 
         $sitebytes = 0;
@@ -2778,7 +2779,7 @@ EOF;
         $modulebytes = 102400;
         $result = get_max_upload_sizes($sitebytes, $coursebytes, $modulebytes);
 
-        $this->assertSame('Course upload limit (50KB)', $result['0']);
+        $this->assertSame("Course upload limit (50{$nbsp}KB)", $result['0']);
         $this->assertCount(3, $result);
 
         // Test custom bytes in range.
@@ -2821,9 +2822,9 @@ EOF;
         $sitebytes = 51200;
         $result = get_max_upload_sizes($sitebytes);
 
-        $this->assertSame('Site upload limit (50KB)', $result['0']);
-        $this->assertSame('50KB', $result['51200']);
-        $this->assertSame('10KB', $result['10240']);
+        $this->assertSame("Site upload limit (50{$nbsp}KB)", $result['0']);
+        $this->assertSame("50{$nbsp}KB", $result['51200']);
+        $this->assertSame("10{$nbsp}KB", $result['10240']);
         $this->assertCount(3, $result);
 
         // Test no limit.
@@ -5026,25 +5027,25 @@ EOF;
     public function display_size_provider() {
 
         return [
-            [0,     '0 bytes'    ],
-            [1,     '1 bytes'    ],
-            [1023,  '1023 bytes' ],
-            [1024,      '1KB'    ],
-            [2222,      '2.2KB'  ],
-            [33333,     '32.6KB' ],
-            [444444,    '434KB'  ],
-            [5555555,       '5.3MB'  ],
-            [66666666,      '63.6MB' ],
-            [777777777,     '741.7MB'],
-            [8888888888,        '8.3GB'  ],
-            [99999999999,       '93.1GB' ],
-            [111111111111,      '103.5GB'],
-            [2222222222222,         '2TB'    ],
-            [33333333333333,        '30.3TB' ],
-            [444444444444444,       '404.2TB'],
-            [5555555555555555,          '4.9PB'  ],
-            [66666666666666666,         '59.2PB' ],
-            [777777777777777777,        '690.8PB'],
+            [0, '0 bytes'],
+            [1, '1 bytes'],
+            [1023, '1023 bytes'],
+            [1024, '1.0 KB'],
+            [2222, '2.2 KB'],
+            [33333, '32.6 KB'],
+            [444444, '434.0 KB'],
+            [5555555, '5.3 MB'],
+            [66666666, '63.6 MB'],
+            [777777777, '741.7 MB'],
+            [8888888888, '8.3 GB'],
+            [99999999999, '93.1 GB'],
+            [111111111111, '103.5 GB'],
+            [2222222222222, '2.0 TB'],
+            [33333333333333, '30.3 TB'],
+            [444444444444444, '404.2 TB'],
+            [5555555555555555, '4.9 PB'],
+            [66666666666666666, '59.2 PB'],
+            [777777777777777777, '690.8 PB'],
         ];
     }
 
@@ -5056,6 +5057,300 @@ EOF;
      */
     public function test_display_size($size, $expected) {
         $result = display_size($size);
+        $expected = str_replace(' ', "\xc2\xa0", $expected); // Should be non-breaking space.
         $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * Provider for display_size using fixed units.
+     *
+     * @return array of ($size, $units, $expected)
+     */
+    public function display_size_fixed_provider(): array {
+        return [
+            [0, 'KB', '0.0 KB'],
+            [1, 'MB', '0.0 MB'],
+            [777777777, 'GB', '0.7 GB'],
+            [8888888888, 'PB', '0.0 PB'],
+            [99999999999, 'TB', '0.1 TB'],
+            [99999999999, 'B', '99999999999 bytes'],
+        ];
+    }
+
+    /**
+     * Test display_size using fixed units.
+     *
+     * @dataProvider display_size_fixed_provider
+     * @param int $size Size in bytes
+     * @param string $units Fixed units
+     * @param string $expected Expected string.
+     */
+    public function test_display_size_fixed(int $size, string $units, string $expected): void {
+        $result = display_size($size, 1, $units);
+        $expected = str_replace(' ', "\xc2\xa0", $expected); // Should be non-breaking space.
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * Provider for display_size using specified decimal places.
+     *
+     * @return array of ($size, $decimalplaces, $units, $expected)
+     */
+    public function display_size_dp_provider(): array {
+        return [
+            [0, 1, 'KB', '0.0 KB'],
+            [1, 6, 'MB', '0.000001 MB'],
+            [777777777, 0, 'GB', '1 GB'],
+            [777777777, 0, '', '742 MB'],
+            [42, 6, '', '42 bytes'],
+        ];
+    }
+
+    /**
+     * Test display_size using specified decimal places.
+     *
+     * @dataProvider display_size_dp_provider
+     * @param int $size Size in bytes
+     * @param int $places Number of decimal places
+     * @param string $units Fixed units
+     * @param string $expected Expected string.
+     */
+    public function test_display_size_dp(int $size, int $places, string $units, string $expected): void {
+        $result = display_size($size, $places, $units);
+        $expected = str_replace(' ', "\xc2\xa0", $expected); // Should be non-breaking space.
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * Test that the get_list_of_plugins function includes/excludes directories as appropriate.
+     *
+     * @dataProvider get_list_of_plugins_provider
+     * @param   array $expectedlist The expected list of folders
+     * @param   array $content The list of file content to set up in the virtual file root
+     * @param   string $dir The base dir to look at in the virtual file root
+     * @param   string $exclude Any additional folder to exclude
+     */
+    public function test_get_list_of_plugins(array $expectedlist, array $content, string $dir, string $exclude): void {
+        $vfileroot = \org\bovigo\vfs\vfsStream::setup('root', null, $content);
+        $base = \org\bovigo\vfs\vfsStream::url('root');
+
+        $this->assertEquals($expectedlist, get_list_of_plugins($dir, $exclude, $base));
+    }
+
+    /**
+     * Data provider for get_list_of_plugins checks.
+     *
+     * @return  array
+     */
+    public function get_list_of_plugins_provider(): array {
+        return [
+            'Standard excludes' => [
+                ['amdd', 'class', 'local', 'test'],
+                [
+                    '.' => [],
+                    '..' => [],
+                    'amd' => [],
+                    'amdd' => [],
+                    'class' => [],
+                    'classes' => [],
+                    'local' => [],
+                    'test' => [],
+                    'tests' => [],
+                    'yui' => [],
+                ],
+                '',
+                '',
+            ],
+            'Standard excludes with addition' => [
+                ['amdd', 'local', 'test'],
+                [
+                    '.' => [],
+                    '..' => [],
+                    'amd' => [],
+                    'amdd' => [],
+                    'class' => [],
+                    'classes' => [],
+                    'local' => [],
+                    'test' => [],
+                    'tests' => [],
+                    'yui' => [],
+                ],
+                '',
+                'class',
+            ],
+            'Files excluded' => [
+                ['def'],
+                [
+                    '.' => [],
+                    '..' => [],
+                    'abc' => 'File with filename abc',
+                    'def' => [
+                        '.' => [],
+                        '..' => [],
+                        'example.txt' => 'In a directory called "def"',
+                    ],
+                ],
+                '',
+                '',
+            ],
+            'Subdirectories only' => [
+                ['abc'],
+                [
+                    '.' => [],
+                    '..' => [],
+                    'foo' => [
+                        '.' => [],
+                        '..' => [],
+                        'abc' => [],
+                    ],
+                    'bar' => [
+                        '.' => [],
+                        '..' => [],
+                        'def' => [],
+                    ],
+                ],
+                'foo',
+                '',
+            ],
+        ];
+    }
+
+    /**
+     * Test get_home_page() method.
+     *
+     * @dataProvider get_home_page_provider
+     * @param string $user Whether the user is logged, guest or not logged.
+     * @param int $expected Expected value after calling the get_home_page method.
+     * @param int $defaulthomepage The $CFG->defaulthomepage setting value.
+     * @param int $enabledashboard Whether the dashboard should be enabled or not.
+     * @param int $userpreference User preference for the home page setting.
+     * @covers ::get_home_page
+     */
+    public function test_get_home_page(string $user, int $expected, ?int $defaulthomepage = null, ?int $enabledashboard = null,
+            ?int $userpreference = null) {
+        global $CFG, $USER;
+
+        $this->resetAfterTest();
+
+        if ($user == 'guest') {
+            $this->setGuestUser();
+        } else if ($user == 'logged') {
+            $this->setUser($this->getDataGenerator()->create_user());
+        }
+
+        if (isset($defaulthomepage)) {
+            $CFG->defaulthomepage = $defaulthomepage;
+        }
+        if (isset($enabledashboard)) {
+            $CFG->enabledashboard = $enabledashboard;
+        }
+
+        if ($USER) {
+            set_user_preferences(['user_home_page_preference' => $userpreference], $USER->id);
+        }
+
+        $homepage = get_home_page();
+        $this->assertEquals($expected, $homepage);
+    }
+
+    /**
+     * Data provider for get_home_page checks.
+     *
+     * @return array
+     */
+    public function get_home_page_provider(): array {
+        return [
+            'No logged user' => [
+                'user' => 'nologged',
+                'expected' => HOMEPAGE_SITE,
+            ],
+            'Guest user' => [
+                'user' => 'guest',
+                'expected' => HOMEPAGE_SITE,
+            ],
+            'Logged user. Dashboard set as default home page and enabled' => [
+                'user' => 'logged',
+                'expected' => HOMEPAGE_MY,
+                'defaulthomepage' => HOMEPAGE_MY,
+                'enabledashboard' => 1,
+            ],
+            'Logged user. Dashboard set as default home page but disabled' => [
+                'user' => 'logged',
+                'expected' => HOMEPAGE_MYCOURSES,
+                'defaulthomepage' => HOMEPAGE_MY,
+                'enabledashboard' => 0,
+            ],
+            'Logged user. My courses set as default home page with dashboard enabled' => [
+                'user' => 'logged',
+                'expected' => HOMEPAGE_MYCOURSES,
+                'defaulthomepage' => HOMEPAGE_MYCOURSES,
+                'enabledashboard' => 1,
+            ],
+            'Logged user. My courses set as default home page with dashboard disabled' => [
+                'user' => 'logged',
+                'expected' => HOMEPAGE_MYCOURSES,
+                'defaulthomepage' => HOMEPAGE_MYCOURSES,
+                'enabledashboard' => 0,
+            ],
+            'Logged user. Site set as default home page with dashboard enabled' => [
+                'user' => 'logged',
+                'expected' => HOMEPAGE_SITE,
+                'defaulthomepage' => HOMEPAGE_SITE,
+                'enabledashboard' => 1,
+            ],
+            'Logged user. Site set as default home page with dashboard disabled' => [
+                'user' => 'logged',
+                'expected' => HOMEPAGE_SITE,
+                'defaulthomepage' => HOMEPAGE_SITE,
+                'enabledashboard' => 0,
+            ],
+            'Logged user. User preference set as default page with dashboard enabled and user preference set to dashboard' => [
+                'user' => 'logged',
+                'expected' => HOMEPAGE_MY,
+                'defaulthomepage' => HOMEPAGE_USER,
+                'enabledashboard' => 1,
+                'userpreference' => HOMEPAGE_MY,
+            ],
+            'Logged user. User preference set as default page with dashboard disabled and user preference set to dashboard' => [
+                'user' => 'logged',
+                'expected' => HOMEPAGE_MYCOURSES,
+                'defaulthomepage' => HOMEPAGE_USER,
+                'enabledashboard' => 0,
+                'userpreference' => HOMEPAGE_MY,
+            ],
+            'Logged user. User preference set as default page with dashboard enabled and user preference set to my courses' => [
+                'user' => 'logged',
+                'expected' => HOMEPAGE_MYCOURSES,
+                'defaulthomepage' => HOMEPAGE_USER,
+                'enabledashboard' => 1,
+                'userpreference' => HOMEPAGE_MYCOURSES,
+            ],
+            'Logged user. User preference set as default page with dashboard disabled and user preference set to my courses' => [
+                'user' => 'logged',
+                'expected' => HOMEPAGE_MYCOURSES,
+                'defaulthomepage' => HOMEPAGE_USER,
+                'enabledashboard' => 0,
+                'userpreference' => HOMEPAGE_MYCOURSES,
+            ],
+        ];
+    }
+
+    /**
+     * Test get_default_home_page() method.
+     *
+     * @covers ::get_default_home_page
+     */
+    public function test_get_default_home_page() {
+        global $CFG;
+
+        $this->resetAfterTest();
+
+        $CFG->enabledashboard = 1;
+        $default = get_default_home_page();
+        $this->assertEquals(HOMEPAGE_MY, $default);
+
+        $CFG->enabledashboard = 0;
+        $default = get_default_home_page();
+        $this->assertEquals(HOMEPAGE_MYCOURSES, $default);
     }
 }

@@ -76,7 +76,7 @@ Feature: Attempt a quiz
       | Section 3 | 5         | 1       |
 
     When I am on the "Quiz 2" "mod_quiz > View" page logged in as "student"
-    And I press "Attempt quiz now"
+    And I press "Attempt quiz"
 
     Then I should see "Section 1" in the "Quiz navigation" "block"
     And I should see question "1" in section "Section 1" in the quiz navigation
@@ -130,7 +130,7 @@ Feature: Attempt a quiz
       | TF1      | 1    |
       | TF2      | 2    |
     When I am on the "Quiz 1" "mod_quiz > View" page logged in as "student"
-    And I press "Attempt quiz now"
+    And I press "Attempt quiz"
     Then I should see "Text of the first question"
     And I should not see "Text of the second question"
     And I press "Next page"

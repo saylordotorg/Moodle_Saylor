@@ -4,20 +4,20 @@ A topics based format that uses a grid of user selectable images to pop up a lig
 
 Required version of Moodle
 ==========================
-This version works with Moodle 3.11 version 2021051700.00 (Build: 20210517) and above within the 3.11 branch until the
+This version works with Moodle 4.0 version 2022041900.00 (Build: 20220419) and above within the MOODLE_400_STABLE branch until the
 next release.
 
 Please ensure that your hardware and software complies with 'Requirements' in 'Installing Moodle' on
-'docs.moodle.org/311/en/Installing_Moodle'
+'docs.moodle.org/40/en/Installing_Moodle'
 
 Free software
 =============
 The Grid format is 'free' software under the terms of the GNU GPLv3 License, please see 'COPYING.txt'.
 
 The primary source for downloading this branch of the format is https://moodle.org/plugins/view.php?plugin=format_grid
-with 'Select Moodle version:' set at 'Moodle 3.11'.
+with 'Select Moodle version:' set at 'Moodle 4.0'.
 
-The secondary source is a tagged version with the v3.11 prefix on https://github.com/gjb2048/moodle-format_grid/tags
+The secondary source is a tagged version with the v4.0 prefix on https://github.com/gjb2048/moodle-format_grid/tags
 
 If you download from the development area - https://github.com/gjb2048/moodle-format_grid - consider that
 the code is unstable and not for use in production environments.  This is because I develop the next version in stages
@@ -104,26 +104,9 @@ Usage
 
 Viewing
 -------
-Click on a grid icon or use 'esc' to open the current selected icon which will then display the shade box containing the section
-content.  Click on the 'X' or use 'esc' to close.
-
-Use the 'left' / 'right' cursor keys to select the previous / next section when the shade box is and is not displayed.
-
-Use the 'left' / 'right' arrows that appear when hovering over the middle of the border when the shade box is shown to navigate to
-the previous / next section.
-
-When the 'Course layout' course setting are set to 'Show all sections on one page' the shade box will operate.  When set to
-'Show one section per page' the shade box will not show but instead the icons will act like links as they do with the
-'Topics' format and take you to a single section page.
 
 Editing
 -------
-Use the 'Change image' link underneath each icon to change the icon's image.
-
-Edit the sections underneath the icons in the normal way.  Note: Some things like current section colour will not update until page
-refresh.
-
-The shade box is not shown in this mode.
 
 Accessibility
 -------------
@@ -135,31 +118,6 @@ https://docs.moodle.org/en/User_profile_fields
 and:
 
 https://github.com/gjb2048/moodle-format_grid/issues/23
-
-Making changes
-==============
-
-Changing the keyboard control code
-----------------------------------
-To change the 'gridkeys.js' code then you'll firstly need to read: http://docs.moodle.org/dev/YUI/Shifter
-it is used to build the source in '/yui/src/gridkeys/js/gridkeys.js' and bring in the 'gallery-event-nav-keys' to build
-the YUI module into 'yui/build/moodle-format_grid-gridkeys' and place a back port minified version in '/yui/gridkeys' for
-use in Moodle 2.3 and 2.4 versions - so even if you have those versions you will need this Moodle 2.5 version to
-make changes.  The compiled YUI module is then loaded in all versions (2.3, 2.4 and 2.5) in 'renderer.php' by the line:
-$PAGE->requires->yui_module('moodle-format_grid-gridkeys', 'M.format_grid.gridkeys.init', null, null, true);
-So even though the location is different for M2.3 / M2.4 than M2.5 it's the same - that's a M2.5+ thing.  There is no
-rocket science to using / learning Shifter, I did so late on a Saturday night whilst half asleep - admittedly with Andrew's
-on-line assistance.
-
-Current selected colour
------------------------
-Edit 'styles.css', change the value in the '.course-content ul.gridicons li.currentselected' selector and perform a 'Purge all caches'
-or override in your theme.
-
-Current section
----------------
-Edit 'styles.css', change the value in the '.course-content ul.gridicons li.current' selector and perform a 'Purge all caches' or
-override in your theme.
 
 File information
 ================

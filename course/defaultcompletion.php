@@ -51,7 +51,7 @@ if ($id) {
 // Set up the page.
 navigation_node::override_active_url(new moodle_url('/course/completion.php', array('id' => $course->id)));
 $PAGE->set_course($course);
-$PAGE->set_url('/course/bulkcompletion.php', array('id' => $course->id));
+$PAGE->set_url('/course/defaultcompletion.php', array('id' => $course->id));
 $PAGE->set_title($course->shortname);
 $PAGE->set_heading($course->fullname);
 $PAGE->set_pagelayout('admin');
@@ -64,17 +64,13 @@ $renderer = $PAGE->get_renderer('core_course', 'bulk_activity_completion');
 
 // Print the form.
 echo $OUTPUT->header();
+
+$actionbar = new \core_course\output\completion_action_bar($course->id, $PAGE->url);
+echo $renderer->render_course_completion_action_bar($actionbar);
+
 echo $OUTPUT->heading(get_string('defaultcompletion', 'completion'));
 
-echo $renderer->navigation($course, 'defaultcompletion');
-
-$PAGE->requires->yui_module('moodle-core-formchangechecker',
-        'M.core_formchangechecker.init',
-        array(array(
-            'formid' => 'theform'
-        ))
-);
-$PAGE->requires->string_for_js('changesmadereallygoaway', 'moodle');
+$PAGE->requires->js_call_amd('core_form/changechecker', 'watchFormById', ['theform']);
 
 echo $renderer->defaultcompletion($activityresourcedata);
 

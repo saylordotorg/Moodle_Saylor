@@ -86,6 +86,7 @@ class behat_partial_named_selector extends \Behat\Mink\Selector\PartialNamedSele
      */
     protected static $allowedselectors = array(
         'activity' => 'activity',
+        'badge' => 'badge',
         'block' => 'block',
         'button' => 'button',
         'checkbox' => 'checkbox',
@@ -107,6 +108,7 @@ class behat_partial_named_selector extends \Behat\Mink\Selector\PartialNamedSele
         'link' => 'link',
         'link_or_button' => 'link_or_button',
         'list_item' => 'list_item',
+        'menuitem' => 'menuitem',
         'optgroup' => 'optgroup',
         'option' => 'option',
         'question' => 'question',
@@ -136,6 +138,9 @@ class behat_partial_named_selector extends \Behat\Mink\Selector\PartialNamedSele
     protected static $moodleselectors = array(
         'activity' => <<<XPATH
 .//li[contains(concat(' ', normalize-space(@class), ' '), ' activity ')][descendant::*[contains(normalize-space(.), %locator%)]]
+XPATH
+        , 'badge' => <<<XPATH
+.//span[(contains(@class, 'badge')) and text()[contains(., %locator%)]]
 XPATH
         , 'block' => <<<XPATH
 .//*[@data-block][contains(concat(' ', normalize-space(@class), ' '), concat(' ', %locator%, ' ')) or
@@ -197,6 +202,9 @@ XPATH
 XPATH
         , 'list_item' => <<<XPATH
 .//li[contains(normalize-space(.), %locator%) and not(.//li[contains(normalize-space(.), %locator%)])]
+XPATH
+        , 'menuitem' => <<<XPATH
+.//*[@role='menuitem'][%titleMatch% or %ariaLabelMatch% or text()[contains(., %locator%)]]
 XPATH
         , 'question' => <<<XPATH
 .//div[contains(concat(' ', normalize-space(@class), ' '), ' que ')]

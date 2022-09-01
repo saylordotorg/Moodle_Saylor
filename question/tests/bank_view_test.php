@@ -49,7 +49,7 @@ class core_question_bank_view_testcase extends advanced_testcase {
         $context = context_course::instance($course->id);
 
         // Create a question in the default category.
-        $contexts = new question_edit_contexts($context);
+        $contexts = new core_question\local\bank\question_edit_contexts($context);
         $cat = question_make_default_categories($contexts->all());
         $questiondata = $questiongenerator->create_question('numerical', null,
                 ['name' => 'Example question', 'category' => $cat->id]);
@@ -59,9 +59,18 @@ class core_question_bank_view_testcase extends advanced_testcase {
         $cache->delete($questiondata->id);
 
         // Generate the view.
-        $view = new core_question\bank\view($contexts, new moodle_url('/'), $course);
+        $view = new core_question\local\bank\view($contexts, new moodle_url('/'), $course);
         ob_start();
-        $view->display('editq', 0, 20, $cat->id . ',' . $context->id, false, false, false);
+        $pagevars = [
+            'qpage' => 0,
+            'qperpage' => 20,
+            'cat' => $cat->id . ',' . $context->id,
+            'recurse' => false,
+            'showhidden' => false,
+            'qbshowtext' => false
+
+        ];
+        $view->display($pagevars, 'editq');
         $html = ob_get_clean();
 
         // Verify the output includes the expected question.
@@ -84,16 +93,25 @@ class core_question_bank_view_testcase extends advanced_testcase {
         $context = context_course::instance($course->id);
 
         // Create a question in the default category.
-        $contexts = new question_edit_contexts($context);
+        $contexts = new core_question\local\bank\question_edit_contexts($context);
         $cat = question_make_default_categories($contexts->all());
         $questiondata = $questiongenerator->create_question('numerical', null,
                 ['name' => 'Example question', 'category' => $cat->id]);
         $DB->set_field('question', 'qtype', 'unknownqtype', ['id' => $questiondata->id]);
 
         // Generate the view.
-        $view = new core_question\bank\view($contexts, new moodle_url('/'), $course);
+        $view = new core_question\local\bank\view($contexts, new moodle_url('/'), $course);
         ob_start();
-        $view->display('editq', 0, 20, $cat->id . ',' . $context->id, false, false, false);
+        $pagevars = [
+            'qpage' => 0,
+            'qperpage' => 20,
+            'cat' => $cat->id . ',' . $context->id,
+            'recurse' => false,
+            'showhidden' => false,
+            'qbshowtext' => false
+
+        ];
+        $view->display($pagevars, 'editq');
         $html = ob_get_clean();
 
         // Mainly we are verifying that there was no fatal error.

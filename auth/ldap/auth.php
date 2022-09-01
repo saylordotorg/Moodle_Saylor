@@ -902,6 +902,7 @@ class auth_plugin_ldap extends auth_plugin_base {
 
         if (!empty($add_users)) {
             print_string('userentriestoadd', 'auth_ldap', count($add_users));
+            $errors = 0;
 
             $transaction = $DB->start_delegated_transaction();
             foreach ($add_users as $user) {
@@ -926,7 +927,14 @@ class auth_plugin_ldap extends auth_plugin_base {
                     $user->calendartype = $CFG->calendartype;
                 }
 
-                $id = user_create_user($user, false);
+                // $id = user_create_user($user, false);
+                try {
+                    $id = user_create_user($user, false);
+                } catch (Exception $e) {
+                    print_string('invaliduserexception', 'auth_ldap', print_r($user, true) .  $e->getMessage());
+                    $errors++;
+                    continue;
+                }
                 echo "\t"; print_string('auth_dbinsertuser', 'auth_db', array('name'=>$user->username, 'id'=>$id)); echo "\n";
                 $euser = $DB->get_record('user', array('id' => $id));
 
@@ -941,6 +949,12 @@ class auth_plugin_ldap extends auth_plugin_base {
                 $this->sync_roles($euser);
 
             }
+
+            // Display number of user creation errors, if any.
+            if ($errors) {
+                print_string('invalidusererrors', 'auth_ldap', $errors);
+            }
+
             $transaction->allow_commit();
             unset($add_users); // free mem
         } else {

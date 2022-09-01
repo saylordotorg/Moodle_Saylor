@@ -66,6 +66,9 @@ if ($overrideid) {
 
 $PAGE->set_url($url);
 
+// Activate the secondary nav tab.
+$PAGE->set_secondary_active_tab("mod_quiz_useroverrides");
+
 require_login($course, false, $cm);
 
 $context = context_module::instance($cm->id);
@@ -236,10 +239,15 @@ if ($mform->is_cancelled()) {
 $pagetitle = get_string('editoverride', 'quiz');
 $PAGE->navbar->add($pagetitle);
 $PAGE->set_pagelayout('admin');
+$PAGE->add_body_class('limitedwidth');
 $PAGE->set_title($pagetitle);
 $PAGE->set_heading($course->fullname);
+$PAGE->activityheader->set_attrs([
+    "title" => format_string($quiz->name, true, array('context' => $context)),
+    "description" => "",
+    "hidecompletion" => true
+]);
 echo $OUTPUT->header();
-echo $OUTPUT->heading(format_string($quiz->name, true, array('context' => $context)));
 
 $mform->display();
 

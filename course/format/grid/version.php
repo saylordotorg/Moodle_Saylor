@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Grid Format - A topics based format that uses a grid of user selectable images to popup a light box of the section.
+ * Grid Format.
  *
  * @package    format_grid
  * @version    See the value of '$plugin->version' in below.
@@ -29,19 +29,19 @@
 defined('MOODLE_INTERNAL') || die();
 
 // Plugin version.
-$plugin->version = 2021102702;
+$plugin->version = 2022072202;
 
 // Required Moodle version.
-$plugin->requires  = 2021051700.00; // 3.11 (Build: 20210517).
+$plugin->requires  = 2022041900.00; // This is Moodle 4.0 (Build: 20220419).
 
 // Supported Moodle version.
-$plugin->supported = array(311, 311);
+$plugin->supported = array(400, 400);
 
 // Full name of the plugin.
 $plugin->component = 'format_grid';
 
 // Software maturity level.
-$plugin->maturity = MATURITY_STABLE;
+$plugin->maturity = MATURITY_RC;
 
 // User-friendly version number.
-$plugin->release = '3.11.1.2';
+$plugin->release = '4.0.0.3';

@@ -45,6 +45,9 @@ class condition_test extends \advanced_testcase {
 
     /**
      * Tests constructing and using condition.
+     *
+     * @covers \availability_role\condition::is_available()
+     * @covers \availability_role\condition::get_description()
      */
     public function test_usage() {
         global $CFG, $USER, $DB;
@@ -76,6 +79,8 @@ class condition_test extends \advanced_testcase {
 
     /**
      * Tests the save() function.
+     *
+     * @covers \availability_role\condition::save()
      */
     public function test_save() {
         $structure = (object)array('id' => 123);

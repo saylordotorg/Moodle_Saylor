@@ -131,9 +131,12 @@ class mod_quiz_external extends external_api {
                                                     'reviewspecificfeedback', 'reviewgeneralfeedback', 'reviewrightanswer',
                                                     'reviewoverallfeedback', 'questionsperpage', 'navmethod',
                                                     'browsersecurity', 'delay1', 'delay2', 'showuserpicture', 'showblocks',
-                                                    'completionattemptsexhausted', 'completionpass', 'overduehandling',
+                                                    'completionattemptsexhausted', 'overduehandling',
                                                     'graceperiod', 'canredoquestions', 'allowofflineattempts');
                         $viewablefields = array_merge($viewablefields, $additionalfields);
+
+                        // Any course module fields that previously existed in quiz.
+                        $quizdetails['completionpass'] = $quizobj->get_cm()->completionpassgrade;
                     }
 
                     // Fields only for managers.
@@ -463,6 +466,8 @@ class mod_quiz_external extends external_api {
                 'timecheckstate' => new external_value(PARAM_INT, 'Next time quiz cron should check attempt for
                                                         state changes.  NULL means never check.', VALUE_OPTIONAL),
                 'sumgrades' => new external_value(PARAM_FLOAT, 'Total marks for this attempt.', VALUE_OPTIONAL),
+                'gradednotificationsenttime' => new external_value(PARAM_INT,
+                    'Time when the student was notified that manual grading of their attempt was complete.', VALUE_OPTIONAL),
             )
         );
     }

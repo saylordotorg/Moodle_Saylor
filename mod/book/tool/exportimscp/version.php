@@ -25,5 +25,5 @@
 defined('MOODLE_INTERNAL') || die;
 
 $plugin->component = 'booktool_exportimscp'; // Full name of the plugin (used for diagnostics)
-$plugin->version   = 2021051700; // The current plugin version (Date: YYYYMMDDXX).
-$plugin->requires  = 2021051100; // Requires this Moodle version.
+$plugin->version   = 2022041900; // The current plugin version (Date: YYYYMMDDXX).
+$plugin->requires  = 2022041200; // Requires this Moodle version.

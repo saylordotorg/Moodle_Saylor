@@ -96,7 +96,7 @@ if ($overrideid) {
 }
 
 // Merge assign defaults with data.
-$keys = array('duedate', 'cutoffdate', 'allowsubmissionsfromdate');
+$keys = array('duedate', 'cutoffdate', 'allowsubmissionsfromdate', 'timelimit');
 foreach ($keys as $key) {
     if (!isset($data->{$key}) || $reset) {
         $data->{$key} = $assigninstance->{$key};
@@ -255,10 +255,17 @@ if ($mform->is_cancelled()) {
 // Print the form.
 $PAGE->navbar->add($pagetitle);
 $PAGE->set_pagelayout('admin');
+$PAGE->add_body_class('limitedwidth');
 $PAGE->set_title($pagetitle);
 $PAGE->set_heading($course->fullname);
+$PAGE->set_secondary_active_tab('mod_assign_useroverrides');
+$activityheader = $PAGE->activityheader;
+$activityheader->set_attrs([
+    'description' => '',
+    'hidecompletion' => true,
+    'title' => $activityheader->is_title_allowed() ? format_string($assigninstance->name, true, ['context' => $context]) : ""
+]);
 echo $OUTPUT->header();
-echo $OUTPUT->heading(format_string($assigninstance->name, true, array('context' => $context)));
 
 $mform->display();
 

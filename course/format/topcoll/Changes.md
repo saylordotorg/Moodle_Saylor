@@ -1,11 +1,35 @@
 ﻿Version Information
 ===================
 
-Version 3.11.1.0 - 12/05/22
+Version 4.0.1.2 - TBR
+--------------------------
+ 1. Fix 'Indentation changes do not show until page refresh' - related to #126.
+
+Version 4.0.1.1 - 18/07/22
+--------------------------
+  1. Fix 'Moodle 4.0: Reactive state/course index not updating on section renaming' - #121, a big thanks to [PhMemmel](https://github.com/PhMemmel)
+     for the patch in #122.
+
+Version 4.0.1.0 - 17/04/22
+--------------------------
+  1. Fix 'Indentation not working in moodle 4.0' - #120.
+
+Version 4.0.0.1 - 10/04/22
 -----------------------------
-  1. Fix 'Error during course creation if defaultdisplayblocks is empty' - CONTRIB-8824.
-  2. Fix 'Mark as done completion box displaying above label activity in Collapsed topics when editing is turned off' - CONTRIB-8818.
-  3. Fix 'Broken ARIA controls name'.
+  1. Refactor - Moodle 4.0 version to cope with course format API changes.
+  2. Fix 'Error during course creation if defaultdisplayblocks is empty' - CONTRIB-8824.
+  3. Add the ability to specify icon font classes for the close and open toggle icons.
+  4. Add the ability to specify icon font classes for the one section link.
+  5. Implications of MDL-73679.
+  6. Implications of MDL-73683.
+  7. Implications of MDL-73679.
+  8. Add 'Dynamic' option to 'Column orientation' setting.
+
+**Important!**
+To support drag and drop editing, the sections will be shown in order in one column regardless of the number of columns setting.
+This is because of the complexities of the functionality, please do not report it as a bug.
+
+Note: Content -> Section -> Section Content -> CMList -> CMItem -> CM -> Activity.  CT Wraps at CMList level.
 
 Version 3.11.0.5 - 15/11/21
 -----------------------------
@@ -54,7 +78,7 @@ Version 3.11.0.1 - 02/07/2021
   1. Fix 'PHP Notice:  Trying to access array offset on value of type null' when accessing a single section page on PHP 7.4.
   2. Reset language improvements in line with global default tracking as implemented in 3.10.0.2.
   3. Improved backup restore with numsections.
-  4. Added 'Toggle blocks location' functionality, thanks to John Joubert (https://github.com/John-Joubert) for the patch - #100.
+  4. Added 'Toggle blocks location' functionality, thanks to [John Joubert](https://github.com/John-Joubert) for the patch - #100.
   5. Fix 'Deprecation warning for 3.11' - #99.
   6. Fix 'Section content is in a column when using horizontal columns on a single section page'.
   7. Fix 'Column orientation combo box strings'.

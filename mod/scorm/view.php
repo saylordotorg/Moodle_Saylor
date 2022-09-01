@@ -136,15 +136,14 @@ if (empty($preventskip) && empty($launch) && (has_capability('mod/scorm:skipview
 
 $PAGE->set_title($pagetitle);
 $PAGE->set_heading($course->fullname);
+// Let the module handle the display.
+if (!empty($action) && $action == 'delete' && confirm_sesskey() && has_capability('mod/scorm:deleteownresponses', $contextmodule)) {
+    $PAGE->activityheader->disable();
+} else {
+    $PAGE->activityheader->set_description('');
+}
+
 echo $OUTPUT->header();
-echo $OUTPUT->heading(format_string($scorm->name));
-
-// Display any activity information (eg completion requirements / dates).
-$cminfo = cm_info::create($cm);
-$completiondetails = \core_completion\cm_completion_details::get_instance($cminfo, $USER->id);
-$activitydates = \core\activity_dates::get_dates_for_module($cminfo, $USER->id);
-echo $OUTPUT->activity_information($cminfo, $completiondetails, $activitydates);
-
 if (!empty($action) && confirm_sesskey() && has_capability('mod/scorm:deleteownresponses', $contextmodule)) {
     if ($action == 'delete') {
         $confirmurl = new moodle_url($PAGE->url, array('action' => 'deleteconfirm'));
@@ -159,16 +158,13 @@ if (!empty($action) && confirm_sesskey() && has_capability('mod/scorm:deleteownr
     }
 }
 
-$currenttab = 'info';
-require($CFG->dirroot . '/mod/scorm/tabs.php');
-
 // Print the main part of the page.
 $attemptstatus = '';
 if (empty($launch) && ($scorm->displayattemptstatus == SCORM_DISPLAY_ATTEMPTSTATUS_ALL ||
          $scorm->displayattemptstatus == SCORM_DISPLAY_ATTEMPTSTATUS_ENTRY)) {
     $attemptstatus = scorm_get_attempt_status($USER, $scorm, $cm);
 }
-echo $OUTPUT->box(format_module_intro('scorm', $scorm, $cm->id).$attemptstatus, 'container', 'intro');
+echo $OUTPUT->box(format_module_intro('scorm', $scorm, $cm->id), '', 'intro');
 
 // Check if SCORM available. No need to display warnings because activity dates are displayed at the top of the page.
 list($available, $warnings) = scorm_get_availability_status($scorm);
@@ -176,8 +172,11 @@ list($available, $warnings) = scorm_get_availability_status($scorm);
 if ($available && empty($launch)) {
     scorm_print_launch($USER, $scorm, 'view.php?id='.$cm->id, $cm);
 }
+
+echo $OUTPUT->box($attemptstatus);
+
 if (!empty($forcejs)) {
-    $message = $OUTPUT->box(get_string("forcejavascriptmessage", "scorm"), "container forcejavascriptmessage");
+    $message = $OUTPUT->box(get_string("forcejavascriptmessage", "scorm"), "forcejavascriptmessage");
     echo html_writer::tag('noscript', $message);
 }
 

@@ -398,6 +398,103 @@ class completionlib_test extends advanced_testcase {
     }
 
     /**
+     * Provider for the test_internal_get_state_with_grade_criteria.
+     *
+     * @return array
+     * @covers ::internal_get_state
+     */
+    public function test_internal_get_state_with_grade_criteria_provider() {
+        return [
+            "Passing grade enabled and achieve. State should be COMPLETION_COMPLETE_PASS" => [
+                [
+                    'completionusegrade' => 1,
+                    'completionpassgrade' => 1,
+                    'gradepass' => 50,
+                ],
+                50,
+                COMPLETION_COMPLETE_PASS
+            ],
+            "Passing grade enabled and not achieve. State should be COMPLETION_COMPLETE_FAIL" => [
+                [
+                    'completionusegrade' => 1,
+                    'completionpassgrade' => 1,
+                    'gradepass' => 50,
+                ],
+                40,
+                COMPLETION_COMPLETE_FAIL
+            ],
+            "Passing grade not enabled with passing grade set." => [
+                [
+                    'completionusegrade' => 1,
+                    'gradepass' => 50,
+                ],
+                50,
+                COMPLETION_COMPLETE_PASS
+            ],
+            "Passing grade not enabled with passing grade not set." => [
+                [
+                    'completionusegrade' => 1,
+                ],
+                90,
+                COMPLETION_COMPLETE
+            ],
+            "Passing grade not enabled with passing grade not set. No submission made." => [
+                [
+                    'completionusegrade' => 1,
+                ],
+                null,
+                COMPLETION_INCOMPLETE
+            ],
+        ];
+    }
+
+    /**
+     * Tests that the right completion state is being set based on the grade criteria.
+     *
+     * @dataProvider test_internal_get_state_with_grade_criteria_provider
+     * @param array $completioncriteria The completion criteria to use
+     * @param int|null $studentgrade Grade to assign to student
+     * @param int $expectedstate Expected completion state
+     * @covers ::internal_get_state
+     */
+    public function test_internal_get_state_with_grade_criteria(array $completioncriteria, ?int $studentgrade, int $expectedstate) {
+        $this->setup_data();
+
+        /** @var \mod_assign_generator $assigngenerator */
+        $assigngenerator = $this->getDataGenerator()->get_plugin_generator('mod_assign');
+        $assign = $assigngenerator->create_instance([
+            'course' => $this->course->id,
+            'completion' => COMPLETION_ENABLED,
+        ] + $completioncriteria);
+
+        $userid = $this->user->id;
+
+        $cm = get_coursemodule_from_instance('assign', $assign->id);
+        $usercm = cm_info::create($cm, $userid);
+
+        // Create a teacher account.
+        $teacher = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($teacher->id, $this->course->id, 'editingteacher');
+        // Log in as the teacher.
+        $this->setUser($teacher);
+
+        // Grade the student for this assignment.
+        $assign = new assign($usercm->context, $cm, $cm->course);
+        if ($studentgrade) {
+            $data = (object)[
+                'sendstudentnotifications' => false,
+                'attemptnumber' => 1,
+                'grade' => $studentgrade,
+            ];
+            $assign->save_grade($userid, $data);
+        }
+
+        // The target user already received a grade, so internal_get_state should be already complete.
+        $completioninfo = new completion_info($this->course);
+        $this->assertEquals($expectedstate, $completioninfo->internal_get_state($cm, $userid, null));
+    }
+
+    /**
      * Covers the case where internal_get_state() is being called for a user different from the logged in user.
      *
      * @covers ::internal_get_state
@@ -810,6 +907,7 @@ class completionlib_test extends advanced_testcase {
             'completion' => COMPLETION_TRACKING_AUTOMATIC,
             // Submission grade required.
             'completiongradeitemnumber' => 0,
+            'completionpassgrade' => 1,
         ]);
 
         $cmworkshop = cm_info::create(get_coursemodule_from_instance('workshop', $workshop->id));
@@ -841,8 +939,10 @@ class completionlib_test extends advanced_testcase {
         $workshopcompletiondata = $method->invoke($completioninfo, $cmworkshop, $user->id);
 
         $this->assertArrayHasKey('completiongrade', $workshopcompletiondata);
+        $this->assertArrayHasKey('passgrade', $workshopcompletiondata);
         $this->assertArrayNotHasKey('customcompletion', $workshopcompletiondata);
         $this->assertEquals(COMPLETION_INCOMPLETE, $workshopcompletiondata['completiongrade']);
+        $this->assertEquals(COMPLETION_INCOMPLETE, $workshopcompletiondata['passgrade']);
 
         // Check that fetching data for a module with no completion conditions does not provide any data.
         $choice2completiondata = $method->invoke($completioninfo, $cmchoice2, $user->id);
@@ -925,6 +1025,38 @@ class completionlib_test extends advanced_testcase {
         $d3->overrideby = null;
         $DB->insert_record('course_modules_completion', $d3);
         $c->internal_set_data($cm, $data);
+
+        // 4) Test instant course completions.
+        $dataactivity = $this->getDataGenerator()->create_module('data', array('course' => $this->course->id),
+            array('completion' => 1));
+        $cm = get_coursemodule_from_instance('data', $dataactivity->id);
+        $c = new completion_info($this->course);
+        $cmdata = get_coursemodule_from_id('data', $dataactivity->cmid);
+
+        // Add activity completion criteria.
+        $criteriadata = new stdClass();
+        $criteriadata->id = $this->course->id;
+        $criteriadata->criteria_activity = array();
+        // Some activities.
+        $criteriadata->criteria_activity[$cmdata->id] = 1;
+        $class = 'completion_criteria_activity';
+        $criterion = new $class();
+        $criterion->update_config($criteriadata);
+
+        $actual = $DB->get_records('course_completions');
+        $this->assertEmpty($actual);
+
+        $data->coursemoduleid = $cm->id;
+        $c->internal_set_data($cm, $data);
+        $actual = $DB->get_records('course_completions');
+        $this->assertEquals(1, count($actual));
+        $this->assertEquals($this->user->id, reset($actual)->userid);
+
+        $data->userid = $newuser2->id;
+        $c->internal_set_data($cm, $data, true);
+        $actual = $DB->get_records('course_completions');
+        $this->assertEquals(1, count($actual));
+        $this->assertEquals($this->user->id, reset($actual)->userid);
     }
 
     /**
@@ -1481,6 +1613,314 @@ class completionlib_test extends advanced_testcase {
 
         // The implicitly created grade_item does not have grade to pass defined so it is not distinguished.
         $this->assertEquals(COMPLETION_COMPLETE, $completioninfo->get_grade_completion($cm, $this->user->id));
+    }
+
+    /**
+     * Test for aggregate_completions().
+     *
+     * @covers \aggregate_completions
+     */
+    public function test_aggregate_completions() {
+        global $DB;
+        $this->resetAfterTest(true);
+        $time = time();
+
+        $course = $this->getDataGenerator()->create_course(array('enablecompletion' => 1));
+
+        for ($i = 0; $i < 4; $i++) {
+            $students[] = $this->getDataGenerator()->create_user();
+        }
+
+        $teacher = $this->getDataGenerator()->create_user();
+        $studentrole = $DB->get_record('role', array('shortname' => 'student'));
+        $teacherrole = $DB->get_record('role', array('shortname' => 'editingteacher'));
+
+        $this->getDataGenerator()->enrol_user($teacher->id, $course->id, $teacherrole->id);
+        foreach ($students as $student) {
+            $this->getDataGenerator()->enrol_user($student->id, $course->id, $studentrole->id);
+        }
+
+        $data = $this->getDataGenerator()->create_module('data', array('course' => $course->id),
+            array('completion' => 1));
+        $cmdata = get_coursemodule_from_id('data', $data->cmid);
+
+        // Add activity completion criteria.
+        $criteriadata = new stdClass();
+        $criteriadata->id = $course->id;
+        $criteriadata->criteria_activity = array();
+        // Some activities.
+        $criteriadata->criteria_activity[$cmdata->id] = 1;
+        $class = 'completion_criteria_activity';
+        $criterion = new $class();
+        $criterion->update_config($criteriadata);
+
+        $this->setUser($teacher);
+
+        // Mark activity complete for both students.
+        $cm = get_coursemodule_from_instance('data', $data->id);
+        $completioncriteria = $DB->get_record('course_completion_criteria', []);
+        foreach ($students as $student) {
+            $cmcompletionrecords[] = (object)[
+                'coursemoduleid' => $cm->id,
+                'userid' => $student->id,
+                'completionstate' => 1,
+                'viewed' => 0,
+                'overrideby' => null,
+                'timemodified' => 0,
+            ];
+
+            $usercompletions[] = (object)[
+                'criteriaid' => $completioncriteria->id,
+                'userid' => $student->id,
+                'timecompleted' => $time,
+            ];
+
+            $cc = array(
+                'course'    => $course->id,
+                'userid'    => $student->id
+            );
+            $ccompletion = new completion_completion($cc);
+            $completion[] = $ccompletion->mark_inprogress($time);
+        }
+        $DB->insert_records('course_modules_completion', $cmcompletionrecords);
+        $DB->insert_records('course_completion_crit_compl', $usercompletions);
+
+        // MDL-33320: for instant completions we need aggregate to work in a single run.
+        $DB->set_field('course_completions', 'reaggregate', $time - 2);
+
+        foreach ($students as $student) {
+            $result = $DB->get_record('course_completions', ['userid' => $student->id, 'reaggregate' => 0]);
+            $this->assertFalse($result);
+        }
+
+        aggregate_completions($completion[0]);
+
+        $result1 = $DB->get_record('course_completions', ['userid' => $students[0]->id, 'reaggregate' => 0]);
+        $result2 = $DB->get_record('course_completions', ['userid' => $students[1]->id, 'reaggregate' => 0]);
+        $result3 = $DB->get_record('course_completions', ['userid' => $students[2]->id, 'reaggregate' => 0]);
+
+        $this->assertIsObject($result1);
+        $this->assertFalse($result2);
+        $this->assertFalse($result3);
+
+        aggregate_completions(0);
+
+        foreach ($students as $student) {
+            $result = $DB->get_record('course_completions', ['userid' => $student->id, 'reaggregate' => 0]);
+            $this->assertIsObject($result);
+        }
+    }
+
+    /**
+     * Test for completion_completion::_save().
+     *
+     * @covers \completion_completion::_save
+     */
+    public function test_save() {
+        global $DB;
+        $this->resetAfterTest(true);
+
+        $course = $this->getDataGenerator()->create_course(array('enablecompletion' => 1));
+
+        $student = $this->getDataGenerator()->create_user();
+        $teacher = $this->getDataGenerator()->create_user();
+        $studentrole = $DB->get_record('role', array('shortname' => 'student'));
+        $teacherrole = $DB->get_record('role', array('shortname' => 'editingteacher'));
+
+        $this->getDataGenerator()->enrol_user($teacher->id, $course->id, $teacherrole->id);
+        $this->getDataGenerator()->enrol_user($student->id, $course->id, $studentrole->id);
+
+        $this->setUser($teacher);
+
+        $cc = array(
+            'course'    => $course->id,
+            'userid'    => $student->id
+        );
+        $ccompletion = new completion_completion($cc);
+
+        $completions = $DB->get_records('course_completions');
+        $this->assertEmpty($completions);
+
+        // We're testing a private method, so we need to setup reflector magic.
+        $method = new ReflectionMethod($ccompletion, '_save');
+        $method->setAccessible(true); // Allow accessing of private method.
+        $completionid = $method->invoke($ccompletion);
+        $completions = $DB->get_records('course_completions');
+        $this->assertEquals(count($completions), 1);
+        $this->assertEquals(reset($completions)->id, $completionid);
+
+        $ccompletion->id = 0;
+        $method = new ReflectionMethod($ccompletion, '_save');
+        $method->setAccessible(true); // Allow accessing of private method.
+        $completionid = $method->invoke($ccompletion);
+        $this->assertDebuggingCalled('Can not update data object, no id!');
+        $this->assertNull($completionid);
+    }
+
+    /**
+     * Test for completion_completion::mark_enrolled().
+     *
+     * @covers \completion_completion::mark_enrolled
+     */
+    public function test_mark_enrolled() {
+        global $DB;
+        $this->resetAfterTest(true);
+
+        $course = $this->getDataGenerator()->create_course(array('enablecompletion' => 1));
+
+        $student = $this->getDataGenerator()->create_user();
+        $teacher = $this->getDataGenerator()->create_user();
+        $studentrole = $DB->get_record('role', array('shortname' => 'student'));
+        $teacherrole = $DB->get_record('role', array('shortname' => 'editingteacher'));
+
+        $this->getDataGenerator()->enrol_user($teacher->id, $course->id, $teacherrole->id);
+        $this->getDataGenerator()->enrol_user($student->id, $course->id, $studentrole->id);
+
+        $this->setUser($teacher);
+
+        $cc = array(
+            'course'    => $course->id,
+            'userid'    => $student->id
+        );
+        $ccompletion = new completion_completion($cc);
+
+        $completions = $DB->get_records('course_completions');
+        $this->assertEmpty($completions);
+
+        $completionid = $ccompletion->mark_enrolled();
+        $completions = $DB->get_records('course_completions');
+        $this->assertEquals(count($completions), 1);
+        $this->assertEquals(reset($completions)->id, $completionid);
+
+        $ccompletion->id = 0;
+        $completionid = $ccompletion->mark_enrolled();
+        $this->assertDebuggingCalled('Can not update data object, no id!');
+        $this->assertNull($completionid);
+        $completions = $DB->get_records('course_completions');
+        $this->assertEquals(1, count($completions));
+    }
+
+    /**
+     * Test for completion_completion::mark_inprogress().
+     *
+     * @covers \completion_completion::mark_inprogress
+     */
+    public function test_mark_inprogress() {
+        global $DB;
+        $this->resetAfterTest(true);
+
+        $course = $this->getDataGenerator()->create_course(array('enablecompletion' => 1));
+
+        $student = $this->getDataGenerator()->create_user();
+        $teacher = $this->getDataGenerator()->create_user();
+        $studentrole = $DB->get_record('role', array('shortname' => 'student'));
+        $teacherrole = $DB->get_record('role', array('shortname' => 'editingteacher'));
+
+        $this->getDataGenerator()->enrol_user($teacher->id, $course->id, $teacherrole->id);
+        $this->getDataGenerator()->enrol_user($student->id, $course->id, $studentrole->id);
+
+        $this->setUser($teacher);
+
+        $cc = array(
+            'course'    => $course->id,
+            'userid'    => $student->id
+        );
+        $ccompletion = new completion_completion($cc);
+
+        $completions = $DB->get_records('course_completions');
+        $this->assertEmpty($completions);
+
+        $completionid = $ccompletion->mark_inprogress();
+        $completions = $DB->get_records('course_completions');
+        $this->assertEquals(1, count($completions));
+        $this->assertEquals(reset($completions)->id, $completionid);
+
+        $ccompletion->id = 0;
+        $completionid = $ccompletion->mark_inprogress();
+        $this->assertDebuggingCalled('Can not update data object, no id!');
+        $this->assertNull($completionid);
+        $completions = $DB->get_records('course_completions');
+        $this->assertEquals(1, count($completions));
+    }
+
+    /**
+     * Test for completion_completion::mark_complete().
+     *
+     * @covers \completion_completion::mark_complete
+     */
+    public function test_mark_complete() {
+        global $DB;
+        $this->resetAfterTest(true);
+
+        $course = $this->getDataGenerator()->create_course(array('enablecompletion' => 1));
+
+        $student = $this->getDataGenerator()->create_user();
+        $teacher = $this->getDataGenerator()->create_user();
+        $studentrole = $DB->get_record('role', array('shortname' => 'student'));
+        $teacherrole = $DB->get_record('role', array('shortname' => 'editingteacher'));
+
+        $this->getDataGenerator()->enrol_user($teacher->id, $course->id, $teacherrole->id);
+        $this->getDataGenerator()->enrol_user($student->id, $course->id, $studentrole->id);
+
+        $this->setUser($teacher);
+
+        $cc = array(
+            'course'    => $course->id,
+            'userid'    => $student->id
+        );
+        $ccompletion = new completion_completion($cc);
+
+        $completions = $DB->get_records('course_completions');
+        $this->assertEmpty($completions);
+
+        $completionid = $ccompletion->mark_complete();
+        $completions = $DB->get_records('course_completions');
+        $this->assertEquals(1, count($completions));
+        $this->assertEquals(reset($completions)->id, $completionid);
+
+        $ccompletion->id = 0;
+        $completionid = $ccompletion->mark_complete();
+        $this->assertNull($completionid);
+        $completions = $DB->get_records('course_completions');
+        $this->assertEquals(1, count($completions));
+    }
+
+    /**
+     * Test for completion_criteria_completion::mark_complete().
+     *
+     * @covers \completion_criteria_completion::mark_complete
+     */
+    public function test_criteria_mark_complete() {
+        global $DB;
+        $this->resetAfterTest(true);
+
+        $course = $this->getDataGenerator()->create_course(array('enablecompletion' => 1));
+
+        $student = $this->getDataGenerator()->create_user();
+        $teacher = $this->getDataGenerator()->create_user();
+        $studentrole = $DB->get_record('role', array('shortname' => 'student'));
+        $teacherrole = $DB->get_record('role', array('shortname' => 'editingteacher'));
+
+        $this->getDataGenerator()->enrol_user($teacher->id, $course->id, $teacherrole->id);
+        $this->getDataGenerator()->enrol_user($student->id, $course->id, $studentrole->id);
+
+        $this->setUser($teacher);
+
+        $record = [
+            'course'    => $course->id,
+            'criteriaid'    => 1,
+            'userid'    => $student->id,
+            'timecompleted' => time()
+        ];
+        $completion = new completion_criteria_completion($record, DATA_OBJECT_FETCH_BY_KEY);
+
+        $completions = $DB->get_records('course_completions');
+        $this->assertEmpty($completions);
+
+        $completionid = $completion->mark_complete($record['timecompleted']);
+        $completions = $DB->get_records('course_completions');
+        $this->assertEquals(1, count($completions));
+        $this->assertEquals(reset($completions)->id, $completionid);
     }
 }
 

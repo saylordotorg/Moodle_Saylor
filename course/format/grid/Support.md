@@ -33,9 +33,9 @@ benefits.
 
 Required version of Moodle
 ==========================
-This version works with Moodle 3.11 version 2021051700.00 (Build: 20210517) and above within the 3.11 branch until the next release.
+This version works with Moodle 4.0 version 2022041900.00 (Build: 20220419) and above within the MOODLE_400_STABLE branch until the next release.
 
-Please ensure that your hardware and software complies with 'Requirements' in '[Installing Moodle](https://docs.moodle.org/311/en/Installing_Moodle)'.
+Please ensure that your hardware and software complies with 'Requirements' in '[Installing Moodle](https://docs.moodle.org/400/en/Installing_Moodle)'.
 
 Reporting issues
 ================

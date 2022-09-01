@@ -52,11 +52,13 @@
 
     <div class="py-3">
         {{#forum.capabilities.create}}
-            <a class="btn btn-primary" data-toggle="collapse" href="#collapseAddForm">
-                {{$discussion_create_text}}
-                    {{#str}}addanewdiscussion, forum{{/str}}
-                {{/discussion_create_text}}
-            </a>
+            {{#enablediscussioncreation}}
+                <a class="btn btn-primary" data-toggle="collapse" href="#collapseAddForm">
+                    {{$discussion_create_text}}
+                        {{#str}}addanewdiscussion, forum{{/str}}
+                    {{/discussion_create_text}}
+                </a>
+            {{/enablediscussioncreation}}
         {{/forum.capabilities.create}}
         {{^forum.capabilities.create}}
             {{#forum.capabilities.selfenrol}}
@@ -364,9 +366,9 @@
         {{/can_create_discussion}}
     {{/state.hasdiscussions}}
     {{^state.hasdiscussions}}
-        <div class="forumnodiscuss">
+        <div class="forumnodiscuss alert alert-info">
             {{$no_discussions_text}}
-                ({{#str}}nodiscussions, forum{{/str}})
+                {{#str}}nodiscussions, forum{{/str}}
             {{/no_discussions_text}}
         </div>
     {{/state.hasdiscussions}}

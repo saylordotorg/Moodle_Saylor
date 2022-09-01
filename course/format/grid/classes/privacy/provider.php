@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Grid Format - A topics based format that uses a grid of user selectable images to popup a light box of the section.
+ * Grid Format.
  *
  * @package    format_grid
  * @category   privacy

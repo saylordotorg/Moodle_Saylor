@@ -48,3 +48,14 @@ ul.ctopics :target::before {
 .format-topcoll.path-course-view.editing #region-main > .card-block {
     overflow-x: visible;
 }
+
+/* Activity padding */
+.format-topcoll .ctopics.topics .activity-item:not(.activityinline) {
+    padding: 1rem 0.5rem;
+}
+
+@media (min-width: 768px) {
+    .format-topcoll .ctopics.topics .activity-item:not(.activityinline) {
+        padding: 0.5rem 0.25rem;
+    }
+}

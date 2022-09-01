@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Grid Format - A topics based format that uses a grid of user selectable images to popup a light box of the section.
+ * Grid Format.
  *
  * @package    format_grid
  * @category   event
@@ -42,7 +42,7 @@ class format_grid_observer {
     public static function course_content_deleted(\core\event\course_content_deleted $event) {
         if (class_exists('format_grid', false)) {
             // If class format_grid was never loaded, this is definitely not a course in 'Grid' format.
-            self::delete_images_and_summary($event->objectid);
+            self::delete_images($event->objectid);
         }
     }
 
@@ -58,17 +58,13 @@ class format_grid_observer {
         $format = $DB->get_field('course', 'format', array('id' => $event->objectid));
         // If not in the grid format, then don't need the images etc.
         if ($format != 'grid') {
-            // Then delete the images and any summary.
-            self::delete_images_and_summary($event->objectid);
+            // Then delete the images.
+            self::delete_images($event->objectid);
         }
     }
 
-    protected static function delete_images_and_summary($courseid) {
-        global $DB;
+    protected static function delete_images($courseid) {
         // Delete any images associated with the course.
         \format_grid\toolbox::delete_images($courseid);
-        unset($courseformat);  // Destruct.
-
-        $DB->delete_records("format_grid_summary", array("courseid" => $courseid));
     }
 }

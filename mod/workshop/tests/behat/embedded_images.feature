@@ -14,6 +14,9 @@ Feature: Teachers can embed images into instructions and conclusion fields
     And the following "course enrolments" exist:
       | user     | course | role           |
       | teacher1 | C1     | editingteacher |
+    And the following "blocks" exist:
+      | blockname     | contextlevel | reference | pagetypepattern | defaultregion |
+      | private_files | System       | 1         | my-index        | side-post     |
     And I log in as "teacher1"
     # Upload an image into the private files.
     And I follow "Manage private files"
@@ -36,7 +39,7 @@ Feature: Teachers can embed images into instructions and conclusion fields
     And I click on "Save image" "button"
     And I press "Save and display"
     # Embed the image into Instructions for assessment.
-    And I navigate to "Edit settings" in current page administration
+    And I navigate to "Settings" in current page administration
     And I expand all fieldsets
     And I set the field "Instructions for assessment" to "<p>Image test</p>"
     And I select the text in the "Instructions for assessment" Atto editor
@@ -49,7 +52,7 @@ Feature: Teachers can embed images into instructions and conclusion fields
     And I click on "Save image" "button"
     And I press "Save and display"
     # Embed the image into Conclusion.
-    And I navigate to "Edit settings" in current page administration
+    And I navigate to "Settings" in current page administration
     And I expand all fieldsets
     And I set the field "Conclusion" to "<p>Image test</p>"
     And I select the text in the "Conclusion" Atto editor

@@ -20,7 +20,6 @@
     Collapsed Topics single section template.
 
     Context variables required for this template:
-    * activityclipboard = Activity clipboard.
     * horizontalclass - Additional classes used when the format has a horizontal layout.
     * horizontalwidth - Horizontal layout width.
     * maincoursepageicon- Main course page icon.
@@ -35,16 +34,15 @@
 
     Example context (json):
     {
-        "activityclipboard": "",
         "horizontalclass": "col-lg-3",
         "horizontalwidth": "100",
         "maincoursepageicon": '<i class="icon fa fa-caret-up fa-fw " title="Main course page" aria-label="Main course page"></i>',
         "maincoursepagestr": "Main course page",
         "maincoursepageurl": 'https://moodle.localhost/course/view.php?id=14',
-        "sectionnavlinksnext": '<a href="https://moodle.localhost/course/view.php?id=14&section=3">Section 3<span class="rarrow">►</span></a>',
-        "sectionnavlinksprevious": '<a href="https://moodle.localhost/course/view.php?id=14&section=1"><span class="larrow">◄</span>Section 1</a>',
+        "sectionnavlinks": 'TBC',
         "sectionnavselection":
-            '<div class="jumpmenu">
+            '<div class="prevsection"><a href="https://moodle.localhost/course/view.php?id=14&section=1"><span class="larrow">◄</span>Section 1</a></div>
+             <div class="jumpmenu">
                 <form method="post" action="https://moodle.localhost/course/jumpto.php" class="form-inline" id="sectionmenu">
                     <input type="hidden" name="sesskey" value="sessionkey">
                     <select class="custom-select jumpmenu" name="jump" data-init-value="">
@@ -64,31 +62,32 @@
                         <input type="submit" class="btn btn-secondary ml-1" value="Go">
                     </noscript>
                 </form>
-            </div>',
+            </div>
+            <div class="nextsection"><a href="https://moodle.localhost/course/view.php?id=14&section=3">Section 3<span class="rarrow">►</span></a></div>',
         "sectiontitle": '<h3 class="sectionname">Section 2</h3>',
         "sectionzero": 'Section zero markup',
         "thissection": 'Section two markup'
     }
 }}
 <a href="{{{maincoursepageurl}}}">{{{maincoursepageicon}}}{{maincoursepagestr}}</a>
-{{{activityclipboard}}}
 {{#sectionzero}}
 <ul class="ctopics">
     {{{sectionzero}}}
 </ul>
 {{/sectionzero}}
 <div class="single-section">
+    {{{sectionnavlinks}}}
     <div class="section-navigation navigationtitle">
         <span class="mdl-left">{{{sectionnavlinksprevious}}}</span>
         <span class="mdl-right">{{{sectionnavlinksnext}}}</span>
-        {{{sectiontitle}}}
     </div>
+    {{{sectiontitle}}}
     <ul class="ctopics">
         {{{thissection}}}
     </ul>
     <div class="section-navigation mdl-bottom">
         <span class="mdl-left">{{{sectionnavlinksprevious}}}</span>
-        <span class="mdl-right">{{{sectionnavlinksnext}}}</span>
         <div class="mdl-align">{{{sectionnavselection}}}</div>
+        <span class="mdl-right">{{{sectionnavlinksnext}}}</span>
     </div>
 </div>

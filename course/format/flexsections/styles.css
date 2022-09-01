@@ -1,65 +1,36 @@
-.format-flexsections .course-content ul.flexsections {
-    margin: 0;
+.course-content ul.flexsections {
     padding: 0;
+    margin: 0;
     list-style: none;
 }
-.format-flexsections .course-content ul.flexsections li.section {
-    padding-bottom: 0.5rem;
-    margin-left: 0.5rem;
-    padding-left: 0.5rem;
-    margin-top: 1rem;
-}
-.course-content ul.flexsections ul.section {
-    padding-left: 0;
-    padding-right: 0;
-}
-.format-flexsections .course-content ul.flexsections-level-0 > li.section {
-    margin-left: 0;
-    padding-left: 0;
-}
-.course-content ul.flexsections li.section.main {
-    /* Cancel borders added by boost */
-    border-bottom: 0;
-}
-.format-flexsections .course-content ul.flexsections-level-1 > li.section.main {
-    border-bottom: 1px solid #dee2e6;
-}
-.format-flexsections .course-content ul.flexsections-level-1 > li.section.main:last-child {
-    border-bottom: 0;
-}
-.format-flexsections .course-content ul.flexsections li.section .controls img {
-    padding-left: 0.3em;
-    padding-right: 0.3em;
-}
-.format-flexsections .header.backto {
-    margin-bottom: 1rem;
+
+.course-content ul.flexsections li.section {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
 }
 
-/* Hidden section. */
-.format-flexsections .course-content li.section.hidden > .content > h3.sectionname,
-.format-flexsections .course-content li.section.hidden > .content > h3.sectionname a,
-.format-flexsections .course-content li.section.hidden > .content > .summary,
-.format-flexsections .course-content li.section.hidden .addresourcemodchooser a,
-.format-flexsections .course-content li.section.hidden a.addsection {
-    color: #aaa;
+.course-content ul.flexsections li.section .content {
+    margin: 0;
+    padding: 0;
 }
 
-/* Moving section */
-.format-flexsections .course-content ul.flexsections li.section.ismoving {
-    background: #eee;
-}
-.format-flexsections .course-content ul.flexsections li.movehere img {
-    padding-left: 1rem;
-}
-.format-flexsections .course-content div.cancelmoving {
-    margin: 3px;
-    padding: 5px;
-    background: yellow;
-    border: 1px solid black;
-    text-align: center;
-    position: fixed;
-    top: 100px;
-    right: 0;
-    z-index: 3;
+@media (min-width: 576px) {
+    .course-content ul.flexsections li.section .summary,
+    .course-content ul.flexsections li.section .content > .availabilityinfo {
+        margin-left: 25px;
+    }
 }
 
+.course-content ul.flexsections li.section .left,
+.course-content ul.flexsections li.section .right {
+    padding: 0 6px 0;
+    text-align: right;
+    width: auto;
+}
+
+@media (max-width: 767.98px) {
+    body:not(.editing) .course-content ul.flexsections li.section .left,
+    body:not(.editing) .course-content ul.flexsections li.section .right {
+        display: none;
+    }
+}

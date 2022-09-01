@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Grid Information
+ * Grid format.
  *
  * @package    format_grid
  * @version    See the value of '$plugin->version' in version.php.
@@ -39,42 +39,8 @@ class backup_format_grid_plugin extends backup_format_plugin {
         // Define the virtual plugin element with the condition to fulfill.
         $plugin = $this->get_plugin_element(null, '/course/format', 'grid');
 
-        // Create one standard named plugin element (the visible container).
-        // The courseid not required as populated on restore.
-        $pluginwrapper = new backup_nested_element($this->get_recommended_name(), null, array('showsummary'));
-
-        // Connect the visible container ASAP.
-        $plugin->add_child($pluginwrapper);
-
-        // Set source to populate the data.
-        $pluginwrapper->set_source_table('format_grid_summary', array('courseid' => backup::VAR_PARENTID));
-
-        // Temporarily remove the generated images so that they are not in the backup.
-        $this->delete_displayed_images();
-
         // Don't need to annotate ids nor files.
         return $plugin;
-    }
-
-    private function delete_displayed_images() {
-        global $CFG, $DB;
-
-        /* We only process this information if the course we are backing up is in the
-          'grid' format (target format can change depending of restore options).
-          Note: This appears to be a bit silly as this code is executed even if the
-          course is not in the 'grid' format.
-         */
-        $courseid = $this->task->get_courseid();
-        $format = $DB->get_field('course', 'format', array('id' => $courseid));
-        if ($format != 'grid') {
-            return;
-        }
-
-        require_once($CFG->dirroot . '/course/format/lib.php'); // For format_base.
-        require_once($CFG->dirroot . '/course/format/grid/lib.php'); // For format_grid.
-
-        $courseformat = course_get_format($courseid);
-        \format_grid\toolbox::delete_displayed_images($courseformat);
     }
 
     /**
@@ -87,16 +53,16 @@ class backup_format_grid_plugin extends backup_format_plugin {
 
         // Create one standard named plugin element (the visible container).
         // The sectionid and courseid not required as populated on restore.
-        $pluginwrapper = new backup_nested_element($this->get_recommended_name(), null, array('image', 'alttext'));
+        $recomendedname = $this->get_recommended_name();
+        $section = new backup_nested_element($recomendedname, array('sectionid'), array('image', 'contenthash'));
 
         // Connect the visible container ASAP.
-        $plugin->add_child($pluginwrapper);
+        $plugin->add_child($section);
 
         // Set source to populate the data.
-        $pluginwrapper->set_source_table('format_grid_icon', array('sectionid' => backup::VAR_SECTIONID));
+        $section->set_source_table('format_grid_image', array('sectionid' => backup::VAR_SECTIONID));
+        $section->annotate_files('format_grid', 'sectionimage', 'sectionid');
 
-        // Don't need to annotate ids nor files.
         return $plugin;
     }
-
 }

@@ -4,6 +4,12 @@ moodle-availability_cohort
 Changes
 -------
 
+### v4.0-r1
+
+* 2022-07-12 - Fix Behat tests which broke with Moodle 4.0.
+* 2022-07-12 - Make codechecker happy again
+* 2022-07-12 - Prepare compatibility for Moodle 4.0.
+
 ### v3.11-r3
 
 * 2022-07-20 - Bugfix: Copying a course failed if a cohort condition was added to a activity - Credits to Andrew Hancox

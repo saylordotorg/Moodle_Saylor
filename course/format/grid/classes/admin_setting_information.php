@@ -15,8 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Grid Format - A topics based format that uses a grid of user selectable images to popup a
- *               light box of the section.
+ * Grid Format.
  *
  * @package    format_grid
  * @version    See the value of '$plugin->version' in version.php.
@@ -130,7 +129,8 @@ class admin_setting_information extends \admin_setting {
         }
 
         if ($CFG->branch != $this->mbranch) {
-            $context['versioncheck'] = 'Release '.$plugininfo->release.', version '.$plugininfo->version.' is incompatible with Moodle '.$CFG->release;
+            $context['versioncheck'] = 'Release '.$plugininfo->release.', version '.$plugininfo->version;
+            $context['versioncheck'] .= ' is incompatible with Moodle '.$CFG->release;
             $context['versioncheck'] .= ', please get the correct version from ';
             $context['versioncheck'] .= '<a href="https://moodle.org/plugins/format_grid" target="_blank">Moodle.org</a>.  ';
             $context['versioncheck'] .= 'If none is available, then please consider supporting the format by funding it.  ';

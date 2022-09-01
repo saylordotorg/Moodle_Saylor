@@ -36,7 +36,6 @@ Feature: The activity results block displays student scores
     And I am on "Course 1" course homepage with editing mode on
     And I should see "Test page name"
     And I navigate to "View > Grader report" in the course gradebook
-    And I turn editing mode on
     And I give the grade "90.00" to the user "Student 1" for the grade item "Test assignment 1"
     And I give the grade "80.00" to the user "Student 2" for the grade item "Test assignment 1"
     And I give the grade "70.00" to the user "Student 3" for the grade item "Test assignment 1"
@@ -50,11 +49,11 @@ Feature: The activity results block displays student scores
     And I add the "Activity results" block
     When I configure the "Activity results" block
     And I set the following fields to these values:
-      | id_config_activitygradeitemid | Test assignment 1 |
-      | id_config_showbest | 3 |
-      | id_config_showworst | 0 |
-      | id_config_gradeformat | Absolute numbers |
-      | id_config_nameformat | Display full names |
+      | config_activitygradeitemid | Test assignment 1 |
+      | config_showbest | 3 |
+      | config_showworst | 0 |
+      | config_gradeformat | Absolute numbers |
+      | config_nameformat | Display full names |
     And I press "Save changes"
     Then I should see "Student 1" in the "Activity results" "block"
     And I should see "90.00" in the "Activity results" "block"
@@ -67,22 +66,22 @@ Feature: The activity results block displays student scores
     Given I follow "Test assignment 1"
     When I add the "Activity results" block
     And I configure the "Activity results" block
-    Then the field "id_config_activitygradeitemid" matches value "Test assignment 1"
+    Then the field "config_activitygradeitemid" matches value "Test assignment 1"
     And I press "Cancel"
     And I am on "Course 1" course homepage
     And I follow "Test assignment 2"
     And I add the "Activity results" block
     And I configure the "Activity results" block
-    And the field "id_config_activitygradeitemid" matches value "Test assignment 2"
+    And the field "config_activitygradeitemid" matches value "Test assignment 2"
     And I press "Cancel"
     And I am on "Course 1" course homepage
     And I follow "Test assignment 3"
     And I add the "Activity results" block
     And I configure the "Activity results" block
-    And the field "id_config_activitygradeitemid" matches value "Test assignment 3"
+    And the field "config_activitygradeitemid" matches value "Test assignment 3"
     And I press "Cancel"
     And I am on "Course 1" course homepage
     And I follow "Test page name"
     And I add the "Activity results" block
     And I configure the "Activity results" block
-    And the field "id_config_activitygradeitemid" does not match value "Test page name"
+    And the field "config_activitygradeitemid" does not match value "Test page name"

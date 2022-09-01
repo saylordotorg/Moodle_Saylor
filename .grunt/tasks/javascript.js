@@ -159,9 +159,9 @@ module.exports = grunt => {
                             ['@babel/preset-env', {
                                 targets: {
                                     browsers: [
-                                        ">0.25%",
+                                        ">0.3%",
                                         "last 2 versions",
-                                        "not ie <= 10",
+                                        "not ie >= 0",
                                         "not op_mini all",
                                         "not Opera > 0",
                                         "not dead"
@@ -200,6 +200,9 @@ module.exports = grunt => {
             },
         },
     });
+
+    // Add the 'js' task as a startup task.
+    grunt.moodleEnv.startupTasks.push('js');
 
     // On watch, we dynamically modify config to build only affected files. This
     // method is slightly complicated to deal with multiple changed files at once (copied

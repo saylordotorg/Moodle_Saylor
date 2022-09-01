@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Grid Format - A topics based format that uses a grid of user selectable images to popup a light box of the section.
+ * Grid Format.
  *
  * @package    format_grid
  * @version    See the value of '$plugin->version' in version.php.
@@ -31,139 +31,96 @@ function xmldb_format_grid_upgrade($oldversion = 0) {
 
     $dbman = $DB->get_manager();
 
-    if ($oldversion < 2011041802) {
-        // Define table course_grid_summary to be created.
-        $table = new xmldb_table('course_grid_summary');
+    if ($oldversion < 2022072200) {
+        // Define table format_grid_image to be created.
+        $table = new xmldb_table('format_grid_image');
 
-        // Adding fields to table course_grid_summary.
-        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null);
-        $table->add_field('show_summary', XMLDB_TYPE_INTEGER, '1', XMLDB_UNSIGNED, null, null, '0', null);
-        $table->add_field('course_id', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0', null);
+        // Adding fields to table format_grid_image.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('image', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('contenthash', XMLDB_TYPE_CHAR, '40', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('displayedimagestate', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('sectionid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('courseid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
 
-        // Adding keys to table course_grid_summary.
-        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        // Adding keys to table format_grid_image.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
 
-        // Launch create table for course_grid_summary.
-        $dbman->create_table($table);
+        // Adding indexes to table format_grid_image.
+        $table->add_index('section', XMLDB_INDEX_UNIQUE, ['sectionid']);
+        $table->add_index('course', XMLDB_INDEX_NOTUNIQUE, ['courseid']);
 
-        upgrade_plugin_savepoint(true, 2011041802, 'format', 'grid');
-    }
+        // Conditionally launch create table for format_grid_image.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
 
-    if ($oldversion < 2012011701) {
-        // Rename the tables.
-        if ($dbman->table_exists('course_grid_icon')) {
-            $table = new xmldb_table('course_grid_icon');
-            if (!$dbman->table_exists('format_grid_icon')) {
-                $dbman->rename_table($table, 'format_grid_icon');
-            } else {
-                // May as well tidy up the db.
-                $dbman->drop_table($table);
+        $oldtable = new xmldb_table('format_grid_icon');
+        if ($dbman->table_exists($oldtable)) {
+            // Upgrade from old images.
+            $oldimages = $DB->get_records('format_grid_icon');
+            if (!empty($oldimages)) {
+                $newimages = array();
+                foreach ($oldimages as $oldimage) {
+                    if (!empty($oldimage->image)) {
+                        $newimagecontainer = new \stdClass();
+                        $newimagecontainer->sectionid = $oldimage->sectionid;
+                        $newimagecontainer->courseid = $oldimage->courseid;
+                        $newimagecontainer->image = $oldimage->image;
+                        $newimagecontainer->displayedimagestate = 0;
+                        // Contenthash later!
+                        $DB->insert_record('format_grid_image', $newimagecontainer, true);
+                        $newimages[$newimagecontainer->sectionid] = $newimagecontainer;
+                    }
+                }
+
+                $fs = get_file_storage();
+                $currentcourseid = 0;
+                foreach ($newimages as $newimage) {
+                    if ($currentcourseid != $newimage->courseid) {
+                        $currentcourseid = $newimage->courseid;
+                        $coursecontext = context_course::instance($currentcourseid);
+                        $files = $fs->get_area_files($coursecontext->id, 'course', 'section');
+                        foreach ($files as $file) {
+                            if (!$file->is_directory()) {
+                                if ($file->get_filepath() == '/gridimage/') {
+                                    $file->delete();
+                                } else {
+                                    $filename = $file->get_filename();
+                                    $filesectionid = $file->get_itemid();
+                                    if (array_key_exists($filesectionid, $newimages)) { // Ensure we know about this section.
+                                        $gridimage = $newimages[$filesectionid];
+
+                                        if (($gridimage) && ($gridimage->image == $filename)) { // Ensure the correct file.
+                                            $filerecord = new stdClass();
+                                            $filerecord->contextid = $coursecontext->id;
+                                            $filerecord->component = 'format_grid';
+                                            $filerecord->filearea = 'sectionimage';
+                                            $filerecord->itemid = $filesectionid;
+                                            $filerecord->filename = $filename;
+                                            $newfile = $fs->create_file_from_storedfile($filerecord, $file);
+                                            if ($newfile) {
+                                                $DB->set_field('format_grid_image', 'contenthash', $newfile->get_contenthash(),
+                                                    array('sectionid' => $filesectionid));
+                                                // Don't delete the section file in case used in the summary.
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
+
+            // Delete 'format_grid_icon' and 'format_grid_summary' tables....
+            $dbman->drop_table($oldtable);
+            $oldsummarytable = new xmldb_table('format_grid_summary');
+            $dbman->drop_table($oldsummarytable);
         }
-
-        if ($dbman->table_exists('course_grid_summary')) {
-            $table = new xmldb_table('course_grid_summary');
-            if (!$dbman->table_exists('format_grid_summary')) {
-                $dbman->rename_table($table, 'format_grid_summary');
-            } else {
-                // May as well tidy up the db.
-                $dbman->drop_table($table);
-            }
-        }
-
-        upgrade_plugin_savepoint(true, 2012011701, 'format', 'grid');
-    }
-
-    if ($oldversion < 2012071500) {
-        $table = new xmldb_table('format_grid_summary');
-
-        $field = new xmldb_field('course_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, null, null);
-        // Rename course_id.
-        $dbman->rename_field($table, $field, 'courseid');
-
-        $field = new xmldb_field('show_summary', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, null);
-        // Rename show_summary.
-        $dbman->rename_field($table, $field, 'showsummary');
-
-        // Add fields and change to unsigned.
-        $table = new xmldb_table('format_grid_icon');
-
-        $field = new xmldb_field('courseid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '1', 'sectionid');
-        // Conditionally launch add field courseid.
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
-
-        upgrade_plugin_savepoint(true, 2012071500, 'format', 'grid');
-    }
-
-    if ($oldversion < 2013110400) {
-        $table = new xmldb_table('format_grid_icon');
-
-        $field = new xmldb_field('imagepath', XMLDB_TYPE_TEXT, null, null, null, null, null);
-        // Rename imagepath.
-        $dbman->rename_field($table, $field, 'image');
-
-        $field = new xmldb_field('displayedimageindex', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0');
-        // Conditionally launch add field displayediconpath.
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
-
-        upgrade_plugin_savepoint(true, 2013110400, 'format', 'grid');
-    }
-
-    if ($oldversion < 2019111702) {
-        $table = new xmldb_table('format_grid_icon');
-
-        $field = new xmldb_field('alttext', XMLDB_TYPE_TEXT, null, null, null, null, null);
-
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
-
-        upgrade_plugin_savepoint(true, 2019111702, 'format', 'grid');
-    }
-
-    if ($oldversion < 2020070700) {
-        $table = new xmldb_table('format_grid_icon');
-        $index = new xmldb_index('course', XMLDB_INDEX_NOTUNIQUE, array('courseid'));
-
-        if (!$dbman->index_exists($table, $index)) {
-            $dbman->add_index($table, $index);
-        }
-
-        upgrade_plugin_savepoint(true, 2020070700, 'format', 'grid');
-    }
-
-    if ($oldversion < 2020111402) {
-        // Change in default name.
-        $value = get_config('format_grid', 'defaultsection0ownpagenogridonesection');
-        set_config('defaultsetsection0ownpagenogridonesection', $value, 'format_grid');
-
-        upgrade_plugin_savepoint(true, 2020111402, 'format', 'grid');
-    }
-
-    if ($oldversion < 2020111404) {
-        // Define field updatedisplayedimage to be added to format_grid_icon.
-        $table = new xmldb_table('format_grid_icon');
-        $field = new xmldb_field('updatedisplayedimage', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'displayedimageindex');
-
-        // Conditionally launch add field updatedisplayedimage.
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
-
-        /* This is a new mechanism and thus we now use it for the previous two versions update of the images.
-           Clearly this has to happen now that the new field is in the DB.
-           Background was removed from images and transparent PNG's need regenerating. */
-        global $CFG;
-        require_once($CFG->dirroot.'/course/format/grid/lib.php'); // For format_grid.
-
-        format_grid::update_displayed_images_callback();
 
         // Grid savepoint reached.
-        upgrade_plugin_savepoint(true, 2020111404, 'format', 'grid');
+        upgrade_plugin_savepoint(true, 2022072200, 'format', 'grid');
     }
 
     // Automatic 'Purge all caches'....

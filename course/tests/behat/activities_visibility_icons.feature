@@ -68,7 +68,6 @@ Feature: Toggle activities visibility from the course page
     And I log in as "student1"
     And I am on "Course 1" course homepage
     And I should not see "Test forum name"
-    And I log out
 
   @javascript
   Scenario: Activities can be made available and unavailable inside a hidden section
@@ -116,7 +115,7 @@ Feature: Toggle activities visibility from the course page
     And "Test forum name" activity should be hidden
     And I click on "Test forum name" "link" in the "Recent activity" "block"
     And I should see "Test forum name"
-    And I should see "(There are no discussion topics yet in this forum)"
+    And I should see "There are no discussion topics yet in this forum"
 
   @javascript
   Scenario: Activities can be made available but not visible on a course page
@@ -147,7 +146,6 @@ Feature: Toggle activities visibility from the course page
     And the field "Availability" matches value "Make available but not shown on course page"
     And I press "Save and return to course"
     And "Test assignment name" activity should be available but hidden from course page
-    And I change window size to "large"
     And I turn editing mode off
     And "Test assignment name" activity should be available but hidden from course page
     And I log out
