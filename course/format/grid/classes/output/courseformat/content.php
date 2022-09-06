@@ -62,7 +62,7 @@ class content extends content_base {
         $editing = $PAGE->user_is_editing();
 
         $data = (object)[
-            'title' => $format->page_title(), // This method should be in the course_format class.
+            'title' => $format->page_title(),
             'format' => $format->get_format(),
             'sectionreturn' => 0,
         ];
@@ -70,6 +70,8 @@ class content extends content_base {
         $singlesection = $this->format->get_section_number();
         $sections = $this->export_sections($output);
         $initialsection = '';
+        $course = $format->get_course();
+        $currentsectionid = 0;
 
         if (!empty($sections)) {
             // Most formats uses section 0 as a separate section so we remove from the list.
@@ -80,9 +82,16 @@ class content extends content_base {
             if (($editing) || ($singlesection)) {
                 $data->sections = $sections;
             }
+            if (!empty($course->marker)) {
+                foreach ($sections as $section) {
+                    if ($section->num == $course->marker) {
+                        $currentsectionid = $section->id;
+                        break;
+                    }
+                }
+            }
         }
 
-        $course = $format->get_course();
         // The single section format has extra navigation.
         if ($singlesection) {
             $sectionnavigation = new $this->sectionnavigationclass($format, $singlesection);
@@ -157,6 +166,12 @@ class content extends content_base {
                         );
                     }
                 }
+
+                // Current section?
+                if ((!empty($currentsectionid)) && ($currentsectionid == $section->id)) {
+                    $sectionimages[$section->id]->currentsection = true;
+                }
+
                 // For the template.
                 $data->gridsections[] = $sectionimages[$section->id];
             }

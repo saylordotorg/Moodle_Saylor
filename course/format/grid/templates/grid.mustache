@@ -24,6 +24,7 @@
     * sectionbreak - There is a section break for this section.
     * sectionbreakheading - Section break heading.
     * number - Section number.
+    * currentsection - Current section?
     * sectionurl - Section URL.
     * sectionname - Section name.
     * imageuri - Image URI.
@@ -46,6 +47,7 @@
                 "sectionbreak": true,
                 "sectionbreakheading": "This is the section heading",
                 "number": 42,
+                "currentsection": true,
                 "sectionurl": "https://mymoodle/course/view.php?id=4&section=2",
                 "sectionname": "The second section",
                 "imageuri": "https://mymoodle/pluginfile.php/358/format_grid/displayedsectionimage/42/1/ducking.jpg.webp",
@@ -64,7 +66,7 @@
     {{/sectionbreakheading}}
     <div class="thegrid d-flex flex-wrap justify-content-between">
     {{/sectionbreak}}
-    <div id="grid-section-{{number}}" class="grid-section card">
+    <div id="grid-section-{{number}}" class="grid-section card{{#currentsection}} currentgridsection{{/currentsection}}">
         <a href="{{sectionurl}}">
             <div class="card-header text-truncate">{{{sectionname}}}</div>
             {{#imageuri}}

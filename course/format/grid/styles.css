@@ -40,6 +40,10 @@
     width: 210px;
 }
 
+.format-grid .thegrid .grid-section.currentgridsection {
+    border: 2px solid var(--primary);
+}
+
 .format-grid .thegrid .grid-image {
     height: 140px;
     position: relative;

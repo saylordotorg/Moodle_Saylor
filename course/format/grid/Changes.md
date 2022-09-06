@@ -4,6 +4,7 @@ Version 4.0.0.3 - TBR
 =============================
 1. Tidy and refactor code.
 2. More Behat tests.
+3. Highlighted section.
 
 Version 4.0.0.2 - 29/08/22
 =============================
