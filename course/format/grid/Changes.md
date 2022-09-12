@@ -1,19 +1,20 @@
 History
 =============
-Version 4.0.0.3 - TBR
-=============================
+Version 4.0.1.0 - 12/09/2022
+============================
 1. Tidy and refactor code.
 2. More Behat tests.
 3. Highlighted section.
+4. Improved restore code.
 
-Version 4.0.0.2 - 29/08/22
-=============================
+Version 4.0.0.2 - 29/08/2022
+============================
 1. Improved styles.
 2. Remove image when a section is deleted.
 3. Release candidate.
 
-Version 4.0.0.1 - 24/08/22
-=============================
+Version 4.0.0.1 - 24/08/2022
+============================
 1. Start of complete re-build from scratch - functionality added as funded.  Decision made due to the changes in the core API.
 
 Version 3.11.1.1 - TBR

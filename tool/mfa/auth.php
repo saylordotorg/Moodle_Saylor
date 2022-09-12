@@ -34,6 +34,7 @@ $context = context_user::instance($USER->id);
 $PAGE->set_context($context);
 $PAGE->set_url('/admin/tool/mfa/auth.php');
 $PAGE->set_pagelayout('secure');
+$PAGE->blocks->show_only_fake_blocks();
 $pagetitle = $SITE->shortname.': '.get_string('mfa', 'tool_mfa');
 $PAGE->set_title($pagetitle);
 
@@ -59,7 +60,7 @@ $currenturl = new moodle_url('/admin/tool/mfa/auth.php');
 
 $factor = \tool_mfa\plugininfo\factor::get_next_user_factor();
 // If ok, perform form actions for input factor.
-$form = new login_form($currenturl, array('factor' => $factor));
+$form = new login_form($currenturl, ['factor' => $factor]);
 if ($form->is_submitted()) {
     if (!$form->is_validated() && !$form->is_cancelled()) {
         // Increment the fail counter for the factor,

@@ -13,6 +13,13 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+namespace tool_mfa\local\form;
+
+defined('MOODLE_INTERNAL') || die();
+
+require_once($CFG->libdir . "/formslib.php");
+
 /**
  * Setup factor form
  *
@@ -21,13 +28,8 @@
  * @copyright   Catalyst IT
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace tool_mfa\local\form;
-
-defined('MOODLE_INTERNAL') || die();
-
-require_once($CFG->libdir . "/formslib.php");
-
 class setup_factor_form extends \moodleform {
+
     /**
      * {@inheritDoc}
      * @see moodleform::definition()
@@ -38,6 +40,7 @@ class setup_factor_form extends \moodleform {
         $factorname = $this->_customdata['factorname'];
         $factor = \tool_mfa\plugininfo\factor::get_factor($factorname);
         $mform = $factor->setup_factor_form_definition($mform);
+        $this->xss_whitelist_static_form_elements($mform);
 
     }
 
@@ -60,7 +63,6 @@ class setup_factor_form extends \moodleform {
 
     /**
      * Invokes factor setup_factor_form_definition_after_data() method after form data has been set.
-     *
      */
     public function definition_after_data() {
         $mform = $this->_form;
@@ -68,6 +70,27 @@ class setup_factor_form extends \moodleform {
         $factorname = $this->_customdata['factorname'];
         $factor = \tool_mfa\plugininfo\factor::get_factor($factorname);
         $mform = $factor->setup_factor_form_definition_after_data($mform);
+        $this->xss_whitelist_static_form_elements($mform);
         $this->add_action_buttons();
+    }
+
+    /**
+     * In newer versions of Totara with consistent cleaning enabled we need to ensure to mark static elements
+     *  as "xss safe". Or in Totara's ideal world to use 'html' if form-like display is not required.
+     *
+     * @param \HTML_QuickForm $mform
+     * @return void
+     */
+    private function xss_whitelist_static_form_elements($mform) {
+        if (!method_exists('MoodleQuickForm_static', 'set_allow_xss')) {
+            return;
+        }
+
+        $elements = $mform->_elements;
+        foreach ($elements as $element) {
+            if (is_a($element, 'MoodleQuickForm_static')) {
+                $element->set_allow_xss(true);
+            }
+        }
     }
 }
