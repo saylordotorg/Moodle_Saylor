@@ -30,6 +30,7 @@ use core_calendar\local\event\entities\action_interface;
 use mod_bigbluebuttonbn\completion\custom_completion;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\bigbluebutton;
+use mod_bigbluebuttonbn\local\exceptions\server_not_available_exception;
 use mod_bigbluebuttonbn\local\helpers\files;
 use mod_bigbluebuttonbn\local\helpers\mod_helper;
 use mod_bigbluebuttonbn\local\helpers\reset;
@@ -73,6 +74,7 @@ function bigbluebuttonbn_supports($feature) {
         FEATURE_GRADE_HAS_GRADE => false,
         FEATURE_GRADE_OUTCOMES => false,
         FEATURE_SHOW_DESCRIPTION => true,
+        FEATURE_MOD_PURPOSE => MOD_PURPOSE_OTHER
     ];
     if (isset($features[(string) $feature])) {
         return $features[$feature];
@@ -166,8 +168,8 @@ function bigbluebuttonbn_delete_instance($id) {
             }
         }
     } catch (moodle_exception $e) {
-        // Do not log any issue when testing and meeting is not running on deletion.
-        if (!(defined('PHPUNIT_TEST') && PHPUNIT_TEST) && !defined('BEHAT_SITE_RUNNING') && $e->getMessage() !== 'mod_bigbluebuttonbn/notFound') {
+        // Do not log any issue when testing.
+        if (!(defined('PHPUNIT_TEST') && PHPUNIT_TEST) && !defined('BEHAT_SITE_RUNNING')) {
             debugging($e->getMessage(), DEBUG_NORMAL, $e->getTrace());
         }
     }
@@ -335,14 +337,7 @@ function bigbluebuttonbn_get_coursemodule_info($coursemodule) {
     global $DB;
 
     $dbparams = ['id' => $coursemodule->instance];
-    $customcompletionfields = custom_completion::get_defined_custom_rules();
-    $fieldsarray = array_merge([
-        'id',
-        'name',
-        'intro',
-        'introformat',
-    ], $customcompletionfields);
-    $fields = join(',', $fieldsarray);
+    $fields = 'id, name, intro, introformat, completionattendance';
     $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', $dbparams, $fields);
     if (!$bigbluebuttonbn) {
         return null;
@@ -355,10 +350,7 @@ function bigbluebuttonbn_get_coursemodule_info($coursemodule) {
     }
     // Populate the custom completion rules as key => value pairs, but only if the completion mode is 'automatic'.
     if ($coursemodule->completion == COMPLETION_TRACKING_AUTOMATIC) {
-        foreach ($customcompletionfields as $completiontype) {
-            $info->customdata['customcompletionrules'][$completiontype] =
-                $bigbluebuttonbn->$completiontype ?? 0;
-        }
+        $info->customdata['customcompletionrules']['completionattendance'] = $bigbluebuttonbn->completionattendance;
     }
 
     return $info;
@@ -538,17 +530,17 @@ function mod_bigbluebuttonbn_core_calendar_is_event_visible(calendar_event $even
  * @param navigation_node $nodenav The node to add module settings to
  */
 function bigbluebuttonbn_extend_settings_navigation(settings_navigation $settingsnav, navigation_node $nodenav) {
-    global $PAGE, $USER;
+    global $USER;
     // Don't add validate completion if the callback for meetingevents is NOT enabled.
     if (!(boolean) \mod_bigbluebuttonbn\local\config::get('meetingevents_enabled')) {
         return;
     }
     // Don't add validate completion if user is not allowed to edit the activity.
-    $context = context_module::instance($PAGE->cm->id);
+    $context = context_module::instance($settingsnav->get_page()->cm->id);
     if (!has_capability('moodle/course:manageactivities', $context, $USER->id)) {
         return;
     }
-    $completionvalidate = '#action=completion_validate&bigbluebuttonbn=' . $PAGE->cm->instance;
+    $completionvalidate = '#action=completion_validate&bigbluebuttonbn=' . $settingsnav->get_page()->cm->instance;
     $nodenav->add(get_string('completionvalidatestate', 'bigbluebuttonbn'),
         $completionvalidate, navigation_node::TYPE_CONTAINER);
 }
@@ -695,5 +687,24 @@ function bigbluebuttonbn_print_recent_activity(object $course, bool $viewfullnam
 
         echo $out;
     }
+    return true;
+}
+
+/**
+ * Callback method executed prior to enabling the activity module.
+ *
+ * @return bool Whether to proceed and enable the plugin or not.
+ */
+function bigbluebuttonbn_pre_enable_plugin_actions(): bool {
+    global $PAGE;
+
+    // If the default server configuration is used and the administrator has not accepted the default data processing
+    // agreement, do not enable the plugin. Instead, display a dynamic form where the administrator can confirm that he
+    // accepts the DPA prior to enabling the plugin.
+    if (config::get('server_url') === config::DEFAULT_SERVER_URL && !config::get('default_dpa_accepted')) {
+        $PAGE->requires->js_call_amd('mod_bigbluebuttonbn/accept_dpa', 'init', []);
+        return false;
+    }
+    // Otherwise, continue and enable the plugin.
     return true;
 }

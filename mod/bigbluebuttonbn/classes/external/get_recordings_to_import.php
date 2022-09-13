@@ -146,6 +146,7 @@ class get_recordings_to_import extends external_api {
                 $excludedids,
                 true,
                 false,
+                ($sourcecourseid == 0 || $sourcebigbluebuttonbnid == 0),
                 ($sourcecourseid == 0 || $sourcebigbluebuttonbnid == 0)
             );
         }

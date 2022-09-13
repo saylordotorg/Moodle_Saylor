@@ -16,9 +16,6 @@
 
 namespace mod_bigbluebuttonbn\output;
 
-use mod_bigbluebuttonbn\instance;
-use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording_data;
-use mod_bigbluebuttonbn\local\config;
 use mod_bigbluebuttonbn\recording;
 use pix_icon;
 use renderable;
@@ -44,6 +41,7 @@ class recording_row_actionbar implements renderable, templatable {
      * @var $tools
      */
     protected $tools;
+
     /**
      * @var array TOOLS_DEFINITION a list of definition for the the specific tools
      */

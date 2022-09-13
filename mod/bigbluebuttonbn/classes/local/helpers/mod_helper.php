@@ -20,7 +20,6 @@ use calendar_event;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\logger;
 use mod_bigbluebuttonbn\plugin;
-use mod_bigbluebuttonbn\task\send_instance_update_notification;
 use stdClass;
 
 /**
@@ -83,6 +82,9 @@ class mod_helper {
         if (!isset($bigbluebuttonbn->recordings_html)) {
             $bigbluebuttonbn->recordings_html = 0;
         }
+        if (!isset($bigbluebuttonbn->recordings_deleted)) {
+            $bigbluebuttonbn->recordings_deleted = 0;
+        }
         if (!isset($bigbluebuttonbn->recordings_imported)) {
             $bigbluebuttonbn->recordings_imported = 0;
         }
@@ -137,29 +139,8 @@ class mod_helper {
      * @param stdClass $bigbluebuttonbn BigBlueButtonBN form data
      **/
     public static function process_post_save(stdClass $bigbluebuttonbn): void {
-        if (isset($bigbluebuttonbn->notification) && $bigbluebuttonbn->notification) {
-            self::process_post_save_notification($bigbluebuttonbn);
-        }
         self::process_post_save_event($bigbluebuttonbn);
         self::process_post_save_completion($bigbluebuttonbn);
-    }
-
-    /**
-     * Generates a message on insert/update which is sent to all users enrolled.
-     *
-     * @param stdClass $bigbluebuttonbn BigBlueButtonBN form data
-     **/
-    protected static function process_post_save_notification(stdClass $bigbluebuttonbn): void {
-        $task = new send_instance_update_notification();
-        $task->set_instance_id($bigbluebuttonbn->id);
-
-        if (isset($bigbluebuttonbn->add) && !empty($bigbluebuttonbn->add)) {
-            $task->set_update_type(send_instance_update_notification::TYPE_CREATED);
-        } else {
-            $task->set_update_type(send_instance_update_notification::TYPE_UPDATED);
-        }
-
-        \core\task\manager::queue_adhoc_task($task);
     }
 
     /**

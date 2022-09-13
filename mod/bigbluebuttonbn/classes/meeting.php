@@ -21,7 +21,7 @@ use cache_store;
 use context_course;
 use core_tag_tag;
 use Exception;
-use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 use mod_bigbluebuttonbn\local\config;
 use mod_bigbluebuttonbn\local\exceptions\bigbluebutton_exception;
 use mod_bigbluebuttonbn\local\exceptions\meeting_join_exception;
@@ -77,7 +77,7 @@ class meeting {
     /**
      * Get currently stored meeting info
      *
-     * @return mixed|stdClass
+     * @return stdClass
      */
     public function get_meeting_info() {
         if (!$this->meetinginfo) {
@@ -198,7 +198,6 @@ class meeting {
             $this->instance->get_user_fullname(),
             $this->instance->get_current_user_password(),
             $this->instance->get_logout_url()->out(false),
-            $this->instance->get_current_user_role(),
             null,
             $this->instance->get_user_id(),
             $this->get_meeting_info()->createtime
@@ -356,7 +355,6 @@ class meeting {
     ];
     /**
      * Helper to prepare data used for create meeting.
-     * @todo moderatorPW and attendeePW will be removed from create after release of BBB v2.6.
      *
      * @return array
      */
@@ -454,36 +452,62 @@ class meeting {
      *  - Body: <A JSON Object>
      *
      * @param instance $instance
-     * @param object $data
-     * @return string
+     * @return void
      */
-    public static function meeting_events(instance $instance, object $data):  string {
+    public static function meeting_events(instance $instance) {
         $bigbluebuttonbn = $instance->get_instance_data();
+        // Decodes the received JWT string.
+        try {
+            // Get the HTTP headers (getallheaders is a PHP function that may only work with Apache).
+            $headers = getallheaders();
+
+            // Pull the Bearer from the headers.
+            if (!array_key_exists('Authorization', $headers)) {
+                $msg = 'Authorization failed';
+                header('HTTP/1.0 400 Bad Request. ' . $msg);
+                return;
+            }
+            $authorization = explode(" ", $headers['Authorization']);
+
+            // Verify the authenticity of the request.
+            $token = \Firebase\JWT\JWT::decode(
+                $authorization[1],
+                new Key(config::get('shared_secret'), 'HS512')
+            );
+
+            // Get JSON string from the body.
+            $jsonstr = file_get_contents('php://input');
+
+            // Convert JSON string to a JSON object.
+            $jsonobj = json_decode($jsonstr);
+        } catch (Exception $e) {
+            $msg = 'Caught exception: ' . $e->getMessage();
+            header('HTTP/1.0 400 Bad Request. ' . $msg);
+            return;
+        }
+
         // Validate that the bigbluebuttonbn activity corresponds to the meeting_id received.
-        $meetingidelements = explode('[', $data->{'meeting_id'});
+        $meetingidelements = explode('[', $jsonobj->{'meeting_id'});
         $meetingidelements = explode('-', $meetingidelements[0]);
         if (!isset($bigbluebuttonbn) || $bigbluebuttonbn->meetingid != $meetingidelements[0]) {
-            $msg = 'HTTP/1.0 410 Gone. The activity may have been deleted';
-            debugging($msg, DEBUG_DEVELOPER);
-            return $msg;
+            $msg = 'The activity may have been deleted';
+            header('HTTP/1.0 410 Gone. ' . $msg);
+            return;
         }
 
         // We make sure events are processed only once.
-        $overrides = ['meetingid' => $data->{'meeting_id'}];
-        $meta['internalmeetingid'] = $data->{'internal_meeting_id'};
+        $overrides = ['meetingid' => $jsonobj->{'meeting_id'}];
+        $meta['recordid'] = $jsonobj->{'internal_meeting_id'};
         $meta['callback'] = 'meeting_events';
-        $meta['meetingid'] = $data->{'meeting_id'};
 
         $eventcount = logger::log_event_callback($instance, $overrides, $meta);
         if ($eventcount === 1) {
             // Process the events.
-            self::process_meeting_events($instance, $data);
-            $msg = 'HTTP/1.0 200 Accepted. Enqueued.';
+            self::process_meeting_events($instance, $jsonobj);
+            header('HTTP/1.0 200 Accepted. Enqueued.');
         } else {
-            $msg = 'HTTP/1.0 202 Accepted. Already processed.';
+            header('HTTP/1.0 202 Accepted. Already processed.');
         }
-        debugging($msg, DEBUG_DEVELOPER);
-        return $msg;
     }
 
     /**

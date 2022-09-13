@@ -113,7 +113,7 @@ class get_recordings extends external_api {
                 if ($groupid) {
                     $instance->set_group_id($groupid);
                 }
-                $recordings = $instance->get_recordings([]);
+                $recordings = $instance->get_recordings([], $instance->get_instance_var('recordings_deleted'));
                 $tabledata = recording_data::get_recording_table($recordings, $tools, $instance);
 
                 $returnval['tabledata'] = $tabledata;
@@ -151,6 +151,7 @@ class get_recordings extends external_api {
                     'type' => new external_value(PARAM_ALPHANUMEXT, 'Column type', VALUE_OPTIONAL),
                     'sortable' => new external_value(PARAM_BOOL, 'Whether this column is sortable', VALUE_OPTIONAL, false),
                     'allowHTML' => new external_value(PARAM_BOOL, 'Whether this column contains HTML', VALUE_OPTIONAL, false),
+                    'formatter' => new external_value(PARAM_ALPHANUMEXT, 'Formatter name', VALUE_OPTIONAL),
                 ])),
                 'data' => new external_value(PARAM_RAW), // For now it will be json encoded.
             ], '', VALUE_OPTIONAL),

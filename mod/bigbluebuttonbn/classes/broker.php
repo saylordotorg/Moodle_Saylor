@@ -18,6 +18,7 @@ namespace mod_bigbluebuttonbn;
 
 use Exception;
 use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 use mod_bigbluebuttonbn\local\config;
 
 /**
@@ -83,13 +84,12 @@ class broker {
      * @param instance $instance
      * @param array $params
      */
-    public static function process_recording_ready(instance $instance, array $params): void {
+    public static function recording_ready(instance $instance, array $params): void {
         // Decodes the received JWT string.
         try {
             $decodedparameters = JWT::decode(
                 $params['signed_parameters'],
-                config::get('shared_secret'),
-                array('HS256')
+                new Key(config::get('shared_secret'), 'HS256')
             );
         } catch (Exception $e) {
             $error = 'Caught exception: ' . $e->getMessage();
@@ -125,48 +125,6 @@ class broker {
         } catch (Exception $e) {
             $error = 'Caught exception: ' . $e->getMessage();
             header('HTTP/1.0 503 Service Unavailable. ' . $error);
-        }
-    }
-
-    /**
-     * Process meeting events for instance with provided HTTP headers.
-     *
-     * @param instance $instance
-     * @return void
-     */
-    public static function process_meeting_events(instance $instance) {
-        try {
-            // Get the HTTP headers (getallheaders is a PHP function that may only work with Apache).
-            $headers = getallheaders();
-
-            // Pull the Bearer from the headers.
-            if (!array_key_exists('Authorization', $headers)) {
-                $msg = 'HTTP/1.0 400 Bad Request. Authorization failed';
-                debugging($msg, DEBUG_DEVELOPER);
-                header($msg);
-                return;
-            }
-            $authorization = explode(" ", $headers['Authorization']);
-
-            // Verify the authenticity of the request.
-            // Encoding is different than the one used in broker.php for process_recording_ready_notifications.
-            $token = JWT::decode(
-                $authorization[1],
-                config::get('shared_secret'),
-                array('HS512')
-            );
-
-            // Get JSON string from the body.
-            $jsonstr = file_get_contents('php://input');
-
-            // Convert JSON string to a JSON object.
-            $jsonobj = json_decode($jsonstr);
-            $headermsg = meeting::meeting_events($instance, $jsonobj);
-            header($headermsg);
-        } catch (Exception $e) {
-            $msg = 'HTTP/1.0 400 Bad Request. Caught exception: ' . $e->getMessage();
-            debugging($msg, DEBUG_DEVELOPER);
-            header($msg);
         }
     }
 }

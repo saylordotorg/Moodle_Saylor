@@ -157,7 +157,7 @@ EOF;
         [$wheresql, $params] = static::get_user_completion_sql_params($instance, $userid, $filters, $timestart);
         $select = "SELECT MAX(timecreated) ";
         $lastlogtime = $DB->get_field_sql($select . ' FROM {bigbluebuttonbn_logs} WHERE ' . $wheresql, $params);
-        return $lastlogtime ?? 0;
+        return $lastlogtime;
     }
 
     /**
@@ -177,6 +177,7 @@ EOF;
         [$insql, $params] = $DB->get_in_or_equal($filters, SQL_PARAMS_NAMED);
         $wheres = [];
         $wheres['bigbluebuttonbnid'] = '= :instanceid';
+        $wheres['courseid'] = '= :courseid'; // This speeds up the requests masively as courseid is an index.
         if ($timestart) {
             $wheres['timecreated'] = ' > :timestart';
             $params['timestart'] = $timestart;
@@ -186,6 +187,7 @@ EOF;
             $params['userid'] = $userid;
         }
         $params['instanceid'] = $instance->get_instance_id();
+        $params['courseid'] = $instance->get_course_id();
         $wheres['log'] = " $insql";
         $wheresqls = [];
         foreach ($wheres as $key => $val) {
@@ -255,7 +257,7 @@ EOF;
             json_encode($meta)
         );
 
-        return self::count_callback_events($meta['internalmeetingid'], 'meeting_events');
+        return self::count_callback_events($meta['recordid'], 'meeting_events');
     }
 
     /**
@@ -439,11 +441,11 @@ EOF;
     /**
      * Helper function to count the number of callback logs matching the supplied specifications.
      *
-     * @param string $id
+     * @param string $recordid
      * @param string $callbacktype
      * @return int
      */
-    protected static function count_callback_events(string $id, string $callbacktype = 'recording_ready'): int {
+    protected static function count_callback_events(string $recordid, string $callbacktype = 'recording_ready'): int {
         global $DB;
         $sql = 'SELECT count(DISTINCT id) FROM {bigbluebuttonbn_logs} WHERE log = ? AND meta LIKE ? AND meta LIKE ?';
         // Callback type added on version 2.4, validate recording_ready first or assume it on records with no callback.
@@ -452,14 +454,14 @@ EOF;
             $count =
                 $DB->count_records_sql($sql, [
                     self::EVENT_CALLBACK, '%recordid%',
-                    "%$id%",
+                    "%$recordid%",
                     $callbacktype, 'callback'
                 ]);
             return $count;
         }
         $sql .= ' AND meta LIKE ?;';
         $count = $DB->count_records_sql($sql,
-            [self::EVENT_CALLBACK, '%%', "%$id%", "%$callbacktype%"]);
+            [self::EVENT_CALLBACK, '%recordid%', "%$recordid%", "%$callbacktype%"]);
         return $count;
     }
 

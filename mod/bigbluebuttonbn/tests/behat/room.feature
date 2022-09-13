@@ -3,6 +3,7 @@ Feature: The recording can be managed through the room page and as a user I can 
 
   Background:  Make sure that import recording is enabled and course, activities and recording exists
     Given a BigBlueButton mock server is configured
+    And I enable "bigbluebuttonbn" "mod" plugin
     And the following "courses" exist:
       | fullname      | shortname | category |
       | Test Course 1 | C1        | 0        |
@@ -21,15 +22,14 @@ Feature: The recording can be managed through the room page and as a user I can 
       | RoomRecordings  | Recording 3 | Description 3 | 2      | 1629666194  |
       | RoomRecordings  | Recording 4 | Description 4 | 2      | 1649666194  |
 
-  #behat test disabled for now until recording.js file updated to be compatible with 4.0 code
   @javascript
   Scenario: Recording should be sortable by date
-   # Given I am on the "RoomRecordings" "bigbluebuttonbn activity" page logged in as admin
-    #Then I click on "th[data-yui3-col-id='date'] .yui3-datatable-sort-indicator" "css_element"
-    #Then "Recording 1" "text" should appear before "Recording 3" "text"
-    #Then "Recording 3" "text" should appear before "Recording 2" "text"
-    #Then "Recording 2" "text" should appear before "Recording 4" "text"
-    #Then I click on "th[data-yui3-col-id='date'] .yui3-datatable-sort-indicator" "css_element"
-    #Then "Recording 1" "text" should appear after "Recording 3" "text"
-    #Then "Recording 3" "text" should appear after "Recording 2" "text"
-    #Then "Recording 2" "text" should appear after "Recording 4" "text"
+    Given I am on the "RoomRecordings" "bigbluebuttonbn activity" page logged in as admin
+    Then I click on "th[data-yui3-col-id='date'] .yui3-datatable-sort-indicator" "css_element"
+    Then "Recording 1" "text" should appear before "Recording 3" "text"
+    Then "Recording 3" "text" should appear before "Recording 2" "text"
+    Then "Recording 2" "text" should appear before "Recording 4" "text"
+    Then I click on "th[data-yui3-col-id='date'] .yui3-datatable-sort-indicator" "css_element"
+    Then "Recording 1" "text" should appear after "Recording 3" "text"
+    Then "Recording 3" "text" should appear after "Recording 2" "text"
+    Then "Recording 2" "text" should appear after "Recording 4" "text"

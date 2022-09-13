@@ -212,7 +212,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $mform->setType('completionattendance', PARAM_INT);
         $mform->addGroup($attendance['group'], 'completionattendancegroup', $attendance['grouplabel'], [' '], false);
         $mform->addHelpButton('completionattendancegroup', 'completionattendancegroup', 'bigbluebuttonbn');
-        $mform->disabledIf('completionattendancegroup', 'completion', 'neq', COMPLETION_AGGREGATION_ANY);
+        $mform->disabledIf('completionattendancegroup', 'completionview', 'notchecked');
         $mform->disabledIf('completionattendance', 'completionattendanceenabled', 'notchecked');
 
         // Elements for completion by Engagement.
@@ -236,7 +236,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             ]
         ]);
         $mform->addHelpButton('completionengagementgroup', 'completionengagementgroup', 'bigbluebuttonbn');
-        $mform->disabledIf('completionengagementgroup', 'completion', 'neq', COMPLETION_AGGREGATION_ANY);
+        $mform->disabledIf('completionengagementgroup', 'completionview', 'notchecked');
 
         return ['completionattendancegroup', 'completionengagementgroup'];
     }
@@ -307,15 +307,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $this->standard_intro_elements(get_string('mod_form_field_intro', 'bigbluebuttonbn'));
         $mform->setAdvanced('introeditor');
         $mform->setAdvanced('showdescription');
-        if ($cfg['sendnotifications_enabled']) {
-            $field = ['type' => 'checkbox', 'name' => 'notification', 'data_type' => PARAM_INT,
-                'description_key' => 'mod_form_field_notification'];
-            $this->bigbluebuttonbn_mform_add_element($mform, $field['type'], $field['name'], $field['data_type'],
-                $field['description_key'], 0);
-        }
     }
-
-
 
     /**
      * Function for showing details of the room settings for the room.
@@ -497,6 +489,15 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
      */
     private function bigbluebuttonbn_mform_add_block_room_recordings(MoodleQuickForm &$mform, array $cfg): void {
         $recordingsettings = false;
+        $field = ['type' => 'hidden', 'name' => 'recordings_deleted', 'data_type' => PARAM_INT,
+            'description_key' => null];
+        if ($cfg['recordings_deleted_editable']) {
+            $field['type'] = 'checkbox';
+            $field['description_key'] = 'mod_form_field_recordings_deleted';
+            $recordingsettings = true;
+        }
+        $this->bigbluebuttonbn_mform_add_element($mform, $field['type'], $field['name'], $field['data_type'],
+            $field['description_key'], $cfg['recordings_deleted_default']);
         $field = ['type' => 'hidden', 'name' => 'recordings_imported', 'data_type' => PARAM_INT,
             'description_key' => null];
         if ($cfg['importrecordings_enabled'] && $cfg['recordings_imported_editable']) {
@@ -537,7 +538,8 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             $mform->addElement('header', 'room', get_string('mod_form_block_room', 'bigbluebuttonbn'));
             $this->bigbluebuttonbn_mform_add_block_room_room($mform, $cfg);
         }
-        if ($cfg['recordings_imported_editable'] || $cfg['recordings_preview_editable']) {
+        if ($cfg['recordings_deleted_editable'] ||
+            $cfg['recordings_imported_editable'] || $cfg['recordings_preview_editable']) {
             $mform->addElement('header', 'recordings', get_string('mod_form_block_recordings', 'bigbluebuttonbn'));
             $this->bigbluebuttonbn_mform_add_block_room_recordings($mform, $cfg);
         }

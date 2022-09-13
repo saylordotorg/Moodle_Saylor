@@ -172,7 +172,8 @@ class recording_proxy extends proxy_base {
      *
      * We use a cache to store recording indexed by keyids/recordingID.
      * @param array $keyids list of recordingids
-     * @return array (associative) with recordings indexed by recordID, each recording is a non sequential array.
+     * @return array (associative) with recordings indexed by recordID, each recording is a non sequential array
+     *  and sorted by {@see recording_proxy::sort_recordings}
      */
     public static function fetch_recordings(array $keyids = []): array {
         $recordings = [];
@@ -196,7 +197,8 @@ class recording_proxy extends proxy_base {
      * Helper function to fetch recordings from a BigBlueButton server.
      *
      * @param array $keyids list of meetingids
-     * @return array (associative) with recordings indexed by recordID, each recording is a non sequential array.
+     * @return array (associative) with recordings indexed by recordID, each recording is a non sequential array
+     *  and sorted by {@see recording_proxy::sort_recordings}
      */
     public static function fetch_recording_by_meeting_id(array $keyids = []): array {
         $recordings = [];
@@ -215,6 +217,7 @@ class recording_proxy extends proxy_base {
      * @param array $keyids list of meetingids or recordingids
      * @param string $key the param name used for the BBB request (<recordID>|meetingID)
      * @return array (associative) with recordings indexed by recordID, each recording is a non sequential array.
+     *  and sorted {@see recording_proxy::sort_recordings}
      */
     private static function do_fetch_recordings(array $keyids = [], string $key = 'recordID'): array {
         $recordings = [];
@@ -223,7 +226,8 @@ class recording_proxy extends proxy_base {
             $fetchrecordings = self::fetch_recordings_page($ids, $key);
             $recordings += $fetchrecordings;
         }
-        return $recordings;
+        // Sort recordings.
+        return self::sort_recordings($recordings);
     }
     /**
      * Helper function to fetch a page of recordings from the remote server.
@@ -271,6 +275,31 @@ class recording_proxy extends proxy_base {
                 }
             }
         }
+
+        return $recordings;
+    }
+
+    /**
+     *  Helper function to sort an array of recordings. It compares the startTime in two recording objects.
+     *
+     * @param array $recordings
+     * @return array
+     */
+    public static function sort_recordings(array $recordings): array {
+        global $CFG;
+
+        $resultless = !empty($CFG->bigbluebuttonbn_recordings_sortorder) ? -1 : 1;
+        $resultmore = !empty($CFG->bigbluebuttonbn_recordings_sortorder) ? 1 : -1;
+
+        uasort($recordings, function($a, $b) use ($resultless, $resultmore) {
+            if ($a['startTime'] < $b['startTime']) {
+                return $resultless;
+            }
+            if ($a['startTime'] == $b['startTime']) {
+                return 0;
+            }
+            return $resultmore;
+        });
 
         return $recordings;
     }

@@ -1,5 +1,9 @@
 History
 =============
+Version 4.0.1.1 - TBR
+============================
+1. Improve upgrade script so that it attempts a repair if something breaks the first time.
+
 Version 4.0.1.0 - 12/09/2022
 ============================
 1. Tidy and refactor code.

@@ -726,19 +726,6 @@ EOF;
     }
 
     /**
-     * Get the appropriate designated role for the current user.
-     *
-     * @return string
-     */
-    public function get_current_user_role(): string {
-        if ($this->is_admin() || $this->is_moderator()) {
-            return 'MODERATOR';
-        }
-
-        return 'VIEWER';
-    }
-
-    /**
      * Whether to show the recording button
      *
      * @return bool
@@ -769,6 +756,9 @@ EOF;
      * @return bool
      */
     public function can_import_recordings(): bool {
+        if (!config::get('importrecordings_enabled')) {
+            return false;
+        }
         if ($this->can_manage_recordings()) {
             return true;
         }
@@ -1112,9 +1102,10 @@ EOF;
      * Get recordings for this instance
      *
      * @param string[] $excludedid
+     * @param bool $viewdeleted view deleted recordings ?
      * @return recording[]
      */
-    public function get_recordings(array $excludedid = []): array {
+    public function get_recordings(array $excludedid = [], $viewdeleted = false): array {
         // Fetch the list of recordings depending on the status of the instance.
         // show room is enabled for TYPE_ALL and TYPE_ROOM_ONLY.
         if ($this->is_feature_enabled('showroom')) {
@@ -1131,7 +1122,7 @@ EOF;
             $excludedid,
             $this->is_feature_enabled('importrecordings'),
             false,
-            false
+            $viewdeleted
         );
     }
 

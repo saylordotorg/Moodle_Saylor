@@ -200,7 +200,7 @@ class files_test extends \advanced_testcase {
     /**
      * Create a user and an activity
      *
-     * @param null $presentationfilename
+     * @param string|null $presentationpath
      * @param bool $closed
      * @return array
      */

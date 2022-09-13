@@ -26,12 +26,13 @@ namespace mod_bigbluebuttonbn\event;
 class recording_deleted extends base {
     /**
      * Init method.
+     *
      * @param string $crud
      * @param int $edulevel
      */
     protected function init($crud = 'r', $edulevel = self::LEVEL_OTHER) {
         parent::init($crud, $edulevel);
-        $this->description = "The user with id '##userid' has deleted a recording with id ".
+        $this->description = "The user with id '##userid' has deleted a recording with id " .
             "'##other' from the course id '##courseid'.";
     }
 

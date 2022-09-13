@@ -33,6 +33,8 @@ require_once($CFG->dirroot . '/search/tests/fixtures/testable_core_search.php');
  * @copyright 2021 - present, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Laurent David (laurent@call-learning.fr)
+ * @covers \mod_bigbluebuttonbn\search\tags
+ * @covers \mod_bigbluebuttonbn\search\activity
  */
 class search_test extends advanced_testcase {
     use testcase_helper_trait;
