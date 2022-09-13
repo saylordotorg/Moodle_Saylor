@@ -441,12 +441,6 @@ def plugins = [
       "dest" : 'mod/facetoface'
     ],
     [
-      "name" : 'mod_bigbluebuttonbn',
-      "url" : 'https://github.com/blindsidenetworks/moodle-mod_bigbluebuttonbn.git',
-      "branch" : 'master',
-      "dest" : 'mod/bigbluebuttonbn'
-    ],
-    [
       "name" : 'availability_role',
       "url" : 'https://github.com/moodle-an-hochschulen/moodle-availability_role.git',
       "branch" : 'MOODLE_400_STABLE',
@@ -511,6 +505,12 @@ def plugins = [
         "url" : 'https://github.com/junpataleta/moodle-mod_threesixo.git',
         "branch" : 'master',
         "dest" : 'mod/threesixo'
+    ],
+    [
+        "name" : 'quiz_randomsummary',
+        "url" : 'https://github.com/danmarsden/moodle-quiz_randomsummary.git',
+        "branch" : 'master',
+        "dest" : 'mod/quiz/report'
     ]
 ]
 
