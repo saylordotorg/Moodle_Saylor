@@ -385,6 +385,18 @@ def plugins = [
         "url" : 'https://github.com/open-lms-open-source/moodle-local_openlms.git',
         "branch" : 'MOODLE_311_STABLE',
         "dest" : 'local/openlms'
+    ],
+    [
+        "name" : 'block_lambda_dedication',
+        "url" : 'https://github.com/saylordotorg/moodle-block_lambda_dedication.git',
+        "branch" : 'master',
+        "dest" : 'blocks/lambda_dedication'
+    ],
+    [
+        "name" : 'local_lambda_time_tracker',
+        "url" : 'https://github.com/saylordotorg/moodle-local_lambda_time_tracker.git',
+        "branch" : 'main',
+        "dest" : 'local/lambda_time_tracker'
     ]
 ]
 
