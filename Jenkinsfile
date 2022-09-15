@@ -387,6 +387,12 @@ def plugins = [
         "dest" : 'local/openlms'
     ],
     [
+        "name" : 'local_lambda_dedication',
+        "url" : 'https://github.com/saylordotorg/moodle-local_lambda_dedication.git',
+        "branch" : 'main',
+        "dest" : 'blocks/lambda_dedication'
+    ],
+    [
         "name" : 'block_lambda_dedication',
         "url" : 'https://github.com/saylordotorg/moodle-block_lambda_dedication.git',
         "branch" : 'master',
