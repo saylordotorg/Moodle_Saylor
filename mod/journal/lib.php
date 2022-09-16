@@ -106,6 +106,11 @@ function journal_delete_instance($id) {
  * @return bool|null True if feature is supported, falsy if it is not
  */
 function journal_supports($feature) {
+    if (defined('FEATURE_MOD_PURPOSE')
+        && defined('MOD_PURPOSE_COLLABORATION')
+        && $feature === FEATURE_MOD_PURPOSE) {
+        return MOD_PURPOSE_COLLABORATION;
+    }
     switch($feature) {
         case FEATURE_MOD_INTRO:
             return true;
@@ -127,8 +132,6 @@ function journal_supports($feature) {
             return true;
         case FEATURE_SHOW_DESCRIPTION:
             return true;
-        case FEATURE_MOD_PURPOSE:
-            return MOD_PURPOSE_COLLABORATION;
         default:
             return null;
     }
@@ -577,7 +580,7 @@ function journal_update_grades($journal=null, $userid=0, $nullifnone=true) {
                 FROM {course_modules} cm
                 JOIN {modules} m ON m.id = cm.module
                 JOIN {journal} j ON cm.instance = j.id
-                WHERE m.name = "journal"';
+                WHERE m.name = \'journal\'';
         if ($recordset = $DB->get_records_sql($sql)) {
             foreach ($recordset as $journal) {
                 if ($journal->grade != false) {
@@ -793,7 +796,7 @@ function journal_get_coursemodule($journalid) {
 
     return $DB->get_record_sql('SELECT cm.id FROM {course_modules} cm
                                 JOIN {modules} m ON m.id = cm.module
-                                WHERE cm.instance = ? AND m.name = "journal"', array($journalid));
+                                WHERE cm.instance = ? AND m.name = \'journal\'', array($journalid));
 }
 
 

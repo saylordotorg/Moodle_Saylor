@@ -14,21 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-// Only when master becomes a stable the version value will be changed for
-// the current date. Otherwise we just increase the last NN by one.
-
 /**
- * mod_journal version file
+ * Test-specific subclass to make some protected things public.
  *
- * @package    mod_journal
- * @copyright  2014 David Monllao <david.monllao@gmail.com>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   core
+ * @category  test
+ * @copyright 2022 onwards Eloy Lafuente (stronk7) {@link https://stronk7.com}
+ * @license   https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-defined('MOODLE_INTERNAL') || die();
-
-$plugin->component = 'mod_journal';
-$plugin->version  = 2022091600;
-$plugin->requires = 2017111300;  /* Moodle 3.4 */
-$plugin->release = '4.0.1 (Build: 2022091600)';
-$plugin->maturity = MATURITY_STABLE;
+class block_ablocktype extends block_base {
+    public function init() {
+    }
+}
