@@ -1,0 +1,209 @@
+// Removes the subcourse links from boost navigation menu so it does not display to students
+
+
+// MBA601 Specific for BUS501 and MBA Enrollment Agreement Subcourses
+
+a[data-key="51114"] {
+    display: none;
+}
+
+a[data-key="51519"] {
+    display: none;
+}
+
+// MBA602
+
+a[data-key="51521"] {
+    display: none;
+}
+
+a[data-key="51522"] {
+    display: none;
+}
+
+// MBA603
+
+a[data-key="51524"] {
+    display: none;
+}
+
+a[data-key="51525"] {
+    display: none;
+}
+
+// MBA604
+
+a[data-key="51526"] {
+    display: none;
+}
+
+a[data-key="51527"] {
+    display: none;
+}
+
+// MBA605
+
+a[data-key="51530"] {
+    display: none;
+}
+
+a[data-key="51531"] {
+    display: none;
+}
+
+// MBA606
+
+a[data-key="51533"] {
+    display: none;
+}
+
+a[data-key="51534"] {
+    display: none;
+}
+
+// MBA607
+
+a[data-key="51536"] {
+    display: none;
+}
+
+a[data-key="51537"] {
+    display: none;
+}
+
+// MBA608
+
+a[data-key="51539"] {
+    display: none;
+}
+
+a[data-key="51540"] {
+    display: none;
+}
+
+// MBA609
+
+a[data-key="51543"] {
+    display: none;
+}
+
+a[data-key="51544"] {
+    display: none;
+}
+
+a[data-key="51545"] {
+    display: none;
+}
+
+a[data-key="51546"] {
+    display: none;
+}
+
+a[data-key="51547"] {
+    display: none;
+}
+
+a[data-key="51548"] {
+    display: none;
+}
+
+a[data-key="51549"] {
+    display: none;
+}
+
+a[data-key="51550"] {
+    display: none;
+}
+
+a[data-key="54490"] {
+    display: none;
+}
+
+// MBA610
+
+a[data-key="51552"] {
+    display: none;
+}
+
+// MBA611
+
+a[data-key="51559"] {
+    display: none;
+}
+
+// MBA612
+
+a[data-key="51561"] {
+    display: none;
+}
+
+// MBA613
+
+a[data-key="51562"] {
+    display: none;
+}
+
+// MBA614
+
+a[data-key="51565"] {
+    display: none;
+}
+
+// MBA615
+
+a[data-key="51566"] {
+    display: none;
+}
+
+// MBA Program Meta Course
+
+// Removes Subcourses navigation link in menu
+#localboostnavigationactivitysubcourse {
+    display: none;
+}
+
+#localboostnavigationactivityforum {
+    display: none;
+}
+
+#localboostnavigationactivityfacetoface {
+    display: none;
+}
+
+#localboostnavigationactivitychecklist {
+    display: none;
+}
+
+#localboostnavigationactivitybigbluebuttonbn {
+    display: none;
+}
+
+// Removes Core Courses section link. It's just a section with the banner. Doesn't need to be in the navigation cluttering up the menu.
+
+a[data-key="18619"] {
+    display: none;
+}
+
+// Removes Capstone section
+
+a[data-key="18639"] {
+    display: none;
+}
+
+// Removes Specialization section banner from localboostnavigationactivityforum
+
+a[data-key="18641"] {
+    display: none;
+}
+
+a[display-key="18642"] {
+    display: none;
+}
+
+a[display-key="18643"] {
+    display: none;
+}
+
+a[display-key="18650"] {
+    display: none;
+}

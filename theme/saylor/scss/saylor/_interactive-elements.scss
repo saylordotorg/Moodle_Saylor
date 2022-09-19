@@ -1,0 +1,704 @@
+// Box shadow variables.
+$theme-shadow-0: 0 1px 3px rgba(0, 0, 0, .1);
+$theme-shadow-1: 0 3px 8px rgba(0, 0, 0, .1);
+$theme-shadow-2: 0 5px 15px rgba(0, 0, 0, .1), 0 15px 35px rgba(0, 0, 0, .1), 0 50px 100px rgba(50, 50, 93, .1);
+$theme-shadow-3: 0 30px 60px -12px rgba(50, 50, 93, .25), 0 18px 36px -18px rgba(0, 0, 0, .3), 0 -12px 36px -8px rgba(0, 0, 0, .025);
+
+// Border radii variables.
+$border-radius-base: 5px;
+$border-radius: $border-radius-base;
+$border-radius-small: 3px;
+$border-radius-large: 8px;
+
+// Link colors.
+$link-color: $primary;
+$link-hover-color: $secondary;
+
+// Global default link hover decoration.
+$link-hover-decoration: none !default;
+
+// Cubic-bezier easing variables.
+$ease: cubic-bezier(0.4, 0.0, 0.2, 1);
+$ease-in: cubic-bezier(0.0, 0.0, 0.2, 1);
+$ease-out: cubic-bezier(0.4, 0.0, 1, 1);
+
+/**
+ * --------------------------------------------------
+ * Theme mixins and utilities.
+ * --------------------------------------------------
+ */
+
+/// Tint function to slightly lighten a color.
+/// @access public
+/// @param {Color} $color - color to tint
+/// @param {Number} $percentage - percentage of `$color` in returned color
+/// @return {Color}
+@function tint($color, $percentage) {
+    @return mix(white, $color, $percentage);
+}
+
+/// Shade function to slightly darken a color.
+/// @access public
+/// @param {Color} $color - color to shade
+/// @param {Number} $percentage - percentage of `$color` in returned color
+/// @return {Color}
+@function shade($color, $percentage) {
+    @return mix(black, $color, $percentage);
+}
+
+// Theme box mixin.
+@mixin theme-box() {
+    background: #fff;
+    box-shadow: $theme-shadow-1;
+    border: none;
+    border-bottom: 2px solid $gray-400;
+    border-radius: $border-radius-base;
+    margin-bottom: .75rem;
+}
+
+// Theme header accent line mixin.
+@mixin header-accent-line() {
+    content: "";
+    display: block;
+    height: 2px;
+    margin: .4em auto 0;
+    width: 62%;
+    background-color: $secondary;
+}
+
+/**
+ * --------------------------------------------------
+ * REIN Styles.
+ *
+ * Because REIN css is loaded after Altitude's
+ * customizations, we prefix everything with the
+ * custom-theme class to override the cascade.
+ * --------------------------------------------------
+ */
+
+// Reset base typography.
+.ui-widget,
+.ui-helper-reset {
+    font-family: $font-family-sans-serif;
+    font-size: $font-size-base;
+    line-height: $line-height-base;
+}
+
+// Reset base content container.
+.ui-widget-content {
+    border: none;
+    background: transparent;
+    color: $body-color;
+}
+
+// Reset header styles.
+.ui-widget-header {
+    border: none;
+    color: $body-color;
+    font-weight: bold;
+}
+
+// Set the base styles for UI default state.
+.ui-state-default,
+.ui-widget-content .ui-state-default,
+.ui-widget-header .ui-state-default {
+    border: none;
+    font-weight: normal;
+    color: #fff;
+    background: $primary;
+    box-shadow: none;
+
+    &:hover,
+    &:focus {
+        background: shade($tertiary, 20%) !important;
+    }
+
+    &:active {
+        background: shade($tertiary, 30%);
+    }
+
+    &.ui-state-active {
+        padding-bottom: 0;
+        background: $primary-orange  !important;
+        color: color-yiq($primary-orange) !important;
+
+        i,
+        .fa {
+            color: rgba(255, 255, 255, .9);
+        }
+    }
+}
+
+// Set the base styles for UI default state links.
+.ui-state-default a,
+.ui-state-default a:link,
+.ui-state-default a:visited {
+    color: color-yiq($secondary);
+}
+
+// Set the base styles for UI active state links.
+.ui-state-active a,
+.ui-state-active a:link,
+.ui-state-active a:visited,
+.ui-tabs .ui-tabs-nav li.ui-tabs-active a {
+    color: color-yiq($secondary) !important;
+}
+
+// Set the base styles for UI highlight state.
+.ui-state-highlight,
+.ui-widget-content .ui-state-highlight,
+.ui-widget-header .ui-state-highlight {
+    border: none;
+}
+
+// Reset ui border default radii.
+.ui-corner {
+    border-radius: $border-radius-base;
+}
+
+.ui-corner-top {
+    border-radius: $border-radius-base $border-radius-base 0 0;
+}
+
+// Remove default text shadows.
+.ui-button {
+    .ui-button-text {
+        text-shadow: none;
+    }
+}
+
+// Add theme box styles to REIN elements.
+.ui-dialog,
+.ui-tabs .ui-tabs-panel,
+.doAccordion,
+.tabs-vertical,
+.tabs-top,
+.tabs-arrows.ui-widget-content {
+    background: #fff;
+    box-shadow: $theme-shadow-1;
+    border-radius: $border-radius-base;
+    border: none;
+    overflow: hidden;
+}
+
+// Load theme ui-icon images.
+.ui-state-default .ui-icon {
+    background-image: url([[pix:theme|ui-icons]]);
+}
+
+/**
+ * --------------------------------------------------
+ * These general UI styles must be scoped inside the
+ * rein-plugin class to avoid global conflics.
+ * --------------------------------------------------
+ */
+
+.rein-plugin {
+
+    // Reset link styles.
+    a,
+    .ui-widget-content a {
+        color: $link-color;
+
+        &:hover,
+        &:focus {
+            color: $link-hover-color;
+            text-decoration: $link-hover-decoration;
+        }
+    }
+
+    // Force white text color in buttons.
+    button,
+    a.btn,
+    .ui-button {
+        color: #fff;
+
+        &:hover,
+        &:focus,
+        &:active {
+            color: #fff;
+        }
+    }
+}
+
+/**
+ * --------------------------------------------------
+ * REIN ui-dialog element.
+ * --------------------------------------------------
+ */
+
+.ui-dialog {
+
+    .ui-dialog-titlebar {
+        background: $tertiary;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-items: center;
+        padding: 0 1em;
+        border: none;
+    }
+
+    .ui-dialog-title {
+        float: none !important;
+        margin: 0 !important;
+        font-size: 1rem !important;
+        text-shadow: none !important;
+    }
+
+    .ui-dialog-titlebar-close {
+        color: #fff;
+        position: static;
+        width: auto;
+        height: auto;
+        margin: 0 0 0 auto;
+        font-size: 0;
+        opacity: .75;
+        transition: opacity 250ms $ease-in;
+
+        .ui-button-icon {
+            color: #fff;
+            font-family: "Fontawesome";
+            position: static;
+            // margin: 0 -1rem 0 0;
+            // padding: .75rem;
+            // line-height: 1;
+            width: auto;
+            height: auto;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-indent: 0;
+            transition: color 250ms $ease-in;
+
+            &:before {
+                content: "\f00d";
+            }
+        }
+
+        &:hover,
+        &:focus,
+        &:active {
+            opacity: 1;
+            background: transparent;
+
+            .ui-button-icon {
+                color: $secondary;
+            }
+        }
+    }
+}
+
+
+/**
+ * --------------------------------------------------
+ * REIN ui-tabs element.
+ * --------------------------------------------------
+ */
+
+.ui-tabs {
+    margin-bottom: 2rem;
+
+    .ui-tabs-nav li {
+        border: none;
+        margin-bottom: 0;
+        top: 0;
+    }
+
+    .ui-tabs-nav li a {
+        font-size: 1rem;
+        text-shadow: none;
+        letter-spacing: -.03rem;
+        color: #f5f5f5;
+        font-weight: bold;
+    }
+
+    .ui-tabs-nav li .fa {
+        color: rgba(255, 255, 255, 1.75);
+        vertical-align: text-top;
+        font-size: 1.25rem;
+    }
+
+    .ui-tabs-panel {
+        border-top-left-radius: 0;
+    }
+}
+
+
+/**
+ * --------------------------------------------------
+ * REIN vertical ui-tabs element.
+ * --------------------------------------------------
+ */
+
+.tabs-vertical {
+
+    ul.ui-tabs-nav:before {
+        background: $gray-200;
+    }
+
+    .ui-tabs-nav li {
+        box-shadow: 0px 1px 0px rgba(255, 255, 255, .1) inset, 0px -1px 0px rgba(0, 0, 0, .15) inset;
+
+        a.ui-tabs-anchor {
+            padding: 1.1rem 0 1rem 1rem;
+        }
+
+        i {
+            color: #ccc;
+            text-shadow: 0px 1px 2px rgba(0, 0, 0, .9);
+            font-size: 1.3rem;
+            padding-right: .5rem;
+            width: 1rem;
+        }
+
+        &.ui-tabs-selected,
+        &.ui-tabs-active {
+
+            a {
+                color: #fff;
+            }
+        }
+
+        &:first-child {
+            border: none;
+        }
+    }
+
+    .ui-tabs-panel {
+        box-shadow: none;
+        border: none;
+        background: transparent;
+    }
+}
+
+
+/**
+ * --------------------------------------------------
+ * REIN top ui-tabs element.
+ * --------------------------------------------------
+ */
+
+.tabs-top {
+    min-height: 0;
+
+    .ui-tabs-nav li {
+        box-shadow: 1px 0px 0px rgba(255, 255, 255, .1) inset, -1px 0px 0px rgba(0, 0, 0, .1) inset;
+
+        &.ui-tabs-selected,
+        &.ui-tabs-active {
+            a {
+                color: #fff;
+            }
+        }
+
+        .fa {
+            display: block;
+            font-size: 2.5rem;
+            margin-bottom: .6rem;
+        }
+    }
+}
+
+
+/**
+ * --------------------------------------------------
+ * REIN arrows ui-tabs element.
+ * --------------------------------------------------
+ */
+
+.tabs-arrows {
+    border: none;
+
+    // Remove default border.
+    &.ui-widget-content {
+        border: none;
+    }
+
+    // Remove default box-shadow.
+    &.ui-tabs .ui-tabs-panel {
+        box-shadow: none;
+    }
+
+    .ui-tabs-nav li {
+        background: $primary;
+        overflow: visible;
+        border-radius: 0;
+        margin: 0;
+        transition: all 0.3s $ease-in;
+
+        a.ui-tabs-anchor {
+            padding: 1rem 2rem 1rem 2.5rem;
+            line-height: 1;
+            background: transparent;
+            transition: all 0.3s $ease-in;
+
+            &:before {
+                content: " ";
+                display: block;
+                width: 0;
+                height: 0;
+                border-style: solid;
+                border-width: 1.5rem 0 1.5rem 1rem;
+                border-color: transparent transparent transparent rgba(255, 255, 255, .25);
+                position: absolute;
+                top: 0;
+                left: 1px;
+                z-index: 1;
+            }
+
+            &:after {
+                border-width: 1.5rem 0 1.5rem 1rem;
+                border-left-color: $primary;
+                background: transparent;
+                transition: all 0.3s $ease-in;
+            }
+
+            &:hover,
+            &:focus {
+                background: shade($primary, 20%);
+
+                &:after {
+                    border-left-color: shade($primary, 20%);
+                }
+            }
+
+            &:active {
+                background: shade($primary, 30%);
+
+                &:after {
+                    border-left-color: shade($primary, 30%);
+                }
+            }
+
+        }
+
+        &:first-of-type a:before {
+            display: none;
+        }
+
+        &.ui-state-active a,
+        &.ui-state-active a:focus {
+            background: $secondary;
+
+            &:after {
+                border-left-color: $secondary;
+            }
+        }
+    }
+}
+
+
+
+/**
+ * --------------------------------------------------
+ * REIN accordion element.
+ * --------------------------------------------------
+ */
+
+// Expand wrap to full width.
+.doAccordionWrap {
+    padding: 0;
+    width: auto;
+}
+
+// Build accordion styles.
+.doAccordion {
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 1rem;
+
+    // Header styles.
+    .accordion-header {
+        font-size: 1rem;
+        margin-top: 0;
+        box-shadow: 0px 1px 0px rgba(255, 255, 255, .1) inset, 0px -1px 0px rgba(0, 0, 0, .2) inset;
+
+        a {
+            font-size: 1em;
+            color: #f5f5f5;
+            font-weight: bold;
+            text-shadow: none;
+            padding: .75rem .75rem .75rem 0;
+        }
+    }
+
+    // Icon styles.
+    .ui-accordion-icons {
+        padding-left: 1.75rem;
+    }
+
+    // Content styles.
+    .ui-accordion-content {
+        border: none;
+        background: transparent;
+        margin: 0;
+        top: 0;
+    }
+}
+
+
+/**
+ * --------------------------------------------------
+ * REIN flipbook element.
+ * --------------------------------------------------
+ */
+
+.flip-book-wrap {
+    margin: auto;
+    padding: 1.25rem;
+    background: $gray-800;
+}
+
+.flip-book {
+    .page {
+        width: 50%;
+
+        >* {
+            margin: .75rem .5rem;
+        }
+    }
+}
+
+
+/**
+ * --------------------------------------------------
+ * REIN misc elements.
+ * --------------------------------------------------
+ */
+
+.sortMultipleLists .sortable {
+    background: #fff;
+    box-shadow: $theme-shadow-1;
+    border-bottom: 2px solid rgba(100, 100, 100, .2);
+}
+
+.sortableCols li,
+.do-multi-drop .ui-state-default {
+    background: $tertiary; // Formerly $gray-700
+    text-shadow: none !important;
+    border-radius: $border-radius-base;
+    box-shadow: 0 -3px 0 rgba(0, 0, 0, .3) inset;
+}
+
+.sortableCols li:hover,
+.do-multi-drop .ui-state-default:hover {
+    background: #555;
+    color: #f5f5f5;
+    text-shadow: none;
+    box-shadow: none;
+    outline: none;
+}
+
+.do-multi-drop .ui-droppable {
+    border: solid 10px $tertiary;
+    box-shadow: $theme-shadow-1;
+}
+
+.do-stepwise .step {
+    background: #fff;
+    border-radius: $border-radius-base;
+    box-shadow: $theme-shadow-1;
+}
+
+.do-stepwise .arrow {
+    width: 0px;
+    height: 0px;
+    border-style: solid;
+    border-width: 39px 50px 0 50px;
+    border-color: $tertiary transparent transparent transparent;
+}
+
+.do-stepwise .arrow svg {
+    display: none;
+}
+
+.markit-controls .control.selected {
+    box-shadow: none;
+}
+
+.markit-controls .label {
+    background: transparent;
+    color: #fff;
+}
+
+.do-sequential div.sequential-item {
+    margin-bottom: 4px;
+    border: 1px solid #ddd;
+    background: #fff;
+}
+
+.ui-tooltip {
+    background: #fff;
+}
+
+/* Interaction states
+----------------------------------*/
+.ui-state-default,
+.ui-widget-content .ui-state-default,
+.ui-widget-header .ui-state-default {
+    border: 1px solid #B6B6B6;
+    font-weight: normal;
+    color: #4F4F4F;
+}
+
+.ui-state-default,
+.ui-widget-content .ui-state-default,
+.ui-widget-header .ui-state-default {
+    background: $tertiary url([[pix:filter_rein|aristo/bg_fallback]]) 0 0 repeat-x !important;
+    /* Old browsers */
+    background: -moz-linear-gradient(top, $tertiary 0%, $tertiary 100%) !important;
+    /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, $tertiary), color-stop(100%, $tertiary)) !important;
+    /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top, $tertiary 0%, $tertiary 100%) !important;
+    /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top, $tertiary 0%, $tertiary 100%) !important;
+    /* Opera11.10+ */
+    background: -ms-linear-gradient(top, $tertiary 0%, $tertiary 100%) !important;
+    /* IE10+ */
+    background: linear-gradient(top, $tertiary 0%, $tertiary 100%) !important;
+    /* W3C */
+    -webkit-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.6) inset !important;
+    -moz-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.6) inset !important;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.6) inset !important;
+}
+
+.ui-tabs .ui-tabs-nav li a.ui-tabs-anchor {
+    color: #fff;
+    text-decoration: none;
+    font-size: 1rem;
+}
+
+.ui-tabs .ui-tabs-nav li a {
+    font-weight: 500 !important;
+    text-shadow: 0 1px 0 rgb(0 0 0 / 50%) !important;
+}
+
+.tabs-top.ui-tabs {
+    border-radius: 3px;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+    border-bottom-left-radius: 3px;
+    box-shadow: 0 1px 3px rgb(0 0 0 / 10%);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    padding: 0;
+    border: none;
+    background: #fff;
+    overflow: hidden;
+    min-height: auto;
+    margin: 0 0 0.5em 0;
+}
+
+#page-mod-book-view {
+    #region-main {
+        .rein-plugin {
+            ul {
+                margin-left: 0;
+            }
+        }
+    }
+}
