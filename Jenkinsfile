@@ -385,6 +385,12 @@ def plugins = [
         "url" : 'https://github.com/open-lms-open-source/moodle-local_openlms.git',
         "branch" : 'MOODLE_311_STABLE',
         "dest" : 'local/openlms'
+    ],
+    [
+        "name" : 'local_staticpage',
+        "url" : 'https://github.com/moodle-an-hochschulen/moodle-local_staticpage.git',
+        "branch" : 'MOODLE_311_STABLE',
+        "dest" : 'local/staticpage'
     ]
 ]
 
