@@ -358,6 +358,8 @@ define(['jquery', 'core/log', 'mod_readaloud/definitions',
             m.controls.feedbackcontainer.hide();
             m.controls.wheretonextcontainer.hide();
             m.controls.stopandplay.hide();
+
+            modelaudiokaraoke.modeling=true;
         },
 
         domenulayout: function () {
@@ -381,6 +383,8 @@ define(['jquery', 'core/log', 'mod_readaloud/definitions',
             m.controls.modelaudioplayer.hide();
             m.controls.hider.hide();
             m.controls.stopandplay.hide();
+
+            modelaudiokaraoke.modeling=true;
         },
 
         dopreviewlayout: function () {
@@ -404,6 +408,8 @@ define(['jquery', 'core/log', 'mod_readaloud/definitions',
             m.controls.feedbackcontainer.hide();
             m.controls.wheretonextcontainer.hide();
             m.controls.stopandplay.show();
+
+            modelaudiokaraoke.modeling=false;
         },
 
         dolandrlayout: function () {
@@ -428,6 +434,9 @@ define(['jquery', 'core/log', 'mod_readaloud/definitions',
             m.controls.wheretonextcontainer.hide();
             m.controls.stopandplay.show();
             landr.activate();
+
+            modelaudiokaraoke.modeling=false;
+
         },
 
         dopassagelayout: function () {

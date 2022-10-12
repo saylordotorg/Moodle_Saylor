@@ -126,7 +126,7 @@ if ($fromform = $mform->get_data()) { // Form submitted.
 
     if (!facetoface_session_has_capacity($session, $context) && (!$session->allowoverbook)) {
         throw new moodle_exception('sessionisfull', 'facetoface', $returnurl);
-    } else if (facetoface_get_user_submissions($facetoface->id, $USER->id)) {
+    } else if ($facetoface->signuptype == MOD_FACETOFACE_SIGNUP_SINGLE && facetoface_get_user_submissions($facetoface->id, $USER->id)) {
         throw new moodle_exception('alreadysignedup', 'facetoface', $returnurl);
     } else if (facetoface_manager_needed($facetoface) && !facetoface_get_manageremail($USER->id)) {
         throw new moodle_exception('error:manageremailaddressmissing', 'facetoface', $returnurl);
@@ -144,7 +144,8 @@ if ($fromform = $mform->get_data()) { // Form submitted.
 
         $message = get_string('bookingcompleted', 'facetoface');
         if ($session->datetimeknown && $facetoface->confirmationinstrmngr) {
-            $message .= html_writer::empty_tag('br') . html_writer::empty_tag('br') . get_string('confirmationsentmgr', 'facetoface');
+            $message .= html_writer::empty_tag('br') . html_writer::empty_tag('br')
+                     . get_string('confirmationsentmgr', 'facetoface');
         } else {
             $message .= html_writer::empty_tag('br') . html_writer::empty_tag('br') . get_string('confirmationsent', 'facetoface');
         }
@@ -182,7 +183,7 @@ $heading = get_string('signupfor', 'facetoface', format_string($facetoface->name
 $viewattendees = has_capability('mod/facetoface:viewattendees', $context);
 $signedup = facetoface_check_signup($facetoface->id);
 
-if ($signedup and $signedup != $session->id) {
+if ($facetoface->signuptype == MOD_FACETOFACE_SIGNUP_SINGLE && $signedup && $signedup != $session->id) {
     throw new moodle_exception('error:signedupinothersession', 'facetoface', $returnurl);
 }
 
@@ -228,18 +229,29 @@ if ($signedup) {
     }
 
     echo html_writer::empty_tag('br') . html_writer::link($returnurl, get_string('goback', 'facetoface'), array('title' => get_string('goback', 'facetoface')));
-} else if (facetoface_manager_needed($facetoface) && !facetoface_get_manageremail($USER->id)) {
+}
+
+$managerrequired = facetoface_manager_needed($facetoface) && !facetoface_get_manageremail($USER->id);
+if (!$signedup && $managerrequired) {
 
     // Don't allow signup to proceed if a manager is required.
     // Check to see if the user has a managers email set.
     echo html_writer::tag('p', html_writer::tag('strong', get_string('error:manageremailaddressmissing', 'facetoface')));
     echo html_writer::empty_tag('br') . html_writer::link($returnurl, get_string('goback', 'facetoface'), array('title' => get_string('goback', 'facetoface')));
 
-} else if (!has_capability('mod/facetoface:signup', $context)) {
-    echo html_writer::tag('p', html_writer::tag('strong', get_string('error:nopermissiontosignup', 'facetoface')));
-    echo html_writer::empty_tag('br') . html_writer::link($returnurl, get_string('goback', 'facetoface'), array('title' => get_string('goback', 'facetoface')));
-} else {
+}
 
+$hascap = has_capability('mod/facetoface:signup', $context);
+if (!$signedup && !$managerrequired && !$hascap) {
+    echo html_writer::tag('p', html_writer::tag('strong', get_string('error:nopermissiontosignup', 'facetoface')));
+    echo html_writer::empty_tag('br') . html_writer::link(
+        $returnurl,
+        get_string('goback', 'facetoface'),
+        array('title' => get_string('goback', 'facetoface'))
+    );
+}
+
+if ($facetoface->signuptype == MOD_FACETOFACE_SIGNUP_MULTIPLE || (!$signedup && !$managerrequired && $hascap)) {
     // Signup form.
     $mform->display();
 }

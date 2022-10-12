@@ -351,7 +351,7 @@ class mod_vpl {
      *
      * @return string with name+(grouping name)
      */
-    public function get_printable_name() {
+    public function get_name() {
         global $CFG;
         $ret = $this->instance->name;
         if (! empty( $CFG->enablegroupings ) && ($this->cm->groupingid > 0)) {
@@ -360,7 +360,16 @@ class mod_vpl {
                 $ret .= ' (' . $grouping->name . ')';
             }
         }
-        return format_string($ret);
+        return $ret;
+    }
+
+    /**
+     * get instance filtered name with groupping name if available
+     *
+     * @return string with name+(grouping name)
+     */
+    public function get_printable_name() {
+        return format_string($this->get_name());
     }
 
     /**
@@ -651,24 +660,24 @@ class mod_vpl {
     }
 
     /**
-     * Check and submission
+     * Internal checks and adds submission if possible. Removes unneeded submissions.
      *
-     * @param
-     *            $userid
-     * @param $data Object
-     *            with submitted data
-     * @param & $error
-     *            string
-     * @return false or submission id
+     * @param Object $vpl
+     * @param int $userid
+     * @param array & $files submitted files
+     * @param string $comments
+     * @param string & $error Error message
+     * @return int|false Submission id or false if error
      */
-    public function add_submission($userid, & $files, $comments, & $error) {
+    public static function internal_add_submission($vpl, $userid, & $files, $comments, & $error) {
         global $USER, $DB;
-        if (! $this->pass_submission_restriction( $files, $error )) {
+        if (! $vpl->pass_submission_restriction( $files, $error )) {
+            $error = get_string('notavailable');
             return false;
         }
         $group = false;
-        if ($this->is_group_activity()) {
-            $group = $this->get_usergroup($userid);
+        if ($vpl->is_group_activity()) {
+            $group = $vpl->get_usergroup($userid);
             if ($group === false) {
                 $error = get_string( 'notsaved', VPL ) . "\n" . get_string( 'inconsistentgroup', VPL );
                 return false;
@@ -676,37 +685,29 @@ class mod_vpl {
         }
         $submittedby = '';
         if ($USER->id != $userid ) {
-            if ($this->has_capability( VPL_MANAGE_CAPABILITY ) || ($this->has_capability(
+            if ($vpl->has_capability( VPL_MANAGE_CAPABILITY ) || ($vpl->has_capability(
                     VPL_GRADE_CAPABILITY ) )) {
-                if (! $this->is_group_activity() ) {
-                    $user = $DB->get_record( 'user', array (
-                            'id' => $USER->id
-                    ) );
-                    $submittedby = get_string( 'submittedby', VPL, fullname( $user ) ) . "\n";
-                    if (strpos($comments, $submittedby) === 0 ) {
-                        $submittedby = '';
-                    }
+                $user = $DB->get_record( 'user', ['id' => $USER->id ] );
+                $submittedby = get_string( 'submittedby', VPL, fullname( $user ) ) . "\n";
+                if (strpos($comments, $submittedby) === 0 ) {
+                    $submittedby = '';
                 }
             } else {
-                $error = get_string( 'notsaved', VPL ) . "\n" . get_string( 'inconsistentgroup', VPL );
+                $error = get_string( 'notsaved', VPL );
                 return false;
             }
         }
-        $saveduserid = $this->is_group_activity() ? $USER->id : $userid;
         $lastsub = false;
-        $lock = new \mod_vpl\util\lock($this->get_users_data_directory() . '/' . $saveduserid);
-        if (($lastsubins = $this->last_user_submission( $userid )) !== false) {
-            $lastsub = new mod_vpl_submission( $this, $lastsubins );
+        if (($lastsubins = $vpl->last_user_submission( $userid )) !== false) {
+            $lastsub = new mod_vpl_submission( $vpl, $lastsubins );
             if ($lastsub->is_equal_to( $files, $submittedby . $comments )) {
-                $lock->__destruct();
                 return $lastsubins->id;
             }
         }
-        ignore_user_abort( true );
         // Create submission record.
         $submissiondata = new stdClass();
-        $submissiondata->vpl = $this->get_instance()->id;
-        $submissiondata->userid = $saveduserid;
+        $submissiondata->vpl = $vpl->get_instance()->id;
+        $submissiondata->userid = $userid;
         $submissiondata->datesubmitted = time();
         $submissiondata->comments = $submittedby . $comments;
         if ( $lastsubins !== false ) {
@@ -718,26 +719,50 @@ class mod_vpl {
         $submissionid = $DB->insert_record( 'vpl_submissions', $submissiondata, true );
         if (! $submissionid) {
             $error = get_string( 'notsaved', VPL ) . "\ninserting vpl_submissions record";
-            $lock->__destruct();
             return false;
         }
         // Save files.
-        $submission = new mod_vpl_submission( $this, $submissionid );
+        $submission = new mod_vpl_submission( $vpl, $submissionid );
         try {
             $submission->set_submitted_file( $files, $lastsub );
         } catch (file_exception $fe) {
-            $DB->delete_records( VPL_SUBMISSIONS, array ('id' => $submissionid));
+            $DB->delete_records( VPL_SUBMISSIONS, ['id' => $submissionid]);
             $error = $fe->getMessage();
-            $lock->__destruct();
             return false;
         }
         $submission->remove_grade();
-        // If no submitted by grader and not group activity, remove near submmissions.
+        // If no submitted by grader, remove near submmissions.
         if ($USER->id == $userid) {
-            $this->delete_overflow_submissions( $userid );
+            $vpl->delete_overflow_submissions( $userid );
         }
-        $lock->__destruct();
         return $submissionid;
+    }
+    /**
+     * Checks and adds submission if possible. Removes unneeded submissions.
+     *
+     * @param int $userid
+     * @param array & $files submitted files
+     * @param string $comments
+     * @param string & $error Error message
+     * @return int|false Submission id or false if error
+     */
+    public function add_submission($userid, & $files, $comments, & $error) {
+        global $USER;
+        if ($USER->id != $userid ) {
+            if (!$this->has_capability( VPL_MANAGE_CAPABILITY ) &&
+                !$this->has_capability( VPL_GRADE_CAPABILITY )) {
+                    $error = get_string('notavailable');
+                    return false;
+            }
+        }
+        $vplid = $this->get_instance()->id;
+        $locktype = 'vpl:submission';
+        $resource = "$vplid:$userid";
+        $funcname = 'mod_vpl::internal_add_submission';
+        $parms = [$this, $userid, $files, $comments, $error];
+        $result = vpl_call_with_lock($locktype, $resource, $funcname, $parms );
+        $error = $parms[4];
+        return $result;
     }
 
     /**
@@ -749,7 +774,6 @@ class mod_vpl {
      */
     public function user_submissions($userid, $groupifga = true) {
         global $DB;
-
         if ($groupifga && $this->is_group_activity()) {
             $group = $this->get_usergroup($userid);
             if ($group) {
@@ -1351,10 +1375,18 @@ class mod_vpl {
      * prepare_page initialy
      */
     public function prepare_page($url = false, $parms = array()) {
-        global $PAGE;
-        $PAGE->set_cm( $this->get_course_module(), $this->get_course(), $this->get_instance() );
+        global $PAGE, $CFG;
+        // Next line resolve problem of classic theme not showing setting menu.
+        require_login($this->get_course(), false, $this->get_course_module());
         if ($url) {
             $PAGE->set_url( new moodle_url('/mod/vpl/' . $url, $parms) );
+        }
+        if ( $CFG->version >= 2022041900) { // Checks is running on Moodle 4.
+            $PAGE->activityheader->set_description('');
+            $PAGE->activityheader->set_hidecompletion($url != 'view.php');
+            if ($url == 'view.php') {
+                $PAGE->activityheader->set_title('');
+            }
         }
     }
 
@@ -1368,7 +1400,7 @@ class mod_vpl {
      * @param $info string title and last nav option
      */
     public function print_header($info = '') {
-        global $PAGE, $OUTPUT, $CFG;
+        global $PAGE, $OUTPUT;
         if (self::$headerisout) {
             return;
         }
@@ -1383,14 +1415,11 @@ class mod_vpl {
             $PAGE->set_popup_notification_allowed(false);
             $PAGE->set_pagelayout('secure');
         }
-        if ( $CFG->version >= 2022041900) { // Checks is running on Moodle 4.
-            $PAGE->activityheader->disable();
-        }
         echo $OUTPUT->header();
         self::$headerisout = true;
     }
     public function print_header_simple($info = '') {
-        global $OUTPUT, $PAGE, $CFG;
+        global $OUTPUT, $PAGE;
         if (self::$headerisout) {
             return;
         }
@@ -1403,9 +1432,6 @@ class mod_vpl {
         if ( $this->use_seb() && ! $this->has_capability(VPL_GRADE_CAPABILITY)) {
             $PAGE->set_popup_notification_allowed(false);
             $PAGE->set_pagelayout('secure');
-        }
-        if ( $CFG->version >= 2022041900) { // Checks is running on Moodle 4.
-            $PAGE->activityheader->disable();
         }
         echo $OUTPUT->header();
         self::$headerisout = true;
@@ -1604,8 +1630,10 @@ class mod_vpl {
      * Show vpl name
      */
     public function print_name() {
-        global $OUTPUT;
-        echo $OUTPUT->heading($this->get_printable_name());
+        global $OUTPUT, $CFG;
+        if ( $CFG->version < 2022041900) {
+            echo $OUTPUT->heading($this->get_printable_name());
+        }
     }
 
     public function str_restriction($str, $value = null, $raw = false, $comp = 'mod_vpl') {
@@ -2082,11 +2110,13 @@ class mod_vpl {
                     if (isset($override->duedate) && !$delete) {
                         if ($target == 'userid') {
                             $userorgroupname = fullname($DB->get_record( 'user', array('id' => $userorgroupid) ));
+                            $strname = 'overridefor';
                         } else {
                             $userorgroupname = groups_get_group($userorgroupid)->name;
+                            $strname = 'overrideforgroup';
                         }
                         $newevent = vpl_create_event($this->instance, $this->instance->id);
-                        $newevent->name = get_string('overridefor', VPL, array(
+                        $newevent->name = get_string($strname, VPL, array(
                                 'base' => $newevent->name,
                                 'for' => $userorgroupname
                         ));

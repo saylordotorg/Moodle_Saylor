@@ -231,8 +231,8 @@ class checklist_class {
 
         $importsection = -1;
         if ($this->checklist->autopopulate == CHECKLIST_AUTOPOPULATE_SECTION) {
-            foreach ($mods->get_sections() as $num => $section) {
-                if (in_array($this->cm->id, $section)) {
+            foreach ($mods->get_sections() as $num => $sectioncms) {
+                if (in_array($this->cm->id, $sectioncms)) {
                     $importsection = $num;
                     $section = $importsection;
                     break;
@@ -652,8 +652,10 @@ class checklist_class {
         $output = '';
         if (!$embedded) {
             $output .= $this->view_header();
-            $output .= $this->view_name_info();
-            $output .= $this->view_tabs($currenttab);
+            if ($CFG->branch < 400) {
+                $output .= $this->view_name_info();
+                $output .= $this->view_tabs($currenttab);
+            }
         }
 
         $params = array(
@@ -680,6 +682,8 @@ class checklist_class {
      * View the edit items interface.
      */
     public function edit() {
+        global $CFG;
+
         if (!$this->canedit()) {
             redirect(new moodle_url('/mod/checklist/view.php', array('id' => $this->cm->id)));
         }
@@ -692,8 +696,10 @@ class checklist_class {
         $event->trigger();
 
         $output = $this->view_header();
-        $output .= $this->view_name_info();
-        $output .= $this->view_tabs('edit');
+        if ($CFG->branch < 400) {
+            $output .= $this->view_name_info();
+            $output .= $this->view_tabs('edit');
+        }
 
         $this->process_edit_actions();
 
@@ -715,6 +721,7 @@ class checklist_class {
      * View the report on user's checkmarks.
      */
     public function report() {
+        global $CFG;
         if ((!$this->items) && $this->canedit()) {
             redirect(new moodle_url('/mod/checklist/edit.php', array('id' => $this->cm->id)));
         }
@@ -736,8 +743,10 @@ class checklist_class {
         checklist_item::add_grouping_names($this->items, $this->course->id);
 
         $output = $this->view_header();
-        $output .= $this->view_name_info();
-        $output .= $this->view_tabs('report');
+        if ($CFG->branch < 400) {
+            $output .= $this->view_name_info();
+            $output .= $this->view_tabs('report');
+        }
 
         $this->process_report_actions();
 
@@ -783,6 +792,7 @@ class checklist_class {
 
     /**
      * Returns the output of the checklist name along with completion info.
+     * @deprecated
      */
     protected function view_name_info(): string {
         global $OUTPUT, $USER;
@@ -802,6 +812,7 @@ class checklist_class {
 
     /**
      * Returns the output of the view/report/edit tabs.
+     * @deprecated
      * @param string $currenttab
      */
     protected function view_tabs($currenttab): string {
@@ -910,7 +921,7 @@ class checklist_class {
      * @param bool $userreport
      */
     protected function view_items($viewother = false, $userreport = false): string {
-        global $DB, $PAGE;
+        global $CFG, $DB, $PAGE;
 
         // Configure the status of the checklist output.
         $status = new output_status();
@@ -974,7 +985,10 @@ class checklist_class {
         }
 
         // Gather some extra details needed in the output.
-        $intro = format_module_intro('checklist', $this->checklist, $this->cm->id);
+        $intro = '';
+        if ($CFG->branch < 400) {
+            $intro = format_module_intro('checklist', $this->checklist, $this->cm->id);
+        }
         $progress = null;
         if ($status->is_showprogressbar()) {
             $progress = $this->get_progress();

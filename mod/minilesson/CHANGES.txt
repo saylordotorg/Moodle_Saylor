@@ -1,3 +1,6 @@
+Version 1.0.45 (Build 2022100700)
+- removed unneeded lang strings
+
 Version 1.0.44(2022082200)
 - Fixed issue with Arabic Voice "Zeina" not working
 - Added 2 new Arabic voices

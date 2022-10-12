@@ -145,6 +145,15 @@ switch ($showreport) {
         $formdata->groupmenu = true;
         break;
 
+    case 'missedwords':
+        $report = new \mod_readaloud\report\missedwords();
+        $formdata = new stdClass();
+        $formdata->readaloudid = $moduleinstance->id;
+        $formdata->courseid = $moduleinstance->course;
+        $formdata->modulecontextid = $modulecontext->id;
+        $formdata->groupmenu = true;
+        break;
+
     case 'attemptssummary':
         $report = new \mod_readaloud\report\attemptssummary();
         $formdata = new stdClass();
@@ -193,6 +202,7 @@ if(isset($formdata->groupmenu)){
 
 $report->process_raw_data($formdata);
 $reportheading = $report->fetch_formatted_heading();
+$reportdescription = $report->fetch_formatted_description();
 
 switch ($format) {
     case 'csv':
@@ -211,7 +221,7 @@ switch ($format) {
             echo $renderer->header($moduleinstance, $cm, $mode, null, get_string('reports', constants::M_COMPONENT));
             echo $extraheader;
             echo $groupmenu;
-            echo $reportrenderer->render_section_html($reportheading, $report->fetch_name(), $report->fetch_head(), $reportrows,
+            echo $reportrenderer->render_section_html($reportheading,$reportdescription, $report->fetch_name(), $report->fetch_head(), $reportrows,
                 $report->fetch_fields());
 
         }else {
@@ -220,7 +230,7 @@ switch ($format) {
             echo $extraheader;
             echo $groupmenu;
             echo $pagingbar;
-            echo $reportrenderer->render_section_html($reportheading, $report->fetch_name(), $report->fetch_head(), $reportrows,
+            echo $reportrenderer->render_section_html($reportheading,$reportdescription, $report->fetch_name(), $report->fetch_head(), $reportrows,
                 $report->fetch_fields());
             echo $pagingbar;
         }

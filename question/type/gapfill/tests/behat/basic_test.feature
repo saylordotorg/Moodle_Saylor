@@ -35,6 +35,7 @@ Feature: Test all the basic functionality of this Gapfill question type
     And I set the field "Question name" to "Gapfill-002"
     And I press "Gap settings"
     And I click on "//span[@id='id1_0']" "xpath_element"
+    And I wait "1" seconds
 
     And I set the field with xpath "//div[@id='id_correcteditable']" to "pergap correct feedback"
     And I set the field with xpath "//div[@id='id_incorrecteditable']" to "pergap incorrect feedback"
@@ -58,7 +59,7 @@ Feature: Test all the basic functionality of this Gapfill question type
     # And I drag "sat" into gap "1" in the gapfill question
     And I type "sat" into gap "1" in the gapfill question
 
-    And I drag "mat" into gap "2" in the gapfill question
+    # And I drag "mat" into gap "2" in the gapfill question
     And I type "mat" into gap "2" in the gapfill question
 
     And I press "Submit and finish"

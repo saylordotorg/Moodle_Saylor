@@ -148,17 +148,81 @@ function vpl_delete_grade_item($instance) {
  */
 function vpl_create_event($instance, $id) {
     $event = new stdClass();
-    $event->name = $instance->name;
+    $event->eventtype = VPL_EVENT_TYPE_DUE;
+    $event->type = CALENDAR_EVENT_TYPE_ACTION;
+    $event->name = get_string('dueevent', VPL, $instance->name);
     $event->description = $instance->shortdescription;
     $event->format = FORMAT_PLAIN;
     $event->courseid = $instance->course;
+    $event->groupid = 0;
+    $event->userid = 0;
     $event->modulename = VPL;
     $event->instance = $id;
-    $event->eventtype = 'duedate';
     $event->timestart = $instance->duedate;
     $event->timesort = $instance->duedate;
+    $event->timeduration = 0;
+    $event->priority = null;
     return $event;
 }
+
+/**
+ * Callback function to determine if the event is visible for the current user.
+ *
+ * @param calendar_event $event
+ * @return bool Returns true if the event is visible, false if not visible.
+ */
+function mod_vpl_core_calendar_is_event_visible(calendar_event $event) {
+    $vpl = new mod_vpl(null, $event->instance);
+    return $vpl->is_visible();
+}
+
+/**
+ * Callback function to set the event action if available.
+ *
+ * @param calendar_event $event
+ * @param \core_calendar\action_factory $factory objet to generate the action
+ * @return \core_calendar\action_factory|null The action object or null
+ */
+function mod_vpl_core_calendar_provide_event_action(calendar_event $event,
+                                                    \core_calendar\action_factory $factory) {
+    $vpl = new mod_vpl(null, $event->instance);
+    if ($vpl->is_visible()) {
+        $text = get_string('dueeventaction', VPL);
+        $cmid = $vpl->get_course_module()->id;
+        $link = new \moodle_url('/mod/vpl/forms/edit.php', ['id' => $cmid]);
+        return $factory->create_instance($text, $link, 1, $vpl->is_submit_able());
+    } else {
+        return null;
+    }
+}
+
+/**
+ * Callback function to know if the event must show its item count.
+ *
+ * @param calendar_event $event
+ * @param int $itemcount item count.
+ * @return bool True if the event must show the item count.
+ */
+function mod_vpl_core_calendar_event_action_shows_item_count(calendar_event $event,
+                                                    int $itemcount = 0) {
+    return $itemcount < 0; // Must always return false.
+}
+
+/**
+ * Callback to fetch the activity event type lang string.
+ *
+ * @param string $eventtype The event type.
+ * @return lang_string The event type lang string.
+ */
+function mod_vpl_core_calendar_get_event_action_string(string $eventtype): string {
+
+    if ($eventtype == VPL_EVENT_TYPE_DUE) {
+        return get_string('calendardue', VPL);
+    } else { // Must be an event of type submission expected on.
+        return get_string('calendarexpectedon', VPL);
+    }
+}
+
 
 /**
  * Add a new vpl instance and return the id
@@ -173,12 +237,48 @@ function vpl_add_instance($instance) {
     $id = $DB->insert_record( VPL, $instance );
     // Add event.
     if ($instance->duedate) {
-        calendar_event::create( vpl_create_event( $instance, $id ) );
+        calendar_event::create( vpl_create_event( $instance, $id ), false );
     }
     // Add grade to grade book.
     $instance->id = $id;
     vpl_grade_item_update( $instance );
+    if (!empty($instance->completionexpected)) {
+        $cmid = $instance->coursemodule;
+        $completionexpected = $instance->completionexpected;
+        \core_completion\api::update_completion_date_event($cmid, 'vpl', $instance, $completionexpected);
+    }
     return $id;
+}
+
+/**
+ * Updates a vpl instance event.
+ *
+ * @param object $instance VPL DB record
+ * @return boolean OK
+ */
+function vpl_update_instance_event($instance) {
+    global $DB, $CFG;
+    require_once($CFG->dirroot . '/calendar/lib.php');
+    $event = vpl_create_event($instance, $instance->id);
+    $searchfields = [
+        'modulename' => VPL,
+        'instance' => $instance->id,
+        'eventtype' => VPL_EVENT_TYPE_DUE,
+        'priority' => null
+    ];
+    if ($eventid = $DB->get_field( 'event', 'id', $searchfields)) {
+        $event->id = $eventid;
+        $calendarevent = \calendar_event::load( $eventid );
+        if ($instance->duedate) {
+            $calendarevent->update($event, false);
+        } else {
+            $calendarevent->delete();
+        }
+    } else {
+        if ($instance->duedate) {
+            \calendar_event::create($event, false);
+        }
+    }
 }
 
 /**
@@ -188,32 +288,16 @@ function vpl_add_instance($instance) {
  * @return boolean OK
  */
 function vpl_update_instance($instance) {
-    global $CFG, $DB;
-    require_once($CFG->dirroot . '/calendar/lib.php');
+    global $DB;
     vpl_truncate_vpl( $instance );
     $instance->id = $instance->instance;
-    // Update event.
-    $event = vpl_create_event( $instance, $instance->id );
-    if ($eventid = $DB->get_field( 'event', 'id', array (
-            'modulename' => VPL,
-            'instance' => $instance->id,
-            'priority' => null
-    ) )) {
-        $event->id = $eventid;
-        $calendarevent = calendar_event::load( $eventid );
-        if ($instance->duedate) {
-            $calendarevent->update( $event );
-        } else {
-            $calendarevent->delete();
-        }
-    } else {
-        if ($instance->duedate) {
-            calendar_event::create( $event );
-        }
-    }
+    vpl_update_instance_event($instance);
     $cm = get_coursemodule_from_instance( VPL, $instance->id, $instance->course );
     $instance->cmidnumber = $cm->id;
     vpl_grade_item_update( $instance );
+    $completionexpected = (!empty($instance->completionexpected)) ? $instance->completionexpected : null;
+    \core_completion\api::update_completion_date_event($instance->cmidnumber, 'vpl', $instance, $completionexpected);
+
     return $DB->update_record( VPL, $instance );
 }
 
@@ -648,16 +732,16 @@ function vpl_extend_settings_navigation(settings_navigation $settings, navigatio
             $parms = array ( 'id' => $cmid );
         }
         $url = new moodle_url( '/mod/vpl/forms/testcasesfile.php', $parms );
-        $node = vpl_navi_node_create($vplnode, 'testcases', $url);
+        $node = vpl_navi_node_create($vplnode, 'testcases', $url, navigation_node::TYPE_SETTING);
         $vplnode->add_node( $node, $fkn );
         $url = new moodle_url( '/mod/vpl/forms/executionoptions.php', $parms );
-        $node = vpl_navi_node_create($vplnode, 'executionoptions', $url);
+        $node = vpl_navi_node_create($vplnode, 'executionoptions', $url, navigation_node::TYPE_SETTING);
         $vplnode->add_node( $node, $fkn );
         $url = new moodle_url( '/mod/vpl/forms/requiredfiles.php', $parms );
-        $node = vpl_navi_node_create($vplnode, 'requestedfiles', $url);
+        $node = vpl_navi_node_create($vplnode, 'requestedfiles', $url, navigation_node::TYPE_SETTING);
         $vplnode->add_node( $node, $fkn );
 
-        if ( $CFG->release >= 4.0 ) { // Remove submenu for compatibility with Moodle >= 4.0.
+        if ( $CFG->release >= '4.0' ) { // Remove submenu for compatibility with Moodle >= 4.0.
             $advance = $vplnode;
             $keybefore = $fkn;
         } else {
@@ -665,32 +749,31 @@ function vpl_extend_settings_navigation(settings_navigation $settings, navigatio
             $vplnode->add_node( $advance, $fkn );
             $keybefore = null;
         }
-
         $url = new moodle_url( '/mod/vpl/forms/executionfiles.php', $parms );
-        $node = vpl_navi_node_create($advance, 'executionfiles', $url);
+        $node = vpl_navi_node_create($advance, 'executionfiles', $url, navigation_node::TYPE_SETTING);
         $advance->add_node( $node, $keybefore );
         $url = new moodle_url( '/mod/vpl/forms/executionlimits.php', $parms );
-        $node = vpl_navi_node_create($advance, 'maxresourcelimits', $url);
+        $node = vpl_navi_node_create($advance, 'maxresourcelimits', $url, navigation_node::TYPE_SETTING);
         $advance->add_node( $node, $keybefore );
         $url = new moodle_url( '/mod/vpl/forms/executionkeepfiles.php', $parms );
-        $node = vpl_navi_node_create($advance, 'keepfiles', $url);
+        $node = vpl_navi_node_create($advance, 'keepfiles', $url, navigation_node::TYPE_SETTING);
         $advance->add_node( $node, $keybefore );
         $url = new moodle_url( '/mod/vpl/forms/variations.php', $parms );
-        $node = vpl_navi_node_create($advance, 'variations', $url);
+        $node = vpl_navi_node_create($advance, 'variations', $url, navigation_node::TYPE_SETTING);
         $advance->add_node( $node, $keybefore );
         $url = new moodle_url( '/mod/vpl/forms/overrides.php', $parms );
-        $node = vpl_navi_node_create($advance, 'overrides', $url);
+        $node = vpl_navi_node_create($advance, 'overrides', $url, navigation_node::TYPE_SETTING);
         $advance->add_node( $node, $keybefore );
         $url = new moodle_url( '/mod/vpl/views/checkjailservers.php', $parms );
-        $node = vpl_navi_node_create($advance, 'check_jail_servers', $url);
+        $node = vpl_navi_node_create($advance, 'check_jail_servers', $url, navigation_node::TYPE_SETTING);
         $advance->add_node( $node, $keybefore );
         if ($setjails) {
             $url = new moodle_url( '/mod/vpl/forms/local_jail_servers.php', $parms );
-            $node = vpl_navi_node_create($advance, 'local_jail_servers', $url);
+            $node = vpl_navi_node_create($advance, 'local_jail_servers', $url, navigation_node::TYPE_SETTING);
             $advance->add_node( $node, $keybefore );
         }
 
-        if ( $CFG->release >= 4.0 ) { // Remove submenu for compatibility with Moodle >= 4.0.
+        if ( $CFG->release >= '4.' ) { // Remove submenu for compatibility with Moodle >= 4.0.
             $testact = $vplnode;
         } else {
             $testact = vpl_navi_node_create($vplnode, 'test', null);
@@ -698,10 +781,10 @@ function vpl_extend_settings_navigation(settings_navigation $settings, navigatio
         }
 
         $url = new moodle_url( '/mod/vpl/forms/submission.php', $parms );
-        $node = vpl_navi_node_create($testact, 'submission', $url);
+        $node = vpl_navi_node_create($testact, 'submission', $url, navigation_node::TYPE_SETTING);
         $testact->add_node( $node, $keybefore );
         $url = new moodle_url( '/mod/vpl/forms/edit.php', $parms );
-        $node = vpl_navi_node_create($testact, 'edit', $url);
+        $node = vpl_navi_node_create($testact, 'edit', $url, navigation_node::TYPE_SETTING);
         $testact->add_node( $node, $keybefore );
         if ( $userid != $USER->id ) { // Auto grading has sense?
             $url = new moodle_url( '/mod/vpl/forms/gradesubmission.php', $parms );
@@ -709,10 +792,10 @@ function vpl_extend_settings_navigation(settings_navigation $settings, navigatio
             $testact->add_node( $node, $keybefore );
         }
         $url = new moodle_url( '/mod/vpl/views/previoussubmissionslist.php', $parms );
-        $node = vpl_navi_node_create($testact, 'previoussubmissionslist', $url);
+        $node = vpl_navi_node_create($testact, 'previoussubmissionslist', $url, navigation_node::TYPE_SETTING);
         $testact->add_node( $node, $keybefore );
         $url = new moodle_url( '/mod/vpl/index.php', array ('id' => $PAGE->cm->course));
-        $node = vpl_navi_node_create($vplnode, 'modulenameplural', $url);
+        $node = vpl_navi_node_create($vplnode, 'modulenameplural', $url, navigation_node::TYPE_SETTING);
         $vplnode->add_node( $node, $fkn );
     }
 }
@@ -840,7 +923,6 @@ function vpl_reset_instance_userdata($vplid) {
  * @return array status array
  */
 function vpl_reset_userdata($data) {
-    global $CFG;
     $status = array ();
     if ($data->reset_vpl_submissions) {
         $componentstr = get_string( 'modulenameplural', VPL );

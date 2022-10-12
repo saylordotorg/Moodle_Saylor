@@ -178,11 +178,6 @@ class renderer extends \plugin_renderer_base {
 
     }
 
-    public function show_ungradedyet(){
-        $message = get_string("notgradedyet",constants::M_COMPONENT);
-        $ret = \html_writer::div($message ,constants::M_CLASS  . '_ungraded_cont');
-        return $ret;
-    }
 
 
     /**
@@ -457,7 +452,7 @@ class renderer extends \plugin_renderer_base {
     public function show_error($minilesson,$cm){
         $displaytext = $this->output->box_start();
         $displaytext .= $this->output->heading(get_string('errorheader',constants::M_COMPONENT), 3, 'main');
-        $displaytext .=  \html_writer::div(get_string('uploadconverterror',constants::M_COMPONENT),'',array());
+        $displaytext .=  \html_writer::div('error message here','',array());
         $displaytext .= $this->output->box_end();
         $ret= \html_writer::div($displaytext,constants::M_ERROR_CONTAINER,array('id'=>constants::M_ERROR_CONTAINER));
         return $ret;

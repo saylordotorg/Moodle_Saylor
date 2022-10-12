@@ -40,10 +40,8 @@ require_once($CFG->dirroot . '/mod/solo/lib.php');
  */
 class utils{
 
-    //  const CLOUDPOODLL = 'http://localhost/moodle';
     const CLOUDPOODLL = 'https://cloud.poodll.com';
-
-
+    //const CLOUDPOODLL = 'https://vbox.poodll.com/cphost';
 
     //are we willing and able to transcribe submissions?
     public static function can_transcribe($instance) {
@@ -1117,7 +1115,8 @@ class utils{
         }
 
         // Send the request & save response to $resp
-        $token_url ="https://cloud.poodll.com/local/cpapi/poodlltoken.php";
+
+        $token_url = self::CLOUDPOODLL . "/local/cpapi/poodlltoken.php";
         $postdata = array(
             'username' => $apiuser,
             'password' => $apisecret,
@@ -1745,6 +1744,8 @@ class utils{
      */
     public static function fetch_recorder_data($cm, $moduleinstance, $media, $token){
         global $CFG, $USER;
+
+        $config = get_config(constants::M_COMPONENT);
         $rec = new \stdClass();
 
         $rec->timelimit = $moduleinstance->maxconvlength * 60;
@@ -1815,11 +1816,20 @@ class utils{
 
         //we encode any hints
         $hints = new \stdClass();
+        //pass localposturl as hint, but if its permanent we will add it as a top level param
+        if($config->enablelocalpost) {
+            $hints->localposturl = $CFG->wwwroot . '/' . constants::M_URL . '/poodlllocalpost.php';
+        }
         $rec->hints = base64_encode(json_encode($hints));
-        $rec->id='therecorder';
+        $rec->id=constants::M_RECORDERID;
         $rec->parent=$CFG->wwwroot;
         $rec->owner=hash('md5',$USER->username);
-        $rec->localloading='auto';
+        if($config->enablelocalpost){
+            $rec->localloading='always';
+            $rec->localposturl= $CFG->wwwroot . '/' . constants::M_URL . '/poodlllocalpost.php';
+        }else {
+            $rec->localloading = 'auto';
+        }
         $rec->localloader= constants::M_URL . '/poodllloader.html';
         $rec->media=$media;
         $rec->appid=constants::M_COMPONENT;

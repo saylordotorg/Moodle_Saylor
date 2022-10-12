@@ -79,9 +79,11 @@ export const init = (singleuse) => {
    *
    * @param {*} e
    */
-  function dragStart(e) {
+   function dragStart(e) {
     e.dataTransfer.setData('text/plain', e.target.innerText);
     e.dataTransfer.setData('sourceId', this.id);
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.dropEffect = "move";
   }
 };
 

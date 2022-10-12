@@ -14,7 +14,8 @@ This file sets up the cloud poodll recorder and passes on events to registered h
             on_recording_end,
             on_media_processing,
             on_speech,
-            on_file_submitted){
+            on_file_submitted,
+            on_upload_details){
 
             var that = this;
             cloudpoodll.init(opts['recorderid'],
@@ -46,6 +47,10 @@ This file sets up the cloud poodll recorder and passes on events to registered h
 
                         case 'speech':
                             on_speech(message);
+                            break;
+
+                        case 'uploaddetails':
+                            on_upload_details(message)
                             break;
 
                         case 'error':

@@ -661,15 +661,6 @@ class utils{
         return $ret;
     }
 
-    //What to show students after an attempt
-    public static function get_postattempt_options(){
-        return array(
-            constants::POSTATTEMPT_NONE => get_string("postattempt_none",constants::M_COMPONENT),
-            constants::POSTATTEMPT_EVAL  => get_string("postattempt_eval",constants::M_COMPONENT),
-            constants::POSTATTEMPT_EVALERRORS  => get_string("postattempt_evalerrors",constants::M_COMPONENT)
-        );
-    }
-
   public static function get_region_options(){
       return array(
         "useast1" => get_string("useast1",constants::M_COMPONENT),
@@ -1213,7 +1204,7 @@ class utils{
 
             //region
             $regionoptions = \mod_minilesson\utils::get_region_options();
-            $mform->addElement('select', 'region', get_string('region', constants::M_COMPONENT), $regionoptions);
+            $mform->addElement('select', 'awsregion', get_string('awsregion', constants::M_COMPONENT), $regionoptions);
             $mform->setDefault('region',$config->awsregion);
 
 

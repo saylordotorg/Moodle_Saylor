@@ -1,8 +1,12 @@
+### Version 2.135 of the Moodle Gapfill question type Sept 2022
+The use of jQuery UI broke the display of the 'dock' in Moodle 4.0 https://github.com/marcusgreen/moodle-qtype_gapfill/issues/83. Thanks to Vitaliy Baran for reporting that.  Switched to using ES6/HTML5 drag and drop code.
+More English language example questions
+
 ### Version 2.134 of the Moodle Gapfill question type Jun 2022
 
-Fix for duplicated draggables when used in the mobile apps. Thanks to Nicholas Stefanski for reporting this and for contributing a code solution. 
+Fix for duplicated draggables when used in the mobile apps. Thanks to Nicholas Stefanski for reporting this and for contributing a code solution.
 
-Added $CFG->wwwwroot in front of path to mobile css for where moodle home hangs of a folder from the 
+Added $CFG->wwwwroot in front of path to mobile css for where moodle home hangs of a folder from the
 url.
 
 ### Version 2.133 of the Moodle Gapfill question type Mar 2022

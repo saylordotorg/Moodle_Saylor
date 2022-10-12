@@ -86,6 +86,21 @@ log.debug('updateid', dd.updatecontrolid);
                 }
             };
 
+            var on_upload_details = function (eventdata) {
+                log.debug(eventdata.id);
+                log.debug(eventdata.uploaddetails);
+                log.debug(eventdata.uploaddetails.postURL);
+                log.debug(dd.activitydata.localposturl);
+                var xhr = new XMLHttpRequest();
+                var params = "datatype=register";
+                params += "&id=" + eventdata.id;
+                params += "&posturl=" + encodeURIComponent(eventdata.uploaddetails.postURL);
+                xhr.open("POST", dd.activitydata.localposturl, true);
+                xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                xhr.setRequestHeader("Cache-Control", "no-cache");
+                xhr.send(params);
+            };
+
             //originates from the recording:ended event
             //contains no meaningful data
             //See https://api.poodll.com
@@ -124,7 +139,8 @@ log.debug('updateid', dd.updatecontrolid);
                 on_recording_end,
                 on_media_processing,
                 on_speech,
-                on_file_submitted);
+                on_file_submitted,
+                on_upload_details);
         },
 
 

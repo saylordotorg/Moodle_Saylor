@@ -381,6 +381,7 @@ if(isset($formdata->groupmenu)){
 
 $report->process_raw_data($formdata, $moduleinstance);
 $reportheading = $report->fetch_formatted_heading();
+$reportdescription = $report->fetch_formatted_description();
 
 switch ($format) {
     case 'csv':
@@ -400,7 +401,7 @@ switch ($format) {
             echo $renderer->render_hiddenaudioplayer();
             echo $extraheader;
             echo $groupmenu;
-            echo $reportrenderer->render_section_html($reportheading, $report->fetch_name(), $report->fetch_head(), $reportrows,
+            echo $reportrenderer->render_section_html($reportheading, $reportdescription, $report->fetch_name(), $report->fetch_head(), $reportrows,
                 $report->fetch_fields());
         }else{
             $pagingbar = $reportrenderer->show_paging_bar($allrowscount, $paging, $PAGE->url);
@@ -412,7 +413,7 @@ switch ($format) {
             echo $groupmenu;
             echo $pagingbar;
             echo $perpage_selector;
-            echo $reportrenderer->render_section_html($reportheading, $report->fetch_name(), $report->fetch_head(), $reportrows,
+            echo $reportrenderer->render_section_html($reportheading, $reportdescription, $report->fetch_name(), $report->fetch_head(), $reportrows,
                 $report->fetch_fields());
             echo $pagingbar;
         }

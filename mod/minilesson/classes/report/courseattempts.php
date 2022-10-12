@@ -149,6 +149,12 @@ class courseattempts extends basereport {
                 $quizdata = $quizdatas[$thedata->activityid];
 
                     $steps = json_decode($thedata->sessiondata)->steps;
+
+                    //in some cases its not an array.. urgh
+                    if(!is_array($steps)){
+                        $steps =(array) $steps;
+                    }
+
                     $results = array_filter($steps, function($step){return $step->hasgrade;});
                     $thedata->itemcount = 0;
                     $thedata->correctcount = 0;

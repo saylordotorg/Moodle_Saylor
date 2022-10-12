@@ -77,6 +77,14 @@ class mod_facetoface_mod_form extends moodleform_mod {
             $mform->addHelpButton('allowcancellationsdefault', 'allowcancellationsdefault', 'facetoface');
         }
 
+        $signupoptions = array(
+            MOD_FACETOFACE_SIGNUP_SINGLE   => get_string('single', 'facetoface'),
+            MOD_FACETOFACE_SIGNUP_MULTIPLE => get_string('multiple', 'facetoface'),
+        );
+        $mform->addElement('select', 'signuptype', get_string('signuptype', 'facetoface'), $signupoptions);
+        $mform->setDefault('signuptype', MOD_FACETOFACE_SIGNUP_SINGLE);
+        $mform->addHelpButton('signuptype', 'signuptype', 'facetoface');
+
         $mform->addElement('header', 'calendaroptions', get_string('calendaroptions', 'facetoface'));
 
         $calendaroptions = array(

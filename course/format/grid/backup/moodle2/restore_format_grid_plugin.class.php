@@ -199,39 +199,41 @@ class restore_format_grid_plugin extends restore_format_plugin {
            can perform a clean up of restored grid image files after all the data is in place in the database
            for this to happen properly. */
 
-        $courseid = $this->task->get_courseid();
-        $newsectionid = $this->task->get_sectionid();
+        if ($this->step->get_task()->get_target() == backup::TARGET_NEW_COURSE) {
+            $courseid = $this->task->get_courseid();
+            $newsectionid = $this->task->get_sectionid();
 
-        if (empty($data->contenthash)) {
-            // Less than M4.0 backup file.
-            if (!empty($data->imagepath)) {
-                $data->image = $data->imagepath;
-                unset($data->imagepath);
-            } else if (empty($data->image)) {
-                $data->image = null;
-            }
+            if (empty($data->contenthash)) {
+                // Less than M4.0 backup file.
+                if (!empty($data->imagepath)) {
+                    $data->image = $data->imagepath;
+                    unset($data->imagepath);
+                } else if (empty($data->image)) {
+                    $data->image = null;
+                }
 
-            if (!empty($data->image)) {
+                if (!empty($data->image)) {
+                    $newimagecontainer = new \stdClass();
+                    $newimagecontainer->sectionid = $newsectionid;
+                    $newimagecontainer->courseid = $courseid;
+                    $newimagecontainer->image = $data->image;
+                    $newimagecontainer->displayedimagestate = 0;
+                    // Contenthash later!
+                    $newid = $DB->insert_record('format_grid_image', $newimagecontainer, true);
+                }
+            } else {
+                $oldsectionid = $data->sectionid;
+                $this->set_mapping('gridimage', $oldsectionid, $newsectionid, true);
+                $this->add_related_files('format_grid', 'sectionimage', 'gridimage');
+
                 $newimagecontainer = new \stdClass();
                 $newimagecontainer->sectionid = $newsectionid;
                 $newimagecontainer->courseid = $courseid;
                 $newimagecontainer->image = $data->image;
+                $newimagecontainer->contenthash = $data->contenthash;
                 $newimagecontainer->displayedimagestate = 0;
-                // Contenthash later!
                 $newid = $DB->insert_record('format_grid_image', $newimagecontainer, true);
             }
-        } else {
-            $oldsectionid = $data->sectionid;
-            $this->set_mapping('gridimage', $oldsectionid, $newsectionid, true);
-            $this->add_related_files('format_grid', 'sectionimage', 'gridimage');
-
-            $newimagecontainer = new \stdClass();
-            $newimagecontainer->sectionid = $newsectionid;
-            $newimagecontainer->courseid = $courseid;
-            $newimagecontainer->image = $data->image;
-            $newimagecontainer->contenthash = $data->contenthash;
-            $newimagecontainer->displayedimagestate = 0;
-            $newid = $DB->insert_record('format_grid_image', $newimagecontainer, true);
         }
     }
 }

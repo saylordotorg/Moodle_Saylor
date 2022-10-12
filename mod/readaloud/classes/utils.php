@@ -1364,6 +1364,38 @@ class utils {
      * To be consistent with how data is stored in matches/errors, we return a 1 based array of mistranscriptions
      * @return array a 1 based array of mistranscriptions(string) or false. i item for each passage word
     */
+    public static function fetch_attempt_misses($passagewords, $transcriptwords, $matches, $endword) {
+        $passagecount = count($passagewords);
+        if (!$passagecount) {
+            return false;
+        }
+        $mistranscriptions = array();
+        for ($wordnumber = 1; $wordnumber <= $passagecount; $wordnumber++) {
+
+
+            //build a quick to search array of matched words
+            $passagematches = array();
+            foreach ($matches as $match) {
+                $passagematches[$match->pposition] = $match->word;
+            }
+
+            $mistranscription = self::fetch_one_mistranscription($wordnumber, $transcriptwords, $matches);
+
+
+            if ($mistranscription) {
+                $mistranscriptions[$wordnumber] = $mistranscription;
+            } else {
+                $mistranscriptions[$wordnumber] = false;
+            }
+        }//end of for loop
+        return $mistranscriptions;
+    }
+
+    /*
+   * This will return an array of mistranscript strings for a single attemot. 1 entry per passageword.
+     * To be consistent with how data is stored in matches/errors, we return a 1 based array of mistranscriptions
+     * @return array a 1 based array of mistranscriptions(string) or false. i item for each passage word
+    */
     public static function fetch_attempt_mistranscriptions($passagewords, $transcriptwords, $matches) {
         $passagecount = count($passagewords);
         if (!$passagecount) {

@@ -36,6 +36,14 @@ class report_renderer extends \plugin_renderer_base {
         $reports[] = array('button'=>$this->render($attemptssummary),
             'text'=>get_string('attemptssummary_explanation', constants::M_COMPONENT));
 
+        $missedwords = new \single_button(
+            new \moodle_url(constants::M_URL . '/reports.php',
+                array('report' => 'missedwords', 'id' => $cm->id, 'n' => $moduleinstance->id)),
+            get_string('missedwordsreport', constants::M_COMPONENT), 'get');
+        $reports[]=$this->render($missedwords);
+        $reports[] = array('button'=>$this->render($missedwords),
+            'text'=>get_string('missedwords_explanation', constants::M_COMPONENT));
+
         $courseattempts = new \single_button(
             new \moodle_url(constants::M_URL . '/reports.php',
                 array('report' => 'courseattempts', 'id' => $cm->id, 'n' => $moduleinstance->id)),
@@ -125,7 +133,7 @@ class report_renderer extends \plugin_renderer_base {
         exit();
     }
 
-    public function render_section_html($sectiontitle, $report, $head, $rows, $fields) {
+    public function render_section_html($sectiontitle, $sectiondescription, $report, $head, $rows, $fields) {
         global $CFG;
         if (empty($rows)) {
             return $this->render_empty_section_html($sectiontitle);
@@ -158,6 +166,7 @@ class report_renderer extends \plugin_renderer_base {
             $htmltable->data[] = $htr;
         }
         $html = $this->output->heading($sectiontitle, 4);
+        $html .= $this->output->heading($sectiondescription, 5);
         $html .= \html_writer::table($htmltable);
 
         //if datatables set up datatables

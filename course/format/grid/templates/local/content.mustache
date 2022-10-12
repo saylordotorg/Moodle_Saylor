@@ -103,7 +103,7 @@
                 }
             }
         ],
-        "format": "topics",
+        "format": "grid",
         "title": "Course title example",
             "hasnavigation": true,
             "sectionnavigation": {
@@ -128,6 +128,7 @@
             "selector": "<select><option>Section 4</option></select>"
         },
         "sectionreturn": 1,
+        "coursesettings": "https://mymoodle/course/edit.php?id=4",
         "singlesection": {
             "num": 1,
             "id": 35,
@@ -206,6 +207,9 @@
             {{> core_courseformat/local/content/addsection}}
         {{/ core_courseformat/local/content/addsection}}
     {{/numsections}}
+    {{#coursesettings}}
+        <a class="d-block text-right" href="{{{coursesettings}}}">{{#str}}sectionchangecoursesettings, format_grid{{/str}}</a>
+    {{/coursesettings}}
 </div>
 {{#js}}
 require(['core_courseformat/local/content'], function(component) {

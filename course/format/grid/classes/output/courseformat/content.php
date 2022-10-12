@@ -73,6 +73,10 @@ class content extends content_base {
         $course = $format->get_course();
         $currentsectionid = 0;
 
+        if ($editing) {
+            $data->coursesettings = new \moodle_url('/course/edit.php', array('id' => $course->id));
+        }
+
         if (!empty($sections)) {
             // Most formats uses section 0 as a separate section so we remove from the list.
             $initialsection = array_shift($sections);

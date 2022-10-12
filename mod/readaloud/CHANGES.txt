@@ -1,3 +1,11 @@
+
+Version 2.0.89 (Build 2022100700)
+- removed unneeded lang strings
+
+2.0.88 (Build 2022091600)
+- Fixed an issue with course attempts report
+- Added a missed words report
+
 2.0.87 (Build 2022072400)
 - Added en-PH
 - Fixed issue with completion from adhoc task in ReadAloud

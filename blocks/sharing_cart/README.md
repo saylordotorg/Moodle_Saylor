@@ -1,7 +1,9 @@
 Sharing Cart
 ============
 
-Version 3.11, release 3 - 2022.09.13
+**Sharing cart basket icon now hidden**  Drag item directly into your cart. Or change settings to prefer old way of clicking basket.
+
+Version 4.0, release 1 - 2022.09.23
 
 The "master" branch requires Moodle 3.6 or newer.
 
@@ -13,6 +15,11 @@ Warning: PHP versions 7.2 and older are deprecated, and will cause problems, unr
 
 Change Log
 ----------
+* 4.0, release 1 2022.09.23
+  * Confirmed compatibility with Moodle 4.0
+* 3.11, release 4 2022.09.16
+  * Added 3 new events to add custom section backup/restore functionality
+  * Added the ability to drag and drop items/sections into the cart and the basket icon
 * 3.11, release 3 2022.09.13
   * Fixed bug where the basket icon does not appear in the flexible sections course format.
 * 3.11, release 2 2022.08.02

@@ -70,6 +70,10 @@ define('F2F_CAL_NONE',   0);
 define('F2F_CAL_COURSE', 1);
 define('F2F_CAL_SITE',   2);
 
+// Signup setting constants.
+define('MOD_FACETOFACE_SIGNUP_SINGLE', 0);
+define('MOD_FACETOFACE_SIGNUP_MULTIPLE', 1);
+
 // Signup status codes (remember to update facetoface_statuses()).
 define('MDL_F2F_STATUS_USER_CANCELLED', 10);
 
@@ -2684,7 +2688,6 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
 
     if ($submissions = facetoface_get_user_submissions($facetoface->id, $USER->id)) {
         // User has signedup for the instance.
-
         foreach ($submissions as $submission) {
 
             if ($session = facetoface_get_session($submission->sessionid)) {
@@ -2751,9 +2754,15 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
             }
         }
         // Add "view all sessions" row to table.
-        $output .= $htmlviewallsessions;
+        // Only show for single session signup type. When using
+        // "multiple" the link will be added by the code below.
+        if ($facetoface->signuptype == MOD_FACETOFACE_SIGNUP_SINGLE) {
+            $output .= $htmlviewallsessions;
+        }
 
-    } else if ($sessions = facetoface_get_sessions($facetoface->id)) {
+    }
+
+    if (($facetoface->signuptype == MOD_FACETOFACE_SIGNUP_MULTIPLE || !$submissions) && $sessions = facetoface_get_sessions($facetoface->id)) {
         if ($facetoface->display > 0) {
             $j = 1;
 
@@ -2762,6 +2771,11 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
 
             foreach ($sessions as $session) {
                 if (!facetoface_session_has_capacity($session, $contextmodule, MDL_F2F_STATUS_WAITLISTED) && !$session->allowoverbook) {
+                    continue;
+                }
+
+                $attendance = facetoface_get_attendee($session->id, $USER->id);
+                if ($facetoface->signuptype == MOD_FACETOFACE_SIGNUP_MULTIPLE && $attendance && $attendance->statuscode != MDL_F2F_STATUS_USER_CANCELLED) {
                     continue;
                 }
 
@@ -2849,12 +2863,16 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
             $coursemodule->set_content($content);
             return;
         }
-    } else if (has_capability('mod/facetoface:viewemptyactivities', $contextmodule)) {
+    }
+
+    if (!$submissions && !$sessions && has_capability('mod/facetoface:viewemptyactivities', $contextmodule)) {
         $content = html_writer::tag('span', $htmlviewallsessions, array('class' => 'f2fsessionnotice f2factivityname'));
         $coursemodule->set_content($content);
         return;
-    } else {
-        // Nothing to display to this user.
+    }
+
+    // Nothing to display to this user.
+    if (!$submissions && !$sessions && !has_capability('mod/facetoface:viewemptyactivities', $contextmodule)) {
         $coursemodule->set_content('');
         return;
     }

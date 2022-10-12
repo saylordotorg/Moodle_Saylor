@@ -98,6 +98,12 @@ class attemptssummary extends basereport {
 
     }//end of function
 
+    public function fetch_formatted_description() {
+
+        return get_string('attemptssummary_explanation', constants::M_COMPONENT);
+
+    }
+
     public function process_raw_data($formdata) {
         global $DB,$USER;
 

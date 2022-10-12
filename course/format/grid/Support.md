@@ -31,28 +31,27 @@ If you make improvements or bug fixes then I would appreciate if you would send 
 [GitHub](https://github.com/gjb2048/moodle-format_grid/) and doing a 'Pull Request' so that the rest of the Moodle community
 benefits.
 
-Required version of Moodle
+Required release of Moodle
 ==========================
-This version works with Moodle 4.0 version 2022041900.00 (Build: 20220419) and above within the MOODLE_400_STABLE branch until the next release.
+This release works with Moodle 4.0 version 2022041900.00 (Build: 20220419) and above within the MOODLE_400_STABLE branch until the next release.
 
 Please ensure that your hardware and software complies with 'Requirements' in '[Installing Moodle](https://docs.moodle.org/400/en/Installing_Moodle)'.
 
 Reporting issues
 ================
-Before reporting an issue, please ensure that you are running the current version for the major release of Moodle you are using.  It
-is essential that you are operating the required version of Moodle as stated above, this is because the format relies on core functionality
-that is out of its control.
+Before reporting an issue, please ensure that you are running the current release for the major release of Moodle you are using.  It
+is essential that you are operating the required release of Moodle as stated above, this is because the format relies on core
+functionality that is out of its control.
 
-If you think you've discovered a genuine bug with the theme then please look at the Moodle Course and course formats forum first to see if it
+If you think you've discovered a genuine bug with the format then please look at the Moodle Course and course formats forum first to see if it
 has already been repoted.  Secondly, look at [GitHub](https://github.com/gjb2048/moodle-format_grid/issues), and thirdly [Moodle Tracker](https://tracker.moodle.org/browse/CONTRIB/component/11231).
 
-I operate a policy that I will fix all genuine issues in 'my' (not other developers of the theme) code, when fully described and
+I operate a policy that I will fix all genuine issues in 'my' (not other developers of the format) code, when fully described and
 replicatable.
 
-It is essential that you provide as much information as possible, the critical information being the contents of the theme's
-version.php file / or the top of the 'Information' settings tab.  Other version information such as specific Moodle version,
-theme name and version also helps.  A screen shot can be really useful in visualising the issue along with any files you
-consider to be relevant.
+It is essential that you provide as much information as possible, the critical information being the contents of the format's
+version.php file / or the top of the 'Information' settings tab.  Other information such as specific Moodle release, format name and
+release also helps.  A screen shot can be really useful in visualising the issue along with any files you consider to be relevant.
 
 You can use either the '[Course and course formats forum](https://moodle.org/mod/forum/view.php?id=47)' or '[GitHub](https://github.com/gjb2048/moodle-format_grid/issues)'.
 

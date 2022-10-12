@@ -149,8 +149,8 @@ if ($ADMIN->fulltree) {
     //Default recorders
     $rec_options = utils::fetch_options_recorders();
     $settings->add(new admin_setting_configselect(constants::M_COMPONENT .'/defaultrecorder',
-            new lang_string('defaultrecorder', constants::M_COMPONENT),
-            new lang_string('defaultrecorder_details', constants::M_COMPONENT), constants::REC_ONCE, $rec_options));
+             get_string('defaultrecorder', constants::M_COMPONENT),
+             get_string('defaultrecorder_details', constants::M_COMPONENT), constants::REC_ONCE, $rec_options));
 
 
 

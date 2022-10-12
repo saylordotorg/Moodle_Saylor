@@ -1,10 +1,10 @@
 Grid course format
 ============================
-A topics based format that uses a grid of user selectable images to pop up a light box of the section.
+A topics based format that uses a grid of user selectable images to select a section.
 
-Required version of Moodle
+Required release  of Moodle
 ==========================
-This version works with Moodle 4.0 version 2022041900.00 (Build: 20220419) and above within the MOODLE_400_STABLE branch until the
+This release works with Moodle 4.0 version 2022041900.00 (Build: 20220419) and above within the MOODLE_400_STABLE branch until the
 next release.
 
 Please ensure that your hardware and software complies with 'Requirements' in 'Installing Moodle' on
@@ -15,13 +15,13 @@ Free software
 The Grid format is 'free' software under the terms of the GNU GPLv3 License, please see 'COPYING.txt'.
 
 The primary source for downloading this branch of the format is https://moodle.org/plugins/view.php?plugin=format_grid
-with 'Select Moodle version:' set at 'Moodle 4.0'.
+with 'Your Moodle version:' set at 'Moodle 4.0'.
 
-The secondary source is a tagged version with the v4.0 prefix on https://github.com/gjb2048/moodle-format_grid/tags
+The secondary source is https://github.com/gjb2048/moodle-format_grid/tags
 
-If you download from the development area - https://github.com/gjb2048/moodle-format_grid - consider that
-the code is unstable and not for use in production environments.  This is because I develop the next version in stages
-and use GitHub as a means of backup.  Therefore the code is not finished, subject to alteration and requires testing.
+If you download from the development area - https://github.com/gjb2048/moodle-format_grid - consider that the code is unstable and
+not for use in production environments.  This is because I develop the next release in stages and use GitHub as a means of backup.
+Therefore the code is not finished, subject to alteration and requires testing.
 
 You have all the rights granted to you by the GPLv3 license.  If you are unsure about anything, then the
 FAQ - http://www.gnu.org/licenses/gpl-faq.html - is a good place to look.
@@ -29,8 +29,7 @@ FAQ - http://www.gnu.org/licenses/gpl-faq.html - is a good place to look.
 If you reuse any of the code then I kindly ask that you make reference to the format.
 
 If you make improvements or bug fixes then I would appreciate if you would send them back to me by forking from
-https://github.com/gjb2048/moodle-format_grid and doing a 'Pull Request' so that the rest of the
-Moodle community benefits.
+https://github.com/gjb2048/moodle-format_grid and doing a 'Pull Request' so that the rest of the Moodle community benefits.
 
 Support
 =======
@@ -38,7 +37,7 @@ Please see Support.md.
 
 Installation
 ============
-1. Ensure you have the version of Moodle as stated above in 'Required version of Moodle'.  This is essential as the
+1. Ensure you have the release of Moodle as stated above in 'Required release of Moodle'.  This is essential as the
    format relies on underlying core code that is out of my control.
 2. Put Moodle in 'Maintenance Mode' (docs.moodle.org/en/admin/setting/maintenancemode) so that there are no
    users using it bar you as the administrator - if you have not already done so.
@@ -61,7 +60,7 @@ Uninstallation
 
 Upgrade instructions
 ====================
-1. Ensure you have the version of Moodle as stated above in 'Required version of Moodle'.  This is essential as the
+1. Ensure you have the release of Moodle as stated above in 'Required release of Moodle'.  This is essential as the
    format relies on underlying core code that is out of my control.
 2. Put Moodle in 'Maintenance Mode' so that there are no users using it bar you as the administrator.
 3. In '/course/format/' move old 'grid' directory to a backup folder outside of Moodle.
@@ -76,7 +75,7 @@ Upgrade instructions
 
 Downgrading
 ===========
-If for any reason you need to downgrade to a previous version of the format then the procedure will inform you how to
+If for any reason you need to downgrade to a previous release of the format then the procedure will inform you how to
 do so:
 
 1.  Put Moodle in 'Maintenance Mode' so that there are no users using it bar you as the administrator.
@@ -99,26 +98,6 @@ Reporting issues
 ================
 Please see Support.md.
 
-Usage
-=====
-
-Viewing
--------
-
-Editing
--------
-
-Accessibility
--------------
-If you wish for a user not to see the grid and shadebox and have the course presented like the Topics format, then add a custom
-user checkbox field with a shortname of 'accessible' and on the user profile tick it, please see:
-
-https://docs.moodle.org/en/User_profile_fields
-
-and:
-
-https://github.com/gjb2048/moodle-format_grid/issues/23
-
 File information
 ================
 
@@ -126,17 +105,14 @@ Languages
 ---------
 The grid/lang folder contains the language files for the format.
 
-Note that existing formats store their language strings in the main
-moodle.php, which you can also do, but this separate file is recommended
-for contributed formats.
+Note that existing formats store their language strings in the main moodle.php, which you can also do, but this separate file is
+recommended for contributed formats.
 
-Of course you can have other folders as well as English etc. if you want to
-provide multiple languages.
+Of course you can have other folders as well as English etc. if you want to provide multiple languages.
 
 Styles
 ------
-The file grid/styles.css contains the CSS styles for the format which can
-be overridden by the theme.
+The file grid/styles.css contains the CSS styles for the format which can be overridden by the theme.
 
 Backup
 ------

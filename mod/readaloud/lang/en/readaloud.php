@@ -17,22 +17,23 @@ $string['modulename'] = 'Poodll ReadAloud';
 $string['modulenameplural'] = 'Poodll ReadAlouds';
 $string['modulename_help'] =
         'ReadAloud is an activity designed to assist teachers in evaluating their students reading fluency. Students read a passage, set by the teacher, into a microphone. Later the teacher can mark words as incorrect and get the student WCPM(Words Correct Per Minute) scores.';
+        'ReadAloud is an activity designed to assist teachers in evaluating their students reading fluency. Students read a passage, set by the teacher, into a microphone. Later the teacher can mark words as incorrect and get the student WCPM(Words Correct Per Minute) scores.';
 $string['readaloudfieldset'] = 'Custom example fieldset';
 $string['readaloudname'] = 'Poodll ReadAloud';
 $string['readaloudname_help'] =
         'This is the content of the help tooltip associated with the readaloudname field. Markdown syntax is supported.';
-$string['readaloud'] = 'readaloud';
+//$string['readaloud'] = 'readaloud';
 $string['activitylink'] = 'Link to next activity';
 $string['activitylink_help'] =
         'To provide a link after the attempt to another activity in the course, select the activity from the dropdown list.';
 $string['activitylinkname'] = 'Continue to next activity: {$a}';
 $string['pluginadministration'] = 'ReadAloud Administration';
 $string['pluginname'] = 'Poodll ReadAloud';
-$string['someadminsetting'] = 'Some Admin Setting';
-$string['someadminsetting_details'] = 'More info about Some Admin Setting';
-$string['someinstancesetting'] = 'Some Instance Setting';
-$string['someinstancesetting_details'] = 'More info about Some Instance Setting';
-$string['readaloudsettings'] = 'readaloud settings';
+//$string['someadminsetting'] = 'Some Admin Setting';
+//$string['someadminsetting_details'] = 'More info about Some Admin Setting';
+//$string['someinstancesetting'] = 'Some Instance Setting';
+////$string['someinstancesetting_details'] = 'More info about Some Instance Setting';
+//$string['readaloudsettings'] = 'readaloud settings';
 $string['readaloud:addinstance'] = 'Add a new Read Aloud';
 $string['readaloud:view'] = 'View Read Aloud';
 $string['readaloud:view'] = 'Preview Read Aloud';
@@ -52,7 +53,7 @@ $string['name'] = 'Name';
 $string['timecreated'] = 'Time Created';
 $string['basicheading'] = 'Basic Report';
 $string['attemptsheading'] = 'Attempts Report';
-$string['attemptsbyuserheading'] = 'User Attempts Report';
+//$string['attemptsbyuserheading'] = 'User Attempts Report';
 $string['attemptssummaryheading'] = 'Attempts Summary Report';
 $string['gradingheading'] = 'Grading latest attempts for each user.';
 $string['machinegradingheading'] = 'Machine evaluated latest attempt for each user.';
@@ -69,7 +70,7 @@ $string['viewgrading'] = 'View Grading';
 $string['grading'] = 'Grading';
 $string['gradenow'] = 'Grade Now';
 $string['cannotgradenow'] = ' - ';
-$string['gradenowtitle'] = 'Grading: {$a}';
+//$string['gradenowtitle'] = 'Grading: {$a}';
 $string['showingattempt'] = 'Showing attempt for: {$a}';
 $string['showingmachinegradedattempt'] = 'Machine evaluated attempt for: {$a}';
 $string['basicreport'] = 'Basic Report';
@@ -77,7 +78,7 @@ $string['returntoreports'] = 'Return to Reports';
 $string['returntogradinghome'] = 'Return to Grading Top';
 $string['returntomachinegradinghome'] = 'Return to Machine Evaluations Top';
 $string['exportexcel'] = 'Export to CSV';
-$string['mingradedetails'] = 'The minimum Read Aloud grade(%) required to "complete" this activity.';
+//$string['mingradedetails'] = 'The minimum Read Aloud grade(%) required to "complete" this activity.';
 $string['mingrade'] = 'Minimum Grade';
 $string['deletealluserdata'] = 'Delete all user data';
 $string['maxattempts'] = 'Max. Attempts';
@@ -92,9 +93,9 @@ $string['gradelowest'] = 'lowest scoring attempt';
 $string['gradehighest'] = 'highest scoring attempt';
 $string['gradelatest'] = 'score of latest attempt';
 $string['gradeaverage'] = 'average score of all attempts';
-$string['defaultsettings'] = 'Default Settings';
+//$string['defaultsettings'] = 'Default Settings';
 $string['exceededattempts'] = 'You have completed the maximum {$a} attempts.';
-$string['exceededallattempts'] = "You have used all of your attempts.";
+//$string['exceededallattempts'] = "You have used all of your attempts.";
 $string['readaloudtask'] = 'Read Aloud Task';
 $string['passagelabel'] = 'Reading Passage';
 $string['welcomelabel'] = 'Default instructions';
@@ -114,7 +115,7 @@ $string['timelimit'] = 'Time Limit';
 $string['gotnosound'] = 'We could not hear you. Please check the permissions and settings for microphone and try again.';
 $string['done'] = 'Done';
 $string['processing'] = 'Processing';
-$string['feedbackheader'] = 'Finished';
+//$string['feedbackheader'] = 'Finished';
 $string['beginreading'] = 'Begin Reading';
 $string['errorheader'] = 'Error';
 $string['uploadconverterror'] =
@@ -272,11 +273,11 @@ $string['viewmachinegrading'] = 'Machine Evaluation';
 $string['review'] = 'Review';
 $string['regrade'] = 'Regrade';
 
-$string['dospotcheck'] = "Spot Check";
+//$string['dospotcheck'] = "Spot Check";
 $string['spotcheckbutton'] = "Spot Check Mode";
 $string['gradingbutton'] = "Grading Mode";
 $string['transcriptcheckbutton'] = "Transcript Check Mode";
-$string['doaigrade'] = "AI Grade";
+//$string['doaigrade'] = "AI Grade";
 $string['doclear'] = "Clear all markers";
 
 $string['gradethisattempt'] = "Grade this attempt";
@@ -397,8 +398,8 @@ $string['transcriber_strict'] = 'Open STT (Strict)';
 $string['stricttranscribe'] = 'Passage Transcriber';
 $string['stricttranscribe_details'] = 'The transcriber to use for full passage readings.';
 
-$string['submitrawaudio'] = 'Submit uncompressed audio';
-$string['submitrawaudio_details'] = 'Submitting uncompressed audio may increase transcription accuracy, but at the expense of upload speed and reliability.';
+//$string['submitrawaudio'] = 'Submit uncompressed audio';
+//$string['submitrawaudio_details'] = 'Submitting uncompressed audio may increase transcription accuracy, but at the expense of upload speed and reliability.';
 
 $string['sessionscoremethod'] = 'Grade Calculation';
 $string['sessionscoremethod_details'] = 'How the value(%) for gradebook is calculated.';
@@ -469,7 +470,7 @@ $string['savemodelaudiomarkup']=' Save model audio markup';
 $string['enablesetuptab']="Enable setup tab";
 $string['enablesetuptab_details']="Show a tab containing the activity instance settings to admins. Not super useful in most cases.";
 $string['setup']="Setup";
-$string['failedttsmarkup']='Unable to mark up speech..';
+//$string['failedttsmarkup']='Unable to mark up speech..';
 $string['manualbreaktiming']=' Manual break timing';
 
 $string['nopassage']="No Reading Passage";
@@ -481,9 +482,9 @@ $string['readaloud:itemview'] = 'View questions';
 $string['readaloud:itemedit'] = 'Edit questions';
 
 //rsquestions
-$string['durationgradesettings'] = 'Grade Settings ';
-$string['durationboundary']='{$a}: Completion time less than (seconds)';
-$string['boundarygrade']='{$a}: points ';
+//$string['durationgradesettings'] = 'Grade Settings ';
+//$string['durationboundary']='{$a}: Completion time less than (seconds)';
+//$string['boundarygrade']='{$a}: points ';
 $string['numeric']='Must be numeric ';
 $string['iteminuse']= 'This item is part of users attempt history. It cannot be deleted.';
 $string['moveitemup']='Up';
@@ -577,13 +578,13 @@ $string['pushpage_explanation']= "Use the buttons on this page to push settings 
 
 $string['disableshadowgrading'] = "Disable Shadow Mode Grading";
 $string['disableshadowgrading_details'] = "If checked, attempts made in shadow mode will be evaluated, but no entry passed to the gradebook.";
-$string['gradeable'] = "Gradeable";
+//$string['gradeable'] = "Gradeable";
 $string['developer'] = "Developer";
 
 $string['freetrial'] = "Get Cloud Poodll API Credentials and a Free Trial";
 $string['freetrial_desc'] = "A dialog should appear that allows you to register for a free trial with Poodll. After registering you should login to the members dashboard to get your API user and secret. And to register your site URL.";
-$string['memberdashboard'] = "Member Dashboard";
-$string['memberdashboard_desc'] = "";
+//$string['memberdashboard'] = "Member Dashboard";
+//$string['memberdashboard_desc'] = "";
 $string['fillcredentials']="Set API user and secret with existing credentials";
 $string['viewstart']="Activity open";
 $string['viewend']="Activity close";
@@ -600,7 +601,7 @@ $string['activityopenscloses']="Activity open/close dates";
 $string['nottsvoice']="No TTS Voice";
 
 $string['guidedtranscriptionadmin']= "Guided Transcription Admin";
-$string['show_guidedtranscriptionadmin']= "Guided Transcription Admin";
+//$string['show_guidedtranscriptionadmin']= "Guided Transcription Admin";
 $string['guidedtrans_corpus']="Use corpus texts";
 $string['usecorpus']="Guided Transcription Type";
 $string['usecorpuschanged']="Guided Transcription Type Changed";
@@ -635,7 +636,7 @@ $string['activitywords']="No. Words in Passage";
 $string['readingtime']="Read Time (secs)";
 $string['oralreadingscore']="Oral Reading Score";
 $string['oralreadingscore_p'] = 'Oral Reading Score(%)';
-$string['reportsmenutoptext']="Review attempts onn ReadAloud activities using the reports below.";
+$string['reportsmenutoptext']="Review attempts on ReadAloud activities using the reports below.";
 $string['courseattempts_explanation']="All the attempts on ReadAloud activities within this course";
 $string['attemptssummary_explanation']="A summary of ReadAloud attempts per user in this activity.";
 
@@ -643,7 +644,9 @@ $string['customfont']="Custom font";
 $string['customfont_help']="A font name that will override site default for this passage when displayed. Must be exact in spelling and case. eg Andika or Comic Sans MS";
 $string['advancedheader']="Advanced";
 
-
-
-
-
+$string['missedwords']="Missed Words";
+$string['missedwordsheading']="Missed Words";
+$string['missedwordsreport']="Missed Words";
+$string['missedwords_explanation']="The top error words in the most recent attempts";
+$string['missed_count'] = "Missed Count";
+$string['rank'] = "Rank";

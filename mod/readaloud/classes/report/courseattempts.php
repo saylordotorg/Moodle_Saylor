@@ -111,6 +111,12 @@ class courseattempts extends basereport {
 
     }
 
+    public function fetch_formatted_description() {
+
+        return get_string('courseattempts_explanation', constants::M_COMPONENT);
+
+    }
+
     public function process_raw_data($formdata) {
         global $DB, $USER;
 
@@ -133,7 +139,8 @@ class courseattempts extends basereport {
             list($groupswhere, $allparams) = $DB->get_in_or_equal($formdata->groupid);
 
             $alldatasql = "SELECT tu.*,tai.wpm as aiwpm, tai.accuracy as aiaccuracy, tai.errorcount as aierrorcount, " .
-                " tai.sessiontime as aisessiontime, at.name as activityname,at.id as activityid, at.passage, at.passagekey " .
+                " tu.wpm as wpm, tu.accuracy as accuracy, tu.errorcount as errorcount, " .
+                " tu.sessiontime as sessiontime,tai.sessiontime as aisessiontime at.name as activityname,at.id as activityid, at.passage, at.passagekey " .
                     " FROM {" . constants::M_USERTABLE . "} tu " .
                     " INNER JOIN {" . constants::M_AITABLE . "} tai ON tai.attemptid=tu.id " .
                     " INNER JOIN {groups_members} gm ON tu.userid=gm.userid " .
@@ -143,7 +150,8 @@ class courseattempts extends basereport {
             $alldata = $DB->get_records_sql($alldatasql, $allparams);
         }else{
             $alldatasql = "SELECT tu.*,tai.wpm as aiwpm, tai.accuracy as aiaccuracy, tai.errorcount as aierrorcount, " .
-                " tai.sessiontime as aisessiontime, at.name as activityname,at.id as activityid, at.passage, at.passagekey " .
+                " tu.wpm as wpm, tu.accuracy as accuracy, tu.errorcount as errorcount, " .
+                " tu.sessiontime as sessiontime, tai.sessiontime as aisessiontime, at.name as activityname,at.id as activityid, at.passage, at.passagekey " .
                 " FROM {" . constants::M_USERTABLE . "} tu " .
                 " INNER JOIN {" . constants::M_AITABLE . "} tai ON tai.attemptid=tu.id " .
                 " INNER JOIN {" . constants::M_TABLE . "} at ON at.id=tu.readaloudid " .

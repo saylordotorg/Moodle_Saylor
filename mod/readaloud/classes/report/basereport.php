@@ -53,6 +53,12 @@ abstract class basereport {
 
     abstract function fetch_formatted_heading();
 
+    public function fetch_formatted_description() {
+
+        return '';
+
+    }
+
     public function fetch_fields() {
         return $this->fields;
     }

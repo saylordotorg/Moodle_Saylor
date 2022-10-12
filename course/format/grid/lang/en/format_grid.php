@@ -111,6 +111,7 @@ $string['defaultsinglepagesummaryimage_desc'] = "Show the grid image for that se
 $string['information'] = 'Information';
 $string['informationsettings'] = 'Information settings';
 $string['informationsettingsdesc'] = 'Grid format information';
+$string['sectionchangecoursesettings'] = 'Change the number of sections in the course settings';
 $string['settings'] = 'Settings';
 $string['settingssettings'] = 'Settings settings';
 $string['settingssettingsdesc'] = 'Grid format settings';

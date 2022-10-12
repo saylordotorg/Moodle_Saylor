@@ -117,8 +117,8 @@ define(['jquery', 'core/log', 'mod_readaloud/definitions'], function($, log, def
 
       //if we are not modeling we want to jump to the clicked location
       //if we are modeling the meaning of a click is to place a marker, so we do not want to jump
-      if (!this.modeling) {
-        this.controls.eachwordorspace.on('click', function() {
+      this.controls.eachwordorspace.on('click', function() {
+        if (!that.modeling) {
           var wordnumber = parseInt($(this).attr('data-wordnumber'));
           var nearest_start_break = false;
           for (var i = 0; i < that.breaks.length; i++) {
@@ -136,8 +136,9 @@ define(['jquery', 'core/log', 'mod_readaloud/definitions'], function($, log, def
             aplayer.currentTime = nearest_start_break.audiotime;
             aplayer.play();
           }
-        }); //end of eachwordorspace
-      } //end of if not modeling
+        } //end of if not modeling
+      }); //end of eachwordorspace
+
 
       var timeupdate = function() {
         var currentTime = aplayer.currentTime;
