@@ -391,6 +391,12 @@ def plugins = [
         "url" : 'https://github.com/moodle-an-hochschulen/moodle-local_staticpage.git',
         "branch" : 'MOODLE_311_STABLE',
         "dest" : 'local/staticpage'
+    ],
+    [
+        "name" : 'tool_mfa',
+        "url" : 'https://github.com/catalyst/moodle-tool_mfa.git',
+        "branch" : 'master',
+        "dest" : 'tool/mfa'
     ]
 ]
 
