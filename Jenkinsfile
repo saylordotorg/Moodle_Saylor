@@ -397,6 +397,12 @@ def plugins = [
         "url" : 'https://github.com/catalyst/moodle-tool_mfa.git',
         "branch" : 'master',
         "dest" : 'admin/tool/mfa'
+    ],
+    [
+        "name" : 'tool_crawler',
+        "url" : 'https://github.com/catalyst/moodle-tool_crawler.git',
+        "branch" : 'master',
+        "dest" : 'admin/tool/crawler'
     ]
 ]
 
