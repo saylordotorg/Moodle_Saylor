@@ -270,7 +270,7 @@ def plugins = [
         "name" : 'tool_mfa',
         "url" : 'https://github.com/catalyst/moodle-tool_mfa.git',
         "branch" : 'master',
-        "dest" : 'tool/mfa'
+        "dest" : 'admin/tool/mfa'
     ],
     [
         "name" : 'mod_solo',
@@ -318,7 +318,7 @@ def plugins = [
         "name" : 'tool_crawler',
         "url" : 'https://github.com/catalyst/moodle-tool_crawler.git',
         "branch" : 'master',
-        "dest" : 'tool/crawler'
+        "dest" : 'admin/tool/crawler'
     ],
     [
         "name" : 'atto_linkadv',
