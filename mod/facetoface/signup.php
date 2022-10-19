@@ -93,6 +93,7 @@ if ($mform->is_cancelled()) {
     redirect($returnurl);
 }
 
+$isbulksignup = $facetoface->multiplesignupmethod == MOD_FACETOFACE_SIGNUP_MULTIPLE_PER_ACTIVITY;
 if ($fromform = $mform->get_data()) { // Form submitted.
 
     if (empty($fromform->submitbutton)) {
@@ -122,6 +123,41 @@ if ($fromform = $mform->get_data()) { // Form submitted.
         $statuscode = MDL_F2F_STATUS_BOOKED;
     } else {
         $statuscode = MDL_F2F_STATUS_WAITLISTED;
+    }
+
+    if ($isbulksignup) {
+        $error = '';
+        $message = get_string('bookingcompleted', 'facetoface');
+        foreach (facetoface_get_sessions($facetoface->id) as $session) {
+            if (!facetoface_session_has_capacity($session, $context) && (!$session->allowoverbook)) {
+                $error = html_writer::empty_tag('br') . html_writer::empty_tag('br') . get_string('somesessionsfull', 'facetoface');
+                continue;
+            }
+
+            // This shouldn't happen. Bulk signup can only be enabled when multiple signups are allowed.
+            if ($facetoface->signuptype == MOD_FACETOFACE_SIGNUP_SINGLE && facetoface_get_user_submissions($facetoface->id, $USER->id)) {
+                throw new moodle_exception('alreadysignedup', 'facetoface', $returnurl);
+            }
+
+            if (facetoface_manager_needed($facetoface) && !facetoface_get_manageremail($USER->id)) {
+                throw new moodle_exception('error:manageremailaddressmissing', 'facetoface', $returnurl);
+            }
+
+            if ($submissionid = facetoface_user_signup($session, $facetoface, $course, $fromform->discountcode, $fromform->notificationtype, $statuscode, false, false)) {
+                // Logging and events trigger.
+                $params = array(
+                    'context'  => $contextmodule,
+                    'objectid' => $session->id
+                );
+                $event = \mod_facetoface\event\signup_success::create($params);
+                $event->add_record_snapshot('facetoface_sessions', $session);
+                $event->add_record_snapshot('facetoface', $facetoface);
+                $event->trigger();
+            }
+        }
+
+        $timemessage = 4;
+        redirect($returnurl, $message . $error, $timemessage);
     }
 
     if (!facetoface_session_has_capacity($session, $context) && (!$session->allowoverbook)) {
@@ -192,7 +228,7 @@ echo $OUTPUT->heading($heading);
 
 $timenow = time();
 
-if ($session->datetimeknown && facetoface_has_session_started($session, $timenow)) {
+if (!$isbulksignup && $session->datetimeknown && facetoface_has_session_started($session, $timenow)) {
     $inprogressstr = get_string('cannotsignupsessioninprogress', 'facetoface');
     $overstr = get_string('cannotsignupsessionover', 'facetoface');
 
@@ -204,16 +240,18 @@ if ($session->datetimeknown && facetoface_has_session_started($session, $timenow
     exit;
 }
 
-if (!$signedup && !facetoface_session_has_capacity($session, $context) && (!$session->allowoverbook)) {
+if (!$isbulksignup && !$signedup && !facetoface_session_has_capacity($session, $context) && (!$session->allowoverbook)) {
     throw new moodle_exception('sessionisfull', 'facetoface', $returnurl);
     echo $OUTPUT->box_end();
     echo $OUTPUT->footer($course);
     exit;
 }
 
-echo facetoface_print_session($session, $viewattendees);
+if (!$isbulksignup) {
+    echo facetoface_print_session($session, $viewattendees);
+}
 
-if ($signedup) {
+if (!$isbulksignup && $signedup) {
     if (!($session->datetimeknown && facetoface_has_session_started($session, $timenow)) && $session->allowcancellations) {
 
         // Cancellation link.

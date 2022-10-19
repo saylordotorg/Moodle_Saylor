@@ -85,6 +85,15 @@ class mod_facetoface_mod_form extends moodleform_mod {
         $mform->setDefault('signuptype', MOD_FACETOFACE_SIGNUP_SINGLE);
         $mform->addHelpButton('signuptype', 'signuptype', 'facetoface');
 
+        $multiplesignupmethods = array(
+            MOD_FACETOFACE_SIGNUP_MULTIPLE_PER_SESSION  => get_string('multiplesignuppersession', 'facetoface'),
+            MOD_FACETOFACE_SIGNUP_MULTIPLE_PER_ACTIVITY => get_string('multiplesignupperactivity', 'facetoface'),
+        );
+        $mform->addElement('select', 'multiplesignupmethod', get_string('multiplesignupmethod', 'facetoface'), $multiplesignupmethods);
+        $mform->setDefault('signuptype', MOD_FACETOFACE_SIGNUP_MULTIPLE_PER_SESSION);
+        $mform->addHelpButton('multiplesignupmethod', 'multiplesignupmethod', 'facetoface');
+        $mform->hideIf('multiplesignupmethod', 'signuptype', 'eq', MOD_FACETOFACE_SIGNUP_SINGLE);
+
         $mform->addElement('header', 'calendaroptions', get_string('calendaroptions', 'facetoface'));
 
         $calendaroptions = array(

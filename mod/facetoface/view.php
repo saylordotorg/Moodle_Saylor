@@ -154,6 +154,7 @@ function print_session_list($courseid, $facetoface, $location) {
     $viewattendees = has_capability('mod/facetoface:viewattendees', $context);
     $editsessions = has_capability('mod/facetoface:editsessions', $context);
     $multiplesignups = $facetoface->signuptype == MOD_FACETOFACE_SIGNUP_MULTIPLE;
+    $bulksignup = $facetoface->multiplesignupmethod == MOD_FACETOFACE_SIGNUP_MULTIPLE_PER_ACTIVITY;
 
     $bookedsession = null;
     if ($submissions = facetoface_get_user_submissions($facetoface->id, $USER->id)) {
@@ -213,11 +214,21 @@ function print_session_list($courseid, $facetoface, $location) {
 
     // Upcoming sessions.
     echo $OUTPUT->heading(get_string('upcomingsessions', 'facetoface'));
+
+    if ($sessions && $bulksignup) {
+        $firstsession = $sessions[array_keys($sessions)[0]];
+        $signupforstreamlink = html_writer::link(
+            'signup.php?s=' . $firstsession->id . '&backtoallsessions=' . $session->facetoface,
+            get_string('signupforstream', 'facetoface')
+        );
+
+        echo html_writer::tag('p', $signupforstreamlink);
+    }
     if (empty($upcomingarray) && empty($upcomingtbdarray)) {
         print_string('noupcoming', 'facetoface');
     } else {
         $upcomingarray = array_merge($upcomingarray, $upcomingtbdarray);
-        echo $f2frenderer->print_session_list_table($customfields, $upcomingarray, $viewattendees, $editsessions);
+        echo $f2frenderer->print_session_list_table($customfields, $upcomingarray, $viewattendees, $editsessions, !$bulksignup);
     }
 
     if ($editsessions) {

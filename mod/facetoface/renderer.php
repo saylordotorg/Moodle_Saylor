@@ -35,7 +35,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
     /**
      * Builds session list table given an array of sessions
      */
-    public function print_session_list_table($customfields, $sessions, $viewattendees, $editsessions) {
+    public function print_session_list_table($customfields, $sessions, $viewattendees, $editsessions, $signuplinks = true) {
         $output = '';
 
         $tableheader = array();
@@ -172,7 +172,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                     $options .= html_writer::link('cancelsignup.php?s=' . $session->id . '&backtoallsessions=' . $session->facetoface,
                         get_string('cancelbooking', 'facetoface'), array('title' => get_string('cancelbooking', 'facetoface')));
                 }
-            } else if (!$sessionstarted and !$bookedsession) {
+            } else if (!$sessionstarted && !$bookedsession && $signuplinks) {
                 $options .= html_writer::link('signup.php?s='.$session->id.'&backtoallsessions='.$session->facetoface,
                     get_string('signup', 'facetoface'));
             }
