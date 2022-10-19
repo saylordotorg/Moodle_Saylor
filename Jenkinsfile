@@ -396,7 +396,7 @@ def plugins = [
         "name" : 'tool_mfa',
         "url" : 'https://github.com/catalyst/moodle-tool_mfa.git',
         "branch" : 'master',
-        "dest" : 'tool/mfa'
+        "dest" : 'admin/tool/mfa'
     ]
 ]
 
