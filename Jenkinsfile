@@ -511,6 +511,12 @@ def plugins = [
         "url" : 'https://github.com/danmarsden/moodle-quiz_randomsummary.git',
         "branch" : 'master',
         "dest" : 'mod/quiz/report'
+    ],
+    [
+        "name" : 'block_edwiser_site_monitor',
+        "url" : 'https://github.com/WisdmLabs/moodle-block_edwiser_site_monitor.git',
+        "branch" : 'master',
+        "dest" : 'blocks/edwiser_site_monitor'
     ]
 ]
 
