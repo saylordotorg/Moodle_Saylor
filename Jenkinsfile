@@ -403,6 +403,12 @@ def plugins = [
         "url" : 'https://github.com/catalyst/moodle-tool_crawler.git',
         "branch" : 'master',
         "dest" : 'admin/tool/crawler'
+    ],
+    [
+        "name" : 'block_edwiser_site_monitor',
+        "url" : 'https://github.com/WisdmLabs/moodle-block_edwiser_site_monitor.git',
+        "branch" : 'master',
+        "dest" : 'blocks/edwiser_site_monitor'
     ]
 ]
 
