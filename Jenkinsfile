@@ -189,12 +189,6 @@ def plugins = [
         "dest" : 'local/boostnavigation'
     ],
     [
-        "name" : 'qtype_gapfill',
-        "url" : 'https://github.com/marcusgreen/moodle-qtype_gapfill',
-        "branch" : 'master',
-        "dest" : 'question/type/gapfill'
-    ],
-    [
         "name" : 'local_affiliations',
         "url" : 'https://github.com/saylordotorg/moodle-local_affiliations',
         "branch" : 'master',
@@ -397,12 +391,6 @@ def plugins = [
         "url" : 'https://github.com/catalyst/moodle-tool_mfa.git',
         "branch" : 'master',
         "dest" : 'admin/tool/mfa'
-    ],
-    [
-        "name" : 'tool_crawler',
-        "url" : 'https://github.com/catalyst/moodle-tool_crawler.git',
-        "branch" : 'master',
-        "dest" : 'admin/tool/crawler'
     ],
     [
         "name" : 'block_edwiser_site_monitor',
