@@ -54,7 +54,7 @@ $expand-orange-800:     #f16505 !default;
 $expand-orange-900:     #e84806 !default;
 
 // orange background color for buttons same as orange 800
-$button-bg-orange: #f16505 !default;
+$button-bg-orange: #D34203  !default;
 
 $expand-dark-blue-50:    #e2f0fe !default;
 $expand-dark-blue-100:   #c2d9e7 !default;
@@ -255,3 +255,71 @@ $spacers: (
     5: ($spacer * 2),
     6: ($spacer * 3)
 ) !default;
+
+// Box shadow variables.
+$theme-shadow-0: 0 1px 3px rgba(0, 0, 0, .1);
+$theme-shadow-1: 0 3px 8px rgba(0, 0, 0, .1);
+$theme-shadow-2: 0 5px 15px rgba(0, 0, 0, .1), 0 15px 35px rgba(0, 0, 0, .1), 0 50px 100px rgba(50, 50, 93, .1);
+$theme-shadow-3: 0 30px 60px -12px rgba(50, 50, 93, .25), 0 18px 36px -18px rgba(0, 0, 0, .3), 0 -12px 36px -8px rgba(0, 0, 0, .025);
+
+// Border radii variables.
+$border-radius-base: 5px;
+$border-radius: $border-radius-base;
+$border-radius-small: 3px;
+$border-radius-large: 8px;
+
+// Link colors.
+$link-color: $primary;
+$link-hover-color: $secondary;
+
+// Global default link hover decoration.
+$link-hover-decoration: none !default;
+
+// Cubic-bezier easing variables.
+$ease: cubic-bezier(0.4, 0.0, 0.2, 1);
+$ease-in: cubic-bezier(0.0, 0.0, 0.2, 1);
+$ease-out: cubic-bezier(0.4, 0.0, 1, 1);
+
+/**
+ * --------------------------------------------------
+ * Theme mixins and utilities.
+ * --------------------------------------------------
+ */
+
+/// Tint function to slightly lighten a color.
+/// @access public
+/// @param {Color} $color - color to tint
+/// @param {Number} $percentage - percentage of `$color` in returned color
+/// @return {Color}
+@function tint($color, $percentage) {
+    @return mix(white, $color, $percentage);
+}
+
+/// Shade function to slightly darken a color.
+/// @access public
+/// @param {Color} $color - color to shade
+/// @param {Number} $percentage - percentage of `$color` in returned color
+/// @return {Color}
+@function shade($color, $percentage) {
+    @return mix(black, $color, $percentage);
+}
+
+// Theme box mixin.
+@mixin theme-box() {
+    background: #fff;
+    box-shadow: $theme-shadow-1;
+    border: none;
+    border-bottom: 2px solid $gray-400;
+    border-radius: $border-radius-base;
+    margin-bottom: .75rem;
+}
+
+// Theme header accent line mixin.
+@mixin header-accent-line() {
+    content: "";
+    display: block;
+    height: 2px;
+    margin: .4em auto 0;
+    width: 62%;
+    background-color: $secondary;
+}

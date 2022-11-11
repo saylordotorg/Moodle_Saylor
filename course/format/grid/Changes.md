@@ -1,9 +1,12 @@
 History
 =============
-Version 3.11.1.1 - TBR
-=============================
- 1. Fix maturity information not showing in information site setting.
- 2. Fix 'PHP8.0 Compatibility issue when switching to Grid format' - #157.
+Version 311.1.2 - 16/10/2022
+============================
+1. Fix maturity information not showing in information site setting.
+2. Fix 'PHP8.0 Compatibility issue when switching to Grid format' - #157.
+3. Changed to semantic versioning 2.0.0 (https://semver.org/) for the release value, whereby the 'major' number is the Moodle core
+   branch number.  The 'version' property still needs to follow the Moodle way in order for the plugin to operate within the core
+   API.
 
 Version 3.11.1.1 - 17/01/2022
 =============================

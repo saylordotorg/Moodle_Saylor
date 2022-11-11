@@ -68,7 +68,12 @@ class restore_checklist_block_task extends restore_block_task {
 
         // Extract block configdata and update it to point to the new checklist.
         if ($configdata = $DB->get_field('block_instances', 'configdata', array('id' => $blockid))) {
-            $config = unserialize(base64_decode($configdata));
+            $config = base64_decode($configdata);
+            if (function_exists('unserialize_object')) {
+                $config = unserialize_object($config);
+            } else {
+                $config = unserialize($config, ['allowed_classes' => [stdClass::class]]);
+            }
             if (!empty($config->checklistid)) {
                 // Get checklist mapping and replace it in config.
                 $checklistmap = restore_dbops::get_backup_ids_record($this->get_restoreid(), 'checklist', $config->checklistid);

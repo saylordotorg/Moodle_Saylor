@@ -758,5 +758,31 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2021113001, 'facetoface');
     }
 
+    if ($oldversion < 2021113002) {
+        $table = new xmldb_table('facetoface');
+        $field = new xmldb_field('signuptype', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'allowcancellationsdefault');
+
+        // Conditionally launch add field signuptype.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Facetoface savepoint reached.
+        upgrade_mod_savepoint(true, 2021113002, 'facetoface');
+    }
+
+    if ($oldversion < 2021113003) {
+        $table = new xmldb_table('facetoface');
+        $field = new xmldb_field('multiplesignupmethod', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'signuptype');
+
+        // Conditionally launch add field multiplesignupmethod.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Facetoface savepoint reached.
+        upgrade_mod_savepoint(true, 2021113003, 'facetoface');
+    }
+
     return $result;
 }

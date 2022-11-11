@@ -167,7 +167,8 @@ function bigbluebuttonbn_delete_instance($id) {
         }
     } catch (moodle_exception $e) {
         // Do not log any issue when testing and meeting is not running on deletion.
-        if (!(defined('PHPUNIT_TEST') && PHPUNIT_TEST) && !defined('BEHAT_SITE_RUNNING') && $e->getMessage() !== 'mod_bigbluebuttonbn/notFound') {
+        if (!(defined('PHPUNIT_TEST') && PHPUNIT_TEST) && !defined('BEHAT_SITE_RUNNING')
+                && $e->getMessage() !== 'mod_bigbluebuttonbn/notFound') {
             debugging($e->getMessage(), DEBUG_NORMAL, $e->getTrace());
         }
     }
@@ -683,7 +684,7 @@ function bigbluebuttonbn_print_recent_activity(object $course, bool $viewfullnam
         if ($logs) {
             echo $OUTPUT->heading(get_string('new_bigblubuttonbn_activities', 'bigbluebuttonbn') . ':', 6);
             foreach ($logs as $log) {
-                $activityurl = new moodle_url('/mod/bigbluebuttonbn/index.php', ['id' => $instance->get_instance_id()]);
+                $activityurl = new moodle_url('/mod/bigbluebuttonbn/index.php', ['id' => $course->id]);
                 print_recent_activity_note($log->timecreated,
                     $log,
                     logger::get_printable_event_name($log) . ' - ' . $instance->get_meeting_name(),

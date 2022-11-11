@@ -70,6 +70,12 @@ define('F2F_CAL_NONE',   0);
 define('F2F_CAL_COURSE', 1);
 define('F2F_CAL_SITE',   2);
 
+// Signup setting constants.
+define('MOD_FACETOFACE_SIGNUP_SINGLE', 0);
+define('MOD_FACETOFACE_SIGNUP_MULTIPLE', 1);
+define('MOD_FACETOFACE_SIGNUP_MULTIPLE_PER_SESSION', 0);
+define('MOD_FACETOFACE_SIGNUP_MULTIPLE_PER_ACTIVITY', 1);
+
 // Signup status codes (remember to update facetoface_statuses()).
 define('MDL_F2F_STATUS_USER_CANCELLED', 10);
 
@@ -302,6 +308,12 @@ function facetoface_fix_settings($facetoface) {
     }
     if (empty($facetoface->approvalreqd)) {
         $facetoface->approvalreqd = 0;
+    }
+
+    // When users can only sign up for one session per activity, force the
+    // signup type to per-session.
+    if (isset($facetoface->signuptype) && $facetoface->signuptype == MOD_FACETOFACE_SIGNUP_SINGLE) {
+        $facetoface->multiplesignupmethod = MOD_FACETOFACE_SIGNUP_MULTIPLE_PER_SESSION;
     }
 }
 
@@ -2684,7 +2696,6 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
 
     if ($submissions = facetoface_get_user_submissions($facetoface->id, $USER->id)) {
         // User has signedup for the instance.
-
         foreach ($submissions as $submission) {
 
             if ($session = facetoface_get_session($submission->sessionid)) {
@@ -2751,9 +2762,15 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
             }
         }
         // Add "view all sessions" row to table.
-        $output .= $htmlviewallsessions;
+        // Only show for single session signup type. When using
+        // "multiple" the link will be added by the code below.
+        if ($facetoface->signuptype == MOD_FACETOFACE_SIGNUP_SINGLE) {
+            $output .= $htmlviewallsessions;
+        }
 
-    } else if ($sessions = facetoface_get_sessions($facetoface->id)) {
+    }
+
+    if (($facetoface->signuptype == MOD_FACETOFACE_SIGNUP_MULTIPLE || !$submissions) && $sessions = facetoface_get_sessions($facetoface->id)) {
         if ($facetoface->display > 0) {
             $j = 1;
 
@@ -2765,14 +2782,18 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
                     continue;
                 }
 
+                $attendance = facetoface_get_attendee($session->id, $USER->id);
+                if ($facetoface->signuptype == MOD_FACETOFACE_SIGNUP_MULTIPLE && $attendance && $attendance->statuscode != MDL_F2F_STATUS_USER_CANCELLED) {
+                    continue;
+                }
+
                 if ($session->datetimeknown && facetoface_has_session_started($session, $timenow) && !facetoface_is_session_in_progress($session, $timenow)) {
                     // Finished session, don't display.
                     continue;
                 } else {
                     $signupurl   = new moodle_url('/mod/facetoface/signup.php', array('s' => $session->id));
-                    $signuptext   = 'signup';
-                    $moreinfolink = html_writer::link($signupurl, get_string($signuptext, 'facetoface'), array('class' => 'f2fsessionlinks f2fsessioninfolink'));
-
+                    $signupstr = $facetoface->multiplesignupmethod == MOD_FACETOFACE_SIGNUP_MULTIPLE_PER_SESSION ? 'signup' : 'signupforstream';
+                    $moreinfolink = html_writer::link($signupurl, get_string($signupstr, 'facetoface'), array('class' => 'f2fsessionlinks f2fsessioninfolink'));
                     $span = html_writer::tag('span', get_string('options', 'facetoface').':', array('class' => 'f2fsessionnotice'));
                 }
 
@@ -2830,13 +2851,27 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
 
             if (!empty($futuresessions)) {
                 $output .= html_writer::start_tag('div', array('class' => 'f2fsessiongroup'));
-                $output .= html_writer::tag('span', get_string('signupforsession', 'facetoface'), array('class' => 'f2fsessionnotice'));
+
+                if ($facetoface->multiplesignupmethod == MOD_FACETOFACE_SIGNUP_MULTIPLE_PER_SESSION) {
+                    $output .= html_writer::tag('span', get_string('signupforsession', 'facetoface'), array('class' => 'f2fsessionnotice'));
+                } else {
+                    $output .= html_writer::tag('span', get_string('upcomingsessions', 'facetoface'), array('class' => 'f2fsessionnotice'));
+
+                    if (!empty($futuresessions)) {
+                        $firstsession = $futuresessions[array_keys($futuresessions)[0]];
+                        $output .= html_writer::tag('div', $firstsession->moreinfolink, array('class' => 'f2foptions'));
+                    }
+                }
 
                 foreach ($futuresessions as $session) {
                     $output .= html_writer::start_tag('div', array('class' => 'f2fsession f2ffuture'))
-                        . html_writer::tag('div', $session->date.$session->multidate, array('class' => 'f2fsessiontime'))
-                        . html_writer::tag('div', $session->options . $session->moreinfolink, array('class' => 'f2foptions'))
-                        . html_writer::end_tag('div');
+                            . html_writer::tag('div', $session->date.$session->multidate, array('class' => 'f2fsessiontime'));
+
+                    if ($facetoface->multiplesignupmethod == MOD_FACETOFACE_SIGNUP_MULTIPLE_PER_SESSION) {
+                        $output .= html_writer::tag('div', $session->options . $session->moreinfolink, array('class' => 'f2foptions'));
+                    }
+
+                    $output .= html_writer::end_tag('div');
                 }
                 $output .= html_writer::end_tag('div');
             }
@@ -2849,12 +2884,16 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
             $coursemodule->set_content($content);
             return;
         }
-    } else if (has_capability('mod/facetoface:viewemptyactivities', $contextmodule)) {
+    }
+
+    if (!$submissions && !$sessions && has_capability('mod/facetoface:viewemptyactivities', $contextmodule)) {
         $content = html_writer::tag('span', $htmlviewallsessions, array('class' => 'f2fsessionnotice f2factivityname'));
         $coursemodule->set_content($content);
         return;
-    } else {
-        // Nothing to display to this user.
+    }
+
+    // Nothing to display to this user.
+    if (!$submissions && !$sessions && !has_capability('mod/facetoface:viewemptyactivities', $contextmodule)) {
         $coursemodule->set_content('');
         return;
     }
@@ -4162,9 +4201,11 @@ function facetoface_get_all_user_name_fields($returnsql = false, $tableprefix = 
  */
 class facetoface_candidate_selector extends user_selector_base {
     protected $sessionid;
+    protected $courseid;
 
     public function __construct($name, $options) {
         $this->sessionid = $options['sessionid'];
+        $this->courseid = $options['courseid'];
         parent::__construct($name, $options);
     }
 
@@ -4181,9 +4222,18 @@ class facetoface_candidate_selector extends user_selector_base {
 
         $fields      = 'SELECT ' . $this->required_fields_sql('u');
         $countfields = 'SELECT COUNT(u.id)';
+
+        $limitsql = '';
+        if (get_config(null, 'facetoface_limit_candidates')) {
+            $params['courseid'] = $this->courseid;
+            $limitsql = "JOIN {user_enrolments} ue ON u.id = ue.userid
+                  JOIN {enrol} e ON e.id = ue.enrolid AND e.courseid = :courseid";
+        }
+
         $sql = "
                   FROM {user} u
-                 WHERE $wherecondition
+                    $limitsql
+                WHERE $wherecondition
                    AND u.id NOT IN
                        (
                        SELECT u2.id

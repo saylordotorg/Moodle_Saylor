@@ -200,10 +200,10 @@ class behat_mod_checklist extends behat_base {
                 }
                 $update[$fieldname] = $value;
             }
-            if (!in_array($update['studentmark'], $studentmarkmap)) {
+            if (!array_key_exists($update['studentmark'], $studentmarkmap)) {
                 throw new Exception('Invalid studentmark value \''.$update['studentmark'].'\' in checklist update');
             }
-            if (!in_array($update['teachermark'], $teachermarkmap)) {
+            if (!array_key_exists($update['teachermark'], $teachermarkmap)) {
                 throw new Exception('Invalid teachermark value \''.$update['teachermark'].'\' in checklist update');
             }
 
@@ -239,5 +239,20 @@ class behat_mod_checklist extends behat_base {
     public function i_enable_selfcompletion_block_plugin_for_use_by_mod_checklist() {
         global $DB;
         $DB->set_field('block', 'visible', 1, ['name' => 'selfcompletion']);
+    }
+
+    /**
+     * Set the given field to the view URL for the given activity
+     * @Given /^I set the field "([^"]*)" to the view URL for activity "([^"]*)"$/
+     * @param string $fieldname the field to set
+     * @param string $activityidnumber the idnumber of the activity to link to
+     */
+    public function i_set_the_field_to_the_view_u_r_l_for_activity(string $fieldname, string $activityidnumber) {
+        global $DB;
+        $cmrec = $DB->get_record('course_modules', ['idnumber' => $activityidnumber], 'id, course', MUST_EXIST);
+        $modinfo = get_fast_modinfo($cmrec->course);
+        $cm = $modinfo->get_cm($cmrec->id);
+        $url = $cm->get_url()->out(false);
+        $this->execute('behat_forms::i_set_the_field_to', [$fieldname, $url]);
     }
 }

@@ -58,6 +58,12 @@ $settings->add(new admin_setting_configmultiselect(
     $choices
 ));
 
+$settings->add(new admin_setting_configcheckbox(
+    'facetoface_limit_candidates',
+    get_string('setting:limit_candidates_caption', 'facetoface'),
+    get_string('setting:limit_candidates', 'facetoface'),
+    0
+));
 
 $settings->add(new admin_setting_heading(
     'facetoface_manageremail_header',

@@ -3379,6 +3379,11 @@ function update_user_login_times() {
         return true;
     }
 
+    if (defined('USER_KEY_LOGIN') && USER_KEY_LOGIN === true) {
+        // Do not update user login time when using user key login.
+        return true;
+    }
+
     $now = time();
 
     $user = new stdClass();
@@ -5151,6 +5156,10 @@ function remove_course_contents($courseid, $showfeedback = true, array $options 
                         question_delete_activity($cm);
                         // Notify the competency subsystem.
                         \core_competency\api::hook_course_module_deleted($cm);
+
+                        // Delete all tag instances associated with the instance of this module.
+                        core_tag_tag::delete_instances("mod_{$modname}", null, context_module::instance($cm->id)->id);
+                        core_tag_tag::remove_all_item_tags('core', 'course_modules', $cm->id);
                     }
                     if (function_exists($moddelete)) {
                         // This purges all module data in related tables, extra user prefs, settings, etc.
@@ -7063,6 +7072,39 @@ function current_language() {
     $return = str_replace('_utf8', '', $return);
 
     return $return;
+}
+
+/**
+ * Fix the current language to the given language code.
+ *
+ * @param string $lang The language code to use.
+ * @return void
+ */
+function fix_current_language(string $lang): void {
+    global $CFG, $COURSE, $SESSION, $USER;
+
+    if (!get_string_manager()->translation_exists($lang)) {
+        throw new coding_exception("The language pack for $lang is not available");
+    }
+
+    $fixglobal = '';
+    $fixlang = 'lang';
+    if (!empty($SESSION->forcelang)) {
+        $fixglobal = $SESSION;
+        $fixlang = 'forcelang';
+    } else if (!empty($COURSE->id) && $COURSE->id != SITEID && !empty($COURSE->lang)) {
+        $fixglobal = $COURSE;
+    } else if (!empty($SESSION->lang)) {
+        $fixglobal = $SESSION;
+    } else if (!empty($USER->lang)) {
+        $fixglobal = $USER;
+    } else if (isset($CFG->lang)) {
+        set_config('lang', $lang);
+    }
+
+    if ($fixglobal) {
+        $fixglobal->$fixlang = $lang;
+    }
 }
 
 /**

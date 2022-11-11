@@ -133,12 +133,12 @@ FilterCodes are meant to be entered as regular text in the Moodle WYSIWYG editor
 * {wwwroot} : Root URL of the Moodle site.
 * {supportname} : Support name as seen on Site Administration > Server > Support contact.
 * {supportemail} : Support email address as seen on Site Administration > Server > Support contact.
-* {supporturl} : Support page as seen on Site Administration > Server > Support contact.
+* {supportpage} : Support page URL as seen on Site Administration > Server > Support contact.
 
 ### UI Elements
 
 * {teamcards}: Displays photos, names (optionally linked) and optional descriptions of the users who are teachers. Only Verbose format is suitable for use in a side block.
-* {coursecards} or {coursecards categoryID}: (ALPHA) Display available courses as cards. You can optionally specify the ID number of a category. Example: {coursecards 1} will only display courses in the default Miscellaneous category. Note: The categoryID is not the "Category ID Number" field that you can optionally specify when creating a category.
+* {coursecards} or {coursecards categoryID}: (ALPHA) Display available courses as cards. You can optionally specify the ID number of a category. Example: {coursecards 1} will only display courses in the default Miscellaneous category. Note: The categoryID is not the "Category ID Number" field that you can optionally specify when creating a category. Please also note that the maximum number of courses displayed is controlled by the front page setting called **frontpagecourselimit**.
 * {coursecardsbyenrol} (ALPHA): Display course cards for the most popular courses based on enrolment. The maximum number of cards is configurable in the plugin settings.
 * {courseprogress}: (ALPHA) Displays course progress status in words. Only works within a course.
 * {courseprogresspercent}: Displays course progress percentage as a number without a percentage symbol. Only works within a course.
@@ -163,7 +163,8 @@ FilterCodes are meant to be entered as regular text in the Moodle WYSIWYG editor
 * {coursestartdate dateTimeFormat} : Course star t date. Will display "Open event" if there is no start date. For information on the optional dateTimeFormat format, see Supported dateTimeFormats Formats in the [FAQ](#faq) section of this documentation.
 * {courseenddate dateTimeFormat} : Course end date. Will display "Open event" if there is no end date. For information on the optional dateTimeFormat format, see Supported dateTimeFormats Formats in the [FAQ](#faq) section of this documentation.
 * {coursecompletiondate dateTimeFormat} : Course completion date. If not completed, will display "Not completed". Will also detect if completion is not enabled. For information on the optional dateTimeFormat format, see Supported dateTimeFormats Formats in the [FAQ](#faq) section of this documentation.
-* {courseprogress}: (ALPHA) Displays course progress status in words.
+* {coursegrade} : Display course grade.
+* {courseprogress} : (ALPHA) Displays course progress status in words.
 * {courseprogressbar}: (ALPHA) Displays course progress status as a status bar.
 * {course_fields}: Displays the custom course fields. NOTE: Respects a custom course field's Visible To setting.
 * {course_field_shortname} : Display custom course field. Replace "shortname" with the shortname of a custom course field all in lowercase. NOTE: Respects a custom course field's Visible To setting.
@@ -171,6 +172,7 @@ FilterCodes are meant to be entered as regular text in the Moodle WYSIWYG editor
 * {coursesummary ID} : Display the course summary of the course with the specified course ID number.
 * {courseimage} : Display's the course image.
 * {courseparticipantcount} : Displays the number of students enrolled in the current course.
+* {coursecount students} : Displays the number of students enrolled in a course.
 * {courseid} or %7Bcourseid%7D : Display a course's ID.
 * {coursecontextid} or %7Bcoursecontextid%7D : Display a course's context ID.
 * %7Bcoursemoduleid%7D : Display a course's activity module ID - for use in URLs. Only for use in course activity modules.
@@ -324,7 +326,7 @@ If the condition is not met in the particular context, the specified tag and its
 * {-} : Is substituted for &shy;, a soft hyphen that only appears when needed.
 * {nbsp} : Is substituted for a non-breaking space when displayed.
 * {hr} : Horizontal rule.
-* {details}{summary}{/summary}{/details} : An easy way to create an HTML 5 Details/Summary expandable section in your page. IMPORTANT: {details}{summary}{/summary} must all be on one line (it is ok if the line wraps). The rest of the details can be on multiple lines followed by the {/details}. This is an experimental feature that may result in invalid HTML but it works.
+* {details}{summary}{/summary}{/details} : An easy way to create an HTML 5 Details/Summary expandable section in your page. IMPORTANT: {details}{summary}{/summary} must all be on one line (it is ok if the line wraps). The rest of the details can be on multiple lines followed by the {/details}. This is an experimental feature that may result in invalid HTML but it works. You can optionally add a CSS class name to the opening details tag. Example: {details faq-class}
 * {langx xx}{/langx} : Tag specific text in a particular language by wrapping the text in a plain text pair of {langx xx} {/langx} or {langx xx-XX} {/langx} tags. This makes no visible changes to the content but wraps the content in an HTML <span lang="xx"></span> inline tag. As a result, screen readers will make use of this localization information to apply a particular pronunciation if the text is in a different language than the language of the rest of the page. This is required for compliance with W3C Web Content Accessibility Guidelines (WCAG 2.0)
 
 The opening {langx xx} tag should include two [ISO 639-1](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) language code abbreviation letters in lowercase associated with the language's name. French, for example, has the code **fr**:
@@ -745,6 +747,14 @@ Enable or disable the {scrape} tag.
 
 Enable or disable the display of a contact's profile picture in {coursecontacts} tag.
 
+### Show contact's profile description
+
+If enabled, will display the contact's profile description in {coursecontacts} tags.
+
+### Show hidden profile fields
+
+If enabled, custom profile fields that are hidden from the user will be displayed by the {profile_field_...} tag.
+
 ### Contact link type
 
 Choose the type of link for the teacher\s link in the {coursecontacts} tags. Profile, Messaging, Email address or None. Choose None if you don't want just the name without a link.
@@ -986,6 +996,7 @@ Create a Page on your Moodle site, preferably in a course, so that those tags wo
 * Course start date [{coursestartdate strftimedatetime}]: {coursestartdate strftimedatetime}
 * Course end date [{courseenddate strftimedatetime}]: {courseenddate strftimedatetime}
 * Completion date [{coursecompletiondate strftimedatetime}]: {coursecompletiondate strftimedatetime}
+* Your grade in this course is [{coursegrade}]: Your grade in this course is {coursegrade}
 * Course progress (ALPHA) [{courseprogress}]: {courseprogress}
 * Course progress percent number [{courseprogresspercent}]: {courseprogresspercent}
 * Course progress bar (ALPHA) [{courseprogressbar}]: {courseprogressbar}
@@ -1037,6 +1048,7 @@ Create a Page on your Moodle site, preferably in a course, so that those tags wo
 * List of custom course fields [{course_fields}]: {course_fields}
 * Course custom fields [{course_field_location}] (assumes you have created a custom course field called "location"): {course_field_location}
 * Number of participants in the course [{courseparticipantcount}]: {courseparticipantcount}
+* Number of students enrolled in the course {{coursecount students}}: {coursecount students}
 * The base (root) URL of your Moodle site [{wwwroot}]: {wwwroot}
 * Site support name [{supportname}]: {supportname}
 * Site support email address [{supportemail}]: {supportemail}
@@ -1249,6 +1261,7 @@ Michael Milette - Author and Lead Developer
 
 Big thank you to the following contributors. (Please let me know if I forgot to include you in the list):
 
+* alexmorrisnz: Add CSS class support for {details} tag (2022).
 * alexmorrisnz: {lastlogin} and fixing issue with {teamcardsformat} setting (2022).
 * 3iPunt and abertranb: New {ifcustomrole} tag (2020).
 * 3iPunt and abertranb: New {ifnotcustomrole} tag (2020).
