@@ -3203,23 +3203,6 @@ Flame skin for Poodll standard media recorder
     opacity: 0.4 !important;
 }
 
-/*
-Fixes By Glen
-Why are these here? They need to be labelled properly, and with the rest of the template CSS
-*/
-/*
-.poodll_multiplayer{
-    height: 120px !important;
-    width: 250px !important;
-}
-.poodll_multiplayer .meter{
-    width: 165px !important;
-}
-.vol-but{
-    border-radius: 3px !important;
-    border: none !important;
-}
-*/
 
 /*
 Editor Fixes
@@ -4559,7 +4542,7 @@ audio.poodll_preview_bmr {
     width: 250px;
     height: 120px;
     text-align: center;
-    margin-bottom: 100px;
+    /* margin-bottom: 100px; */
     padding: 10px;
     background-color: #333;
     color: #fff;

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="blocks/edwiser_site_monitor/db" VERSION="20120122" COMMENT="XMLDB file for Moodle blocks/edwiser_site_monitor"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="block_edwiser_site_monitor" COMMENT="Edwiser Site Monitor block">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="time" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="cpu" TYPE="float" LENGTH="5" DECIMALS="3" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="memory" TYPE="float" LENGTH="5" DECIMALS="3" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="storage" TYPE="float" LENGTH="5" DECIMALS="3" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+  </TABLES>
+</XMLDB>

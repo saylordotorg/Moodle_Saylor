@@ -339,7 +339,7 @@ class external extends external_api {
         //fetch attempt information
         $attempt = $DB->get_record(constants::M_ATTEMPTSTABLE, array('userid' => $USER->id, 'id' => $attemptid));
         $moduleinstance = $DB->get_record(constants::M_TABLE, array('id' => $attempt->solo), '*', MUST_EXIST);
-        $cm = get_coursemodule_from_instance(constants::M_MODNAME, $moduleinstance->id, $moduleinstance->courseid, false, MUST_EXIST);
+        $cm = get_coursemodule_from_instance(constants::M_MODNAME, $moduleinstance->id, $moduleinstance->course, false, MUST_EXIST);
 
         if($attempt) {
             $hastranscripts = !empty($attempt->jsontranscript);
@@ -350,7 +350,7 @@ class external extends external_api {
             }
         }
 
-        //if no results, thats that. return.
+        //if no results, that's that. return.
         if($have_aieval || $have_humaneval){
             $ret['ready']=true;
         }

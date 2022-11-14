@@ -1,0 +1,59 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template block_edwiser_site_monitor/recommendation
+
+    This template renders live status tab
+
+    Example context (json):
+    {
+        "error": false,
+        "plugins": [{
+            "cardclass"   : "col-lg-4 col-md-6 col-12",
+            "image"       : "image url",
+            "title"       : "title of recommendation",
+            "description" : "description of recommendation",
+            "purchaseurl" : "plugin purchase url",
+        }]
+
+    }
+}}
+<div class="edwiser_plugins_recommendation container">
+    {{#error}}
+        {{error}}
+    {{/error}}
+    {{#has}}
+    <ul class="recommendation-list blocks row">
+        {{#plugins}}
+        <li class="recommendation-item p-3 {{cardclass}}">
+          <div class="card card-shadow h-100">
+            <div class="card-header cover">
+              <img class="cover-image" src="{{image}}" alt="...">
+            </div>
+            <div class="card-block">
+              <h3 class="card-title">{{title}}</h3>
+              <p class="card-text">{{description}}</p>
+            </div>
+            <div class="px-5 pb-5">
+              <a target="_blank" href="{{purchaseurl}}" class="btn btn-warning text-white card-link">{{#str}} knowmore, block_edwiser_site_monitor {{/str}}</a>
+            </div>
+          </div>
+        </li>
+        {{/plugins}}
+    </ul>
+    {{/has}}
+</div>

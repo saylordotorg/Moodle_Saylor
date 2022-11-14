@@ -400,8 +400,10 @@ class utils{
         //this will happen if crons runs while the student is still typing and after the transcript has finishined processing
         $transcribestep = self::fetch_step_no($moduleinstance, constants::STEP_SELFTRANSCRIBE);
         if(empty($attempt->selftranscript) && $transcribestep !==false){
-            $trace->output("Self Transcript not ready yet. quitting");
-            return false;
+            if($trace) {
+                $trace->output("Self Transcript not ready yet. quitting");
+                return false;
+            }
         }
 
         //if we do not have automatic transcripts, try to fetch them

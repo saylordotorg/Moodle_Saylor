@@ -188,6 +188,22 @@ class behat_general extends behat_base {
     }
 
     /**
+     * Switches to a second window.
+     *
+     * @Given /^I switch to a second window$/
+     * @throws DriverException If there aren't exactly 2 windows open.
+     */
+    public function switch_to_second_window() {
+        $names = $this->getSession()->getWindowNames();
+
+        if (count($names) !== 2) {
+            throw new DriverException('Expected to see 2 windows open, found ' . count($names));
+        }
+
+        $this->getSession()->switchToWindow($names[1]);
+    }
+
+    /**
      * Switches to the main Moodle frame.
      *
      * @Given /^I switch to the main frame$/
@@ -1209,7 +1225,8 @@ EOF;
         $containernode = $this->find($containerselectortype, $containerelement);
 
         // Specific exception giving info about where can't we find the element.
-        $locatorexceptionmsg = "{$element} in the {$containerelement} {$containerselectortype}";
+        $containerdescription = $this->get_selector_description($containerselectortype, $containerelement);
+        $locatorexceptionmsg = "{$element} not found in the {$containerdescription}}";
         $exception = new ElementNotFoundException($this->getSession(), $selectortype, null, $locatorexceptionmsg);
 
         // Looks for the requested node inside the container node.
@@ -1243,8 +1260,10 @@ EOF;
         }
 
         // The element was found and should not have been. Throw an exception.
+        $elementdescription = $this->get_selector_description($selectortype, $element);
+        $containerdescription = $this->get_selector_description($containerselectortype, $containerelement);
         throw new ExpectationException(
-            "The '{$element}' '{$selectortype}' exists in the '{$containerelement}' '{$containerselectortype}'",
+            "The {$elementdescription} exists in the {$containerdescription}",
             $this->getSession()
         );
     }
@@ -1776,7 +1795,17 @@ EOF;
      * @param   string $keys The key, or list of keys, to type
      */
     public function i_type(string $keys): void {
-        behat_base::type_keys($this->getSession(), str_split($keys));
+        // Certain keys, such as the newline character, must be converted to the appropriate character code.
+        // Without this, keys will behave differently depending on the browser.
+        $keylist = array_map(function($key): string {
+            switch ($key) {
+                case "\n":
+                    return behat_keys::ENTER;
+                default:
+                    return $key;
+            }
+        }, str_split($keys));
+        behat_base::type_keys($this->getSession(), $keylist);
     }
 
     /**

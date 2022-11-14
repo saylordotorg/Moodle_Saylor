@@ -1,0 +1,113 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template block_edwiser_site_monitor/live_status
+
+    This template renders live status tab
+
+    Example context (json):
+    {
+        "disabled" : {
+            "cpu"    : false,
+            "memory" : false
+        },
+        "cpu"                  : 82.5,
+        "cpucolor"             : "bg-danger",
+        "memory"               : 67.4,
+        "memorycolor"          : "bg-warning",
+        "storage"              : 12.1,
+        "storagecolor"         : "bg-success",
+        "active"               : 1391,
+        "activepercentage"     : 89.11,
+        "susspended"           : 97,
+        "susspendedpercentage" : 6.21,
+        "deleted"              : 73,
+        "deletedpercentage"    : 4.68,
+        "liveusers"            : 189
+    }
+}}
+<div class="server_live_status">
+    <div class="progress-row">
+        <div class="usage-header">
+            <label class="progress-name"><i class="fa fa-server" aria-hidden="true"></i>{{#str}} cpu, block_edwiser_site_monitor {{/str}}</label>
+        </div>
+        <div class="usage-details">
+            <label class="progress-label" id="esm_cpu_usage_label">{{cpu}}%</label>
+            <span class="command-disabled">{{#disabled.cpu}}{{#str}} cpucommandnotallowed, block_edwiser_site_monitor {{/str}}{{/disabled.cpu}}</span>
+            <div class="progress-wrap progress">
+                <div class="usage-progress-bar progress-bar {{cpucolor}}" id="esm_cpu_usage_bar" role="progressbar" style="width: {{cpu}}%;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="progress-row">
+        <div class="usage-header">
+            <label class="progress-name"><i class="fa fa-microchip" aria-hidden="true"></i>{{#str}} memory, block_edwiser_site_monitor {{/str}}</label>
+        </div>
+        <div class="usage-details">
+            <label class="progress-label" id="esm_memory_usage_label">{{memory}}% ({{memoryvalues}})</label>
+            <span class="command-disabled">{{#disabled.memory}}{{#str}} memorycommandnotallowed, block_edwiser_site_monitor {{/str}}{{/disabled.memory}}</span>
+            <div class="progress-wrap progress">
+                <div class="usage-progress-bar progress-bar {{memorycolor}}" id="esm_memory_usage_bar" role="progressbar" style="width: {{memory}}%;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="progress-row">
+        <div class="usage-header">
+            <label class="progress-name"><i class="fa fa-hdd-o" aria-hidden="true"></i>{{#str}} storage, block_edwiser_site_monitor {{/str}}</label>
+        </div>
+        <div class="usage-details">
+            <label class="progress-label" id="esm_storage_usage_label">{{storage}}% ({{storagevalues}})</label>
+            <div class="progress-wrap progress">
+                <div class="usage-progress-bar progress-bar {{storagecolor}}" id="esm_storage_usage_bar" role="progressbar" style="width: {{storage}}%;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="progress-row users">
+        <div class="usage-header">
+            <label><i class="fa fa-users" aria-hidden="true"></i>{{#str}} users, block_edwiser_site_monitor {{/str}}</label>
+        </div>
+        <div class="usage-details">
+            <div class="legends">
+                <div class="activeusers legend">
+                    <div class="color bg-success"></div>
+                    <label>{{#str}} activeusers, block_edwiser_site_monitor {{/str}}({{active}})</label>
+                </div>
+                <div class="suspendedusers legend">
+                    <div class="color bg-warning"></div>
+                    <label>{{#str}} suspendedusers, block_edwiser_site_monitor {{/str}}({{suspended}})</label>
+                </div>
+                <div class="deletedusers legend">
+                    <div class="color bg-danger"></div>
+                    <label>{{#str}} deletedusers, block_edwiser_site_monitor {{/str}}({{deleted}})</label>
+                </div>
+            </div>
+            <div class="progress-wrap progress">
+                <div class="usage-progress-bar progress-bar bg-success" role="progressbar" id="esm_users_active_bar" style="width: {{activepercentage}}%;"></div>
+                <div class="usage-progress-bar progress-bar bg-warning" role="progressbar" id="esm_users_suspended_bar" style="width: {{suspendedpercentage}}%;"></div>
+                <div class="usage-progress-bar progress-bar bg-danger" role="progressbar" id="esm_users_deleted_bar" style="width: {{deletedpercentage}}%;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="progress-row">
+        <div class="usage-header">
+            <label><i class="fa fa-user-circle" aria-hidden="true"></i>{{#str}} liveusers, block_edwiser_site_monitor {{/str}}</label>
+        </div>
+        <div class="usage-details">
+            <label id="esm_live_users_label">{{liveusers}}</label>
+        </div>
+    </div>
+</div>

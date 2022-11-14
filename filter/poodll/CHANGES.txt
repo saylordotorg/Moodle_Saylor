@@ -1,5 +1,8 @@
 Change List
 =========
+Versions 3.1.60 (Build 2022082200)
+- updated strict multiplayer to remember play position
+
 Version 3.1.59 (Build 2022082200)
 - Added strict multiplayer
 - Added lightbox, Buncee, Flip, Wordwall, Quizlet templates

@@ -1,0 +1,48 @@
+Change Log:
+===========
+
+Version 2.1.0
+=============
+Tweak - Improved Recommended plugins UI.
+Tweak - If cron is not running frequently then show a warning on the Last 24 hours usage tab.
+Tweak - Improved plugin performance.
+Tweak - Logging system usage when live data is being fetched.
+Fix - Validating context in services to avoid fatal errors.
+Fix - Issue with Contact Us form.
+
+Version 2.0.0
+=============
+Feature - Brand new live usage tab design.
+Tweak - Plugin update check time.
+Tweak - Improvement in CPU usage calculation.
+Fix - Edwiser RemUI updating issue with different moodle branch.
+
+Version 1.0.4
+=============
+Fix - Fixed upgrade issue.
+Fix - Fixed mustache issue.
+Fix - Changed memory usage warning message.
+
+Version 1.0.3
+=============
+Fix - Improved plugin updater stability.
+Fix - Tabs working in themes not based on Bootstrap.
+Fix - Showing warning to Admin for linux if unable to fetch cpu and memory usage.
+
+Version 1.0.2 (First release)
+=============================
+Fix - Update code according to moodle standards
+Feature - Receive edwiser news in notifications
+Feature - Implemented privacy provider
+Feature - Added gulp and sass
+
+Version 1.0.1 (Beta)
+====================
+Fix - Sql errors in PostgreSQL
+Fix - Hiding block from users other than admin
+Fix - Minor bugs in js
+Feature - Updated CPU and Memory usage commands to support hosting sites
+
+Version 1.0.0 (Alpha)
+=====================
+Plugin Prototype

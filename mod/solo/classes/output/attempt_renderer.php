@@ -207,7 +207,9 @@ class attempt_renderer extends \plugin_renderer_base {
         if($tdata['grammarerrors']){$tdata['hasgrammarerrors']=true;}
         if($selftranscribe){$tdata['selftranscribe']=true; }
         if($aidata) {
-            $simpleselftranscript='';
+            //if you have no transcript then it will error on render, so we use a space by default
+            //it should never really be blank however, and theuser arrived in a strange way probbaly. This just avoids an ugly error
+            $simpleselftranscript=' ';
             if(!empty($attempt->selftranscript)){
                 $simpleselftranscript=$attempt->selftranscript;
             }

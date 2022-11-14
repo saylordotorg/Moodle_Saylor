@@ -82,6 +82,9 @@ class qtype_gapfill extends question_type {
         if (empty($questiondata->options->answers)) {
             return;
         }
+        // Remove html comments as they can contain delimiters, e.g. <!--[if !supportLists] .
+        $question->questiontext = preg_replace('/<!--(.|\s)*?-->/', '', $question->questiontext);
+
         foreach ($questiondata->options->answers as $a) {
             if (strstr($a->fraction, '1') == false) {
                 /* if this is a wronganswer/distractor strip any
@@ -223,6 +226,10 @@ class qtype_gapfill extends question_type {
     public function save_question_options($question) {
         /* Save the extra data to your database tables from the
           $question object, which has all the post data from editquestion.html */
+
+        // Remove html comments as they can contain delimiters, e.g. <!--[if !supportLists] .
+        $question->questiontext = preg_replace('/<!--(.|\s)*?-->/', '', $question->questiontext);
+
         $gaps = $this->get_gaps($question->delimitchars, $question->questiontext);
         /* answerwords are the text within gaps */
         $answerfields = $this->get_answer_fields($gaps, $question);

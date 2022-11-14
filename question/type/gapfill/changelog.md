@@ -1,3 +1,10 @@
+### Version 2.136 of the Moodle Gapfill question type Month 2022
+Remove html comments from code before rendering. There is no
+reason to include comments at run time and when people copy and paste
+from other sources it can include items like  <!--[if !supportLists]
+creating spurious gaps. Thanks to sunnac for reporting this.
+
+
 ### Version 2.135 of the Moodle Gapfill question type Sept 2022
 The use of jQuery UI broke the display of the 'dock' in Moodle 4.0 https://github.com/marcusgreen/moodle-qtype_gapfill/issues/83. Thanks to Vitaliy Baran for reporting that.  Switched to using ES6/HTML5 drag and drop code.
 More English language example questions

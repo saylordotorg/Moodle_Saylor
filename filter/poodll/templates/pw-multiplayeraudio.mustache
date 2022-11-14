@@ -23,6 +23,7 @@
 
 <!-- Custom JS from template  goes goes here  -->
 {{#js}}
+    //<script></script>
  require(['jquery','filter_poodll/mediaparser'], function($,parser) {
       
 $('#{{AUTOID}}').data('playtime', {{canplaycount}});
@@ -33,9 +34,12 @@ var aplayer = $('#' + "{{AUTOID}}").children().first();
 var fa = $('#' + "{{AUTOID}}" + ' .fa');
 var thestate =$('#' + "{{AUTOID}}" + '_state'); 
 var thetime = $('#' + "{{AUTOID}}" + '_time');
- var playtimer = $('#' + "{{AUTOID}}");
+var playtimer = $('#' + "{{AUTOID}}");
+var lastseconds = 0;
+var position_update_interval = 2;
+var is_strict_quiz = "{{quiz_strict_mode}}"=="true" && "{{URLPARAM:attempt}}" !="";
+var is_remember_pos =  is_strict_quiz &&  "{{quiz_remember_play_position}}"=="true";
 
-      
 var details = parser.parse('{{AUTOID}}_original', 'audio');
 aplayer.attr('src',details.mediaurl); // mediaurl, subtitlesurl, sources
 
@@ -49,11 +53,17 @@ aplayer.attr('src',details.mediaurl); // mediaurl, subtitlesurl, sources
  aplayer[0].volume = 0.2;
 
  //cookies if in strict mode
- var cookiename = details.mediaurl + '_' + "{{URLPARAM:attempt}}"+ '_' + "{{URLPARAM:cmid}}";
- console.log(cookiename);
- console.log(getCookie(cookiename));
- if("{{quiz_strict_mode}}"=="true" && "{{URLPARAM:attempt}}" !=""){
-   var prevplaycount = getCookie(cookiename);
+ var cookiename_playcount = details.mediaurl + '_pc_' + "{{URLPARAM:attempt}}"+ '_' + "{{URLPARAM:cmid}}";
+ var cookiename_position = details.mediaurl + '_pos_' + "{{URLPARAM:attempt}}"+ '_' + "{{URLPARAM:cmid}}";
+
+/*
+ console.log(cookiename_playcount);
+ console.log(getCookie(cookiename_playcount));
+ console.log('is_remember_pos',is_remember_pos);
+*/
+
+ if(is_strict_quiz){
+   var prevplaycount = getCookie(cookiename_playcount);
    if(prevplaycount!==null){
     playtimer.data('playtime',prevplaycount);
     if(prevplaycount==="0"){
@@ -62,17 +72,13 @@ aplayer.attr('src',details.mediaurl); // mediaurl, subtitlesurl, sources
    }
  }
 
-
-
-
-
 // Append Playtime text
 $('#' + "{{AUTOID}}" + '_playtime').empty();
  var remainingplays = playtimer.data('playtime');
 $('#' + "{{AUTOID}}" + '_playtime').append('Remaining plays: '+remainingplays +'x');
 
 
-
+//volume buttons
 $('#' + "{{AUTOID}}" + '_vol-up').click(function(){
     if(aplayer[0].volume +0.1 > 1){return;}
 	$('#' + "{{AUTOID}}" + '_indicator').css("width", '+=' + (0.1 * $('.meter').width()));
@@ -89,8 +95,10 @@ $('#' + "{{AUTOID}}" + '_vol-down').click(function(){
      var currentplaycount = playtimer.data('playtime');
        currentplaycount--;
       //if cookies are enabled set the play count in the cookie
-     if("{{quiz_strict_mode}}"=="true" && "{{URLPARAM:attempt}}" !="" ){
-         setCookie(cookiename,currentplaycount,1);
+     if(is_strict_quiz){
+         setCookie(cookiename_playcount,currentplaycount,1);
+         setCookie(cookiename_position,0,1);
+         lastseconds=0;
      }
 
       playtimer.data('playtime',currentplaycount );
@@ -137,15 +145,41 @@ $('#' + "{{AUTOID}}" + '_vol-down').click(function(){
 
 
 function play_audio(){
+    if(is_remember_pos) {
+        var lastpos = get_last_pos();
+        if (lastpos > 0) {
+            aplayer[0].currentTime = lastpos;
+        }
+    }
 	aplayer[0].play();
+
 	thestate.text('- playing -');
 	$(fa).removeClass('fa-play');
 	$(fa).addClass('fa-circle-o-notch');
 	$(fa).addClass('fa-spin');
 }
 
+ function get_last_pos(){
+     var lastpos = getCookie(cookiename_position);
+     if(lastpos && lastpos > 0 && $.isNumeric(lastpos)){
+         return lastpos;
+     }
+     return 0;
+ }
 
-aplayer.bind('durationchange',function(){thetime.text(poodll_mp_fetchtime(aplayer));});
+
+aplayer.bind('durationchange',function(){
+    if(is_remember_pos) {
+        var lastpos = get_last_pos();
+        var currentpos = aplayer[0].currentTime;
+        if (currentpos < lastpos && currentpos > 0) {
+            aplayer[0].pause();
+            aplayer[0].currentTime = lastpos;
+            aplayer[0].play();
+        }
+    }
+    thetime.text(poodll_mp_fetchtime(aplayer));
+ });
 
 
 //time display function
@@ -155,6 +189,12 @@ function poodll_mp_sec2time(seconds){
     date.setSeconds(seconds); 
     return date.toISOString().substr(11, 8);
 }
+
+ function poodll_mp_fetchseconds(theplayer){
+     var a_currenttime= isNaN(theplayer[0].currentTime) ? 0 : theplayer[0].currentTime;
+     return a_currenttime;
+ }
+
 function poodll_mp_fetchtime(theplayer){
      var a_currenttime= isNaN(theplayer[0].currentTime) ? 0 : theplayer[0].currentTime;
      var a_duration= isNaN(theplayer[0].duration) ? 0 : theplayer[0].duration;
@@ -165,14 +205,19 @@ function poodll_mp_fetchtime(theplayer){
 }
 //The timer display
 aplayer.on('timeupdate',function(e){
+    if(is_remember_pos) {
+        var currentseconds = poodll_mp_fetchseconds(aplayer);
+        if (currentseconds - lastseconds > position_update_interval) {
+            setCookie(cookiename_position, currentseconds, 1);
+            lastseconds = currentseconds;
+        }
+    }
  var displaytime = poodll_mp_fetchtime(aplayer)
  thetime.text(displaytime);
 });
 
 //show current time
  thetime.text(poodll_mp_fetchtime(aplayer));
-
-
 
  
  });

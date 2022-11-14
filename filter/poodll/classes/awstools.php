@@ -479,8 +479,9 @@ class awstools {
         return $this->s3client;
     }
 
-    function get_presigned_upload_url($mediatype, $minutes = 30, $key, $iosvideo = false) {
+    function get_presigned_upload_url($mediatype, $minutes, $key, $iosvideo = false) {
         $s3client = $this->fetch_s3client();
+        if(!$minutes){$minutes=30;}
         //Get bucket
         $bucket = '';
         switch ($mediatype) {

@@ -1,0 +1,113 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template block_edwiser_site_monitor/live_status
+
+    This template renders live status tab
+
+    Example context (json):
+    {
+        "errors"         : "false"
+        "hasupdate"      : "true",
+        "overviewupdate" : 3,
+        "overviewall"    : 51,
+        "list": [{
+            "class"  : "type-block name-block_edwiser_site_monitor status-uptodate extension",
+            "header" : [{
+                "header"      : false,
+                "icon"        : "plugin icon",
+                "displayname" : "plugin name",
+                "component"   : "plugin component",
+                "release"     : "plugin release number",
+                "versiondb"   : "plugin version in db",
+                "source"      : "source of plugin",
+                "actions"     : "actions supported with the plugin",
+                "msg"         : "message to display about update",
+                "requireby"   : "is this plugin required by another plugin",
+                "parent"      : "parent plugin name",
+                "update"      : "does this plugin have update"
+            }]
+        }]
+    }
+}}
+{{#errors}}
+    {{{errors}}}
+{{/errors}}
+{{^errors}}
+<ul class="nav nav-tabs nav-tabs-line border-0 mx-15 mb-10 w-full" role="tablist">
+    <li class="nav-item">
+        <a class="nav-link edwiser-plugin-filter {{#hasupdate}}active{{/hasupdate}}" data-filter='update' href="#">
+            {{#str}} overviewupdatable, core_plugin {{/str}}
+            <span class="badge number number-all">{{overviewupdate}}</span>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link edwiser-plugin-filter {{^hasupdate}}active{{/hasupdate}}" data-filter='all' href="#">
+            {{#str}} overviewext, core_plugin {{/str}}
+            <span class="badge number number-all">{{overviewall}}</span>
+        </a>
+    </li>
+</ul>
+<div class="edwiser-plugin-list">
+    <table class="generaltable {{#hasupdate}}update{{/hasupdate}}" id="plugins-control-panel">
+        <thead>
+            <tr>
+                <th class="header displayname" scope="col">{{#str}} displayname, core_plugin {{/str}} </th>
+                <th class="header version" scope="col">{{#str}} version, core_plugin {{/str}} </th>
+                <th class="header notes" scope="col">{{#str}} notes, core_plugin {{/str}} </th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#list}}
+            <tr class="{{class}}">
+            {{#header}}
+                <th class="pluginname cell c0 lastcol" colspan="6" scope="row">
+                    <span id="plugin_type_cell_{{type}}">
+                        {{{html}}}
+                    </span>
+                </th>
+            {{/header}}
+            {{^header}}
+                <td class="pluginname cell">
+                    <div class="displayname">
+                        {{{icon}}}{{displayname}}
+                    </div>
+                    <div class="componentname">{{component}}</div>
+                </td>
+                <td class="version cell">
+                    <div class="release">{{release}}</div>
+                    <div class="versionnumber">{{versiondb}}</div>
+                </td>
+                <td class="status cell">
+                    {{{source}}}
+                    {{{actions}}}
+                    {{{msg}}}
+                    {{{requireby}}}
+                    {{{parent}}}
+                    {{#update}}
+                        {{#has}}
+                            {{{html}}}
+                        {{/has}}
+                    {{/update}}
+                </td>
+            {{/header}}
+            </tr>
+            {{/list}}
+        </tbody>
+    </table>
+</div>
+{{/errors}}

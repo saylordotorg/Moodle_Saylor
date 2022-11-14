@@ -981,11 +981,12 @@ class filter_filtercodes extends moodle_text_filter {
                         $profiledata = $DB->get_records_menu('user_info_data', ['userid' => $USER->id], '', 'fieldid, data');
                     }
                 }
+                $showhidden = get_config('filter_filtercodes', 'showhiddenprofilefields');
                 foreach ($profilefields as $field) {
                     // If the tag exists and is not set to "Not visible" in the custom profile field's settings.
                     if ($isuser
                             && stripos($text, '{profile_field_' . $field->shortname . '}') !== false
-                            && $field->visible != '0') {
+                            && ($field->visible != '0' || !empty($showhidden))) {
                         $data = isset($profiledata[$field->id]) ? trim($profiledata[$field->id]) : '' . PHP_EOL;
                         switch ($field->datatype) { // Format data for some field types.
                             case 'datetime':
@@ -1510,6 +1511,20 @@ class filter_filtercodes extends moodle_text_filter {
                     $cnt = \user_get_total_participants($PAGE->course->id);
                 }
                 $replace['/\{courseparticipantcount\}/i'] = $cnt;
+            }
+
+            // Tag: {coursecount students}.
+            if (stripos($text, '{coursecount students}') !== false) {
+                if ($CFG->branch >= 32) {
+                    $coursecontext = context_course::instance($PAGE->course->id);
+                    $role = $DB->get_record('role', array('shortname' => 'student'));
+                    $students = get_role_users($role->id, $coursecontext);
+                    $cnt = count($students);
+                    unset($students);
+                } else {
+                    $cnt = '';
+                }
+                $replace['/\{coursecount students\}/i'] = $cnt;
             }
 
             // Tag: {courseid}.
@@ -2555,6 +2570,7 @@ class filter_filtercodes extends moodle_text_filter {
         }
 
         // Tag: {details}{/details}.
+        // Tag: {details style1}{/details}.
         // Tag: {summary}{/summary}.
         if (stripos($text, '{/details}') !== false) {
             $replace['/\{details\}/i'] = '<details>';
@@ -2562,6 +2578,11 @@ class filter_filtercodes extends moodle_text_filter {
             $replace['/\{\/details\}/i'] = '</details>';
             $replace['/\{summary\}/i'] = '<summary>';
             $replace['/\{\/summary\}/i'] = '</summary>';
+            if (preg_match_all('/\{details ([a-zA-Z0-9-_ ]+)\}/', $text, $matches) !== 0) {
+                foreach ($matches[1] as $cssclass) {
+                    $replace['/\{details ' . $cssclass . '\}/i'] = '<details class="' . $cssclass . '">';
+                }
+            }
         }
 
         // Conditional block tags.

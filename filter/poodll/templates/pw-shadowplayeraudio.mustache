@@ -1,0 +1,189 @@
+<div id="{{AUTOID}}_mini_player" class="mini_player_holder mini_player_loading">
+  <div id="{{AUTOID}}_progress_circle" class="progress-circle">
+
+    <div tabindex="0" id="{{AUTOID}}_play-btn" class="play-btn"><i class="fa fa-play-circle"></i></div>
+
+    <div class="left-half-clipper">
+
+      <div class="first50-bar"></div>
+
+      <div class="value-bar"></div>
+
+    </div>
+
+  </div>
+</div>
+
+
+{{#js}}
+
+ require(['jquery', 'filter_poodll/mediaparser','/filter/poodll/amd/src/poodll_mediarecorder.js'], function($, parser,pmr) {
+ //<script>
+  var app = {
+    audioInterval: {
+      interval: null,
+      currentTime: 0,
+      paused: false,
+      start: function() {
+        app.audioInterval.interval = setInterval(function() {
+          app.audioInterval.update();
+        }, 100);
+      },
+      pause: function() {
+        clearInterval(app.audioInterval.interval);
+      },
+      stop: function() {
+        clearInterval(app.audioInterval.interval);
+        app.audioInterval.currentTime = 0;
+      },
+      update: function() {
+        app.audioInterval.currentTime += 100;
+        var duration = app.audioBuffer.duration * 1000;
+        var currentTime = app.audioInterval.currentTime;
+        var percent = Math.round((currentTime / duration) * 100);
+        $('#{{AUTOID}}_progress_circle').attr('class', 'progress-circle');
+        if (percent > 50) {
+          $("#{{AUTOID}}_progress_circle").addClass("over50");
+        }
+        $("#{{AUTOID}}_progress_circle").addClass("p" + percent);
+      }
+    },
+    audioData:null,
+    audioStarted: false,
+    audioBuffer: null,
+    audioContext: null,
+    audioSource: null,
+    details: parser.parse('{{AUTOID}}_original', 'audio'),
+
+    loadAudio: function() {
+      app.audioContext = new AudioContext();
+      app.audioContext.onstatechange = function() {
+        console.log(app.audioContext.state);
+      }
+      var request = new XMLHttpRequest();
+      console.log("getting audio..");
+      
+      request.addEventListener('load', function() {
+        
+        if (request.status < 400) {
+          
+          console.log("got audio");
+          
+          app.audioData = request.response;
+          console.log("getting audio buffer");
+          
+          app.audioContext.decodeAudioData(app.audioData, function(audioBuffer) {
+            console.log("got audio buffer");
+            app.audioBuffer = audioBuffer;
+            app.initAudio();
+          },function(error){
+            $("#{{AUTOID}}_play-btn").html('<i class="fa fa-exclamation-circle"></i>');
+            console.log("error getting audio buffer");
+          });
+          
+        }
+        
+        else {
+          $("#{{AUTOID}}_play-btn").html('<i class="fa fa-exclamation-circle"></i>');
+          console.log("error getting audio file");
+        }
+        
+      });
+      
+      request.open('GET', app.details.mediaurl);
+      request.responseType = 'arraybuffer';
+      request.send();
+      
+    },
+    initAudio: function(buffer) {
+
+      $("#{{AUTOID}}_mini_player").removeClass("mini_player_loading");
+
+      $("#{{AUTOID}}_play-btn").on("click keypress", function() {
+
+        if (!app.audioStarted) {
+
+          if (app.audioSource) {
+            app.audioSource.disconnect();
+          }
+
+          app.audioSource = app.audioContext.createBufferSource();
+          app.audioSource.buffer = app.audioBuffer;
+          app.audioSource.connect(app.audioContext.destination);
+
+          app.audioSource.onended = function() {
+            app.audioInterval.stop();
+            app.audioStarted = false;
+            $('#{{AUTOID}}_progress_circle').attr('class', 'progress-circle');
+            $("#{{AUTOID}}_play-btn").html('<i class="fa fa-play-circle"></i>');
+          }
+
+          app.audioInterval.start();
+          app.audioSource.start();
+          app.audioStarted = true;
+
+          $("#{{AUTOID}}_play-btn").html('<i class="fa fa-pause-circle"></i>');
+
+        } 
+
+        else {
+
+          if (app.audioContext.state === 'running') {
+
+            app.audioContext.suspend().then(function() {
+              app.audioInterval.pause();
+              $("#{{AUTOID}}_play-btn").html('<i class="fa fa-play-circle"></i>');
+            });
+
+          }
+
+          else if (app.audioContext.state === 'suspended') {
+            app.audioContext.resume().then(function() {
+              app.audioInterval.start();
+              $("#{{AUTOID}}_play-btn").html('<i class="fa fa-pause-circle"></i>');
+            });
+          }
+
+        }
+
+      });
+
+    },
+
+    do_embed: function() {
+         //just once trigger the permissions dialog, if needed
+         if(!('filter_poodll_navigator_checked' in window)){
+         window.filter_poodll_navigator_checked=true;
+         navigator.mediaDevices.getUserMedia({"audio": true});
+         }
+
+         var params=[];
+         params['widgetid'] = @@AUTOID@@;
+         params['media_timeinterval'] = 2000;
+         params['media_audiomimetype'] = 'audio/webm';//or audio/wav
+         params['media_videorecordertype'] = 'auto';//or mediarec or webp
+         params['media_videocapturewidth'] = 320;
+         params['media_videocaptureheight'] = 240;
+         params['mediatype'] = 'audio';
+         params['media_skin'] = 'shadow';
+         params['media_skin_style'] = 'none';
+         params['timelimit'] =0;
+         params['hideupload'] =true;
+         params['resource'] =@@VIDEOURL@@;
+
+         var pmr= requiredjs_shadow;
+         pmr.embed('#' + @@AUTOID@@,params);
+
+     },
+
+    init: function() {
+      window.AudioContext = window.AudioContext || window.webkitAudioContext;
+      app.loadAudio();
+    }
+  };
+
+  app.init();
+//</script>
+
+});
+{{/js}}
