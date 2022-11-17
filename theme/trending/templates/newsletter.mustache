@@ -1,0 +1,21 @@
+{{#displaynewslettersection}}
+<div class="newsletter">
+   <div class="container">
+      {{#newsletterheading}}
+      <h5>{{{newsletterheading}}}</h5>
+      {{/newsletterheading}}
+      {{#newslettertagline}}
+      <p>{{{newslettertagline}}}</p>
+      {{/newslettertagline}}
+      <form method="post" action="http://trending.demo.themescustom.com" onsubmit="return newsletter_check(this)">
+         <div class="newsletter-field-email">
+            <label>Email</label>
+            <input class="newsletter-email" type="email" name="ne" required="">
+         </div>
+         <div class="newsletter-field-button">
+            <input class="newsletter-submit" type="submit" value="Subscribe">
+         </div>
+      </form>
+   </div>
+</div>
+{{/displaynewslettersection}}

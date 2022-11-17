@@ -1,0 +1,134 @@
+/**
+ * @package		Mb2 A-Z Courses
+ * @author		Mariusz Boloz (http://mb2extensions.com)
+ * @copyright	Copyright (C) 2018 Mariusz Boloz (http://mb2extensions.com). All rights reserved
+ * @license		Commercial (http://codecanyon.net/licenses)
+**/
+
+
+/* Clear div */
+
+.mb2azc-clr {
+	*zoom: 1;
+}
+.mb2azc-clr:before,
+.mb2azc-clr:after {
+	display: table;
+	content: "";
+	line-height: 0;
+}
+.mb2azc-clr:after {
+	clear: both;
+}
+
+
+
+
+/* ================================ Alphabet list =================================== */
+
+
+.mb2azc-alphabet {
+	margin: 0 0 20px 0;
+	padding: 0;	
+}
+
+.mb2azc-alphabet li {
+	display: block;
+	float: left;
+	margin: 0 10px 10px 0;
+}
+
+.mb2azc-alphabet li a,
+.mb2azc-alphabet li span  {
+	display: block;
+	width: 36px;
+	height: 36px;
+	line-height: 36px;
+	text-align: center;
+	color: #000;
+	background-color: #f9f9f9;	
+}
+
+.mb2azc-alphabet li a {
+	background-color: #e5e5e5;	
+}
+
+.mb2azc-alphabet li a:hover,
+.mb2azc-alphabet li a:focus {
+	background-color: #ddd;	
+	color: #000;
+}
+
+.mb2azc-alphabet li.nolink {
+	cursor: not-allowed;
+}
+
+.dir-rtl .mb2azc-alphabet li {
+	float: right;	
+	margin: 0 0 10px 10px;
+}
+
+
+
+
+/* ================================ Layout: list =================================== */
+
+
+.mb2azc.layout-list .mb2azc-header {
+ 	margin: 30px 0;
+}
+
+.mb2azc.layout-list .mb2azc-header h4 {
+	margin: 0;	
+	float: left;
+	line-height: normal;
+}
+
+.dir-rtl .mb2azc.layout-list .mb2azc-header h4 {
+	float: right;	
+}
+
+.mb2azc.layout-list .mb2azc-ttop {	
+	float: right;
+}
+
+.dir-rtl .mb2azc.layout-list .mb2azc-ttop {	
+	float: left;
+}
+
+.mb2azc.layout-list .mb2azc-items li.mb2azc-item {
+	padding-left: 15px;
+	margin: 15px 0;
+}
+
+.dir-rtl .mb2azc.layout-list .mb2azc-items li.mb2azc-item  {
+	padding-left: 0;
+	padding-right: 15px;	
+}
+
+.mb2azc.layout-list .mb2azc-items li.mb2azc-item a  {
+	position: relative;		
+}
+
+.mb2azc.layout-list .mb2azc-items li.mb2azc-item a:after  {
+	content: '\00BB';
+	margin-left: 5px;
+}
+
+.dir-rtl .mb2azc.layout-list .mb2azc-items li.mb2azc-item a:before {
+	margin-left: 0;
+	margin-right: 5px;
+	content: '\00AB';		
+}
+
+.dir-rtl .mb2azc.layout-list .mb2azc-items {
+	padding-left: 0;
+	padding-right: 15px;	
+}
+
+
+@media only screen and (max-width:768px){
+	
+	
+	
+}

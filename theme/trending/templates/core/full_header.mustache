@@ -1,0 +1,46 @@
+{{!
+@template theme_trending/header
+This template renders the header.
+Example context (json):
+{
+"contextheader": "context_header_html",
+"hasnavbar": false,
+"navbar": "navbar_if_available",
+"courseheader": "course_header_html"
+}
+}}
+<header id="page-header" class="internalbanner">
+   <div class="container">
+      <div class="card {{^contextheader}}border-0 bg-transparent{{/contextheader}}">
+         <div class="card-body {{^contextheader}}p-2{{/contextheader}}">
+            <div class="d-flex">
+               <div class="mr-auto">
+                  {{{contextheader}}}
+               </div>
+            </div>
+            <div class="mini-block"></div>
+         </div>
+      </div>
+   </div>
+</header>
+<div id="page-navbar-con">
+   <div class="container">
+      <div class="card">
+         <div class="card-body">
+            <div class="d-flex flex-wrap">
+               {{#hasnavbar}}
+               <div id="page-navbar">
+                  {{{navbar}}}
+               </div>
+               {{/hasnavbar}}
+               <div class="ml-auto d-flex">
+                  {{{pageheadingbutton}}}
+               </div>
+               <div id="course-header">
+                  {{{courseheader}}}
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>

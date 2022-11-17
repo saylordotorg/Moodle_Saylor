@@ -1,0 +1,110 @@
+{{#displayaboutussection}}
+<section id="about">
+   <div class="container">
+      <div class="center">
+         <div class="heading">
+            {{#aboutusheading}}
+            <h2>{{{aboutusheading}}}</h2>
+            {{/aboutusheading}}
+            {{#aboutustagline}}
+            <p class="tagline">{{{aboutustagline}}}</p>
+            {{/aboutustagline}}
+         </div>
+      </div>
+      <div class="row-fluid">
+         <div class="col-lg-6 col-md-6 col-sm-12 wow fadeInRight">
+            <img src="{{{aboutusimage}}}" class="img-responsive" />
+            {{#aboutusdescription}}
+            <p>{{{aboutusdescription}}}</p>
+            {{/aboutusdescription}}
+         </div>
+         <div class="col-lg-6 col-md-6 col-sm-12 wow fadeInDown">
+            <div class="accordion">
+               <div class="panel-group" id="accordion1">
+                  <div class="panel panel-default">
+                     {{#accordionbox1heading}}
+                     <div class="panel-heading active">
+                        <h3 class="panel-title">
+                           <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion1" href="#collapseOne1">
+                           {{{accordionbox1heading}}}
+                           <i class="fa fa-angle-right pull-right"></i>
+                           </a>
+                        </h3>
+                     </div>
+                     {{/accordionbox1heading}}
+                     {{#accordionbox1description}}
+                     <div id="collapseOne1" class="panel-collapse collapse in">
+                        <div class="panel-body">
+                           {{{accordionbox1description}}}
+                        </div>
+                     </div>
+                     {{/accordionbox1description}}
+                  </div>
+                  <div class="panel panel-default">
+                     {{#accordionbox2heading}}
+                     <div class="panel-heading">
+                        <h3 class="panel-title">
+                           <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion1" href="#collapseTwo1">
+                           {{{accordionbox2heading}}}
+                           <i class="fa fa-angle-right pull-right"></i>
+                           </a>
+                        </h3>
+                     </div>
+                     {{/accordionbox2heading}}
+                     {{#accordionbox2description}}
+                     <div id="collapseTwo1" class="panel-collapse collapse">
+                        <div class="panel-body">
+                           {{{accordionbox2description}}}
+                        </div>
+                     </div>
+                     {{/accordionbox2description}}
+                  </div>
+                  <div class="panel panel-default">
+                     {{#accordionbox3heading}}
+                     <div class="panel-heading">
+                        <h3 class="panel-title">
+                           <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion1" href="#collapseThree1">
+                           {{{accordionbox3heading}}}
+                           <i class="fa fa-angle-right pull-right"></i>
+                           </a>
+                        </h3>
+                     </div>
+                     {{/accordionbox3heading}}
+                     {{#accordionbox3description}}
+                     <div id="collapseThree1" class="panel-collapse collapse">
+                        <div class="panel-body">
+                           {{{accordionbox3description}}}
+                        </div>
+                     </div>
+                     {{/accordionbox3description}}
+                  </div>
+                  <div class="panel panel-default">
+                     {{#accordionbox4heading}}
+                     <div class="panel-heading">
+                        <h3 class="panel-title">
+                           <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion1" href="#collapseFour1">
+                           {{{accordionbox4heading}}}
+                           <i class="fa fa-angle-right pull-right"></i>
+                           </a>
+                        </h3>
+                     </div>
+                     {{/accordionbox4heading}}
+                     {{#accordionbox4description}}
+                     <div id="collapseFour1" class="panel-collapse collapse">
+                        <div class="panel-body">
+                           {{{accordionbox4description}}}
+                        </div>
+                     </div>
+                     {{/accordionbox4description}}
+                  </div>
+               </div>
+               <!--/#accordion1-->
+            </div>
+         </div>
+      </div>
+      <!--/.row-->
+   </div>
+   <!--/.container-->
+</section>
+<!--/#about-->
+{{/displayaboutussection}}

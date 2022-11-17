@@ -1,0 +1,241 @@
+.colorful-tab-wrapper {
+  width: 100%;
+  margin: 0px auto;
+  background: #aaa;
+  padding: 20px;
+  box-sizing: border-box;
+  overflow: hidden;
+  position: relative;
+  transition: background .3s ease 0s;
+}
+
+.colorful-tab-wrapper.active:before {
+  content: attr(active-tab);
+  transform: scale(1) rotate(0deg);
+  z-index: 9;
+  opacity: 1;
+  visibility: visible;
+}
+
+.colorful-tab-wrapper.active .colorful-tab-content {
+  color: white;
+}
+
+.colorful-tab-background-image {
+  background-attachment: fixed !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+  background-size: cover !important;
+}
+
+.colorful-tab-background-image:after {
+  transition: .5s ease 0s;
+  content: "";
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  opacity: 0;
+  top: 0;
+  background: #000;
+}
+
+.colorful-tab-background-image.active:after {
+  width: 100%;
+  opacity: .5;
+}
+
+.colorful-tab-menu {
+  background: rgba(255, 255, 255, 0.2);
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 99;
+}
+
+.colorful-tab-menu-item {
+  margin: 0 20px;
+  display: inline-block;
+}
+
+.colorful-tab-menu-item a {
+  display: block;
+  text-decoration: none;
+  color: #fff;
+  text-align: center;
+  font-size: 18px;
+  transition: background .3s ease 0s, color .3s ease 0s;
+}
+
+.colorful-tab-menu-item.active a {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.colorful-tab-container {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+}
+
+.colorful-tab-content {
+  height: 0;
+  overflow: hidden;
+  opacity: 0;
+  color: #fff;
+  visibility: hidden;
+  position: relative;
+  z-index: 9;
+  line-height: 28px;
+  width: 0;
+  transform: scale(0.9);
+  transition: all .9s ease-in;
+  filter: blur(2px);
+}
+
+.colorful-tab-content.active {
+  height: auto;
+  overflow: auto;
+  transition-delay: .9s;
+  width: auto;
+  opacity: 1;
+  filter: blur(0);
+  visibility: visible;
+  transform: scale(1);
+}
+
+.colorful-tab-content h2.student-title {
+  text-align: center;
+  color: #fff;
+  font-weight: normal;
+  font-size: 22px;
+}
+
+.colorful-tab-content p {
+  color: #fff;
+  font-size: 15px;
+  font-style: italic;
+  line-height: normal;
+}
+
+.colorful-tab-wrapper.elliptic {
+  border-radius: 10px;
+  padding: 0;
+}
+
+.colorful-tab-wrapper.elliptic:before {
+  padding-top: 55px;
+}
+
+.colorful-tab-wrapper.elliptic .colorful-tab-menu {
+  margin: 0;
+}
+
+.colorful-tab-wrapper.elliptic .colorful-tab-container {
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.colorful-tab-wrapper.flatline {
+  padding: 50px 0;
+}
+
+.colorful-tab-list-section {
+  text-align: center;
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.colorful-tab-wrapper.flatline:before {
+  padding-top: 55px;
+}
+
+.colorful-tab-wrapper.flatline .colorful-tab-menu {
+  background: none;
+  margin-bottom: 35px;
+  /* box-shadow: 0 -2px 0 rgba(255, 255, 255, 0.2) inset; */
+}
+
+.colorful-tab-wrapper.flatline .colorful-tab-menu-item a {
+  transition: box-shadow .3s ease 0s, opacity .3s ease 0s;
+  opacity: .5;
+  text-indent: -9999px;
+  -webkit-border-radius: 50px;
+  -moz-border-radius: 50px;
+  border-radius: 50px;
+  border: none;
+}
+
+.colorful-tab-wrapper.flatline .colorful-tab-menu-item.active a {
+  background: none;
+  opacity: 1;
+  /* box-shadow: 0 -2px 0 #fff inset */
+  ;
+}
+
+.custom-tab .title-container {
+  border-top: 2px solid #ccc;
+  padding: 2em 0;
+  text-align: center;
+}
+
+.custom-tab .title-container h1 {
+  font-family: "Times New Roman", Times, serif;
+  text-align: center;
+  color: #333;
+  font-size: 2.5em;
+  line-height: normal;
+  margin: 0;
+}
+
+.custom-tab .title-container p.tagline {
+  color: #333;
+}
+
+.colorful-tab-wrapper.flatline .colorful-tab-menu-item a.student-a {
+  background-repeat: no-repeat;
+  background-size: cover;
+  width: 90px;
+  height: 90px;
+}
+
+.colorful-tab-wrapper.flatline .colorful-tab-menu-item a.student-b {
+  background-repeat: no-repeat;
+  background-size: cover;
+  width: 90px;
+  height: 90px;
+}
+
+.colorful-tab-wrapper.flatline .colorful-tab-menu-item a.student-c {
+  background-repeat: no-repeat;
+  background-size: cover;
+  width: 90px;
+  height: 90px;
+}
+
+.colorful-tab-wrapper.flatline .colorful-tab-menu-item a.student-d {
+  background-repeat: no-repeat;
+  background-size: cover;
+  width: 90px;
+  height: 90px;
+}
+
+.colorful-tab-wrapper.flatline .colorful-tab-menu-item a.student-e {
+  background-repeat: no-repeat;
+  background-size: cover;
+  width: 90px;
+  height: 90px;
+}
+
+.testimonial-wrapper {
+  text-align: center;
+}
+
+
+/* For Mobile CSS
+---------------------*/
+
+@media only screen and (min-width: 0px) and (max-width: 767px) {
+  .colorful-tab-menu {
+    flex-direction: column;
+  }
+}

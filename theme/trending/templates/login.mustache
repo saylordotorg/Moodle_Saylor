@@ -1,0 +1,46 @@
+{{!
+@template theme_trending/login
+Login page template
+Example context (json):
+{
+"output": {
+"doctype": "<!DOCTYPE html>",
+"page_title": "Login page",
+"favicon": "favicon.ico",
+"main_content": "
+<h1>Headers keep HTML validators happy</h1>
+"
+}
+}
+}}
+{{> theme_trending/head }}
+<body {{{ bodyattributes }}}>
+<div id="page-wrapper">
+
+<div id="page">
+   {{{ output.standard_top_of_body_html }}}
+   <!-- Start navigation -->
+   {{>theme_trending/navbar}}
+   <!-- End navigation -->
+   <div class="container">
+      <div id="page-content" class="row">
+         <div id="region-main-box"  class="col-12">
+            
+            <section id="region-main" aria-label="{{#str}}content{{/str}}">
+                 <div class="col-lg-6 col-sm-12 col-md-12 l-box">
+               {{{ output.course_content_header }}}
+               {{{ output.main_content }}}
+               {{{ output.course_content_footer }}}
+                </div>
+            </section>
+          
+         </div>
+      </div>
+   </div>
+   {{> theme_trending/footer }}
+</div>
+</body>
+</html>
+{{#js}}
+require(['theme_boost/loader']);
+{{/js}}

@@ -1,0 +1,10 @@
+{
+  "name": "moodle-atto_mb2shortcodes-button",
+  "builds": {
+    "moodle-atto_mb2shortcodes-button": {
+      "jsfiles": [
+        "button.js"
+      ]
+    }
+  }
+}

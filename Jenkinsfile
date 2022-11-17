@@ -517,6 +517,12 @@ def plugins = [
         "url" : 'https://github.com/WisdmLabs/moodle-block_edwiser_site_monitor.git',
         "branch" : 'master',
         "dest" : 'blocks/edwiser_site_monitor'
+    ],
+    [
+        "name" : 'mod_reengagement',
+        "url" : 'https://github.com/catalyst/moodle-mod_reengagement.git',
+        "branch" : 'MOODLE_400_STABLE',
+        "dest" : 'mod/reengagement'
     ]
 ]
 

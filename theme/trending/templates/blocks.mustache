@@ -1,0 +1,26 @@
+<!-- Start Block Section -->
+<div class="block-section float-left">
+   <input type="checkbox" id="navigation1" />
+   <label for="navigation1" class="slideblocklabel"><i class="fa fa-cogs fa-spin"></i></label>
+   <nav class="slideblock">
+      <section class="slideblock-con">
+         {{#blockcustombutton}}
+         <a class="link-buy" href="{{{blockcustombuttonurl}}}" title="{{{blockcustombutton}}}"><i class="fa fa-shopping-cart"></i>{{{blockcustombutton}}}</a>
+         {{/blockcustombutton}}
+         <h4 class="links">{{{blockheading}}}</h4>
+         <p class="links-con">{{{blocktagline}}}</p>
+         <hr/>
+      </section>
+      <div class="columnleft blockcolumn {{#haspreblocks}} has-blocks {{/haspreblocks}}">
+         <section data-region="blocks-column" class="hidden-print" aria-label="{{#str}}blocks{{/str}}">
+            {{{ sidepreblocks }}}
+         </section>
+      </div>
+      <div class="columnright blockcolumn {{#haspostblocks}} has-blocks {{/haspostblocks}}">
+         <section data-region="blocks-column" class="hidden-print" aria-label="{{#str}}blocks{{/str}}">
+            {{{ sidepostblocks }}}
+         </section>
+      </div>
+   </nav>
+</div>
+<!-- End Block Section -->

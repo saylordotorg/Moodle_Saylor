@@ -1,0 +1,122 @@
+{{!
+Page footer.
+}}
+<!-- Start Top Footer Section -->
+<div class="social">
+   <div class="container">
+      <img src="{{{footerlogo}}}" alt="Footer_Logo"/>
+      <ul>
+         {{#hasfacebook}}
+         <li>
+            <a href="{{{hasfacebook}}}" target="_blank">
+            <i class="fa fa-facebook"></i>
+            </a>
+         </li>
+         {{/hasfacebook}}
+         {{#hastwitter}}
+         <li>
+            <a href="{{{hastwitter}}}" target="_blank">
+            <i class="fa fa-twitter"></i>
+            </a>
+         </li>
+         {{/hastwitter}}
+         {{#hasgoogleplus}}
+         <li>
+            <a href="{{{hasgoogleplus}}}" target="_blank">
+            <i class="fa fa-google-plus"></i>
+            </a>
+         </li>
+         {{/hasgoogleplus}}
+         {{#haspinterest}}
+         <li>
+            <a href="{{{haspinterest}}}" target="_blank">
+            <i class="fa fa-pinterest"></i>
+            </a>
+         </li>
+         {{/haspinterest}}
+         {{#hasinstagram}}
+         <li>
+            <a href="{{{hasinstagram}}}" target="_blank">
+            <i class="fa fa-instagram"></i>
+            </a>
+         </li>
+         {{/hasinstagram}}
+         {{#hasyoutube}}
+         <li>
+            <a href="{{{hasyoutube}}}" target="_blank">
+            <i class="fa fa-youtube"></i>
+            </a>
+         </li>
+         {{/hasyoutube}}
+         {{#hasflickr}}
+         <li>
+            <a href="{{{hasflickr}}}" target="_blank">
+            <i class="fa fa-flickr"></i>
+            </a>
+         </li>
+         {{/hasflickr}}
+         {{#haswhatsapp}}
+         <li>
+            <a href="{{{haswhatsapp}}}" target="_blank">
+            <i class="fa fa-whatsapp"></i>
+            </a>
+         </li>
+         {{/haswhatsapp}}
+         {{#hasskype}}
+         <li>
+            <a href="{{{hasskype}}}" target="_blank">
+            <i class="fa fa-skype"></i>
+            </a>
+         </li>
+         {{/hasskype}}
+         {{#hasgithub}}
+         <li>
+            <a href="{{{hasgithub}}}" target="_blank">
+            <i class="fa fa-github"></i>
+            </a>
+         </li>
+         {{/hasgithub}}
+      </ul>
+   </div>
+</div>
+<!-- End Top Footer Section -->
+<!-- Start Footer Section -->
+<footer id="page-footer">
+   <div class="container">
+      <ul class="copyright">
+         {{#hascopyright}}
+         <li>
+            <p class="copy">Copyright &copy; {{{copyrightY}}} {{{hascopyright}}} </p>
+         </li>
+         {{/hascopyright}}
+         {{#privacypolicy}}
+         | 
+         <li> 
+            <a href="{{{privacypolicyurl}}}">
+            {{{privacypolicy}}}
+            </a>
+         </li>
+         {{/privacypolicy}}
+      </ul>
+      {{#googleplayurl}}
+      <ul>
+         <li>
+            <a href="{{{googleplayurl}}}">
+            <img src="{{config.wwwroot}}/theme/trending/pix/googleplay.png" alt="">
+            </a>
+         </li>
+      </ul>
+      {{/googleplayurl}}
+      {{{ output.standard_footer_html }}}
+      {{{ output.standard_end_of_body_html }}}
+   </div>
+</footer>
+<!-- End Footer Section -->
+<!-- Start Back To Top -->
+{{#backtotop}}
+<div id="backtotop" style="display: none;"> 
+   <a class="scrollup" href="javascript:void(0);" title="Go to top">
+   </a>
+</div>
+{{/backtotop}}
+<!-- End Back To Top -->

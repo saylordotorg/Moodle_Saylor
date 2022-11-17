@@ -1,0 +1,271 @@
+/**
+ * @package		Mb2 Content
+ * @author		Mariusz Boloz (http://mb2extensions.com)
+ * @copyright	Copyright (C) 2018 Mariusz Boloz (http://mb2extensions.com). All rights reserved
+ * @license		Commercial (http://codecanyon.net/licenses)
+**/
+
+@font-face {
+  font-family: 'mb2content_font';
+  src: url('../../../../blocks/mb2content/assets/font/mb2content_font.eot?66378961');
+  src: url('../../../../blocks/mb2content/assets/font/mb2content_font.eot?66378961#iefix') format('embedded-opentype'),
+       url('../../../../blocks/mb2content/assets/font/mb2content_font.woff?66378961') format('woff'),
+       url('../../../../blocks/mb2content/assets/font/mb2content_font.ttf?66378961') format('truetype'),
+       url('../../../../blocks/mb2content/assets/font/mb2content_font.svg?66378961#mb2content_font') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+ 
+ [class^="mb2content_icon-"]:before, [class*=" mb2content_icon-"]:before {
+  font-family: "mb2content_font";
+  font-style: normal;
+  font-weight: normal;
+  speak: none;
+ 
+  display: inline-block;
+  text-decoration: inherit;
+  width: 1em;
+  margin-right: .2em;
+  text-align: center;
+  /* opacity: .8; */
+ 
+  /* For safety - reset parent styles, that can break glyph codes*/
+  font-variant: normal;
+  text-transform: none;
+ 
+  /* fix buttons height, for twitter bootstrap */
+  line-height: 1em;
+ 
+  /* Animation center compensation - margins should be symmetric */
+  /* remove if not needed */
+  margin-left: .2em;
+ 
+  /* you can be more comfortable with increased icons size */
+  /* font-size: 120%; */
+ 
+  /* Font smoothing. That was taken from TWBS */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+ 
+  /* Uncomment for 3D effect */
+  /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
+}
+ 
+.mb2content_icon-right-open:before { content: '\e800'; } /* '' */
+.mb2content_icon-left-open:before { content: '\e801'; } /* '' */
+.mb2content_icon-down-open:before { content: '\e802'; } /* '' */
+.mb2content_icon-up-open:before { content: '\e803'; } /* '' */
+
+
+
+
+/* ================================ Owl Carousel =================================== */
+/**
+ * Owl Carousel v2.2.1
+ * Copyright 2013-2017 David Deutsch
+ * Licensed under  ()
+ */
+.owl-carousel,.owl-carousel .owl-item{-webkit-tap-highlight-color:transparent;position:relative}.owl-carousel{display:none;width:100%;z-index:1}.owl-carousel .owl-stage{position:relative;-ms-touch-action:pan-Y;-moz-backface-visibility:hidden}.owl-carousel .owl-stage:after{content:".";display:block;clear:both;visibility:hidden;line-height:0;height:0}.owl-carousel .owl-stage-outer{position:relative;overflow:hidden;-webkit-transform:translate3d(0,0,0)}.owl-carousel .owl-item,.owl-carousel .owl-wrapper{-webkit-backface-visibility:hidden;-moz-backface-visibility:hidden;-ms-backface-visibility:hidden;-webkit-transform:translate3d(0,0,0);-moz-transform:translate3d(0,0,0);-ms-transform:translate3d(0,0,0)}.owl-carousel .owl-item{min-height:1px;float:left;-webkit-backface-visibility:hidden;-webkit-touch-callout:none}.owl-carousel .owl-item img{display:block;width:100%}.owl-carousel .owl-dots.disabled,.owl-carousel .owl-nav.disabled{display:none}.no-js .owl-carousel,.owl-carousel.owl-loaded{display:block}.owl-carousel .owl-dot,.owl-carousel .owl-nav .owl-next,.owl-carousel .owl-nav .owl-prev{cursor:pointer;cursor:hand;-webkit-user-select:none;-khtml-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}.owl-carousel.owl-loading{opacity:0;display:block}.owl-carousel.owl-hidden{opacity:0}.owl-carousel.owl-refresh .owl-item{visibility:hidden}.owl-carousel.owl-drag .owl-item{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}.owl-carousel.owl-grab{cursor:move;cursor:grab}.owl-carousel.owl-rtl{direction:rtl}.owl-carousel.owl-rtl .owl-item{float:right}.owl-carousel .animated{animation-duration:1s;animation-fill-mode:both}.owl-carousel .owl-animated-in{z-index:0}.owl-carousel .owl-animated-out{z-index:1}.owl-carousel .fadeOut{animation-name:fadeOut}@keyframes fadeOut{0%{opacity:1}100%{opacity:0}}.owl-height{transition:height .5s ease-in-out}.owl-carousel .owl-item .owl-lazy{opacity:0;transition:opacity .4s ease}.owl-carousel .owl-item img.owl-lazy{transform-style:preserve-3d}.owl-carousel .owl-video-wrapper{position:relative;height:100%;background:#000}.owl-carousel .owl-video-play-icon{position:absolute;height:80px;width:80px;left:50%;top:50%;margin-left:-40px;margin-top:-40px;background:url(owl.video.play.png) no-repeat;cursor:pointer;z-index:1;-webkit-backface-visibility:hidden;transition:transform .1s ease}.owl-carousel .owl-video-play-icon:hover{-ms-transform:scale(1.3,1.3);transform:scale(1.3,1.3)}.owl-carousel .owl-video-playing .owl-video-play-icon,.owl-carousel .owl-video-playing .owl-video-tn{display:none}.owl-carousel .owl-video-tn{opacity:0;height:100%;background-position:center center;background-repeat:no-repeat;background-size:contain;transition:opacity .4s ease}.owl-carousel .owl-video-frame{position:relative;z-index:1;height:100%;width:100%}
+
+
+
+
+
+/* ================================ COLUMNS =================================== */
+
+
+.mb2content-col {
+	position: relative;
+	float: left;	
+}
+
+.mb2content-gdefault.mb2content-cols .mb2content-list,
+.mb2content-gdefault .mb2content-parentcols {
+	margin-left: -15px;
+	margin-right: -15px;	
+}
+
+.mb2content-gdefault .mb2content-col {
+	padding-left: 15px;
+	padding-right: 15px;
+	padding-bottom: 30px;	
+}
+
+.mb2content-gsmall.mb2content-cols .mb2content-list,
+.mb2content-gsmall .mb2content-parentcols  {
+	margin-left: -2px;
+	margin-right: -2px;
+}
+
+.mb2content-gsmall .mb2content-col {
+	padding-left: 2px;
+	padding-right: 2px;
+	padding-bottom: 4px;	
+}
+
+
+@media only screen and (max-width:768px){	
+	.mb2content-nocarousel.mb2content-mcols .mb2content-col {
+		width: 50% !important;	
+	}
+}
+
+
+@media only screen and (max-width:480px){
+	
+	.mb2content-nocarousel.mb2content-mcols .mb2content-col,
+	.mb2content-nocarousel .mb2content-col {
+		float: none;
+		width: 100% !important;	
+	}
+	
+	.mb2content-col:last-child {
+		margin-bottom: 0;	
+	}
+}
+
+
+
+
+
+/* ================================ BLOCK =================================== */
+
+/* Block header */
+
+.mb2content-header {
+	padding-bottom: 15px;	
+}
+
+.mb2content-alllink {
+	float: right;	
+}
+
+.mb2content-blocktitle {
+	float: left;
+	margin: 0;	
+}
+
+
+/* Clear div */
+
+.mb2content-clr {
+	*zoom: 1;
+}
+.mb2content-clr:before,
+.mb2content-clr:after {
+	display: table;
+	content: "";
+	line-height: 0;
+}
+.mb2content-clr:after {
+	clear: both;
+}
+
+
+
+
+/* ================================ ITEM =================================== */
+
+.mb2content-item-inner,
+.mb2content-item-a,
+.mb2content-item-b {
+	position: relative;	
+	overflow: hidden;
+}
+
+/* Item elements */
+
+.mb2content-item-b {
+	padding-top: 5px;	
+}
+
+.mb2content-readmore,
+.mb2content-price {
+	margin: 10px 0 0 0;	
+}
+
+.mb2content-title {
+	margin: 0;
+}
+
+.mb2content-img {
+	overflow: hidden;
+	margin-bottom: 15px;
+}
+
+.mb2content-img img {	
+	-webkit-transition: all 0.25s linear 0s;
+	-moz-transition: all 0.25s linear 0s;
+	-ms-transition: all 0.25s linear 0s;
+    transition: all 0.25s linear 0s;
+}
+
+.mb2content .ccolor-el {
+	display: none;	
+}
+
+
+/* Style  - Links */
+
+.mb2content-links .mb2content-item {
+	margin-bottom: 20px;	
+}
+
+
+.mb2content-simgli .img-item .mb2content-content {
+	position: absolute;
+	bottom: 0;	
+	left: 0;
+	width: 100%;
+	padding: 15px;
+	background-color: rgba(0,0,0,.55);
+	color: #fff;
+}
+
+
+.mb2content-simgli .mb2content-img {
+	margin: 0;	
+}
+
+.mb2content-simgli .img-item .mb2content-content a {
+	color: #fff;	
+}
+
+.mb2content-simgli .img-item .mb2content-content a:hover,
+.mb2content-simgli .img-item .mb2content-content a:focus {
+	color: #fff;	
+}
+
+.mb2content-simgli .mb2content-item:hover .mb2content-img img {
+	-webkit-transform: scale(1.1);
+  	-moz-transform: scale(1.1);
+	-ms-transform: scale(1.1);
+  	transform: scale(1.1);	
+}
+
+
+/* Style ticker */
+.mb2content-sticker .mb2content-tickertitle {
+	float: left;
+	margin-right: 15px;	
+}
+
+.dir-rtl .mb2content-sticker .mb2content-tickertitle {
+	float: right;
+	margin-left: 15px;
+	margin-right: 0;	
+}
+
+@media only screen and (max-width:630px){
+	.mb2content-sticker .mb2content-tickertitle,
+	.dir-rtl .mb2content-sticker .mb2content-tickertitle,
+	.mb2content-sticker .mb2content-tickertitle h3,
+	.dir-rtl .mb2content-sticker .mb2content-tickertitle h3 {
+		float: none;
+		margin: 0;
+		text-align: center;	
+	}
+	
+}
+

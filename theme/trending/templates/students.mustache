@@ -1,0 +1,71 @@
+<!-- Start Custom Tab Section -->
+{{#displaystudentsection}}
+<div class="custom-tab">
+   {{#studentsectionheading}}
+   <div class="title-container">
+      <div class="container-fluid">
+         <h1>{{{studentsectionheading}}}</h1>
+         <p class="tagline">{{{studentsectiontagline}}}</p>
+      </div>
+   </div>
+   {{/studentsectionheading}}
+   <div class="testimonial-wrapper">
+      <!-- Background Image -->
+      <div class="colorful-tab-wrapper active" id="colorful-background-image">
+         <div class="colorful-tab-list-section clearfix">
+            <ul class="colorful-tab-menu">
+               <li class="colorful-tab-menu-item active" tab-background="{{{student1backgroundurl}}}"><a class="student-a" href="#bg-0">{{{student1name}}}</a></li>
+               <li class="colorful-tab-menu-item tab-menu-one" tab-background="{{{student2backgroundurl}}}"><a class="student-b" href="#bg-1">{{{student2name}}}</a></li>
+               <li class="colorful-tab-menu-item tab-menu-two" tab-background="{{{student3backgroundurl}}}"><a class="student-c" href="#bg-2">{{{student3name}}}</a></li>
+               <li class="colorful-tab-menu-item" tab-background="{{{student4backgroundurl}}}"><a class="student-d" href="#bg-3">{{{student4name}}}</a></li>
+               <li class="colorful-tab-menu-item" tab-background="{{{student5backgroundurl}}}"><a class="student-e" href="#bg-4">{{{student5name}}}</a></li>
+            </ul>
+         </div>
+         <div class="colorful-tab-container clearfix">
+            <div class="colorful-tab-content active" id="bg-0">
+               {{#student1name}}
+               <h2 class="student-title"></h2>
+               {{/student1name}}
+               {{#student1description}}
+               <p>{{{student1description}}}</p>
+               {{/student1description}}
+            </div>
+            <div class="colorful-tab-content" id="bg-1">
+               {{#student2name}}
+               <h2 class="student-title"></h2>
+               {{/student2name}}
+               {{#student2description}}
+               <p>{{{student2description}}}</p>
+               {{/student2description}}
+            </div>
+            <div class="colorful-tab-content" id="bg-2">
+               {{#student3name}}
+               <h2 class="student-title"></h2>
+               {{/student3name}}
+               {{#student3description}}
+               <p>{{{student3description}}}</p>
+               {{/student3description}}
+            </div>
+            <div class="colorful-tab-content" id="bg-3">
+               {{#student4name}}
+               <h2 class="student-title"></h2>
+               {{/student4name}}
+               {{#student4description}}
+               <p>{{{student4description}}}</p>
+               {{/student4description}}
+            </div>
+            <div class="colorful-tab-content" id="bg-4">
+               {{#student5name}}
+               <h2 class="student-title"></h2>
+               {{/student5name}}
+               {{#student5description}}
+               <p>{{{student5description}}}</p>
+               {{/student5description}}
+            </div>
+         </div>
+      </div>
+      <!-- Background Image -->
+   </div>
+</div>
+{{/displaystudentsection}}
+<!-- End Custom Tab Section -->
