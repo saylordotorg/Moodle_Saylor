@@ -517,6 +517,12 @@ def plugins = [
         "url" : 'https://github.com/WisdmLabs/moodle-block_edwiser_site_monitor.git',
         "branch" : 'master',
         "dest" : 'blocks/edwiser_site_monitor'
+    ],
+    [
+        "name" : 'theme_mb2cg',
+        "url" : 'https://github.com/saylordotorg/moodle-theme_mb2cg.git',
+        "branch" : 'MOODLE_400_STABLE',
+        "dest" : 'theme/mb2cg'
     ]
 ]
 
