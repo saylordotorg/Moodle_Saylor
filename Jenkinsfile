@@ -185,7 +185,7 @@ def plugins = [
     [
         "name" : 'local_boostnavigation',
         "url" : 'https://github.com/moodleuulm/moodle-local_boostnavigation',
-        "branch" : 'master',
+        "branch" : 'MOODLE_311_STABLE',
         "dest" : 'local/boostnavigation'
     ],
     [
