@@ -397,6 +397,12 @@ def plugins = [
         "url" : 'https://github.com/WisdmLabs/moodle-block_edwiser_site_monitor.git',
         "branch" : 'master',
         "dest" : 'blocks/edwiser_site_monitor'
+    ],
+    [
+        "name" : 'qtype_gapfill',
+        "url" : 'https://github.com/marcusgreen/moodle-qtype_gapfill.git',
+        "branch" : 'gapfill_2.134',
+        "dest" : 'question/type/gapfill'
     ]
 ]
 
