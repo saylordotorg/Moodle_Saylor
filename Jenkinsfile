@@ -409,12 +409,6 @@ def plugins = [
         "url" : 'https://github.com/moodle-an-hochschulen/moodle-tool_opcache.git',
         "branch" : 'MOODLE_311_STABLE',
         "dest" : 'admin/tool/opcache'
-    ],
-    [
-        "name" : 'tool_crawler',
-        "url" : 'https://github.com/catalyst/moodle-tool_crawler.git',
-        "branch" : 'MOODLE_310_STABLE',
-        "dest" : 'admin/tool/crawler'
     ]
 ]
 
