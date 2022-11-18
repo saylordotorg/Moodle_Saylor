@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<libraries>
+  <library>
+    <location>lib/opcache-gui</location>
+    <name>Opcache GUI</name>
+    <license>MIT</license>
+    <version>3.4.0</version>
+    <licenseversion></licenseversion>
+  </library>
+</libraries>
