@@ -5,7 +5,7 @@
 def mysql_source_dbname = 'moodle'
 def mysql_dest_dbname = 'moodle_test'
 
-def moodle_version = 'MOODLE_400_STABLE'
+def moodle_version = 'MOODLE_401_STABLE'
 
 def plugins = [
     [
@@ -263,7 +263,7 @@ def plugins = [
     [
         "name" : 'mod_questionnaire',
         "url" : 'https://github.com/PoetOS/moodle-mod_questionnaire.git',
-        "branch" : 'MOODLE_310_STABLE',
+        "branch" : 'main',
         "dest" : 'mod/questionnaire'
     ],
     [
