@@ -64,18 +64,18 @@ class custom_report_filters_exporter_test extends advanced_testcase {
         $exporter = new custom_report_filters_exporter(null, ['report' => $reportinstance]);
         $export = $exporter->export($PAGE->get_renderer('core_reportbuilder'));
 
-        // The root of the available filters property should contain two entities.
         $this->assertTrue($export->hasavailablefilters);
-        $this->assertCount(2, $export->availablefilters);
 
-        [$filterscategory, $filterscourse] = $export->availablefilters;
+        // The root of the available filters property should contain each entity.
+        $this->assertCount(3, $export->availablefilters);
+        [$filterscategory, $filterscourse, $filterstag] = $export->availablefilters;
 
         // Course category filters, assert structure of first item.
         $this->assertEquals('Course category', $filterscategory['optiongroup']['text']);
         $this->assertGreaterThanOrEqual(1, $filterscategory['optiongroup']['values']);
         $this->assertEquals([
-            'value' => 'course_category:idnumber',
-            'visiblename' => 'Category ID number',
+            'value' => 'course_category:text',
+            'visiblename' => 'Category name',
         ], $filterscategory['optiongroup']['values'][0]);
 
         // Course filters, assert structure of first item.
@@ -91,6 +91,14 @@ class custom_report_filters_exporter_test extends advanced_testcase {
         $this->assertNotContains('course_category:name', $filterscourseavailable);
         $this->assertNotContains('course:idnumber', $filterscourseavailable);
 
+        // Tag filters, assert structure of first item.
+        $this->assertEquals('Tag', $filterstag['optiongroup']['text']);
+        $this->assertGreaterThanOrEqual(1, $filterstag['optiongroup']['values']);
+        $this->assertEquals([
+            'value' => 'tag:name',
+            'visiblename' => 'Tag name',
+        ], $filterstag['optiongroup']['values'][0]);
+
         $this->assertTrue($export->hasactivefilters);
         $this->assertCount(2, $export->activefilters);
         [$activefiltercourseidnumber, $activefiltercategoryname] = $export->activefilters;
@@ -104,7 +112,7 @@ class custom_report_filters_exporter_test extends advanced_testcase {
         // Course category filter.
         $this->assertEquals($filtercategoryname->get('id'), $activefiltercategoryname['id']);
         $this->assertEquals('Course category', $activefiltercategoryname['entityname']);
-        $this->assertEquals('Category name', $activefiltercategoryname['heading']);
+        $this->assertEquals('Select category', $activefiltercategoryname['heading']);
         $this->assertEquals(2, $activefiltercategoryname['sortorder']);
 
         $this->assertNotEmpty($export->helpicon);

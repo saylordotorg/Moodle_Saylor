@@ -114,6 +114,11 @@ class view {
     protected $sort;
 
     /**
+     * @var int page size to use (when we are not showing all questions).
+     */
+    protected $pagesize = DEFAULT_QUESTIONS_PER_PAGE;
+
+    /**
      * @var int|null id of the a question to highlight in the list (if present).
      */
     protected $lastchangedid;
@@ -204,6 +209,10 @@ class view {
             $pluginentrypoint = new $plugin();
             $bulkactions = $pluginentrypoint->get_bulk_actions();
             if (!is_array($bulkactions)) {
+                debugging("The method {$componentname}::get_bulk_actions() must return an " .
+                    "array of bulk actions instead of a single bulk action. " .
+                    "Please update your implementation of get_bulk_actions() to return an array. " .
+                    "Check out the qbank_bulkmove plugin for a working example.", DEBUG_DEVELOPER);
                 $bulkactions = [$bulkactions];
             }
 
@@ -936,11 +945,11 @@ class view {
      * @param string     $categoryandcontext 'categoryID,contextID'.
      * @param int        $recurse     Whether to include subcategories.
      * @param int        $page        The number of the page to be displayed
-     * @param int        $perpage     Number of questions to show per page
+     * @param int|null   $perpage     Number of questions to show per page
      * @param array      $addcontexts contexts where the user is allowed to add new questions.
      */
     protected function display_question_list($pageurl, $categoryandcontext, $recurse = 1, $page = 0,
-                                                $perpage = 100, $addcontexts = []): void {
+                $perpage = null, $addcontexts = []): void {
         global $OUTPUT;
         // This function can be moderately slow with large question counts and may time out.
         // We probably do not want to raise it to unlimited, so randomly picking 5 minutes.
@@ -948,6 +957,7 @@ class view {
         \core_php_time_limit::raise(300);
 
         $category = $this->get_current_category($categoryandcontext);
+        $perpage = $perpage ?? $this->pagesize;
 
         list($categoryid, $contextid) = explode(',', $categoryandcontext);
         $catcontext = \context::instance_by_id($contextid);
@@ -1023,9 +1033,9 @@ class view {
                 'pagination' => $pagination,
                 'biggertotal' => true,
         );
-        if ($totalnumber > DEFAULT_QUESTIONS_PER_PAGE) {
+        if ($totalnumber > $this->pagesize) {
             $displaydata['showall'] = true;
-            if ($perpage == DEFAULT_QUESTIONS_PER_PAGE) {
+            if ($perpage == $this->pagesize) {
                 $url = new \moodle_url($pageurl, array_merge($pageurl->params(),
                         ['qpage' => 0, 'qperpage' => MAXIMUM_QUESTIONS_PER_PAGE]));
                 if ($totalnumber > MAXIMUM_QUESTIONS_PER_PAGE) {
@@ -1036,8 +1046,8 @@ class view {
                 }
             } else {
                 $url = new \moodle_url($pageurl, array_merge($pageurl->params(),
-                        ['qperpage' => DEFAULT_QUESTIONS_PER_PAGE]));
-                $displaydata['totalnumber'] = DEFAULT_QUESTIONS_PER_PAGE;
+                        ['qperpage' => $this->pagesize]));
+                $displaydata['totalnumber'] = $this->pagesize;
             }
             $displaydata['showallurl'] = $url;
         }

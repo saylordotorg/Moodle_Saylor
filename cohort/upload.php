@@ -37,7 +37,7 @@ if ($contextid) {
     $context = context_system::instance();
 }
 if ($context->contextlevel != CONTEXT_COURSECAT && $context->contextlevel != CONTEXT_SYSTEM) {
-    print_error('invalidcontext');
+    throw new \moodle_exception('invalidcontext');
 }
 
 require_capability('moodle/cohort:manage', $context);
@@ -69,6 +69,7 @@ if ($uploadform->is_cancelled()) {
 }
 
 $strheading = get_string('uploadcohorts', 'cohort');
+$PAGE->set_title($strheading);
 $PAGE->navbar->add($strheading);
 
 echo $OUTPUT->header();

@@ -59,6 +59,7 @@ $string['deleteservice'] = 'Delete the service: {$a->name} (id: {$a->id})';
 $string['deleteserviceconfirm'] = 'Deleting a service will also delete the tokens related to this service. Do you really want to delete external service "{$a}"?';
 $string['deletetoken'] = 'Delete token';
 $string['deletetokenconfirm'] = 'Do you really want to delete this web service token for <strong>{$a->user}</strong> on the service <strong>{$a->service}</strong>?';
+$string['deprecated'] = 'Deprecated';
 $string['disabledwarning'] = 'All web service protocols are disabled.  The "Enable web services" setting can be found in Advanced features.';
 $string['doc'] = 'Documentation';
 $string['docaccessrefused'] = 'You are not allowed to see the documentation for this token';
@@ -245,9 +246,6 @@ $string['wsdocumentationintro'] = 'To create a client we advise you to read the 
 $string['wsdocumentationlogin'] = 'or enter your web service username and password:';
 $string['wspassword'] = 'Web service password';
 $string['wsusername'] = 'Web service username';
-
-// Deprecated since Moodle 3.9.
-$string['documentation'] = 'web service documentation';
 
 // Deprecated since Moodle 3.11.
 $string['usernameoridnousererror'] = 'No users were found with this username/user id.';

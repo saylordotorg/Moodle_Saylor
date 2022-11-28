@@ -38,15 +38,6 @@ function xmldb_tool_usertours_upgrade($oldversion) {
 
     $dbman = $DB->get_manager();
 
-    // Automatically generated Moodle v3.6.0 release upgrade line.
-    // Put any upgrade step following this.
-
-    // Automatically generated Moodle v3.7.0 release upgrade line.
-    // Put any upgrade step following this.
-
-    // Automatically generated Moodle v3.8.0 release upgrade line.
-    // Put any upgrade step following this.
-
     // Automatically generated Moodle v3.9.0 release upgrade line.
     // Put any upgrade step following this.
 
@@ -127,6 +118,14 @@ function xmldb_tool_usertours_upgrade($oldversion) {
         manager::update_shipped_tours();
 
         upgrade_plugin_savepoint(true, 2022040602, 'tool', 'usertours');
+    }
+
+    if ($oldversion < 2022061600) {
+        // Update shipped tours.
+        // Normally, we just bump the version numbers because we need to call update_shipped_tours only once.
+        manager::update_shipped_tours();
+
+        upgrade_plugin_savepoint(true, 2022061600, 'tool', 'usertours');
     }
 
     // Automatically generated Moodle v4.0.0 release upgrade line.

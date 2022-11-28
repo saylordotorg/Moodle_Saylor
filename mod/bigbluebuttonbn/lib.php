@@ -99,6 +99,8 @@ function bigbluebuttonbn_add_instance($bigbluebuttonbn) {
     $bigbluebuttonbn->presentation = files::save_media_file($bigbluebuttonbn);
     // Encode meetingid.
     $bigbluebuttonbn->meetingid = meeting::get_unique_meetingid_seed();
+    [$bigbluebuttonbn->guestlinkuid, $bigbluebuttonbn->guestpassword] =
+        \mod_bigbluebuttonbn\plugin::generate_guest_meeting_credentials();
     // Insert a record.
     $bigbluebuttonbn->id = $DB->insert_record('bigbluebuttonbn', $bigbluebuttonbn);
     // Log insert action.
@@ -125,6 +127,10 @@ function bigbluebuttonbn_update_instance($bigbluebuttonbn) {
     $bigbluebuttonbn->id = $bigbluebuttonbn->instance;
     $bigbluebuttonbn->presentation = files::save_media_file($bigbluebuttonbn);
 
+    if (empty($bigbluebuttonbn->guestjoinurl) || empty($bigbluebuttonbn->guestpassword)) {
+        [$bigbluebuttonbn->guestlinkuid, $bigbluebuttonbn->guestpassword] =
+            \mod_bigbluebuttonbn\plugin::generate_guest_meeting_credentials();
+    }
     // Update a record.
     $DB->update_record('bigbluebuttonbn', $bigbluebuttonbn);
 
@@ -159,18 +165,30 @@ function bigbluebuttonbn_delete_instance($id) {
     try {
         $meeting = new meeting($instance);
         $meeting->end_meeting();
-        $groups = groups_get_course_group($instance->get_course());
-        if ($groups) {
-            foreach ($groups as $group) {
-                $instance->set_group_id($group->id);
-                $meeting = new meeting($instance);
-                $meeting->end_meeting();
-            }
-        }
     } catch (moodle_exception $e) {
         // Do not log any issue when testing.
         if (!(defined('PHPUNIT_TEST') && PHPUNIT_TEST) && !defined('BEHAT_SITE_RUNNING')) {
-            debugging($e->getMessage(), DEBUG_NORMAL, $e->getTrace());
+            debugging($e->getMessage(), DEBUG_DEVELOPER, $e->getTrace());
+        }
+    }
+    // Get all possible groups (course and course module).
+    $groupids = [];
+    if (groups_get_activity_groupmode($instance->get_cm())) {
+        $coursegroups = groups_get_activity_allowed_groups($instance->get_cm());
+        $groupids = array_map(
+            function($gp) {
+                return $gp->id;
+            },
+            $coursegroups);
+    }
+    // End all meetings for all groups.
+    foreach ($groupids as $groupid) {
+        try {
+            $instance->set_group_id($groupid);
+            $meeting = new meeting($instance);
+            $meeting->end_meeting();
+        } catch (moodle_exception $e) {
+            debugging($e->getMessage() . ' for group ' . $groupid, DEBUG_NORMAL, $e->getTrace());
         }
     }
 

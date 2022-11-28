@@ -1,6 +1,10 @@
 ﻿Version Information
 ===================
 
+Version 401.0.1 - 27/11/22
+--------------------------
+1. Release candidate for Moodle 4.1.
+
 Version 400.1.2 - 15/11/22
 --------------------------
 1. Fix 'Indentation changes do not show until page refresh' - related to #126.

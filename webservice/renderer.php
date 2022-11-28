@@ -497,6 +497,8 @@ EOF;
     /**
      * Create indented XML-RPC  param description
      *
+     * @todo MDL-76078 - Incorrect inter-communication, core cannot have plugin dependencies like this.
+     *
      * @param external_description $paramdescription the description structure of the web service function parameters
      * @param string $indentation Indentation in the generated HTML code; should contain only spaces.
      * @return string the html to diplay
@@ -575,6 +577,8 @@ EOF;
     /**
      * Return indented REST param description
      *
+     * @todo MDL-76078 - Incorrect inter-communication, core cannot have plugin dependencies like this.
+     *
      * @param external_description $paramdescription the description structure of the web service function parameters
      * @param string $paramstring parameter
      * @return string the html to diplay
@@ -620,6 +624,8 @@ EOF;
     /**
      * Displays all the documentation
      *
+     * @todo MDL-76078 - Incorrect inter-communication, core cannot have plugin dependencies like this.
+     *
      * @param array $functions external_description of all the web service functions
      * @param boolean $printableformat true if we want to display the documentation in a printable format
      * @param array $activatedprotocol the currently enabled protocol
@@ -658,16 +664,21 @@ EOF;
         //(opened if printableformat = true)
         foreach ($functions as $functionname => $description) {
 
+            $tags = '';
+            if (!empty($description->deprecated)) {
+                $tags .= ' ' . html_writer::span(get_string('deprecated', 'core_webservice'), 'badge badge-warning');
+            }
+
             if (empty($printableformat)) {
                 $documentationhtml .= print_collapsible_region_start('',
                                 'aera_' . $functionname,
                                 html_writer::start_tag('strong', array())
-                                . $functionname . html_writer::end_tag('strong'),
+                                . $functionname . html_writer::end_tag('strong') . $tags,
                                 false,
                                 !$printableformat,
                                 true);
             } else {
-                $documentationhtml .= html_writer::tag('strong', $functionname);
+                $documentationhtml .= html_writer::tag('strong', $functionname) . $tags;
                 $documentationhtml .= $br;
             }
 

@@ -736,7 +736,7 @@ class behat_navigation extends behat_base {
      * Recognised page names are:
      * | Page type                  | Identifier meaning        | description                          |
      * | Category                   | category idnumber         | List of courses in that category.    |
-     * | Course                     | course shortname          | Main course home page                |
+     * | Course                     | course shortname          | Main course home pag                 |
      * | Course editing             | course shortname          | Edit settings page for the course    |
      * | Activity                   | activity idnumber         | Start page for that activity         |
      * | Activity editing           | activity idnumber         | Edit settings page for that activity |

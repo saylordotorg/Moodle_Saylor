@@ -26,6 +26,7 @@ use core_reportbuilder\user_entity_report;
 use core_reportbuilder\local\filters\boolean_select;
 use core_reportbuilder\local\filters\date;
 use core_reportbuilder\local\filters\select;
+use core_reportbuilder\local\filters\tags;
 use core_reportbuilder\local\filters\text;
 use core_reportbuilder\local\helpers\user_filter_manager;
 
@@ -70,6 +71,7 @@ class user_test extends advanced_testcase {
             'suspended' => 1,
             'confirmed' => 0,
             'country' => 'ES',
+            'interests' => ['dancing'],
             'profile_field_favcolor' => 'Blue',
             'profile_field_favsuperpower' => 'Time travel',
         ]);
@@ -138,10 +140,12 @@ class user_test extends advanced_testcase {
      * Test filtering report by user fields
      */
     public function test_filters(): void {
+        global $DB;
+
         $this->resetAfterTest();
 
         $this->getDataGenerator()->create_user(['firstname' => 'Daffy', 'lastname' => 'Duck', 'email' => 'daffy@test.com',
-            'city' => 'LA', 'lastaccess' => time() - YEARSECS, 'suspended' => 1]);
+            'city' => 'LA', 'lastaccess' => time() - YEARSECS, 'suspended' => 1, 'interests' => ['dancing']]);
         $this->getDataGenerator()->create_user(['firstname' => 'Donald', 'lastname' => 'Duck', 'email' => 'donald@test.com',
             'city' => 'Chicago', 'lastaccess' => time(), 'suspended' => 0]);
 

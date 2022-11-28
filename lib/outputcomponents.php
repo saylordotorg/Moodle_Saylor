@@ -167,9 +167,8 @@ class user_picture implements renderable {
     public $link = true;
 
     /**
-     * @var int Size in pixels. Special values are (true/1 = 100px) and
-     * (false/0 = 35px)
-     * for backward compatibility.
+     * @var int Size in pixels. Special values are (true/1 = 100px) and (false/0 = 35px) for backward compatibility.
+     * Recommended values (supporting user initials too): 16, 35, 64 and 100.
      */
     public $size = 35;
 
@@ -4566,6 +4565,19 @@ class action_menu implements renderable, templatable {
             }
         } else if ($value) {
             // The value is true and the class has not been set yet. Add it.
+            $this->attributes['class'] = $class;
+        }
+    }
+
+    /**
+     * Add classes to the action menu for an easier styling.
+     *
+     * @param string $class The class to add to attributes.
+     */
+    public function set_additional_classes(string $class = '') {
+        if (!empty($this->attributes['class'])) {
+            $this->attributes['class'] .= " ".$class;
+        } else {
             $this->attributes['class'] = $class;
         }
     }

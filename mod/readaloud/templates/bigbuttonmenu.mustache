@@ -17,11 +17,11 @@
         </div>
     </div>
     <div>
-        <div id='mod_readaloud_button_startshadow' class='mode-chooser readaloudshadow {{#cantattempt}}no-click{{/cantattempt}} {{#noshadow}}no-show{{/noshadow}}' {{^noshadow}}{{^cantattempt}}tabindex='0'{{/cantattempt}}{{/noshadow}}>
+        <div id='mod_readaloud_button_startshadow' class='mode-chooser readaloudshadow {{#cantshadowattempt}}no-click{{/cantshadowattempt}} {{#noshadow}}no-show{{/noshadow}}' {{^noshadow}}{{^cantattempt}}tabindex='0'{{/cantattempt}}{{/noshadow}}>
             <div class='mode-chooser-label'>
                 <b>{{#str}}startshadowreading , mod_readaloud{{/str}}</b>:
                 {{#str}}shadowhelp , mod_readaloud{{/str}}
-                {{#cantattempt}}<span class="mod_readaloud_menubutton_warning">{{#str}}exceededallattempts , mod_readaloud{{/str}}</span>{{/cantattempt}}
+                {{#cantshadowattempt}}<span class="mod_readaloud_menubutton_warning">{{#str}}exceededallattempts , mod_readaloud{{/str}}</span>{{/cantshadowattempt}}
             </div>
         </div>
     </div>

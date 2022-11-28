@@ -1068,7 +1068,7 @@ abstract class base {
         $changed = $needrebuild = false;
         foreach ($defaultoptions as $key => $value) {
             if (isset($records[$key])) {
-                if (array_key_exists($key, $data) && $records[$key]->value !== $data[$key]) {
+                if (array_key_exists($key, $data) && $records[$key]->value != $data[$key]) {
                     $DB->set_field('course_format_options', 'value',
                             $data[$key], array('id' => $records[$key]->id));
                     $changed = true;
@@ -1341,7 +1341,7 @@ abstract class base {
      * return true if the course editor must be displayed.
      *
      * @param array|null $capabilities array of capabilities a user needs to have to see edit controls in general.
-     *  If null or not specified, the user needs to have 'moodle/course:manageactivities'
+     *  If null or not specified, the user needs to have 'moodle/course:manageactivities'.
      * @return bool true if edit controls must be displayed
      */
     public function show_editor(?array $capabilities = ['moodle/course:manageactivities']): bool {

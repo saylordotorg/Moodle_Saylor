@@ -532,104 +532,6 @@ function upgrade_delete_orphaned_file_records() {
 }
 
 /**
- * Updates the existing prediction actions in the database according to the new suggested actions.
- * @return null
- */
-function upgrade_rename_prediction_actions_useful_incorrectly_flagged() {
-    global $DB;
-
-    // The update depends on the analyser class used by each model so we need to iterate through the models in the system.
-    $modelids = $DB->get_records_sql("SELECT DISTINCT am.id, am.target
-                                        FROM {analytics_models} am
-                                        JOIN {analytics_predictions} ap ON ap.modelid = am.id
-                                        JOIN {analytics_prediction_actions} apa ON ap.id = apa.predictionid");
-    foreach ($modelids as $model) {
-        $targetname = $model->target;
-        if (!class_exists($targetname)) {
-            // The plugin may not be available.
-            continue;
-        }
-        $target = new $targetname();
-
-        $analyserclass = $target->get_analyser_class();
-        if (!class_exists($analyserclass)) {
-            // The plugin may not be available.
-            continue;
-        }
-
-        if ($analyserclass::one_sample_per_analysable()) {
-            // From 'fixed' to 'useful'.
-            $params = ['oldaction' => 'fixed', 'newaction' => 'useful'];
-        } else {
-            // From 'notuseful' to 'incorrectlyflagged'.
-            $params = ['oldaction' => 'notuseful', 'newaction' => 'incorrectlyflagged'];
-        }
-
-        $subsql = "SELECT id FROM {analytics_predictions} WHERE modelid = :modelid";
-        $updatesql = "UPDATE {analytics_prediction_actions}
-                         SET actionname = :newaction
-                       WHERE predictionid IN ($subsql) AND actionname = :oldaction";
-
-        $DB->execute($updatesql, $params + ['modelid' => $model->id]);
-    }
-}
-
-/**
- * Convert the site settings for the 'hub' component in the config_plugins table.
- *
- * @param stdClass $hubconfig Settings loaded for the 'hub' component.
- * @param string $huburl The URL of the hub to use as the valid one in case of conflict.
- * @return stdClass List of new settings to be applied (including null values to be unset).
- */
-function upgrade_convert_hub_config_site_param_names(stdClass $hubconfig, string $huburl): stdClass {
-
-    $cleanhuburl = clean_param($huburl, PARAM_ALPHANUMEXT);
-    $converted = [];
-
-    foreach ($hubconfig as $oldname => $value) {
-        if (preg_match('/^site_([a-z]+)([A-Za-z0-9_-]*)/', $oldname, $matches)) {
-            $newname = 'site_'.$matches[1];
-
-            if ($oldname === $newname) {
-                // There is an existing value with the new naming convention already.
-                $converted[$newname] = $value;
-
-            } else if (!array_key_exists($newname, $converted)) {
-                // Add the value under a new name and mark the original to be unset.
-                $converted[$newname] = $value;
-                $converted[$oldname] = null;
-
-            } else if ($matches[2] === '_'.$cleanhuburl) {
-                // The new name already exists, overwrite only if coming from the valid hub.
-                $converted[$newname] = $value;
-                $converted[$oldname] = null;
-
-            } else {
-                // Just unset the old value.
-                $converted[$oldname] = null;
-            }
-
-        } else {
-            // Not a hub-specific site setting, just keep it.
-            $converted[$oldname] = $value;
-        }
-    }
-
-    return (object) $converted;
-}
-
-/**
- * Fix the incorrect default values inserted into analytics contextids field.
- */
-function upgrade_analytics_fix_contextids_defaults() {
-    global $DB;
-
-    $select = $DB->sql_compare_text('contextids') . ' = :zero OR ' . $DB->sql_compare_text('contextids') . ' = :null';
-    $params = ['zero' => '0', 'null' => 'null'];
-    $DB->execute("UPDATE {analytics_models} set contextids = null WHERE " . $select, $params);
-}
-
-/**
  * Upgrade core licenses shipped with Moodle.
  */
 function upgrade_core_licenses() {
@@ -1596,4 +1498,375 @@ function upgrade_block_set_my_user_parent_context(
     $DB->execute($sql);
 
     $dbman->drop_table($xmldbtable);
+}
+
+/**
+ * Fix the timestamps for files where their timestamps are older
+ * than the directory listing that they are contained in.
+ */
+function upgrade_fix_file_timestamps() {
+    global $DB;
+
+    // Due to incompatability in SQL syntax for updates with joins,
+    // These will be updated in a select + separate update.
+    $sql = "SELECT f.id, f2.timecreated
+              FROM {files} f
+              JOIN {files} f2
+                    ON f2.contextid = f.contextid
+                   AND f2.filepath = f.filepath
+                   AND f2.component = f.component
+                   AND f2.filearea = f.filearea
+                   AND f2.itemid = f.itemid
+                   AND f2.filename = '.'
+             WHERE f2.timecreated > f.timecreated";
+
+    $recordset = $DB->get_recordset_sql($sql);
+
+    if (!$recordset->valid()) {
+        $recordset->close();
+        return;
+    }
+
+    foreach ($recordset as $record) {
+        $record->timemodified = $record->timecreated;
+        $DB->update_record('files', $record);
+    }
+
+    $recordset->close();
+}
+
+/**
+ * Upgrade helper to add foreign keys and indexes for MDL-49795
+ */
+function upgrade_add_foreign_key_and_indexes() {
+    global $DB;
+
+    $dbman = $DB->get_manager();
+    // Define key originalcourseid (foreign) to be added to course.
+    $table = new xmldb_table('course');
+    $key = new xmldb_key('originalcourseid', XMLDB_KEY_FOREIGN, ['originalcourseid'], 'course', ['id']);
+    // Launch add key originalcourseid.
+    $dbman->add_key($table, $key);
+
+    // Define key roleid (foreign) to be added to enrol.
+    $table = new xmldb_table('enrol');
+    $key = new xmldb_key('roleid', XMLDB_KEY_FOREIGN, ['roleid'], 'role', ['id']);
+    // Launch add key roleid.
+    $dbman->add_key($table, $key);
+
+    // Define key userid (foreign) to be added to scale.
+    $table = new xmldb_table('scale');
+    $key = new xmldb_key('userid', XMLDB_KEY_FOREIGN, ['userid'], 'user', ['id']);
+    // Launch add key userid.
+    $dbman->add_key($table, $key);
+
+    // Define key userid (foreign) to be added to scale_history.
+    $table = new xmldb_table('scale_history');
+    $key = new xmldb_key('userid', XMLDB_KEY_FOREIGN, ['userid'], 'user', ['id']);
+    // Launch add key userid.
+    $dbman->add_key($table, $key);
+
+    // Define key courseid (foreign) to be added to post.
+    $table = new xmldb_table('post');
+    $key = new xmldb_key('courseid', XMLDB_KEY_FOREIGN, ['courseid'], 'course', ['id']);
+    // Launch add key courseid.
+    $dbman->add_key($table, $key);
+
+    // Define key coursemoduleid (foreign) to be added to post.
+    $table = new xmldb_table('post');
+    $key = new xmldb_key('coursemoduleid', XMLDB_KEY_FOREIGN, ['coursemoduleid'], 'course_modules', ['id']);
+    // Launch add key coursemoduleid.
+    $dbman->add_key($table, $key);
+
+    // Define key questionid (foreign) to be added to question_statistics.
+    $table = new xmldb_table('question_statistics');
+    $key = new xmldb_key('questionid', XMLDB_KEY_FOREIGN, ['questionid'], 'question', ['id']);
+    // Launch add key questionid.
+    $dbman->add_key($table, $key);
+
+    // Define key questionid (foreign) to be added to question_response_analysis.
+    $table = new xmldb_table('question_response_analysis');
+    $key = new xmldb_key('questionid', XMLDB_KEY_FOREIGN, ['questionid'], 'question', ['id']);
+    // Launch add key questionid.
+    $dbman->add_key($table, $key);
+
+    // Define index last_log_id (not unique) to be added to mnet_host.
+    $table = new xmldb_table('mnet_host');
+    $index = new xmldb_index('last_log_id', XMLDB_INDEX_NOTUNIQUE, ['last_log_id']);
+    // Conditionally launch add index last_log_id.
+    if (!$dbman->index_exists($table, $index)) {
+        $dbman->add_index($table, $index);
+    }
+
+    // Define key userid (foreign) to be added to mnet_session.
+    $table = new xmldb_table('mnet_session');
+    $key = new xmldb_key('userid', XMLDB_KEY_FOREIGN, ['userid'], 'user', ['id']);
+    // Launch add key userid.
+    $dbman->add_key($table, $key);
+
+    // Define key mnethostid (foreign) to be added to mnet_session.
+    $table = new xmldb_table('mnet_session');
+    $key = new xmldb_key('mnethostid', XMLDB_KEY_FOREIGN, ['mnethostid'], 'mnet_host', ['id']);
+    // Launch add key mnethostid.
+    $dbman->add_key($table, $key);
+
+    // Define key userid (foreign) to be added to grade_import_values.
+    $table = new xmldb_table('grade_import_values');
+    $key = new xmldb_key('userid', XMLDB_KEY_FOREIGN, ['userid'], 'user', ['id']);
+    // Launch add key userid.
+    $dbman->add_key($table, $key);
+
+    // Define key tempdataid (foreign) to be added to portfolio_log.
+    $table = new xmldb_table('portfolio_log');
+    $key = new xmldb_key('tempdataid', XMLDB_KEY_FOREIGN, ['tempdataid'], 'portfolio_tempdata', ['id']);
+    // Launch add key tempdataid.
+    $dbman->add_key($table, $key);
+
+    // Define key usermodified (foreign) to be added to file_conversion.
+    $table = new xmldb_table('file_conversion');
+    $key = new xmldb_key('usermodified', XMLDB_KEY_FOREIGN, ['usermodified'], 'user', ['id']);
+    // Launch add key usermodified.
+    $dbman->add_key($table, $key);
+
+    // Define key userid (foreign) to be added to repository_instances.
+    $table = new xmldb_table('repository_instances');
+    $key = new xmldb_key('userid', XMLDB_KEY_FOREIGN, ['userid'], 'user', ['id']);
+    // Launch add key userid.
+    $dbman->add_key($table, $key);
+
+    // Define key contextid (foreign) to be added to repository_instances.
+    $table = new xmldb_table('repository_instances');
+    $key = new xmldb_key('contextid', XMLDB_KEY_FOREIGN, ['contextid'], 'context', ['id']);
+    // Launch add key contextid.
+    $dbman->add_key($table, $key);
+
+    // Define key scaleid (foreign) to be added to rating.
+    $table = new xmldb_table('rating');
+    $key = new xmldb_key('scaleid', XMLDB_KEY_FOREIGN, ['scaleid'], 'scale', ['id']);
+    // Launch add key scaleid.
+    $dbman->add_key($table, $key);
+
+    // Define key courseid (foreign) to be added to course_published.
+    $table = new xmldb_table('course_published');
+    $key = new xmldb_key('courseid', XMLDB_KEY_FOREIGN, ['courseid'], 'course', ['id']);
+    // Launch add key courseid.
+    $dbman->add_key($table, $key);
+
+    // Define index hubcourseid (not unique) to be added to course_published.
+    $table = new xmldb_table('course_published');
+    $index = new xmldb_index('hubcourseid', XMLDB_INDEX_NOTUNIQUE, ['hubcourseid']);
+    // Conditionally launch add index hubcourseid.
+    if (!$dbman->index_exists($table, $index)) {
+        $dbman->add_index($table, $index);
+    }
+
+    // Define key courseid (foreign) to be added to event_subscriptions.
+    $table = new xmldb_table('event_subscriptions');
+    $key = new xmldb_key('courseid', XMLDB_KEY_FOREIGN, ['courseid'], 'course', ['id']);
+    // Launch add key courseid.
+    $dbman->add_key($table, $key);
+
+    // Define key userid (foreign) to be added to event_subscriptions.
+    $table = new xmldb_table('event_subscriptions');
+    $key = new xmldb_key('userid', XMLDB_KEY_FOREIGN, ['userid'], 'user', ['id']);
+    // Launch add key userid.
+    $dbman->add_key($table, $key);
+
+    // Define key userid (foreign) to be added to task_log.
+    $table = new xmldb_table('task_log');
+    $key = new xmldb_key('userid', XMLDB_KEY_FOREIGN, ['userid'], 'user', ['id']);
+    // Launch add key userid.
+    $dbman->add_key($table, $key);
+
+    // Define key scaleid (foreign) to be added to competency.
+    $table = new xmldb_table('competency');
+    $key = new xmldb_key('scaleid', XMLDB_KEY_FOREIGN, ['scaleid'], 'scale', ['id']);
+    // Launch add key scaleid.
+    $dbman->add_key($table, $key);
+
+    // Define key usermodified (foreign) to be added to competency.
+    $table = new xmldb_table('competency');
+    $key = new xmldb_key('usermodified', XMLDB_KEY_FOREIGN, ['usermodified'], 'user', ['id']);
+    // Launch add key usermodified.
+    $dbman->add_key($table, $key);
+
+    // Define key usermodified (foreign) to be added to competency_coursecompsetting.
+    $table = new xmldb_table('competency_coursecompsetting');
+    $key = new xmldb_key('usermodified', XMLDB_KEY_FOREIGN, ['usermodified'], 'user', ['id']);
+    // Launch add key usermodified.
+    $dbman->add_key($table, $key);
+
+    // Define key contextid (foreign) to be added to competency_framework.
+    $table = new xmldb_table('competency_framework');
+    $key = new xmldb_key('contextid', XMLDB_KEY_FOREIGN, ['contextid'], 'context', ['id']);
+    // Launch add key contextid.
+    $dbman->add_key($table, $key);
+
+    // Define key scaleid (foreign) to be added to competency_framework.
+    $table = new xmldb_table('competency_framework');
+    $key = new xmldb_key('scaleid', XMLDB_KEY_FOREIGN, ['scaleid'], 'scale', ['id']);
+    // Launch add key scaleid.
+    $dbman->add_key($table, $key);
+
+    // Define key usermodified (foreign) to be added to competency_framework.
+    $table = new xmldb_table('competency_framework');
+    $key = new xmldb_key('usermodified', XMLDB_KEY_FOREIGN, ['usermodified'], 'user', ['id']);
+    // Launch add key usermodified.
+    $dbman->add_key($table, $key);
+
+    // Define key usermodified (foreign) to be added to competency_coursecomp.
+    $table = new xmldb_table('competency_coursecomp');
+    $key = new xmldb_key('usermodified', XMLDB_KEY_FOREIGN, ['usermodified'], 'user', ['id']);
+    // Launch add key usermodified.
+    $dbman->add_key($table, $key);
+
+    // Define key actionuserid (foreign) to be added to competency_evidence.
+    $table = new xmldb_table('competency_evidence');
+    $key = new xmldb_key('actionuserid', XMLDB_KEY_FOREIGN, ['actionuserid'], 'user', ['id']);
+    // Launch add key actionuserid.
+    $dbman->add_key($table, $key);
+
+    // Define key contextid (foreign) to be added to competency_evidence.
+    $table = new xmldb_table('competency_evidence');
+    $key = new xmldb_key('contextid', XMLDB_KEY_FOREIGN, ['contextid'], 'context', ['id']);
+    // Launch add key contextid.
+    $dbman->add_key($table, $key);
+
+    // Define key usermodified (foreign) to be added to competency_evidence.
+    $table = new xmldb_table('competency_evidence');
+    $key = new xmldb_key('usermodified', XMLDB_KEY_FOREIGN, ['usermodified'], 'user', ['id']);
+    // Launch add key usermodified.
+    $dbman->add_key($table, $key);
+
+    // Define key usermodified (foreign) to be added to competency_userevidence.
+    $table = new xmldb_table('competency_userevidence');
+    $key = new xmldb_key('usermodified', XMLDB_KEY_FOREIGN, ['usermodified'], 'user', ['id']);
+    // Launch add key usermodified.
+    $dbman->add_key($table, $key);
+
+    // Define key usermodified (foreign) to be added to competency_plan.
+    $table = new xmldb_table('competency_plan');
+    $key = new xmldb_key('usermodified', XMLDB_KEY_FOREIGN, ['usermodified'], 'user', ['id']);
+    // Launch add key usermodified.
+    $dbman->add_key($table, $key);
+
+    // Define key usermodified (foreign) to be added to competency_template.
+    $table = new xmldb_table('competency_template');
+    $key = new xmldb_key('usermodified', XMLDB_KEY_FOREIGN, ['usermodified'], 'user', ['id']);
+    // Launch add key usermodified.
+    $dbman->add_key($table, $key);
+
+    // Define key contextid (foreign) to be added to competency_template.
+    $table = new xmldb_table('competency_template');
+    $key = new xmldb_key('contextid', XMLDB_KEY_FOREIGN, ['contextid'], 'context', ['id']);
+    // Launch add key contextid.
+    $dbman->add_key($table, $key);
+
+    // Define key usermodified (foreign) to be added to competency_templatecomp.
+    $table = new xmldb_table('competency_templatecomp');
+    $key = new xmldb_key('usermodified', XMLDB_KEY_FOREIGN, ['usermodified'], 'user', ['id']);
+    // Launch add key usermodified.
+    $dbman->add_key($table, $key);
+
+    // Define key usermodified (foreign) to be added to competency_templatecohort.
+    $table = new xmldb_table('competency_templatecohort');
+    $key = new xmldb_key('usermodified', XMLDB_KEY_FOREIGN, ['usermodified'], 'user', ['id']);
+    // Launch add key usermodified.
+    $dbman->add_key($table, $key);
+
+    // Define key competencyid (foreign) to be added to competency_relatedcomp.
+    $table = new xmldb_table('competency_relatedcomp');
+    $key = new xmldb_key('competencyid', XMLDB_KEY_FOREIGN, ['competencyid'], 'competency', ['id']);
+    // Launch add key competencyid.
+    $dbman->add_key($table, $key);
+
+    // Define key relatedcompetencyid (foreign) to be added to competency_relatedcomp.
+    $table = new xmldb_table('competency_relatedcomp');
+    $key = new xmldb_key('relatedcompetencyid', XMLDB_KEY_FOREIGN, ['relatedcompetencyid'], 'competency', ['id']);
+    // Launch add key relatedcompetencyid.
+    $dbman->add_key($table, $key);
+
+    // Define key usermodified (foreign) to be added to competency_relatedcomp.
+    $table = new xmldb_table('competency_relatedcomp');
+    $key = new xmldb_key('usermodified', XMLDB_KEY_FOREIGN, ['usermodified'], 'user', ['id']);
+    // Launch add key usermodified.
+    $dbman->add_key($table, $key);
+
+    // Define key usermodified (foreign) to be added to competency_usercomp.
+    $table = new xmldb_table('competency_usercomp');
+    $key = new xmldb_key('usermodified', XMLDB_KEY_FOREIGN, ['usermodified'], 'user', ['id']);
+    // Launch add key usermodified.
+    $dbman->add_key($table, $key);
+
+    // Define key usermodified (foreign) to be added to competency_usercompcourse.
+    $table = new xmldb_table('competency_usercompcourse');
+    $key = new xmldb_key('usermodified', XMLDB_KEY_FOREIGN, ['usermodified'], 'user', ['id']);
+    // Launch add key usermodified.
+    $dbman->add_key($table, $key);
+
+    // Define key usermodified (foreign) to be added to competency_usercompplan.
+    $table = new xmldb_table('competency_usercompplan');
+    $key = new xmldb_key('usermodified', XMLDB_KEY_FOREIGN, ['usermodified'], 'user', ['id']);
+    // Launch add key usermodified.
+    $dbman->add_key($table, $key);
+
+    // Define key usermodified (foreign) to be added to competency_plancomp.
+    $table = new xmldb_table('competency_plancomp');
+    $key = new xmldb_key('usermodified', XMLDB_KEY_FOREIGN, ['usermodified'], 'user', ['id']);
+    // Launch add key usermodified.
+    $dbman->add_key($table, $key);
+
+    // Define key usermodified (foreign) to be added to competency_userevidencecomp.
+    $table = new xmldb_table('competency_userevidencecomp');
+    $key = new xmldb_key('usermodified', XMLDB_KEY_FOREIGN, ['usermodified'], 'user', ['id']);
+    // Launch add key usermodified.
+    $dbman->add_key($table, $key);
+
+    // Define key usermodified (foreign) to be added to competency_modulecomp.
+    $table = new xmldb_table('competency_modulecomp');
+    $key = new xmldb_key('usermodified', XMLDB_KEY_FOREIGN, ['usermodified'], 'user', ['id']);
+    // Launch add key usermodified.
+    $dbman->add_key($table, $key);
+
+    // Define key usermodified (foreign) to be added to oauth2_endpoint.
+    $table = new xmldb_table('oauth2_endpoint');
+    $key = new xmldb_key('usermodified', XMLDB_KEY_FOREIGN, ['usermodified'], 'user', ['id']);
+    // Launch add key usermodified.
+    $dbman->add_key($table, $key);
+
+    // Define key usermodified (foreign) to be added to oauth2_system_account.
+    $table = new xmldb_table('oauth2_system_account');
+    $key = new xmldb_key('usermodified', XMLDB_KEY_FOREIGN, ['usermodified'], 'user', ['id']);
+    // Launch add key usermodified.
+    $dbman->add_key($table, $key);
+
+    // Define key usermodified (foreign) to be added to oauth2_user_field_mapping.
+    $table = new xmldb_table('oauth2_user_field_mapping');
+    $key = new xmldb_key('usermodified', XMLDB_KEY_FOREIGN, ['usermodified'], 'user', ['id']);
+    // Launch add key usermodified.
+    $dbman->add_key($table, $key);
+
+    // Define key usermodified (foreign) to be added to analytics_models.
+    $table = new xmldb_table('analytics_models');
+    $key = new xmldb_key('usermodified', XMLDB_KEY_FOREIGN, ['usermodified'], 'user', ['id']);
+    // Launch add key usermodified.
+    $dbman->add_key($table, $key);
+
+    // Define key usermodified (foreign) to be added to analytics_models_log.
+    $table = new xmldb_table('analytics_models_log');
+    $key = new xmldb_key('usermodified', XMLDB_KEY_FOREIGN, ['usermodified'], 'user', ['id']);
+    // Launch add key usermodified.
+    $dbman->add_key($table, $key);
+
+    // Define key usermodified (foreign) to be added to oauth2_access_token.
+    $table = new xmldb_table('oauth2_access_token');
+    $key = new xmldb_key('usermodified', XMLDB_KEY_FOREIGN, ['usermodified'], 'user', ['id']);
+    // Launch add key usermodified.
+    $dbman->add_key($table, $key);
+
+    // Define key contextid (foreign) to be added to payment_accounts.
+    $table = new xmldb_table('payment_accounts');
+    $key = new xmldb_key('contextid', XMLDB_KEY_FOREIGN, ['contextid'], 'context', ['id']);
+    // Launch add key contextid.
+    $dbman->add_key($table, $key);
 }

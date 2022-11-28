@@ -188,22 +188,6 @@ class behat_general extends behat_base {
     }
 
     /**
-     * Switches to a second window.
-     *
-     * @Given /^I switch to a second window$/
-     * @throws DriverException If there aren't exactly 2 windows open.
-     */
-    public function switch_to_second_window() {
-        $names = $this->getSession()->getWindowNames();
-
-        if (count($names) !== 2) {
-            throw new DriverException('Expected to see 2 windows open, found ' . count($names));
-        }
-
-        $this->getSession()->switchToWindow($names[1]);
-    }
-
-    /**
      * Switches to the main Moodle frame.
      *
      * @Given /^I switch to the main frame$/
@@ -226,6 +210,22 @@ class behat_general extends behat_base {
         }
 
         $this->getSession()->switchToWindow($windowname);
+    }
+
+    /**
+     * Switches to a second window.
+     *
+     * @Given /^I switch to a second window$/
+     * @throws DriverException If there aren't exactly 2 windows open.
+     */
+    public function switch_to_second_window() {
+        $names = $this->getSession()->getWindowNames();
+
+        if (count($names) !== 2) {
+            throw new DriverException('Expected to see 2 windows open, found ' . count($names));
+        }
+
+        $this->getSession()->switchToWindow($names[1]);
     }
 
     /**
@@ -1101,7 +1101,7 @@ EOF;
      * the Behat result look ugly.
      *
      * Note: Most of the code relating to running a task is based on
-     * admin/tool/task/cli/schedule_task.php.
+     * admin/cli/scheduled_task.php.
      *
      * @Given /^I run the scheduled task "(?P<task_name>[^"]+)"$/
      * @param string $taskname Name of task e.g. 'mod_whatever\task\do_something'

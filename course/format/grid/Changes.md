@@ -1,12 +1,16 @@
 History
 =============
+Version 401.0.1 - 27/11/2022
+----------------------------
+1. Release candidate for Moodle 4.1.
+
 Version 400.2.0 - 16/10/2022
-============================
+----------------------------
 1. Add 'Change the number of sections in the course settings' link when editing.
 2. Fix 'Cannot import activities between two courses using the Grid format' - #169.
 
 Version 400.1.1 - 18/09/2022
-============================
+----------------------------
 1. Improve upgrade script so that it attempts a repair if something breaks the first time.
 2. Fix 'Error during exchange of section pictures' - #168.
 3. Fix 'Displayed image not deleted when there are draft area files for a section'.
@@ -15,45 +19,45 @@ Version 400.1.1 - 18/09/2022
    API.
 
 Version 4.0.1.0 - 12/09/2022
-============================
+----------------------------
 1. Tidy and refactor code.
 2. More Behat tests.
 3. Highlighted section.
 4. Improved restore code.
 
 Version 4.0.0.2 - 29/08/2022
-============================
+----------------------------
 1. Improved styles.
 2. Remove image when a section is deleted.
 3. Release candidate.
 
 Version 4.0.0.1 - 24/08/2022
-============================
+----------------------------
 1. Start of complete re-build from scratch - functionality added as funded.  Decision made due to the changes in the core API.
 
 Version 3.11.1.1 - TBR
-=============================
+----------------------------
 1. Fix maturity information not showing in information site setting.
 2. Fix 'PHP8.0 Compatibility issue when switching to Grid format' - #157.
 
 Version 3.11.1.1 - 17/01/2022
-=============================
+----------------------------
 1. Fix 'core_text' inclusion issue - #153.
 2. Fix more inclusion issues - #156.
 3. Fix "'format_grid\output\completion_info' not found" - #152.
 
 Version 3.11.1.0 - 14/01/2022
-=============================
+----------------------------
 1. Fix 'Observer throws error on course restore format_{name}::get_contextid()' - #149.
 2. Added support information and settings for such.
 
 Version 3.10.1.4 - 01/07/2021
-=============================
+----------------------------
 1. Fix 'Exception when using course import function' - #144.
 2. Fix 'Course restore fails with cannotgetimagesforcourse error' - #145.
 
 Version 3.10.1.3 - 02/06/2021
-=============================
+----------------------------
 Due to the changes, this is a 'release candidate' release, therefore it is imperative that you test on a test server
 first and report any issues back to me please.  Please see the 'Reporting issues' section of the 'Readme.md' file.
 
@@ -65,19 +69,19 @@ first and report any issues back to me please.  Please see the 'Reporting issues
 2. Fix backup files do not contain 'alttext' field for the image.
 
 Version 3.10.1.2 - 19/05/2021
-=============================
+----------------------------
 1. Fix grid image placement for RTL languages.
 2. Fix missing 'set' prefix on 'section0ownpagenogridonesection' causing offset error on course restore.
 3. Fix 'PNG files not transparent' - #142.
 
 Version 3.10.1.1 - 12/05/2021
-=============================
+----------------------------
 1. Fix 'Site default not applied to setsection0ownpagenogridonesection'.
 2. Add new 'single page summary image' functionality (with settings) to show the section image in the section summary on a
    single section page.
 
 Version 3.10.1.0 - 29/03/2021
-=============================
+----------------------------
 1. Fix 'Duplicated section name' - #134.
 2. All course settings now have an option to track the value of the global default as set by the administrator.  Thus, when they change,
    then the course changes without any user interaction on the course.  The reset course functionality is still there and will
@@ -88,13 +92,13 @@ Version 3.10.1.0 - 29/03/2021
 Note: If you see 'Default - {$a}' in a setting dropdown then you need to update core Moodle, please see: MDL-71048.
 
 Version 3.10.0.1 - 14/11/2020
-=============================
+----------------------------
 Note: Functionally the same as 3.9.1.0.
 1. Fix summary tooltip dismissing itself when floating over the section name.  If you find it is still an issue, then
    consider using the 'sectiontitlesummarymaxlength' setting.
 
 Version 3.9.0.1 - 19/07/2020
-============================
+----------------------------
 1. Apply MDL-65539.
 2. Apply MDL-68231.
 3. Apply MDL-68235.

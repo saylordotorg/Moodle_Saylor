@@ -47,22 +47,13 @@ defined('MOODLE_INTERNAL') || die;
 function xmldb_label_upgrade($oldversion) {
     global $CFG, $DB;
 
-    // Automatically generated Moodle v3.6.0 release upgrade line.
-    // Put any upgrade step following this.
-
-    // Automatically generated Moodle v3.7.0 release upgrade line.
-    // Put any upgrade step following this.
-
-    // Automatically generated Moodle v3.8.0 release upgrade line.
-    // Put any upgrade step following this.
-
     // Automatically generated Moodle v3.9.0 release upgrade line.
     // Put any upgrade step following this.
 
     // Automatically generated Moodle v4.0.0 release upgrade line.
     // Put any upgrade step following this.
 
-    if ($oldversion < 2022041901) {
+    if ($oldversion < 2022101300) {
         $module = $DB->get_field('modules', 'id', ['name' => 'label']);
         $DB->execute('
             UPDATE {course_modules}
@@ -72,7 +63,7 @@ function xmldb_label_upgrade($oldversion) {
                    AND visibleoncoursepage = 0',
             ['module' => $module]
         );
-        upgrade_mod_savepoint(true, 2022041901, 'label');
+        upgrade_mod_savepoint(true, 2022101300, 'label');
     }
 
     return true;

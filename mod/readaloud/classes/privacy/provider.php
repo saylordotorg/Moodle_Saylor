@@ -198,7 +198,7 @@ class provider implements
                        usert.errorcount,
                        usert.filename,
                        ait.transcript,
-                       ait.fulltranscript
+                       ait.fulltranscript,
                        usert.timemodified
                   FROM {" . constants::M_USERTABLE . "} usert
                   JOIN {" . constants::M_TABLE . "} actt ON usert.readaloudid = actt.id

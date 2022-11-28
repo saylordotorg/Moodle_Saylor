@@ -1,3 +1,8 @@
+Version 2.0.91 (Build 2022112701)
+- fixed issue in privacy provider
+
+Version 2.0.90 (Build 2022112700)
+- added Dutch Belgian (and other ) voices
 
 Version 2.0.89 (Build 2022100700)
 - removed unneeded lang strings

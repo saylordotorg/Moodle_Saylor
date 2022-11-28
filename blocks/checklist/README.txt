@@ -5,6 +5,7 @@ http://moodle.org/plugins/view.php?plugin=mod_checklist
 
 ==Changes==
 
+* 2022-11-19 - Minor M4.1 compatibility fixes
 * 2022-09-24 - Adjust use of unserialize (during backup + restore) to avoid security risk
 * 2022-01-22 - Minor M4.0 compatibility fixes
 * 2021-05-15 - Moodle 3.11 compatibility fixes

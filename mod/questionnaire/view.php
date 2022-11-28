@@ -14,6 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * This main view page for a questionnaire.
+ *
+ * @package mod_questionnaire
+ * @copyright  2016 Mike Churchward (mike.churchward@poetgroup.org)
+ * @author     Mike Churchward
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ *
+ */
 require_once("../../config.php");
 require_once($CFG->dirroot.'/mod/questionnaire/locallib.php');
 require_once($CFG->libdir . '/completionlib.php');
@@ -47,7 +56,7 @@ if (isset($sid)) {
 
 $PAGE->set_url($url);
 $PAGE->set_context($context);
-$questionnaire = new questionnaire(0, $questionnaire, $course, $cm);
+$questionnaire = new questionnaire($course, $cm, 0, $questionnaire);
 // Add renderer and page objects to the questionnaire object for display use.
 $questionnaire->add_renderer($PAGE->get_renderer('mod_questionnaire'));
 $questionnaire->add_page(new \mod_questionnaire\output\viewpage());
@@ -128,13 +137,14 @@ if ($questionnaire->capabilities->readownresponses && ($usernumresp > 0)) {
         $argstr .= '&byresponse=1&action=vresp';
     }
     $questionnaire->page->add_to_page('yourresponse',
-        '<a href="'.$CFG->wwwroot.htmlspecialchars('/mod/questionnaire/myreport.php?'.$argstr).'">'.$titletext.'</a>');
+        '<a href="' .$CFG->wwwroot.htmlspecialchars('/mod/questionnaire/myreport.php?' . $argstr).
+        '" class="btn btn-primary">' . $titletext . '</a>');
 }
 
 if ($questionnaire->can_view_all_responses($usernumresp)) {
     $argstr = 'instance='.$questionnaire->id.'&group='.$currentgroupid;
     $questionnaire->page->add_to_page('allresponses',
-        '<a href="'.$CFG->wwwroot.htmlspecialchars('/mod/questionnaire/report.php?'.$argstr).'">'.
+        '<a href="'.$CFG->wwwroot.htmlspecialchars('/mod/questionnaire/report.php?'.$argstr).'" class="btn btn-primary">'.
         get_string('viewallresponses', 'questionnaire').'</a>');
 }
 

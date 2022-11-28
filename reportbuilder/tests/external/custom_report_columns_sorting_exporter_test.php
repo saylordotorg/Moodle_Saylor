@@ -66,7 +66,7 @@ class custom_report_columns_sorting_exporter_test extends advanced_testcase {
         // Email column.
         $this->assertEquals($columnemail->get('id'), $sortcolumnemail['id']);
         $this->assertEquals('Email address', $sortcolumnemail['heading']);
-        $this->assertEquals(1, $sortcolumnemail['sortenabled']);
+        $this->assertTrue($sortcolumnemail['sortenabled']);
         $this->assertEquals(1, $sortcolumnemail['sortorder']);
         $this->assertEquals(SORT_DESC, $sortcolumnemail['sortdirection']);
         $this->assertEquals('Disable sorting for column \'Email address\'', $sortcolumnemail['sortenabledtitle']);
@@ -75,7 +75,7 @@ class custom_report_columns_sorting_exporter_test extends advanced_testcase {
         // Fullname column.
         $this->assertEquals($columnfullname->get('id'), $sortcolumnfullname['id']);
         $this->assertEquals('Full name', $sortcolumnfullname['heading']);
-        $this->assertEquals(0, $sortcolumnfullname['sortenabled']);
+        $this->assertFalse($sortcolumnfullname['sortenabled']);
         $this->assertEquals(2, $sortcolumnfullname['sortorder']);
         $this->assertEquals(SORT_ASC, $sortcolumnfullname['sortdirection']);
         $this->assertEquals('Enable sorting for column \'Full name\'', $sortcolumnfullname['sortenabledtitle']);

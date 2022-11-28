@@ -70,11 +70,13 @@ const M_LANG_ARAE ='ar-AE';
 const M_LANG_ARSA ='ar-SA';
 const M_LANG_ZHCN ='zh-CN';
 const M_LANG_NLNL ='nl-NL';
+const M_LANG_NLBE ='nl-BE';
 const M_LANG_ENIE ='en-IE';
 const M_LANG_ENWL ='en-WL';
 const M_LANG_ENAB ='en-AB';
 const M_LANG_FAIR ='fa-IR';
 const M_LANG_DECH ='de-CH';
+const M_LANG_DEAT ='de-AT';
 const M_LANG_HEIL ='he-IL';
 const M_LANG_IDID ='id-ID';
 const M_LANG_JAJP ='ja-JP';
@@ -102,5 +104,6 @@ const M_USE_DATATABLES=0;
 const M_USE_PAGEDTABLES=1;
 
 const M_NEURALVOICES = array("Amy","Emma","Brian","Olivia","Aria","Ayanda","Ivy","Joanna","Kendra","Kimberly",
-        "Salli","Joey","Justin","Kevin","Matthew","Camila","Lupe", "Gabrielle", "Vicki", "Seoyeon","Takumi","lucia","Lea","Bianca");
+        "Salli","Joey","Justin","Kevin","Matthew","Camila","Lupe", "Gabrielle", "Vicki", "Seoyeon","Takumi","lucia",
+        "Lea","Bianca","Laura","Kajal","Suvi","Liam","Daniel","Hannah","Camila");
 }

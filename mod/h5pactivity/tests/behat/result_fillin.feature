@@ -20,9 +20,7 @@ Feature: View fill the blanks attempt report
     And the following "activity" exists:
       | activity        | h5pactivity                          |
       | course          | C1                                   |
-      | section         | 1                                    |
       | name            | Awesome H5P package                  |
-      | intro           | Description                          |
       | grademethod     | 2                                    |
       | packagefilepath | h5p/tests/fixtures/filltheblanks.h5p |
 

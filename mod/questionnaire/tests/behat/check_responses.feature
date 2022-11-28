@@ -23,29 +23,28 @@ Feature: Review responses
     And "Test questionnaire" has questions and responses
     And I log in as "admin"
     And I navigate to "Location > Location settings" in site administration
-    And I set the field "id_s__timezone" to "Europe/London"
-    And I set the field "id_s__forcetimezone" to "Europe/London"
+    And I set the field "Default timezone" to "Europe/London"
+    And I set the field "Force timezone" to "Europe/London"
     And I press "Save changes"
     And I navigate to "Language > Language settings" in site administration
-    And I set the field "id_s__autolang" to "0"
-#    And I set the field "id_s__lang" to "en‎"
+    And I set the field "Language autodetect" to "0"
     And I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test questionnaire"
-    Then I should see "View All Responses"
-    And I navigate to "View All Responses" in current page administration
-    Then I should see "View All Responses."
+    Then I should see "View all responses"
+    And I navigate to "View all responses" in current page administration
+    Then I should see "View all responses."
     And I should see "All participants."
     And I should see "View Default order"
     And I should see "Responses: 6"
     And I follow "Ascending order"
-    Then I should see "View All Responses."
+    Then I should see "View all responses."
     And I should see "All participants."
     And I should see "Ascending order"
     And I should see "Responses: 6"
     And I follow "Descending order"
-    Then I should see "View All Responses."
+    Then I should see "View all responses."
     And I should see "All participants."
     And I should see "Descending order"
     And I should see "Responses: 6"
@@ -72,7 +71,7 @@ Feature: Review responses
     And I follow "Admin User"
     Then I should see "1 / 5"
     And I follow "Summary"
-    Then I should see "View All Responses."
+    Then I should see "View all responses."
     And I should see "All participants."
     And I should see "View Default order"
     And I should see "Responses: 5"
@@ -80,4 +79,4 @@ Feature: Review responses
     Then I should see "Are you sure you want to delete ALL the responses in this questionnaire?"
     And I press "Delete"
     Then I should see "You are not eligible to take this questionnaire."
-    And I should not see "View All Responses"
+    And I should not see "View all responses"

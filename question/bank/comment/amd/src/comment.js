@@ -41,11 +41,10 @@ const commentEvent = (questionId, courseID, contextId) => {
         questionid: questionId,
         courseid: courseID
     };
-    let commentFragment = Fragment.loadFragment('qbank_comment', 'question_comment', contextId, args);
     ModalFactory.create({
         type: ModalFactory.types.SAVE_CANCEL,
         title: Str.get_string('commentheader', 'qbank_comment'),
-        body: commentFragment,
+        body: Fragment.loadFragment('qbank_comment', 'question_comment', contextId, args),
         large: true,
     }).then((modal) => {
         let root = modal.getRoot();
@@ -54,6 +53,12 @@ const commentEvent = (questionId, courseID, contextId) => {
         root.on(ModalEvents.bodyRendered, function() {
             const submitlink = document.querySelectorAll("div.comment-area a")[0];
             submitlink.style.display = 'none';
+        });
+
+        // Version selection event.
+        root.on('change', '#question_comment_version_dropdown', function(e) {
+            args.questionid = e.target.value;
+            modal.setBody(Fragment.loadFragment('qbank_comment', 'question_comment', contextId, args));
         });
 
         // Get the required strings and updated the modal button text labels.

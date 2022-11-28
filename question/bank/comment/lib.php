@@ -133,5 +133,10 @@ function qbank_comment_output_fragment_question_comment($args): string {
         $displaydata['commenstdisabled'] = true;
     }
 
+    $selector = \core_question\output\question_version_selection::make_for_question('question_comment_version_dropdown',
+        $args['questionid']);
+    $qbankrenderer = $PAGE->get_renderer('core_question', 'bank');
+    $displaydata['versionselection'] = $selector->export_for_template($qbankrenderer);
+
     return $PAGE->get_renderer('qbank_comment')->render_comment_fragment($displaydata);
 }

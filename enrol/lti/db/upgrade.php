@@ -40,15 +40,6 @@ function xmldb_enrol_lti_upgrade($oldversion) {
     global $CFG, $OUTPUT, $DB;
     $dbman = $DB->get_manager();
 
-    // Automatically generated Moodle v3.6.0 release upgrade line.
-    // Put any upgrade step following this.
-
-    // Automatically generated Moodle v3.7.0 release upgrade line.
-    // Put any upgrade step following this.
-
-    // Automatically generated Moodle v3.8.0 release upgrade line.
-    // Put any upgrade step following this.
-
     // Automatically generated Moodle v3.9.0 release upgrade line.
     // Put any upgrade step following this.
 
@@ -459,7 +450,7 @@ function xmldb_enrol_lti_upgrade($oldversion) {
     // Automatically generated Moodle v4.0.0 release upgrade line.
     // Put any upgrade step following this.
 
-    if ($oldversion < 2022041901) {
+    if ($oldversion < 2022061500) {
         // Disable all orphaned enrolment method instances.
         $sql = "id IN (SELECT t.enrolid
                          FROM {enrol_lti_tools} t
@@ -468,19 +459,19 @@ function xmldb_enrol_lti_upgrade($oldversion) {
         $DB->set_field_select('enrol', 'status', 1, $sql);
 
         // Lti savepoint reached.
-        upgrade_plugin_savepoint(true, 2022041901, 'enrol', 'lti');
+        upgrade_plugin_savepoint(true, 2022061500, 'enrol', 'lti');
     }
 
-    if ($oldversion < 2022041902) {
+    if ($oldversion < 2022103100) {
         // Update lti user information for LTI 2.0 users having the wrong consumer secret recorded.
         // This applies to any LTI 2.0 user who has launched the tool (i.e. has lastaccess) and fixes a non-functional grade sync
         // for LTI 2.0 consumers.
         $sql = "SELECT lu.id, lc.secret
                   FROM {enrol_lti_users} lu
                   JOIN {enrol_lti_lti2_consumer} lc
-                    ON (lu.consumerkey = lc.consumerkey256)
+                    ON (" . $DB->sql_compare_text('lu.consumerkey', 255) . " = lc.consumerkey256)
                  WHERE lc.ltiversion = :ltiversion
-                   AND lu.consumersecret != lc.secret
+                   AND " . $DB->sql_compare_text('lu.consumersecret') . " != lc.secret
                    AND lu.lastaccess IS NOT NULL";
         $affectedltiusersrs = $DB->get_recordset_sql($sql, ['ltiversion' => 'LTI-2p0']);
         foreach ($affectedltiusersrs as $ltiuser) {
@@ -489,10 +480,10 @@ function xmldb_enrol_lti_upgrade($oldversion) {
         $affectedltiusersrs->close();
 
         // Lti savepoint reached.
-        upgrade_plugin_savepoint(true, 2022041902, 'enrol', 'lti');
+        upgrade_plugin_savepoint(true, 2022103100, 'enrol', 'lti');
     }
 
-    if ($oldversion < 2022041903) {
+    if ($oldversion < 2022110300) {
         // Update lti user information for any users missing a consumer secret.
         // This applies to any user who has launched the tool (i.e. has lastaccess) but who doesn't have a secret recorded.
         // This fixes a bug where enrol_lti_users records are created first during a member sync, and are missing the secret,
@@ -500,7 +491,7 @@ function xmldb_enrol_lti_upgrade($oldversion) {
         $sql = "SELECT lu.id, lc.secret
                   FROM {enrol_lti_users} lu
                   JOIN {enrol_lti_lti2_consumer} lc
-                    ON (lu.consumerkey = lc.consumerkey256)
+                    ON (" . $DB->sql_compare_text('lu.consumerkey', 255) . " = lc.consumerkey256)
                  WHERE lu.consumersecret IS NULL
                    AND lu.lastaccess IS NOT NULL";
         $affectedltiusersrs = $DB->get_recordset_sql($sql);
@@ -510,7 +501,7 @@ function xmldb_enrol_lti_upgrade($oldversion) {
         $affectedltiusersrs->close();
 
         // Lti savepoint reached.
-        upgrade_plugin_savepoint(true, 2022041903, 'enrol', 'lti');
+        upgrade_plugin_savepoint(true, 2022110300, 'enrol', 'lti');
     }
 
     return true;

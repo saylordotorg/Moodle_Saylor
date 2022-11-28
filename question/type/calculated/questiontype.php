@@ -380,7 +380,7 @@ class qtype_calculated extends question_type {
                 require("{$CFG->dirroot}/question/type/calculated/datasetitems.php");
                 break;
             default:
-                print_error('invalidwizardpage', 'question');
+                throw new \moodle_exception('invalidwizardpage', 'question');
                 break;
         }
     }
@@ -412,7 +412,7 @@ class qtype_calculated extends question_type {
                         "{$submiturl}?wizardnow=datasetitems", $question, $regenerate);
                 break;
             default:
-                print_error('invalidwizardpage', 'question');
+                throw new \moodle_exception('invalidwizardpage', 'question');
                 break;
         }
 
@@ -675,7 +675,7 @@ class qtype_calculated extends question_type {
                 $this->save_question_calculated($question, $form);
                 break;
             default:
-                print_error('invalidwizardpage', 'question');
+                throw new \moodle_exception('invalidwizardpage', 'question');
                 break;
         }
         return $question;
@@ -1032,7 +1032,7 @@ class qtype_calculated extends question_type {
             return sprintf("%.".$regs[4].'f', $nbr);
 
         } else {
-            print_error('disterror', 'question', '', $regs[1]);
+            throw new \moodle_exception('disterror', 'question', '', $regs[1]);
         }
         return '';
     }
@@ -1466,7 +1466,7 @@ class qtype_calculated extends question_type {
             $a = new stdClass();
             $a->id = $question->id;
             $a->item = $datasetitem;
-            print_error('cannotgetdsfordependent', 'question', '', $a);
+            throw new \moodle_exception('cannotgetdsfordependent', 'question', '', $a);
         }
         $dataset = Array();
         foreach ($dataitems as $id => $dataitem) {

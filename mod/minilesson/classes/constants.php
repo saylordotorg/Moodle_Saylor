@@ -36,7 +36,8 @@ const M_USE_DATATABLES=0;
 const M_USE_PAGEDTABLES=1;
 
 const M_NEURALVOICES = array("Amy","Emma","Brian","Olivia","Aria","Ayanda","Ivy","Joanna","Kendra","Kimberly",
-        "Salli","Joey","Justin","Kevin","Matthew","Camila","Lupe", "Gabrielle", "Vicki", "Seoyeon","Takumi", "Lucia","Lea","Bianca");
+        "Salli","Joey","Justin","Kevin","Matthew","Camila","Lupe", "Gabrielle", "Vicki", "Seoyeon","Takumi", "Lucia",
+        "Lea","Bianca","Laura","Kajal","Suvi","Liam","Daniel","Hannah","Camila");
 
 
 //grading options
@@ -218,6 +219,7 @@ const M_LANG_ESES = 'es-ES';
 const M_LANG_FRCA = 'fr-CA';
 const M_LANG_FRFR = 'fr-FR';
 const M_LANG_DEDE = 'de-DE';
+const M_LANG_DEAT ='de-AT';
 const M_LANG_ITIT = 'it-IT';
 const M_LANG_PTBR = 'pt-BR';
 
@@ -230,6 +232,7 @@ const M_LANG_ARAE ='ar-AE';
 const M_LANG_ARSA ='ar-SA';
 const M_LANG_ZHCN ='zh-CN';
 const M_LANG_NLNL ='nl-NL';
+const M_LANG_NLBE ='nl-BE';
 const M_LANG_ENIE ='en-IE';
 const M_LANG_ENWL ='en-WL';
 const M_LANG_ENAB ='en-AB';

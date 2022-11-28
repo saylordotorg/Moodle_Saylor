@@ -119,7 +119,7 @@ Feature: Add URL to main menu block
     And I am on the "reference link" "url activity editing" page
     And I expand all fieldsets
     And I set the following fields to these values:
-      | id_display | Embed |
+      | id_display | In pop-up |
     And I press "Save and return to course"
     Then "reference link" "link" should not exist in the "Main menu" "block"
     And I should see "mooooooooodle" in the "region-main" "region"

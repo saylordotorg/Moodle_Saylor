@@ -215,17 +215,20 @@ class renderer extends \plugin_renderer_base {
             $data['noshadow'] = 1;
         }
         //can we attempt this activity
+        $disableshadowgrading = get_config(constants::M_COMPONENT,'disableshadowgrading');
         if(!$canattempt) {
             $data['cantattempt'] = 1;
+            if(!$disableshadowgrading){
+                $data['cantshadowattempt'] = 1;
+            }
         }
+
         //no quiz
         $data['noquiz'] = 1;
 
         //finally render template and return
         return $this->render_from_template('mod_readaloud/bigbuttonmenu', $data);
-
     }
-
 
     /*
      * Show a small summary of the activity
@@ -977,9 +980,11 @@ class renderer extends \plugin_renderer_base {
                 case constants::POSTATTEMPT_EVAL:
                 case constants::POSTATTEMPT_EVALERRORS:
                     $attemptsummary = utils::fetch_attempt_summary($moduleinstance);
-                    $ret .= $this->show_attempt_summary($attemptsummary,$showgradesinchart);
-                    $chartdata = utils::fetch_attempt_chartdata($moduleinstance);
-                    $ret .= $this->show_progress_chart($chartdata,$showgradesinchart);
+                    if($attemptsummary) {
+                        $ret .= $this->show_attempt_summary($attemptsummary, $showgradesinchart);
+                        $chartdata = utils::fetch_attempt_chartdata($moduleinstance);
+                        $ret .= $this->show_progress_chart($chartdata, $showgradesinchart);
+                    }
             }
         }
 

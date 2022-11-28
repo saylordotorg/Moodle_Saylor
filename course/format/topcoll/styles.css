@@ -163,6 +163,11 @@
     margin: 4px;
 }
 
+.course-content ul.ctopics .course-section .sectionbadges .badge {
+    margin: 3px 0 0;
+    vertical-align: top;
+}
+
 /* Icon set common. */
 .course-content ul.ctopics li.section .content .toggle span.the_toggle,
 #toggle-all .content .toggle-all {

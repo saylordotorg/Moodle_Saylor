@@ -58,6 +58,8 @@ class course extends base {
         return [
             'course' => 'c',
             'context' => 'cctx',
+            'tag_instance' => 'cti',
+            'tag' => 'ct',
         ];
     }
 
@@ -112,6 +114,20 @@ class course extends base {
         }
 
         return $this;
+    }
+
+    /**
+     * Return syntax for joining on the context table
+     *
+     * @return string
+     */
+    public function get_context_join(): string {
+        $coursealias = $this->get_table_alias('course');
+        $contextalias = $this->get_table_alias('context');
+
+        return "LEFT JOIN {context} {$contextalias}
+            ON {$contextalias}.contextlevel = " . CONTEXT_COURSE . "
+           AND {$contextalias}.instanceid = {$coursealias}.id";
     }
 
     /**
@@ -194,6 +210,26 @@ class course extends base {
     }
 
     /**
+     * Return joins necessary for retrieving tags
+     *
+     * @return string[]
+     */
+    public function get_tag_joins(): array {
+        $course = $this->get_table_alias('course');
+        $taginstance = $this->get_table_alias('tag_instance');
+        $tag = $this->get_table_alias('tag');
+
+        return [
+            "LEFT JOIN {tag_instance} {$taginstance}
+                    ON {$taginstance}.component = 'core'
+                   AND {$taginstance}.itemtype = 'course'
+                   AND {$taginstance}.itemid = {$course}.id",
+            "LEFT JOIN {tag} {$tag}
+                    ON {$tag}.id = {$taginstance}.tagid",
+        ];
+    }
+
+    /**
      * Returns list of all available columns.
      *
      * These are all the columns available to use in any report that uses this entity.
@@ -236,11 +272,7 @@ class course extends base {
 
             // Join on the context table so that we can use it for formatting these columns later.
             if ($key === 'coursefullnamewithlink') {
-                $join = "LEFT JOIN {context} {$contexttablealias}
-                           ON {$contexttablealias}.contextlevel = " . CONTEXT_COURSE . "
-                          AND {$contexttablealias}.instanceid = {$tablealias}.id";
-
-                $column->add_join($join)
+                $column->add_join($this->get_context_join())
                     ->add_fields(context_helper::get_preload_record_columns_sql($contexttablealias));
             }
 
@@ -268,11 +300,7 @@ class course extends base {
 
             // Join on the context table so that we can use it for formatting these columns later.
             if ($coursefield === 'summary' || $coursefield === 'shortname' || $coursefield === 'fullname') {
-                $join = "LEFT JOIN {context} {$contexttablealias}
-                           ON {$contexttablealias}.contextlevel = " . CONTEXT_COURSE . "
-                          AND {$contexttablealias}.instanceid = {$tablealias}.id";
-
-                $column->add_join($join)
+                $column->add_join($this->get_context_join())
                     ->add_field("{$tablealias}.id", 'courseid')
                     ->add_fields(context_helper::get_preload_record_columns_sql($contexttablealias));
             }
@@ -296,11 +324,9 @@ class course extends base {
 
         $fields = $this->get_course_fields();
         foreach ($fields as $field => $name) {
-            // Filtering isn't supported for LONGTEXT fields on Oracle.
-            if ($this->get_course_field_type($field) === column::TYPE_LONGTEXT &&
-                    $DB->get_dbfamily() === 'oracle') {
-
-                continue;
+            $filterfieldsql = "{$tablealias}.{$field}";
+            if ($this->get_course_field_type($field) === column::TYPE_LONGTEXT) {
+                $filterfieldsql = $DB->sql_cast_to_char($filterfieldsql);
             }
 
             $optionscallback = [static::class, 'get_options_for_' . $field];
@@ -319,7 +345,7 @@ class course extends base {
                 $field,
                 $name,
                 $this->get_entity_name(),
-                "{$tablealias}.$field"
+                $filterfieldsql
             ))
                 ->add_joins($this->get_joins());
 

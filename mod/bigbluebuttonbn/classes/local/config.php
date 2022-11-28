@@ -17,6 +17,7 @@
 namespace mod_bigbluebuttonbn\local;
 
 use mod_bigbluebuttonbn\instance;
+use mod_bigbluebuttonbn\local\proxy\bigbluebutton_proxy;
 use mod_bigbluebuttonbn\recording;
 
 /**
@@ -108,10 +109,9 @@ class config {
             'disablenote_editable' => true,
             'hideuserlist_default' => false,
             'hideuserlist_editable' => true,
-            'lockonjoin_default' => true,
-            'lockonjoin_editable' => false,
             'welcome_default' => '',
             'default_dpa_accepted' => false,
+            'poll_interval' => bigbluebutton_proxy::DEFAULT_POLL_INTERVAL,
         ];
     }
 
@@ -215,10 +215,10 @@ class config {
             'disablenote_default' => self::get('disablenote_default'),
             'hideuserlist_editable' => self::get('hideuserlist_editable'),
             'hideuserlist_default' => self::get('hideuserlist_default'),
-            'lockonjoin_editable' => self::get('lockonjoin_editable'),
-            'lockonjoin_default' => self::get('lockonjoin_default'),
             'welcome_default' => self::get('welcome_default'),
             'welcome_editable' => self::get('welcome_editable'),
+            'poll_interval' => self::get('poll_interval'),
+            'guestaccess_enabled' => self::get('guestaccess_enabled'),
         ];
     }
 

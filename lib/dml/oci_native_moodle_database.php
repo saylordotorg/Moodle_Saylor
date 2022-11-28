@@ -1554,6 +1554,16 @@ class oci_native_moodle_database extends moodle_database {
         return 'MOD(' . $int1 . ', ' . $int2 . ')';
     }
 
+    /**
+     * Return SQL for casting to char of given field/expression
+     *
+     * @param string $field Table field or SQL expression to be cast
+     * @return string
+     */
+    public function sql_cast_to_char(string $field): string {
+        return "TO_CHAR({$field})";
+    }
+
     public function sql_cast_char2int($fieldname, $text=false) {
         if (!$text) {
             return ' CAST(' . $fieldname . ' AS INT) ';
@@ -1641,6 +1651,19 @@ class oci_native_moodle_database extends moodle_database {
     public function sql_group_concat(string $field, string $separator = ', ', string $sort = ''): string {
         $fieldsort = $sort ?: '1';
         return "LISTAGG({$field}, '{$separator}') WITHIN GROUP (ORDER BY {$fieldsort})";
+    }
+
+    /**
+     * Returns the SQL text to be used to order by columns, standardising the return
+     * pattern of null values across database types to sort nulls first when ascending
+     * and last when descending.
+     *
+     * @param string $fieldname The name of the field we need to sort by.
+     * @param int $sort An order to sort the results in.
+     * @return string The piece of SQL code to be used in your statement.
+     */
+    public function sql_order_by_null(string $fieldname, int $sort = SORT_ASC): string {
+        return parent::sql_order_by_null($fieldname, $sort) . ' NULLS ' . ($sort == SORT_ASC ? 'FIRST' : 'LAST');
     }
 
     /**

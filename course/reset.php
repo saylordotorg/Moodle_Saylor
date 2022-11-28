@@ -33,7 +33,7 @@ require_once('reset_form.php');
 $id = required_param('id', PARAM_INT);
 
 if (!$course = $DB->get_record('course', array('id'=>$id))) {
-    print_error("invalidcourseid");
+    throw new \moodle_exception("invalidcourseid");
 }
 
 $PAGE->set_url('/course/reset.php', array('id'=>$id));
@@ -79,7 +79,7 @@ if ($mform->is_cancelled()) {
             $line = array();
             $line[] = $item['component'];
             $line[] = $item['item'];
-            $line[] = ($item['error']===false) ? get_string('ok') : '<div class="notifyproblem">'.$item['error'].'</div>';
+            $line[] = ($item['error'] === false) ? get_string('statusok') : '<div class="notifyproblem">'.$item['error'].'</div>';
             $data[] = $line;
         }
 

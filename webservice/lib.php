@@ -115,7 +115,7 @@ class webservice {
         $user = $DB->get_record('user', array('id' => $token->userid, 'deleted' => 0), '*', MUST_EXIST);
 
         // let enrol plugins deal with new enrolments if necessary
-        enrol_check_plugins($user);
+        enrol_check_plugins($user, false);
 
         // setup user session to check capability
         \core\session\manager::set_user($user);
@@ -898,7 +898,7 @@ class webservice_access_exception extends moodle_exception {
 /**
  * Check if a protocol is enabled
  *
- * @param string $protocol name of WS protocol ('rest', 'soap', 'xmlrpc'...)
+ * @param string $protocol name of WS protocol ('rest', 'soap', ...)
  * @return bool true if the protocol is enabled
  */
 function webservice_protocol_is_enabled($protocol) {
@@ -1131,7 +1131,7 @@ abstract class webservice_server implements webservice_server_interface {
         }
 
         // now fake user login, the session is completely empty too
-        enrol_check_plugins($user);
+        enrol_check_plugins($user, false);
         \core\session\manager::set_user($user);
         set_login_session_preferences();
         $this->userid = $user->id;
