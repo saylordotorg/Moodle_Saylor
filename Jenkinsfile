@@ -409,6 +409,12 @@ def plugins = [
         "url" : 'https://github.com/moodle-an-hochschulen/moodle-tool_opcache.git',
         "branch" : 'MOODLE_311_STABLE',
         "dest" : 'admin/tool/opcache'
+    ],
+    [
+      "name" : 'availability_relativedate',
+      "url" : 'https://github.com/ewallah/moodle-availability_relativedate.git',
+      "branch" : 'main',
+      "dest" : 'availability/condition/relativedate'
     ]
 ]
 
