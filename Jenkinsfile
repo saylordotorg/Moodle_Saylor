@@ -415,12 +415,6 @@ def plugins = [
       "url" : 'https://github.com/ewallah/moodle-availability_relativedate.git',
       "branch" : 'main',
       "dest" : 'availability/condition/relativedate'
-    ],
-    [
-      "name" : 'availability_quizquestion',
-      "url" : 'https://github.com/timhunt/moodle-availability_quizquestion.git',
-      "branch" : 'main',
-      "dest" : 'availability/condition/quizquestion'
     ]
 ]
 
