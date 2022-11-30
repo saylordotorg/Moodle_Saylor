@@ -4,6 +4,10 @@ moodle-availability_role
 Changes
 -------
 
+### Unreleased
+
+* 2022-11-28 - Updated Moodle Plugin CI to latest upstream recommendations
+
 ### v3.11-r4
 
 * 2022-07-12 - Fix availability form styling (which didn't use Bootstrap styles up to now)

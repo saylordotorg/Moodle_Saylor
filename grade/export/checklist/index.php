@@ -50,7 +50,11 @@ $strchkgrades = get_string('pluginname', 'gradeexport_checklist');
 
 if (class_exists('\core_grades\output\export_action_bar')) {
     // New tertiary navigation introduced in Moodle 4.0.
-    $actionbar = new \core_grades\output\export_action_bar($context, $PAGE->url, 'checklist');
+    if ($CFG->branch < 401) {
+        $actionbar = new \core_grades\output\export_action_bar($context, $PAGE->url, 'checklist');
+    } else {
+        $actionbar = new \core_grades\output\export_action_bar($context, null, 'checklist');
+    }
     print_grade_page_head($COURSE->id, 'export', 'checklist', $strchkgrades, false, false, true, null, null, null, $actionbar);
 } else {
     print_grade_page_head($COURSE->id, 'export', 'checklist', $strchkgrades);
