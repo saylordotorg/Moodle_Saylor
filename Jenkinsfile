@@ -431,7 +431,7 @@ def plugins = [
     [
       "name" : 'mod_simplecertificate',
       "url" : 'https://github.com/bozoh/moodle-mod_simplecertificate.git',
-      "branch" : 'MOODLE_311_STABLE',
+      "branch" : 'master',
       "dest" : 'mod/simplecertificate'
     ]
 ]
