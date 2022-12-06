@@ -425,7 +425,7 @@ def plugins = [
     [
       "name" : 'mod_coursecertificate',
       "url" : 'https://github.com/moodleworkplace/moodle-mod_coursecertificate.git',
-      "branch" : 'master',
+      "branch" : 'MOODLE_39_STABLE',
       "dest" : 'mod/coursecertificate'
     ],
     [
