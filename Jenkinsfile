@@ -415,6 +415,24 @@ def plugins = [
       "url" : 'https://github.com/ewallah/moodle-availability_relativedate.git',
       "branch" : 'main',
       "dest" : 'availability/condition/relativedate'
+    ],
+    [
+      "name" : 'tool_certificate',
+      "url" : 'https://github.com/moodleworkplace/moodle-tool_certificate.git',
+      "branch" : '3.11.7_release',
+      "dest" : 'admin/tool/certificate'
+    ],
+    [
+      "name" : 'mod_coursecertificate',
+      "url" : 'https://github.com/moodleworkplace/moodle-mod_coursecertificate.git',
+      "branch" : 'master',
+      "dest" : 'mod/coursecertificate'
+    ],
+    [
+      "name" : 'mod_simplecertificate',
+      "url" : 'https://github.com/bozoh/moodle-mod_simplecertificate.git',
+      "branch" : 'MOODLE_311_STABLE',
+      "dest" : 'mod/simplecertificate'
     ]
 ]
 
