@@ -1,6 +1,20 @@
 # Changelog
 
-## 3.11.7 (2022031510)
+## 3.11.11 (2022031650)
+### Changed
+- Do not show user fields that were removed in 3.11 (ICQ, Twitter, etc)
+- Small automated tests and coding style changes
+
+## 3.11.9 (2022031630)
+### Changed
+- Add lock when generating certificate
+
+## 3.11.8 (2022031620)
+### Added
+- Course certificates may be archived when a course is reset allowing to receive more than one
+  certificate per user in the same course
+
+## 3.11.7 (2022031610)
 ### Changed
 - Prevent race condition resulting in issuing course certificate twice
 
