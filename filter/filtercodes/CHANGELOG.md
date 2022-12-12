@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [2.3.4] 2022-12-07 (dev)
+## [2.3.4] 2022-12-11 (dev)
 ### Added
 - New {courseunenrolurl} tag.
 - New {coursecount students} tag.
@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 - CSS class support for details tag.
 - New {coursegrade} tag.
 - New {ifnotingroup}{/ifnotingroup} tags.
+- New setting to disable {sesskey} tag globally.
 - GitHub bug and feature request issue templates.
 - Code of Conduct guidelines.
 - Compatibility with Moodle 4.1.
