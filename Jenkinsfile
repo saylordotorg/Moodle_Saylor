@@ -418,8 +418,8 @@ def plugins = [
     ],
     [
       "name" : 'tool_certificate',
-      "url" : 'https://github.com/saylordotorg/moodle-tool_certificate.git',
-      "branch" : 'main',
+      "url" : 'https://github.com/moodleworkplace/moodle-tool_certificate.git',
+      "branch" : 'MOODLE_39_STABLE',
       "dest" : 'admin/tool/certificate'
     ],
     [
