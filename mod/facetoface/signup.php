@@ -128,7 +128,8 @@ if ($fromform = $mform->get_data()) { // Form submitted.
     if ($isbulksignup) {
         $error = '';
         $message = get_string('bookingcompleted', 'facetoface');
-        foreach (facetoface_get_sessions($facetoface->id) as $session) {
+
+        foreach (facetoface_get_future_sessions($facetoface->id) as $session) {
             if (!facetoface_session_has_capacity($session, $context) && (!$session->allowoverbook)) {
                 $error = html_writer::empty_tag('br') . html_writer::empty_tag('br') . get_string('somesessionsfull', 'facetoface');
                 continue;

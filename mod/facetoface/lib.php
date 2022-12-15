@@ -1087,6 +1087,21 @@ function facetoface_get_sessions($facetofaceid, $location='') {
 }
 
 /**
+ * Get all sessions that are in the future.
+ *
+ * @param int $id Face to face ID.
+ *
+ * @return array Array of Face to face sessions.
+ */
+function facetoface_get_future_sessions(int $id): array {
+    $now = time();
+    return array_filter(
+        facetoface_get_sessions($id),
+        fn (stdClass $s): bool => !empty(array_filter($s->sessiondates, fn (stdClass $d): bool => $d->timestart > $now))
+    );
+}
+
+/**
  * Get a grade for the given user from the gradebook.
  *
  * @param integer $userid       ID of the user
