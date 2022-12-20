@@ -523,12 +523,6 @@ def plugins = [
         "url" : 'https://github.com/catalyst/moodle-mod_reengagement.git',
         "branch" : 'MOODLE_400_STABLE',
         "dest" : 'mod/reengagement'
-    ],
-    [
-        "name" : 'theme_mb2cg',
-        "url" : 'https://github.com/saylordotorg/moodle-theme_mb2cg.git',
-        "branch" : 'MOODLE_400_STABLE',
-        "dest" : 'theme/mb2cg'
     ]
 ]
 
