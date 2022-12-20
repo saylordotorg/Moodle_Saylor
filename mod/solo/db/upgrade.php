@@ -298,6 +298,43 @@ function xmldb_solo_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2022061000, 'solo');
     }
 
+    if ($oldversion < 2022110500) {
+        $table = new xmldb_table(constants::M_STATSTABLE);
+        $fields=[];
+        $fields[] =  new xmldb_field('cefrlevel', XMLDB_TYPE_CHAR, '4', XMLDB_UNSIGNED);
+        $fields[] =  new xmldb_field('ideacount', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, null, null);
+
+        // Add fields
+        foreach ($fields as $field) {
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+        upgrade_mod_savepoint(true, 2022110500, 'solo');
+    }
+
+    if ($oldversion < 2022121700) {
+        //add relevance field to stats
+        $table_s = new xmldb_table(constants::M_STATSTABLE);
+        $field_s =  new xmldb_field('relevance', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, null, null);
+        // Add fields
+        if (!$dbman->field_exists($table_s, $field_s)) {
+            $dbman->add_field($table_s, $field_s);
+        }
+
+        //add model tts embedding and idea count fields to main table
+        $table_t = new xmldb_table(constants::M_TABLE);
+        $fields_t=[];
+        $fields_t[]= new xmldb_field('modelttsembedding', XMLDB_TYPE_TEXT, null, null, null, null);
+        $fields_t[] =  new xmldb_field('modelttsideacount', XMLDB_TYPE_INTEGER, '4', XMLDB_UNSIGNED, null, null);
+        // Add fields
+        foreach ($fields_t as $field_t) {
+            if (!$dbman->field_exists($table_t, $field_t)) {
+                $dbman->add_field($table_t, $field_t);
+            }
+        }
+        upgrade_mod_savepoint(true, 2022121700, 'solo');
+    }
 
     // Final return of upgrade result (true, all went good) to Moodle.
     return true;

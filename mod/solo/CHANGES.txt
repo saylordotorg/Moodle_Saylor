@@ -1,3 +1,7 @@
+- added ideacount and cefr level and relevance to grading attributes
+- cleaned up target words so it uses new lines AND commas and ignored blanks
+- Set default report view size to 50
+
 Version 1.0.23 (Build 2022100900)
 - added localposturl support for using moodle server as proxy for cloud poodll (only for very special cases)
 

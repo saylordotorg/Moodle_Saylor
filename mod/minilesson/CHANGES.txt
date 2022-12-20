@@ -1,3 +1,6 @@
+Version 1.0.47(Build 2022120200)
+- Fixed missing lang strings
+
 Version 1.0.46(Build 2022112700)
 - Added Dutch Belgian (and other) voices
 

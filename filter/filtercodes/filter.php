@@ -213,6 +213,24 @@ class filter_filtercodes extends moodle_text_filter {
     }
 
     /**
+     * Returns the URL of a blank Avatar as a square image.
+     *
+     * @param integer $size Width of desired image in pixels.
+     * @return MOODLE_URL URL to image of avatar image.
+     */
+    private function getblankavatarurl($size) {
+        global $PAGE, $CFG;
+        $img = 'u/' . ($size > 100 ? 'f3' : ($size > 35 ? 'f1' : 'f2'));
+        $renderer = $PAGE->get_renderer('core');
+        if ($CFG->branch >= 33) {
+            $url = $renderer->image_url($img);
+        } else {
+            $url = $renderer->pix_url($img); // Deprecated as of Moodle 3.3.
+        }
+        return new moodle_url($url);
+    }
+
+    /**
      * Retrieves the URL for the user's profile picture, if one is available.
      *
      * @param object $user The Moodle user object for which we want a photo.
@@ -777,52 +795,54 @@ class filter_filtercodes extends moodle_text_filter {
         // This tag: {menudev}.
         if (stripos($text, '{menudev}') !== false) {
             $menu = '';
-            $menu .= '-{getstring:tool_installaddon}installaddons{/getstring}|/admin/tool/installaddon' . PHP_EOL;
-            $menu .= '-###' . PHP_EOL;
-            $menu .= '-{getstring:admin}debugging{/getstring}|/admin/settings.php?section=debugging' . PHP_EOL;
-            $menu .= '-{getstring:admin}purgecachespage{/getstring}|/admin/purgecaches.php' . PHP_EOL;
-            $menu .= '-###' . PHP_EOL;
-            if (file_exists(dirname(__FILE__) . '/../../local/adminer/index.php')) {
-                $menu .= '-{getstring:local_adminer}pluginname{/getstring}|/local/adminer' . PHP_EOL;
+            if (is_siteadmin() && !is_role_switched($PAGE->course->id)) { // If a site administrator.
+                $menu .= '-{getstring:tool_installaddon}installaddons{/getstring}|/admin/tool/installaddon' . PHP_EOL;
+                $menu .= '-###' . PHP_EOL;
+                $menu .= '-{getstring:admin}debugging{/getstring}|/admin/settings.php?section=debugging' . PHP_EOL;
+                $menu .= '-{getstring:admin}purgecachespage{/getstring}|/admin/purgecaches.php' . PHP_EOL;
+                $menu .= '-###' . PHP_EOL;
+                if (file_exists(dirname(__FILE__) . '/../../local/adminer/index.php')) {
+                    $menu .= '-{getstring:local_adminer}pluginname{/getstring}|/local/adminer' . PHP_EOL;
+                }
+                if (file_exists(dirname(__FILE__) . '/../../local/codechecker/index.php')) {
+                    $menu .= '-{getstring:local_codechecker}pluginname{/getstring}|/local/codechecker' . PHP_EOL;
+                }
+                if (file_exists(dirname(__FILE__) . '/../../local/moodlecheck/index.php')) {
+                    $menu .= '-{getstring:local_moodlecheck}pluginname{/getstring}|/local/moodlecheck' . PHP_EOL;
+                }
+                if (file_exists(dirname(__FILE__) . '/../../admin/tool/pluginskel/index.php')) {
+                    $menu .= '-{getstring:tool_pluginskel}pluginname{/getstring}|/admin/tool/pluginskel' . PHP_EOL;
+                }
+                if (file_exists(dirname(__FILE__) . '/../../local/tinyfilemanager/index.php')) {
+                    $menu .= '-{getstring:local_tinyfilemanager}pluginname{/getstring}|/local/tinyfilemanager' . PHP_EOL;
+                }
+                $menu .= '-{getstring}phpinfo{/getstring}|/admin/phpinfo.php' . PHP_EOL;
+                $menu .= '-###' . PHP_EOL;
+                $menu .= '-{getstring:filter_filtercodes}pagebuilder{/getstring}|'
+                        . '{getstring:filter_filtercodes}pagebuilderlink{/getstring}"'
+                        . ' target="popup" onclick="window.open(\'{getstring:filter_filtercodes}pagebuilderlink{/getstring}\''
+                        . ',\'popup\',\'width=1340,height=700\'); return false;' . PHP_EOL;
+                $menu .= '-{getstring:filter_filtercodes}photoeditor{/getstring}|'
+                        . '{getstring:filter_filtercodes}photoeditorlink{/getstring}"'
+                        . ' target="popup" onclick="window.open(\'{getstring:filter_filtercodes}photoeditorlink{/getstring}\''
+                        . ',\'popup\',\'width=1340,height=700\'); return false;' . PHP_EOL;
+                $menu .= '-{getstring:filter_filtercodes}screenrec{/getstring}|'
+                        . '{getstring:filter_filtercodes}screenreclink{/getstring}"'
+                        . ' target="popup" onclick="window.open(\'{getstring:filter_filtercodes}screenreclink{/getstring}\''
+                        . ',\'popup\',\'width=1340,height=700\'); return false;' . PHP_EOL;
+                $menu .= '-###' . PHP_EOL;
+                $menu .= '-Dev docs|https://moodle.org/development|Moodle.org ({getstring}english{/getstring})' . PHP_EOL;
+                $menu .= '-Dev forum|https://moodle.org/mod/forum/view.php?id=55|Moodle.org ({getstring}english{/getstring})' .
+                        PHP_EOL;
+                $menu .= '-Tracker|https://tracker.moodle.org/|Moodle.org ({getstring}english{/getstring})' . PHP_EOL;
+                $menu .= '-AMOS|https://lang.moodle.org/|Moodle.org ({getstring}english{/getstring})' . PHP_EOL;
+                $menu .= '-WCAG 2.1|https://www.w3.org/WAI/WCAG21/quickref/|W3C ({getstring}english{/getstring})' . PHP_EOL;
+                $menu .= '-###' . PHP_EOL;
+                $menu .= '-DevTuts|https://www.youtube.com/watch?v=UY_pcs4HdDM|{getstring}english{/getstring}' . PHP_EOL;
+                $menu .= '-Moodle Development School|https://moodledev.moodle.school/|{getstring}english{/getstring}' . PHP_EOL;
+                $menu .= '-Moodle Dev Academy|https://moodle.academy/course/index.php?categoryid=4|{getstring}english{/getstring}' .
+                        PHP_EOL;
             }
-            if (file_exists(dirname(__FILE__) . '/../../local/codechecker/index.php')) {
-                $menu .= '-{getstring:local_codechecker}pluginname{/getstring}|/local/codechecker' . PHP_EOL;
-            }
-            if (file_exists(dirname(__FILE__) . '/../../local/moodlecheck/index.php')) {
-                $menu .= '-{getstring:local_moodlecheck}pluginname{/getstring}|/local/moodlecheck' . PHP_EOL;
-            }
-            if (file_exists(dirname(__FILE__) . '/../../admin/tool/pluginskel/index.php')) {
-                $menu .= '-{getstring:tool_pluginskel}pluginname{/getstring}|/admin/tool/pluginskel' . PHP_EOL;
-            }
-            if (file_exists(dirname(__FILE__) . '/../../local/tinyfilemanager/index.php')) {
-                $menu .= '-{getstring:local_tinyfilemanager}pluginname{/getstring}|/local/tinyfilemanager' . PHP_EOL;
-            }
-            $menu .= '-{getstring}phpinfo{/getstring}|/admin/phpinfo.php' . PHP_EOL;
-            $menu .= '-###' . PHP_EOL;
-            $menu .= '-{getstring:filter_filtercodes}pagebuilder{/getstring}|'
-                    . '{getstring:filter_filtercodes}pagebuilderlink{/getstring}"'
-                    . ' target="popup" onclick="window.open(\'{getstring:filter_filtercodes}pagebuilderlink{/getstring}\''
-                    . ',\'popup\',\'width=1340,height=700\'); return false;' . PHP_EOL;
-            $menu .= '-{getstring:filter_filtercodes}photoeditor{/getstring}|'
-                    . '{getstring:filter_filtercodes}photoeditorlink{/getstring}"'
-                    . ' target="popup" onclick="window.open(\'{getstring:filter_filtercodes}photoeditorlink{/getstring}\''
-                    . ',\'popup\',\'width=1340,height=700\'); return false;' . PHP_EOL;
-            $menu .= '-{getstring:filter_filtercodes}screenrec{/getstring}|'
-                    . '{getstring:filter_filtercodes}screenreclink{/getstring}"'
-                    . ' target="popup" onclick="window.open(\'{getstring:filter_filtercodes}screenreclink{/getstring}\''
-                    . ',\'popup\',\'width=1340,height=700\'); return false;' . PHP_EOL;
-            $menu .= '-###' . PHP_EOL;
-            $menu .= '-MoodleDev docs|https://moodle.org/development|Moodle.org ({getstring}english{/getstring})' . PHP_EOL;
-            $menu .= '-MoodleDev forum|https://moodle.org/mod/forum/view.php?id=55|Moodle.org ({getstring}english{/getstring})' .
-                    PHP_EOL;
-            $menu .= '-Tracker|https://tracker.moodle.org/|Moodle.org ({getstring}english{/getstring})' . PHP_EOL;
-            $menu .= '-AMOS|https://lang.moodle.org/|Moodle.org ({getstring}english{/getstring})' . PHP_EOL;
-            $menu .= '-WCAG 2.1|https://www.w3.org/WAI/WCAG21/quickref/|W3C ({getstring}english{/getstring})' . PHP_EOL;
-            $menu .= '-###' . PHP_EOL;
-            $menu .= '-DevTuts|https://www.youtube.com/watch?v=UY_pcs4HdDM|{getstring}english{/getstring}' . PHP_EOL;
-            $menu .= '-Moodle Development School|https://moodledev.moodle.school/|{getstring}english{/getstring}' . PHP_EOL;
-            $menu .= '-Moodle Dev Academy|https://moodle.academy/course/index.php?categoryid=4|{getstring}english{/getstring}' .
-                    PHP_EOL;
             $replace['/\{menudev\}/i'] = $menu;
         }
 
@@ -871,21 +891,36 @@ class filter_filtercodes extends moodle_text_filter {
                         'phone' => get_string('phone')
                 ];
                 if ($cardformat == 'verbose') {
+                    if (empty($CFG->enablegravatar)) {
+                        $blankavatarurl = $this->getblankavatarurl(150);
+                    }
                     foreach ($users as $user) {
                         $cards .= '<div class="clearfix mb-4">';
                         $name = '<h3 class="h4">' . get_string('fullnamedisplay', null, $user) . '</h3>';
                         $cards .= $this->userlink($clinktype, $user, $name);
-                        $cards .= $OUTPUT->user_picture($user, ['size' => '150', 'class' => 'img-fluid pull-left p-1 border mr-4',
-                                'link' => false, 'visibletoscreenreaders' => false]);
+                        if (empty($user->picture) && empty($CFG->enablegravatar)) {
+                            $cards .= '<img src="' . $blankavatarurl . '" class="img-fluid" width="150" height="150" alt="">';
+                        } else {
+                            $cards .= $OUTPUT->user_picture($user, ['size' => '150',
+                                    'class' => 'img-fluid pull-left p-1 border mr-4',
+                                    'link' => false, 'visibletoscreenreaders' => false]);
+                        }
                         $cards .= format_string($user->description);
                         $cards .= '</div><hr>';
                     }
                 } else {
+                    if (empty($CFG->enablegravatar)) {
+                        $blankavatarurl = $this->getblankavatarurl(250);
+                    }
                     $cards .= '<div class="row" id="fc_teamcards" style="width:99%;">';
                     foreach ($users as $user) {
                         $cards .= '<div class="col-sm-6 col-md-4 col-lg-3 col-xl-' . (empty($narrowpage) ? 4 : 3) . ' mt-3">';
-                        $cards .= $OUTPUT->user_picture($user, ['size' => '250', 'class' => 'img-fluid', 'link' => false,
-                                'visibletoscreenreaders' => false]);
+                        if (empty($user->picture) && empty($CFG->enablegravatar)) {
+                            $cards .= '<img src="' . $blankavatarurl . '" class="img-fluid" width="250" height="250" alt="">';
+                        } else {
+                            $cards .= $OUTPUT->user_picture($user, ['size' => '250', 'class' => 'img-fluid',
+                                    'link' => false, 'visibletoscreenreaders' => false]);
+                        }
                         $name = '<br><h3 class="h5 font-weight-bold d-inline">' . get_string('fullnamedisplay', null, $user) .
                                 '</h3>';
                         $cards .= $this->userlink($clinktype, $user, $name);
@@ -1904,65 +1939,6 @@ class filter_filtercodes extends moodle_text_filter {
             }
         }
 
-        // Tag: {chart <type> <value> <title>} - Easily display a chart in one of several styles.
-        if (stripos($text, '{chart ') !== false && $CFG->branch >= 32) {
-            global $OUTPUT;
-            preg_match_all('/\{chart\s(\w+)\s([0-9]+)\s(.*)\}/isuU', $text, $matches, PREG_SET_ORDER);
-            $matches = array_unique($matches, SORT_REGULAR);
-            foreach ($matches as $match) {
-                $type = $match[1]; // Chart type: radial, pie or progressbar.
-                $value = $match[2]; // Value between 0 and 100.
-                $title = $match[3]; // Text label.
-                $percent = get_string('percents', '', $value);
-                switch($type) { // Type of chart.
-                    case 'radial': // Tag: {chart radial 99 Label to be displayed} - Display a radial (circle) chart.
-                        $chart = new \core\chart_pie();
-                        $chart->set_doughnut(true); // Calling set_doughnut(true) we display the chart as a doughnut.
-                        if (!empty($title)) {
-                            $chart->set_title($title);
-                        }
-                        $series = new \core\chart_series('Percentage', [min($value, 100), 100 - min($value, 100)]);
-                        $chart->add_series($series);
-                        $chart->set_labels(['Completed', 'Remaining']);
-                        if ($CFG->branch >= 39) {
-                            $chart->set_legend_options(['display' => false]);  // Hide chart legend.
-                        }
-                        $html = $OUTPUT->render_chart($chart, false);
-                        break;
-                    case 'pie': // Tag: {chart pie 99 Label to be displayed} - Display a pie chart.
-                        $chart = new \core\chart_pie();
-                        $chart->set_doughnut(false); // Calling set_doughnut(true) we display the chart as a doughnut.
-                        if (!empty($title)) {
-                            $chart->set_title($title);
-                        }
-                        $series = new \core\chart_series('Percentage', [min($value, 100), 100 - min($value, 100)]);
-                        $chart->add_series($series);
-                        $chart->set_labels(['Completed', 'Remaining']);
-                        if ($CFG->branch >= 39) {
-                            $chart->set_legend_options(['display' => false]);  // Hide chart legend.
-                        }
-                        $html = $OUTPUT->render_chart($chart, false);
-                        break;
-                    case 'progressbar': // Tag: {chart progressbar 99 Label to be displayed} - Display a horizontal progres bar.
-                        $html = '
-                        <div class="progress mb-0">
-                            <div class="fc-progress progress-bar bar" role="progressbar" aria-valuenow="' . $value
-                                . '" style="width: ' . $value . '%" aria-valuemin="0" aria-valuemax="100">
-                            </div>
-                        </div>';
-                        if (!empty($title)) {
-                            $html .= '<div class="small">' . get_string('chartprogressbarlabel', 'filter_filtercodes',
-                                    ['label' => $title, 'value' => $percent]) . '</div>';
-                        }
-                        break;
-                    default:
-                        $html = '';
-                }
-                $replace['/\{chart ' . $type . ' ' . $value . ' ' . preg_quote($title) . '\}/isuU'] = $html;
-            }
-            unset($chart, $matches, $html, $value, $title);
-        }
-
         // These tags: {mycourses} and {mycoursesmenu} and {mycoursescards}.
         if (stripos($text, '{mycourses') !== false) {
             if (isloggedin() && !isguestuser()) {
@@ -2404,14 +2380,19 @@ class filter_filtercodes extends moodle_text_filter {
             $replace['/\{ipaddress\}/i'] = getremoteaddr();
         }
 
-        // Any {sesskey} or %7Bsesskey%7D tags.
         // Tag: {sesskey}.
-        if (stripos($text, '{sesskey}') !== false) {
-            $replace['/\{sesskey\}/i'] = sesskey();
-        }
-        // Alternative Tag: %7Bsesskey%7D (for encoded URLs).
-        if (stripos($text, '%7Bsesskey%7D') !== false) {
-            $replace['/%7Bsesskey%7D/i'] = sesskey();
+        if (get_config('filter_filtercodes', 'enable_sesskey')) {
+            global $PAGE;
+            if (@$PAGE->cm->modname != 'forum' && $PAGE->pagetype != 'admin-cron') {
+                if (stripos($text, '{sesskey}') !== false) {
+                    // Tag: {sesskey}.
+                    $replace['/\{sesskey\}/i'] = sesskey();
+                }
+                // Tag: %7Bsesskey%7D (for encoded URLs).
+                if (stripos($text, '%7Bsesskey%7D') !== false) {
+                    $replace['/%7Bsesskey%7D/i'] = sesskey();
+                }
+            }
         }
 
         // Tag: {sectionid}.
@@ -2462,6 +2443,28 @@ class filter_filtercodes extends moodle_text_filter {
             if ($newtext !== false) {
                 $text = $newtext;
                 $changed = true;
+            }
+        }
+
+        // Tag: {courseunenrolurl}.
+        if (stripos($text, '{courseunenrolurl}') !== false) {
+            require_once($CFG->libdir . '/enrollib.php');
+            $course = $PAGE->course;
+            $coursecontext = context_course::instance($course->id);
+            $replace['/\{courseunenrolurl\}/i'] = '';
+            if ($course->id != SITEID && isloggedin() && !isguestuser() && is_enrolled($coursecontext)) {
+                $plugins   = enrol_get_plugins(true);
+                $instances = enrol_get_instances($course->id, true);
+                foreach ($instances as $instance) {
+                    if (!isset($plugins[$instance->enrol])) {
+                        continue;
+                    }
+                    $plugin = $plugins[$instance->enrol];
+                    if ($unenrollink = $plugin->get_unenrolself_link($instance)) {
+                        $replace['/\{courseunenrolurl\}/i'] = $unenrollink;
+                        break;
+                    }
+                }
             }
         }
 
@@ -3330,10 +3333,75 @@ class filter_filtercodes extends moodle_text_filter {
         $newtext = null;
         if (count($replace) > 0) {
             $newtext = preg_replace(array_keys($replace), array_values($replace), $text);
+            $replace = [];
         }
         if (!is_null($newtext)) {
             $text = $newtext;
             $changed = true;
+        }
+
+        // Tag: {chart <type> <value> <title>} - Easily display a chart in one of several styles.
+        if (stripos($text, '{chart ') !== false && $CFG->branch >= 32) {
+            global $OUTPUT;
+            preg_match_all('/\{chart\s(\w+)\s([0-9]+)\s(.*)\}/isuU', $text, $matches, PREG_SET_ORDER);
+            $matches = array_unique($matches, SORT_REGULAR);
+            foreach ($matches as $match) {
+                $type = $match[1]; // Chart type: radial, pie or progressbar.
+                $value = $match[2]; // Value between 0 and 100.
+                $title = $match[3]; // Text label.
+                $percent = get_string('percents', '', $value);
+                switch($type) { // Type of chart.
+                    case 'radial': // Tag: {chart radial 99 Label to be displayed} - Display a radial (circle) chart.
+                        $chart = new \core\chart_pie();
+                        $chart->set_doughnut(true); // Calling set_doughnut(true) we display the chart as a doughnut.
+                        if (!empty($title)) {
+                            $chart->set_title($title);
+                        }
+                        $series = new \core\chart_series('Percentage', [min($value, 100), 100 - min($value, 100)]);
+                        $chart->add_series($series);
+                        $chart->set_labels(['Completed', 'Remaining']);
+                        if ($CFG->branch >= 39) {
+                            $chart->set_legend_options(['display' => false]);  // Hide chart legend.
+                        }
+                        $html = $OUTPUT->render_chart($chart, false);
+                        break;
+                    case 'pie': // Tag: {chart pie 99 Label to be displayed} - Display a pie chart.
+                        $chart = new \core\chart_pie();
+                        $chart->set_doughnut(false); // Calling set_doughnut(true) we display the chart as a doughnut.
+                        if (!empty($title)) {
+                            $chart->set_title($title);
+                        }
+                        $series = new \core\chart_series('Percentage', [min($value, 100), 100 - min($value, 100)]);
+                        $chart->add_series($series);
+                        $chart->set_labels(['Completed', 'Remaining']);
+                        if ($CFG->branch >= 39) {
+                            $chart->set_legend_options(['display' => false]);  // Hide chart legend.
+                        }
+                        $html = $OUTPUT->render_chart($chart, false);
+                        break;
+                    case 'progressbar': // Tag: {chart progressbar 99 Label to be displayed} - Display a horizontal progres bar.
+                        $html = '
+                        <div class="progress mb-0">
+                            <div class="fc-progress progress-bar bar" role="progressbar" aria-valuenow="' . $value
+                                . '" style="width: ' . $value . '%" aria-valuemin="0" aria-valuemax="100">
+                            </div>
+                        </div>';
+                        if (!empty($title)) {
+                            $html .= '<div class="small">' . get_string('chartprogressbarlabel', 'filter_filtercodes',
+                                    ['label' => $title, 'value' => $percent]) . '</div>';
+                        }
+                        break;
+                    default:
+                        $html = '';
+                }
+                $replace['/\{chart ' . $type . ' ' . $value . ' ' . preg_quote($title) . '\}/isuU'] = $html;
+                $newtext = preg_replace(array_keys($replace), array_values($replace), $text);
+                if (!is_null($newtext)) {
+                    $text = $newtext;
+                    $changed = true;
+                }
+            }
+            unset($chart, $matches, $html, $value, $title);
         }
 
         // Tag: {urlencode}content{/urlencode}.

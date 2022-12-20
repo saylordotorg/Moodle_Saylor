@@ -480,8 +480,8 @@ $string['prompttype_help'] ='Use plain text and separate selectors for adding me
 
 //reattempt
 $string['reattempt'] = 'Try Again';
-//$string['reattempttitle'] = 'Really Try Again?';
-//$string['reattemptbody'] = 'If you continue your previous attempt will be replaced with this one. OK?';
+$string['reattempttitle'] = 'Really Try Again?';
+$string['reattemptbody'] = 'If you continue your previous attempt will be replaced with this one. OK?';
 
 //media toggles
 $string['addmedia'] = 'Add Media';

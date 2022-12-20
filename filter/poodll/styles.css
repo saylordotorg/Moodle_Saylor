@@ -4825,4 +4825,14 @@ audio.poodll_preview_bmr {
 .progress-circle.p99 .value-bar { transform: rotate(356deg); }
 .progress-circle.p100 .value-bar { transform: rotate(360deg); }
 /* Poodll MINI Player END */
+.filter_poodll_skeleton_box {
+    background-color: #DDDBDD;
+    color: grey;
+    -webkit-mask: linear-gradient(-60deg,#000 30%,#0005,#000 70%) right/300% 100%;
+    background-repeat: no-repeat;
+    animation: filterpoodllshimmer 2.5s infinite;
 
+}
+@keyframes filterpoodllshimmer {
+    100% {-webkit-mask-position:left}
+}

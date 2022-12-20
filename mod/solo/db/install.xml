@@ -56,6 +56,8 @@
         <FIELD NAME="viewend" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="enablesuggestions" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="true" DEFAULT="1" SEQUENCE="false" COMMENT="enable suggestions"/>
         <FIELD NAME="enabletts" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="enable TTS"/>
+        <FIELD NAME="modelttsembedding" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Tips for the solo activity"/>
+        <FIELD NAME="modelttsideacount" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="model tts ideacount"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
@@ -122,6 +124,9 @@
         <FIELD NAME="autospellscore" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="autospellerrors" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="autospell" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="cefrlevel" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="The CEFR level"/>
+        <FIELD NAME="ideacount" TYPE="int" LENGTH="4" NOTNULL="false" SEQUENCE="false" COMMENT="The number of ideas"/>
+        <FIELD NAME="relevance" TYPE="int" LENGTH="4" NOTNULL="false" SEQUENCE="false" COMMENT="relevance to model %"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="createdby" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="modifiedby" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>

@@ -206,13 +206,15 @@ class attempt_renderer extends \plugin_renderer_base {
         if($tdata['spellingerrors']){$tdata['hasspellingerrors']=true;}
         if($tdata['grammarerrors']){$tdata['hasgrammarerrors']=true;}
         if($selftranscribe){$tdata['selftranscribe']=true; }
+
+        //if you have no transcript then it will error on render, so we use a space by default
+        //it should never really be blank however, and theuser arrived in a strange way probbaly. This just avoids an ugly error
+        $simpleselftranscript=' ';
+        if(!empty($attempt->selftranscript)){
+            $simpleselftranscript=$attempt->selftranscript;
+        }
+
         if($aidata) {
-            //if you have no transcript then it will error on render, so we use a space by default
-            //it should never really be blank however, and theuser arrived in a strange way probbaly. This just avoids an ugly error
-            $simpleselftranscript=' ';
-            if(!empty($attempt->selftranscript)){
-                $simpleselftranscript=$attempt->selftranscript;
-            }
 
             $markedpassage = \mod_solo\aitranscriptutils::render_passage($simpleselftranscript);
             $js_opts_html = \mod_solo\aitranscriptutils::prepare_passage_amd($attempt, $aidata);

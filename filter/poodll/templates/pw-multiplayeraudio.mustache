@@ -1,15 +1,13 @@
 
 <!-- HTML from template body goes goes here  -->
-<div id='{{AUTOID}}_container' class='poodll_multiplayer'>
+<div id='{{AUTOID}}_container_pmp' class='poodll_multiplayer'>
 
   <div class="button-wrapper">
     <button type='button' id='{{AUTOID}}' class='poodll_multiplayer_button'>
-		<audio id='{{AUTOID}}_player' class="onceplayerjs nomediaplugin" src="{{VIDEOURL}}"></audio>
 		<i class="fa fa-play fa-2x" aria-hidden="true"></i></button>
   </div>
   <div class="state-wrapper">
     <div id='{{AUTOID}}_time' class='poodll_onceplayer_time'></div>
-    <!--<div id='{{AUTOID}}_state' class='poodll_onceplayer_state'></div>-->
     <div id='{{AUTOID}}_playtime' class="poodll_multiplayer_playtime"></div>
   </div>
   <div class="volume-control">
@@ -23,42 +21,53 @@
 
 <!-- Custom JS from template  goes goes here  -->
 {{#js}}
-    //<script></script>
+    //<script>
  require(['jquery','filter_poodll/mediaparser'], function($,parser) {
-      
+
+//The template seems to run this code twice, possibly because of the end tag. So we check for data attr as a flag to prevent 2x running
+if($('#{{AUTOID}}').data('playtime')!==undefined){return;}
+//set playtime attribute
 $('#{{AUTOID}}').data('playtime', {{canplaycount}});
       
+//set our player
+var playertemplate = "<audio id='{{AUTOID}}_player' class='onceplayerjs nomediaplugin' src='@mediaurl@' preload='auto'></audio>";
+var details = parser.parse('{{AUTOID}}_original', 'audio');
+$('#' + "{{AUTOID}}").prepend(playertemplate.replace('@mediaurl@',details.mediaurl));
+
 //get our player
-      
 var aplayer = $('#' + "{{AUTOID}}").children().first();
 var fa = $('#' + "{{AUTOID}}" + ' .fa');
 var thestate =$('#' + "{{AUTOID}}" + '_state'); 
 var thetime = $('#' + "{{AUTOID}}" + '_time');
 var playtimer = $('#' + "{{AUTOID}}");
 var lastseconds = 0;
-var position_update_interval = 2;
+var canplaythrough=aplayer[0].readyState===4; //can play through
+var position_update_interval = 1;//each X seconds do the cookie update
 var is_strict_quiz = "{{quiz_strict_mode}}"=="true" && "{{URLPARAM:attempt}}" !="";
 var is_remember_pos =  is_strict_quiz &&  "{{quiz_remember_play_position}}"=="true";
 
-var details = parser.parse('{{AUTOID}}_original', 'audio');
-aplayer.attr('src',details.mediaurl); // mediaurl, subtitlesurl, sources
 
  $(fa).removeClass('fa-minus');
 
  //set status
  thestate.text('- ready -');
 
-
  // setting base volume for audio player
  aplayer[0].volume = 0.2;
 
  //cookies if in strict mode
- var cookiename_playcount = details.mediaurl + '_pc_' + "{{URLPARAM:attempt}}"+ '_' + "{{URLPARAM:cmid}}";
- var cookiename_position = details.mediaurl + '_pos_' + "{{URLPARAM:attempt}}"+ '_' + "{{URLPARAM:cmid}}";
+//trim the cache killer or the cookiename would be different each pay load if cachekiller was in the url
+ var regexp = /&?cachekiller\=[^&]+/;
+ var useurl = details.mediaurl.replace(regexp,'');
+ useurl = useurl.replace('?','');
+ var cookiename_playcount = useurl + '_pc_' + "{{URLPARAM:attempt}}"+ '_' + "{{URLPARAM:cmid}}";
+ var cookiename_position = useurl + '_pos_' + "{{URLPARAM:attempt}}"+ '_' + "{{URLPARAM:cmid}}";
 
 /*
  console.log(cookiename_playcount);
  console.log(getCookie(cookiename_playcount));
+ console.log(cookiename_position);
+ console.log(getCookie(cookiename_position));
  console.log('is_remember_pos',is_remember_pos);
 */
 
@@ -90,6 +99,14 @@ $('#' + "{{AUTOID}}" + '_vol-down').click(function(){
 	aplayer[0].volume-=0.1;
 });
 
+//can play through event
+ aplayer[0].addEventListener('canplaythrough',
+         function(){
+             canplaythrough=true;
+         }
+ );
+
+ //ended event
  aplayer[0].addEventListener('ended', function(){
      $('#' + "{{AUTOID}}" + '_playtime').empty();
      var currentplaycount = playtimer.data('playtime');
@@ -119,7 +136,7 @@ $('#' + "{{AUTOID}}" + '_vol-down').click(function(){
  });//end of ended listener
 
 //player clicked event
-	$('#' + "{{AUTOID}}").click(function(){
+$('#' + "{{AUTOID}}").click(function(){
         var playtimer = $('#' + "{{AUTOID}}");
         var currentplaycount = playtimer.data('playtime');
         if(currentplaycount==0){return;}
@@ -135,28 +152,49 @@ $('#' + "{{AUTOID}}" + '_vol-down').click(function(){
  function setCookie(key, value, expiry) {
    var expires = new Date();
    expires.setTime(expires.getTime() + (expiry * 24 * 60 * 60 * 1000));
-   document.cookie = key + '=' + value + ';expires=' + expires.toUTCString();
+   document.cookie = key + '=' + value + ';expires=' + expires.toUTCString() + '; SameSite=Lax';
  }
 
  function getCookie(key) {
-   var keyValue = document.cookie.match('(^|;) ?' + key + '=([^;]*)(;|$)');
-   return keyValue ? keyValue[2] : null;
+   var keyValue = document.cookie.match(`(?:(?:^|.*; *)${key} *= *([^;]*).*$)|^.*$`)[1]
+     if (keyValue){
+         return decodeURIComponent(keyValue);
+     } else{
+         return null;
+     }
  }
 
 
 function play_audio(){
+     //if playing just continue
+    if(!aplayer[0].paused){return;}
+
+    //change visible state to playing
+    thestate.text('- playing -');
+    $(fa).removeClass('fa-play');
+    $(fa).addClass('fa-circle-o-notch');
+    $(fa).addClass('fa-spin');
+
+    //if we are remembering position, set the new position
     if(is_remember_pos) {
         var lastpos = get_last_pos();
         if (lastpos > 0) {
+            //set the current time
             aplayer[0].currentTime = lastpos;
-        }
+
+            //if we can not playthrough yet ..wait .. till we can canplaythrough
+            if(!canplaythrough) {
+                aplayer[0].addEventListener('canplaythrough',
+                        function(){
+                            aplayer[0].play();
+                        }
+                );
+                aplayer[0].load();
+                return;
+            }//end of if can play through
+        } //end of if last pos
     }
 	aplayer[0].play();
-
-	thestate.text('- playing -');
-	$(fa).removeClass('fa-play');
-	$(fa).addClass('fa-circle-o-notch');
-	$(fa).addClass('fa-spin');
 }
 
  function get_last_pos(){
@@ -197,12 +235,23 @@ function poodll_mp_sec2time(seconds){
 
 function poodll_mp_fetchtime(theplayer){
      var a_currenttime= isNaN(theplayer[0].currentTime) ? 0 : theplayer[0].currentTime;
+
+    //tweak the display if this was a reload
+     if(a_currenttime===0 && is_remember_pos) {
+        var lastpos = get_last_pos();
+        if (lastpos > 0) {
+            a_currenttime = lastpos;
+        }
+     }
+
+
      var a_duration= isNaN(theplayer[0].duration) ? 0 : theplayer[0].duration;
      var currenttime = poodll_mp_sec2time(Math.floor(a_currenttime));
      var totaltime = poodll_mp_sec2time(Math.floor(a_duration)); 
      var displaytime = currenttime + ' / ' +  totaltime;
     return displaytime;
 }
+
 //The timer display
 aplayer.on('timeupdate',function(e){
     if(is_remember_pos) {

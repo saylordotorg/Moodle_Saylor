@@ -215,7 +215,7 @@ function print_session_list($courseid, $facetoface, $location) {
     // Upcoming sessions.
     echo $OUTPUT->heading(get_string('upcomingsessions', 'facetoface'));
 
-    if ($sessions && $bulksignup) {
+    if (!empty($upcomingarray) && $bulksignup) {
         $firstsession = $sessions[array_keys($sessions)[0]];
         $signupforstreamlink = html_writer::link(
             'signup.php?s=' . $firstsession->id . '&backtoallsessions=' . $session->facetoface,

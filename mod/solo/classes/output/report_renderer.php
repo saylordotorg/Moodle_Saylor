@@ -131,7 +131,7 @@ class report_renderer extends \plugin_renderer_base
             foreach($fields as $field) {
                 if($field=='file'){continue;}
                 if(empty($row->{$field})){continue;}
-                // every forbidden character is replace by an underscore
+                // every forbidden character is replaced by an underscore
                 $safefield = $this->make_name_safe($row->{$field});
                 if(!empty($name)){$name .= '_';}
                 $name .= $safefield;
@@ -262,7 +262,7 @@ class report_renderer extends \plugin_renderer_base
         if(constants::M_USE_DATATABLES) {
             $tableprops = [];
             $tableprops['paging']=true;
-            $tableprops['pageLength']=10;
+            $tableprops['pageLength']=50;
 /*
             $columns=[];
             $columns[0]=array('orderable'=>false);

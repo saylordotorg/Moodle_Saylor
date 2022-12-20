@@ -81,6 +81,17 @@ const STEP_MODEL= 4;
 //later we need to make this variable
 const STEP_FINAL= 4;
 
+//constants for relevance
+const RELEVANCE_NONE = 0;
+const RELEVANCE_BROAD = 50;
+const RELEVANCE_QUITE = 70;
+const RELEVANCE_VERY = 80;
+const RELEVANCE_EXTREME = 90;
+
+//constants for suggest grade
+const SUGGEST_GRADE_NONE = 0;
+const SUGGEST_GRADE_USE = 1;
+
 const CLASS_AUDIOREC_IFRAME ='solo_audiorec_iframe';
 const CLASS_VIDEOREC_IFRAME ='solo_videorec_iframe';
 

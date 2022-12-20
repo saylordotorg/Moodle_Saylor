@@ -794,3 +794,5 @@ $string['eventupdatemanageremailfailed'] = 'Update manager email (FAILED)';
 $string['eventupdatesession'] = 'Session updated';
 $string['eventupdatesessionfailed'] = 'Session update (FAILED)';
 $string['waitliststatus'] = 'You have a place on the waitlist of the following session';
+$string['addtoallsessions'] = 'Add users to all (upcoming) sessions';
+$string['addtoallsessions_help'] = 'Use this option if you want to add users to all upcoming Face-to-Face sessions. When this uption is toggled, the selected users will be added to this session and all other future sessions in the activity.';

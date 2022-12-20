@@ -265,10 +265,14 @@ class utils{
         return $stats;
     }
 
+    public static function is_english($language){
+        return strpos($language,'en')===0;
+    }
+
     public static function fetch_word_stats($text,$language, $stats) {
 
         //prepare data
-        $is_english=strpos($language,'en')===0;
+        $is_english=self::is_english($language);
         $items = \core_text::strtolower($text);
         $items = self::mb_count_words($items,$language,1);
         $items = array_unique($items);
@@ -384,7 +388,11 @@ class utils{
     public static function fetch_targetwords($attempt){
         $targetwords = explode(PHP_EOL,$attempt->topictargetwords);
         $mywords = explode(PHP_EOL,$attempt->mywords);
-        $alltargetwords = array_unique(array_merge($targetwords, $mywords));
+        //Do new lines and commas
+        $allwords = array_merge($targetwords, $mywords);
+        //remove any duplicates or blanks
+        $alltargetwords = array_filter(array_unique($allwords));
+
         return $alltargetwords;
     }
 
@@ -441,6 +449,7 @@ class utils{
 
         //update statistics and grammar correction if we need to
         self::process_all_stats($moduleinstance, $attempt, $contextid);
+
         //fetch grammar correction or use existing one
         $attempt->grammarcorrection = self::process_grammar_correction($moduleinstance,$attempt);
 
@@ -463,6 +472,9 @@ class utils{
             }
             $stats = utils::calculate_stats($attempt->selftranscript, $attempt, $moduleinstance->ttslanguage);
             if ($stats) {
+                $stats->ideacount = self::process_idea_count($moduleinstance,$attempt,$stats);
+                $stats->cefrlevel = self::process_cefr_level($moduleinstance,$attempt,$stats);
+                $stats->relevance = self::process_relevance($moduleinstance,$attempt,$stats);
                 $stats = utils::fetch_sentence_stats($attempt->selftranscript,$stats, $moduleinstance->ttslanguage);
                 $stats = utils::fetch_word_stats($attempt->selftranscript,$moduleinstance->ttslanguage,$stats);
                 $stats = utils::calc_grammarspell_stats($attempt->selftranscript,$moduleinstance->region,
@@ -499,6 +511,67 @@ class utils{
             }
         }
         return $attempt->grammarcorrection;
+    }
+
+    public static function process_relevance($moduleinstance,$attempt,$stats){
+        global $DB;
+
+        //if there is a cefrlevel and its not null, then return that
+        if(isset($stats->relevance)&&$stats->relevance!=null){
+            return $stats->relevance;
+        }
+        $relevance=false;//default is blank
+        if(!empty($attempt->selftranscript)){
+            $siteconfig = get_config(constants::M_COMPONENT);
+            $token = utils::fetch_token($siteconfig->apiuser, $siteconfig->apisecret);
+            $relevance = utils::fetch_relevance($token, $moduleinstance, $attempt->selftranscript);
+        }
+        if ($relevance!==false) {
+            return $relevance;
+        }else{
+            return 0;
+        }
+    }
+
+    public static function process_cefr_level($moduleinstance,$attempt,$stats){
+        global $DB;
+
+        //if there is a cefrlevel and its not null, then return that
+        if(isset($stats->cefrlevel)&&$stats->cefrlevel!=null){
+            return $stats->cefrlevel;
+        }
+        $cefrlevel=false;//default is blank
+        if(!empty($attempt->selftranscript)){
+            $siteconfig = get_config(constants::M_COMPONENT);
+            $token = utils::fetch_token($siteconfig->apiuser, $siteconfig->apisecret);
+            $cefrlevel = utils::fetch_cefr_level($token, $moduleinstance->region,$moduleinstance->ttslanguage, $attempt->selftranscript);
+        }
+        if ($cefrlevel!==false) {
+            return $cefrlevel;
+        }else{
+            return "";
+        }
+    }
+
+    public static function process_idea_count($moduleinstance,$attempt,$stats){
+        global $DB;
+
+        //if there is a cefrlevel and its not null, then return that
+        if(isset($stats->ideacount)&&$stats->ideacount!=null){
+            return $stats->ideacount;
+        }
+        $ideacount=false;
+        if(!empty($attempt->selftranscript)){
+            $siteconfig = get_config(constants::M_COMPONENT);
+            $token = utils::fetch_token($siteconfig->apiuser, $siteconfig->apisecret);
+            $ideacount = utils::fetch_idea_count($token, $moduleinstance, $attempt->selftranscript);
+        }
+        if ($ideacount!==false) {
+            return $ideacount;
+        }else{
+            return 0;
+        }
+
     }
 
     public static function fetch_grammar_correction_diff($selftranscript,$correction){
@@ -578,11 +651,6 @@ class utils{
 
     }
 
-
-    public static function is_english($moduleinstance){
-        return strpos($moduleinstance->ttslanguage,'en')===0;
-
-    }
 
     //we leave it up to the grading logic how/if it adds the ai grades to gradebook
     public static function calc_grammarspell_stats($selftranscript, $region, $language, $stats){
@@ -687,8 +755,13 @@ class utils{
         }
         if(!$stats){
             $stats = self::calculate_stats($attempt->selftranscript, $attempt,$moduleinstance->ttslanguage);
+
             //if that worked, and why wouldn't it, lets save them too.
             if ($stats) {
+                //get the AI stats
+                $stats->ideacount = self::process_idea_count($moduleinstance,$attempt,$stats);
+                $stats->cefrlevel = self::process_cefr_level($moduleinstance,$attempt,$stats);
+                $stats->relevance = self::process_relevance($moduleinstance,$attempt,$stats);
                 $stats = utils::fetch_sentence_stats($attempt->selftranscript,$stats,$moduleinstance->ttslanguage);
                 $stats = utils::fetch_word_stats($attempt->selftranscript,$moduleinstance->ttslanguage,$stats);
                 $stats = self::calc_grammarspell_stats($attempt->selftranscript,
@@ -1321,6 +1394,23 @@ class utils{
         return $options;
     }
 
+    public static function get_relevancegrade_options(){
+        return array(
+            constants::RELEVANCE_NONE => get_string("relevance_none",constants::M_COMPONENT),
+            constants::RELEVANCE_BROAD => get_string("relevance_broad",constants::M_COMPONENT),
+            constants::RELEVANCE_QUITE => get_string("relevance_quite",constants::M_COMPONENT),
+            constants::RELEVANCE_VERY => get_string("relevance_very",constants::M_COMPONENT),
+            constants::RELEVANCE_EXTREME => get_string("relevance_extreme",constants::M_COMPONENT)
+        );
+    }
+
+    public static function get_suggestionsgrade_options(){
+        return array(
+            constants::SUGGEST_GRADE_NONE => get_string("suggestionsgrade_none",constants::M_COMPONENT),
+            constants::SUGGEST_GRADE_USE => get_string("suggestionsgrade_use",constants::M_COMPONENT)
+        );
+    }
+
     public static function get_word_count_options(){
         return array(
                 "totalunique" => get_string("totalunique",constants::M_COMPONENT),
@@ -1857,7 +1947,7 @@ class utils{
 
     }
 
-    //fetch the MP3 URL of the text we want read aloud
+    //fetch the grammar correction suggestions
     public static function fetch_grammar_correction($token,$region,$ttslanguage,$passage) {
         global $USER;
 
@@ -1901,6 +1991,197 @@ class utils{
             }
 
             return $correction;
+        } else {
+            return false;
+        }
+    }
+
+    //fetch the relevance
+    public static function fetch_relevance($token, $moduleinstance,$passage) {
+        global $USER;
+
+        //default to 100% relevant if no TTS model or if it's not English
+        if(!self::is_english($moduleinstance->ttslanguage) || empty($moduleinstance->modeltts)){
+            return 1;
+        }
+
+        //The REST API we are calling
+        $functionname = 'local_cpapi_call_ai';
+
+        $params = array();
+        $params['wstoken'] = $token;
+        $params['wsfunction'] = $functionname;
+        $params['moodlewsrestformat'] = 'json';
+        $params['action'] = 'get_semantic_sim';
+        $params['appid'] = 'mod_solo';
+        $params['prompt'] = $passage;//urlencode($passage);
+        $params['subject'] = !empty($moduleinstance->modelttsembedding) ? $moduleinstance->modelttsembedding : $moduleinstance->modeltts;
+        $params['language'] = $moduleinstance->ttslanguage;
+        $params['region'] = $moduleinstance->region;
+        $params['owner'] = hash('md5',$USER->username);
+
+        //log.debug(params);
+
+        $serverurl = self::CLOUDPOODLL . '/webservice/rest/server.php';
+        $response = self::curl_fetch($serverurl, $params,'post');
+        if (!self::is_json($response)) {
+            return false;
+        }
+        $payloadobject = json_decode($response);
+
+        //returnCode > 0  indicates an error
+        if (!isset($payloadobject->returnCode) || $payloadobject->returnCode > 0) {
+            return false;
+            //if all good, then return the value
+        } else if ($payloadobject->returnCode === 0) {
+            $relevance = $payloadobject->returnMessage;
+            if(is_numeric($relevance)){
+                $relevance=(int)round($relevance * 100,0);
+            }else{
+                $relevance = false;
+            }
+            return $relevance;
+        } else {
+            return false;
+        }
+    }
+
+    //fetch the CEFR Level
+    public static function fetch_cefr_level($token,$region,$ttslanguage,$passage) {
+        global $USER;
+
+        //The REST API we are calling
+        $functionname = 'local_cpapi_call_ai';
+
+        $params = array();
+        $params['wstoken'] = $token;
+        $params['wsfunction'] = $functionname;
+        $params['moodlewsrestformat'] = 'json';
+        $params['action'] = 'predict_cefr';
+        $params['appid'] = 'mod_solo';
+        $params['prompt'] = $passage;//urlencode($passage);
+        $params['language'] = $ttslanguage;
+        $params['subject'] = 'none';
+        $params['region'] = $region;
+        $params['owner'] = hash('md5',$USER->username);
+
+        //log.debug(params);
+
+        $serverurl = self::CLOUDPOODLL . '/webservice/rest/server.php';
+        $response = self::curl_fetch($serverurl, $params);
+        if (!self::is_json($response)) {
+            return false;
+        }
+        $payloadobject = json_decode($response);
+
+        //returnCode > 0  indicates an error
+        if (!isset($payloadobject->returnCode) || $payloadobject->returnCode > 0) {
+            return false;
+            //if all good, then return the value
+        } else if ($payloadobject->returnCode === 0) {
+            $cefr = $payloadobject->returnMessage;
+            //make pretty sure its a CEFR level
+            if(\core_text::strlen($cefr) !== 2){
+                $cefr=false;
+            }
+
+            return $cefr;
+        } else {
+            return false;
+        }
+    }
+
+    //fetch embedding
+    public static function fetch_embedding($token,$moduleinstance,$passage) {
+        global $USER;
+
+        //The REST API we are calling
+        $functionname = 'local_cpapi_call_ai';
+
+        $params = array();
+        $params['wstoken'] = $token;
+        $params['wsfunction'] = $functionname;
+        $params['moodlewsrestformat'] = 'json';
+        $params['action'] = 'get_embedding';
+        $params['appid'] = 'mod_solo';
+        $params['prompt'] = $passage;//urlencode($passage);
+        $params['language'] = $moduleinstance->ttslanguage;
+        $params['subject'] = 'none';
+        $params['region'] = $moduleinstance->region;
+        $params['owner'] = hash('md5',$USER->username);
+
+        //log.debug(params);
+
+        $serverurl = self::CLOUDPOODLL . '/webservice/rest/server.php';
+        $response = self::curl_fetch($serverurl, $params);
+        if (!self::is_json($response)) {
+            return false;
+        }
+        $payloadobject = json_decode($response);
+
+        //returnCode > 0  indicates an error
+        if (!isset($payloadobject->returnCode) || $payloadobject->returnCode > 0) {
+            return false;
+            //if all good, then process  it
+        } else if ($payloadobject->returnCode === 0) {
+            $return_data = $payloadobject->returnMessage;
+            //clean up the correction a little
+            if(!self::is_json($return_data)){
+                $embedding=false;
+            }else{
+                $data_object = json_decode($return_data);
+                if(is_array($data_object)&&$data_object[0]->object=='embedding') {
+                    $embedding = json_encode($data_object[0]->embedding);
+                }else{
+                    $embedding=false;
+                }
+            }
+            return $embedding;
+        } else {
+            return false;
+        }
+    }
+
+    //fetch the Idea Count
+    public static function fetch_idea_count($token,$moduleinstance,$passage) {
+        global $USER;
+
+        //The REST API we are calling
+        $functionname = 'local_cpapi_call_ai';
+
+        $params = array();
+        $params['wstoken'] = $token;
+        $params['wsfunction'] = $functionname;
+        $params['moodlewsrestformat'] = 'json';
+        $params['action'] = 'count_unique_ideas';
+        $params['appid'] = 'mod_solo';
+        $params['prompt'] = $passage;//urlencode($passage);
+        $params['language'] = $moduleinstance->ttslanguage;
+        $params['subject'] = 'none';
+        $params['region'] = $moduleinstance->region;
+        $params['owner'] = hash('md5',$USER->username);
+
+        //log.debug(params);
+
+        $serverurl = self::CLOUDPOODLL . '/webservice/rest/server.php';
+        $response = self::curl_fetch($serverurl, $params);
+        if (!self::is_json($response)) {
+            return false;
+        }
+        $payloadobject = json_decode($response);
+
+        //returnCode > 0  indicates an error
+        if (!isset($payloadobject->returnCode) || $payloadobject->returnCode > 0) {
+            return false;
+            //if all good, then lets do the embed
+        } else if ($payloadobject->returnCode === 0) {
+            $ideacount = $payloadobject->returnMessage;
+            //clean up the correction a little
+            if(!is_number($ideacount)){
+                $ideacount=false;
+            }
+
+            return $ideacount;
         } else {
             return false;
         }
@@ -1969,6 +2250,23 @@ class utils{
         }else{
             return false;
         }
+    }
+
+    public static function process_modeltts_stats($moduleinstance){
+        if(empty($moduleinstance->modeltts) || !self::is_english($moduleinstance->ttslanguage)) {
+            return $moduleinstance;
+        }
+        $siteconfig = get_config(constants::M_COMPONENT);
+        $token = utils::fetch_token($siteconfig->apiuser, $siteconfig->apisecret);
+        $embedding = self::fetch_embedding($token,$moduleinstance,$moduleinstance->modeltts);
+        $ideacount = self::fetch_idea_count($token,$moduleinstance,$moduleinstance->modeltts);
+        if($embedding){
+            $moduleinstance->modelttsembedding = $embedding;
+        }
+        if($ideacount){
+            $moduleinstance->modelttsideacount = $ideacount;
+        }
+        return $moduleinstance;
     }
 
     public static function sequence_to_steps($moduleinstance){
@@ -2066,6 +2364,13 @@ class utils{
         $mform->setType('speakingtopic', PARAM_TEXT);
         $mform->addHelpButton('speakingtopic', 'speakingtopic', constants::M_MODNAME);
         //$mform->addRule('speakingtopic', get_string('required'), 'required', null, 'client');
+
+        //add tips field
+        $edoptions = solo_editor_no_files_options($context);
+        $opts = array('rows'=>'2', 'columns'=>'80');
+        $mform->addElement('editor','tips_editor',get_string('tips', constants::M_COMPONENT),$opts,$edoptions);
+        $mform->setDefault('tips_editor',array('text'=>$config->speakingtips, 'format'=>FORMAT_HTML));
+        $mform->setType('tips_editor',PARAM_RAW);
 
         //Sequence of activities
         $options = self::fetch_options_sequences();
@@ -2217,7 +2522,7 @@ class utils{
         $points_per = get_string("ag_pointsper",constants::M_COMPONENT);
         $over_target_words = get_string("ag_overgradewordgoal",constants::M_COMPONENT);
 
-        $aggroup[] =& $mform->createElement('static', 'stext0', '','( ');
+        $aggroup[] =& $mform->createElement('static', 'stext0', '',get_string('gradeequals', constants::M_COMPONENT). '( ');
         $aggroup[] =& $mform->createElement('select', 'gradewordcount', '', $wordcountoptions);
         $aggroup[] =& $mform->createElement('static', 'statictext00', '',$over_target_words );
         $aggroup[] =& $mform->createElement('select', 'gradebasescore', '', $startgradeoptions);
@@ -2232,6 +2537,18 @@ class utils{
                 '', false);
         $mform->addHelpButton('aggroup', 'aggroup', constants::M_MODNAME);
 
+        //relevance
+        $relevanceoptions = utils::get_relevancegrade_options();
+        $mform->addElement('select', 'relevancegrade',get_string('relevancegrade', constants::M_COMPONENT), $relevanceoptions);
+        $mform->addHelpButton('relevancegrade', 'relevancegrade', constants::M_MODNAME);
+        $mform->addElement('static', 'stext32','', get_string('relevancegrade_details', constants::M_COMPONENT));
+
+        //suggestions
+        $suggestionsoptions = utils::get_suggestionsgrade_options();
+        $mform->addElement('select', 'suggestionsgrade',get_string('suggestionsgrade', constants::M_COMPONENT), $suggestionsoptions);
+        $mform->addHelpButton('suggestionsgrade', 'suggestionsgrade', constants::M_MODNAME);
+        $mform->addElement('static', 'stext42','', get_string('suggestionsgrade_details', constants::M_COMPONENT));
+
         for ($bonusno=1;$bonusno<=4;$bonusno++){
             $bg = array();
             $bg[] =& $mform->createElement('select', 'bonusdirection' . $bonusno, '', $plusminusoptions);
@@ -2245,7 +2562,8 @@ class utils{
             }else{
                 $mform->setDefault('bonus' . $bonusno, '--');
             }
-            $mform->addGroup($bg, 'bonusgroup' . $bonusno, '', '', false);
+            $grouptitle = $bonusno==1 ?  get_string('bonusgrade', constants::M_COMPONENT) : "";
+            $mform->addGroup($bg, 'bonusgroup' . $bonusno,$grouptitle, '', false);
         }
 
         //grade options
@@ -2253,12 +2571,6 @@ class utils{
         $mform->addElement('hidden', 'gradeoptions',constants::M_GRADELATEST);
         $mform->setType('gradeoptions', PARAM_INT);
 
-        //add tips field
-        $edoptions = solo_editor_no_files_options($context);
-        $opts = array('rows'=>'2', 'columns'=>'80');
-        $mform->addElement('editor','tips_editor',get_string('tips', constants::M_COMPONENT),$opts,$edoptions);
-        $mform->setDefault('tips_editor',array('text'=>$config->speakingtips, 'format'=>FORMAT_HTML));
-        $mform->setType('tips_editor',PARAM_RAW);
 
     } //end of add_mform_elements
 
@@ -2268,6 +2580,14 @@ class utils{
         //display media options for speaking prompt
         $cp = $contentprefix;
         $m35 = $CFG->version >= 2018051700;
+
+        //Speaking topic TTS
+        if($cp=='model') {
+            $mform->addElement('textarea', $cp . 'tts', get_string('content_tts', constants::M_COMPONENT), array('wrap' => 'virtual', 'style' => 'width: 100%;'));
+            $mform->setType($cp . 'tts', PARAM_RAW);
+            $mform->addHelpButton($cp . 'tts', 'content_tts', constants::M_MODNAME);
+        }
+
         $togglearray=array();
         $togglearray[] =& $mform->createElement('advcheckbox',$cp . 'addmedia',get_string('addmedia',constants::M_COMPONENT),'');
         $togglearray[] =& $mform->createElement('advcheckbox',$cp . 'addiframe',get_string('addiframe',constants::M_COMPONENT),'');
@@ -2305,17 +2625,22 @@ class utils{
         }
 
         //Speaking topic TTS
-        $mform->addElement('textarea', $cp . 'tts', get_string('content_tts', constants::M_COMPONENT), array('wrap'=>'virtual','style'=>'width: 100%;'));
-        $mform->setType($cp . 'tts', PARAM_RAW);
-        $mform->addHelpButton($cp . 'tts', 'content_tts', constants::M_MODNAME);
+        if($cp=='topic') {
+            $mform->addElement('textarea', $cp . 'tts', get_string('content_tts', constants::M_COMPONENT), array('wrap' => 'virtual', 'style' => 'width: 100%;'));
+            $mform->setType($cp . 'tts', PARAM_RAW);
+            $mform->addHelpButton($cp . 'tts', 'content_tts', constants::M_MODNAME);
+            if($m35){
+                $mform->hideIf($cp . 'tts',$cp .  'addttsaudio', 'neq', 1);
+            }else {
+                $mform->disabledIf($cp . 'tts', $cp . 'addttsaudio', 'neq', 1);
+            }
+        }
         $voiceoptions = utils::get_tts_voices();
         $mform->addElement('select', $cp . 'ttsvoice', get_string('content_ttsvoice',constants::M_COMPONENT), $voiceoptions);
         $mform->setDefault($cp . 'ttsvoice','Amy');
         if($m35){
-            $mform->hideIf($cp . 'tts',$cp .  'addttsaudio', 'neq', 1);
             $mform->hideIf($cp . 'ttsvoice', $cp . 'addttsaudio', 'neq', 1);
         }else {
-            $mform->disabledIf($cp . 'tts', $cp . 'addttsaudio', 'neq', 1);
             $mform->disabledIf($cp . 'ttsvoice', $cp . 'addttsaudio', 'neq', 1);
         }
 

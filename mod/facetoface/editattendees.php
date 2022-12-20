@@ -33,13 +33,14 @@ require_once('lib.php');
 
 define('MAX_USERS_PER_PAGE', 5000);
 
-$s              = required_param('s', PARAM_INT); // Facetoface session ID.
-$add            = optional_param('add', 0, PARAM_BOOL);
-$remove         = optional_param('remove', 0, PARAM_BOOL);
-$showall        = optional_param('showall', 0, PARAM_BOOL);
-$searchtext     = optional_param('searchtext', '', PARAM_TEXT); // Search string.
-$suppressemail  = optional_param('suppressemail', false, PARAM_BOOL); // Send email notifications.
-$previoussearch = optional_param('previoussearch', 0, PARAM_BOOL);
+$s                 = required_param('s', PARAM_INT); // Facetoface session ID.
+$add               = optional_param('add', 0, PARAM_BOOL);
+$remove            = optional_param('remove', 0, PARAM_BOOL);
+$showall           = optional_param('showall', 0, PARAM_BOOL);
+$searchtext        = optional_param('searchtext', '', PARAM_TEXT); // Search string.
+$suppressemail     = optional_param('suppressemail', false, PARAM_BOOL); // Send email notifications.
+$previoussearch    = optional_param('previoussearch', 0, PARAM_BOOL);
+$addtoallsessions  = optional_param('addtoallsessions', 0, PARAM_BOOL);
 $backtoallsessions = optional_param('backtoallsessions', 0, PARAM_INT); // Facetoface activity to go back to.
 
 if (!$session = facetoface_get_session($s)) {
@@ -105,20 +106,26 @@ if (optional_param('add', false, PARAM_BOOL) && confirm_sesskey()) {
                 $erruser = $DB->get_record('user', array('id' => $adduser), "id, {$usernamefields}");
                 $errors[] = get_string('error:addalreadysignedupattendee', 'facetoface', fullname($erruser));
             } else {
-                if (!facetoface_session_has_capacity($session, $context)) {
-                    $errors[] = get_string('full', 'facetoface');
-                    break; // No point in trying to add other people.
-                }
-                // Check if we are waitlisting or booking.
-                if ($session->datetimeknown) {
-                    $status = MDL_F2F_STATUS_BOOKED;
-                } else {
-                    $status = MDL_F2F_STATUS_WAITLISTED;
-                }
-                if (!facetoface_user_signup($session, $facetoface, $course, '', MDL_F2F_BOTH,
-                $status, $adduser, !$suppressemail)) {
-                    $erruser = $DB->get_record('user', array('id' => $adduser), "id, {$usernamefields}");
-                    $errors[] = get_string('error:addattendee', 'facetoface', fullname($erruser));
+                $now = time();
+                $addtofuturesessions = $addtoallsessions && $facetoface->signuptype == MOD_FACETOFACE_SIGNUP_MULTIPLE;
+                $sessions = $addtofuturesessions ? facetoface_get_future_sessions($facetoface->id) : [$session];
+
+                foreach ($sessions as $session) {
+                    if (!facetoface_session_has_capacity($session, $context)) {
+                        $errors[] = get_string('full', 'facetoface');
+                        break; // No point in trying to add other people.
+                    }
+                    // Check if we are waitlisting or booking.
+                    if ($session->datetimeknown) {
+                        $status = MDL_F2F_STATUS_BOOKED;
+                    } else {
+                        $status = MDL_F2F_STATUS_WAITLISTED;
+                    }
+                    if (!facetoface_user_signup($session, $facetoface, $course, '', MDL_F2F_BOTH,
+                            $status, $adduser, !$suppressemail)) {
+                        $erruser = $DB->get_record('user', array('id' => $adduser), "id, {$usernamefields}");
+                        $errors[] = get_string('error:addattendee', 'facetoface', fullname($erruser));
+                    }
                 }
             }
         }
@@ -182,6 +189,29 @@ $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => "ses
 $table = new html_table();
 $table->attributes['class'] = "generaltable generalbox boxaligncenter";
 $cells = array();
+
+if ($facetoface->signuptype == MOD_FACETOFACE_SIGNUP_MULTIPLE) {
+    $content = html_writer::checkbox(
+        'addtoallsessions',
+        1,
+        0,
+        get_string('addtoallsessions', 'facetoface'),
+        array('id' => 'addtoallsessions')
+    );
+    $content .= $OUTPUT->help_icon('addtoallsessions', 'facetoface');
+    $cell = new html_table_cell($content);
+    $cell->attributes['colspan'] = '3';
+    $table->data[] = new html_table_row(array($cell));
+}
+
+$content = html_writer::checkbox('suppressemail', 1, 0, get_string('suppressemail', 'facetoface'),
+    array('id' => 'suppressemail'));
+$content .= $OUTPUT->help_icon('suppressemail', 'facetoface');
+$cell = new html_table_cell($content);
+$cell->attributes['id'] = 'backcell';
+$cell->attributes['colspan'] = '3';
+$table->data[] = new html_table_row(array($cell));
+
 $content = html_writer::start_tag('p') . html_writer::tag('label', get_string('attendees', 'facetoface'),
         array('for' => 'removeselect')) . html_writer::end_tag('p');
 $content .= $existinguserselector->display(true);
@@ -204,13 +234,6 @@ $cell = new html_table_cell($content);
 $cell->attributes['id'] = 'potentialcell';
 $cells[] = $cell;
 $table->data[] = new html_table_row($cells);
-$content = html_writer::checkbox('suppressemail', 1, $suppressemail, get_string('suppressemail', 'facetoface'),
-    array('id' => 'suppressemail'));
-$content .= $OUTPUT->help_icon('suppressemail', 'facetoface');
-$cell = new html_table_cell($content);
-$cell->attributes['id'] = 'backcell';
-$cell->attributes['colspan'] = '3';
-$table->data[] = new html_table_row(array($cell));
 
 $out .= html_writer::table($table);
 
