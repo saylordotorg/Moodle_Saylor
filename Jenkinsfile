@@ -263,7 +263,7 @@ def plugins = [
     [
         "name" : 'mod_questionnaire',
         "url" : 'https://github.com/PoetOS/moodle-mod_questionnaire.git',
-        "branch" : 'main',
+        "branch" : 'MOODLE_400_STABLE',
         "dest" : 'mod/questionnaire'
     ],
     [
