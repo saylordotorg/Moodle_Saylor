@@ -32,7 +32,16 @@ Change log:
 
 Unreleased
 
- * Fix Behat 'The username must be in lower case' error.
+2.16 (Build 2022122100)
+Requirement increased to 3.9 but only tested on 3.11 - 4.x updating work is next
+Fix Behat 'The username must be in lower case' error.
+Replace $_POST with optional_param().
+Add missing MOODLE_INTERNAL lines.
+Fix PostgreSQL incompatibility.
+Parameterize SQL queries.
+Initialise missing variables.
+Improve authentication/capability checks.
+Add sesskey checks.
 
 2.15 (Build: 2019062400)
 Resolutions for:
