@@ -39,6 +39,7 @@ class my_words_pool {
             );
             if(!empty($this->pool)) {
                 $this->pool = \mod_wordcards_module::insert_media_urls($this->pool);
+                $this->pool = \mod_wordcards_module::format_defs($this->pool);
             }
         }
         return $this->pool;

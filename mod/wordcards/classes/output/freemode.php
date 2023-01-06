@@ -193,7 +193,8 @@ class freemode implements \renderable, \templatable {
                         return [];
                     }
                     shuffle($records);
-                    return \mod_wordcards_module::insert_media_urls($records);
+                    $records = \mod_wordcards_module::insert_media_urls($records);
+                    $records = \mod_wordcards_module::format_defs($records);
                 }
             } else {
                 //in this case we want words to practice returned

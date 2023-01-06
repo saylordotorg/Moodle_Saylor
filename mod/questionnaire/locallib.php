@@ -487,6 +487,8 @@ function questionnaire_get_type ($id) {
             return get_string('date', 'questionnaire');
         case 10:
             return get_string('numeric', 'questionnaire');
+        case 11:
+            return get_string('slider', 'questionnaire');
         case 100:
             return get_string('sectiontext', 'questionnaire');
         case 99:
@@ -575,15 +577,7 @@ function questionnaire_get_incomplete_users($cm, $sid,
     // First get all users who can complete this questionnaire.
     $cap = 'mod/questionnaire:submit';
     $fields = 'u.id, u.username';
-    if (!$allusers = get_users_by_capability($context,
-                    $cap,
-                    $fields,
-                    $sort,
-                    '',
-                    '',
-                    $group,
-                    '',
-                    true)) {
+    if (!$allusers = get_enrolled_users($context, $cap, $group, $fields, $sort)) {
         return false;
     }
     $allusers = array_keys($allusers);
@@ -756,7 +750,7 @@ function questionnaire_check_page_breaks($questionnaire) {
 
         $dependencies = $DB->get_records('questionnaire_dependency', ['questionid' => $key , 'surveyid' => $sid],
                 'id ASC', 'id, dependquestionid, dependchoiceid, dependlogic');
-        $positions[$qu->position]['dependencies'] = $dependencies;
+        $positions[$qu->position]['dependencies'] = $dependencies ?? [];
     }
     $count = count($positions);
 

@@ -560,5 +560,4 @@ class renderer extends \plugin_renderer_base {
         ];
         return isset($wordpoolstringkeys[$wordpoolid]) ? get_string($wordpoolstringkeys[$wordpoolid], 'mod_wordcards') : '';
     }
-
 }

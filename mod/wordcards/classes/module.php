@@ -271,6 +271,18 @@ class mod_wordcards_module {
         return $terms;
     }
 
+    /*
+     * If there is a need we can run format_string over the definition
+     */
+
+    public static function format_defs($terms){
+        global $CFG;
+        foreach($terms as $def){
+            $def->definition = format_text($def->definition);
+        }
+        return $terms;
+    }
+
     public function get_learn_terms(int $maxterms) {
         $records = $this->get_terms();
         if (!$records) {
@@ -279,9 +291,13 @@ class mod_wordcards_module {
         shuffle($records);
         if($maxterms>0) {
             $selected_records = array_slice($records, 0, $maxterms);
-            return self::insert_media_urls($selected_records);
+            $selected_records = self::insert_media_urls($selected_records);
+            $selected_records = self::format_defs($selected_records);
+            return $selected_records;
         }else {
-            return self::insert_media_urls($records);
+            $records =  self::insert_media_urls($records);
+            $records =  self::format_defs($records);
+            return $records;
         }
     }
 
@@ -364,9 +380,13 @@ class mod_wordcards_module {
         shuffle($records);
         if($maxterms>0) {
             $selected_records = array_slice($records, 0, $maxterms);
-            return self::insert_media_urls($selected_records);
+            $selected_records = self::insert_media_urls($selected_records);
+            $selected_records = self::format_defs($selected_records);
+            return $selected_records;
         }else{
-            return self::insert_media_urls($records);
+            $records= self::insert_media_urls($records);
+            $records = self::format_defs($records);
+            return $records;
         }
 
     }
@@ -467,6 +487,7 @@ class mod_wordcards_module {
         $terms = $DB->get_records('wordcards_terms', $params, 'id ASC');
         if($terms){
             $terms = self::insert_media_urls($terms);
+            $terms = self::format_defs($terms);
         }
         return $terms;
     }

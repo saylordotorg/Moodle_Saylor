@@ -2,7 +2,7 @@
 .qtype-gapfill input[type=text] {
     border: solid black thin;
     border-radius: 4px;
-    color: black;
+    color: inherit;
     margin-bottom: 1px;
     margin-top: 1px;
     padding: 1px;
@@ -10,7 +10,7 @@
 /* dropped text is centred, keyed in text is not */
 .qtype-gapfill .droptarget {
     text-align: center;
-    background: white;
+    background: inherit;
     cursor: pointer;
 }
 
@@ -19,7 +19,7 @@
 }
 
 .qtype-gapfill span.draggable.answers {
-    background: white;
+    background: inherit;
     border: solid 1px;
     box-shadow: 3px 3px 4px #000;
     cursor: pointer;
