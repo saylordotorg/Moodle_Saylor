@@ -1005,16 +1005,22 @@ class toolbox {
      * @return string|bool false if a problem occurs or the image data.
      */
     private static function generate_image($filepath, $requestedwidth, $requestedheight, $crop, $mime, $debugdata) {
-        if (empty($filepath) or empty($requestedwidth) or empty($requestedheight)) {
+        if (empty($filepath) || empty($requestedwidth) || empty($requestedheight)) {
             return false;
         }
+
+        global $CFG;
+        require_once($CFG->libdir . '/gdlib.php');
 
         $imageinfo = getimagesize($filepath);
 
         if (empty($imageinfo)) {
             unlink($filepath);
-            print_error('noimageinformation', 'format_grid', '', self::debugdata_decode($debugdata), 'generate_image');
-            return false;
+            throw new \moodle_exception('noimageinformation', 'format_grid', '',
+                get_string('noimageinformation', 'format_grid',
+                    self::debugdata_decode($debugdata)
+                )
+            );
         }
 
         $originalwidth = $imageinfo[0];
@@ -1022,38 +1028,52 @@ class toolbox {
 
         if (empty($originalheight)) {
             unlink($filepath);
-            print_error('originalheightempty', 'format_grid', '', self::debugdata_decode($debugdata), 'generate_image');
-            return false;
+            throw new \moodle_exception('originalheightempty', 'format_grid', '',
+                get_string('originalheightempty', 'format_grid',
+                    self::debugdata_decode($debugdata)
+                )
+            );
         }
         if (empty($originalwidth)) {
             unlink($filepath);
-            print_error('originalwidthempty', 'format_grid', '', self::debugdata_decode($debugdata), 'generate_image');
-            return false;
+            throw new \moodle_exception('originalwidthempty', 'format_grid', '',
+                get_string('originalwidthempty', 'format_grid',
+                    self::debugdata_decode($debugdata)
+                )
+            );
         }
 
         $original = imagecreatefromstring(file_get_contents($filepath)); // Need to alter / check for webp support.
 
+        $imageargs = array(
+            1 => null // File.
+        );
         switch ($mime) {
             case 'image/png':
                 if (function_exists('imagepng')) {
                     $imagefnc = 'imagepng';
-                    $filters = PNG_NO_FILTER;
-                    $quality = 1;
+                    $imageargs[2] = 1; // Quality.
+                    $imageargs[3] = PNG_NO_FILTER; // Filter.
                 } else {
                     unlink($filepath);
-                    print_error('formatnotsupported', 'format_grid', '', 'PNG, '.self::debugdata_decode($debugdata), 'generate_image');
-                    return false;
+                    throw new \moodle_exception('formatnotsupported', 'format_grid', '',
+                        get_string('formatnotsupported', 'format_grid',
+                            'PNG, '.self::debugdata_decode($debugdata)
+                        )
+                    );
                 }
                 break;
             case 'image/jpeg':
                 if (function_exists('imagejpeg')) {
                     $imagefnc = 'imagejpeg';
-                    $filters = null;
-                    $quality = 90;
+                    $imageargs[2] = 90; // Quality.
                 } else {
                     unlink($filepath);
-                    print_error('formatnotsupported', 'format_grid', '', 'JPG, '.self::debugdata_decode($debugdata), 'generate_image');
-                    return false;
+                    throw new \moodle_exception('formatnotsupported', 'format_grid', '',
+                        get_string('formatnotsupported', 'format_grid',
+                            'JPG, '.self::debugdata_decode($debugdata)
+                        )
+                    );
                 }
                 break;
             /* Moodle does not yet natively support webp as a mime type, but have here for us on the displayed image and
@@ -1061,29 +1081,35 @@ class toolbox {
             case 'image/webp':
                 if (function_exists('imagewebp')) {
                     $imagefnc = 'imagewebp';
-                    $filters = null;
-                    $quality = 90;
+                    $imageargs[2] = 90; // Quality.
                 } else {
                     unlink($filepath);
-                    print_error('formatnotsupported', 'format_grid', '', 'WEBP, '.self::debugdata_decode($debugdata), 'generate_image');
-                    return false;
+                    throw new \moodle_exception('formatnotsupported', 'format_grid', '',
+                        get_string('formatnotsupported', 'format_grid',
+                            'WEBP, '.self::debugdata_decode($debugdata)
+                        )
+                    );
                 }
                 break;
             case 'image/gif':
                 if (function_exists('imagegif')) {
                     $imagefnc = 'imagegif';
-                    $filters = null;
-                    $quality = null;
                 } else {
                     unlink($filepath);
-                    print_error('formatnotsupported', 'format_grid', '', 'GIF, '.self::debugdata_decode($debugdata), 'generate_image');
-                    return false;
+                    throw new \moodle_exception('formatnotsupported', 'format_grid', '',
+                        get_string('formatnotsupported', 'format_grid',
+                            'GIF, '.self::debugdata_decode($debugdata)
+                        )
+                    );
                 }
                 break;
             default:
                 unlink($filepath);
-                print_error('mimetypenotsupported', 'format_grid', '', $mime.', '.self::debugdata_decode($debugdata), 'generate_image');
-                return false;
+                throw new \moodle_exception('mimetypenotsupported', 'format_grid', '',
+                    get_string('mimetypenotsupported', 'format_grid',
+                        $mime.', '.self::debugdata_decode($debugdata)
+                    )
+                );
         }
 
         if ($crop) {
@@ -1171,11 +1197,16 @@ class toolbox {
         }
 
         ob_start();
-        if (!$imagefnc($finalimage, null, $quality, $filters)) {
+        $imageargs[0] = $finalimage; // GdImage.
+        ksort($imageargs);
+        if (!call_user_func_array($imagefnc, $imageargs)) {
             ob_end_clean();
             unlink($filepath);
-            print_error('functionfailed', 'format_grid', '', $imagefnc.', '.self::debugdata_decode($debugdata), 'generate_image');
-            return false;
+            throw new \moodle_exception('functionfailed', 'format_grid', '',
+                get_string('functionfailed', 'format_grid',
+                    $imagefnc.', '.self::debugdata_decode($debugdata)
+                )
+            );
         }
         $data = ob_get_clean();
 

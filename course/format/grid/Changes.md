@@ -1,5 +1,9 @@
 History
 =============
+Version 311.1.3 - TBR
+============================
+1. Fix 'PHP 8.0 error when uploading image to grid element' - #163.
+
 Version 311.1.2 - 16/10/2022
 ============================
 1. Fix maturity information not showing in information site setting.
