@@ -1315,7 +1315,7 @@ class format_grid extends format_base {
         if ($this->validate_colour($data['currentselectedimagecontainercolour']) === false) {
             $retr['currentselectedimagecontainercolour'] = get_string('colourrule', 'format_grid');
         }
-        if ($data['sectiontitlegridlengthmaxoption'] < 0) {
+        if (($data['sectiontitlegridlengthmaxoption'] != '-') && ($data['sectiontitlegridlengthmaxoption'] < 0)) {
             $retr['sectiontitlegridlengthmaxoption'] = get_string('sectiontitlegridlengthmaxoptionrule', 'format_grid');
         }
         if ($this->validate_colour($data['sectiontitleinsidetitletextcolour']) === false) {

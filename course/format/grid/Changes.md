@@ -3,6 +3,7 @@ History
 Version 311.1.3 - TBR
 ============================
 1. Fix 'PHP 8.0 error when uploading image to grid element' - #163.
+2. Fix 'sectiontitlegridlengthmaxoption' validation.
 
 Version 311.1.2 - 16/10/2022
 ============================
