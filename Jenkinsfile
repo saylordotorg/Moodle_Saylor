@@ -433,6 +433,12 @@ def plugins = [
       "url" : 'https://github.com/moodleworkplace/moodle-mod_coursecertificate.git',
       "branch" : 'MOODLE_39_STABLE',
       "dest" : 'mod/coursecertificate'
+    ],
+    [
+        "name" : 'block_configurablereports',
+        "url" : 'https://github.com/jleyva/moodle-block_configurablereports.git',
+        "branch" : 'MOODLE_36_STABLE',
+        "dest" : 'blocks/configurablereports'
     ]
 ]
 
