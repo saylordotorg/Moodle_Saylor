@@ -592,3 +592,8 @@ try {
 
     }
 }
+catch (err) {
+    echo "Caught: ${err}"
+    NotifyOnFail("Failed to build: ${err}")
+    throw err
+}
