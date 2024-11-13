@@ -407,3 +407,5 @@ catch (err) {
     echo "Caught: ${err}"
     throw err
 }
+
+return // End the pipeline for testing purposes
