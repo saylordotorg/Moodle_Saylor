@@ -249,106 +249,10 @@ def plugins = [
         "dest" : 'blocks/quickmail'
     ],
     [
-        "name" : 'mod_questionnaire',
-        "url" : 'https://github.com/PoetOS/moodle-mod_questionnaire.git',
-        "branch" : 'MOODLE_310_STABLE',
-        "dest" : 'mod/questionnaire'
-    ],
-    [
-        "name" : 'mod_subcourse',
-        "url" : 'https://github.com/mudrd8mz/moodle-mod_subcourse.git',
-        "branch" : 'main',
-        "dest" : 'mod/subcourse'
-    ],
-    [
-      "name" : 'availability_coursecompleted',
-      "url" : 'https://github.com/ewallah/moodle-availability_coursecompleted.git',
-      "branch" : 'main',
-      "dest" : 'availability/condition/coursecompleted'
-    ],
-    [
-      "name" : 'format_buttons',
-      "url" : 'https://github.com/brandaorodrigo/moodle-format_buttons.git',
-      "branch" : 'master',
-      "dest" : 'course/format/buttons'
-    ],
-    [
       "name" : 'block_advnotifications',
       "url" : 'https://github.com/learningworks/moodle-block_advnotifications.git',
       "branch" : 'master',
       "dest" : 'blocks/advnotifications'
-    ],
-    [
-        "name" : 'filter_rein',
-        "url" : 'https://github.com/dta121/moodle-filter_rein.git',
-        "branch": 'main',
-        "dest" : 'filter/rein'
-    ],
-    [
-      "name" : 'availability_role',
-      "url" : 'https://github.com/moodleuulm/moodle-availability_role.git',
-      "branch" : 'master',
-      "dest" : 'availability/condition/role'
-    ],
-    [
-      "name" : 'tool_trigger',
-      "url" : 'https://github.com/catalyst/moodle-tool_trigger.git',
-      "branch" : 'master',
-      "dest" : 'admin/tool/trigger'
-    ],
-    [
-        "name" : 'block_sharing_cart',
-        "url" : 'https://github.com/donhinkelman/moodle-block_sharing_cart.git',
-        "branch" : 'master',
-        "dest" : 'blocks/sharing_cart'
-    ],
-    [
-      "name" : 'mod_facetoface',
-      "url" : 'https://github.com/catalyst/moodle-mod_facetoface.git',
-      "branch" : 'MOODLE_311_STABLE',
-      "dest" : 'mod/facetoface'
-    ],
-    [
-      "name" : 'mod_bigbluebuttonbn',
-      "url" : 'https://github.com/blindsidenetworks/moodle-mod_bigbluebuttonbn.git',
-      "branch" : 'master',
-      "dest" : 'mod/bigbluebuttonbn'
-    ],
-    [
-      "name" : 'availability_role',
-      "url" : 'https://github.com/moodle-an-hochschulen/moodle-availability_role.git',
-      "branch" : 'MOODLE_311_STABLE',
-      "dest" : 'availability/condition/role'
-    ],
-    [
-      "name" : 'enrol_autoenrol',
-      "url" : 'https://github.com/bobopinna/moodle-enrol_autoenrol.git',
-      "branch" : 'master',
-      "dest" : 'enrol/autoenrol'
-    ],
-    [
-      "name" : 'availability_cohort',
-      "url" : 'https://github.com/moodle-an-hochschulen/moodle-availability_cohort.git',
-      "branch" : 'MOODLE_311_STABLE',
-      "dest" : 'availability/condition/cohort'
-    ],
-    [
-      "name" : 'filter_filtercodes',
-      "url" : 'https://github.com/michael-milette/moodle-filter_filtercodes.git',
-      "branch" : 'master',
-      "dest" : 'filter/filtercodes'
-    ],
-    [
-        "name" : 'local_cohortauto',
-        "url" : 'https://github.com/catalyst/moodle-local_cohortauto.git',
-        "branch" : 'main',
-        "dest" : 'local/cohortauto'
-    ],
-    [
-        "name" : 'block_dedication',
-        "url" : 'https://bitbucket.org/ciceidev/moodle_block_dedication.git',
-        "branch" : 'MOODLE_30_STABLE',
-        "dest" : 'blocks/dedication'
     ],
     [
         "name" : 'enrol_programs',
@@ -367,66 +271,6 @@ def plugins = [
         "url" : 'https://github.com/open-lms-open-source/moodle-local_openlms.git',
         "branch" : 'MOODLE_311_STABLE',
         "dest" : 'local/openlms'
-    ],
-    [
-        "name" : 'local_staticpage',
-        "url" : 'https://github.com/moodle-an-hochschulen/moodle-local_staticpage.git',
-        "branch" : 'MOODLE_311_STABLE',
-        "dest" : 'local/staticpage'
-    ],
-    [
-        "name" : 'tool_mfa',
-        "url" : 'https://github.com/catalyst/moodle-tool_mfa.git',
-        "branch" : 'master',
-        "dest" : 'admin/tool/mfa'
-    ],
-    [
-        "name" : 'block_edwiser_site_monitor',
-        "url" : 'https://github.com/WisdmLabs/moodle-block_edwiser_site_monitor.git',
-        "branch" : 'master',
-        "dest" : 'blocks/edwiser_site_monitor'
-    ],
-    [
-        "name" : 'qtype_gapfill',
-        "url" : 'https://github.com/marcusgreen/moodle-qtype_gapfill.git',
-        "branch" : 'gapfill_2.134',
-        "dest" : 'question/type/gapfill'
-    ],
-    [
-        "name" : 'tool_opcache',
-        "url" : 'https://github.com/moodle-an-hochschulen/moodle-tool_opcache.git',
-        "branch" : 'MOODLE_311_STABLE',
-        "dest" : 'admin/tool/opcache'
-    ],
-    [
-      "name" : 'availability_relativedate',
-      "url" : 'https://github.com/ewallah/moodle-availability_relativedate.git',
-      "branch" : 'main',
-      "dest" : 'availability/condition/relativedate'
-    ],
-    [
-      "name" : 'tool_certificate',
-      "url" : 'https://github.com/moodleworkplace/moodle-tool_certificate.git',
-      "branch" : 'MOODLE_39_STABLE',
-      "dest" : 'admin/tool/certificate'
-    ],
-    [
-      "name" : 'mod_simplecertificate',
-      "url" : 'https://github.com/bozoh/moodle-mod_simplecertificate.git',
-      "branch" : 'master',
-      "dest" : 'mod/simplecertificate'
-    ],
-    [
-      "name" : 'mod_coursecertificate',
-      "url" : 'https://github.com/moodleworkplace/moodle-mod_coursecertificate.git',
-      "branch" : 'MOODLE_39_STABLE',
-      "dest" : 'mod/coursecertificate'
-    ],
-    [
-        "name" : 'block_configurablereports',
-        "url" : 'https://github.com/jleyva/moodle-block_configurablereports.git',
-        "branch" : 'MOODLE_36_STABLE',
-        "dest" : 'blocks/configurablereports'
     ]
 ]
 
