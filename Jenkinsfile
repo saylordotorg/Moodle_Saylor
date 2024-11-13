@@ -9,12 +9,6 @@ def moodle_version = 'MOODLE_311_STABLE'
 
 def plugins = [
     [
-        "name" : 'theme_saylor',
-        "url" : 'https://github.com/saylordotorg/moodle-theme_saylor.git',
-        "branch" : env.BRANCH_NAME,
-        "dest" : 'theme/saylor'
-    ],
-    [
         "name" : 'mod_journal',
         "url" : 'https://github.com/dmonllao/moodle-mod_journal.git',
         "branch" : 'master',
