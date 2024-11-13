@@ -249,12 +249,6 @@ def plugins = [
         "dest" : 'blocks/quickmail'
     ],
     [
-      "name" : 'format_board',
-      "url" : 'https://github.com/brandaorodrigo/moodle-format_board.git',
-      "branch" : 'master',
-      "dest" : 'course/format/board'
-    ],
-    [
         "name" : 'mod_questionnaire',
         "url" : 'https://github.com/PoetOS/moodle-mod_questionnaire.git',
         "branch" : 'MOODLE_310_STABLE',
