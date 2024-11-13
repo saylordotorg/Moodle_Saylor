@@ -449,7 +449,7 @@ def StashMoodle(moodle_version) {
                 git([url: 'https://github.com/moodle/moodle.git', branch: "${moodle_version}"])
             }
             catch(err) {
-                NotifyOnFail("Unable to retrieve Moodle: ${err}")
+                    echo "Unable to retrieve Moodle: ${err}"
             }
         // Remove the Moodle .git folder.
         sh "rm -r .git"
@@ -486,7 +486,6 @@ def StashPlugins(plugins) {
             }
             catch(err) {
                 def failmessage = "Unable to retrieve plugin ${plugins[x].get('name')}: ${err}"
-                NotifyOnFail(failmessage)
             }
             sh "rm -rf .git"
             sh "rm -rf .github"
@@ -540,26 +539,6 @@ def CopyDatabase(mysql_user, mysql_password, mysql_source_host, mysql_source_dbn
 
 }
 
-// def NotifyOnComplete() {
-    // What to do when build is successful.
-//    def message = "Build completed successfully: ${env.JOB_NAME} #${env.BUILD_NUMBER} on ${env.BRANCH_NAME}"
-
-    // For now, we post in slack.
-//    slackSend color: 'good', message: "${message}"
-// }
-
-// def NotifyOnFail(err) {
-    // What to do when a build is unsuccessful.
-//     def message = "Build failed: ${env.JOB_NAME} ${env.BUILD_NUMBER} on ${env.BRANCH_NAME} -> ${err}"
-
-    // List of people to @ in Slack since this is important.
-//     def slack_recipients = '@ja'
-
-    //Slack
-//     slackSend color: 'danger', message: "${slack_recipients} ${message}"
-
-// }
-
 /* Start build process */
 try {
     stage('Build') {
@@ -594,6 +573,5 @@ try {
 }
 catch (err) {
     echo "Caught: ${err}"
-    NotifyOnFail("Failed to build: ${err}")
     throw err
 }
